@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             ? 'ml-0' 
             : sidebarOpen 
               ? 'ml-72' 
-              : 'ml-16'
+              : 'ml-12'
         }`}
       >
         {isMobile && (

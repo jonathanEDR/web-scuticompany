@@ -72,6 +72,53 @@
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+/* ============================================
+   OPTIMIZACIONES DEL SIDEBAR
+   ============================================ */
+
+/* Transición suave para el sidebar colapsado */
+.sidebar-collapsed {
+  transform: translateX(0) !important;
+  width: 3rem !important; /* 48px = w-12 */
+}
+
+/* Optimización de la animación del overlay */
+.sidebar-overlay {
+  backdrop-filter: blur(4px);
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mejora en la transición de elementos del sidebar */
+.sidebar-item {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-item:hover {
+  transform: translateX(2px);
+}
+
+/* Animación específica para elementos móviles */
+@media (max-width: 767px) {
+  .sidebar-mobile-item {
+    transition: all 0.15s ease-in-out;
+  }
+  
+  .sidebar-mobile-layout {
+    animation: mobileSlideIn 0.3s ease-out;
+  }
+}
+
+@keyframes mobileSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* Asegurar que los elementos mantengan su estilo durante transiciones */
 .theme-preserve {
   transition: none !important;
@@ -105,4 +152,162 @@
   .dark .theme-text-primary { color: #F9FAFB; }
   .dark .theme-text-secondary { color: #D1D5DB; }
   .dark .theme-border { border-color: #374151; }
+}
+
+/* ============================================
+   ANIMACIONES DEL LOGO
+   ============================================ */
+
+/* Animación de entrada del logo */
+@keyframes logoFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación de pulso sutil para el logo */
+@keyframes logoPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Animación de brillo (shine effect) */
+@keyframes logoShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Clase para logo animado */
+.logo-animated {
+  animation: logoFadeIn 0.6s ease-out;
+}
+
+/* Efecto hover para el logo */
+.logo-animated:hover {
+  animation: logoPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.5)) !important;
+}
+
+/* Transición suave para cambios de tamaño */
+.logo-size-transition {
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto de escala en hover */
+.logo-scale-hover:hover {
+  transform: scale(1.05);
+}
+
+/* Animación de rotación sutil */
+@keyframes logoRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glow effect para modo oscuro */
+.dark .logo-glow {
+  filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.4));
+}
+
+/* Glow effect para modo claro */
+.light .logo-glow {
+  filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.3));
+}
+
+/* Animación de aparición con retraso para múltiples logos */
+.logo-delayed-1 {
+  animation: logoFadeIn 0.6s ease-out 0.1s both;
+}
+
+.logo-delayed-2 {
+  animation: logoFadeIn 0.6s ease-out 0.2s both;
+}
+
+.logo-delayed-3 {
+  animation: logoFadeIn 0.6s ease-out 0.3s both;
+}
+
+/* Resplandor animado continuo */
+@keyframes continuousGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.6));
+  }
+}
+
+.logo-continuous-glow {
+  animation: continuousGlow 3s ease-in-out infinite;
+}
+
+/* ============================================
+   ANIMACIONES ADICIONALES PARA LA UI
+   ============================================ */
+
+/* Fade in general */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Slide in desde la izquierda */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+/* Slide in desde la derecha */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.6s ease-out;
 }

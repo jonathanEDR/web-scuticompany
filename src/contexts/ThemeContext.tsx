@@ -57,48 +57,57 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     // Obtener tema guardado o usar el del sistema
     const savedTheme = localStorage.getItem('scuti-theme') as 'light' | 'dark';
-    if (savedTheme) return savedTheme;
+    if (savedTheme) {
+      console.log('🎨 ThemeContext: Using saved theme:', savedTheme);
+      return savedTheme;
+    }
     
     // Detectar preferencia del sistema
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      console.log('🎨 ThemeContext: Using system dark theme');
       return 'dark';
     }
     
+    console.log('🎨 ThemeContext: Using default light theme');
     return 'light';
   });
 
   // Detectar si estamos en una página pública
   const isPublicPage = !window.location.pathname.startsWith('/dashboard');
 
-  // Aplicar tema al documento SOLO en páginas públicas
+  // Aplicar tema al documento
   useEffect(() => {
-    if (!isPublicPage) return; // No aplicar en dashboard
-    
     const root = document.documentElement;
-    const colors = theme === 'light' ? themeConfig.lightMode : themeConfig.darkMode;
     
-    // Aplicar variables CSS
-    root.style.setProperty('--color-primary', colors.primary);
-    root.style.setProperty('--color-secondary', colors.secondary);
-    root.style.setProperty('--color-background', colors.background);
-    root.style.setProperty('--color-text', colors.text);
-    root.style.setProperty('--color-text-secondary', colors.textSecondary);
-    root.style.setProperty('--color-card-bg', colors.cardBg);
-    root.style.setProperty('--color-border', colors.border);
-    
-    // Añadir/quitar clase dark SOLO en páginas públicas
-    if (theme === 'dark') {
-      root.classList.add('public-dark');
-    } else {
-      root.classList.remove('public-dark');
-    }
-    
-    // Guardar preferencia
+    // Guardar preferencia siempre
     localStorage.setItem('scuti-theme', theme);
-  }, [theme, themeConfig]);
+    
+    // Solo aplicar estilos CSS en páginas públicas
+    if (isPublicPage) {
+      const colors = theme === 'light' ? themeConfig.lightMode : themeConfig.darkMode;
+      
+      // Aplicar variables CSS
+      root.style.setProperty('--color-primary', colors.primary);
+      root.style.setProperty('--color-secondary', colors.secondary);
+      root.style.setProperty('--color-background', colors.background);
+      root.style.setProperty('--color-text', colors.text);
+      root.style.setProperty('--color-text-secondary', colors.textSecondary);
+      root.style.setProperty('--color-card-bg', colors.cardBg);
+      root.style.setProperty('--color-border', colors.border);
+      
+      // Añadir/quitar clase dark SOLO en páginas públicas
+      if (theme === 'dark') {
+        root.classList.add('public-dark');
+      } else {
+        root.classList.remove('public-dark');
+      }
+    }
+  }, [theme, themeConfig, isPublicPage]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    console.log('🔄 Theme Toggle:', { from: theme, to: newTheme });
+    setTheme(newTheme);
   };
 
   const colors = theme === 'light' ? themeConfig.lightMode : themeConfig.darkMode;

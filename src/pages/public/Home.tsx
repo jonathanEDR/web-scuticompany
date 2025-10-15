@@ -4,6 +4,7 @@ import PublicHeader from '../../components/public/PublicHeader';
 import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import PublicFooter from '../../components/public/PublicFooter';
+import ThemeDebugger from '../../components/ThemeDebugger';
 import { getPageBySlug } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
@@ -137,6 +138,9 @@ const Home = () => {
           <SolutionsSection data={pageData.content.solutions} />
         </main>
         <PublicFooter />
+        
+        {/* Debug component - solo para desarrollo */}
+        <ThemeDebugger />
       </div>
     </>
   );

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
+import Logo from '../Logo';
 
 const PublicFooter = () => {
   return (
@@ -12,10 +13,7 @@ const PublicFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="text-2xl font-bold">
-              <span className="theme-text-primary">SCUTI</span>
-              <span className="block text-xs tracking-wider" style={{ color: 'var(--color-primary)' }}>COMPANY</span>
-            </div>
+            <Logo size="lg" withText />
             <p className="theme-text-secondary text-sm theme-transition">
               Transformamos empresas con tecnología inteligente e innovadora.
             </p>
