@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import '../../styles/gradient-borders.css';
 
@@ -15,17 +16,23 @@ interface HeroData {
     dark?: string;
   };
   backgroundImageAlt?: string;
+  styles?: {
+    light: {
+      titleColor?: string;
+      subtitleColor?: string;
+      descriptionColor?: string;
+    };
+    dark: {
+      titleColor?: string;
+      subtitleColor?: string;
+      descriptionColor?: string;
+    };
+  };
 }
-
-// Interfaz ButtonTheme removida ya que no se utiliza
-
-// Interfaz ExtendedTheme removida ya que no se utiliza
 
 interface HeroSectionProps {
   data?: HeroData;
 }
-
-// Constantes removidas ya que no se utilizan
 
 const HeroSection = ({ data }: HeroSectionProps) => {
   // Estados para animaciones progresivas
@@ -123,28 +130,40 @@ const HeroSection = ({ data }: HeroSectionProps) => {
         }`}>
           {/* Main Title - Optimizado para móvil con animación progresiva */}
           <div className="max-w-3xl mx-auto">
-            <h1 className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold theme-text-primary theme-transition transition-all duration-1000 ${
-              animationPhase >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`} 
-                style={{ lineHeight: '1.2' }}>
-              <span className="block">{heroData.title}</span>
-            </h1>
+            <div
+              className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold theme-text-primary theme-transition transition-all duration-1000 ${
+                animationPhase >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+              style={{
+                lineHeight: '1.2',
+                color: heroData.styles?.[currentTheme]?.titleColor || undefined
+              }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.title) }}
+            />
           </div>
 
           {/* Subtitle - Optimizado para móvil con animación escalonada */}
           <div className="max-w-2xl mx-auto space-y-2">
-            <p className={`text-sm sm:text-sm md:text-base theme-text-primary theme-transition transition-all duration-1000 delay-300 ${
-              animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-            }`} 
-               style={{ lineHeight: '1.4' }}>
-              {heroData.subtitle}
-            </p>
-            <p className={`text-xs sm:text-xs md:text-sm theme-text-secondary theme-transition transition-all duration-1000 delay-500 ${
-              animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`} 
-               style={{ lineHeight: '1.5' }}>
-              {heroData.description}
-            </p>
+            <div
+              className={`text-sm sm:text-sm md:text-base theme-text-primary theme-transition transition-all duration-1000 delay-300 ${
+                animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+              }`}
+              style={{
+                lineHeight: '1.4',
+                color: heroData.styles?.[currentTheme]?.subtitleColor || undefined
+              }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.subtitle) }}
+            />
+            <div
+              className={`text-xs sm:text-xs md:text-sm theme-text-secondary theme-transition transition-all duration-1000 delay-500 ${
+                animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}
+              style={{
+                lineHeight: '1.5',
+                color: heroData.styles?.[currentTheme]?.descriptionColor || undefined
+              }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.description) }}
+            />
           </div>
 
           {/* CTA Buttons */}

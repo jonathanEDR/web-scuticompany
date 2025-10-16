@@ -51,14 +51,6 @@ export const useUserSync = (): UserSyncStatus => {
       setSyncStatus(prev => ({ ...prev, isLoading: true, isError: false }));
 
       try {
-        console.log('🔄 Sincronizando usuario con backend...');
-        console.log('👤 Datos de Clerk:', {
-          id: user.id,
-          email: user.primaryEmailAddress?.emailAddress,
-          firstName: user.firstName,
-          lastName: user.lastName
-        });
-
         const userData = {
           clerkId: user.id,
           email: user.primaryEmailAddress?.emailAddress || '',
@@ -79,7 +71,6 @@ export const useUserSync = (): UserSyncStatus => {
         const result = await response.json();
 
         if (response.ok) {
-          console.log('✅ Usuario sincronizado:', result);
           setSyncStatus({
             isLoading: false,
             isSuccess: true,
@@ -87,11 +78,6 @@ export const useUserSync = (): UserSyncStatus => {
             error: null,
             userData: result.user
           });
-
-          // Mostrar mensaje si es un usuario nuevo
-          if (result.user.isNewUser) {
-            console.log('🎉 ¡Bienvenido! Tu perfil ha sido creado correctamente.');
-          }
         } else {
           throw new Error(result.message || 'Error al sincronizar usuario');
         }

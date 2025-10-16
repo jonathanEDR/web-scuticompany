@@ -205,8 +205,7 @@ const PublicHeader = () => {
               style={{
                 '--gradient-border': 'var(--color-contact-border)',
                 '--gradient-border-hover': 'var(--color-contact-hover-bg)',
-                color: 'var(--color-contact-text)',
-                backgroundColor: 'transparent'
+                color: 'var(--color-contact-text)'
               } as React.CSSProperties & { [key: string]: string }}
             >
               CONTÁCTENOS
@@ -304,7 +303,6 @@ const PublicHeader = () => {
                 '--gradient-border': 'var(--color-contact-border)',
                 '--gradient-border-hover': 'var(--color-contact-hover-bg)',
                 color: 'var(--color-contact-text)',
-                backgroundColor: 'transparent',
                 padding: '0.375rem 0.625rem'
               } as React.CSSProperties & { [key: string]: string }}
             >

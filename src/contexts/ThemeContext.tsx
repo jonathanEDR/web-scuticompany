@@ -13,11 +13,16 @@ export interface ThemeColors {
 }
 
 interface ButtonTheme {
-  bg: string;
-  text: string;
+  // Formato antiguo (para compatibilidad)
+  bg?: string;
+  text?: string;
   border?: string;
-  hover: string;
+  hover?: string;
   hoverText?: string;
+  // Formato nuevo simplificado
+  background?: string;
+  textColor?: string;
+  borderColor?: string;
 }
 
 export interface ExtendedThemeColors extends ThemeColors {
@@ -86,29 +91,71 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (savedTheme) {
       return savedTheme;
     }
-    
+
     // Detectar preferencia del sistema
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
-    
+
     return 'light';
   });
 
-  // Detectar si estamos en una página pública
-  const isPublicPage = !window.location.pathname.startsWith('/dashboard');
+  // Detectar si estamos en una página pública (REACTIVO - se actualiza con cada render)
+  const [isPublicPage, setIsPublicPage] = useState(!window.location.pathname.startsWith('/dashboard'));
+
+  // Actualizar isPublicPage cuando cambie la ubicación
+  useEffect(() => {
+    const updatePageType = () => {
+      const isDashboard = window.location.pathname.startsWith('/dashboard');
+      setIsPublicPage(!isDashboard);
+      console.log('📍 Ubicación detectada:', window.location.pathname, '- Página pública:', !isDashboard);
+    };
+
+    // Verificar inmediatamente
+    updatePageType();
+
+    // Escuchar cambios en el historial (navegación con botones del navegador)
+    window.addEventListener('popstate', updatePageType);
+
+    // Interceptar pushState y replaceState de React Router
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+
+    window.history.pushState = function(...args) {
+      originalPushState.apply(this, args);
+      updatePageType();
+    };
+
+    window.history.replaceState = function(...args) {
+      originalReplaceState.apply(this, args);
+      updatePageType();
+    };
+
+    return () => {
+      window.removeEventListener('popstate', updatePageType);
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
+    };
+  }, []);
 
   // Aplicar tema al documento
   useEffect(() => {
     const root = document.documentElement;
-    
+
     // Guardar preferencia siempre
     localStorage.setItem('scuti-theme', theme);
-    
-    // Solo aplicar estilos CSS en páginas públicas
+
+    // NUEVO: Aplicar clase 'dark' GLOBALMENTE para Tailwind (dashboard + público)
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
+    // Solo aplicar CSS variables en páginas públicas (mantiene funcionalidad CMS)
     if (isPublicPage) {
       const colors = theme === 'light' ? themeConfig.lightMode : themeConfig.darkMode;
-      
+
       // Aplicar variables CSS
       root.style.setProperty('--color-primary', colors.primary);
       root.style.setProperty('--color-secondary', colors.secondary);
@@ -118,37 +165,32 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       root.style.setProperty('--color-card-bg', colors.cardBg);
       root.style.setProperty('--color-border', colors.border);
 
-      // Aplicar variables de botones
+      // Aplicar variables de botones (NUEVO FORMATO SIMPLIFICADO)
       if (colors.buttons) {
         // Botón CTA Principal
         if (colors.buttons.ctaPrimary) {
-          root.style.setProperty('--color-cta-bg', colors.buttons.ctaPrimary.bg);
-          root.style.setProperty('--color-cta-text', colors.buttons.ctaPrimary.text);
-          root.style.setProperty('--color-cta-hover-bg', colors.buttons.ctaPrimary.hover);
+          root.style.setProperty('--color-cta-bg', colors.buttons.ctaPrimary.background || colors.buttons.ctaPrimary.bg || 'transparent');
+          root.style.setProperty('--color-cta-text', colors.buttons.ctaPrimary.textColor || colors.buttons.ctaPrimary.text || '#8B5CF6');
+          root.style.setProperty('--color-cta-border', colors.buttons.ctaPrimary.borderColor || colors.buttons.ctaPrimary.border || 'transparent');
+          root.style.setProperty('--color-cta-hover-bg', colors.buttons.ctaPrimary.hover || colors.buttons.ctaPrimary.background || 'transparent');
         }
 
-        // Botón Contacto
+        // Botón Contacto (FORMATO SIMPLIFICADO)
         if (colors.buttons.contact) {
-          root.style.setProperty('--color-contact-bg', colors.buttons.contact.bg);
-          root.style.setProperty('--color-contact-text', colors.buttons.contact.text);
-          root.style.setProperty('--color-contact-border', colors.buttons.contact.border || colors.buttons.contact.bg);
-          root.style.setProperty('--color-contact-hover-bg', colors.buttons.contact.hover);
+          root.style.setProperty('--color-contact-bg', colors.buttons.contact.background || colors.buttons.contact.bg || 'transparent');
+          root.style.setProperty('--color-contact-text', colors.buttons.contact.textColor || colors.buttons.contact.text || '#8B5CF6');
+          root.style.setProperty('--color-contact-border', colors.buttons.contact.borderColor || colors.buttons.contact.border || 'transparent');
+          root.style.setProperty('--color-contact-hover-bg', colors.buttons.contact.hover || colors.buttons.contact.borderColor || 'transparent');
           root.style.setProperty('--color-contact-hover-text', colors.buttons.contact.hoverText || '#FFFFFF');
         }
 
         // Botón Dashboard
         if (colors.buttons.dashboard) {
-          root.style.setProperty('--color-dashboard-bg', colors.buttons.dashboard.bg);
-          root.style.setProperty('--color-dashboard-text', colors.buttons.dashboard.text);
-          root.style.setProperty('--color-dashboard-hover-bg', colors.buttons.dashboard.hover);
+          root.style.setProperty('--color-dashboard-bg', colors.buttons.dashboard.background || colors.buttons.dashboard.bg || 'transparent');
+          root.style.setProperty('--color-dashboard-text', colors.buttons.dashboard.textColor || colors.buttons.dashboard.text || '#FFFFFF');
+          root.style.setProperty('--color-dashboard-border', colors.buttons.dashboard.borderColor || colors.buttons.dashboard.border || 'transparent');
+          root.style.setProperty('--color-dashboard-hover-bg', colors.buttons.dashboard.hover || colors.buttons.dashboard.background || 'transparent');
         }
-      }
-      
-      // Añadir/quitar clase dark SOLO en páginas públicas
-      if (theme === 'dark') {
-        root.classList.add('public-dark');
-      } else {
-        root.classList.remove('public-dark');
       }
     }
   }, [theme, themeConfig, isPublicPage]);

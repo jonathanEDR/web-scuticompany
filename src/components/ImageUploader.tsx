@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+import imageCompression from 'browser-image-compression';
 
 interface ImageUploaderProps {
   currentImage?: string;
@@ -10,9 +12,15 @@ interface ImageUploaderProps {
 
 const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMode = false }: ImageUploaderProps) => {
   const [uploading, setUploading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [error, setError] = useState<string | null>(null);
+  const [compressionInfo, setCompressionInfo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { getToken } = useAuth();
+
+  // Obtener URL del API desde variables de entorno
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   // Actualizar preview cuando cambie currentImage
   useEffect(() => {
@@ -30,8 +38,39 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
       return;
     }
 
-    // Validar tamaño (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    setError(null);
+    setCompressionInfo(null);
+
+    // Comprimir imagen antes de subir (si es mayor a 1MB)
+    let fileToUpload = file;
+    if (file.size > 1024 * 1024) { // > 1MB
+      try {
+        setCompressing(true);
+        const originalSize = (file.size / 1024 / 1024).toFixed(2);
+
+        const options = {
+          maxSizeMB: 1, // Máximo 1MB
+          maxWidthOrHeight: 1920, // Máximo 1920px
+          useWebWorker: true, // Usar Web Worker para no bloquear UI
+          fileType: file.type as any,
+        };
+
+        fileToUpload = await imageCompression(file, options);
+        const compressedSize = (fileToUpload.size / 1024 / 1024).toFixed(2);
+        const saved = ((1 - fileToUpload.size / file.size) * 100).toFixed(0);
+
+        setCompressionInfo(`✅ Comprimida: ${originalSize}MB → ${compressedSize}MB (${saved}% reducido)`);
+        console.log('Imagen comprimida:', { originalSize, compressedSize, saved });
+      } catch (error) {
+        console.error('Error al comprimir imagen:', error);
+        setError('Error al comprimir la imagen. Intentando subir sin comprimir...');
+      } finally {
+        setCompressing(false);
+      }
+    }
+
+    // Validar tamaño final (max 5MB después de comprimir)
+    if (fileToUpload.size > 5 * 1024 * 1024) {
       setError('El archivo es demasiado grande. Máximo 5MB');
       return;
     }
@@ -41,10 +80,10 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
     reader.onloadend = () => {
       setPreview(reader.result as string);
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(fileToUpload);
 
     // Subir archivo
-    await uploadFile(file);
+    await uploadFile(fileToUpload);
   };
 
   const uploadFile = async (file: File) => {
@@ -52,23 +91,33 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
       setUploading(true);
       setError(null);
 
+      // Obtener token de autenticación
+      const token = await getToken();
+      if (!token) {
+        throw new Error('No se pudo obtener el token de autenticación');
+      }
+
       const formData = new FormData();
       formData.append('image', file);
 
-      const response = await fetch('http://localhost:5000/api/upload/image', {
+      const response = await fetch(`${API_URL}/api/upload/image`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData
       });
 
       if (!response.ok) {
-        throw new Error('Error al subir la imagen');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         // Construir URL completa
-        const imageUrl = `http://localhost:5000${data.data.url}`;
+        const imageUrl = `${API_URL}${data.data.url}`;
         onImageUpload(imageUrl);
         setPreview(imageUrl);
       } else {
@@ -78,6 +127,7 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
       console.error('Error:', err);
       setError(err instanceof Error ? err.message : 'Error al subir la imagen');
       setPreview(currentImage || null);
+      setCompressionInfo(null);
     } finally {
       setUploading(false);
     }
@@ -172,6 +222,17 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
         disabled={uploading}
       />
 
+      {/* Estado de compresión */}
+      {compressing && (
+        <div className="flex items-center justify-center space-x-2 text-blue-600">
+          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span className="text-sm font-medium">Comprimiendo imagen...</span>
+        </div>
+      )}
+
       {/* Estado de carga */}
       {uploading && (
         <div className="flex items-center justify-center space-x-2 text-purple-600">
@@ -180,6 +241,13 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
           <span className="text-sm font-medium">Subiendo imagen...</span>
+        </div>
+      )}
+
+      {/* Info de compresión */}
+      {compressionInfo && !uploading && !compressing && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+          {compressionInfo}
         </div>
       )}
 

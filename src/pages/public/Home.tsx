@@ -4,19 +4,14 @@ import PublicHeader from '../../components/public/PublicHeader';
 import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import PublicFooter from '../../components/public/PublicFooter';
-import ThemeDebugger from '../../components/ThemeDebugger';
-import ThemeSyncIndicator from '../../components/ThemeSyncIndicator';
-import CSSVariablesDebug from '../../components/CSSVariablesDebug';
 import { getPageBySlug } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 
 interface ButtonTheme {
-  bg: string;
-  text: string;
-  border?: string;
-  hover: string;
-  hoverText?: string;
+  background: string;
+  textColor: string;
+  borderColor: string;
 }
 
 interface ExtendedThemeConfig extends ThemeConfig {
@@ -176,11 +171,6 @@ const Home = () => {
           <SolutionsSection data={pageData.content.solutions} />
         </main>
         <PublicFooter />
-        
-        {/* Debug components - solo para desarrollo */}
-        <CSSVariablesDebug />
-        <ThemeDebugger />
-        <ThemeSyncIndicator />
       </div>
     </>
   );

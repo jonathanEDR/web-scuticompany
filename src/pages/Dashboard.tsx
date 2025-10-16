@@ -86,7 +86,7 @@ export default function Dashboard() {
   // Mostrar loading mientras carga la autenticación
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
         <LoadingSpinner size="lg" text="Cargando..." />
       </div>
     );
@@ -95,10 +95,10 @@ export default function Dashboard() {
   // Si no está autenticado, redirigir al home
   if (!isSignedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Acceso Requerido</h2>
-          <p className="text-gray-600 mb-6">Necesitas iniciar sesión para acceder al dashboard</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Acceso Requerido</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">Necesitas iniciar sesión para acceder al dashboard</p>
           <SignInButton mode="modal">
             <Button>Iniciar Sesión</Button>
           </SignInButton>
@@ -135,18 +135,18 @@ export default function Dashboard() {
 
         {/* Sección de Bienvenida */}
         {isLoaded && user && (
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 text-white shadow-2xl relative overflow-hidden animate-slideDown">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 via-purple-600/50 to-pink-600/50 animate-pulse"></div>
-            
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-purple-700 dark:via-pink-700 dark:to-purple-900 rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 text-white shadow-2xl relative overflow-hidden animate-slideDown transition-colors duration-300">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 via-purple-600/50 to-pink-600/50 dark:from-purple-700/50 dark:via-pink-700/50 dark:to-purple-900/50 animate-pulse"></div>
+
             <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-center sm:text-left animate-slideLeft">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 drop-shadow-lg">
                   ¡Bienvenido, {user.firstName || user.username || 'Usuario'}! 👋
                 </h1>
-                <p className="text-blue-100 text-sm sm:text-base lg:text-lg font-medium">
+                <p className="text-blue-100 dark:text-purple-100 text-sm sm:text-base lg:text-lg font-medium">
                   {user.primaryEmailAddress?.emailAddress}
                 </p>
-                <p className="text-blue-200 text-xs sm:text-sm mt-1 sm:mt-2">
+                <p className="text-blue-200 dark:text-purple-200 text-xs sm:text-sm mt-1 sm:mt-2">
                   Último acceso: {formatDate(new Date())}
                 </p>
               </div>
@@ -159,9 +159,9 @@ export default function Dashboard() {
 
         {/* Sección de Conexión Backend */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 hover:shadow-2xl transition-all duration-300 animate-slideLeft hover:-translate-y-1">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 animate-slideLeft hover:-translate-y-1">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 flex items-center gap-2">
                 <span className="text-2xl sm:text-3xl">📨</span>
                 <span className="hidden sm:inline">Mensaje del Backend</span>
                 <span className="sm:hidden">Backend</span>
@@ -179,14 +179,14 @@ export default function Dashboard() {
             {loading ? (
               <LoadingSpinner text="Cargando..." />
             ) : error ? (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 sm:p-6 text-red-700">
+              <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 sm:p-6 text-red-700 dark:text-red-400">
                 <div className="flex items-start gap-3">
-                  <div className="text-red-600 text-xl">❌</div>
+                  <div className="text-red-600 dark:text-red-400 text-xl">❌</div>
                   <span className="text-sm sm:text-base">{error}</span>
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 rounded-xl p-4 sm:p-6 text-white shadow-lg">
+              <div className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 dark:from-purple-600 dark:via-pink-600 dark:to-purple-700 rounded-xl p-4 sm:p-6 text-white shadow-lg">
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold flex items-center justify-center gap-2">
                   <span className="text-2xl">☀️</span>
                   {message}
@@ -195,8 +195,8 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 hover:shadow-2xl transition-all duration-300 animate-slideRight hover:-translate-y-1">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-800 mb-4 sm:mb-6 flex items-center gap-2">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 animate-slideRight hover:-translate-y-1">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 mb-4 sm:mb-6 flex items-center gap-2">
               <span className="text-2xl sm:text-3xl">📊</span>
               <span className="hidden sm:inline">Información del Proyecto</span>
               <span className="sm:hidden">Proyecto</span>
@@ -204,24 +204,24 @@ export default function Dashboard() {
 
             {companyInfo ? (
               <div className="space-y-3 sm:space-y-4">
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 sm:p-4 border border-blue-100">
-                  <p className="text-xs sm:text-sm text-slate-500 font-semibold mb-1">EMPRESA</p>
-                  <p className="text-sm sm:text-base lg:text-lg font-bold text-slate-900">{companyInfo.empresa}</p>
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-3 sm:p-4 border border-blue-100 dark:border-blue-800">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 font-semibold mb-1">EMPRESA</p>
+                  <p className="text-sm sm:text-base lg:text-lg font-bold text-slate-900 dark:text-gray-100">{companyInfo.empresa}</p>
                 </div>
-                <div className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-200">
-                  <p className="text-xs sm:text-sm text-slate-500 font-semibold mb-1">DESCRIPCIÓN</p>
-                  <p className="text-xs sm:text-sm lg:text-base text-slate-700">{companyInfo.descripcion}</p>
+                <div className="bg-slate-50 dark:bg-gray-900/50 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-gray-700">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 font-semibold mb-1">DESCRIPCIÓN</p>
+                  <p className="text-xs sm:text-sm lg:text-base text-slate-700 dark:text-gray-300">{companyInfo.descripcion}</p>
                 </div>
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-3 sm:p-4 border border-purple-100">
-                  <p className="text-xs sm:text-sm text-slate-500 font-semibold mb-2">STACK TECNOLÓGICO</p>
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-3 sm:p-4 border border-purple-100 dark:border-purple-800">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 font-semibold mb-2">STACK TECNOLÓGICO</p>
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm">🛠️</span>
-                      <span className="text-xs sm:text-sm font-medium text-slate-700">Backend: {companyInfo.tecnologias.backend}</span>
+                      <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-gray-300">Backend: {companyInfo.tecnologias.backend}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm">🎨</span>
-                      <span className="text-xs sm:text-sm font-medium text-slate-700">Frontend: {companyInfo.tecnologias.frontend}</span>
+                      <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-gray-300">Frontend: {companyInfo.tecnologias.frontend}</span>
                     </div>
                   </div>
                 </div>
@@ -273,17 +273,17 @@ export default function Dashboard() {
         </div>
 
         {/* Sección de Features */}
-        <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-slate-200 animate-slideUp">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-slate-200 dark:border-gray-700 animate-slideUp transition-colors duration-300">
           <div className="flex items-center gap-3 mb-6 sm:mb-8">
             <span className="text-2xl sm:text-3xl lg:text-4xl animate-bounce">🎉</span>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-purple-400 dark:to-pink-400">
               ¡Configuración Exitosa!
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 border border-green-200">
-              <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-3 sm:mb-4 flex items-center gap-2">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 sm:p-6 border border-green-200 dark:border-green-800">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 mb-3 sm:mb-4 flex items-center gap-2">
                 <span className="text-xl sm:text-2xl">✨</span>
                 Implementado:
               </h3>
@@ -291,21 +291,21 @@ export default function Dashboard() {
                 {[
                   'Backend con Express configurado',
                   'API REST funcional',
-                  'MongoDB conectado', 
+                  'MongoDB conectado',
                   'Frontend React + TypeScript',
                   'Tailwind CSS integrado',
                   'Autenticación con Clerk'
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3 group">
-                    <span className="text-green-600 text-sm sm:text-base mt-0.5">✅</span>
-                    <span className="text-xs sm:text-sm text-slate-700 group-hover:text-slate-900 transition-colors">{item}</span>
+                    <span className="text-green-600 dark:text-green-400 text-sm sm:text-base mt-0.5">✅</span>
+                    <span className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 group-hover:text-slate-900 dark:group-hover:text-gray-100 transition-colors">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 sm:p-6 border border-blue-200">
-              <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-3 sm:mb-4 flex items-center gap-2">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 mb-3 sm:mb-4 flex items-center gap-2">
                 <span className="text-xl sm:text-2xl">💡</span>
                 Próximos Pasos:
               </h3>
@@ -318,8 +318,8 @@ export default function Dashboard() {
                   'Optimizar para producción'
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3 group">
-                    <span className="text-blue-600 text-sm sm:text-base mt-0.5">🔄</span>
-                    <span className="text-xs sm:text-sm text-slate-700 group-hover:text-slate-900 transition-colors">{item}</span>
+                    <span className="text-blue-600 dark:text-blue-400 text-sm sm:text-base mt-0.5">🔄</span>
+                    <span className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 group-hover:text-slate-900 dark:group-hover:text-gray-100 transition-colors">{item}</span>
                   </li>
                 ))}
               </ul>

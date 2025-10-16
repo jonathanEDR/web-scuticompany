@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
+import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 
 interface SolutionItem {
@@ -18,6 +19,16 @@ interface SolutionsData {
     dark?: string;
   };
   backgroundImageAlt?: string;
+  styles?: {
+    light: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+    dark: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+  };
   items?: SolutionItem[];
 }
 
@@ -116,13 +127,21 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
 
       {/* Section Header */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
-        <h2 className="text-4xl sm:text-5xl font-bold theme-text-primary mb-4 theme-transition">
-          {solutionsData.title}
-        </h2>
+        <div
+          className="text-4xl sm:text-5xl font-bold theme-text-primary mb-4 theme-transition"
+          style={{
+            color: solutionsData.styles?.[theme]?.titleColor || undefined
+          }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solutionsData.title) }}
+        />
         <div className="max-w-3xl mx-auto">
-          <p className="text-xl theme-text-secondary theme-transition">
-            {solutionsData.description}
-          </p>
+          <div
+            className="text-xl theme-text-secondary theme-transition"
+            style={{
+              color: solutionsData.styles?.[theme]?.descriptionColor || undefined
+            }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solutionsData.description) }}
+          />
         </div>
       </div>
 
@@ -170,12 +189,14 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
 
               {/* Content */}
               <div className="relative">
-                <h3 className="text-2xl font-bold theme-text-primary mb-4 theme-transition">
-                  {solution.title}
-                </h3>
-                <p className="theme-text-secondary leading-relaxed theme-transition">
-                  {solution.description}
-                </p>
+                <div
+                  className="text-2xl font-bold theme-text-primary mb-4 theme-transition"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.title) }}
+                />
+                <div
+                  className="theme-text-secondary leading-relaxed theme-transition"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.description) }}
+                />
               </div>
 
               {/* Arrow Indicator */}

@@ -37,12 +37,12 @@ export const ButtonPreview: React.FC<ButtonPreviewProps> = ({
   return (
     <div className="space-y-6">
       {/* Selector de tema para vista previa */}
-      <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-        <span className="text-sm font-medium text-gray-700">Vista previa en:</span>
+      <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Vista previa en:</span>
         <span className={`px-3 py-1 rounded text-sm ${
           currentTheme === 'light' 
-            ? 'bg-yellow-100 text-yellow-800' 
-            : 'bg-gray-800 text-gray-200'
+            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' 
+            : 'bg-gray-800 dark:bg-gray-700 text-gray-200 dark:text-gray-100'
         }`}>
           {currentTheme === 'light' ? '☀️ Modo Claro' : '🌙 Modo Oscuro'}
         </span>
@@ -144,38 +144,46 @@ export const ButtonPreview: React.FC<ButtonPreviewProps> = ({
             
             {/* Botón Contacto del Header */}
             {currentButtons?.contact && (
-              <button
-                className={`px-3 py-1.5 rounded-full transition-all duration-300 font-medium text-sm ${
-                  currentButtons.contact.border?.includes('gradient') ? 'gradient-border-button' : 'border-2'
-                }`}
-                style={{
-                  borderColor: currentButtons.contact.border?.includes('gradient') ? 'transparent' : (currentButtons.contact.border || currentButtons.contact.text),
-                  color: currentButtons.contact.text,
-                  backgroundColor: 'transparent',
-                  ...(currentButtons.contact.border?.includes('gradient') && {
-                    '--gradient-border': currentButtons.contact.border,
-                    '--gradient-border-hover': currentButtons.contact.hover?.includes('gradient') ? currentButtons.contact.hover : currentButtons.contact.border,
-                  })
-                } as React.CSSProperties & { [key: string]: string }}
-                onMouseEnter={(e) => {
-                  if (!currentButtons.contact?.border?.includes('gradient')) {
-                    if (currentButtons.contact?.hover) {
-                      (e.target as HTMLElement).style.backgroundColor = currentButtons.contact.hover;
-                      (e.target as HTMLElement).style.color = currentButtons.contact.hoverText || '#ffffff';
-                    }
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!currentButtons.contact?.border?.includes('gradient')) {
-                    (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                    if (currentButtons.contact?.text) {
-                      (e.target as HTMLElement).style.color = currentButtons.contact.text;
-                    }
-                  }
-                }}
-              >
-                CONTÁCTENOS
-              </button>
+              <>
+                {currentButtons.contact.border?.includes('gradient') ? (
+                  // Botón con borde gradiente - usando técnica especial
+                  <div
+                    className="px-3 py-1.5 rounded-full transition-all duration-300 font-medium text-sm border-2"
+                    style={{
+                      background: `linear-gradient(${currentTheme === 'light' ? '#ffffff' : '#111827'}, ${currentTheme === 'light' ? '#ffffff' : '#111827'}) padding-box, ${currentButtons.contact.border} border-box`,
+                      color: currentButtons.contact.text,
+                      border: '2px solid transparent',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    CONTÁCTENOS
+                  </div>
+                ) : (
+                  // Botón con borde sólido
+                  <button
+                    className="px-3 py-1.5 rounded-full transition-all duration-300 font-medium text-sm border-2"
+                    style={{
+                      borderColor: currentButtons.contact.border || currentButtons.contact.text,
+                      color: currentButtons.contact.text,
+                      backgroundColor: currentButtons.contact.bg || 'transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentButtons.contact?.hover) {
+                        (e.target as HTMLElement).style.backgroundColor = currentButtons.contact.hover;
+                        (e.target as HTMLElement).style.color = currentButtons.contact.hoverText || '#ffffff';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.backgroundColor = currentButtons.contact?.bg || 'transparent';
+                      if (currentButtons.contact?.text) {
+                        (e.target as HTMLElement).style.color = currentButtons.contact.text;
+                      }
+                    }}
+                  >
+                    CONTÁCTENOS
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
