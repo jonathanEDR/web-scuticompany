@@ -1,8 +1,38 @@
 import { useState, useEffect } from 'react';
 import { SignedIn } from '@clerk/clerk-react';
 import DashboardLayout from '../components/DashboardLayout';
+import ImageUploader from '../components/ImageUploader';
+import ButtonConfig from '../components/ButtonConfig';
+import ThemePreviewSwitcher from '../components/ThemePreviewSwitcher';
 import { getPageBySlug, updatePage } from '../services/cmsApi';
+import { useTheme } from '../contexts/ThemeContext';
 import type { ThemeConfig } from '../contexts/ThemeContext';
+import '../styles/gradient-borders.css';
+
+interface ButtonTheme {
+  bg: string;
+  text: string;
+  border?: string;
+  hover: string;
+  hoverText?: string;
+}
+
+interface ExtendedThemeConfig extends ThemeConfig {
+  lightMode: ThemeConfig['lightMode'] & {
+    buttons: {
+      ctaPrimary: ButtonTheme;
+      contact: ButtonTheme;
+      dashboard: ButtonTheme;
+    };
+  };
+  darkMode: ThemeConfig['darkMode'] & {
+    buttons: {
+      ctaPrimary: ButtonTheme;
+      contact: ButtonTheme;
+      dashboard: ButtonTheme;
+    };
+  };
+}
 
 interface PageContent {
   hero: {
@@ -11,10 +41,20 @@ interface PageContent {
     description: string;
     ctaText: string;
     ctaLink: string;
+    backgroundImage?: {
+      light?: string;
+      dark?: string;
+    };
+    backgroundImageAlt?: string;
   };
   solutions: {
     title: string;
     description: string;
+    backgroundImage?: {
+      light?: string;
+      dark?: string;
+    };
+    backgroundImageAlt?: string;
     items: Array<{
       icon: string;
       title: string;
@@ -38,7 +78,7 @@ interface PageData {
   pageName: string;
   content: PageContent;
   seo: PageSeo;
-  theme?: ThemeConfig;
+  theme?: ExtendedThemeConfig;
   isPublished: boolean;
 }
 
@@ -48,6 +88,7 @@ export default function CmsManager() {
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme'>('content');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const { setThemeConfig } = useTheme();
 
   // Cargar datos de la página Home
   useEffect(() => {
@@ -56,10 +97,67 @@ export default function CmsManager() {
     }
   }, [pageData]);
 
+  // Sincronizar el tema con el contexto cuando cambian los datos
+  useEffect(() => {
+    if (pageData?.theme) {
+      setThemeConfig(pageData.theme as ThemeConfig);
+    }
+  }, [pageData?.theme, setThemeConfig]);
+
   const loadPageData = async () => {
     try {
       setLoading(true);
       const data = await getPageBySlug('home');
+      
+      // Asegurar que los botones tengan valores por defecto si no existen
+      if (data.theme) {
+        // Valores por defecto para modo claro
+        if (!data.theme.lightMode.buttons) {
+          data.theme.lightMode.buttons = {};
+        }
+        if (!data.theme.lightMode.buttons.ctaPrimary) {
+          data.theme.lightMode.buttons.ctaPrimary = {
+            bg: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+            text: '#FFFFFF',
+            hover: 'linear-gradient(135deg, #7C3AED, #0891B2)',
+            border: 'transparent',
+            hoverText: '#FFFFFF'
+          };
+        }
+        if (!data.theme.lightMode.buttons.dashboard) {
+          data.theme.lightMode.buttons.dashboard = {
+            bg: 'linear-gradient(135deg, #06B6D4, #3B82F6)',
+            text: '#FFFFFF',
+            hover: 'linear-gradient(135deg, #0891B2, #2563EB)',
+            border: 'transparent',
+            hoverText: '#FFFFFF'
+          };
+        }
+        
+        // Valores por defecto para modo oscuro
+        if (!data.theme.darkMode.buttons) {
+          data.theme.darkMode.buttons = {};
+        }
+        if (!data.theme.darkMode.buttons.ctaPrimary) {
+          data.theme.darkMode.buttons.ctaPrimary = {
+            bg: 'linear-gradient(135deg, #A78BFA, #22D3EE)',
+            text: '#111827',
+            hover: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+            border: 'transparent',
+            hoverText: '#FFFFFF'
+          };
+        }
+        if (!data.theme.darkMode.buttons.dashboard) {
+          data.theme.darkMode.buttons.dashboard = {
+            bg: 'linear-gradient(135deg, #22D3EE, #60A5FA)',
+            text: '#111827',
+            hover: 'linear-gradient(135deg, #06B6D4, #3B82F6)',
+            border: 'transparent',
+            hoverText: '#FFFFFF'
+          };
+        }
+      }
+      
       setPageData(data);
     } catch (error) {
       console.error('Error al cargar página:', error);
@@ -101,6 +199,14 @@ export default function CmsManager() {
     let current: any = newData.content;
     
     for (let i = 0; i < keys.length - 1; i++) {
+      // Si no existe el objeto, crearlo
+      if (!current[keys[i]]) {
+        current[keys[i]] = {};
+      }
+      // Si es un string (formato anterior) y necesitamos convertir a objeto
+      if (typeof current[keys[i]] === 'string' && keys[i] === 'backgroundImage') {
+        current[keys[i]] = { dark: current[keys[i]] }; // Mover string existente a dark
+      }
       current = current[keys[i]];
     }
     
@@ -143,6 +249,37 @@ export default function CmsManager() {
       theme: {
         ...pageData.theme,
         default: value
+      }
+    });
+  };
+
+  const updateButtonTheme = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard', property: string, value: string) => {
+    if (!pageData || !pageData.theme) return;
+
+    // Asegurar que la estructura existe
+    const currentTheme = { ...pageData.theme };
+    if (!currentTheme[mode].buttons) {
+      currentTheme[mode].buttons = {
+        ctaPrimary: { bg: '', text: '', border: '', hover: '' },
+        contact: { bg: '', text: '', border: '', hover: '', hoverText: '' },
+        dashboard: { bg: '', text: '', border: '', hover: '' }
+      };
+    }
+
+    setPageData({
+      ...pageData,
+      theme: {
+        ...currentTheme,
+        [mode]: {
+          ...currentTheme[mode],
+          buttons: {
+            ...currentTheme[mode].buttons,
+            [buttonType]: {
+              ...currentTheme[mode].buttons[buttonType],
+              [property]: value
+            }
+          }
+        }
       }
     });
   };
@@ -311,6 +448,36 @@ export default function CmsManager() {
                       />
                     </div>
                   </div>
+
+                  {/* Imágenes de Fondo del Hero por Tema */}
+                  <div className="pt-4 border-t border-gray-200 space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">🖼️ Imágenes de Fondo del Hero</h4>
+                    
+                    {/* Imagen para Tema Claro */}
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <ImageUploader
+                        label="🌞 Imagen para Tema Claro"
+                        description="Imagen que se mostrará cuando el sitio esté en modo claro. Tamaño recomendado: 1920x1080px"
+                        currentImage={typeof pageData.content.hero.backgroundImage === 'string' 
+                          ? pageData.content.hero.backgroundImage 
+                          : pageData.content.hero.backgroundImage?.light}
+                        onImageUpload={(url) => updateContent('hero.backgroundImage.light', url)}
+                      />
+                    </div>
+
+                    {/* Imagen para Tema Oscuro */}
+                    <div className="bg-gray-800 p-4 rounded-lg border border-gray-600">
+                      <ImageUploader
+                        label="🌙 Imagen para Tema Oscuro"
+                        description="Imagen que se mostrará cuando el sitio esté en modo oscuro. Tamaño recomendado: 1920x1080px"
+                        currentImage={typeof pageData.content.hero.backgroundImage === 'string' 
+                          ? pageData.content.hero.backgroundImage 
+                          : pageData.content.hero.backgroundImage?.dark}
+                        onImageUpload={(url) => updateContent('hero.backgroundImage.dark', url)}
+                        darkMode={true}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -343,6 +510,36 @@ export default function CmsManager() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       rows={3}
                     />
+                  </div>
+
+                  {/* Imágenes de Fondo de Soluciones por Tema */}
+                  <div className="pt-4 border-t border-gray-200 space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">🖼️ Imágenes de Fondo de Soluciones</h4>
+                    
+                    {/* Imagen para Tema Claro */}
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <ImageUploader
+                        label="🌞 Imagen para Tema Claro"
+                        description="Imagen que se mostrará en soluciones cuando el sitio esté en modo claro. Tamaño recomendado: 1920x1080px"
+                        currentImage={typeof pageData.content.solutions.backgroundImage === 'string' 
+                          ? pageData.content.solutions.backgroundImage 
+                          : pageData.content.solutions.backgroundImage?.light}
+                        onImageUpload={(url) => updateContent('solutions.backgroundImage.light', url)}
+                      />
+                    </div>
+
+                    {/* Imagen para Tema Oscuro */}
+                    <div className="bg-gray-800 p-4 rounded-lg border border-gray-600">
+                      <ImageUploader
+                        label="🌙 Imagen para Tema Oscuro"
+                        description="Imagen que se mostrará en soluciones cuando el sitio esté en modo oscuro. Tamaño recomendado: 1920x1080px"
+                        currentImage={typeof pageData.content.solutions.backgroundImage === 'string' 
+                          ? pageData.content.solutions.backgroundImage 
+                          : pageData.content.solutions.backgroundImage?.dark}
+                        onImageUpload={(url) => updateContent('solutions.backgroundImage.dark', url)}
+                        darkMode={true}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -534,13 +731,13 @@ export default function CmsManager() {
                           <input
                             type="color"
                             value={pageData.theme.lightMode.background}
-                            onChange={(e) => updateTheme('lightMode', 'background', e.target.value)}
+                            onChange={(e) => updateTheme('lightMode', 'bg', e.target.value)}
                             className="w-16 h-10 rounded cursor-pointer"
                           />
                           <input
                             type="text"
                             value={pageData.theme.lightMode.background}
-                            onChange={(e) => updateTheme('lightMode', 'background', e.target.value)}
+                            onChange={(e) => updateTheme('lightMode', 'bg', e.target.value)}
                             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
                             placeholder="#FFFFFF"
                           />
@@ -669,13 +866,13 @@ export default function CmsManager() {
                           <input
                             type="color"
                             value={pageData.theme.darkMode.background}
-                            onChange={(e) => updateTheme('darkMode', 'background', e.target.value)}
+                            onChange={(e) => updateTheme('darkMode', 'bg', e.target.value)}
                             className="w-16 h-10 rounded cursor-pointer"
                           />
                           <input
                             type="text"
                             value={pageData.theme.darkMode.background}
-                            onChange={(e) => updateTheme('darkMode', 'background', e.target.value)}
+                            onChange={(e) => updateTheme('darkMode', 'bg', e.target.value)}
                             className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white"
                             placeholder="#111827"
                           />
@@ -745,6 +942,132 @@ export default function CmsManager() {
                         </div>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Nueva Configuración Avanzada de Botones */}
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                        🎨 Configuración Avanzada de Botones
+                      </h3>
+                      <div className="bg-gradient-to-r from-purple-100 to-blue-100 px-4 py-2 rounded-lg">
+                        <span className="text-sm font-medium text-purple-700">
+                          ⚡ Vista Optimizada
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Vista Previa en Tiempo Real - Optimizada */}
+                    <div className="mb-8">
+                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
+                        <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                          👁️ Vista Previa en Tiempo Real
+                        </h4>
+                        <ThemePreviewSwitcher
+                          lightMode={pageData.theme?.lightMode || { buttons: {} }}
+                          darkMode={pageData.theme?.darkMode || { buttons: {} }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Configuradores por Modo - Layout Optimizado */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Modo Claro */}
+                      <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
+                        <h4 className="text-lg font-semibold text-gray-700 mb-6 flex items-center">
+                          ☀️ Configuración - Modo Claro
+                        </h4>
+                        <div className="space-y-4">
+                          <ButtonConfig
+                            buttonType="ctaPrimary"
+                            theme={pageData.theme?.lightMode?.buttons?.ctaPrimary || { bg: '', text: '', hover: '' }}
+                            mode="lightMode"
+                            onUpdate={(property, value) => updateButtonTheme('lightMode', 'ctaPrimary', property, value)}
+                            title="Botón Principal de Servicios"
+                            icon="🚀"
+                          />
+                          <ButtonConfig
+                            buttonType="contact"
+                            theme={pageData.theme?.lightMode?.buttons?.contact || { bg: '', text: '', hover: '', border: '', hoverText: '' }}
+                            mode="lightMode"
+                            onUpdate={(property, value) => updateButtonTheme('lightMode', 'contact', property, value)}
+                            title="Botón de Contacto"
+                            icon="📞"
+                          />
+                          <ButtonConfig
+                            buttonType="dashboard"
+                            theme={pageData.theme?.lightMode?.buttons?.dashboard || { bg: '', text: '', hover: '' }}
+                            mode="lightMode"
+                            onUpdate={(property, value) => updateButtonTheme('lightMode', 'dashboard', property, value)}
+                            title="Botón Dashboard"
+                            icon="🎯"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Modo Oscuro */}
+                      <div className="bg-gradient-to-br from-slate-900 to-gray-900 rounded-xl p-6 border border-slate-700">
+                        <h4 className="text-lg font-semibold text-white mb-6 flex items-center">
+                          🌙 Configuración - Modo Oscuro
+                        </h4>
+                        <div className="space-y-4">
+                          <ButtonConfig
+                            buttonType="ctaPrimary"
+                            theme={pageData.theme?.darkMode?.buttons?.ctaPrimary || { bg: '', text: '', hover: '' }}
+                            mode="darkMode"
+                            onUpdate={(property, value) => updateButtonTheme('darkMode', 'ctaPrimary', property, value)}
+                            title="Botón Principal de Servicios"
+                            icon="🚀"
+                          />
+                          <ButtonConfig
+                            buttonType="contact"
+                            theme={pageData.theme?.darkMode?.buttons?.contact || { bg: '', text: '', hover: '', border: '', hoverText: '' }}
+                            mode="darkMode"
+                            onUpdate={(property, value) => updateButtonTheme('darkMode', 'contact', property, value)}
+                            title="Botón de Contacto"
+                            icon="📞"
+                          />
+                          <ButtonConfig
+                            buttonType="dashboard"
+                            theme={pageData.theme?.darkMode?.buttons?.dashboard || { bg: '', text: '', hover: '' }}
+                            mode="darkMode"
+                            onUpdate={(property, value) => updateButtonTheme('darkMode', 'dashboard', property, value)}
+                            title="Botón Dashboard"
+                            icon="🎯"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sección de Ayuda Rápida */}
+                    <div className="mt-8 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-xl p-6 border border-blue-200">
+                      <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        💡 Consejos de Configuración
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                        <div className="bg-white/70 rounded-lg p-4 border border-blue-100">
+                          <div className="font-medium text-blue-700 mb-2">🎨 Gradientes</div>
+                          <p className="text-gray-600">
+                            Usa gradientes para fondos y bordes. Ejemplos:<br/>
+                            <code className="bg-gray-100 px-1 rounded text-xs">linear-gradient(90deg, #8B5CF6, #06B6D4)</code><br/>
+                            <code className="bg-gray-100 px-1 rounded text-xs">linear-gradient(135deg, #EC4899, #F97316)</code>
+                          </p>
+                        </div>
+                        <div className="bg-white/70 rounded-lg p-4 border border-purple-100">
+                          <div className="font-medium text-purple-700 mb-2">🌈 Contraste</div>
+                          <p className="text-gray-600">
+                            Asegúrate de que el contraste entre fondo y texto sea bueno para accesibilidad.
+                          </p>
+                        </div>
+                        <div className="bg-white/70 rounded-lg p-4 border border-pink-100">
+                          <div className="font-medium text-pink-700 mb-2">📱 Responsive</div>
+                          <p className="text-gray-600">
+                            Los botones se adaptan automáticamente a dispositivos móviles y desktop.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </>
               )}

@@ -12,15 +12,31 @@ export interface ThemeColors {
   border: string;
 }
 
+interface ButtonTheme {
+  bg: string;
+  text: string;
+  border?: string;
+  hover: string;
+  hoverText?: string;
+}
+
+export interface ExtendedThemeColors extends ThemeColors {
+  buttons?: {
+    ctaPrimary?: ButtonTheme;
+    contact?: ButtonTheme;
+    dashboard?: ButtonTheme;
+  };
+}
+
 export interface ThemeConfig {
   default: 'light' | 'dark';
-  lightMode: ThemeColors;
-  darkMode: ThemeColors;
+  lightMode: ExtendedThemeColors;
+  darkMode: ExtendedThemeColors;
 }
 
 interface ThemeContextType {
   theme: 'light' | 'dark';
-  colors: ThemeColors;
+  colors: ExtendedThemeColors;
   themeConfig: ThemeConfig | null;
   toggleTheme: () => void;
   setThemeConfig: (config: ThemeConfig) => void;
@@ -39,7 +55,12 @@ const defaultThemeConfig: ThemeConfig = {
     text: '#1F2937',
     textSecondary: '#6B7280',
     cardBg: '#F9FAFB',
-    border: '#E5E7EB'
+    border: '#E5E7EB',
+    buttons: {
+      ctaPrimary: { bg: '#8B5CF6', text: '#FFFFFF', hover: '#7C3AED', border: 'transparent' },
+      contact: { bg: '#10B981', text: '#FFFFFF', hover: '#059669', border: '#10B981' },
+      dashboard: { bg: '#06B6D4', text: '#FFFFFF', hover: '#0891B2', border: 'transparent' }
+    }
   },
   darkMode: {
     primary: '#A78BFA',
@@ -48,7 +69,12 @@ const defaultThemeConfig: ThemeConfig = {
     text: '#F9FAFB',
     textSecondary: '#D1D5DB',
     cardBg: '#1F2937',
-    border: '#374151'
+    border: '#374151',
+    buttons: {
+      ctaPrimary: { bg: '#A78BFA', text: '#111827', hover: '#8B5CF6', border: 'transparent' },
+      contact: { bg: '#34D399', text: '#111827', hover: '#10B981', border: '#34D399' },
+      dashboard: { bg: '#22D3EE', text: '#111827', hover: '#06B6D4', border: 'transparent' }
+    }
   }
 };
 
@@ -58,17 +84,14 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Obtener tema guardado o usar el del sistema
     const savedTheme = localStorage.getItem('scuti-theme') as 'light' | 'dark';
     if (savedTheme) {
-      console.log('🎨 ThemeContext: Using saved theme:', savedTheme);
       return savedTheme;
     }
     
     // Detectar preferencia del sistema
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      console.log('🎨 ThemeContext: Using system dark theme');
       return 'dark';
     }
     
-    console.log('🎨 ThemeContext: Using default light theme');
     return 'light';
   });
 
@@ -94,6 +117,32 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       root.style.setProperty('--color-text-secondary', colors.textSecondary);
       root.style.setProperty('--color-card-bg', colors.cardBg);
       root.style.setProperty('--color-border', colors.border);
+
+      // Aplicar variables de botones
+      if (colors.buttons) {
+        // Botón CTA Principal
+        if (colors.buttons.ctaPrimary) {
+          root.style.setProperty('--color-cta-bg', colors.buttons.ctaPrimary.bg);
+          root.style.setProperty('--color-cta-text', colors.buttons.ctaPrimary.text);
+          root.style.setProperty('--color-cta-hover-bg', colors.buttons.ctaPrimary.hover);
+        }
+
+        // Botón Contacto
+        if (colors.buttons.contact) {
+          root.style.setProperty('--color-contact-bg', colors.buttons.contact.bg);
+          root.style.setProperty('--color-contact-text', colors.buttons.contact.text);
+          root.style.setProperty('--color-contact-border', colors.buttons.contact.border || colors.buttons.contact.bg);
+          root.style.setProperty('--color-contact-hover-bg', colors.buttons.contact.hover);
+          root.style.setProperty('--color-contact-hover-text', colors.buttons.contact.hoverText || '#FFFFFF');
+        }
+
+        // Botón Dashboard
+        if (colors.buttons.dashboard) {
+          root.style.setProperty('--color-dashboard-bg', colors.buttons.dashboard.bg);
+          root.style.setProperty('--color-dashboard-text', colors.buttons.dashboard.text);
+          root.style.setProperty('--color-dashboard-hover-bg', colors.buttons.dashboard.hover);
+        }
+      }
       
       // Añadir/quitar clase dark SOLO en páginas públicas
       if (theme === 'dark') {
@@ -106,8 +155,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    console.log('🔄 Theme Toggle:', { from: theme, to: newTheme });
     setTheme(newTheme);
+  };
+
+  const handleSetThemeConfig = (config: ThemeConfig) => {
+    setThemeConfig(config);
   };
 
   const colors = theme === 'light' ? themeConfig.lightMode : themeConfig.darkMode;
@@ -118,7 +170,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       colors, 
       themeConfig,
       toggleTheme, 
-      setThemeConfig,
+      setThemeConfig: handleSetThemeConfig,
       isPublicPage 
     }}>
       {children}

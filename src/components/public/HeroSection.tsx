@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useState, useEffect } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
+import '../../styles/gradient-borders.css';
 
 interface HeroData {
   title: string;
@@ -8,23 +10,49 @@ interface HeroData {
   description: string;
   ctaText: string;
   ctaLink: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
+  };
+  backgroundImageAlt?: string;
 }
+
+// Interfaz ButtonTheme removida ya que no se utiliza
+
+// Interfaz ExtendedTheme removida ya que no se utiliza
 
 interface HeroSectionProps {
   data?: HeroData;
 }
 
-// Constantes de estilos para mejor mantenimiento
-const HERO_STYLES = {
-  background: `linear-gradient(135deg, var(--color-background), color-mix(in srgb, var(--color-primary) 10%, var(--color-background)), var(--color-background))`,
-  patternBg: `radial-gradient(circle at 2px 2px, color-mix(in srgb, var(--color-primary) 40%, transparent) 1px, transparent 0)`,
-  primaryButton: `linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-primary))`,
-} as const;
+// Constantes removidas ya que no se utilizan
 
 const HeroSection = ({ data }: HeroSectionProps) => {
   // Estados para animaciones progresivas
   const [isVisible, setIsVisible] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
+  const { theme: currentTheme } = useTheme();
+
+  // Obtener la imagen correcta según el tema activo
+  const getCurrentBackgroundImage = () => {
+    if (!data?.backgroundImage) return null;
+    
+    // Si es un string (formato anterior), usarlo como fallback
+    if (typeof data.backgroundImage === 'string') {
+      return data.backgroundImage;
+    }
+    
+    // Usar imagen del tema activo, con fallback a la otra si no existe
+    if (currentTheme === 'light') {
+      return data.backgroundImage.light || data.backgroundImage.dark || null;
+    } else {
+      return data.backgroundImage.dark || data.backgroundImage.light || null;
+    }
+  };
+
+  const currentBackgroundImage = getCurrentBackgroundImage();
+
+  // Función helper removida ya que no se utiliza
 
   // Datos por defecto si no se proporcionan
   const heroData: HeroData = data || {
@@ -56,6 +84,24 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                minHeight: '100vh',
                height: '100vh'
              }}>
+      
+      {/* Background Image (si existe) */}
+      {currentBackgroundImage && (
+        <>
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out"
+            style={{
+              backgroundImage: `url(${currentBackgroundImage})`,
+              opacity: 0.85
+            }}
+            role="img"
+            aria-label={data?.backgroundImageAlt || 'Hero background'}
+          />
+          {/* Overlay muy sutil para mejorar legibilidad del texto */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5" />
+        </>
+      )}
+
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute inset-0" style={{
@@ -63,22 +109,6 @@ const HeroSection = ({ data }: HeroSectionProps) => {
           backgroundSize: '40px 40px',
           animation: 'backgroundScroll 20s linear infinite'
         }}></div>
-      </div>
-
-      {/* Key Icon - Right Side */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 opacity-20">
-        <svg viewBox="0 0 200 200" className="w-full h-auto">
-          <defs>
-            <linearGradient id="keyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: 'var(--color-secondary)', stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: 'var(--color-primary)', stopOpacity: 1 }} />
-            </linearGradient>
-          </defs>
-          <circle cx="140" cy="60" r="35" fill="none" stroke="url(#keyGradient)" strokeWidth="8"/>
-          <rect x="100" y="58" width="60" height="12" fill="url(#keyGradient)" rx="2"/>
-          <rect x="130" y="45" width="8" height="30" fill="url(#keyGradient)" rx="2"/>
-          <rect x="150" y="50" width="8" height="20" fill="url(#keyGradient)" rx="2"/>
-        </svg>
       </div>
 
       {/* Content */}
@@ -128,17 +158,24 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                 animationPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
               style={{
-                background: HERO_STYLES.primaryButton,
+                background: 'var(--color-cta-bg)',
+                color: 'var(--color-cta-text)',
                 backgroundSize: '200% 100%',
                 animation: 'gradientShift 3s ease-in-out infinite'
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.background = 'var(--color-cta-hover-bg)';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.background = 'var(--color-cta-bg)';
               }}
             >
               <div className="absolute inset-0 blur-xl opacity-50 group-hover:opacity-75 transition-all duration-300"
                    style={{
-                     background: HERO_STYLES.primaryButton,
+                     background: 'var(--color-cta-bg)',
                      backgroundSize: '200% 100%'
                    }}></div>
-              <span className="relative text-white font-medium text-xs sm:text-sm flex items-center space-x-1.5">
+              <span className="relative font-medium text-xs sm:text-sm flex items-center space-x-1.5">
                 <span>{heroData.ctaText}</span>
                 <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -180,9 +217,20 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                 to="/dashboard"
                 role="button"
                 aria-label="Ir al Dashboard - Acceder a tu panel de control"
-                className={`group relative px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-75 transform hover:scale-105 active:scale-95 transition-all duration-300 font-medium text-xs sm:text-sm ${
+                className={`group relative px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-75 transform hover:scale-105 active:scale-95 transition-all duration-300 font-medium text-xs sm:text-sm ${
                   animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                 }`}
+                style={{
+                  background: 'var(--color-dashboard-bg)',
+                  color: 'var(--color-dashboard-text)',
+                  borderColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  (e.target as HTMLElement).style.background = 'var(--color-dashboard-hover-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.target as HTMLElement).style.background = 'var(--color-dashboard-bg)';
+                }}
               >
                 <span className="flex items-center space-x-2">
                   <span role="img" aria-label="Objetivo">🎯</span>

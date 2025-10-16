@@ -5,9 +5,36 @@ import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import ThemeDebugger from '../../components/ThemeDebugger';
+import ThemeSyncIndicator from '../../components/ThemeSyncIndicator';
+import CSSVariablesDebug from '../../components/CSSVariablesDebug';
 import { getPageBySlug } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
+
+interface ButtonTheme {
+  bg: string;
+  text: string;
+  border?: string;
+  hover: string;
+  hoverText?: string;
+}
+
+interface ExtendedThemeConfig extends ThemeConfig {
+  lightMode: ThemeConfig['lightMode'] & {
+    buttons?: {
+      ctaPrimary?: ButtonTheme;
+      contact?: ButtonTheme;
+      dashboard?: ButtonTheme;
+    };
+  };
+  darkMode: ThemeConfig['darkMode'] & {
+    buttons?: {
+      ctaPrimary?: ButtonTheme;
+      contact?: ButtonTheme;
+      dashboard?: ButtonTheme;
+    };
+  };
+}
 
 interface PageData {
   content: {
@@ -17,10 +44,20 @@ interface PageData {
       description: string;
       ctaText: string;
       ctaLink: string;
+      backgroundImage?: {
+        light?: string;
+        dark?: string;
+      };
+      backgroundImageAlt?: string;
     };
     solutions: {
       title: string;
       description: string;
+      backgroundImage?: {
+        light?: string;
+        dark?: string;
+      };
+      backgroundImageAlt?: string;
       items: Array<{
         icon: string;
         title: string;
@@ -37,7 +74,7 @@ interface PageData {
     ogDescription: string;
     ogImage: string;
   };
-  theme?: ThemeConfig;
+  theme?: ExtendedThemeConfig;
 }
 
 const Home = () => {
@@ -56,6 +93,7 @@ const Home = () => {
     
     try {
       const data = await getPageBySlug('home');
+      
       setPageData(data);
       
       // Cargar configuración de tema si existe
@@ -139,8 +177,10 @@ const Home = () => {
         </main>
         <PublicFooter />
         
-        {/* Debug component - solo para desarrollo */}
+        {/* Debug components - solo para desarrollo */}
+        <CSSVariablesDebug />
         <ThemeDebugger />
+        <ThemeSyncIndicator />
       </div>
     </>
   );

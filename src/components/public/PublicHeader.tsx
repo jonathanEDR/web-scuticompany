@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import Logo from '../Logo';
+import '../../styles/gradient-borders.css';
 
 const PublicHeader = () => {
   const { theme, toggleTheme } = useTheme();
@@ -200,7 +201,13 @@ const PublicHeader = () => {
             {/* Botón Contacto */}
             <Link 
               to="/contacto"
-              className="px-3 py-1.5 rounded-full border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white transition-all duration-300 font-medium text-sm"
+              className="px-3 py-1.5 rounded-full transition-all duration-300 font-medium text-sm gradient-border-button"
+              style={{
+                '--gradient-border': 'var(--color-contact-border)',
+                '--gradient-border-hover': 'var(--color-contact-hover-bg)',
+                color: 'var(--color-contact-text)',
+                backgroundColor: 'transparent'
+              } as React.CSSProperties & { [key: string]: string }}
             >
               CONTÁCTENOS
             </Link>
@@ -292,7 +299,14 @@ const PublicHeader = () => {
             </Link>
             <Link 
               to="/contacto"
-              className="px-2.5 py-0.5 rounded-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white transition-all duration-300 font-medium"
+              className="px-2.5 py-0.5 rounded-full transition-all duration-300 font-medium gradient-border-button"
+              style={{
+                '--gradient-border': 'var(--color-contact-border)',
+                '--gradient-border-hover': 'var(--color-contact-hover-bg)',
+                color: 'var(--color-contact-text)',
+                backgroundColor: 'transparent',
+                padding: '0.375rem 0.625rem'
+              } as React.CSSProperties & { [key: string]: string }}
             >
               CONTÁCTANOS
             </Link>

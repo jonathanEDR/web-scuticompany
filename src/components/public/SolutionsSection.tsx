@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SolutionItem {
   icon: React.ReactNode | string;
@@ -12,6 +13,11 @@ interface SolutionItem {
 interface SolutionsData {
   title: string;
   description: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
+  };
+  backgroundImageAlt?: string;
   items?: SolutionItem[];
 }
 
@@ -20,12 +26,33 @@ interface SolutionsSectionProps {
 }
 
 const SolutionsSection = ({ data }: SolutionsSectionProps) => {
+  const { theme } = useTheme();
+  
   // Datos por defecto
   const solutionsData: SolutionsData = data || {
     title: 'Soluciones',
     description: 'En el dinámico entorno empresarial de hoy, la tecnología es la columna vertebral del éxito. Impulsa la innovación, seguridad y el crecimiento de tu negocio.',
     items: []
   };
+
+  // Obtener la imagen correcta según el tema activo
+  const getCurrentBackgroundImage = () => {
+    if (!solutionsData.backgroundImage) return null;
+    
+    // Si es un string (formato anterior), usarlo como fallback
+    if (typeof solutionsData.backgroundImage === 'string') {
+      return solutionsData.backgroundImage;
+    }
+    
+    // Usar imagen del tema activo, con fallback a la otra si no existe
+    if (theme === 'light') {
+      return solutionsData.backgroundImage.light || solutionsData.backgroundImage.dark || null;
+    } else {
+      return solutionsData.backgroundImage.dark || solutionsData.backgroundImage.light || null;
+    }
+  };
+
+  const currentBackgroundImage = getCurrentBackgroundImage();
 
   const defaultSolutions: SolutionItem[] = [
     {
@@ -70,8 +97,25 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
              style={{
                background: `linear-gradient(to bottom, color-mix(in srgb, var(--color-card-bg) 95%, var(--color-primary)), var(--color-card-bg))`
              }}>
+      
+      {/* Background Image (si existe) */}
+      {currentBackgroundImage && (
+        <>
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out"
+            style={{
+              backgroundImage: `url(${currentBackgroundImage})`,
+              opacity: 0.08
+            }}
+            role="img"
+            aria-label={solutionsData.backgroundImageAlt || 'Solutions background'}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent backdrop-blur-[2px]" />
+        </>
+      )}
+
       {/* Section Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
         <h2 className="text-4xl sm:text-5xl font-bold theme-text-primary mb-4 theme-transition">
           {solutionsData.title}
         </h2>
@@ -83,7 +127,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
       </div>
 
       {/* Solutions Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {solutions.map((solution, index) => (
             <div
