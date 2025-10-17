@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
+import type { CardDesignStyles } from '../../types/cms';
 
 interface SolutionItem {
-  icon: React.ReactNode | string;
+  iconLight?: string;  // URL del icono para tema claro (PNG)
+  iconDark?: string;   // URL del icono para tema oscuro (PNG)
+  // Mantener para compatibilidad
+  icon?: React.ReactNode | string;
+  iconUrl?: string;
   title: string;
   description: string;
   gradient: string;
@@ -30,6 +33,10 @@ interface SolutionsData {
     };
   };
   items?: SolutionItem[];
+  cardsDesign?: {
+    light: CardDesignStyles;
+    dark: CardDesignStyles;
+  };
 }
 
 interface SolutionsSectionProps {
@@ -38,13 +45,73 @@ interface SolutionsSectionProps {
 
 const SolutionsSection = ({ data }: SolutionsSectionProps) => {
   const { theme } = useTheme();
-  
+
   // Datos por defecto
   const solutionsData: SolutionsData = data || {
     title: 'Soluciones',
     description: 'En el dinámico entorno empresarial de hoy, la tecnología es la columna vertebral del éxito. Impulsa la innovación, seguridad y el crecimiento de tu negocio.',
     items: []
   };
+
+  // Valores por defecto para el diseño de tarjetas
+  const defaultLightStyles: CardDesignStyles = {
+    background: 'rgba(255, 255, 255, 0.1)',
+    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    borderWidth: '1px',
+    shadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+    hoverBackground: 'rgba(255, 255, 255, 0.15)',
+    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
+    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.2)',
+    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    iconBackground: 'rgba(255, 255, 255, 0.9)',
+    iconColor: '#1f2937',
+    titleColor: '#1f2937',
+    descriptionColor: '#4b5563',
+    linkColor: '#a78bfa',
+    cardMinWidth: '280px',
+    cardMaxWidth: '100%',
+    cardMinHeight: 'auto',
+    cardPadding: '2rem',
+    iconBorderEnabled: true,
+    iconAlignment: 'left'
+  };
+
+  const defaultDarkStyles: CardDesignStyles = {
+    background: 'rgba(0, 0, 0, 0.3)',
+    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    borderWidth: '2px',
+    shadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+    hoverBackground: 'rgba(0, 0, 0, 0.4)',
+    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
+    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.3)',
+    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    iconBackground: 'rgba(17, 24, 39, 0.8)',
+    iconColor: '#ffffff',
+    titleColor: '#ffffff',
+    descriptionColor: '#d1d5db',
+    linkColor: '#a78bfa',
+    cardMinWidth: '280px',
+    cardMaxWidth: '100%',
+    cardMinHeight: 'auto',
+    cardPadding: '2rem',
+    iconBorderEnabled: true,
+    iconAlignment: 'left'
+  };
+
+  // Obtener estilos actuales según el tema
+  const cardStyles = theme === 'light'
+    ? {
+        ...defaultLightStyles,
+        ...(solutionsData.cardsDesign?.light || {}),
+        // Asegurar que iconAlignment tenga un valor por defecto si no existe
+        iconAlignment: solutionsData.cardsDesign?.light?.iconAlignment || 'left'
+      }
+    : {
+        ...defaultDarkStyles,
+        ...(solutionsData.cardsDesign?.dark || {}),
+        // Asegurar que iconAlignment tenga un valor por defecto si no existe
+        iconAlignment: solutionsData.cardsDesign?.dark?.iconAlignment || 'left'
+      };
 
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {
@@ -61,6 +128,48 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
     } else {
       return solutionsData.backgroundImage.dark || solutionsData.backgroundImage.light || null;
     }
+  };
+
+  // Función helper para detectar si un string es una URL de imagen
+  const isImageUrl = (str: string): boolean => {
+    return str.startsWith('http://') || str.startsWith('https://') || str.startsWith('/');
+  };
+
+  // Obtener el icono correcto según el tema activo
+  const getCurrentIcon = (solution: SolutionItem): { type: 'image' | 'emoji' | 'component' | 'none', value: string | React.ReactNode | null } => {
+    // Prioridad 1: iconLight/iconDark según tema activo
+    if (theme === 'light' && solution.iconLight) {
+      const iconType = isImageUrl(solution.iconLight) ? 'image' : 'emoji';
+      return { type: iconType, value: solution.iconLight };
+    }
+    if (theme === 'dark' && solution.iconDark) {
+      const iconType = isImageUrl(solution.iconDark) ? 'image' : 'emoji';
+      return { type: iconType, value: solution.iconDark };
+    }
+    
+    // Prioridad 2: Fallback al icono del otro tema si el actual no existe
+    if (theme === 'light' && solution.iconDark) {
+      const iconType = isImageUrl(solution.iconDark) ? 'image' : 'emoji';
+      return { type: iconType, value: solution.iconDark };
+    }
+    if (theme === 'dark' && solution.iconLight) {
+      const iconType = isImageUrl(solution.iconLight) ? 'image' : 'emoji';
+      return { type: iconType, value: solution.iconLight };
+    }
+    
+    // Prioridad 3: Compatibilidad con formato anterior
+    if (solution.iconUrl) {
+      return { type: 'image', value: solution.iconUrl };
+    }
+    if (solution.icon) {
+      return { 
+        type: typeof solution.icon === 'string' ? 'emoji' : 'component', 
+        value: solution.icon 
+      };
+    }
+    
+    // Fallback: No icon
+    return { type: 'none', value: null };
   };
 
   const currentBackgroundImage = getCurrentBackgroundImage();
@@ -116,12 +225,19 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out"
             style={{
               backgroundImage: `url(${currentBackgroundImage})`,
-              opacity: 0.08
+              opacity: theme === 'dark' ? 0.65 : 0.85  // Más nitidez en ambos modos
             }}
             role="img"
             aria-label={solutionsData.backgroundImageAlt || 'Solutions background'}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent backdrop-blur-[2px]" />
+          {/* Overlay condicional según tema */}
+          {theme === 'dark' ? (
+            // Modo oscuro: overlay muy sutil para mantener contraste del texto
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+          ) : (
+            // Modo claro: sin overlay, imagen pura
+            <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/10" />
+          )}
         </>
       )}
 
@@ -151,56 +267,151 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
           {solutions.map((solution, index) => (
             <div
               key={index}
-              className="group relative theme-bg-card backdrop-blur-sm rounded-2xl p-8 theme-border theme-transition hover:transform hover:-translate-y-2"
-              style={{ 
+              className="group relative rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2 overflow-hidden"
+              style={{
                 animationDelay: `${index * 100}ms`,
-                borderWidth: '1px',
-                borderColor: `color-mix(in srgb, var(--color-primary) 20%, transparent)`,
-                transition: 'all 0.3s ease, border-color 0.3s ease, transform 0.3s ease'
+                background: cardStyles.background,
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                boxShadow: cardStyles.shadow,
+                minWidth: cardStyles.cardMinWidth || '280px',
+                maxWidth: cardStyles.cardMaxWidth || '100%',
+                minHeight: cardStyles.cardMinHeight || 'auto',
+                padding: cardStyles.cardPadding || '2rem',
+                transition: 'all 0.3s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = `color-mix(in srgb, var(--color-primary) 50%, transparent)`;
-                e.currentTarget.style.boxShadow = `0 20px 40px -5px color-mix(in srgb, var(--color-primary) 20%, transparent)`;
+                const card = e.currentTarget;
+                card.style.background = cardStyles.hoverBackground;
+                card.style.boxShadow = cardStyles.hoverShadow;
+                const borderEl = card.querySelector('.card-border') as HTMLElement;
+                if (borderEl) {
+                  borderEl.style.background = cardStyles.hoverBorder;
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = `color-mix(in srgb, var(--color-primary) 20%, transparent)`;
-                e.currentTarget.style.boxShadow = 'none';
+                const card = e.currentTarget;
+                card.style.background = cardStyles.background;
+                card.style.boxShadow = cardStyles.shadow;
+                const borderEl = card.querySelector('.card-border') as HTMLElement;
+                if (borderEl) {
+                  borderEl.style.background = cardStyles.border;
+                }
               }}
             >
-              {/* Gradient Background on Hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300"
-                   style={{
-                     background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`
-                   }}></div>
+              {/* Borde con soporte para degradados */}
+              <div 
+                className="card-border absolute inset-0 rounded-2xl pointer-events-none transition-all duration-300"
+                style={{
+                  background: cardStyles.border,
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                  padding: cardStyles.borderWidth
+                }}
+              />
               
-              {/* Icon */}
-              <div className="relative mb-6 w-16 h-16 rounded-xl p-0.5"
-                   style={{
-                     background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`
-                   }}>
-                <div className="w-full h-full theme-bg-background rounded-xl flex items-center justify-center theme-text-primary">
-                  {typeof solution.icon === 'string' ? (
-                    <span className="text-3xl">{solution.icon}</span>
-                  ) : (
-                    solution.icon
-                  )}
-                </div>
-              </div>
+              {/* Icon - Condicional con/sin borde y por tema */}
+              {(() => {
+                const currentIcon = getCurrentIcon(solution);
+                
+                // Renderizar contenido del icono basado en el tipo
+                const renderIconContent = () => {
+                  switch (currentIcon.type) {
+                    case 'image':
+                      return (
+                        <img 
+                          src={currentIcon.value as string} 
+                          alt={solution.title} 
+                          className="w-12 h-12 object-contain"
+                        />
+                      );
+                    case 'emoji':
+                      return (
+                        <span 
+                          className="text-3xl leading-none flex items-center justify-center"
+                          style={{ 
+                            fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
+                            textRendering: 'optimizeLegibility'
+                          }}
+                        >
+                          {currentIcon.value as string}
+                        </span>
+                      );
+                    case 'component':
+                      return currentIcon.value as React.ReactNode;
+                    default:
+                      return <span className="text-3xl">📄</span>; // Fallback icon
+                  }
+                };
+
+                // Obtener clases de alineación
+                const getAlignmentClasses = () => {
+                  const alignment = cardStyles.iconAlignment || 'left';
+                  switch (alignment) {
+                    case 'center':
+                      return 'mx-auto';
+                    case 'right':
+                      return 'ml-auto';
+                    case 'left':
+                    default:
+                      return 'mr-auto';
+                  }
+                };
+
+                // Renderizar con o sin borde
+                return cardStyles.iconBorderEnabled === true ? (
+                  // Con borde gradiente
+                  <div className={`relative mb-6 w-16 h-16 rounded-xl p-0.5 ${getAlignmentClasses()}`}
+                       style={{
+                         background: cardStyles.iconGradient
+                       }}>
+                    <div
+                      className="w-full h-full rounded-xl flex items-center justify-center"
+                      style={{
+                        background: cardStyles.iconBackground,
+                        // Solo aplicar color si no es emoji
+                        color: currentIcon.type === 'emoji' ? 'inherit' : cardStyles.iconColor
+                      }}
+                    >
+                      {renderIconContent()}
+                    </div>
+                  </div>
+                ) : (
+                  // Sin borde - icono directo
+                  <div className={`relative mb-6 w-16 h-16 flex items-center justify-center ${getAlignmentClasses()}`}
+                       style={{
+                         // Solo aplicar color si no es emoji
+                         color: currentIcon.type === 'emoji' ? 'inherit' : cardStyles.iconColor
+                       }}>
+                    {renderIconContent()}
+                  </div>
+                );
+              })()}
 
               {/* Content */}
               <div className="relative">
                 <div
-                  className="text-2xl font-bold theme-text-primary mb-4 theme-transition"
+                  className="text-2xl font-bold mb-4 transition-colors"
+                  style={{
+                    color: cardStyles.titleColor
+                  }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.title) }}
                 />
                 <div
-                  className="theme-text-secondary leading-relaxed theme-transition"
+                  className="leading-relaxed transition-colors"
+                  style={{
+                    color: cardStyles.descriptionColor
+                  }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.description) }}
                 />
               </div>
 
               {/* Arrow Indicator */}
-              <div className="relative mt-6 flex items-center text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div
+                className="relative mt-6 flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ color: cardStyles.linkColor }}
+              >
                 <span className="text-sm font-medium mr-2">Conocer más</span>
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -208,40 +419,6 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Bottom CTA */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 text-center">
-        <p className="text-gray-400 mb-6">¿Listo para transformar tu empresa?</p>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          {/* Botón principal */}
-          <Link 
-            to="/contacto"
-            className="px-8 py-3 rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300"
-          >
-            Solicitar Consultoría Gratuita
-          </Link>
-
-          {/* Botones según estado de autenticación */}
-          <SignedOut>
-            <SignUpButton mode="modal">
-              <button className="px-8 py-3 rounded-full border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition-all duration-300 font-semibold">
-                Crear Cuenta Gratis
-              </button>
-            </SignUpButton>
-          </SignedOut>
-
-          <SignedIn>
-            <Link 
-              to="/dashboard"
-              className="px-8 py-3 rounded-full border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white transition-all duration-300 font-semibold flex items-center justify-center space-x-2"
-            >
-              <span>🎯</span>
-              <span>Acceder al Panel</span>
-            </Link>
-          </SignedIn>
         </div>
       </div>
     </section>

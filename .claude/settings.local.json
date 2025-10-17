@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/pc1/Desktop/web-scuti/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

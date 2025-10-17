@@ -100,7 +100,7 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
       const formData = new FormData();
       formData.append('image', file);
 
-      const response = await fetch(`${API_URL}/api/upload/image`, {
+      const response = await fetch(`${API_URL}/upload/image`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -116,8 +116,9 @@ const ImageUploader = ({ currentImage, onImageUpload, label, description, darkMo
       const data = await response.json();
 
       if (data.success) {
-        // Construir URL completa
-        const imageUrl = `${API_URL}${data.data.url}`;
+        // Construir URL completa - remover /api para archivos estáticos
+        const baseUrl = API_URL.replace('/api', '');
+        const imageUrl = `${baseUrl}${data.data.url}`;
         onImageUpload(imageUrl);
         setPreview(imageUrl);
       } else {

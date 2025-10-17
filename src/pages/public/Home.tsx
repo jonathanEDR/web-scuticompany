@@ -78,15 +78,32 @@ const Home = () => {
   const { setThemeConfig } = useTheme();
 
   useEffect(() => {
-    if (!pageData && loading) {
-      loadPageData();
-    }
-  }, [pageData, loading]);
+    loadPageData();
+  }, []);
 
-  const loadPageData = async () => {
-    if (!loading) return; // Evitar múltiples cargas
-    
+  // Refrescar datos cada 30 segundos para detectar cambios del CMS
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadPageData(true); // Recarga silenciosa
+    }, 30000);
+
+    // Escuchar eventos de actualización del CMS
+    const handleCMSUpdate = () => {
+      loadPageData(true);
+    };
+
+    window.addEventListener('cmsUpdate', handleCMSUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('cmsUpdate', handleCMSUpdate);
+    };
+  }, []);
+
+  const loadPageData = async (silent = false) => {
     try {
+      if (!silent) setLoading(true);
+      
       const data = await getPageBySlug('home');
       
       setPageData(data);

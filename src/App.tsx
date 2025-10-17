@@ -82,6 +82,38 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/cms/content"
+          element={
+            <ProtectedRoute>
+              <CmsManager />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/cms/seo"
+          element={
+            <ProtectedRoute>
+              <CmsManager />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/cms/theme"
+          element={
+            <ProtectedRoute>
+              <CmsManager />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/cms/cards"
+          element={
+            <ProtectedRoute>
+              <CmsManager />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
           </Suspense>
         </BrowserRouter>
