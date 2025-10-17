@@ -138,10 +138,30 @@ vercel inspect
 
 ## Solución de Problemas Comunes
 
+### Error: "ERESOLVE could not resolve" (React 19 con react-helmet-async)
+**Síntoma:** Error al instalar dependencias que dice "ERESOLVE could not resolve: react-helmet-async@2.0.5"
+
+**Solución:** Ya está resuelto en `package.json` con overrides. Si persiste:
+```json
+"overrides": {
+  "react-helmet-async": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
+```
+
+**Verificación:**
+```bash
+npm install
+npm run build
+```
+
 ### Error: "Build failed"
 - Verifica que todas las dependencias estén en `package.json`
 - Revisa los logs de build en Vercel
 - Asegúrate de que `npm run build` funcione localmente
+- Verifica que los overrides de React estén configurados (ver arriba)
 
 ### Error: "API requests failing"
 - Verifica que `VITE_API_URL` esté configurada correctamente

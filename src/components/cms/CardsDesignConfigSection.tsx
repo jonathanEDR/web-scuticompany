@@ -490,7 +490,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 { value: 'left', label: '⬅️ Izquierda', icon: '⬅️' },
                 { value: 'center', label: '⚡ Centro', icon: '⚡' },
                 { value: 'right', label: '➡️ Derecha', icon: '➡️' }
-              ].map(({ value, label, icon }) => (
+              ].map(({ value, icon }) => (
                 <button
                   key={value}
                   onClick={() => updateCardStyle('iconAlignment', value)}

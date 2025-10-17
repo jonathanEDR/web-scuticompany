@@ -20,14 +20,6 @@ interface UserSyncStatus {
   userData: UserSyncData | null;
 }
 
-interface SyncUserData {
-  clerkId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  profileImage: string;
-}
 
 /**
  * Hook personalizado para sincronizar automáticamente el usuario de Clerk con MongoDB

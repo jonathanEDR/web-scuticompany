@@ -67,7 +67,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             </p>
 
             {/* Error details (only in development) */}
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="mb-6 p-4 bg-red-50 rounded-lg text-left">
                 <p className="text-xs font-mono text-red-800 break-all">
                   {this.state.error.toString()}
