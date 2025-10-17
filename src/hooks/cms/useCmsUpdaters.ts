@@ -1,6 +1,11 @@
 import type { PageData, PageSeo, ButtonStyle } from '../../types/cms';
+import type { ThemeConfig } from '../../contexts/ThemeContext';
 
-export const useCmsUpdaters = (pageData: PageData | null, setPageData: (data: PageData) => void) => {
+export const useCmsUpdaters = (
+  pageData: PageData | null, 
+  setPageData: (data: PageData) => void,
+  setThemeConfig?: (config: ThemeConfig) => void
+) => {
   
   const updateContent = (field: string, value: any) => {
     if (!pageData) return;
@@ -61,32 +66,58 @@ export const useCmsUpdaters = (pageData: PageData | null, setPageData: (data: Pa
   const updateTheme = (mode: 'lightMode' | 'darkMode', field: string, value: string) => {
     if (!pageData || !pageData.theme) return;
     
-    setPageData({
-      ...pageData,
-      theme: {
-        ...pageData.theme,
-        [mode]: {
-          ...pageData.theme[mode],
-          [field]: value
-        }
+    console.log(`🎨 Actualizando tema ${mode}.${field}:`, value);
+    
+    const newTheme = {
+      ...pageData.theme,
+      [mode]: {
+        ...pageData.theme[mode],
+        [field]: value
       }
-    });
+    };
+    
+    const newPageData = {
+      ...pageData,
+      theme: newTheme
+    };
+    
+    setPageData(newPageData);
+    
+    // IMPORTANTE: Actualizar ThemeContext
+    if (setThemeConfig) {
+      console.log('✅ Sincronizando tema con contexto');
+      setThemeConfig(newTheme as ThemeConfig);
+    }
   };
 
   const updateThemeDefault = (value: 'light' | 'dark') => {
     if (!pageData || !pageData.theme) return;
     
-    setPageData({
+    console.log(`🎨 Cambiando tema por defecto a:`, value);
+    
+    const newTheme = {
+      ...pageData.theme,
+      default: value
+    };
+    
+    const newPageData = {
       ...pageData,
-      theme: {
-        ...pageData.theme,
-        default: value
-      }
-    });
+      theme: newTheme
+    };
+    
+    setPageData(newPageData);
+    
+    // IMPORTANTE: Actualizar ThemeContext
+    if (setThemeConfig) {
+      console.log('✅ Sincronizando tema por defecto con contexto');
+      setThemeConfig(newTheme as ThemeConfig);
+    }
   };
 
   const updateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard', style: ButtonStyle) => {
     if (!pageData || !pageData.theme) return;
+
+    console.log(`🎨 Actualizando botón ${buttonType} en modo ${mode}:`, style);
 
     // Asegurar que la estructura existe
     const currentTheme = { ...pageData.theme };
@@ -98,21 +129,30 @@ export const useCmsUpdaters = (pageData: PageData | null, setPageData: (data: Pa
       };
     }
 
-    const newPageData = {
-      ...pageData,
-      theme: {
-        ...currentTheme,
-        [mode]: {
-          ...currentTheme[mode],
-          buttons: {
-            ...currentTheme[mode].buttons,
-            [buttonType]: style
-          }
+    const newTheme = {
+      ...currentTheme,
+      [mode]: {
+        ...currentTheme[mode],
+        buttons: {
+          ...currentTheme[mode].buttons,
+          [buttonType]: style
         }
       }
     };
+
+    const newPageData = {
+      ...pageData,
+      theme: newTheme
+    };
     
+    // Actualizar pageData
     setPageData(newPageData);
+    
+    // IMPORTANTE: También actualizar el ThemeContext inmediatamente
+    if (setThemeConfig) {
+      console.log('✅ Aplicando configuración de tema actualizada al contexto');
+      setThemeConfig(newTheme as ThemeConfig);
+    }
   };
 
   return {

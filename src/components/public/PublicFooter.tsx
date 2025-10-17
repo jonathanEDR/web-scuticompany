@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
-import { SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../Logo';
 
 const PublicFooter = () => {
+  const navigate = useNavigate();
+  
   return (
     <footer className="theme-bg-card theme-transition theme-border" 
             style={{
@@ -69,28 +70,26 @@ const PublicFooter = () => {
           <div>
             <h3 className="text-white font-semibold mb-4">Acceso</h3>
             <div className="space-y-3">
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <button className="w-full px-4 py-2 text-gray-400 hover:text-purple-400 transition-colors text-sm text-left border border-gray-700 rounded-lg hover:border-purple-400">
-                    🔐 Iniciar Sesión
-                  </button>
-                </SignInButton>
-                
-                <SignUpButton mode="modal">
-                  <button className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm">
-                    🚀 Crear Cuenta
-                  </button>
-                </SignUpButton>
-              </SignedOut>
-
-              <SignedIn>
-                <Link 
-                  to="/dashboard"
-                  className="block w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm text-center"
-                >
-                  🎯 Ir al Dashboard
-                </Link>
-              </SignedIn>
+              {/* ⚡ Botones optimizados - Redirigen a páginas específicas */}
+              <button
+                onClick={() => {
+                  console.log('🔐 Footer: Click en Iniciar Sesión - Redirigiendo a /login');
+                  navigate('/login');
+                }}
+                className="w-full px-4 py-2 text-gray-400 hover:text-purple-400 transition-colors text-sm text-left border border-gray-700 rounded-lg hover:border-purple-400"
+              >
+                🔐 Iniciar Sesión
+              </button>
+              
+              <button
+                onClick={() => {
+                  console.log('🚀 Footer: Click en Crear Cuenta - Redirigiendo a /signup');
+                  navigate('/signup');
+                }}
+                className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
+              >
+                🚀 Crear Cuenta
+              </button>
             </div>
 
             {/* Contact Info */}

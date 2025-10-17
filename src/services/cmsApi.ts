@@ -8,7 +8,7 @@ interface CacheEntry<T> {
 
 class RequestCache {
   private cache = new Map<string, CacheEntry<any>>();
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+  private readonly CACHE_DURATION = 10 * 60 * 1000; // ⚡ 10 minutos (aumentado de 5)
 
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
@@ -43,6 +43,12 @@ class RequestCache {
         this.cache.delete(key);
       }
     });
+  }
+
+  // ⚡ Nuevo: Obtener datos aunque estén expirados (para fallback)
+  getStale<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    return entry ? entry.data : null;
   }
 }
 
@@ -157,7 +163,7 @@ export const getAllPages = async (useCache = true) => {
 export const getPageBySlug = async (slug: string, useCache = true) => {
   const cacheKey = `page-${slug}`;
 
-  // Intentar obtener del caché
+  // ⚡ Intentar obtener del caché
   if (useCache) {
     const cached = cache.get(cacheKey);
     if (cached) {
@@ -167,7 +173,11 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
   }
 
   try {
-    const response = await fetchWithRetry(`${API_URL}/cms/pages/${slug}`);
+    const response = await fetchWithRetry(
+      `${API_URL}/cms/pages/${slug}`,
+      {},
+      { maxRetries: 2, delay: 500 } // ⚡ Menos reintentos y delay más corto para páginas públicas
+    );
     const data = await response.json();
 
     if (!data.success) {
@@ -180,21 +190,59 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
     return data.data;
   } catch (error) {
     console.error(`Error en getPageBySlug (${slug}):`, error);
+    
+    // ⚡ Intentar usar datos en caché aunque estén expirados (stale-while-revalidate)
+    const staleData = cache.getStale(cacheKey);
+    if (staleData) {
+      console.warn(`⚠️ Usando datos expirados del caché para ${slug}`);
+      return staleData;
+    }
+    
     throw error;
   }
+};
+
+// Limpiar datos antes de enviar al backend
+const cleanDataForBackend = (data: any): any => {
+  if (Array.isArray(data)) {
+    return data.map(cleanDataForBackend);
+  }
+  
+  if (data && typeof data === 'object') {
+    const cleaned: any = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+      // Omitir _id problemáticos que contengan buffer
+      if (key === '_id' && 
+          value && 
+          typeof value === 'object' && 
+          'buffer' in value) {
+        continue; // Omitir este _id problemático
+      }
+      
+      cleaned[key] = cleanDataForBackend(value);
+    }
+    
+    return cleaned;
+  }
+  
+  return data;
 };
 
 // Actualizar contenido de una página (con auth)
 export const updatePage = async (slug: string, pageData: any) => {
   try {
     const headers = await getAuthHeaders();
+    
+    // Limpiar datos antes de enviar
+    const cleanedData = cleanDataForBackend(pageData);
 
     const response = await fetchWithRetry(
       `${API_URL}/cms/pages/${slug}`,
       {
         method: 'PUT',
         headers,
-        body: JSON.stringify(pageData),
+        body: JSON.stringify(cleanedData),
       },
       { maxRetries: 2 } // Menos reintentos para operaciones de escritura
     );

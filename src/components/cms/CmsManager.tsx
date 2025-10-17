@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useCmsUpdaters } from '../../hooks/cms/useCmsUpdaters';
@@ -25,7 +25,6 @@ const CmsManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards'>(getInitialTab());
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const timeoutRef = useRef<number | null>(null);
 
   // Sincronizar tab con URL
   useEffect(() => {
@@ -50,6 +49,8 @@ const CmsManager: React.FC = () => {
     pageData,
     loading: dataLoading,
     message: dataMessage,
+    setPageData,
+    setThemeConfig,
     loadPageData,
     handleSave
   } = useCmsData();
@@ -58,47 +59,29 @@ const CmsManager: React.FC = () => {
     updateContent,
     updateTextStyle,
     updateSimpleButtonStyle
-  } = useCmsUpdaters(pageData, loadPageData);
+  } = useCmsUpdaters(pageData, setPageData, setThemeConfig);
 
-  // Auto-save functionality
-  const handleAutoSave = async () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
 
-    timeoutRef.current = window.setTimeout(async () => {
-      try {
-        setSaveStatus('saving');
-        await handleSave();
-        setSaveStatus('saved');
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      } catch (error) {
-        console.error('Error auto-saving:', error);
-        setSaveStatus('error');
-        setTimeout(() => setSaveStatus('idle'), 3000);
-      }
-    }, 1000);
-  };
 
-  // Enhanced update content - SIN auto-save para CardItemsEditor
+  // Update content without auto-save (manual save only)
   const handleUpdateContent = (field: string, value: any) => {
     updateContent(field, value);
-    // No auto-save para solutions.items - se maneja manualmente en CardItemsEditor
-    if (field !== 'solutions.items') {
-      handleAutoSave();
-    }
+    // Marcar como cambios pendientes sin guardar automáticamente
+    setSaveStatus('idle');
   };
 
-  // Enhanced update text style with auto-save
+  // Update text style without auto-save (manual save only)
   const handleUpdateTextStyle = (section: 'hero' | 'solutions', field: string, mode: 'light' | 'dark', color: string) => {
     updateTextStyle(section, field, mode, color);
-    handleAutoSave();
+    // Marcar como cambios pendientes
+    setSaveStatus('idle');
   };
 
-  // Enhanced update button style with auto-save
+  // Update button style without auto-save (manual save only)
   const handleUpdateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard', style: any) => {
     updateSimpleButtonStyle(mode, buttonType, style);
-    handleAutoSave();
+    // Marcar como cambios pendientes
+    setSaveStatus('idle');
   };
 
   // Manual save

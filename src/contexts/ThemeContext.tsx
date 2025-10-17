@@ -50,9 +50,9 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Temas por defecto
+// Temas por defecto - Sincronizados con la configuración de MongoDB
 const defaultThemeConfig: ThemeConfig = {
-  default: 'light',
+  default: 'dark',
   lightMode: {
     primary: '#8B5CF6',
     secondary: '#06B6D4',
@@ -62,23 +62,47 @@ const defaultThemeConfig: ThemeConfig = {
     cardBg: '#F9FAFB',
     border: '#E5E7EB',
     buttons: {
-      ctaPrimary: { bg: '#8B5CF6', text: '#FFFFFF', hover: '#7C3AED', border: 'transparent' },
-      contact: { bg: '#10B981', text: '#FFFFFF', hover: '#059669', border: '#10B981' },
-      dashboard: { bg: '#06B6D4', text: '#FFFFFF', hover: '#0891B2', border: 'transparent' }
+      ctaPrimary: {
+        background: 'linear-gradient(90deg, #8B5CF6, #06B6D4, #8B5CF6)',
+        textColor: '#FFFFFF',
+        borderColor: 'transparent'
+      },
+      contact: {
+        background: 'transparent',
+        textColor: '#8B5CF6',
+        borderColor: 'linear-gradient(90deg, #8B5CF6, #06B6D4)'
+      },
+      dashboard: {
+        background: 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
+        textColor: '#FFFFFF',
+        borderColor: 'transparent'
+      }
     }
   },
   darkMode: {
     primary: '#A78BFA',
     secondary: '#22D3EE',
-    background: '#111827',
-    text: '#F9FAFB',
-    textSecondary: '#D1D5DB',
-    cardBg: '#1F2937',
-    border: '#374151',
+    background: '#000000', // ⚡ Negro profundo en lugar de #111827
+    text: '#FFFFFF', // ⚡ Blanco puro para mejor contraste
+    textSecondary: '#E5E7EB', // ⚡ Gris más claro
+    cardBg: '#0A0A0A', // ⚡ Negro ligeramente gris para las tarjetas
+    border: '#1F1F1F', // ⚡ Borde gris muy oscuro
     buttons: {
-      ctaPrimary: { bg: '#A78BFA', text: '#111827', hover: '#8B5CF6', border: 'transparent' },
-      contact: { bg: '#34D399', text: '#111827', hover: '#10B981', border: '#34D399' },
-      dashboard: { bg: '#22D3EE', text: '#111827', hover: '#06B6D4', border: 'transparent' }
+      ctaPrimary: {
+        background: 'linear-gradient(90deg, #A78BFA, #22D3EE, #A78BFA)',
+        textColor: '#000000', // ⚡ Negro para mejor contraste en botones
+        borderColor: 'transparent'
+      },
+      contact: {
+        background: 'transparent',
+        textColor: '#A78BFA',
+        borderColor: 'linear-gradient(90deg, #A78BFA, #22D3EE)'
+      },
+      dashboard: {
+        background: 'linear-gradient(90deg, #A78BFA, #22D3EE)',
+        textColor: '#000000', // ⚡ Negro para mejor contraste
+        borderColor: 'transparent'
+      }
     }
   }
 };

@@ -53,7 +53,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
     items: []
   };
 
-  // Valores por defecto para el diseño de tarjetas
+  // Valores por defecto para el diseño de tarjetas - Sincronizados con MongoDB
   const defaultLightStyles: CardDesignStyles = {
     background: 'rgba(255, 255, 255, 0.1)',
     border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
@@ -68,12 +68,12 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
     titleColor: '#1f2937',
     descriptionColor: '#4b5563',
     linkColor: '#a78bfa',
-    cardMinWidth: '280px',
+    cardMinWidth: '200px',
     cardMaxWidth: '100%',
     cardMinHeight: 'auto',
     cardPadding: '2rem',
-    iconBorderEnabled: true,
-    iconAlignment: 'left'
+    iconBorderEnabled: false,
+    iconAlignment: 'center'
   };
 
   const defaultDarkStyles: CardDesignStyles = {
@@ -94,8 +94,8 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
     cardMaxWidth: '100%',
     cardMinHeight: 'auto',
     cardPadding: '2rem',
-    iconBorderEnabled: true,
-    iconAlignment: 'left'
+    iconBorderEnabled: false,
+    iconAlignment: 'center'
   };
 
   // Obtener estilos actuales según el tema
@@ -104,13 +104,13 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
         ...defaultLightStyles,
         ...(solutionsData.cardsDesign?.light || {}),
         // Asegurar que iconAlignment tenga un valor por defecto si no existe
-        iconAlignment: solutionsData.cardsDesign?.light?.iconAlignment || 'left'
+        iconAlignment: solutionsData.cardsDesign?.light?.iconAlignment || 'center'
       }
     : {
         ...defaultDarkStyles,
         ...(solutionsData.cardsDesign?.dark || {}),
         // Asegurar que iconAlignment tenga un valor por defecto si no existe
-        iconAlignment: solutionsData.cardsDesign?.dark?.iconAlignment || 'left'
+        iconAlignment: solutionsData.cardsDesign?.dark?.iconAlignment || 'center'
       };
 
   // Obtener la imagen correcta según el tema activo

@@ -72,20 +72,73 @@ interface PageData {
   theme?: ExtendedThemeConfig;
 }
 
-const Home = () => {
-  const [pageData, setPageData] = useState<PageData | null>(null);
-  const [loading, setLoading] = useState(true);
+// ⚡ Contenido por defecto - Se renderiza INMEDIATAMENTE
+const DEFAULT_PAGE_DATA: PageData = {
+  content: {
+    hero: {
+      title: 'Transformamos tu empresa con tecnología inteligente',
+      subtitle: 'Innovamos para que tu empresa avance al ritmo de la tecnología.',
+      description: 'Transformamos procesos con soluciones digitales, proyectos de software y modelos de IA personalizados.',
+      ctaText: 'Conoce nuestros servicios',
+      ctaLink: '#servicios'
+    },
+    solutions: {
+      title: 'Soluciones',
+      description: 'En el dinámico entorno empresarial de hoy, la tecnología es la columna vertebral del éxito.',
+      items: [
+        {
+          icon: '🚀',
+          title: 'Desarrollo de Software',
+          description: 'Soluciones personalizadas para tu negocio',
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        },
+        {
+          icon: '🤖',
+          title: 'Inteligencia Artificial',
+          description: 'Modelos de IA adaptados a tus necesidades',
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+        },
+        {
+          icon: '☁️',
+          title: 'Soluciones Cloud',
+          description: 'Infraestructura escalable y segura',
+          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+        }
+      ]
+    }
+  },
+  seo: {
+    metaTitle: 'Scuti Company - Transformamos tu empresa con tecnología inteligente',
+    metaDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.',
+    keywords: ['tecnología', 'software', 'inteligencia artificial', 'desarrollo web', 'transformación digital'],
+    ogTitle: 'Scuti Company - Tecnología Inteligente',
+    ogDescription: 'Transformamos procesos con soluciones digitales y modelos de IA',
+    ogImage: ''
+  }
+};
+
+/**
+ * Página Home Optimizada
+ * - Renderiza contenido estático inmediatamente
+ * - Carga datos del CMS en background sin bloquear
+ * - Sin dependencias de autenticación
+ */
+const HomeOptimized = () => {
+  // ⚡ Estado inicial con datos por defecto - RENDERIZA INMEDIATAMENTE
+  const [pageData, setPageData] = useState<PageData>(DEFAULT_PAGE_DATA);
+  const [isLoadingCMS, setIsLoadingCMS] = useState(false);
   const { setThemeConfig } = useTheme();
 
   useEffect(() => {
+    // Cargar datos del CMS en background (no bloquea renderizado inicial)
     loadPageData();
   }, []);
 
-  // Refrescar datos cada 30 segundos para detectar cambios del CMS
+  // Refrescar datos cada 60 segundos (reducido de 30s para mejor rendimiento)
   useEffect(() => {
     const interval = setInterval(() => {
       loadPageData(true); // Recarga silenciosa
-    }, 30000);
+    }, 60000); // 60 segundos
 
     // Escuchar eventos de actualización del CMS
     const handleCMSUpdate = () => {
@@ -102,63 +155,36 @@ const Home = () => {
 
   const loadPageData = async (silent = false) => {
     try {
-      if (!silent) setLoading(true);
+      if (!silent) setIsLoadingCMS(true);
       
+      console.log('🔄 Intentando cargar datos del CMS...');
+      
+      // Intentar obtener datos del CMS
       const data = await getPageBySlug('home');
       
-      setPageData(data);
+      console.log('📦 Datos recibidos del CMS:', data);
       
-      // Cargar configuración de tema si existe
-      if (data.theme) {
-        setThemeConfig(data.theme);
+      // Actualizar solo si obtuvimos datos válidos
+      if (data && data.content) {
+        console.log('✅ Aplicando datos del CMS a la página');
+        setPageData(data);
+        
+        // Cargar configuración de tema si existe
+        if (data.theme) {
+          console.log('🎨 Aplicando configuración de tema del CMS');
+          setThemeConfig(data.theme);
+        }
+      } else {
+        console.warn('⚠️ Datos del CMS inválidos o vacíos, manteniendo valores por defecto');
       }
     } catch (error) {
-      console.error('Error al cargar página:', error);
-      // Usar datos por defecto si falla
-      setPageData({
-        content: {
-          hero: {
-            title: 'Transformamos tu empresa con tecnología inteligente',
-            subtitle: 'Innovamos para que tu empresa avance al ritmo de la tecnología.',
-            description: 'Transformamos procesos con soluciones digitales, proyectos de software y modelos de IA personalizados.',
-            ctaText: 'Conoce nuestros servicios',
-            ctaLink: '#servicios'
-          },
-          solutions: {
-            title: 'Soluciones',
-            description: 'En el dinámico entorno empresarial de hoy, la tecnología es la columna vertebral del éxito.',
-            items: []
-          }
-        },
-        seo: {
-          metaTitle: 'Scuti Company - Tecnología Inteligente',
-          metaDescription: 'Transformamos tu empresa con tecnología inteligente',
-          keywords: ['tecnología', 'software', 'IA'],
-          ogTitle: 'Scuti Company',
-          ogDescription: 'Transformamos tu empresa con tecnología inteligente',
-          ogImage: ''
-        }
-      });
+      console.error('❌ Error al cargar datos del CMS:', error);
+      console.warn('⚠️ Usando contenido por defecto debido al error');
+      // No hacer nada - ya tenemos datos por defecto
     } finally {
-      setLoading(false);
+      if (!silent) setIsLoadingCMS(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
-
-  if (!pageData) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Error al cargar la página</div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -171,16 +197,17 @@ const Home = () => {
         {/* Open Graph */}
         <meta property="og:title" content={pageData.seo.ogTitle} />
         <meta property="og:description" content={pageData.seo.ogDescription} />
-        <meta property="og:image" content={pageData.seo.ogImage} />
+        {pageData.seo.ogImage && <meta property="og:image" content={pageData.seo.ogImage} />}
         <meta property="og:type" content="website" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageData.seo.ogTitle} />
         <meta name="twitter:description" content={pageData.seo.ogDescription} />
-        <meta name="twitter:image" content={pageData.seo.ogImage} />
+        {pageData.seo.ogImage && <meta name="twitter:image" content={pageData.seo.ogImage} />}
       </Helmet>
 
+      {/* ⚡ Contenido se renderiza INMEDIATAMENTE sin esperar autenticación ni CMS */}
       <div className="min-h-screen bg-gray-900">
         <PublicHeader />
         <main>
@@ -188,9 +215,19 @@ const Home = () => {
           <SolutionsSection data={pageData.content.solutions} />
         </main>
         <PublicFooter />
+        
+        {/* Indicador sutil de carga del CMS (opcional) */}
+        {isLoadingCMS && (
+          <div className="fixed bottom-4 right-4 bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg text-sm">
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              Actualizando contenido...
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
 };
 
-export default Home;
+export default HomeOptimized;

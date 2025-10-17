@@ -62,6 +62,7 @@ export const useCmsData = () => {
       }
       
       // Asegurar que los botones tengan valores por defecto si no existen
+      // Sincronizados con la configuración actual de MongoDB
       if (data.theme) {
         // Valores por defecto para modo claro
         if (!data.theme.lightMode.buttons) {
@@ -69,7 +70,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.lightMode.buttons.ctaPrimary) {
           data.theme.lightMode.buttons.ctaPrimary = {
-            background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+            background: 'linear-gradient(90deg, #8B5CF6, #06B6D4, #8B5CF6)',
             textColor: '#FFFFFF',
             borderColor: 'transparent'
           };
@@ -83,19 +84,19 @@ export const useCmsData = () => {
         }
         if (!data.theme.lightMode.buttons.dashboard) {
           data.theme.lightMode.buttons.dashboard = {
-            background: 'linear-gradient(135deg, #06B6D4, #3B82F6)',
+            background: 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
             textColor: '#FFFFFF',
             borderColor: 'transparent'
           };
         }
-        
+
         // Valores por defecto para modo oscuro
         if (!data.theme.darkMode.buttons) {
           data.theme.darkMode.buttons = {};
         }
         if (!data.theme.darkMode.buttons.ctaPrimary) {
           data.theme.darkMode.buttons.ctaPrimary = {
-            background: 'linear-gradient(135deg, #A78BFA, #22D3EE)',
+            background: 'linear-gradient(90deg, #A78BFA, #22D3EE, #A78BFA)',
             textColor: '#111827',
             borderColor: 'transparent'
           };
@@ -109,7 +110,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.darkMode.buttons.dashboard) {
           data.theme.darkMode.buttons.dashboard = {
-            background: 'linear-gradient(135deg, #22D3EE, #60A5FA)',
+            background: 'linear-gradient(90deg, #A78BFA, #22D3EE)',
             textColor: '#111827',
             borderColor: 'transparent'
           };
@@ -160,6 +161,7 @@ export const useCmsData = () => {
     message,
     setPageData,
     setMessage,
+    setThemeConfig,
     loadPageData,
     handleSave
   };

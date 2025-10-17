@@ -82,6 +82,7 @@ export interface ThemeColors {
 }
 
 export interface SolutionItem {
+  _id?: string;        // ObjectId opcional de MongoDB
   iconLight?: string;  // URL del icono para tema claro (PNG)
   iconDark?: string;   // URL del icono para tema oscuro (PNG)
   // Mantener para compatibilidad con datos antiguos

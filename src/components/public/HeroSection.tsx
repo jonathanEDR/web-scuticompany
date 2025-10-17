@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-import { SignUpButton, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -39,6 +38,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
   const { theme: currentTheme } = useTheme();
+  const navigate = useNavigate();
 
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {
@@ -202,61 +202,35 @@ const HeroSection = ({ data }: HeroSectionProps) => {
               </span>
             </Link>
 
-            {/* Botones de autenticación */}
-            <SignedOut>
-              <SignUpButton mode="modal">
-                <button 
-                  aria-label="Comenzar gratis - Crear cuenta nueva"
-                  className={`group relative px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border-2 theme-transition font-medium text-xs sm:text-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 transition-all duration-300 ${
-                    animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                  }`}
-                  style={{
-                    borderColor: 'var(--color-primary)',
-                    color: 'var(--color-primary)',
-                    backgroundColor: 'transparent'
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                    (e.target as HTMLElement).style.color = 'white';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                    (e.target as HTMLElement).style.color = 'var(--color-primary)';
-                  }}>
-                  <span className="flex items-center space-x-2">
-                    <span role="img" aria-label="Cohete">🚀</span>
-                    <span className="hidden sm:inline">Comenzar Gratis</span>
-                  </span>
-                </button>
-              </SignUpButton>
-            </SignedOut>
-
-            <SignedIn>
-              <Link
-                to="/dashboard"
-                role="button"
-                aria-label="Ir al Dashboard - Acceder a tu panel de control"
-                className={`group relative px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-75 transform hover:scale-105 active:scale-95 transition-all duration-300 font-medium text-xs sm:text-sm ${
-                  animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                }`}
-                style={{
-                  background: 'var(--color-dashboard-bg)',
-                  color: 'var(--color-dashboard-text)',
-                  borderColor: 'transparent'
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.background = 'var(--color-dashboard-hover-bg)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.background = 'var(--color-dashboard-bg)';
-                }}
-              >
-                <span className="flex items-center space-x-2">
-                  <span role="img" aria-label="Objetivo">🎯</span>
-                  <span className="hidden sm:inline">Ir al Dashboard</span>
-                </span>
-              </Link>
-            </SignedIn>
+            {/* ⚡ Botón optimizado - Redirige a página de signup */}
+            <button
+              onClick={() => {
+                console.log('🚀 HeroSection: Click en Comenzar Gratis - Redirigiendo a /signup');
+                navigate('/signup');
+              }}
+              aria-label="Comenzar gratis - Crear cuenta nueva"
+              className={`group relative px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border-2 theme-transition font-medium text-xs sm:text-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 transition-all duration-300 ${
+                animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}
+              style={{
+                borderColor: 'var(--color-primary)',
+                color: 'var(--color-primary)',
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                (e.target as HTMLElement).style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                (e.target as HTMLElement).style.color = 'var(--color-primary)';
+              }}
+            >
+              <span className="flex items-center space-x-2">
+                <span role="img" aria-label="Cohete">🚀</span>
+                <span className="hidden sm:inline">Comenzar Gratis</span>
+              </span>
+            </button>
           </div>
 
           {/* Scroll Indicator Dots */}

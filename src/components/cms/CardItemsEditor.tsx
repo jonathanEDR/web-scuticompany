@@ -41,6 +41,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
     ];
     
     return {
+      // No incluir _id para nuevos items, dejar que el backend lo genere
       iconLight: '',
       iconDark: '',
       title: defaultTitles[index] || `Solución ${index + 1}`,
