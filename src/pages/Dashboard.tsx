@@ -1,325 +1,434 @@
-import { useState, useEffect } from 'react';
-import { SignedIn, SignInButton, useUser } from '@clerk/clerk-react';
+import { useState, useEffect, useCallback } from 'react';
+import { SignedIn, useUser } from '@clerk/clerk-react';
 import DashboardLayout from '../components/DashboardLayout';
-import { useUserSync } from '../hooks/useUserSync';
-import { 
-  Button, 
-  LoadingSpinner, 
-  StatusCard, 
-  Alert, 
-  formatDate, 
-  API_CONFIG 
-} from '../components/UI';
+import { Button, LoadingSpinner } from '../components/UI';
 
-// Interfaces
-interface BackendMessage {
-  message: string;
-  timestamp?: string;
-  backend?: string;
-  status?: string;
+// 🎯 Tipos TypeScript optimizados
+interface DatabaseInfo {
+  status: string;
+  host: string;
+  connected?: boolean;
+  name?: string;
 }
 
-interface CompanyInfo {
-  empresa: string;
-  descripcion: string;
-  tecnologias: {
-    backend: string;
-    frontend: string;
+interface ServerInfo {
+  port: number;
+  uptime: number;
+  environment?: string;
+  memory?: {
+    used: number;
+    total: number;
   };
 }
 
+interface BackendStatus {
+  message: string;
+  database: DatabaseInfo;
+  server: ServerInfo;
+  timestamp?: string;
+}
 
+interface TechnologyStack {
+  backend: string;
+  frontend: string;
+  database: string;
+  auth?: string;
+}
 
-// Componente principal del Dashboard
+interface PageInfo {
+  name: string;
+  status: string;
+  updatedBy: string;
+  lastUpdate: string;
+  published?: boolean;
+}
+
+interface ProjectData {
+  empresa: string;
+  descripcion?: string;
+  status: string;
+  database: {
+    totalPages: number;
+  };
+  currentPage: PageInfo | null;
+  tecnologias: TechnologyStack;
+  features?: string[];
+  timestamp?: string;
+}
+
+// 🔧 Configuración de API
+const API_CONFIG = {
+  BASE_URL: 'http://localhost:5000',
+  ENDPOINTS: {
+    DASHBOARD_STATUS: '/api/dashboard-status',
+    PROJECT_INFO: '/api/project-info',
+    HEALTH: '/api/health'
+  },
+  TIMEOUT: 10000
+} as const;
+
 export default function Dashboard() {
   const { user, isLoaded, isSignedIn } = useUser();
-  const syncStatus = useUserSync();
-  const [message, setMessage] = useState<string>('Cargando...');
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
+  const [backendData, setBackendData] = useState<BackendStatus | null>(null);
+  const [projectData, setProjectData] = useState<ProjectData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  const API_URL = API_CONFIG.BASE_URL;
-
-  // Función para obtener mensaje del backend
-  const fetchHelloMessage = async () => {
+  // 🚀 Función optimizada para obtener datos del backend
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    
     try {
-      setLoading(true);
-      setError('');
-      const response = await fetch(`${API_URL}${API_CONFIG.ENDPOINTS.HELLO}`);
+      console.log('🔄 Actualizando datos del dashboard...');
       
-      if (!response.ok) {
-        throw new Error('Error al conectar con el backend');
+      // Crear controller para timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+      
+      // Fetch paralelo para mejor performance
+      const [backendResponse, projectResponse] = await Promise.all([
+        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DASHBOARD_STATUS}`, {
+          signal: controller.signal,
+          headers: { 'Content-Type': 'application/json' }
+        }),
+        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECT_INFO}`, {
+          signal: controller.signal,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      ]);
+      
+      clearTimeout(timeoutId);
+      
+      // Procesar respuesta del backend
+      if (!backendResponse.ok) {
+        throw new Error(`Error del servidor: ${backendResponse.status} ${backendResponse.statusText}`);
       }
       
-      const data: BackendMessage = await response.json();
-      setMessage(data.message);
+      const backendResult = await backendResponse.json();
+      if (backendResult.success && backendResult.data) {
+        setBackendData(backendResult.data);
+        console.log('✅ Estado del backend actualizado');
+      } else {
+        throw new Error(backendResult.message || 'Error en la respuesta del backend');
+      }
+
+      // Procesar información del proyecto
+      if (projectResponse.ok) {
+        const projectResult = await projectResponse.json();
+        if (projectResult.success && projectResult.data) {
+          setProjectData(projectResult.data);
+          console.log('✅ Información del proyecto actualizada');
+        }
+      }
+
+      setLastUpdate(new Date());
+      
     } catch (err) {
-      setError('⚠️ No se pudo conectar con el backend. Verifica que esté ejecutándose.');
-      console.error('Error:', err);
+      console.error('❌ Error al obtener datos:', err);
+      
+      let errorMessage = 'Error desconocido';
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          errorMessage = 'Timeout: El servidor tardó demasiado en responder';
+        } else if (err.message.includes('Failed to fetch')) {
+          errorMessage = 'No se puede conectar al servidor. Verifica que esté ejecutándose en puerto 5000';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Función para obtener información de la empresa
-  const fetchCompanyInfo = async () => {
-    try {
-      const response = await fetch(`${API_URL}${API_CONFIG.ENDPOINTS.INFO}`);
-      if (response.ok) {
-        const data: CompanyInfo = await response.json();
-        setCompanyInfo(data);
-      }
-    } catch (err) {
-      console.error('Error al obtener información de la empresa:', err);
-    }
-  };
-
-  // Cargar datos al montar el componente
   useEffect(() => {
     if (isSignedIn) {
-      fetchHelloMessage();
-      fetchCompanyInfo();
+      fetchData();
     }
   }, [isSignedIn]);
 
-  // Mostrar loading mientras carga la autenticación
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-        <LoadingSpinner size="lg" text="Cargando..." />
-      </div>
-    );
+  if (!isLoaded || !isSignedIn) {
+    return <div>Loading...</div>;
   }
 
-  // Si no está autenticado, redirigir al home
-  if (!isSignedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Acceso Requerido</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">Necesitas iniciar sesión para acceder al dashboard</p>
-          <SignInButton mode="modal">
-            <Button>Iniciar Sesión</Button>
-          </SignInButton>
-        </div>
-      </div>
-    );
-  }  // Vista para usuarios autenticados
   return (
     <SignedIn>
       <DashboardLayout>
-        {/* Notificaciones de sincronización */}
-        {syncStatus.isLoading && (
-          <Alert type="info" className="mb-4 sm:mb-6">
-            <div className="flex items-center gap-3">
-              <LoadingSpinner size="sm" />
-              <span className="text-sm sm:text-base">Sincronizando perfil...</span>
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 mb-8 text-white">
+          <h1 className="text-3xl font-bold mb-2">
+            ¡Bienvenido, {user.firstName || 'Usuario'}! 👋
+          </h1>
+          <p>{user.primaryEmailAddress?.emailAddress}</p>
+        </div>
+
+        {/* Status Summary */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-xl border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h3 className="font-bold text-lg">� Estado del Sistema</h3>
+              {lastUpdate && (
+                <span className="text-xs bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">
+                  Actualizado: {lastUpdate.toLocaleTimeString()}
+                </span>
+              )}
             </div>
-          </Alert>
-        )}
-
-        {syncStatus.isSuccess && syncStatus.userData?.isNewUser && (
-          <Alert type="success" className="mb-4 sm:mb-6">
-            <span className="text-sm sm:text-base">
-              ¡Bienvenido por primera vez! Tu perfil ha sido creado.
-            </span>
-          </Alert>
-        )}
-
-        {syncStatus.isError && (
-          <Alert type="error" className="mb-4 sm:mb-6">
-            <span className="text-sm sm:text-base">Error: {syncStatus.error}</span>
-          </Alert>
-        )}
-
-        {/* Sección de Bienvenida */}
-        {isLoaded && user && (
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-purple-700 dark:via-pink-700 dark:to-purple-900 rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 text-white shadow-2xl relative overflow-hidden animate-slideDown transition-colors duration-300">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 via-purple-600/50 to-pink-600/50 dark:from-purple-700/50 dark:via-pink-700/50 dark:to-purple-900/50 animate-pulse"></div>
-
-            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-center sm:text-left animate-slideLeft">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 drop-shadow-lg">
-                  ¡Bienvenido, {user.firstName || user.username || 'Usuario'}! 👋
-                </h1>
-                <p className="text-blue-100 dark:text-purple-100 text-sm sm:text-base lg:text-lg font-medium">
-                  {user.primaryEmailAddress?.emailAddress}
-                </p>
-                <p className="text-blue-200 dark:text-purple-200 text-xs sm:text-sm mt-1 sm:mt-2">
-                  Último acceso: {formatDate(new Date())}
-                </p>
-              </div>
-              <div className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl animate-float">
-                🎉
-              </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className={`w-3 h-3 rounded-full ${backendData && projectData && !error ? 'bg-green-500' : error ? 'bg-red-500' : 'bg-yellow-500'}`}></span>
+              <span className="font-medium">
+                {backendData && projectData && !error ? 'Sistema OK' : error ? 'Con errores' : 'Cargando...'}
+              </span>
             </div>
           </div>
-        )}
+          
+          {error && (
+            <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-red-700 dark:text-red-300 text-sm">⚠️ {error}</p>
+            </div>
+          )}
+        </div>
 
-        {/* Sección de Conexión Backend */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 animate-slideLeft hover:-translate-y-1">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 flex items-center gap-2">
-                <span className="text-2xl sm:text-3xl">📨</span>
-                <span className="hidden sm:inline">Mensaje del Backend</span>
-                <span className="sm:hidden">Backend</span>
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Backend Status Card */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                🔌 Estado del Backend
               </h2>
-              <Button
-                onClick={fetchHelloMessage}
-                loading={loading}
-                size="sm"
-                className="w-full sm:w-auto"
-              >
+              <Button onClick={fetchData} loading={loading} size="sm">
                 🔄 Recargar
               </Button>
             </div>
 
             {loading ? (
-              <LoadingSpinner text="Cargando..." />
+              <LoadingSpinner text="Verificando conexión..." />
             ) : error ? (
-              <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 sm:p-6 text-red-700 dark:text-red-400">
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-red-700">
                 <div className="flex items-start gap-3">
-                  <div className="text-red-600 dark:text-red-400 text-xl">❌</div>
-                  <span className="text-sm sm:text-base">{error}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 dark:from-purple-600 dark:via-pink-600 dark:to-purple-700 rounded-xl p-4 sm:p-6 text-white shadow-lg">
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold flex items-center justify-center gap-2">
-                  <span className="text-2xl">☀️</span>
-                  {message}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 animate-slideRight hover:-translate-y-1">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 mb-4 sm:mb-6 flex items-center gap-2">
-              <span className="text-2xl sm:text-3xl">📊</span>
-              <span className="hidden sm:inline">Información del Proyecto</span>
-              <span className="sm:hidden">Proyecto</span>
-            </h2>
-
-            {companyInfo ? (
-              <div className="space-y-3 sm:space-y-4">
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-3 sm:p-4 border border-blue-100 dark:border-blue-800">
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 font-semibold mb-1">EMPRESA</p>
-                  <p className="text-sm sm:text-base lg:text-lg font-bold text-slate-900 dark:text-gray-100">{companyInfo.empresa}</p>
-                </div>
-                <div className="bg-slate-50 dark:bg-gray-900/50 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-gray-700">
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 font-semibold mb-1">DESCRIPCIÓN</p>
-                  <p className="text-xs sm:text-sm lg:text-base text-slate-700 dark:text-gray-300">{companyInfo.descripcion}</p>
-                </div>
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-3 sm:p-4 border border-purple-100 dark:border-purple-800">
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 font-semibold mb-2">STACK TECNOLÓGICO</p>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">🛠️</span>
-                      <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-gray-300">Backend: {companyInfo.tecnologias.backend}</span>
+                  <span className="text-xl">❌</span>
+                  <div>
+                    <div className="font-semibold">Error de Conexión</div>
+                    <div className="text-sm">{error}</div>
+                    <div className="text-xs mt-2 opacity-75">
+                      Verifica que el backend esté en: http://localhost:5000
                     </div>
+                  </div>
+                </div>
+              </div>
+            ) : backendData ? (
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4 text-white">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">✅</span>
+                    <span className="font-bold">{backendData.message}</span>
+                  </div>
+                  {backendData.timestamp && (
+                    <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+                      {new Date(backendData.timestamp).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div className="bg-white/20 rounded-lg p-3">
+                    <div className="font-semibold mb-1">🗄️ Base de Datos</div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">🎨</span>
-                      <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-gray-300">Frontend: {companyInfo.tecnologias.frontend}</span>
+                      <span className={`w-2 h-2 rounded-full ${backendData.database.connected ? 'bg-green-300' : 'bg-red-300'}`}></span>
+                      <span>{backendData.database.status}</span>
+                    </div>
+                    <div className="text-xs opacity-75 mt-1">
+                      {backendData.database.host} • {backendData.database.name || 'web-scuti'}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/20 rounded-lg p-3">
+                    <div className="font-semibold mb-1">⚡ Servidor</div>
+                    <div>Puerto: {backendData.server.port}</div>
+                    <div className="text-xs opacity-75 mt-1">
+                      Uptime: {Math.floor(backendData.server.uptime / 60)}min • 
+                      {backendData.server.environment || 'development'}
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <LoadingSpinner text="Cargando información..." />
+              <div className="text-center py-8 text-gray-500">
+                No hay datos del backend
+              </div>
+            )}
+          </div>
+
+          {/* Project Info Card */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              📊 Información del Proyecto
+            </h2>
+
+            {projectData ? (
+              <div className="space-y-4">
+                {/* Información de la empresa */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold">EMPRESA</div>
+                    {projectData.timestamp && (
+                      <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded">
+                        {new Date(projectData.timestamp).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="font-bold text-lg text-gray-800 dark:text-gray-200">{projectData.empresa}</div>
+                  {projectData.descripcion && (
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{projectData.descripcion}</div>
+                  )}
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className={`w-2 h-2 rounded-full ${projectData.status === 'Sistema funcionando correctamente ✅' ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
+                    <span className="text-xs font-medium text-green-600 dark:text-green-400">{projectData.status}</span>
+                  </div>
+                </div>
+
+                {/* Base de datos y páginas */}
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-100 dark:border-emerald-800">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-3">📄 CONFIGURACIÓN DE PÁGINAS</div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        {projectData.database.totalPages}
+                      </span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">páginas configuradas</span>
+                    </div>
+                    <div className="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full">
+                      Base de datos inicializada ✓
+                    </div>
+                  </div>
+                  
+                  {projectData.currentPage && (
+                    <div className="bg-white/70 dark:bg-gray-800/50 rounded-lg p-3 border border-emerald-200/50">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Página activa:</div>
+                        <div className={`text-xs px-2 py-1 rounded-full ${
+                          projectData.currentPage.published 
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
+                            : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
+                        }`}>
+                          {projectData.currentPage.published ? 'Publicada' : 'Borrador'}
+                        </div>
+                      </div>
+                      <div className="font-semibold text-gray-800 dark:text-gray-200">{projectData.currentPage.name}</div>
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">{projectData.currentPage.status}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
+                        <span>👤 {projectData.currentPage.updatedBy}</span>
+                        <span>•</span>
+                        <span>📅 {new Date(projectData.currentPage.lastUpdate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Stack tecnológico */}
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border border-purple-100 dark:border-purple-800">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-3">🚀 STACK TECNOLÓGICO</div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white/60 dark:bg-gray-800/50 rounded-lg p-2 border border-purple-200/50">
+                      <div className="flex items-center gap-2">
+                        <span>🛠️</span>
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Backend</div>
+                          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">{projectData.tecnologias.backend}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white/60 dark:bg-gray-800/50 rounded-lg p-2 border border-purple-200/50">
+                      <div className="flex items-center gap-2">
+                        <span>🎨</span>
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Frontend</div>
+                          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">{projectData.tecnologias.frontend}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white/60 dark:bg-gray-800/50 rounded-lg p-2 border border-purple-200/50">
+                      <div className="flex items-center gap-2">
+                        <span>🗄️</span>
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Database</div>
+                          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">{projectData.tecnologias.database}</div>
+                        </div>
+                      </div>
+                    </div>
+                    {projectData.tecnologias.auth && (
+                      <div className="bg-white/60 dark:bg-gray-800/50 rounded-lg p-2 border border-purple-200/50">
+                        <div className="flex items-center gap-2">
+                          <span>🔐</span>
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Auth</div>
+                            <div className="text-sm font-medium text-gray-800 dark:text-gray-200">{projectData.tecnologias.auth}</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <LoadingSpinner text="Cargando información del proyecto..." />
             )}
           </div>
         </div>
 
-        {/* Status Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-          <div className="animate-scaleIn" style={{animationDelay: '0ms'}}>
-            <StatusCard 
-              icon="✅"
-              title="Backend"
-              subtitle="Node.js + Express"
-              status="Puerto 5000 Activo"
-              gradient="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200"
-            />
-          </div>
-          <div className="animate-scaleIn" style={{animationDelay: '100ms'}}>
-            <StatusCard 
-              icon="⚛️"
-              title="Frontend" 
-              subtitle="React + Vite"
-              status="Puerto 5173 Activo"
-              gradient="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200"
-            />
-          </div>
-          <div className="animate-scaleIn" style={{animationDelay: '200ms'}}>
-            <StatusCard 
-              icon="🎨"
-              title="Estilos"
-              subtitle="Tailwind CSS"
-              status="Utilidad primero"
-              gradient="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200"
-            />
-          </div>
-          <div className="animate-scaleIn" style={{animationDelay: '300ms'}}>
-            <StatusCard 
-              icon="🔐"
-              title="Auth"
-              subtitle="Clerk"
-              status="✓ Autenticado"
-              gradient="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200"
-            />
-          </div>
-        </div>
-
-        {/* Sección de Features */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-slate-200 dark:border-gray-700 animate-slideUp transition-colors duration-300">
-          <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <span className="text-2xl sm:text-3xl lg:text-4xl animate-bounce">🎉</span>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-purple-400 dark:to-pink-400">
-              ¡Configuración Exitosa!
+        {/* Success Message */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">🎉</span>
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              ¡Sistema Funcionando Correctamente!
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 sm:p-6 border border-green-200 dark:border-green-800">
-              <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 mb-3 sm:mb-4 flex items-center gap-2">
-                <span className="text-xl sm:text-2xl">✨</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <span className="text-2xl">✨</span>
                 Implementado:
               </h3>
-              <ul className="space-y-2 sm:space-y-3">
+              <ul className="space-y-2">
                 {[
-                  'Backend con Express configurado',
-                  'API REST funcional',
-                  'MongoDB conectado',
-                  'Frontend React + TypeScript',
-                  'Tailwind CSS integrado',
-                  'Autenticación con Clerk'
+                  'Auto-inicialización de base de datos',
+                  'Estado del backend en tiempo real',
+                  'Información del proyecto actualizada',
+                  'Sistema de monitoreo integrado',
+                  'Health checks automáticos',
+                  'Logging detallado de cambios'
                 ].map((item, index) => (
-                  <li key={index} className="flex items-start gap-3 group">
-                    <span className="text-green-600 dark:text-green-400 text-sm sm:text-base mt-0.5">✅</span>
-                    <span className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 group-hover:text-slate-900 dark:group-hover:text-gray-100 transition-colors">{item}</span>
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="text-green-600 text-sm mt-0.5">✅</span>
+                    <span className="text-sm text-gray-700">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800">
-              <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-gray-100 mb-3 sm:mb-4 flex items-center gap-2">
-                <span className="text-xl sm:text-2xl">💡</span>
-                Próximos Pasos:
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <span className="text-2xl">🎯</span>
+                Listo para usar:
               </h3>
-              <ul className="space-y-2 sm:space-y-3">
+              <ul className="space-y-2">
                 {[
-                  'Crear páginas adicionales',
-                  'Personalizar tema y colores',
-                  'Implementar SEO avanzado',
-                  'Agregar CRUD de servicios',
-                  'Optimizar para producción'
+                  'CMS Manager para editar contenido',
+                  'Deployment a producción',
+                  'Configuración de imágenes e iconos',
+                  'Personalización completa del tema',
+                  'SEO optimizado',
+                  'Sistema escalable y mantenible'
                 ].map((item, index) => (
-                  <li key={index} className="flex items-start gap-3 group">
-                    <span className="text-blue-600 dark:text-blue-400 text-sm sm:text-base mt-0.5">🔄</span>
-                    <span className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 group-hover:text-slate-900 dark:group-hover:text-gray-100 transition-colors">{item}</span>
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="text-blue-600 text-sm mt-0.5">🚀</span>
+                    <span className="text-sm text-gray-700">{item}</span>
                   </li>
                 ))}
               </ul>

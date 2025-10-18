@@ -215,6 +215,9 @@ export const API_CONFIG = {
   ENDPOINTS: {
     HELLO: '/api/hello',
     INFO: '/api/info',
-    USER: '/api/user'
+    USER: '/api/user',
+    DASHBOARD_STATUS: '/api/dashboard-status',
+    PROJECT_INFO: '/api/project-info',
+    HEALTH: '/api/health'
   }
 };
