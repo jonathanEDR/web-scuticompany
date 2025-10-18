@@ -41,7 +41,6 @@ const MediaLibrary = () => {
   const [stats, setStats] = useState<any>(null);
   const [orphans, setOrphans] = useState<any>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<any>(null);
   const [showMetadataEditor, setShowMetadataEditor] = useState(false);
   const [editingImage, setEditingImage] = useState<any>(null);
 
@@ -344,7 +343,7 @@ const MediaLibrary = () => {
                       />
 
                       {/* Imagen */}
-                      <div className="aspect-square overflow-hidden cursor-pointer" onClick={() => setSelectedImage(image)}>
+                      <div className="aspect-square overflow-hidden cursor-pointer" onClick={() => handleEditImage(image)}>
                         <img
                           src={getImageUrl(image.url)}
                           alt={image.alt || image.filename}
