@@ -56,15 +56,59 @@ interface ProjectData {
   timestamp?: string;
 }
 
-// 🔧 Configuración de API
+// 🔧 Configuración de API  
+const getApiBaseUrl = () => {
+  console.log('🔍 Detectando configuración de API...');
+  console.log('🌍 VITE_API_URL:', import.meta.env.VITE_API_URL);
+  console.log('🏷️ MODE:', import.meta.env.MODE);
+  console.log('🔗 Current hostname:', window.location.hostname);
+  
+  // En producción (Vercel), usar backend de Render
+  if (typeof window !== 'undefined' && window.location.hostname === 'web-scuticompany.vercel.app') {
+    console.log('🚀 Detectado entorno de producción - Usando backend de Render');
+    return 'https://web-scuticompany-back.onrender.com';
+  }
+  
+  // Si hay variable de entorno específica, usarla
+  if (import.meta.env.VITE_API_URL) {
+    const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+    console.log('✅ Usando VITE_API_URL:', baseUrl);
+    return baseUrl;
+  }
+  
+  // Auto-detección basada en el entorno
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    console.log('🏠 Hostname detectado:', hostname);
+    
+    // Si estamos en Vercel (producción)
+    if (hostname.includes('vercel.app')) {
+      // TEMPORAL: Necesitamos la URL real del backend
+      // Por ahora, mostrar error claro
+      console.warn('⚠️ Producción detectada pero backend URL no configurada');
+      return 'BACKEND_URL_NOT_CONFIGURED';
+    }
+    
+    // Si estamos en localhost (desarrollo)
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      console.log('🏠 Desarrollo local detectado');
+      return 'http://localhost:5000';
+    }
+  }
+  
+  // Fallback
+  console.log('🔄 Usando fallback localhost');
+  return 'http://localhost:5000';
+};
+
 const API_CONFIG = {
-  BASE_URL: 'http://localhost:5000',
+  BASE_URL: getApiBaseUrl(),
   ENDPOINTS: {
     DASHBOARD_STATUS: '/api/dashboard-status',
     PROJECT_INFO: '/api/project-info',
     HEALTH: '/api/health'
   },
-  TIMEOUT: 10000
+  TIMEOUT: 15000 // Aumentar timeout para producción
 } as const;
 
 export default function Dashboard() {
@@ -82,6 +126,13 @@ export default function Dashboard() {
     
     try {
       console.log('🔄 Actualizando datos del dashboard...');
+      console.log('🌐 Backend URL configurada:', API_CONFIG.BASE_URL);
+      console.log('🏠 Hostname actual:', window.location.hostname);
+      
+      // Verificar si la URL del backend está configurada
+      if (API_CONFIG.BASE_URL === 'BACKEND_URL_NOT_CONFIGURED') {
+        throw new Error('Backend URL no configurada para producción. Necesitas configurar VITE_API_URL en las variables de entorno de Vercel.');
+      }
       
       // Crear controller para timeout
       const controller = new AbortController();
@@ -170,7 +221,7 @@ export default function Dashboard() {
         <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-xl border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h3 className="font-bold text-lg">� Estado del Sistema</h3>
+              <h3 className="font-bold text-lg">📊 Estado del Sistema</h3>
               {lastUpdate && (
                 <span className="text-xs bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">
                   Actualizado: {lastUpdate.toLocaleTimeString()}
@@ -185,9 +236,37 @@ export default function Dashboard() {
             </div>
           </div>
           
+          {/* Debug info de configuración */}
+          <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 p-2 rounded font-mono">
+            🔗 Backend URL: {API_CONFIG.BASE_URL} • 🌍 Entorno: {import.meta.env.MODE} • 🏠 Host: {window.location.hostname}
+          </div>
+          
           {error && (
-            <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-red-700 dark:text-red-300 text-sm">⚠️ {error}</p>
+            <div className="mt-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-red-700 dark:text-red-300 text-sm font-semibold">⚠️ {error}</p>
+              
+              {/* Mostrar instrucciones específicas si estamos en producción sin backend configurado */}
+              {API_CONFIG.BASE_URL === 'BACKEND_URL_NOT_CONFIGURED' && (
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <h4 className="text-blue-800 dark:text-blue-300 font-semibold mb-2">🔧 Configuración Requerida</h4>
+                  <div className="text-sm text-blue-700 dark:text-blue-300 space-y-2">
+                    <p><strong>1. Ve a Render.com</strong> y copia la URL de tu backend</p>
+                    <p><strong>2. Ve a Vercel → Settings → Environment Variables</strong></p>
+                    <p><strong>3. Agrega:</strong> VITE_API_URL = https://tu-backend.onrender.com/api</p>
+                    <p><strong>4. Redeploy</strong> tu proyecto en Vercel</p>
+                  </div>
+                  <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-xs text-yellow-800 dark:text-yellow-300">
+                    <strong>URLs posibles:</strong> web-scuti-backend.onrender.com, webscuti-backend.onrender.com
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                <p>🌐 Backend URL: {API_CONFIG.BASE_URL}</p>
+                <p>🏠 Hostname: {typeof window !== 'undefined' ? window.location.hostname : 'N/A'}</p>
+                <p>🔗 Environment: {import.meta.env.MODE}</p>
+                <p>📦 VITE_API_URL: {import.meta.env.VITE_API_URL || 'No configurada'}</p>
+              </div>
             </div>
           )}
         </div>
