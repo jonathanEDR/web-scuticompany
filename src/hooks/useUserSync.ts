@@ -20,6 +20,16 @@ interface UserSyncStatus {
   userData: UserSyncData | null;
 }
 
+// 🔧 Configuración de API (igual que en Dashboard)
+const getApiBaseUrl = () => {
+  // En producción (Vercel), usar backend de Render
+  if (typeof window !== 'undefined' && window.location.hostname === 'web-scuticompany.vercel.app') {
+    return 'https://web-scuticompany-back.onrender.com';
+  }
+  // En desarrollo usar localhost
+  return import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+};
+
 
 /**
  * Hook personalizado para sincronizar automáticamente el usuario de Clerk con MongoDB
@@ -43,6 +53,9 @@ export const useUserSync = (): UserSyncStatus => {
       setSyncStatus(prev => ({ ...prev, isLoading: true, isError: false }));
 
       try {
+        console.log('🔄 Sincronizando usuario con backend...');
+        console.log('🔗 API URL:', getApiBaseUrl());
+        
         const userData = {
           clerkId: user.id,
           email: user.primaryEmailAddress?.emailAddress || '',
@@ -52,7 +65,13 @@ export const useUserSync = (): UserSyncStatus => {
           profileImage: user.imageUrl || ''
         };
 
-        const response = await fetch('/api/users/sync', {
+        console.log('👤 Datos del usuario a sincronizar:', {
+          clerkId: userData.clerkId,
+          email: userData.email,
+          firstName: userData.firstName
+        });
+
+        const response = await fetch(`${getApiBaseUrl()}/api/users/sync`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -63,6 +82,9 @@ export const useUserSync = (): UserSyncStatus => {
         const result = await response.json();
 
         if (response.ok) {
+          console.log('✅ Usuario sincronizado exitosamente:', result.message);
+          console.log('📊 Es usuario nuevo:', result.user.isNewUser);
+          
           setSyncStatus({
             isLoading: false,
             isSuccess: true,
@@ -71,12 +93,15 @@ export const useUserSync = (): UserSyncStatus => {
             userData: result.user
           });
         } else {
+          console.error('❌ Error en respuesta del servidor:', result.message);
           throw new Error(result.message || 'Error al sincronizar usuario');
         }
 
       } catch (error) {
         console.error('❌ Error sincronizando usuario:', error);
         const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        console.error('🔍 Detalles del error:', errorMessage);
+        
         setSyncStatus({
           isLoading: false,
           isSuccess: false,

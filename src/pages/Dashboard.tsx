@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import DashboardLayout from '../components/DashboardLayout';
 import { Button, LoadingSpinner } from '../components/UI';
+import { useUserSync } from '../hooks/useUserSync';
 
 // 🎯 Tipos TypeScript optimizados
 interface DatabaseInfo {
@@ -113,6 +114,7 @@ const API_CONFIG = {
 
 export default function Dashboard() {
   const { user, isLoaded, isSignedIn } = useUser();
+  const userSyncStatus = useUserSync(); // Hook para auto-registro
   const [backendData, setBackendData] = useState<BackendStatus | null>(null);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -239,6 +241,19 @@ export default function Dashboard() {
           {/* Debug info de configuración */}
           <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 p-2 rounded font-mono">
             🔗 Backend URL: {API_CONFIG.BASE_URL} • 🌍 Entorno: {import.meta.env.MODE} • 🏠 Host: {window.location.hostname}
+          </div>
+          
+          {/* User Sync Status */}
+          <div className="mt-2 text-xs bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 p-2 rounded">
+            <div className="font-semibold text-purple-800 dark:text-purple-300 mb-1">👤 Estado de Auto-registro:</div>
+            <div className="text-purple-700 dark:text-purple-300 space-y-1">
+              <div>🔄 Sincronizando: {userSyncStatus.isLoading ? 'Sí' : 'No'}</div>
+              <div>✅ Completado: {userSyncStatus.isSuccess ? 'Sí' : 'No'}</div>
+              <div>❌ Error: {userSyncStatus.isError ? userSyncStatus.error : 'No'}</div>
+              {userSyncStatus.userData && (
+                <div>👤 Usuario: {userSyncStatus.userData.isNewUser ? 'Nuevo registrado' : 'Existente actualizado'}</div>
+              )}
+            </div>
           </div>
           
           {error && (
