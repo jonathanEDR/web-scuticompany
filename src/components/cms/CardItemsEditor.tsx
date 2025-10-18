@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import type { SolutionItem } from '../../types/cms';
-import ImageUploader from '../ImageUploader';
+import ManagedImageSelector from '../ManagedImageSelector';
 import RichTextEditor from '../RichTextEditor';
 
 interface CardItemsEditorProps {
@@ -199,21 +199,21 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                       
                       {/* Icono Tema Claro */}
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                        <ImageUploader
+                        <ManagedImageSelector
                           label="🌞 Icono Tema Claro"
                           description="Imagen PNG para el modo claro"
                           currentImage={item.iconLight}
-                          onImageUpload={(url) => updateItem(index, 'iconLight', url)}
+                          onImageSelect={(url: string) => updateItem(index, 'iconLight', url)}
                         />
                       </div>
 
                       {/* Icono Tema Oscuro */}
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                        <ImageUploader
+                        <ManagedImageSelector
                           label="🌙 Icono Tema Oscuro"
                           description="Imagen PNG para el modo oscuro"
                           currentImage={item.iconDark}
-                          onImageUpload={(url) => updateItem(index, 'iconDark', url)}
+                          onImageSelect={(url: string) => updateItem(index, 'iconDark', url)}
                         />
                       </div>
                     </div>

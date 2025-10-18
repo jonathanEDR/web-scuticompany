@@ -44,6 +44,12 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       description: 'Gestor de contenido'
     },
     {
+      name: 'Media Library',
+      icon: '🖼️',
+      path: '/dashboard/media',
+      description: 'Gestión de imágenes'
+    },
+    {
       name: 'Configuración',
       icon: '🔧',
       path: '/dashboard/settings',

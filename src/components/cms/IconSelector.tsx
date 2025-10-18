@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ImageUploader from '../ImageUploader';
+import ManagedImageSelector from '../ManagedImageSelector';
 
 interface IconSelectorProps {
   iconType: 'emoji' | 'image';
@@ -114,11 +114,11 @@ const IconSelector: React.FC<IconSelectorProps> = ({
       {/* Image Uploader */}
       {iconType === 'image' && (
         <div className="space-y-3">
-          <ImageUploader
-            label=""
+          <ManagedImageSelector
+            label="Icono de Imagen"
             description="Sube una imagen para usar como icono (PNG, SVG, JPG)"
             currentImage={iconValue}
-            onImageUpload={onIconValueChange}
+            onImageSelect={onIconValueChange}
             darkMode={darkMode}
           />
           <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>

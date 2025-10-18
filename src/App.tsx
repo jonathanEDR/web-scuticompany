@@ -21,6 +21,7 @@ const Services = lazy(() => import('./pages/Services'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Help = lazy(() => import('./pages/Help'));
 const CmsManager = lazy(() => import('./pages/CmsManager'));
+const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
 
 // Componente de loading minimalista
 const LoadingSpinner = () => (
@@ -126,6 +127,12 @@ function App() {
               <Route path="/dashboard/cms/cards" element={
                 <DashboardRoute>
                   <CmsManager />
+                </DashboardRoute>
+              } />
+              
+              <Route path="/dashboard/media" element={
+                <DashboardRoute>
+                  <MediaLibrary />
                 </DashboardRoute>
               } />
             </Routes>

@@ -1,6 +1,6 @@
 import React from 'react';
 import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
-import ImageUploader from '../ImageUploader';
+import ManagedImageSelector from '../ManagedImageSelector';
 import type { PageData } from '../../types/cms';
 
 interface SolutionsConfigSectionProps {
@@ -70,13 +70,13 @@ const SolutionsConfigSection: React.FC<SolutionsConfigSectionProps> = ({
                   <p className="text-xs text-gray-600">Fondo para modo día</p>
                 </div>
               </div>
-              <ImageUploader
-                label=""
+              <ManagedImageSelector
+                label="Imagen de Fondo (Claro)"
                 description="Tamaño recomendado: 1920x1080px"
                 currentImage={typeof pageData.content.solutions.backgroundImage === 'string' 
                   ? pageData.content.solutions.backgroundImage 
                   : pageData.content.solutions.backgroundImage?.light}
-                onImageUpload={(url) => updateContent('solutions.backgroundImage.light', url)}
+                onImageSelect={(url: string) => updateContent('solutions.backgroundImage.light', url)}
               />
             </div>
 
@@ -93,13 +93,13 @@ const SolutionsConfigSection: React.FC<SolutionsConfigSectionProps> = ({
                   <p className="text-xs text-gray-400">Fondo para modo noche</p>
                 </div>
               </div>
-              <ImageUploader
-                label=""
+              <ManagedImageSelector
+                label="Imagen de Fondo (Oscuro)"
                 description="Tamaño recomendado: 1920x1080px"
                 currentImage={typeof pageData.content.solutions.backgroundImage === 'string' 
                   ? pageData.content.solutions.backgroundImage 
                   : pageData.content.solutions.backgroundImage?.dark}
-                onImageUpload={(url) => updateContent('solutions.backgroundImage.dark', url)}
+                onImageSelect={(url: string) => updateContent('solutions.backgroundImage.dark', url)}
                 darkMode={true}
               />
             </div>

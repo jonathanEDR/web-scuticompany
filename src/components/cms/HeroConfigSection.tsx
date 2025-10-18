@@ -1,6 +1,6 @@
 import React from 'react';
 import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
-import ImageUploader from '../ImageUploader';
+import ManagedImageSelector from '../ManagedImageSelector';
 import type { PageData } from '../../types/cms';
 
 interface HeroConfigSectionProps {
@@ -108,13 +108,13 @@ const HeroConfigSection: React.FC<HeroConfigSectionProps> = ({
                   <p className="text-xs text-gray-600">Apariencia diurna</p>
                 </div>
               </div>
-              <ImageUploader
-                label=""
+              <ManagedImageSelector
+                label="Imagen de Fondo (Claro)"
                 description="Tamaño recomendado: 1920x1080px"
                 currentImage={typeof pageData.content.hero.backgroundImage === 'string' 
                   ? pageData.content.hero.backgroundImage 
                   : pageData.content.hero.backgroundImage?.light}
-                onImageUpload={(url) => updateContent('hero.backgroundImage.light', url)}
+                onImageSelect={(url) => updateContent('hero.backgroundImage.light', url)}
               />
             </div>
 
@@ -131,13 +131,13 @@ const HeroConfigSection: React.FC<HeroConfigSectionProps> = ({
                   <p className="text-xs text-gray-400">Apariencia nocturna</p>
                 </div>
               </div>
-              <ImageUploader
-                label=""
+              <ManagedImageSelector
+                label="Imagen de Fondo (Oscuro)"
                 description="Tamaño recomendado: 1920x1080px"
                 currentImage={typeof pageData.content.hero.backgroundImage === 'string' 
                   ? pageData.content.hero.backgroundImage 
                   : pageData.content.hero.backgroundImage?.dark}
-                onImageUpload={(url) => updateContent('hero.backgroundImage.dark', url)}
+                onImageSelect={(url) => updateContent('hero.backgroundImage.dark', url)}
                 darkMode={true}
               />
             </div>
