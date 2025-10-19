@@ -182,9 +182,9 @@ const HomeOptimized = () => {
       </Helmet>
 
       {/* ⚡ Contenido se renderiza INMEDIATAMENTE sin esperar autenticación ni CMS */}
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen bg-gray-900 w-full overflow-x-hidden">
         <PublicHeader />
-        <main>
+        <main className="w-full">
           <HeroSection data={pageData.content.hero} />
           <SolutionsSection 
             data={pageData.content.solutions} 
@@ -195,7 +195,7 @@ const HomeOptimized = () => {
         
         {/* Indicador sutil de carga del CMS (opcional) */}
         {isLoadingCMS && (
-          <div className="fixed bottom-4 right-4 bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg text-sm">
+          <div className="fixed bottom-4 right-4 bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg text-sm z-50">
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
               Actualizando contenido...

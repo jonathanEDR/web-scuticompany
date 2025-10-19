@@ -60,23 +60,23 @@ const PublicHeaderOptimized = () => {
         backdropFilter: lastScrollY > 50 ? 'blur(10px)' : 'none'
       }}
     >
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center h-auto sm:h-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 w-full">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center h-auto sm:h-20 w-full">
           {/* Fila 1 Mobile: Logo centrado + Toggle tema derecha | Desktop: Logo izquierda */}
-          <div className="flex justify-between items-center sm:justify-start py-4 sm:py-0">
-            {/* Espaciador invisible en móvil para centrar el logo */}
-            <div className="w-10 sm:hidden"></div>
-            
-            <Link 
-              to="/" 
-              aria-label="Scuti Company - Ir al inicio"
-              className="flex items-center transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 rounded-lg"
-            >
-              <Logo size="md" animated compact />
-            </Link>
+          <div className="flex justify-between items-center sm:justify-start py-4 sm:py-0 w-full">
+            {/* Logo - Centrado en móvil, izquierda en desktop */}
+            <div className="flex-1 flex justify-center sm:justify-start sm:flex-initial">
+              <Link 
+                to="/" 
+                aria-label="Scuti Company - Ir al inicio"
+                className="flex items-center transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 rounded-lg"
+              >
+                <Logo size="md" animated compact />
+              </Link>
+            </div>
 
             {/* Theme Toggle - Visible en móvil, oculto en desktop */}
-            <div className="sm:hidden">
+            <div className="sm:hidden flex-shrink-0">
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
@@ -96,7 +96,7 @@ const PublicHeaderOptimized = () => {
           </div>
 
           {/* Navegación - Solo en móvil como fila separada, en desktop como parte de la fila principal */}
-          <nav className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 py-3 sm:py-0 sm:space-x-8 sm:flex-1 sm:justify-center" role="navigation" aria-label="Navegación principal">
+          <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 py-3 sm:py-0 sm:space-x-6 sm:flex-1 sm:justify-center w-full" role="navigation" aria-label="Navegación principal">
             <Link 
               to="/" 
               className="theme-text-primary font-medium theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
@@ -151,7 +151,7 @@ const PublicHeaderOptimized = () => {
           </nav>
 
           {/* Actions Desktop - Toggle de tema + CONTÁCTANOS + Avatar */}
-          <div className="hidden sm:flex items-center space-x-4">
+          <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
             {/* Theme Toggle - Solo visible en desktop */}
             <button
               onClick={toggleTheme}

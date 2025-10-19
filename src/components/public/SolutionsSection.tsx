@@ -215,7 +215,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   const solutions = mappedData.cards || [];
 
   return (
-    <section className="relative py-20 theme-transition"
+    <section className="relative py-20 theme-transition overflow-hidden w-full"
              style={{
                background: `linear-gradient(to bottom, color-mix(in srgb, var(--color-card-bg) 95%, var(--color-primary)), var(--color-card-bg))`
              }}>
