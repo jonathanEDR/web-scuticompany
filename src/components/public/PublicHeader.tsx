@@ -151,15 +151,25 @@ const PublicHeaderOptimized = () => {
               Proyectos destacados
             </Link>
             
-            {/* CONTÁCTANOS - Visible en todas las pantallas */}
+            {/* CONTÁCTANOS - Color rosado en tema blanco */}
             <Link 
               to="/contacto"
-              className="px-4 py-2 rounded-full transition-all duration-300 font-medium gradient-border-button text-sm"
+              className="px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
               style={{
-                '--gradient-border': 'var(--color-contact-border)',
-                '--gradient-border-hover': 'var(--color-contact-hover-bg)',
-                color: 'var(--color-contact-text)',
-              } as React.CSSProperties & { [key: string]: string }}
+                borderColor: theme === 'light' ? '#7528ee' : '#7528ee', // Rosado en light, violeta en dark
+                color: theme === 'light' ? '#7528ee' : '#7528ee', // Rosado en light, violeta en dark
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                const element = e.target as HTMLElement;
+                element.style.backgroundColor = theme === 'light' ? '#7528ee' : '#7528ee';
+                element.style.color = '#FFFFFF';
+              }}
+              onMouseLeave={(e) => {
+                const element = e.target as HTMLElement;
+                element.style.backgroundColor = 'transparent';
+                element.style.color = theme === 'light' ? '#7528ee' : '#7528ee';
+              }}
             >
               CONTÁCTANOS
             </Link>

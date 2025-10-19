@@ -1,42 +1,27 @@
 import React from 'react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
+import { DEFAULT_SOLUTIONS_CONFIG } from '../../utils/defaultConfig';
 import type { CardDesignStyles } from '../../types/cms';
 
 interface SolutionItem {
-  iconLight?: string;  // URL del icono para tema claro (PNG)
-  iconDark?: string;   // URL del icono para tema oscuro (PNG)
-  // Mantener para compatibilidad
-  icon?: React.ReactNode | string;
-  iconUrl?: string;
+  id: string;
   title: string;
   description: string;
-  gradient: string;
+  icon: string;
+  iconLight?: string;
+  iconDark?: string;
 }
 
 interface SolutionsData {
   title: string;
-  description: string;
-  backgroundImage?: {
-    light?: string;
-    dark?: string;
+  subtitle: string;
+  backgroundImage: {
+    light: string;
+    dark: string;
   };
-  backgroundImageAlt?: string;
-  styles?: {
-    light: {
-      titleColor?: string;
-      descriptionColor?: string;
-    };
-    dark: {
-      titleColor?: string;
-      descriptionColor?: string;
-    };
-  };
-  items?: SolutionItem[];
-  cardsDesign?: {
-    light: CardDesignStyles;
-    dark: CardDesignStyles;
-  };
+  backgroundImageAlt: string;
+  cards: SolutionItem[];
 }
 
 interface SolutionsSectionProps {
@@ -46,14 +31,10 @@ interface SolutionsSectionProps {
 const SolutionsSection = ({ data }: SolutionsSectionProps) => {
   const { theme } = useTheme();
 
-  // Datos por defecto
-  const solutionsData: SolutionsData = data || {
-    title: 'Soluciones',
-    description: 'En el dinámico entorno empresarial de hoy, la tecnología es la columna vertebral del éxito. Impulsa la innovación, seguridad y el crecimiento de tu negocio.',
-    items: []
-  };
+  // Usar SOLO defaultConfig.ts como fuente única de verdad
+  const solutionsData: SolutionsData = data || DEFAULT_SOLUTIONS_CONFIG;
 
-  // Valores por defecto para el diseño de tarjetas - Sincronizados con MongoDB
+  // Valores por defecto para el diseño de tarjetas - Colores según maqueta
   const defaultLightStyles: CardDesignStyles = {
     background: 'rgba(255, 255, 255, 0.1)',
     border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
@@ -64,10 +45,10 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
     hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.2)',
     iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
     iconBackground: 'rgba(255, 255, 255, 0.9)',
-    iconColor: '#1f2937',
-    titleColor: '#1f2937',
-    descriptionColor: '#4b5563',
-    linkColor: '#a78bfa',
+    iconColor: '#7528ee', // Color violeta para iconos según maqueta
+    titleColor: '#333333', // Color específico de la maqueta para títulos
+    descriptionColor: '#6B7280', // Gris medio más legible
+    linkColor: '#7528ee', // Violeta para enlaces
     cardMinWidth: '200px',
     cardMaxWidth: '100%',
     cardMinHeight: 'auto',
@@ -99,35 +80,16 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
   };
 
   // Obtener estilos actuales según el tema
-  const cardStyles = theme === 'light'
-    ? {
-        ...defaultLightStyles,
-        ...(solutionsData.cardsDesign?.light || {}),
-        // Asegurar que iconAlignment tenga un valor por defecto si no existe
-        iconAlignment: solutionsData.cardsDesign?.light?.iconAlignment || 'center'
-      }
-    : {
-        ...defaultDarkStyles,
-        ...(solutionsData.cardsDesign?.dark || {}),
-        // Asegurar que iconAlignment tenga un valor por defecto si no existe
-        iconAlignment: solutionsData.cardsDesign?.dark?.iconAlignment || 'center'
-      };
+  const cardStyles = theme === 'light' ? defaultLightStyles : defaultDarkStyles;
 
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {
     if (!solutionsData.backgroundImage) return null;
     
-    // Si es un string (formato anterior), usarlo como fallback
-    if (typeof solutionsData.backgroundImage === 'string') {
-      return solutionsData.backgroundImage;
-    }
-    
-    // Usar imagen del tema activo, con fallback a la otra si no existe
-    if (theme === 'light') {
-      return solutionsData.backgroundImage.light || solutionsData.backgroundImage.dark || null;
-    } else {
-      return solutionsData.backgroundImage.dark || solutionsData.backgroundImage.light || null;
-    }
+    // Usar imagen del tema activo
+    return theme === 'light' 
+      ? solutionsData.backgroundImage.light 
+      : solutionsData.backgroundImage.dark;
   };
 
   // Función helper para detectar si un string es una URL de imagen
@@ -157,15 +119,10 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
       return { type: iconType, value: solution.iconLight };
     }
     
-    // Prioridad 3: Compatibilidad con formato anterior
-    if (solution.iconUrl) {
-      return { type: 'image', value: solution.iconUrl };
-    }
+    // Prioridad 3: Usar icon como fallback (siempre será string en defaultConfig)
     if (solution.icon) {
-      return { 
-        type: typeof solution.icon === 'string' ? 'emoji' : 'component', 
-        value: solution.icon 
-      };
+      const iconType = isImageUrl(solution.icon) ? 'image' : 'emoji';
+      return { type: iconType, value: solution.icon };
     }
     
     // Fallback: No icon
@@ -174,43 +131,8 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
 
   const currentBackgroundImage = getCurrentBackgroundImage();
 
-  const defaultSolutions: SolutionItem[] = [
-    {
-      icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
-      title: 'Soluciones Digitales',
-      description: 'Transformamos tu negocio con estrategias digitales innovadoras y plataformas web de alto rendimiento.',
-      gradient: 'from-purple-500 to-purple-700'
-    },
-    {
-      icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-        </svg>
-      ),
-      title: 'Proyectos de Software',
-      description: 'Desarrollamos software a medida con las últimas tecnologías para optimizar tus procesos empresariales.',
-      gradient: 'from-cyan-500 to-cyan-700'
-    },
-    {
-      icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
-      ),
-      title: 'Modelos de IA',
-      description: 'Implementamos inteligencia artificial personalizada para automatizar y potenciar tu empresa.',
-      gradient: 'from-amber-500 to-amber-700'
-    }
-  ];
-
-  // Usar items de data si existen, sino usar defaultSolutions
-  const solutions = (solutionsData.items && solutionsData.items.length > 0) 
-    ? solutionsData.items 
-    : defaultSolutions;
+  // Usar items directamente de solutionsData (que ya viene de defaultConfig)
+  const solutions = solutionsData.cards || [];
 
   return (
     <section className="relative py-20 theme-transition"
@@ -218,45 +140,45 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
                background: `linear-gradient(to bottom, color-mix(in srgb, var(--color-card-bg) 95%, var(--color-primary)), var(--color-card-bg))`
              }}>
       
-      {/* Background Image (si existe) */}
+      {/* Background Image (si existe) - CALIDAD HD SIN FILTROS */}
       {currentBackgroundImage && (
         <>
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out"
             style={{
               backgroundImage: `url(${currentBackgroundImage})`,
-              opacity: theme === 'dark' ? 0.65 : 0.85  // Más nitidez en ambos modos
+              opacity: 1  // 100% opacidad - calidad HD total
             }}
             role="img"
             aria-label={solutionsData.backgroundImageAlt || 'Solutions background'}
           />
-          {/* Overlay condicional según tema */}
-          {theme === 'dark' ? (
-            // Modo oscuro: overlay muy sutil para mantener contraste del texto
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
-          ) : (
-            // Modo claro: sin overlay, imagen pura
-            <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/10" />
-          )}
+          {/* SIN OVERLAY - imagen pura HD */}
         </>
       )}
 
-      {/* Section Header */}
+      {/* Section Header - SIN SOMBRAS, colores según maqueta */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
         <div
-          className="text-4xl sm:text-5xl font-bold theme-text-primary mb-4 theme-transition"
+          className="text-4xl sm:text-5xl font-bold mb-4 theme-transition"
           style={{
-            color: solutionsData.styles?.[theme]?.titleColor || undefined
+            color: theme === 'light' 
+              ? '#333333' // Color específico de la maqueta para tema claro
+              : '#FFFFFF', // Blanco para tema oscuro
+            fontWeight: '700'
           }}
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solutionsData.title) }}
         />
         <div className="max-w-3xl mx-auto">
           <div
-            className="text-xl theme-text-secondary theme-transition"
+            className="text-xl theme-transition"
             style={{
-              color: solutionsData.styles?.[theme]?.descriptionColor || undefined
+              color: theme === 'light' 
+                ? '#7528ee' // Color violeta específico de la maqueta
+                : '#D1D5DB', // Gris claro para tema oscuro
+              fontWeight: '400',
+              lineHeight: '1.6'
             }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solutionsData.description) }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solutionsData.subtitle) }}
           />
         </div>
       </div>
@@ -271,8 +193,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
               style={{
                 animationDelay: `${index * 100}ms`,
                 background: cardStyles.background,
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
+                // SIN backdrop-filter para máxima nitidez
                 boxShadow: cardStyles.shadow,
                 minWidth: cardStyles.cardMinWidth || '280px',
                 maxWidth: cardStyles.cardMaxWidth || '100%',
@@ -419,6 +340,31 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Botón "Ver más..." según maqueta */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center">
+          <button
+            className="group relative px-8 py-3 rounded-full overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75"
+            style={{
+              background: 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)',
+              color: '#FFFFFF',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              boxShadow: '0 4px 15px rgba(117, 40, 238, 0.3)'
+            }}
+            onClick={() => {
+              console.log('🔗 Ver más soluciones...');
+              // Aquí puedes agregar navegación o modal
+            }}
+          >
+            <span className="relative flex items-center space-x-2">
+              <span>Ver más...</span>
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </span>
+          </button>
         </div>
       </div>
     </section>

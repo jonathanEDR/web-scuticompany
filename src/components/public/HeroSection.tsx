@@ -1,7 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
+import { DEFAULT_HERO_CONFIG } from '../../utils/defaultConfig';
 import '../../styles/gradient-borders.css';
 
 interface HeroData {
@@ -38,37 +39,44 @@ const HeroSection = ({ data }: HeroSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
   const { theme: currentTheme } = useTheme();
-  const navigate = useNavigate();
+
+  // Usar datos proporcionados o configuración predeterminada como fallback
+  const heroData: HeroData = data || DEFAULT_HERO_CONFIG;
 
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {
-    if (!data?.backgroundImage) return null;
+    const backgroundImageData = heroData.backgroundImage;
+    
+    console.log('🖼️ HeroSection Debug:', {
+      backgroundImageData,
+      currentTheme,
+      heroData: heroData.title
+    });
+    
+    if (!backgroundImageData) return null;
     
     // Si es un string (formato anterior), usarlo como fallback
-    if (typeof data.backgroundImage === 'string') {
-      return data.backgroundImage;
+    if (typeof backgroundImageData === 'string') {
+      console.log('📎 Usando imagen string:', backgroundImageData);
+      return backgroundImageData;
     }
     
     // Usar imagen del tema activo, con fallback a la otra si no existe
+    let selectedImage;
     if (currentTheme === 'light') {
-      return data.backgroundImage.light || data.backgroundImage.dark || null;
+      selectedImage = backgroundImageData.light || backgroundImageData.dark || null;
     } else {
-      return data.backgroundImage.dark || data.backgroundImage.light || null;
+      selectedImage = backgroundImageData.dark || backgroundImageData.light || null;
     }
+    
+    console.log('🎨 Imagen seleccionada:', { theme: currentTheme, image: selectedImage });
+    return selectedImage;
   };
 
   const currentBackgroundImage = getCurrentBackgroundImage();
 
-  // Función helper removida ya que no se utiliza
-
-  // Datos por defecto si no se proporcionan
-  const heroData: HeroData = data || {
-    title: 'Transformamos tu empresa con tecnología inteligente',
-    subtitle: 'Innovamos para que tu empresa avance al ritmo de la tecnología.',
-    description: 'Transformamos procesos con soluciones digitales, proyectos de software y modelos de IA personalizados.',
-    ctaText: 'Conoce nuestros servicios',
-    ctaLink: '#servicios'
-  };
+  // Log adicional para verificar renderizado
+  console.log('🎬 HeroSection renderizando con imagen:', currentBackgroundImage);
 
   // Animación progresiva al cargar el componente
   useEffect(() => {
@@ -87,150 +95,129 @@ const HeroSection = ({ data }: HeroSectionProps) => {
   return (
     <section className="relative overflow-hidden theme-transition"
              style={{
-               background: `linear-gradient(135deg, var(--color-background), color-mix(in srgb, var(--color-primary) 10%, var(--color-background)), var(--color-background))`,
+               backgroundColor: 'var(--color-background)',
                minHeight: '100vh',
                height: '100vh'
              }}>
       
-      {/* Background Image (si existe) */}
+      {/* Background Image (si existe) - CALIDAD HD SIN FILTROS */}
       {currentBackgroundImage && (
         <>
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out z-0"
             style={{
               backgroundImage: `url(${currentBackgroundImage})`,
-              opacity: 0.85
+              opacity: 1  // 100% opacidad - calidad HD total
             }}
             role="img"
-            aria-label={data?.backgroundImageAlt || 'Hero background'}
+            aria-label={heroData.backgroundImageAlt || 'Hero background'}
           />
-          {/* Overlay muy sutil para mejorar legibilidad del texto */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5" />
+          {/* SIN OVERLAY - imagen pura HD */}
         </>
       )}
 
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, color-mix(in srgb, var(--color-primary) 40%, transparent) 1px, transparent 0)`,
-          backgroundSize: '40px 40px',
-          animation: 'backgroundScroll 20s linear infinite'
-        }}></div>
-      </div>
+      {/* Animated Background Pattern - Solo si NO hay imagen */}
+      {!currentBackgroundImage && (
+        <div className="absolute inset-0 opacity-30 z-0">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, color-mix(in srgb, var(--color-primary) 40%, transparent) 1px, transparent 0)`,
+            backgroundSize: '40px 40px',
+            animation: 'backgroundScroll 20s linear infinite'
+          }}></div>
+        </div>
+      )}
 
-      {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col justify-end items-center" 
+      {/* Content - Distribución más alta como en maqueta */}
+      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col justify-center items-center" 
            style={{ 
-             paddingTop: '40vh',
-             paddingBottom: '15vh',
+             paddingTop: '40vh', // Más arriba, menos centrado
+             paddingBottom: '7vh', // Más espacio abajo
              minHeight: '100vh'
            }}>
-        <div className={`space-y-2 sm:space-y-3 transition-all duration-1000 ${
+        <div className={`space-y-3 sm:space-y-4 transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
-          {/* Main Title - Optimizado para móvil con animación progresiva */}
+          {/* Main Title - Colores optimizados según maqueta */}
           <div className="max-w-3xl mx-auto">
             <div
-              className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold theme-text-primary theme-transition transition-all duration-1000 ${
+              className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold theme-transition transition-all duration-1000 ${
                 animationPhase >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
               style={{
                 lineHeight: '1.2',
-                color: heroData.styles?.[currentTheme]?.titleColor || undefined
+                color: currentTheme === 'light' 
+                  ? '#1F2937' // Gris oscuro elegante para tema claro (como en maqueta)
+                  : '#FFFFFF', // Blanco para tema oscuro
+                fontWeight: '700',
+                textShadow: currentTheme === 'light' 
+                  ? '1px 1px 2px rgba(0,0,0,0.1)' // Sombra muy sutil para tema claro
+                  : '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6)' // Sombra más fuerte para tema oscuro
               }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.title) }}
             />
           </div>
 
-          {/* Subtitle - Optimizado para móvil con animación escalonada */}
+          {/* Subtitle - Colores optimizados según maqueta */}
           <div className="max-w-2xl mx-auto space-y-2">
             <div
-              className={`text-sm sm:text-sm md:text-base theme-text-primary theme-transition transition-all duration-1000 delay-300 ${
+              className={`text-sm sm:text-sm md:text-base theme-transition transition-all duration-1000 delay-300 ${
                 animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
               style={{
                 lineHeight: '1.4',
-                color: heroData.styles?.[currentTheme]?.subtitleColor || undefined
+                color: currentTheme === 'light' 
+                  ? '#7528ee' // Color violeta para subtítulo en tema claro (más visible)
+                  : '#D1D5DB', // Gris claro para tema oscuro
+                fontWeight: '500',
+                textShadow: currentTheme === 'light' 
+                  ? '0.5px 0.5px 1px rgba(0,0,0,0.1)' // Sombra muy ligera para tema claro
+                  : '1px 1px 3px rgba(0,0,0,0.7), 0 0 6px rgba(0,0,0,0.5)' // Sombra para tema oscuro
               }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.subtitle) }}
             />
             <div
-              className={`text-xs sm:text-xs md:text-sm theme-text-secondary theme-transition transition-all duration-1000 delay-500 ${
+              className={`hero-description text-xs sm:text-xs md:text-sm theme-transition transition-all duration-1000 delay-500 ${
                 animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
               style={{
                 lineHeight: '1.5',
-                color: heroData.styles?.[currentTheme]?.descriptionColor || undefined
+                color: currentTheme === 'light' 
+                  ? '#7528ee' // Gris medio más legible para descripción en tema claro
+                  : '#9CA3AF', // Gris claro para tema oscuro
+                fontWeight: '400',
+                textShadow: currentTheme === 'light' 
+                  ? 'none' // Sin sombra para texto de descripción en tema claro
+                  : '1px 1px 2px rgba(0,0,0,0.6)' // Sombra sutil para tema oscuro
               }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.description) }}
             />
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-row gap-2 justify-center items-center pt-2 sm:pt-3">
+          {/* CTA Buttons - Solo dos botones principales */}
+          <div className="flex flex-row gap-3 justify-center items-center pt-4 sm:pt-5">
             {/* Botón principal de servicios */}
             <Link
               to={heroData.ctaLink}
               role="button"
               aria-label={`${heroData.ctaText} - Ir a la sección de servicios`}
-              className={`group relative px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full overflow-hidden theme-transition transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 transition-all duration-300 ${
+              className={`group relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full overflow-hidden theme-transition transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 transition-all duration-300 ${
                 animationPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
               style={{
-                background: 'var(--color-cta-bg)',
-                color: 'var(--color-cta-text)',
-                backgroundSize: '200% 100%',
-                animation: 'gradientShift 3s ease-in-out infinite'
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.background = 'var(--color-cta-hover-bg)';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.background = 'var(--color-cta-bg)';
+                background: 'linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)',
+                color: '#FFFFFF',
+                fontWeight: '600',
+                fontSize: '0.875rem',
+                boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'
               }}
             >
-              <div className="absolute inset-0 blur-xl opacity-50 group-hover:opacity-75 transition-all duration-300"
-                   style={{
-                     background: 'var(--color-cta-bg)',
-                     backgroundSize: '200% 100%'
-                   }}></div>
-              <span className="relative font-medium text-xs sm:text-sm flex items-center space-x-1.5">
+              <span className="relative flex items-center space-x-2">
                 <span>{heroData.ctaText}</span>
-                <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </span>
             </Link>
-
-            {/* ⚡ Botón optimizado - Redirige a página de signup */}
-            <button
-              onClick={() => {
-                console.log('🚀 HeroSection: Click en Comenzar Gratis - Redirigiendo a /signup');
-                navigate('/signup');
-              }}
-              aria-label="Comenzar gratis - Crear cuenta nueva"
-              className={`group relative px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full border-2 theme-transition font-medium text-xs sm:text-sm transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 transition-all duration-300 ${
-                animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-              style={{
-                borderColor: 'var(--color-primary)',
-                color: 'var(--color-primary)',
-                backgroundColor: 'transparent'
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                (e.target as HTMLElement).style.color = 'white';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                (e.target as HTMLElement).style.color = 'var(--color-primary)';
-              }}
-            >
-              <span className="flex items-center space-x-2">
-                <span role="img" aria-label="Cohete">🚀</span>
-                <span className="hidden sm:inline">Comenzar Gratis</span>
-              </span>
-            </button>
           </div>
 
           {/* Scroll Indicator Dots */}

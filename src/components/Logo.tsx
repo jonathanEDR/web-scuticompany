@@ -7,6 +7,7 @@ interface LogoProps {
   className?: string;
   animated?: boolean;
   compact?: boolean;
+  variant?: 'auto' | 'white' | 'dark';
 }
 
 const Logo = ({ 
@@ -14,7 +15,8 @@ const Logo = ({
   withText = false, 
   className = '', 
   animated = true,
-  compact = false 
+  compact = false,
+  variant = 'auto'
 }: LogoProps) => {
   const { theme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,23 +48,25 @@ const Logo = ({
     xl: 'h-16 sm:h-20'
   };
 
-  // Tamaños de texto según el tamaño del logo
-  const textSizes = {
-    xs: 'text-xs',
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-lg',
-    xl: 'text-xl'
-  };
 
-  // Seleccionar logo según el tema
-  // NOTA: Los nombres de archivo están invertidos vs su contenido real
-  // "NEGRA.svg" = texto blanco, "BLANCA.svg" = texto negro
-  // Tema claro (light) → Necesitamos contraste oscuro → usar "BLANCA.svg" (que tiene texto negro)
-  // Tema oscuro (dark) → Necesitamos contraste claro → usar "NEGRA.svg" (que tiene texto blanco)
-  const logoSrc = theme === 'light' 
-    ? '/LOGO VECTOR VERSION BLANCA.svg'  // Contiene texto negro (bueno para fondo claro)
-    : '/LOGO VECTOR VERSION NEGRA.svg';  // Contiene texto blanco (bueno para fondo oscuro)
+  // Seleccionar logo según el tema o variant
+  const logoSrc = (() => {
+    switch (variant) {
+      case 'white':
+        return '/logo-white.svg';  // Logo blanco para fondos oscuros
+      case 'dark':
+        return '/LOGO VECTOR VERSION BLANCA.svg';  // Logo oscuro para fondos claros
+      case 'auto':
+      default:
+        // NOTA: Los nombres de archivo están invertidos vs su contenido real
+        // "NEGRA.svg" = texto blanco, "BLANCA.svg" = texto negro
+        // Tema claro (light) → Necesitamos contraste oscuro → usar "BLANCA.svg" (que tiene texto negro)
+        // Tema oscuro (dark) → Necesitamos contraste claro → usar "NEGRA.svg" (que tiene texto blanco)
+        return theme === 'light' 
+          ? '/LOGO VECTOR VERSION BLANCA.svg'  // Contiene texto negro (bueno para fondo claro)
+          : '/LOGO VECTOR VERSION NEGRA.svg';  // Contiene texto blanco (bueno para fondo oscuro)
+    }
+  })();
 
   // Agregar cache-busting para asegurar que se cargue el logo correcto
   const logoSrcWithCache = `${logoSrc}?t=${logoKey}`;
@@ -105,20 +109,6 @@ const Logo = ({
         )}
       </div>
 
-      {/* Texto complementario */}
-      {withText && (
-        <div className={`
-          ${textSizes[size]} 
-          font-medium 
-          theme-text-secondary 
-          transition-all 
-          duration-300
-          ${compact && isScrolled ? 'opacity-0 w-0' : 'opacity-100'}
-        `}>
-          <span className="hidden sm:inline">Tecnología Inteligente</span>
-          <span className="sm:hidden">Tech Intelligence</span>
-        </div>
-      )}
     </div>
   );
 };

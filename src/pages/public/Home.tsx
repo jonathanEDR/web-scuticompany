@@ -6,6 +6,7 @@ import SolutionsSection from '../../components/public/SolutionsSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import { getPageBySlug } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
+import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG } from '../../utils/defaultConfig';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 
 interface ButtonTheme {
@@ -47,17 +48,19 @@ interface PageData {
     };
     solutions: {
       title: string;
-      description: string;
-      backgroundImage?: {
-        light?: string;
-        dark?: string;
+      subtitle: string;
+      backgroundImage: {
+        light: string;
+        dark: string;
       };
-      backgroundImageAlt?: string;
-      items: Array<{
-        icon: string;
+      backgroundImageAlt: string;
+      cards: Array<{
+        id: string;
         title: string;
         description: string;
-        gradient: string;
+        icon: string;
+        iconLight?: string;
+        iconDark?: string;
       }>;
     };
   };
@@ -72,40 +75,11 @@ interface PageData {
   theme?: ExtendedThemeConfig;
 }
 
-// ⚡ Contenido por defecto - Se renderiza INMEDIATAMENTE
+// ⚡ Usar SOLO defaultConfig.ts como fuente única de verdad
 const DEFAULT_PAGE_DATA: PageData = {
   content: {
-    hero: {
-      title: 'Transformamos tu empresa con tecnología inteligente',
-      subtitle: 'Innovamos para que tu empresa avance al ritmo de la tecnología.',
-      description: 'Transformamos procesos con soluciones digitales, proyectos de software y modelos de IA personalizados.',
-      ctaText: 'Conoce nuestros servicios',
-      ctaLink: '#servicios'
-    },
-    solutions: {
-      title: 'Soluciones',
-      description: 'En el dinámico entorno empresarial de hoy, la tecnología es la columna vertebral del éxito.',
-      items: [
-        {
-          icon: '🚀',
-          title: 'Desarrollo de Software',
-          description: 'Soluciones personalizadas para tu negocio',
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-        },
-        {
-          icon: '🤖',
-          title: 'Inteligencia Artificial',
-          description: 'Modelos de IA adaptados a tus necesidades',
-          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-        },
-        {
-          icon: '☁️',
-          title: 'Soluciones Cloud',
-          description: 'Infraestructura escalable y segura',
-          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
-        }
-      ]
-    }
+    hero: DEFAULT_HERO_CONFIG,
+    solutions: DEFAULT_SOLUTIONS_CONFIG
   },
   seo: {
     metaTitle: 'Scuti Company - Transformamos tu empresa con tecnología inteligente',
