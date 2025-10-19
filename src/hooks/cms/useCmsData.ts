@@ -119,16 +119,19 @@ export const useCmsData = () => {
               border: '#e2e8f0',
               buttons: {
                 ctaPrimary: {
+                  text: 'Comenzar Ahora',
                   background: 'linear-gradient(90deg, #8B5CF6, #06B6D4, #8B5CF6)',
                   textColor: '#FFFFFF',
                   borderColor: 'transparent'
                 },
                 contact: {
+                  text: 'Contactar',
                   background: 'transparent',
                   textColor: '#8B5CF6',
                   borderColor: 'linear-gradient(90deg, #8B5CF6, #06B6D4)'
                 },
                 dashboard: {
+                  text: 'Dashboard',
                   background: 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
                   textColor: '#FFFFFF',
                   borderColor: 'transparent'
@@ -145,16 +148,19 @@ export const useCmsData = () => {
               border: '#334155',
               buttons: {
                 ctaPrimary: {
+                  text: 'Comenzar Ahora',
                   background: 'linear-gradient(90deg, #A78BFA, #22D3EE, #A78BFA)',
                   textColor: '#111827',
                   borderColor: 'transparent'
                 },
                 contact: {
+                  text: 'Contactar',
                   background: 'transparent',
                   textColor: '#A78BFA',
                   borderColor: 'linear-gradient(90deg, #A78BFA, #22D3EE)'
                 },
                 dashboard: {
+                  text: 'Dashboard',
                   background: 'linear-gradient(90deg, #A78BFA, #22D3EE)',
                   textColor: '#111827',
                   borderColor: 'transparent'
@@ -204,16 +210,19 @@ export const useCmsData = () => {
         if (!data.theme.lightMode.buttons) {
           data.theme.lightMode.buttons = {
             ctaPrimary: {
+              text: 'Comenzar Ahora',
               background: 'linear-gradient(90deg, #8B5CF6, #06B6D4, #8B5CF6)',
               textColor: '#FFFFFF',
               borderColor: 'transparent'
             },
             contact: {
+              text: 'Contactar',
               background: 'transparent',
               textColor: '#8B5CF6',
               borderColor: 'linear-gradient(90deg, #8B5CF6, #06B6D4)'
             },
             dashboard: {
+              text: 'Dashboard',
               background: 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
               textColor: '#FFFFFF',
               borderColor: 'transparent'
@@ -222,6 +231,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.lightMode.buttons.ctaPrimary) {
           data.theme.lightMode.buttons.ctaPrimary = {
+            text: 'Comenzar Ahora',
             background: 'linear-gradient(90deg, #8B5CF6, #06B6D4, #8B5CF6)',
             textColor: '#FFFFFF',
             borderColor: 'transparent'
@@ -229,6 +239,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.lightMode.buttons.contact) {
           data.theme.lightMode.buttons.contact = {
+            text: 'Contactar',
             background: 'transparent',
             textColor: '#8B5CF6',
             borderColor: 'linear-gradient(90deg, #8B5CF6, #06B6D4)'
@@ -236,6 +247,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.lightMode.buttons.dashboard) {
           data.theme.lightMode.buttons.dashboard = {
+            text: 'Dashboard',
             background: 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
             textColor: '#FFFFFF',
             borderColor: 'transparent'
@@ -246,16 +258,19 @@ export const useCmsData = () => {
         if (!data.theme.darkMode.buttons) {
           data.theme.darkMode.buttons = {
             ctaPrimary: {
+              text: 'Comenzar Ahora',
               background: 'linear-gradient(90deg, #A78BFA, #22D3EE, #A78BFA)',
               textColor: '#111827',
               borderColor: 'transparent'
             },
             contact: {
+              text: 'Contactar',
               background: 'transparent',
               textColor: '#A78BFA',
               borderColor: 'linear-gradient(90deg, #A78BFA, #22D3EE)'
             },
             dashboard: {
+              text: 'Dashboard',
               background: 'linear-gradient(90deg, #A78BFA, #22D3EE)',
               textColor: '#111827',
               borderColor: 'transparent'
@@ -264,6 +279,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.darkMode.buttons.ctaPrimary) {
           data.theme.darkMode.buttons.ctaPrimary = {
+            text: 'Comenzar Ahora',
             background: 'linear-gradient(90deg, #A78BFA, #22D3EE, #A78BFA)',
             textColor: '#111827',
             borderColor: 'transparent'
@@ -271,6 +287,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.darkMode.buttons.contact) {
           data.theme.darkMode.buttons.contact = {
+            text: 'Contactar',
             background: 'transparent',
             textColor: '#A78BFA',
             borderColor: 'linear-gradient(90deg, #A78BFA, #22D3EE)'
@@ -278,6 +295,7 @@ export const useCmsData = () => {
         }
         if (!data.theme.darkMode.buttons.dashboard) {
           data.theme.darkMode.buttons.dashboard = {
+            text: 'Dashboard',
             background: 'linear-gradient(90deg, #A78BFA, #22D3EE)',
             textColor: '#111827',
             borderColor: 'transparent'
