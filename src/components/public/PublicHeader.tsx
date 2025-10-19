@@ -149,9 +149,10 @@ const PublicHeaderOptimized = () => {
               Proyectos destacados
             </Link>
 
+            {/* CONTÁCTANOS en navegación - Solo visible en móvil */}
             <Link 
               to="/contacto"
-              className="px-6 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
+              className="sm:hidden px-6 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
               style={{
                 borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
                 color: theme === 'light' ? '#7528ee' : '#7528ee',
@@ -171,8 +172,6 @@ const PublicHeaderOptimized = () => {
               CONTÁCTANOS
             </Link>
           </nav>
-
-  
 
           {/* Actions Desktop - Toggle de tema + CONTÁCTANOS + Avatar */}
           <div className="hidden sm:flex items-center space-x-4 flex-shrink-0">
