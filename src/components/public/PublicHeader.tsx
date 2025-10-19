@@ -13,22 +13,20 @@ import '../../styles/gradient-borders.css';
  * - Detección progresiva del estado de autenticación
  * - Avatar real del usuario cuando Clerk está disponible
  * - Fallback a iniciales si no hay imagen
- * - Indicador visual de carga
+ * - Toggle de tema unificado y responsivo
  * - Botón "Contáctanos" temático
- * - Responsive design
+ * - Diseño responsive mejorado
  * 
- * Flujo de funcionamiento:
- * 1. Carga inicial: Header básico sin autenticación
- * 2. Detección progresiva: Verifica si Clerk está disponible
- * 3. Carga dinámica: Obtiene datos reales del usuario
- * 4. Actualización: Muestra avatar al lado del cambio de tema
+ * Estructura:
+ * 1. Logo centrado en móvil, izquierda en desktop
+ * 2. Navegación centrada en todas las resoluciones  
+ * 3. Toggle tema y avatar en la parte derecha
  */
 const PublicHeaderOptimized = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  // Estado removido - no necesitamos menú móvil desplegable
   
   // Hook personalizado para detectar usuario de Clerk
   const { userData, getUserInitials } = useClerkDetection();
@@ -66,7 +64,7 @@ const PublicHeaderOptimized = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center h-auto sm:h-20">
           {/* Fila 1 Mobile: Logo centrado + Toggle tema derecha | Desktop: Logo izquierda */}
           <div className="flex justify-between items-center sm:justify-start py-4 sm:py-0">
-            {/* Espaciador invisible en móvil para centrar logo */}
+            {/* Espaciador invisible en móvil para centrar el logo */}
             <div className="w-10 sm:hidden"></div>
             
             <Link 
@@ -77,11 +75,11 @@ const PublicHeaderOptimized = () => {
               <Logo size="md" animated compact />
             </Link>
 
-            {/* Theme Toggle - Derecha en móvil, se mueve a actions en desktop */}
+            {/* Theme Toggle - Visible en móvil, oculto en desktop */}
             <div className="sm:hidden">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg theme-text-secondary hover:bg-white/5"
+                className="p-2 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
                 aria-label="Cambiar tema"
               >
                 {theme === 'light' ? (
@@ -97,8 +95,8 @@ const PublicHeaderOptimized = () => {
             </div>
           </div>
 
-          {/* Fila 2 Mobile: Navegación horizontal | Desktop: Navegación centro */}
-          <nav className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 py-3 sm:py-0 sm:space-x-8" role="navigation" aria-label="Navegación principal">
+          {/* Navegación - Solo en móvil como fila separada, en desktop como parte de la fila principal */}
+          <nav className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 py-3 sm:py-0 sm:space-x-8 sm:flex-1 sm:justify-center" role="navigation" aria-label="Navegación principal">
             <Link 
               to="/" 
               className="theme-text-primary font-medium theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
@@ -150,34 +148,11 @@ const PublicHeaderOptimized = () => {
             >
               Proyectos destacados
             </Link>
-            
-            {/* CONTÁCTANOS - Color rosado en tema blanco */}
-            <Link 
-              to="/contacto"
-              className="px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
-              style={{
-                borderColor: theme === 'light' ? '#7528ee' : '#7528ee', // Rosado en light, violeta en dark
-                color: theme === 'light' ? '#7528ee' : '#7528ee', // Rosado en light, violeta en dark
-                backgroundColor: 'transparent'
-              }}
-              onMouseEnter={(e) => {
-                const element = e.target as HTMLElement;
-                element.style.backgroundColor = theme === 'light' ? '#7528ee' : '#7528ee';
-                element.style.color = '#FFFFFF';
-              }}
-              onMouseLeave={(e) => {
-                const element = e.target as HTMLElement;
-                element.style.backgroundColor = 'transparent';
-                element.style.color = theme === 'light' ? '#7528ee' : '#7528ee';
-              }}
-            >
-              CONTÁCTANOS
-            </Link>
           </nav>
 
-          {/* Actions Desktop - Solo visible en desktop */}
+          {/* Actions Desktop - Toggle de tema + CONTÁCTANOS + Avatar */}
           <div className="hidden sm:flex items-center space-x-4">
-            {/* Theme Toggle Desktop */}
+            {/* Theme Toggle - Solo visible en desktop */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
@@ -193,53 +168,73 @@ const PublicHeaderOptimized = () => {
                 </svg>
               )}
             </button>
+            
+            {/* CONTÁCTANOS - Color rosado en tema blanco */}
+            <Link 
+              to="/contacto"
+              className="px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
+              style={{
+                borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
+                color: theme === 'light' ? '#7528ee' : '#7528ee',
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                const element = e.target as HTMLElement;
+                element.style.backgroundColor = theme === 'light' ? '#7528ee' : '#7528ee';
+                element.style.color = '#FFFFFF';
+              }}
+              onMouseLeave={(e) => {
+                const element = e.target as HTMLElement;
+                element.style.backgroundColor = 'transparent';
+                element.style.color = theme === 'light' ? '#7528ee' : '#7528ee';
+              }}
+            >
+              CONTÁCTANOS
+            </Link>
 
             {/* Avatar del usuario - Solo si está logueado */}
             {userData ? (
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => {
-                    console.log('🚀 Redirigiendo al dashboard...');
-                    navigate('/dashboard');
-                  }}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-lg theme-bg-card border theme-border hover:bg-white/5 transition-all duration-200 group"
-                  aria-label={`Dashboard de ${userData.firstName || 'Usuario'}`}
-                  title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
+              <button
+                onClick={() => {
+                  console.log('🚀 Redirigiendo al dashboard...');
+                  navigate('/dashboard');
+                }}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg theme-bg-card border theme-border hover:bg-white/5 transition-all duration-200 group"
+                aria-label={`Dashboard de ${userData.firstName || 'Usuario'}`}
+                title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
+              >
+                {/* Avatar con imagen real o iniciales */}
+                {userData.imageUrl ? (
+                  <img 
+                    src={userData.imageUrl} 
+                    alt={`Avatar de ${userData.firstName || 'Usuario'}`}
+                    className="w-8 h-8 rounded-full object-cover border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200"
+                    onError={(e) => {
+                      // Si falla la imagen, mostrar iniciales
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                
+                {/* Fallback con iniciales */}
+                <div 
+                  className={`w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-white font-medium text-sm border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200 ${
+                    userData.imageUrl ? 'hidden' : ''
+                  }`}
                 >
-                  {/* Avatar con imagen real o iniciales */}
-                  {userData.imageUrl ? (
-                    <img 
-                      src={userData.imageUrl} 
-                      alt={`Avatar de ${userData.firstName || 'Usuario'}`}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200"
-                      onError={(e) => {
-                        // Si falla la imagen, mostrar iniciales
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        target.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                  ) : null}
-                  
-                  {/* Fallback con iniciales */}
-                  <div 
-                    className={`w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-white font-medium text-sm border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200 ${
-                      userData.imageUrl ? 'hidden' : ''
-                    }`}
-                  >
-                    {getUserInitials()}
-                  </div>
-                  
-                  {/* Flecha indicadora */}
-                  <svg className="w-4 h-4 theme-text-secondary group-hover:text-purple-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-
-              </div>
+                  {getUserInitials()}
+                </div>
+                
+                {/* Flecha indicadora */}
+                <svg className="w-4 h-4 theme-text-secondary group-hover:text-purple-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             ) : null}
           </div>
+
         </div>
       </div>
 
