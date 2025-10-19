@@ -2,37 +2,96 @@ import React from 'react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_SOLUTIONS_CONFIG } from '../../utils/defaultConfig';
-import type { CardDesignStyles } from '../../types/cms';
+import type { CardDesignStyles, ButtonStyle } from '../../types/cms';
 
 interface SolutionItem {
-  id: string;
+  id?: string;
   title: string;
   description: string;
-  icon: string;
+  icon?: string;
   iconLight?: string;
   iconDark?: string;
+  gradient?: string;
+  _id?: any; // Para compatibilidad con MongoDB
 }
 
 interface SolutionsData {
   title: string;
-  subtitle: string;
+  subtitle?: string; // Opcional para compatibilidad con defaultConfig
+  description?: string; // Del CMS
   backgroundImage: {
     light: string;
     dark: string;
   };
   backgroundImageAlt: string;
-  cards: SolutionItem[];
+  cards?: SolutionItem[]; // Del defaultConfig
+  items?: SolutionItem[]; // Del CMS
+  cardsDesign?: {
+    light: CardDesignStyles;
+    dark: CardDesignStyles;
+  };
 }
 
 interface SolutionsSectionProps {
   data?: SolutionsData;
+  themeConfig?: any; // Simplificado para evitar conflictos de tipos
 }
 
-const SolutionsSection = ({ data }: SolutionsSectionProps) => {
+const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   const { theme } = useTheme();
 
-  // Usar SOLO defaultConfig.ts como fuente única de verdad
+  // ⚡ Priorizar datos del CMS sobre defaultConfig
   const solutionsData: SolutionsData = data || DEFAULT_SOLUTIONS_CONFIG;
+
+  // Mapear datos del CMS a estructura esperada
+  const getMappedSolutionsData = () => {
+    // Si tenemos datos del CMS (con 'items'), mapear a estructura esperada
+    if (solutionsData.items) {
+      return {
+        ...solutionsData,
+        // Mapear 'description' del CMS a 'subtitle' para compatibilidad
+        subtitle: solutionsData.description || solutionsData.subtitle || '',
+        // Usar 'items' del CMS como 'cards'
+        cards: solutionsData.items.map((item, index) => ({
+          id: item.id || item._id?.toString() || index.toString(),
+          title: item.title,
+          description: item.description,
+          icon: item.icon || '📄',
+          iconLight: item.iconLight,
+          iconDark: item.iconDark,
+          gradient: item.gradient
+        }))
+      };
+    }
+    
+    // Fallback a estructura de defaultConfig
+    return {
+      ...solutionsData,
+      subtitle: solutionsData.subtitle || '',
+      cards: solutionsData.cards || []
+    };
+  };
+
+  const mappedData = getMappedSolutionsData();
+
+  // ⚡ Usar estilos del CMS si están disponibles, sino usar defaults
+  const getCMSCardStyles = (): CardDesignStyles => {
+    const cmsStyles = solutionsData.cardsDesign;
+    
+    if (cmsStyles && cmsStyles[theme]) {
+      const styles = cmsStyles[theme];
+      
+      // ⚡ CORRECCIÓN: Asegurar que 'transparent' se convierte correctamente
+      if (styles.background === 'transparent') {
+        styles.background = 'transparent';
+      }
+      
+      return styles;
+    }
+    
+    // Fallback a estilos por defecto
+    return theme === 'light' ? defaultLightStyles : defaultDarkStyles;
+  };
 
   // Valores por defecto para el diseño de tarjetas - Colores según maqueta
   const defaultLightStyles: CardDesignStyles = {
@@ -79,17 +138,38 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
     iconAlignment: 'center'
   };
 
-  // Obtener estilos actuales según el tema
-  const cardStyles = theme === 'light' ? defaultLightStyles : defaultDarkStyles;
+  // Obtener estilos actuales según el tema (CMS o defaults)
+  const cardStyles = getCMSCardStyles();
+
+  // ⚡ Obtener estilos del botón "Ver más..." desde la configuración de tema
+  const getViewMoreButtonStyles = (): ButtonStyle => {
+    const themeButtons = themeConfig?.[theme === 'light' ? 'lightMode' : 'darkMode']?.buttons;
+    
+    if (themeButtons?.viewMore) {
+      return themeButtons.viewMore;
+    }
+    
+    // Fallback a estilos por defecto
+    return {
+      text: 'Ver más...',
+      background: theme === 'light' 
+        ? 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)'
+        : 'linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%)',
+      textColor: theme === 'light' ? '#FFFFFF' : '#111827',
+      borderColor: 'transparent'
+    };
+  };
+
+  const viewMoreButtonStyles = getViewMoreButtonStyles();
 
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {
-    if (!solutionsData.backgroundImage) return null;
+    if (!mappedData.backgroundImage) return null;
     
     // Usar imagen del tema activo
     return theme === 'light' 
-      ? solutionsData.backgroundImage.light 
-      : solutionsData.backgroundImage.dark;
+      ? mappedData.backgroundImage.light 
+      : mappedData.backgroundImage.dark;
   };
 
   // Función helper para detectar si un string es una URL de imagen
@@ -131,8 +211,8 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
 
   const currentBackgroundImage = getCurrentBackgroundImage();
 
-  // Usar items directamente de solutionsData (que ya viene de defaultConfig)
-  const solutions = solutionsData.cards || [];
+  // Usar items mapeados correctamente
+  const solutions = mappedData.cards || [];
 
   return (
     <section className="relative py-20 theme-transition"
@@ -150,7 +230,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
               opacity: 1  // 100% opacidad - calidad HD total
             }}
             role="img"
-            aria-label={solutionsData.backgroundImageAlt || 'Solutions background'}
+            aria-label={mappedData.backgroundImageAlt || 'Solutions background'}
           />
           {/* SIN OVERLAY - imagen pura HD */}
         </>
@@ -166,7 +246,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
               : '#FFFFFF', // Blanco para tema oscuro
             fontWeight: '700'
           }}
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solutionsData.title) }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.title) }}
         />
         <div className="max-w-3xl mx-auto">
           <div
@@ -178,7 +258,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
               fontWeight: '400',
               lineHeight: '1.6'
             }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solutionsData.subtitle) }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.subtitle || '') }}
           />
         </div>
       </div>
@@ -189,9 +269,10 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
           {solutions.map((solution, index) => (
             <div
               key={index}
-              className="group relative rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2 overflow-hidden"
+              className="group relative rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2 overflow-hidden solutions-card"
               style={{
                 animationDelay: `${index * 100}ms`,
+                '--solutions-card-bg': cardStyles.background,
                 background: cardStyles.background,
                 // SIN backdrop-filter para máxima nitidez
                 boxShadow: cardStyles.shadow,
@@ -200,7 +281,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
                 minHeight: cardStyles.cardMinHeight || 'auto',
                 padding: cardStyles.cardPadding || '2rem',
                 transition: 'all 0.3s ease'
-              }}
+              } as React.CSSProperties}
               onMouseEnter={(e) => {
                 const card = e.currentTarget;
                 card.style.background = cardStyles.hoverBackground;
@@ -347,8 +428,11 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
           <button
             className="group relative px-8 py-3 rounded-full overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75"
             style={{
-              background: 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)',
-              color: '#FFFFFF',
+              background: viewMoreButtonStyles.background,
+              color: viewMoreButtonStyles.textColor,
+              border: viewMoreButtonStyles.borderColor !== 'transparent' 
+                ? `1px solid ${viewMoreButtonStyles.borderColor}` 
+                : 'none',
               fontWeight: '600',
               fontSize: '0.875rem',
               boxShadow: '0 4px 15px rgba(117, 40, 238, 0.3)'
@@ -359,7 +443,7 @@ const SolutionsSection = ({ data }: SolutionsSectionProps) => {
             }}
           >
             <span className="relative flex items-center space-x-2">
-              <span>Ver más...</span>
+              <span>{viewMoreButtonStyles.text || 'Ver más...'}</span>
               <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

@@ -59,6 +59,7 @@ export interface CardsDesign {
 }
 
 export interface ButtonStyle {
+  text: string;
   background: string;
   textColor: string;
   borderColor: string;
@@ -68,6 +69,7 @@ export interface ThemeButtons {
   ctaPrimary: ButtonStyle;
   contact: ButtonStyle;
   dashboard: ButtonStyle;
+  viewMore?: ButtonStyle;
 }
 
 export interface ThemeColors {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 interface ButtonStyle {
+  text: string;
   background: string;
   textColor: string;
   borderColor: string;
@@ -13,41 +14,6 @@ interface SimpleButtonConfigProps {
   onChange: (style: ButtonStyle) => void;
 }
 
-const PRESET_STYLES = [
-  {
-    name: '🟣 Morado Sólido',
-    style: {
-      background: '#8B5CF6',
-      textColor: '#FFFFFF',
-      borderColor: 'transparent'
-    }
-  },
-  {
-    name: '🌊 Gradiente Morado-Cyan',
-    style: {
-      background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
-      textColor: '#FFFFFF',
-      borderColor: 'transparent'
-    }
-  },
-  {
-    name: '🔲 Solo Borde',
-    style: {
-      background: 'transparent',
-      textColor: '#8B5CF6',
-      borderColor: '#8B5CF6'
-    }
-  },
-  {
-    name: '🌈 Borde Gradiente',
-    style: {
-      background: 'transparent',
-      textColor: '#8B5CF6',
-      borderColor: 'linear-gradient(90deg, #8B5CF6, #06B6D4)'
-    }
-  }
-];
-
 export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
   title,
   icon,
@@ -56,7 +22,46 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const applyPreset = (preset: typeof PRESET_STYLES[0]) => {
+  const PRESET_STYLES_UPDATED = [
+    {
+      name: '🟣 Morado Sólido',
+      style: {
+        text: value.text || 'Botón',
+        background: '#8B5CF6',
+        textColor: '#FFFFFF',
+        borderColor: 'transparent'
+      }
+    },
+    {
+      name: '🌊 Gradiente Morado-Cyan',
+      style: {
+        text: value.text || 'Botón',
+        background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+        textColor: '#FFFFFF',
+        borderColor: 'transparent'
+      }
+    },
+    {
+      name: '🔲 Solo Borde',
+      style: {
+        text: value.text || 'Botón',
+        background: 'transparent',
+        textColor: '#8B5CF6',
+        borderColor: '#8B5CF6'
+      }
+    },
+    {
+      name: '🌈 Borde Gradiente',
+      style: {
+        text: value.text || 'Botón',
+        background: 'transparent',
+        textColor: '#8B5CF6',
+        borderColor: 'linear-gradient(90deg, #8B5CF6, #06B6D4)'
+      }
+    }
+  ];
+
+  const applyPreset = (preset: typeof PRESET_STYLES_UPDATED[0]) => {
     onChange(preset.style);
   };
 
@@ -97,9 +102,9 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
                   border: '2px solid transparent'
                 }}
               >
-                {title.includes('Contacto') ? 'CONTÁCTENOS' : 
+                {value.text || (title.includes('Contacto') ? 'CONTÁCTENOS' : 
                  title.includes('Principal') ? 'Ver Servicios' : 
-                 'Dashboard'}
+                 'Dashboard')}
               </div>
             ) : (
               // Botón normal con borde sólido
@@ -111,9 +116,9 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
                   borderColor: value.borderColor || 'transparent'
                 }}
               >
-                {title.includes('Contacto') ? 'CONTÁCTENOS' : 
+                {value.text || (title.includes('Contacto') ? 'CONTÁCTENOS' : 
                  title.includes('Principal') ? 'Ver Servicios' : 
-                 'Dashboard'}
+                 'Dashboard')}
               </div>
             )}
             <svg 
@@ -135,7 +140,7 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
           <div className="mb-6">
             <h6 className="text-sm font-medium text-gray-300 dark:text-gray-200 mb-3">🎨 Estilos Rápidos</h6>
             <div className="grid grid-cols-2 gap-2">
-              {PRESET_STYLES.map((preset, index) => (
+              {PRESET_STYLES_UPDATED.map((preset, index) => (
                 <button
                   key={index}
                   onClick={() => applyPreset(preset)}
@@ -186,6 +191,18 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
           {/* Personalización Simple */}
           <div className="space-y-4">
             <h6 className="text-sm font-medium text-gray-300 dark:text-gray-200">⚙️ Personalización</h6>
+            
+            {/* Texto del Botón */}
+            <div>
+              <label className="block text-xs text-gray-400 dark:text-gray-300 mb-2">📝 Texto del Botón</label>
+              <input
+                type="text"
+                value={value.text || ''}
+                onChange={(e) => handleCustomChange('text', e.target.value)}
+                placeholder="Ingresa el texto del botón"
+                className="w-full px-3 py-2 bg-gray-600 dark:bg-gray-700 border border-gray-500 dark:border-gray-600 rounded-lg text-white text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
             
             {/* Color de Fondo */}
             <div>
@@ -264,9 +281,9 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
                     border: '2px solid transparent'
                   }}
                 >
-                  {title.includes('Contacto') ? 'CONTÁCTENOS' : 
+                  {value.text || (title.includes('Contacto') ? 'CONTÁCTENOS' : 
                    title.includes('Principal') ? 'Ver Servicios' : 
-                   'Ir al Dashboard'}
+                   'Ir al Dashboard')}
                 </button>
               ) : (
                 // Botón normal
@@ -278,9 +295,9 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
                     borderColor: value.borderColor || 'transparent'
                   }}
                 >
-                  {title.includes('Contacto') ? 'CONTÁCTENOS' : 
+                  {value.text || (title.includes('Contacto') ? 'CONTÁCTENOS' : 
                    title.includes('Principal') ? 'Ver Servicios' : 
-                   'Ir al Dashboard'}
+                   'Ir al Dashboard')}
                 </button>
               )}
             </div>

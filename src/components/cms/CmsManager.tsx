@@ -78,7 +78,7 @@ const CmsManager: React.FC = () => {
   };
 
   // Update button style without auto-save (manual save only)
-  const handleUpdateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard', style: any) => {
+  const handleUpdateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: any) => {
     updateSimpleButtonStyle(mode, buttonType, style);
     // Marcar como cambios pendientes
     setSaveStatus('idle');

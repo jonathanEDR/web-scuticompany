@@ -114,7 +114,7 @@ export const useCmsUpdaters = (
     }
   };
 
-  const updateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard', style: ButtonStyle) => {
+  const updateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: ButtonStyle) => {
     if (!pageData || !pageData.theme) return;
 
     console.log(`🎨 Actualizando botón ${buttonType} en modo ${mode}:`, style);
@@ -123,9 +123,10 @@ export const useCmsUpdaters = (
     const currentTheme = { ...pageData.theme };
     if (!currentTheme[mode].buttons) {
       currentTheme[mode].buttons = {
-        ctaPrimary: { background: 'transparent', textColor: '#8B5CF6', borderColor: 'transparent' },
-        contact: { background: 'transparent', textColor: '#8B5CF6', borderColor: '#8B5CF6' },
-        dashboard: { background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }
+        ctaPrimary: { text: 'Conoce nuestros servicios', background: 'transparent', textColor: '#8B5CF6', borderColor: 'transparent' },
+        contact: { text: 'CONTÁCTANOS', background: 'transparent', textColor: '#8B5CF6', borderColor: '#8B5CF6' },
+        dashboard: { text: 'Ir al Dashboard', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' },
+        viewMore: { text: 'Ver más...', background: 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)', textColor: '#FFFFFF', borderColor: 'transparent' }
       };
     }
 

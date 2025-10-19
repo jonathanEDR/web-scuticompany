@@ -186,7 +186,10 @@ const HomeOptimized = () => {
         <PublicHeader />
         <main>
           <HeroSection data={pageData.content.hero} />
-          <SolutionsSection data={pageData.content.solutions} />
+          <SolutionsSection 
+            data={pageData.content.solutions} 
+            themeConfig={pageData.theme}
+          />
         </main>
         <PublicFooter />
         

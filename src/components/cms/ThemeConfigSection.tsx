@@ -5,7 +5,7 @@ import type { PageData, ThemeColors, ButtonStyle } from '../../types/cms';
 interface ThemeConfigSectionProps {
   pageData: PageData;
   updateContent: (field: string, value: any) => void;
-  updateSimpleButtonStyle: (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard', style: ButtonStyle) => void;
+  updateSimpleButtonStyle: (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: ButtonStyle) => void;
 }
 
 const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
@@ -244,20 +244,26 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
             <SimpleButtonConfig
               title="🎯 Botón Principal CTA"
               icon="🎯"
-              value={pageData.theme?.lightMode?.buttons?.ctaPrimary || { background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+              value={pageData.theme?.lightMode?.buttons?.ctaPrimary || { text: 'Conoce nuestros servicios', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
               onChange={(style) => updateSimpleButtonStyle('lightMode', 'ctaPrimary', style)}
             />
             <SimpleButtonConfig
               title="📞 Botón Contacto"
               icon="📞"
-              value={pageData.theme?.lightMode?.buttons?.contact || { background: 'transparent', textColor: '#8B5CF6', borderColor: '#8B5CF6' }}
+              value={pageData.theme?.lightMode?.buttons?.contact || { text: 'CONTÁCTANOS', background: 'transparent', textColor: '#8B5CF6', borderColor: '#8B5CF6' }}
               onChange={(style) => updateSimpleButtonStyle('lightMode', 'contact', style)}
             />
             <SimpleButtonConfig
               title="📊 Botón Dashboard"
               icon="📊"
-              value={pageData.theme?.lightMode?.buttons?.dashboard || { background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+              value={pageData.theme?.lightMode?.buttons?.dashboard || { text: 'Ir al Dashboard', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
               onChange={(style) => updateSimpleButtonStyle('lightMode', 'dashboard', style)}
+            />
+            <SimpleButtonConfig
+              title="👁️ Botón Ver más..."
+              icon="👁️"
+              value={pageData.theme?.lightMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)', textColor: '#FFFFFF', borderColor: 'transparent' }}
+              onChange={(style) => updateSimpleButtonStyle('lightMode', 'viewMore', style)}
             />
           </div>
         </div>
@@ -280,20 +286,26 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
             <SimpleButtonConfig
               title="🎯 Botón Principal CTA"
               icon="🎯"
-              value={pageData.theme?.darkMode?.buttons?.ctaPrimary || { background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+              value={pageData.theme?.darkMode?.buttons?.ctaPrimary || { text: 'Conoce nuestros servicios', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
               onChange={(style) => updateSimpleButtonStyle('darkMode', 'ctaPrimary', style)}
             />
             <SimpleButtonConfig
               title="📞 Botón Contacto"
               icon="📞"
-              value={pageData.theme?.darkMode?.buttons?.contact || { background: 'transparent', textColor: '#A78BFA', borderColor: '#A78BFA' }}
+              value={pageData.theme?.darkMode?.buttons?.contact || { text: 'CONTÁCTANOS', background: 'transparent', textColor: '#A78BFA', borderColor: '#A78BFA' }}
               onChange={(style) => updateSimpleButtonStyle('darkMode', 'contact', style)}
             />
             <SimpleButtonConfig
               title="📊 Botón Dashboard"
               icon="📊"
-              value={pageData.theme?.darkMode?.buttons?.dashboard || { background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+              value={pageData.theme?.darkMode?.buttons?.dashboard || { text: 'Ir al Dashboard', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
               onChange={(style) => updateSimpleButtonStyle('darkMode', 'dashboard', style)}
+            />
+            <SimpleButtonConfig
+              title="👁️ Botón Ver más..."
+              icon="👁️"
+              value={pageData.theme?.darkMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%)', textColor: '#111827', borderColor: 'transparent' }}
+              onChange={(style) => updateSimpleButtonStyle('darkMode', 'viewMore', style)}
             />
           </div>
         </div>
