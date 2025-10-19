@@ -225,6 +225,16 @@ html {
   overflow-x: hidden;
 }
 
+/* Header optimizations for desktop/mobile */
+@media (min-width: 640px) {
+  .header-desktop-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+}
+
 /* Gradiente animado */
 @keyframes gradient {
   0%, 100% {

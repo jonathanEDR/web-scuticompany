@@ -61,9 +61,9 @@ const PublicHeaderOptimized = () => {
       }}
     >
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 w-full">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center h-auto sm:h-20 w-full">
-          {/* Fila 1 Mobile: Logo centrado + Toggle tema derecha | Desktop: Logo izquierda */}
-          <div className="flex justify-between items-center sm:justify-start py-4 sm:py-0 w-full">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center h-auto sm:h-20">
+          {/* Desktop: Logo izquierda | Mobile: Logo centrado + Toggle tema derecha */}
+          <div className="flex justify-between items-center sm:justify-start py-4 sm:py-0 w-full sm:w-auto sm:flex-shrink-0">
             {/* Logo - Centrado en móvil, izquierda en desktop */}
             <div className="flex-1 flex justify-center sm:justify-start sm:flex-initial">
               <Link 
@@ -95,8 +95,8 @@ const PublicHeaderOptimized = () => {
             </div>
           </div>
 
-          {/* Navegación - Solo en móvil como fila separada, en desktop como parte de la fila principal */}
-          <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 py-3 sm:py-0 sm:space-x-6 sm:flex-1 sm:justify-center w-full" role="navigation" aria-label="Navegación principal">
+          {/* Navegación - Mobile: fila separada | Desktop: centrada entre logo y acciones */}
+          <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 py-3 sm:py-0 sm:space-x-6 lg:space-x-8 sm:flex-1 sm:justify-center w-full sm:w-auto" role="navigation" aria-label="Navegación principal">
             <Link 
               to="/" 
               className="theme-text-primary font-medium theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
@@ -148,10 +148,34 @@ const PublicHeaderOptimized = () => {
             >
               Proyectos destacados
             </Link>
+
+            <Link 
+              to="/contacto"
+              className="px-6 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
+              style={{
+                borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
+                color: theme === 'light' ? '#7528ee' : '#7528ee',
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                const element = e.target as HTMLElement;
+                element.style.backgroundColor = theme === 'light' ? '#7528ee' : '#7528ee';
+                element.style.color = '#FFFFFF';
+              }}
+              onMouseLeave={(e) => {
+                const element = e.target as HTMLElement;
+                element.style.backgroundColor = 'transparent';
+                element.style.color = theme === 'light' ? '#7528ee' : '#7528ee';
+              }}
+            >
+              CONTÁCTANOS
+            </Link>
           </nav>
 
+  
+
           {/* Actions Desktop - Toggle de tema + CONTÁCTANOS + Avatar */}
-          <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
+          <div className="hidden sm:flex items-center space-x-4 flex-shrink-0">
             {/* Theme Toggle - Solo visible en desktop */}
             <button
               onClick={toggleTheme}
