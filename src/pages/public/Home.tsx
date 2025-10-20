@@ -138,15 +138,14 @@ const HomeOptimized = () => {
     }, 60000); // 60 segundos
 
     // Escuchar eventos de actualización del CMS
-    const handleCMSUpdate = (event: Event) => {
-      const customEvent = event as CustomEvent;
+    const handleCMSUpdate = () => {
       // SIEMPRE limpiar caché y forzar refresh cuando viene de un evento CMS
       clearCache('page-home');
       loadPageData(true, true); // silent=true, forceRefresh=true
     };
 
     // Escuchar eventos de limpieza de caché
-    const handleClearCache = (event: Event) => {
+    const handleClearCache = () => {
       clearCache('page-home');
       loadPageData(true, true);
     };

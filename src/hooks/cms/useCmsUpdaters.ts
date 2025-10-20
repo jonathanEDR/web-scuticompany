@@ -9,25 +9,17 @@ export const useCmsUpdaters = (
   
   const updateContent = (field: string, value: any) => {
     if (!pageData) {
-      console.log('❌ [useCmsUpdaters] updateContent: pageData es null');
       return;
-    }
-
-    // Solo log para campos de valueAdded.cardsDesign
-    if (field.includes('valueAdded.cardsDesign')) {
-      console.log('🔄 [useCmsUpdaters] updateContent ValueAdded:', { field, value });
     }
     
     const keys = field.split('.');
-    const newData = { ...pageData };
+    // Hacer una copia profunda para evitar mutaciones
+    const newData = structuredClone(pageData);
     let current: any = newData.content;
 
     for (let i = 0; i < keys.length - 1; i++) {
       // Si no existe el objeto, crearlo
       if (!current[keys[i]]) {
-        if (field.includes('valueAdded.cardsDesign')) {
-          console.log(`🔧 [useCmsUpdaters] Creando objeto faltante: ${keys[i]}`);
-        }
         current[keys[i]] = {};
       }
       // Si es un string (formato anterior) y necesitamos convertir a objeto
@@ -38,10 +30,6 @@ export const useCmsUpdaters = (
     }
 
     current[keys[keys.length - 1]] = value;
-    
-    if (field.includes('valueAdded.cardsDesign')) {
-      console.log('✅ [useCmsUpdaters] ValueAdded actualizado, llamando setPageData');
-    }
     
     setPageData(newData);
   };
@@ -85,8 +73,6 @@ export const useCmsUpdaters = (
   const updateTheme = (mode: 'lightMode' | 'darkMode', field: string, value: string) => {
     if (!pageData || !pageData.theme) return;
     
-    console.log(`🎨 Actualizando tema ${mode}.${field}:`, value);
-    
     const newTheme = {
       ...pageData.theme,
       [mode]: {
@@ -104,15 +90,12 @@ export const useCmsUpdaters = (
     
     // IMPORTANTE: Actualizar ThemeContext
     if (setThemeConfig) {
-      console.log('✅ Sincronizando tema con contexto');
       setThemeConfig(newTheme as ThemeConfig);
     }
   };
 
   const updateThemeDefault = (value: 'light' | 'dark') => {
     if (!pageData || !pageData.theme) return;
-    
-    console.log(`🎨 Cambiando tema por defecto a:`, value);
     
     const newTheme = {
       ...pageData.theme,
@@ -128,7 +111,6 @@ export const useCmsUpdaters = (
     
     // IMPORTANTE: Actualizar ThemeContext
     if (setThemeConfig) {
-      console.log('✅ Sincronizando tema por defecto con contexto');
       setThemeConfig(newTheme as ThemeConfig);
     }
   };
@@ -136,7 +118,7 @@ export const useCmsUpdaters = (
   const updateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: ButtonStyle) => {
     if (!pageData || !pageData.theme) return;
 
-    console.log(`🎨 Actualizando botón ${buttonType} en modo ${mode}:`, style);
+    
 
     // Asegurar que la estructura existe
     const currentTheme = { ...pageData.theme };
@@ -170,7 +152,7 @@ export const useCmsUpdaters = (
     
     // IMPORTANTE: También actualizar el ThemeContext inmediatamente
     if (setThemeConfig) {
-      console.log('✅ Aplicando configuración de tema actualizada al contexto');
+      
       setThemeConfig(newTheme as ThemeConfig);
     }
   };

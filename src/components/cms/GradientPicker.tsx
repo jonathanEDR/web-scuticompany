@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface GradientPickerProps {
   value: string;
@@ -37,6 +37,18 @@ const GradientPicker: React.FC<GradientPickerProps> = ({
   const [angle, setAngle] = useState(extractAngle(value));
   const [isSolid, setIsSolid] = useState(!value.includes('gradient'));
   const timeoutRef = useRef<number | null>(null);
+
+  // Sincronizar el estado cuando cambie el valor externo
+  useEffect(() => {
+    const newColors = extractColors(value);
+    const newAngle = extractAngle(value);
+    const newIsSolid = !value.includes('gradient');
+    
+    setColor1(newColors[0]);
+    setColor2(newColors[1]);
+    setAngle(newAngle);
+    setIsSolid(newIsSolid);
+  }, [value]);
 
   const updateGradient = (newColor1?: string, newColor2?: string, newAngle?: string, solid?: boolean) => {
     const c1 = newColor1 || color1;

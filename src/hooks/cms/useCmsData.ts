@@ -34,7 +34,6 @@ export const useCmsData = () => {
       // Intentar cargar datos desde la API
       try {
         data = await getPageBySlug('home');
-        console.log('✅ Datos cargados desde la base de datos');
       } catch (apiError) {
         console.warn('⚠️ No se pudo conectar con la base de datos, usando configuración predeterminada');
         
@@ -318,15 +317,6 @@ export const useCmsData = () => {
     try {
       setSaving(true);
       
-      console.log('💾 [useCmsData] Guardando datos en backend...');
-      console.log('💾 [useCmsData] Datos a guardar:', {
-        content: {
-          valueAdded: {
-            cardsDesign: pageData.content.valueAdded?.cardsDesign
-          }
-        }
-      });
-      
       await updatePage('home', {
         content: pageData.content,
         seo: pageData.seo,
@@ -334,12 +324,9 @@ export const useCmsData = () => {
         isPublished: pageData.isPublished
       });
       
-      console.log('✅ [useCmsData] Datos guardados exitosamente en backend');
-      
       setMessage({ type: 'success', text: '✅ Cambios guardados correctamente' });
       
       // Notificar a la página pública sobre la actualización
-      console.log('🔔 [useCmsData] Disparando evento cmsUpdate');
       window.dispatchEvent(new CustomEvent('cmsUpdate', {
         detail: { 
           timestamp: Date.now(),

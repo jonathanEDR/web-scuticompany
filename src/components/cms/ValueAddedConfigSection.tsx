@@ -1,6 +1,8 @@
 import React from 'react';
 import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
 import ManagedImageSelector from '../ManagedImageSelector';
+import ValueAddedLogosEditor from './ValueAddedLogosEditor';
+import LogosBarDesignSection from './LogosBarDesignSection';
 import type { PageData } from '../../types/cms';
 
 interface ValueAddedConfigSectionProps {
@@ -160,6 +162,22 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Editor de Logos */}
+      <div className="mt-8">
+        <ValueAddedLogosEditor
+          logos={pageData.content.valueAdded?.logos || []}
+          onUpdate={(logos) => updateContent('valueAdded.logos', logos)}
+        />
+      </div>
+
+      {/* Diseño de la Barra de Logos */}
+      <div className="mt-8">
+        <LogosBarDesignSection
+          pageData={pageData}
+          updateContent={updateContent}
+        />
       </div>
     </div>
   );

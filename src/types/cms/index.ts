@@ -128,6 +128,30 @@ export interface ValueAddedItem {
   gradient?: string;
 }
 
+export interface ValueAddedLogo {
+  _id?: string;
+  name: string;
+  imageUrl: string;
+  alt: string;
+  link?: string;
+  order?: number;
+}
+
+export interface LogosBarDesignStyles {
+  background: string;
+  borderColor: string;
+  borderWidth: string;
+  borderRadius: string;
+  shadow: string;
+  backdropBlur: boolean;
+  disperseEffect: boolean;
+}
+
+export interface LogosBarDesign {
+  light: LogosBarDesignStyles;
+  dark: LogosBarDesignStyles;
+}
+
 export interface ValueAddedContent {
   title: string;
   description?: string;
@@ -135,6 +159,8 @@ export interface ValueAddedContent {
   backgroundImageAlt?: string;
   styles?: SolutionTextStyles;
   items?: ValueAddedItem[];
+  logos?: ValueAddedLogo[];
+  logosBarDesign?: LogosBarDesign;
   cardsDesign?: CardsDesign;
   showIcons?: boolean; // Controla si se muestran los iconos en las tarjetas
 }

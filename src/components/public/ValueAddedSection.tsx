@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_VALUE_ADDED_CONFIG } from '../../utils/defaultConfig';
-import type { CardDesignStyles } from '../../types/cms';
+import type { CardDesignStyles, LogosBarDesignStyles } from '../../types/cms';
 
 interface ValueAddedItem {
   id?: string;
@@ -12,6 +12,15 @@ interface ValueAddedItem {
   iconDark?: string;
   gradient?: string;
   _id?: any; // Para compatibilidad con MongoDB
+}
+
+interface ValueAddedLogo {
+  _id?: string;
+  name: string;
+  imageUrl: string;
+  alt: string;
+  link?: string;
+  order?: number;
 }
 
 interface ValueAddedData {
@@ -26,9 +35,14 @@ interface ValueAddedData {
   backgroundImageAlt: string;
   cards?: ValueAddedItem[]; // Del defaultConfig
   items?: ValueAddedItem[]; // Del CMS
+  logos?: ValueAddedLogo[]; // Del CMS
   cardsDesign?: {
     light: CardDesignStyles;
     dark: CardDesignStyles;
+  };
+  logosBarDesign?: {
+    light: LogosBarDesignStyles;
+    dark: LogosBarDesignStyles;
   };
 }
 
@@ -69,7 +83,9 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
           iconLight: item.iconLight,
           iconDark: item.iconDark,
           gradient: item.gradient || 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
-        }))
+        })),
+        // Incluir logos del CMS si existen
+        logos: valueAddedData.logos || []
       };
     }
     
@@ -77,7 +93,8 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
     return {
       ...valueAddedData,
       subtitle: valueAddedData.subtitle || '',
-      cards: valueAddedData.cards || []
+      cards: valueAddedData.cards || [],
+      logos: valueAddedData.logos || []
     };
   };
 
@@ -165,6 +182,49 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
   };
 
   // Función helper para detectar si un string es una URL de imagen
+  const getLogosBarStyles = () => {
+    const logosBarDesign = mappedData.logosBarDesign;
+    const currentTheme = theme as 'light' | 'dark';
+    
+    if (logosBarDesign && logosBarDesign[currentTheme]) {
+      const themeStyles = logosBarDesign[currentTheme];
+      return {
+        background: themeStyles.background || (theme === 'light' 
+          ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%)' 
+          : 'linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(31, 41, 55, 0.8) 100%)'),
+        borderColor: themeStyles.borderColor || (theme === 'light'
+          ? 'rgba(139, 92, 246, 0.15)'
+          : 'rgba(139, 92, 246, 0.25)'),
+        borderWidth: themeStyles.borderWidth || '1px',
+        borderStyle: 'solid',
+        boxShadow: themeStyles.shadow || (theme === 'light'
+          ? '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)'
+          : '0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(255, 255, 255, 0.05)'),
+        borderRadius: themeStyles.borderRadius || '1rem',
+        // Efectos de dispersión con máscara de degradado en las puntas
+        ...(themeStyles.disperseEffect && {
+          maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+        })
+      };
+    }
+    
+    // Estilos por defecto
+    return {
+      background: theme === 'light' 
+        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%)' 
+        : 'linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(31, 41, 55, 0.8) 100%)',
+      borderColor: theme === 'light'
+        ? 'rgba(139, 92, 246, 0.15)'
+        : 'rgba(139, 92, 246, 0.25)',
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      boxShadow: theme === 'light'
+        ? '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)'
+        : '0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(255, 255, 255, 0.05)',
+      borderRadius: '1rem'
+    };
+  };
   const isImageUrl = (str: string): boolean => {
     return str.startsWith('http://') || str.startsWith('https://') || str.startsWith('/');
   };
@@ -269,6 +329,78 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
           </div>
         )}
       </div>
+
+      {/* Logos Bar - Barra de tecnologías */}
+      {mappedData.logos && mappedData.logos.length > 0 && (
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+          <div 
+            className={`transition-all duration-1000 delay-500 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+            }`}
+          >
+            {/* Barra de fondo con estilos CMS */}
+            <div className="relative">
+              {/* Fondo de la barra con configuración personalizable */}
+              <div 
+                className={`absolute inset-0 ${mappedData.logosBarDesign?.[theme]?.backdropBlur !== false ? 'backdrop-blur-sm' : ''}`}
+                style={getLogosBarStyles()}
+              />
+              
+              {/* Contenedor de logos */}
+              <div className="relative py-6 px-12">
+                <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 lg:gap-12">
+                  {mappedData.logos
+                    .sort((a: ValueAddedLogo, b: ValueAddedLogo) => (a.order || 0) - (b.order || 0))
+                    .map((logo: ValueAddedLogo, index: number) => (
+                      <div
+                        key={typeof logo._id === 'string' ? logo._id : `logo-${index}`}
+                        className="flex items-center justify-center transition-all duration-300 hover:scale-110 hover:opacity-90 group"
+                        style={{
+                          animationDelay: `${index * 100 + 700}ms`
+                        }}
+                      >
+                        {logo.link ? (
+                          <a
+                            href={logo.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block group-hover:transform group-hover:scale-105 transition-transform duration-300"
+                            title={logo.name}
+                          >
+                            <img
+                              src={logo.imageUrl}
+                              alt={logo.alt}
+                              className="h-10 md:h-12 w-auto object-contain filter group-hover:brightness-110 transition-all duration-300"
+                              style={{
+                                maxWidth: '90px',
+                                filter: theme === 'light' 
+                                  ? 'none'
+                                  : 'brightness(1.1) contrast(1.1)'
+                              }}
+                            />
+                          </a>
+                        ) : (
+                          <img
+                            src={logo.imageUrl}
+                            alt={logo.alt}
+                            title={logo.name}
+                            className="h-10 md:h-12 w-auto object-contain filter group-hover:brightness-110 transition-all duration-300"
+                            style={{
+                              maxWidth: '90px',
+                              filter: theme === 'light' 
+                                ? 'none'
+                                : 'brightness(1.1) contrast(1.1)'
+                            }}
+                          />
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Value Added Grid */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

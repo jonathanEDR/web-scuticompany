@@ -22,7 +22,10 @@ const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorP
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3, 4, 5, 6]
-        }
+        },
+        // Deshabilitamos las extensiones que vamos a agregar manualmente
+        link: false, // Deshabilitamos el link de StarterKit para usar nuestra configuración
+        underline: false, // Deshabilitamos underline de StarterKit para usar nuestra configuración
       }),
       TextStyle,
       FontFamily.configure({
@@ -32,7 +35,7 @@ const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorP
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Underline,
+      Underline, // Esta extensión NO está en StarterKit, así que es seguro agregarla
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {

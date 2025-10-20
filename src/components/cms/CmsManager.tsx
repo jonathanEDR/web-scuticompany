@@ -92,40 +92,38 @@ const CmsManager: React.FC = () => {
   // Manual save
   const handleManualSave = async () => {
     try {
-      console.log('🚀 [CmsManager] Iniciando guardado manual...');
-      console.log('🚀 [CmsManager] Tab activo:', activeTab);
-      
       setIsLoading(true);
       setSaveStatus('saving');
       
-      // Si estamos en la pestaña de cards y hay cambios pendientes, guardar primero
+      // Guardar componentes específicos según la pestaña activa
       if (activeTab === 'cards') {
-        console.log('🎴 [CmsManager] Guardando diseños de tarjetas...');
-        
         // Guardar cambios del componente de Solutions si existen
         if ((window as any).__cardDesignSave) {
-          console.log('✅ [CmsManager] Llamando __cardDesignSave (Solutions)');
           (window as any).__cardDesignSave();
-        } else {
-          console.log('⚠️ [CmsManager] __cardDesignSave NO disponible');
         }
         
         // Guardar cambios del componente de Value Added si existen
         if ((window as any).__valueAddedCardDesignSave) {
-          console.log('✅ [CmsManager] Llamando __valueAddedCardDesignSave');
           (window as any).__valueAddedCardDesignSave();
-        } else {
-          console.log('⚠️ [CmsManager] __valueAddedCardDesignSave NO disponible');
         }
         
         // Esperar un momento para que los estados se actualicen
         await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      console.log('💾 [CmsManager] Ejecutando handleSave...');
+      // Si estamos en la pestaña de content, guardar componentes de contenido
+      if (activeTab === 'content') {
+        // Guardar cambios del componente de Logos Bar Design si existen
+        if ((window as any).__logosBarDesignSave) {
+          (window as any).__logosBarDesignSave();
+        }
+        
+        // Esperar un momento para que los estados se actualicen
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
       await handleSave();
       
-      console.log('✅ [CmsManager] Guardado completado exitosamente');
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
