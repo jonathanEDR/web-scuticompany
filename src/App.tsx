@@ -130,6 +130,12 @@ function App() {
                 </DashboardRoute>
               } />
               
+              <Route path="/dashboard/cms/contact" element={
+                <DashboardRoute>
+                  <CmsManager />
+                </DashboardRoute>
+              } />
+              
               <Route path="/dashboard/media" element={
                 <DashboardRoute>
                   <MediaLibrary />

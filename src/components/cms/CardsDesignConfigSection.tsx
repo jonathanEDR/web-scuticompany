@@ -37,6 +37,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     cardMaxWidth: '100%',
     cardMinHeight: 'auto',
     cardPadding: '2rem',
+    cardsAlignment: 'left',
     iconBorderEnabled: true,
     iconAlignment: 'left'
   };
@@ -59,6 +60,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     cardMaxWidth: '100%',
     cardMinHeight: 'auto',
     cardPadding: '2rem',
+    cardsAlignment: 'left',
     iconBorderEnabled: true,
     iconAlignment: 'left'
   };
@@ -67,13 +69,15 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   const [localLightStyles, setLocalLightStyles] = useState<CardDesignStyles>(() => ({
     ...defaultLightStyles,
     ...(pageData.content.solutions.cardsDesign?.light || {}),
-    // Asegurar que iconAlignment siempre tenga un valor
+    // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
+    cardsAlignment: pageData.content.solutions.cardsDesign?.light?.cardsAlignment || 'left',
     iconAlignment: pageData.content.solutions.cardsDesign?.light?.iconAlignment || 'left'
   }));
   const [localDarkStyles, setLocalDarkStyles] = useState<CardDesignStyles>(() => ({
     ...defaultDarkStyles,
     ...(pageData.content.solutions.cardsDesign?.dark || {}),
-    // Asegurar que iconAlignment siempre tenga un valor
+    // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
+    cardsAlignment: pageData.content.solutions.cardsDesign?.dark?.cardsAlignment || 'left',
     iconAlignment: pageData.content.solutions.cardsDesign?.dark?.iconAlignment || 'left'
   }));
 
@@ -83,13 +87,15 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
       setLocalLightStyles({
         ...defaultLightStyles,
         ...(pageData.content.solutions.cardsDesign.light || {}),
-        // Asegurar que iconAlignment siempre tenga un valor
+        // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
+        cardsAlignment: pageData.content.solutions.cardsDesign.light?.cardsAlignment || 'left',
         iconAlignment: pageData.content.solutions.cardsDesign.light?.iconAlignment || 'left'
       });
       setLocalDarkStyles({
         ...defaultDarkStyles,
         ...(pageData.content.solutions.cardsDesign.dark || {}),
-        // Asegurar que iconAlignment siempre tenga un valor
+        // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
+        cardsAlignment: pageData.content.solutions.cardsDesign.dark?.cardsAlignment || 'left',
         iconAlignment: pageData.content.solutions.cardsDesign.dark?.iconAlignment || 'left'
       });
     }
@@ -115,13 +121,6 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
   // Función para guardar los cambios al padre (llamada por el botón Guardar)
   const saveChanges = () => {
-    console.log(`🔍 CardsDesignConfigSection - Guardando cambios:`, {
-      localLightStyles: localLightStyles.iconAlignment,
-      localDarkStyles: localDarkStyles.iconAlignment,
-      fullLightStyles: localLightStyles,
-      fullDarkStyles: localDarkStyles
-    });
-    
     // Guardar ambos temas
     updateContent('solutions.cardsDesign.light', localLightStyles);
     updateContent('solutions.cardsDesign.dark', localDarkStyles);
@@ -239,7 +238,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           👁️ Vista Previa en Tiempo Real
         </h3>
         <div
-          key={`preview-${activeTheme}-${JSON.stringify(currentStyles)}`}
+          key={`preview-${activeTheme}-${currentStyles.cardMinWidth}-${currentStyles.cardPadding}-${currentStyles.cardsAlignment}`}
           className="group relative rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
           style={{
             background: currentStyles.background,
@@ -575,78 +574,210 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
           {/* Grid de 2 columnas para Tamaño y Sombras */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Tamaño de Tarjetas */}
+            {/* Tamaño de Tarjetas - MEJORADO */}
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
               <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
                 📏 Tamaño de Tarjetas
               </h4>
-              <div className="space-y-4">
-                {/* Ancho Mínimo */}
+              
+              {/* Presets Rápidos */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  🎯 Tamaños Predefinidos
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => {
+                      updateCardStyle('cardMinWidth', '250px');
+                      updateCardStyle('cardPadding', '1.5rem');
+                    }}
+                    className="px-3 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    📱 Pequeño
+                  </button>
+                  <button
+                    onClick={() => {
+                      updateCardStyle('cardMinWidth', '320px');
+                      updateCardStyle('cardPadding', '2rem');
+                    }}
+                    className="px-3 py-2 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    💻 Mediano
+                  </button>
+                  <button
+                    onClick={() => {
+                      updateCardStyle('cardMinWidth', '400px');
+                      updateCardStyle('cardPadding', '2.5rem');
+                    }}
+                    className="px-3 py-2 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    🖥️ Grande
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Ancho de Tarjetas - Slider */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ancho Mínimo
+                    📐 Ancho Mínimo: <span className="font-mono text-blue-600 dark:text-blue-400">{currentStyles.cardMinWidth || '280px'}</span>
                   </label>
-                  <input
-                    type="text"
-                    value={currentStyles.cardMinWidth || '280px'}
-                    onChange={(e) => updateCardStyle('cardMinWidth', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                    placeholder="280px"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Ej: 280px, 300px, 20rem
-                  </p>
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      min="200"
+                      max="500"
+                      step="10"
+                      value={parseInt(currentStyles.cardMinWidth?.replace('px', '') || '280')}
+                      onChange={(e) => updateCardStyle('cardMinWidth', `${e.target.value}px`)}
+                      className="w-full h-2 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-lg appearance-none cursor-pointer hover:from-purple-600 hover:to-cyan-600 transition-all duration-200"
+                      style={{
+                        background: 'linear-gradient(to right, #8B5CF6, #06B6D4)',
+                      }}
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>200px (Muy pequeño)</span>
+                      <span>350px (Ideal)</span>
+                      <span>500px (Muy grande)</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Ancho Máximo */}
+                {/* Alto de Tarjetas - Toggle + Slider */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ancho Máximo
+                    📏 Alto Mínimo
                   </label>
-                  <input
-                    type="text"
+                  <div className="space-y-3">
+                    {/* Toggle Auto/Manual */}
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => updateCardStyle('cardMinHeight', 'auto')}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                          currentStyles.cardMinHeight === 'auto'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                            : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                        }`}
+                      >
+                        🔧 Automático
+                      </button>
+                      <button
+                        onClick={() => updateCardStyle('cardMinHeight', '300px')}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                          currentStyles.cardMinHeight !== 'auto'
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                            : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                        }`}
+                      >
+                        📏 Manual: <span className="font-mono">{currentStyles.cardMinHeight !== 'auto' ? currentStyles.cardMinHeight : '300px'}</span>
+                      </button>
+                    </div>
+                    
+                    {/* Slider para altura manual */}
+                    {currentStyles.cardMinHeight !== 'auto' && (
+                      <div className="ml-4">
+                        <input
+                          type="range"
+                          min="250"
+                          max="600"
+                          step="25"
+                          value={parseInt(currentStyles.cardMinHeight?.replace('px', '') || '300')}
+                          onChange={(e) => updateCardStyle('cardMinHeight', `${e.target.value}px`)}
+                          className="w-full h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg appearance-none cursor-pointer hover:from-blue-600 hover:to-green-600 transition-all duration-200"
+                          style={{
+                            background: 'linear-gradient(to right, #3B82F6, #10B981)',
+                          }}
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <span>250px</span>
+                          <span>425px</span>
+                          <span>600px</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Espaciado Interno - Slider */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    📦 Espaciado Interno: <span className="font-mono text-purple-600 dark:text-purple-400">{currentStyles.cardPadding || '2rem'}</span>
+                  </label>
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      min="1"
+                      max="4"
+                      step="0.25"
+                      value={parseFloat(currentStyles.cardPadding?.replace('rem', '') || '2')}
+                      onChange={(e) => updateCardStyle('cardPadding', `${e.target.value}rem`)}
+                      className="w-full h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg appearance-none cursor-pointer hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
+                      style={{
+                        background: 'linear-gradient(to right, #8B5CF6, #EC4899)',
+                      }}
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>1rem (Compacto)</span>
+                      <span>2.5rem (Cómodo)</span>
+                      <span>4rem (Espacioso)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ancho Máximo - Simple select */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    ↔️ Ancho Máximo
+                  </label>
+                  <select
                     value={currentStyles.cardMaxWidth || '100%'}
                     onChange={(e) => updateCardStyle('cardMaxWidth', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                    placeholder="100%"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Ej: 100%, 400px, 30rem
-                  </p>
+                  >
+                    <option value="100%">📱 Responsive (100%)</option>
+                    <option value="400px">💻 Fijo Pequeño (400px)</option>
+                    <option value="500px">🖥️ Fijo Mediano (500px)</option>
+                    <option value="600px">📺 Fijo Grande (600px)</option>
+                  </select>
                 </div>
 
-                {/* Alto Mínimo */}
+                {/* Alineación de Tarjetas */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Alto Mínimo
+                    🎯 Alineación de Tarjetas
                   </label>
-                  <input
-                    type="text"
-                    value={currentStyles.cardMinHeight || 'auto'}
-                    onChange={(e) => updateCardStyle('cardMinHeight', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                    placeholder="auto"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Ej: auto, 400px, 30rem
-                  </p>
-                </div>
-
-                {/* Padding */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Espaciado Interno
-                  </label>
-                  <input
-                    type="text"
-                    value={currentStyles.cardPadding || '2rem'}
-                    onChange={(e) => updateCardStyle('cardPadding', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                    placeholder="2rem"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Ej: 1rem, 2rem, 32px
-                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => updateCardStyle('cardsAlignment', 'left')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentStyles.cardsAlignment === 'left'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 ring-2 ring-blue-500'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                      }`}
+                    >
+                      ⬅️ Izquierda
+                    </button>
+                    <button
+                      onClick={() => updateCardStyle('cardsAlignment', 'center')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentStyles.cardsAlignment === 'center'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 ring-2 ring-green-500'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                      }`}
+                    >
+                      ⬆️ Centro
+                    </button>
+                    <button
+                      onClick={() => updateCardStyle('cardsAlignment', 'right')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentStyles.cardsAlignment === 'right'
+                          ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 ring-2 ring-purple-500'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                      }`}
+                    >
+                      ➡️ Derecha
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -112,6 +112,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
     cardMaxWidth: '100%',
     cardMinHeight: 'auto',
     cardPadding: '2rem',
+    cardsAlignment: 'left',
     iconBorderEnabled: false,
     iconAlignment: 'center'
   };
@@ -134,6 +135,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
     cardMaxWidth: '100%',
     cardMinHeight: 'auto',
     cardPadding: '2rem',
+    cardsAlignment: 'left',
     iconBorderEnabled: false,
     iconAlignment: 'center'
   };
@@ -214,6 +216,26 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   // Usar items mapeados correctamente
   const solutions = mappedData.cards || [];
 
+  // Función para obtener clases de alineación de tarjetas
+  const getCardsAlignmentClasses = () => {
+    const alignment = cardStyles.cardsAlignment || 'left';
+    
+
+    
+    // Para que la alineación sea visible, necesitamos cambiar el comportamiento del grid
+    switch (alignment) {
+      case 'center':
+        return 'justify-center'; // Centra todo el contenido del grid
+      case 'right':
+        return 'justify-end'; // Alinea todo a la derecha
+      case 'left':
+      default:
+        return 'justify-start'; // Alinea todo a la izquierda (por defecto)
+    }
+  };
+
+
+
   return (
     <section className="relative py-20 theme-transition overflow-hidden w-full"
              style={{
@@ -265,18 +287,18 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
 
       {/* Solutions Grid */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className={`flex flex-wrap gap-8 w-full ${getCardsAlignmentClasses()}`}>
           {solutions.map((solution, index) => (
             <div
               key={index}
-              className="group relative rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2 overflow-hidden solutions-card"
+              className="group relative rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2 overflow-hidden solutions-card flex-shrink-0"
               style={{
                 animationDelay: `${index * 100}ms`,
                 '--solutions-card-bg': cardStyles.background,
                 background: cardStyles.background,
                 // SIN backdrop-filter para máxima nitidez
                 boxShadow: cardStyles.shadow,
-                minWidth: cardStyles.cardMinWidth || '280px',
+                width: `min(${cardStyles.cardMinWidth || '320px'}, 100%)`, // Responsive pero respeta la configuración
                 maxWidth: cardStyles.cardMaxWidth || '100%',
                 minHeight: cardStyles.cardMinHeight || 'auto',
                 padding: cardStyles.cardPadding || '2rem',

@@ -8,21 +8,23 @@ import CardItemsEditor from './CardItemsEditor';
 import SeoConfigSection from './SeoConfigSection';
 import ThemeConfigSection from './ThemeConfigSection';
 import CardsDesignConfigSection from './CardsDesignConfigSection';
+import ContactConfigSection from './ContactConfigSection';
 
 const CmsManager: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
   // Determinar tab activo desde la URL
-  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' => {
+  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' => {
     const path = location.pathname;
     if (path.includes('/seo')) return 'seo';
     if (path.includes('/theme')) return 'theme';
     if (path.includes('/cards')) return 'cards';
+    if (path.includes('/contact')) return 'contact';
     return 'content';
   };
 
-  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards'>(getInitialTab());
+  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact'>(getInitialTab());
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
@@ -35,7 +37,7 @@ const CmsManager: React.FC = () => {
   }, [location.pathname]);
 
   // Actualizar URL cuando cambia el tab
-  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards') => {
+  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards' | 'contact') => {
     setActiveTab(tab);
     const baseUrl = '/dashboard/cms';
     if (tab === 'content') {
@@ -110,6 +112,7 @@ const CmsManager: React.FC = () => {
   const tabs = [
     { id: 'content' as const, label: 'Contenido', icon: '📝' },
     { id: 'cards' as const, label: 'Diseño de Tarjetas', icon: '🎴' },
+    { id: 'contact' as const, label: 'Contacto', icon: '📞' },
     { id: 'seo' as const, label: 'SEO', icon: '🔍' },
     { id: 'theme' as const, label: 'Tema', icon: '🎨' }
   ];
@@ -268,6 +271,13 @@ const CmsManager: React.FC = () => {
 
           {activeTab === 'cards' && (
             <CardsDesignConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+            />
+          )}
+
+          {activeTab === 'contact' && (
+            <ContactConfigSection
               pageData={pageData}
               updateContent={handleUpdateContent}
             />

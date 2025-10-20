@@ -48,6 +48,8 @@ export interface CardDesignStyles {
   cardMaxWidth?: string;
   cardMinHeight?: string;
   cardPadding?: string;
+  // Alineación de tarjetas
+  cardsAlignment?: 'left' | 'center' | 'right';
   // Configuración de iconos
   iconBorderEnabled?: boolean;
   iconAlignment?: 'left' | 'center' | 'right';
@@ -116,6 +118,19 @@ export interface SolutionsContent {
   cardsDesign?: CardsDesign;
 }
 
+export interface SocialLink {
+  name: string;
+  url: string;
+  icon: string;
+  enabled: boolean;
+}
+
+export interface ContactContent {
+  phone: string;
+  email: string;
+  socialLinks: SocialLink[];
+}
+
 export interface PageSection {
   type: 'text' | 'image' | 'grid' | 'cta';
   title?: string;
@@ -126,6 +141,7 @@ export interface PageSection {
 export interface PageContent {
   hero: HeroContent;
   solutions: SolutionsContent;
+  contact?: ContactContent;
   sections?: PageSection[];
 }
 
