@@ -47,36 +47,22 @@ const HeroSection = ({ data }: HeroSectionProps) => {
   const getCurrentBackgroundImage = () => {
     const backgroundImageData = heroData.backgroundImage;
     
-    console.log('🖼️ HeroSection Debug:', {
-      backgroundImageData,
-      currentTheme,
-      heroData: heroData.title
-    });
-    
     if (!backgroundImageData) return null;
     
     // Si es un string (formato anterior), usarlo como fallback
     if (typeof backgroundImageData === 'string') {
-      console.log('📎 Usando imagen string:', backgroundImageData);
       return backgroundImageData;
     }
     
     // Usar imagen del tema activo, con fallback a la otra si no existe
-    let selectedImage;
     if (currentTheme === 'light') {
-      selectedImage = backgroundImageData.light || backgroundImageData.dark || null;
+      return backgroundImageData.light || backgroundImageData.dark || null;
     } else {
-      selectedImage = backgroundImageData.dark || backgroundImageData.light || null;
+      return backgroundImageData.dark || backgroundImageData.light || null;
     }
-    
-    console.log('🎨 Imagen seleccionada:', { theme: currentTheme, image: selectedImage });
-    return selectedImage;
   };
 
   const currentBackgroundImage = getCurrentBackgroundImage();
-
-  // Log adicional para verificar renderizado
-  console.log('🎬 HeroSection renderizando con imagen:', currentBackgroundImage);
 
   // Animación progresiva al cargar el componente
   useEffect(() => {

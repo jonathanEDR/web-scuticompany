@@ -4,10 +4,13 @@ import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useCmsUpdaters } from '../../hooks/cms/useCmsUpdaters';
 import HeroConfigSection from './HeroConfigSection';
 import SolutionsConfigSection from './SolutionsConfigSection';
+import ValueAddedConfigSection from './ValueAddedConfigSection';
 import CardItemsEditor from './CardItemsEditor';
+import ValueAddedItemsEditor from './ValueAddedItemsEditor';
 import SeoConfigSection from './SeoConfigSection';
 import ThemeConfigSection from './ThemeConfigSection';
 import CardsDesignConfigSection from './CardsDesignConfigSection';
+import ValueAddedCardsDesignSection from './ValueAddedCardsDesignSection';
 import ContactConfigSection from './ContactConfigSection';
 
 const CmsManager: React.FC = () => {
@@ -73,7 +76,7 @@ const CmsManager: React.FC = () => {
   };
 
   // Update text style without auto-save (manual save only)
-  const handleUpdateTextStyle = (section: 'hero' | 'solutions', field: string, mode: 'light' | 'dark', color: string) => {
+  const handleUpdateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded', field: string, mode: 'light' | 'dark', color: string) => {
     updateTextStyle(section, field, mode, color);
     // Marcar como cambios pendientes
     setSaveStatus('idle');
@@ -89,19 +92,44 @@ const CmsManager: React.FC = () => {
   // Manual save
   const handleManualSave = async () => {
     try {
+      console.log('🚀 [CmsManager] Iniciando guardado manual...');
+      console.log('🚀 [CmsManager] Tab activo:', activeTab);
+      
       setIsLoading(true);
       setSaveStatus('saving');
       
       // Si estamos en la pestaña de cards y hay cambios pendientes, guardar primero
-      if (activeTab === 'cards' && (window as any).__cardDesignSave) {
-        (window as any).__cardDesignSave();
+      if (activeTab === 'cards') {
+        console.log('🎴 [CmsManager] Guardando diseños de tarjetas...');
+        
+        // Guardar cambios del componente de Solutions si existen
+        if ((window as any).__cardDesignSave) {
+          console.log('✅ [CmsManager] Llamando __cardDesignSave (Solutions)');
+          (window as any).__cardDesignSave();
+        } else {
+          console.log('⚠️ [CmsManager] __cardDesignSave NO disponible');
+        }
+        
+        // Guardar cambios del componente de Value Added si existen
+        if ((window as any).__valueAddedCardDesignSave) {
+          console.log('✅ [CmsManager] Llamando __valueAddedCardDesignSave');
+          (window as any).__valueAddedCardDesignSave();
+        } else {
+          console.log('⚠️ [CmsManager] __valueAddedCardDesignSave NO disponible');
+        }
+        
+        // Esperar un momento para que los estados se actualicen
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
+      console.log('💾 [CmsManager] Ejecutando handleSave...');
       await handleSave();
+      
+      console.log('✅ [CmsManager] Guardado completado exitosamente');
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
-      console.error('Error saving:', error);
+      console.error('❌ [CmsManager] Error guardando:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
@@ -266,14 +294,38 @@ const CmsManager: React.FC = () => {
                 onSave={handleSave} // Función de save manual
                 className="mt-6"
               />
+
+              {/* Configuración General de Valor Agregado */}
+              <ValueAddedConfigSection
+                pageData={pageData}
+                updateContent={handleUpdateContent}
+                updateTextStyle={handleUpdateTextStyle}
+              />
+              
+              {/* Editor de Tarjetas de Valor Agregado */}
+              <ValueAddedItemsEditor
+                items={pageData.content.valueAdded?.items || []}
+                onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
+                onSave={handleSave} // Función de save manual
+                className="mt-6"
+              />
             </>
           )}
 
           {activeTab === 'cards' && (
-            <CardsDesignConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-            />
+            <div className="space-y-8">
+              {/* Configuración para Soluciones */}
+              <CardsDesignConfigSection
+                pageData={pageData}
+                updateContent={handleUpdateContent}
+              />
+              
+              {/* Configuración para Valor Agregado */}
+              <ValueAddedCardsDesignSection
+                pageData={pageData}
+                updateContent={handleUpdateContent}
+              />
+            </div>
           )}
 
           {activeTab === 'contact' && (

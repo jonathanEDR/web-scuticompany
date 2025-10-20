@@ -132,7 +132,6 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const updatePageType = () => {
       const isDashboard = window.location.pathname.startsWith('/dashboard');
       setIsPublicPage(!isDashboard);
-      console.log('📍 Ubicación detectada:', window.location.pathname, '- Página pública:', !isDashboard);
     };
 
     // Verificar inmediatamente

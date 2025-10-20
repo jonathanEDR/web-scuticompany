@@ -8,8 +8,16 @@ export const useCmsUpdaters = (
 ) => {
   
   const updateContent = (field: string, value: any) => {
-    if (!pageData) return;
+    if (!pageData) {
+      console.log('❌ [useCmsUpdaters] updateContent: pageData es null');
+      return;
+    }
 
+    // Solo log para campos de valueAdded.cardsDesign
+    if (field.includes('valueAdded.cardsDesign')) {
+      console.log('🔄 [useCmsUpdaters] updateContent ValueAdded:', { field, value });
+    }
+    
     const keys = field.split('.');
     const newData = { ...pageData };
     let current: any = newData.content;
@@ -17,6 +25,9 @@ export const useCmsUpdaters = (
     for (let i = 0; i < keys.length - 1; i++) {
       // Si no existe el objeto, crearlo
       if (!current[keys[i]]) {
+        if (field.includes('valueAdded.cardsDesign')) {
+          console.log(`🔧 [useCmsUpdaters] Creando objeto faltante: ${keys[i]}`);
+        }
         current[keys[i]] = {};
       }
       // Si es un string (formato anterior) y necesitamos convertir a objeto
@@ -27,22 +38,30 @@ export const useCmsUpdaters = (
     }
 
     current[keys[keys.length - 1]] = value;
+    
+    if (field.includes('valueAdded.cardsDesign')) {
+      console.log('✅ [useCmsUpdaters] ValueAdded actualizado, llamando setPageData');
+    }
+    
     setPageData(newData);
   };
 
-  const updateTextStyle = (section: 'hero' | 'solutions', field: string, mode: 'light' | 'dark', color: string) => {
+  const updateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded', field: string, mode: 'light' | 'dark', color: string) => {
     if (!pageData) return;
+
+    const currentSection = pageData.content[section];
+    if (!currentSection) return;
 
     setPageData({
       ...pageData,
       content: {
         ...pageData.content,
         [section]: {
-          ...pageData.content[section],
+          ...currentSection,
           styles: {
-            ...pageData.content[section].styles,
+            ...currentSection.styles,
             [mode]: {
-              ...pageData.content[section].styles?.[mode],
+              ...currentSection.styles?.[mode],
               [field]: color
             }
           }

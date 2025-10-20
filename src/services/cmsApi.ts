@@ -291,9 +291,22 @@ export const initHomePage = async () => {
   }
 };
 
+// ⚡ Exportar función para limpiar caché manualmente
+export const clearCache = (pattern?: string) => {
+  cache.clear(pattern);
+};
+
+// ⚡ Exportar función para forzar recarga sin caché
+export const forceReload = async (slug: string) => {
+  cache.clear(`page-${slug}`);
+  return await getPageBySlug(slug, false);
+};
+
 export default {
   getAllPages,
   getPageBySlug,
   updatePage,
-  initHomePage
+  initHomePage,
+  clearCache,
+  forceReload
 };

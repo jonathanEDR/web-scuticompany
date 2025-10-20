@@ -57,6 +57,27 @@ export interface DefaultSolutionsConfig {
   }>;
 }
 
+export interface DefaultValueAddedConfig {
+  title: string;
+  subtitle?: string;
+  backgroundImage: DefaultImageConfig;
+  backgroundImageAlt: string;
+  showIcons?: boolean; // Opción para mostrar/ocultar iconos
+  cards: Array<{
+    id: string;
+    title: string;
+    description: string;
+    icon?: string;
+    iconLight?: string;
+    iconDark?: string;
+    gradient?: string;
+  }>;
+  cardsDesign?: {
+    light: any;
+    dark: any;
+  };
+}
+
 export interface DefaultThemeConfig {
   colors: {
     primary: string;
@@ -85,6 +106,11 @@ export const getHeroBackgroundImages = (): DefaultImageConfig => ({
 export const getSolutionsBackgroundImages = (): DefaultImageConfig => ({
   light: '/10.webp',   // Imagen 10 para tema claro
   dark: '/2.webp'      // Imagen 2 para tema oscuro
+});
+
+export const getValueAddedBackgroundImages = (): DefaultImageConfig => ({
+  light: '/11.webp',   // Imagen 11 para tema claro
+  dark: '/3.webp'      // Imagen 3 para tema oscuro
 });
 
 // Configuración predeterminada para Hero Section
@@ -144,6 +170,41 @@ export const DEFAULT_SOLUTIONS_CONFIG: DefaultSolutionsConfig = {
   ]
 };
 
+// Configuración predeterminada para Value Added Section
+export const DEFAULT_VALUE_ADDED_CONFIG: DefaultValueAddedConfig = {
+  title: 'Valor agregado',
+  subtitle: '',
+  showIcons: true, // Por defecto mostrar iconos
+  backgroundImage: getValueAddedBackgroundImages(),
+  backgroundImageAlt: 'Valor agregado Scuti Company',
+  cards: [
+    {
+      id: '1',
+      title: 'Garantía',
+      description: 'Nuestros servicios cuentan con garantía de atención y de soporte técnico.',
+      iconLight: encodeImagePath('/ICONOS/ICONO_1_FONDO_BLANCO.png'),
+      iconDark: encodeImagePath('/ICONOS/ICONO_1_FONDO_NEGRO.png'),
+      gradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
+    },
+    {
+      id: '2',
+      title: 'Asesoría comercial',
+      description: 'Nuestra asesoría comercial evalúa cada requerimiento y propone la solución con las mejores herramientas de TI.',
+      iconLight: encodeImagePath('/ICONOS/ICONO_2_FONDO_BLANCO.png'),
+      iconDark: encodeImagePath('/ICONOS/ICONO_2_FONDO_NEGRO.png'),
+      gradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
+    },
+    {
+      id: '3',
+      title: 'Personal calificado',
+      description: 'Nuestros ingenieros cuentan con certificaciones y títulos realizados que respalda la experiencia sobre los servicios que ofrecemos.',
+      iconLight: encodeImagePath('/ICONOS/ICONO_3_FONDO_BLANCO.png'),
+      iconDark: encodeImagePath('/ICONOS/ICONO_3_FONDO_NEGRO.png'),
+      gradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
+    }
+  ]
+};
+
 // Configuración predeterminada de tema
 export const DEFAULT_THEME_CONFIG: DefaultThemeConfig = {
   colors: {
@@ -188,5 +249,6 @@ export const getImageById = (imageId: number): DefaultImageConfig | null => {
 export const DEFAULT_PAGE_CONFIG = {
   hero: DEFAULT_HERO_CONFIG,
   solutions: DEFAULT_SOLUTIONS_CONFIG,
+  valueAdded: DEFAULT_VALUE_ADDED_CONFIG,
   theme: DEFAULT_THEME_CONFIG
 };

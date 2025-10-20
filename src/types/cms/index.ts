@@ -118,6 +118,27 @@ export interface SolutionsContent {
   cardsDesign?: CardsDesign;
 }
 
+export interface ValueAddedItem {
+  _id?: string;
+  title: string;
+  description: string;
+  icon?: string;
+  iconLight?: string;
+  iconDark?: string;
+  gradient?: string;
+}
+
+export interface ValueAddedContent {
+  title: string;
+  description?: string;
+  backgroundImage?: BackgroundImage;
+  backgroundImageAlt?: string;
+  styles?: SolutionTextStyles;
+  items?: ValueAddedItem[];
+  cardsDesign?: CardsDesign;
+  showIcons?: boolean; // Controla si se muestran los iconos en las tarjetas
+}
+
 export interface SocialLink {
   name: string;
   url: string;
@@ -141,6 +162,7 @@ export interface PageSection {
 export interface PageContent {
   hero: HeroContent;
   solutions: SolutionsContent;
+  valueAdded?: ValueAddedContent;
   contact?: ContactContent;
   sections?: PageSection[];
 }
