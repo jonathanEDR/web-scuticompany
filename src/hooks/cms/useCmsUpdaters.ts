@@ -34,7 +34,7 @@ export const useCmsUpdaters = (
     setPageData(newData);
   };
 
-  const updateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded', field: string, mode: 'light' | 'dark', color: string) => {
+  const updateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos', field: string, mode: 'light' | 'dark', color: string) => {
     if (!pageData) return;
 
     const currentSection = pageData.content[section];

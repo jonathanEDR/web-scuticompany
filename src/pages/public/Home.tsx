@@ -4,11 +4,13 @@ import PublicHeader from '../../components/public/PublicHeader';
 import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import ValueAddedSection from '../../components/public/ValueAddedSection';
+import ClientLogosSection from '../../components/public/ClientLogosSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import { getPageBySlug, clearCache, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG } from '../../utils/defaultConfig';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
+import type { ClientLogosContent } from '../../types/cms';
 
 interface ButtonTheme {
   background: string;
@@ -82,6 +84,7 @@ interface PageData {
         gradient?: string;
       }>;
     };
+    clientLogos?: ClientLogosContent;
   };
   seo: {
     metaTitle: string;
@@ -213,9 +216,9 @@ const HomeOptimized = () => {
       </Helmet>
 
       {/* ⚡ Contenido se renderiza INMEDIATAMENTE sin esperar autenticación ni CMS */}
-      <div className="min-h-screen bg-gray-900 w-full overflow-x-hidden">
+      <div className="min-h-screen w-full overflow-x-hidden bg-transparent">
         <PublicHeader />
-        <main className="w-full">
+        <main className="w-full bg-transparent">
           <HeroSection data={pageData.content.hero} />
           <SolutionsSection 
             data={pageData.content.solutions} 
@@ -224,6 +227,9 @@ const HomeOptimized = () => {
           <ValueAddedSection 
             data={pageData.content.valueAdded} 
             themeConfig={pageData.theme}
+          />
+          <ClientLogosSection 
+            data={pageData.content.clientLogos}
           />
         </main>
         <PublicFooter />

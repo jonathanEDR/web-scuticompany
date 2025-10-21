@@ -9,6 +9,7 @@
   html, body {
     overflow-x: hidden;
     max-width: 100vw;
+    background: transparent;
   }
   
   body {
@@ -18,6 +19,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    background: transparent;
+  }
+  
+  #root {
+    background: transparent;
   }
   
   h1, h2, h3, h4, h5, h6 {

@@ -5,6 +5,7 @@ import { useCmsUpdaters } from '../../hooks/cms/useCmsUpdaters';
 import HeroConfigSection from './HeroConfigSection';
 import SolutionsConfigSection from './SolutionsConfigSection';
 import ValueAddedConfigSection from './ValueAddedConfigSection';
+import ClientLogosConfigSection from './ClientLogosConfigSection';
 import CardItemsEditor from './CardItemsEditor';
 import ValueAddedItemsEditor from './ValueAddedItemsEditor';
 import SeoConfigSection from './SeoConfigSection';
@@ -76,7 +77,7 @@ const CmsManager: React.FC = () => {
   };
 
   // Update text style without auto-save (manual save only)
-  const handleUpdateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded', field: string, mode: 'light' | 'dark', color: string) => {
+  const handleUpdateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos', field: string, mode: 'light' | 'dark', color: string) => {
     updateTextStyle(section, field, mode, color);
     // Marcar como cambios pendientes
     setSaveStatus('idle');
@@ -116,6 +117,11 @@ const CmsManager: React.FC = () => {
         // Guardar cambios del componente de Logos Bar Design si existen
         if ((window as any).__logosBarDesignSave) {
           (window as any).__logosBarDesignSave();
+        }
+        
+        // Guardar cambios del componente de Client Logos Design si existen
+        if ((window as any).__clientLogosDesignSave) {
+          (window as any).__clientLogosDesignSave();
         }
         
         // Esperar un momento para que los estados se actualicen
@@ -306,6 +312,13 @@ const CmsManager: React.FC = () => {
                 onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
                 onSave={handleSave} // Función de save manual
                 className="mt-6"
+              />
+
+              {/* Configuración de Logos de Clientes */}
+              <ClientLogosConfigSection
+                pageData={pageData}
+                updateContent={handleUpdateContent}
+                updateTextStyle={handleUpdateTextStyle}
               />
             </>
           )}

@@ -137,6 +137,16 @@ export interface ValueAddedLogo {
   order?: number;
 }
 
+export interface ClientLogo {
+  _id?: string;
+  name: string;
+  imageUrl: string;
+  alt: string;
+  link?: string;
+  order?: number;
+  background?: string; // Individual logo background (color or gradient)
+}
+
 export interface LogosBarDesignStyles {
   background: string;
   borderColor: string;
@@ -145,6 +155,63 @@ export interface LogosBarDesignStyles {
   shadow: string;
   backdropBlur: boolean;
   disperseEffect: boolean;
+}
+
+export interface LogosBarDesign {
+  light: LogosBarDesignStyles;
+  dark: LogosBarDesignStyles;
+}
+
+export interface ClientLogosSectionDesignStyles {
+  background: string;
+  borderColor: string;
+  borderWidth: string;
+  borderRadius: string;
+  shadow: string;
+  padding: string;
+  margin: string;
+}
+
+export interface ClientLogosSectionDesign {
+  light: ClientLogosSectionDesignStyles;
+  dark: ClientLogosSectionDesignStyles;
+}
+
+export interface ClientLogosDesignStyles {
+  logoMaxWidth: string;
+  logoMaxHeight: string;
+  logoOpacity: string;
+  logoHoverOpacity: string;
+  logoFilter: string;
+  logoHoverFilter: string;
+  logoBackground: string;
+  logoPadding: string;
+  logosBorderRadius: string;
+  logosGap: string;
+  logosPerRow: number;
+  logosAlignment: 'left' | 'center' | 'right';
+}
+
+export interface ClientLogosDesign {
+  light: ClientLogosDesignStyles;
+  dark: ClientLogosDesignStyles;
+}
+
+export interface ClientLogosContent {
+  title: string;
+  description?: string;
+  visible?: boolean;
+  showText?: boolean; // Controla si se muestran título y descripción
+  backgroundImage?: string; // Imagen única, no por tema
+  backgroundImageAlt?: string;
+  // Configuración directa de la sección
+  sectionHeight?: string; // Altura de la sección
+  sectionPaddingY?: string; // Espaciado vertical
+  logosHeight?: string; // Altura específica de los logos
+  styles?: SolutionTextStyles;
+  logos?: ClientLogo[];
+  sectionDesign?: ClientLogosSectionDesign;
+  logosDesign?: ClientLogosDesign;
 }
 
 export interface LogosBarDesign {
@@ -189,6 +256,7 @@ export interface PageContent {
   hero: HeroContent;
   solutions: SolutionsContent;
   valueAdded?: ValueAddedContent;
+  clientLogos?: ClientLogosContent;
   contact?: ContactContent;
   sections?: PageSection[];
 }
