@@ -171,6 +171,22 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
   // Obtener estilos actuales según el tema (CMS o defaults)
   const cardStyles = getCMSCardStyles();
 
+  // 🔍 LOGS DE DEPURACIÓN - Para diagnosticar problemas de configuración
+  useEffect(() => {
+    console.log('🎴 [ValueAddedSection] Datos recibidos:', {
+      hasData: !!data,
+      hasCardsDesign: !!data?.cardsDesign,
+      currentTheme: theme,
+      cardStyles: {
+        cardMinWidth: cardStyles.cardMinWidth,
+        cardMaxWidth: cardStyles.cardMaxWidth,
+        cardsAlignment: cardStyles.cardsAlignment,
+        background: cardStyles.background,
+        titleColor: cardStyles.titleColor
+      }
+    });
+  }, [data, theme, cardStyles]);
+
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {
     if (!mappedData.backgroundImage) return null;
@@ -179,6 +195,11 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
     return theme === 'light' 
       ? mappedData.backgroundImage.light 
       : mappedData.backgroundImage.dark;
+  };
+
+  // 🛡️ FUNCIÓN HELPER para CSS robusto - Evita valores undefined/null
+  const getSafeStyle = (value: string | undefined, fallback: string): string => {
+    return value && value !== 'undefined' && value !== 'null' ? value : fallback;
   };
 
   // Función helper para detectar si un string es una URL de imagen
@@ -416,9 +437,9 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
                 '--value-card-bg': cardStyles.background,
                 background: 'transparent', // El fondo se maneja en el div interno del borde
                 boxShadow: cardStyles.shadow,
-                width: `min(${cardStyles.cardMinWidth || '320px'}, 100%)`,
-                maxWidth: cardStyles.cardMaxWidth || '100%',
-                minHeight: cardStyles.cardMinHeight || 'auto',
+                width: `min(${getSafeStyle(cardStyles.cardMinWidth, '320px')}, 100%)`, // 🛡️ CSS robusto
+                maxWidth: getSafeStyle(cardStyles.cardMaxWidth, '100%'), // 🛡️ CSS robusto
+                minHeight: getSafeStyle(cardStyles.cardMinHeight, 'auto'), // 🛡️ CSS robusto
                 transition: 'all 0.3s ease'
               } as React.CSSProperties}
               onMouseEnter={(e) => {
@@ -462,7 +483,7 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
               <div 
                 className="relative z-10 h-full"
                 style={{
-                  padding: cardStyles.cardPadding || '2rem'
+                  padding: getSafeStyle(cardStyles.cardPadding, '2rem') // 🛡️ CSS robusto
                 }}
               >
                 {/* Icono (solo imagen) - Condicional basado en showIcons */}

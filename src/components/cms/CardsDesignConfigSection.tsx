@@ -1,25 +1,27 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { PageData, CardDesignStyles } from '../../types/cms';
 import ColorWithOpacity from './ColorWithOpacity';
 import GradientPicker from './GradientPicker';
 import ShadowControl from './ShadowControl';
+import { updatePage } from '../../services/cmsApi';
 
 interface CardsDesignConfigSectionProps {
   pageData: PageData;
   updateContent: (field: string, value: any) => void;
+  setHasGlobalChanges: (value: boolean) => void; // 🔥 NUEVA PROP
 }
 
 const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   pageData,
-  updateContent
+  setHasGlobalChanges // 🔥 RECIBIR LA FUNCIÓN
 }) => {
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
+  const [activeSection, setActiveSection] = useState<'solutions' | 'valueAdded'>('solutions'); // 🔥 NUEVO: Selector de sección
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
 
-  // Valores por defecto
-  const defaultLightStyles: CardDesignStyles = {
+  // Valores por defecto para Solutions (mantener originales)
+  const defaultSolutionsLightStyles: CardDesignStyles = {
     background: 'rgba(255, 255, 255, 0.1)',
     border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
     borderWidth: '1px',
@@ -42,7 +44,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     iconAlignment: 'left'
   };
 
-  const defaultDarkStyles: CardDesignStyles = {
+  const defaultSolutionsDarkStyles: CardDesignStyles = {
     background: 'rgba(0, 0, 0, 0.3)',
     border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
     borderWidth: '2px',
@@ -65,141 +67,235 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     iconAlignment: 'left'
   };
 
-  // Estado local temporal para los estilos que se están editando
-  const [localLightStyles, setLocalLightStyles] = useState<CardDesignStyles>(() => ({
-    ...defaultLightStyles,
-    ...(pageData.content.solutions.cardsDesign?.light || {}),
-    // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
-    cardsAlignment: pageData.content.solutions.cardsDesign?.light?.cardsAlignment || 'left',
-    iconAlignment: pageData.content.solutions.cardsDesign?.light?.iconAlignment || 'left'
-  }));
-  const [localDarkStyles, setLocalDarkStyles] = useState<CardDesignStyles>(() => ({
-    ...defaultDarkStyles,
-    ...(pageData.content.solutions.cardsDesign?.dark || {}),
-    // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
-    cardsAlignment: pageData.content.solutions.cardsDesign?.dark?.cardsAlignment || 'left',
-    iconAlignment: pageData.content.solutions.cardsDesign?.dark?.iconAlignment || 'left'
-  }));
+  // 🔥 NUEVO: Valores por defecto para Value Added
+  const defaultValueAddedLightStyles: CardDesignStyles = {
+    background: 'rgba(255, 255, 255, 0.9)',
+    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    borderWidth: '2px',
+    shadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+    hoverBackground: 'rgba(255, 255, 255, 0.95)',
+    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
+    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.2)',
+    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    iconBackground: 'rgba(255, 255, 255, 0.9)',
+    iconColor: '#7528ee',
+    titleColor: '#1F2937',
+    descriptionColor: '#4B5563',
+    linkColor: '#06B6D4',
+    cardMinWidth: '280px',
+    cardMaxWidth: '350px',
+    cardMinHeight: '200px',
+    cardPadding: '2rem',
+    cardsAlignment: 'center',
+    iconBorderEnabled: false,
+    iconAlignment: 'center'
+  };
 
-  // Sincronizar estado local cuando cambia pageData desde la DB (solo una vez al montar o cuando cambia significativamente)
-  useEffect(() => {
-    if (pageData.content.solutions.cardsDesign) {
-      setLocalLightStyles({
-        ...defaultLightStyles,
-        ...(pageData.content.solutions.cardsDesign.light || {}),
-        // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
-        cardsAlignment: pageData.content.solutions.cardsDesign.light?.cardsAlignment || 'left',
-        iconAlignment: pageData.content.solutions.cardsDesign.light?.iconAlignment || 'left'
-      });
-      setLocalDarkStyles({
-        ...defaultDarkStyles,
-        ...(pageData.content.solutions.cardsDesign.dark || {}),
-        // Asegurar que cardsAlignment y iconAlignment siempre tengan un valor
-        cardsAlignment: pageData.content.solutions.cardsDesign.dark?.cardsAlignment || 'left',
-        iconAlignment: pageData.content.solutions.cardsDesign.dark?.iconAlignment || 'left'
-      });
+  const defaultValueAddedDarkStyles: CardDesignStyles = {
+    background: 'rgba(17, 24, 39, 0.9)',
+    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    borderWidth: '2px',
+    shadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+    hoverBackground: 'rgba(31, 41, 55, 0.95)',
+    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
+    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.3)',
+    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    iconBackground: 'rgba(17, 24, 39, 0.8)',
+    iconColor: '#ffffff',
+    titleColor: '#FFFFFF',
+    descriptionColor: '#D1D5DB',
+    linkColor: '#a78bfa',
+    cardMinWidth: '280px',
+    cardMaxWidth: '350px',
+    cardMinHeight: '200px',
+    cardPadding: '2rem',
+    cardsAlignment: 'center',
+    iconBorderEnabled: false,
+    iconAlignment: 'center'
+  };
+
+  // 🔥 NUEVO: Data loader unificado para ambas secciones
+  const initialData = useMemo(() => {
+    let cardData;
+    if (activeSection === 'solutions') {
+      cardData = pageData.content.solutions.cardsDesign;
+    } else {
+      cardData = pageData.content.valueAdded?.cardsDesign;
     }
-  }, [pageData._id]); // Solo cuando cambia el ID del documento
+    return cardData;
+  }, [pageData.content, activeSection]);
 
-  // Obtener estilos actuales del estado local según el tema activo
-  const currentStyles = activeTheme === 'light' ? localLightStyles : localDarkStyles;
+  // 🔥 NUEVO: Determinar defaults según la sección activa
+  const currentDefaults = useMemo(() => {
+    if (activeSection === 'solutions') {
+      return { light: defaultSolutionsLightStyles, dark: defaultSolutionsDarkStyles };
+    } else {
+      return { light: defaultValueAddedLightStyles, dark: defaultValueAddedDarkStyles };
+    }
+  }, [activeSection]);
+
+  // 🔥 NUEVO: Estados unificados SIN defaults automáticos
+  const [lightStyles, setLightStyles] = useState<CardDesignStyles>(() => {
+    // Solo cargar datos reales de BD, NO defaults
+    return initialData?.light || {} as CardDesignStyles;
+  });
+  
+  const [darkStyles, setDarkStyles] = useState<CardDesignStyles>(() => {
+    // Solo cargar datos reales de BD, NO defaults  
+    return initialData?.dark || {} as CardDesignStyles;
+  });
+
+  // 🔄 ACTUALIZAR: Solo cargar datos reales de BD, NO defaults automáticos
+  const [justSaved, setJustSaved] = useState(false);
+
+  useEffect(() => {
+    // No actualizar si acabamos de guardar (evitar sobreescritura)
+    if (justSaved) {
+      return; // No resetear justSaved aquí
+    }
+    // Solo cargar datos reales de BD
+    const data = initialData?.light;
+    if (data) {
+      setLightStyles(data);
+    }
+  }, [initialData, activeSection, justSaved]);
+
+  useEffect(() => {
+    // No actualizar si acabamos de guardar (evitar sobreescritura)
+    if (justSaved) {
+      return;
+    }
+    // Solo cargar datos reales de BD
+    const data = initialData?.dark;
+    if (data) {
+      setDarkStyles(data);
+    }
+  }, [initialData, activeSection, justSaved]);
+
+  const currentStyles = activeTheme === 'light' ? lightStyles : darkStyles;
 
   const updateCardStyle = (field: keyof CardDesignStyles, value: string | boolean) => {
-    // Actualizar estado local inmediatamente (para vista previa)
     if (activeTheme === 'light') {
-      setLocalLightStyles(prev => ({ ...prev, [field]: value }));
+      setLightStyles(prev => ({ ...prev, [field]: value }));
     } else {
-      setLocalDarkStyles(prev => ({ ...prev, [field]: value }));
+      setDarkStyles(prev => ({ ...prev, [field]: value }));
     }
-
-    // Marcar como cambios pendientes
+    // 🔥 CONECTAR CON EL SISTEMA GLOBAL
     setHasUnsavedChanges(true);
-    
-    // NO actualizamos el padre automáticamente
-    // Los cambios solo se guardan cuando el usuario hace click en "Guardar"
+    setHasGlobalChanges(true); // ← ESTA ES LA CONEXIÓN CLAVE
   };
 
-  // Función para guardar los cambios al padre (llamada por el botón Guardar)
-  const saveChanges = () => {
-    // Guardar ambos temas
-    updateContent('solutions.cardsDesign.light', localLightStyles);
-    updateContent('solutions.cardsDesign.dark', localDarkStyles);
-    setHasUnsavedChanges(false);
-  };
-
-  // Exponer saveChanges para que CmsManager pueda llamarlo
-  useEffect(() => {
-    // Guardar referencia en el componente padre si hay cambios pendientes
-    if (hasUnsavedChanges) {
-      // Esta función será llamada cuando se presione "Guardar" en CmsManager
-      (window as any).__cardDesignSave = saveChanges;
+  // 🔥 NUEVO: Guardado directo usando updatePage (con autenticación automática)
+  const saveChanges = async () => {
+    try {
+      // 🔧 SOLUCIÓN: Construir objeto completo con los datos actuales del estado
+      const updatedContent = {
+        ...pageData.content,
+        [activeSection]: {
+          ...pageData.content[activeSection],
+          cardsDesign: {
+            light: { ...lightStyles },  // ← Usar estado actual
+            dark: { ...darkStyles }     // ← Usar estado actual
+          }
+        }
+      };
+      // 🔧 SOLUCIÓN: Usar updatePage que maneja autenticación automáticamente
+      await updatePage('home', {
+        content: updatedContent,
+        seo: pageData.seo,
+        theme: pageData.theme,
+        isPublished: pageData.isPublished
+      });
+      // Marcar que acabamos de guardar para evitar recargas automáticas
+      setJustSaved(true);
+      setHasUnsavedChanges(false);
+      setHasGlobalChanges(false); // ← LIMPIAR ESTADO GLOBAL
+      // 🔧 NUEVO: Resetear flag después de un tiempo para permitir futuras recargas
+      setTimeout(() => {
+        setJustSaved(false);
+      }, 2000); // 2 segundos de gracia
+    } catch (error) {
+      // No cambiar estados si falló el guardado
     }
+  };
+
+  // 🔥 NUEVO: Exponer función para el botón global de guardar
+  useEffect(() => {
+    (window as any).__cardsDesignSave = saveChanges;
     return () => {
-      delete (window as any).__cardDesignSave;
+      delete (window as any).__cardsDesignSave;
     };
-  }, [hasUnsavedChanges, localLightStyles, localDarkStyles]);
+  }, [lightStyles, darkStyles, activeSection, justSaved]);
 
   const resetToDefaults = () => {
-    const defaults = activeTheme === 'light' ? defaultLightStyles : defaultDarkStyles;
-    
-    // Actualizar estado local
     if (activeTheme === 'light') {
-      setLocalLightStyles(defaults);
+      setLightStyles(currentDefaults.light);
     } else {
-      setLocalDarkStyles(defaults);
+      setDarkStyles(currentDefaults.dark);
     }
-    
-    // Marcar como cambios pendientes para que se guarde al hacer click en Guardar
     setHasUnsavedChanges(true);
+    setHasGlobalChanges(true);
   };
 
-  // Función para aplicar los valores transparentes a AMBOS temas
   const applyTransparentDefaults = () => {
-    // Aplicar valores transparentes a ambos temas
-    setLocalLightStyles(defaultLightStyles);
-    setLocalDarkStyles(defaultDarkStyles);
-    
-    // Guardar inmediatamente
-    updateContent('solutions.cardsDesign.light', defaultLightStyles);
-    updateContent('solutions.cardsDesign.dark', defaultDarkStyles);
-    
-    setHasUnsavedChanges(false);
+    setLightStyles(currentDefaults.light);
+    setDarkStyles(currentDefaults.dark);
+    setHasUnsavedChanges(true);
+    setHasGlobalChanges(true);
   };
-
-  // Cleanup del timeout al desmontar
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-            🎨 Diseño de Tarjetas
-          </h2>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4 md:gap-0">
+        {/* Left: Title, Section Selector, Status */}
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3 w-full md:w-auto">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+              🎨 Diseño de Tarjetas
+            </h2>
+            {/* 🔥 NUEVO: Selector de sección */}
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+              <button
+                onClick={() => setActiveSection('solutions')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  activeSection === 'solutions'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Solutions
+              </button>
+              <button
+                onClick={() => setActiveSection('valueAdded')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  activeSection === 'valueAdded'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Value Added
+              </button>
+            </div>
+          </div>
           {hasUnsavedChanges && (
-            <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300 text-xs font-medium rounded-full">
+            <span className="mt-2 md:mt-0 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300 text-xs font-medium rounded-full self-start md:self-auto">
               ⚠️ Cambios sin guardar
             </span>
           )}
         </div>
-        <div className="flex gap-2">
+        {/* Right: Action Buttons */}
+        <div className="flex gap-2 w-full md:w-auto">
           <button
             onClick={applyTransparentDefaults}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+            className="flex-1 md:flex-none px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
             title="Aplicar diseño transparente a ambos temas y guardar"
           >
             ✨ Aplicar Transparencia
           </button>
           <button
             onClick={resetToDefaults}
-            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+            className="flex-1 md:flex-none px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
           >
             🔄 Restaurar por defecto
           </button>
@@ -233,20 +329,15 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
       </div>
 
       {/* Preview Card */}
-      <div className="mb-8 p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
-          👁️ Vista Previa en Tiempo Real
-        </h3>
+      <div className="mb-8 px-2 sm:px-4 md:px-8 py-4 sm:py-6 flex justify-center">
         <div
           key={`preview-${activeTheme}-${currentStyles.cardMinWidth}-${currentStyles.cardPadding}-${currentStyles.cardsAlignment}`}
-          className="group relative rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
+          className="group relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
           style={{
             background: currentStyles.background,
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             boxShadow: currentStyles.shadow,
-            minWidth: currentStyles.cardMinWidth || '280px',
-            maxWidth: currentStyles.cardMaxWidth || '100%',
             minHeight: currentStyles.cardMinHeight || 'auto',
             padding: currentStyles.cardPadding || '2rem'
           }}
@@ -304,6 +395,9 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           )}
 
           {/* Content Preview */}
+           <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+          👁️ Vista Previa en Tiempo Real
+        </h3>
           <h4
             className="text-2xl font-bold mb-4"
             style={{ color: currentStyles.titleColor }}
@@ -344,10 +438,11 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           🎨 Configuración Simple
         </h3>
 
-        {/* Fondo y Borde - Grid de 2 columnas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    {/* Fondo y Borde - Responsive grid: 1 columna en móvil, 2 en md+ */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+
           {/* Fondo de Tarjeta */}
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-1">
             <ColorWithOpacity
               label="Fondo de Tarjeta"
               value={currentStyles.background}
@@ -356,100 +451,32 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           </div>
 
           {/* Borde de Tarjeta */}
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-            <GradientPicker
-              label="Borde de Tarjeta"
-              value={currentStyles.border}
-              onChange={(value) => updateCardStyle('border', value)}
-            />
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Grosor del Borde
-              </label>
-              <select
-                value={currentStyles.borderWidth}
-                onChange={(e) => updateCardStyle('borderWidth', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              >
-                <option value="0px">Sin borde</option>
-                <option value="1px">Fino (1px)</option>
-                <option value="2px">Medio (2px)</option>
-                <option value="3px">Grueso (3px)</option>
-                <option value="4px">Muy grueso (4px)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Colores de Texto - Grid de 2 columnas */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-          <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            ✏️ Colores de Texto
-          </h4>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Color del Título */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Color del Título
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={currentStyles.titleColor}
-                  onChange={(e) => updateCardStyle('titleColor', e.target.value)}
-                  className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
-                />
-                <input
-                  type="text"
-                  value={currentStyles.titleColor}
-                  onChange={(e) => updateCardStyle('titleColor', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                />
-              </div>
-            </div>
-
-            {/* Color de la Descripción */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Color de la Descripción
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={currentStyles.descriptionColor}
-                  onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
-                  className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
-                />
-                <input
-                  type="text"
-                  value={currentStyles.descriptionColor}
-                  onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                />
-              </div>
-            </div>
-
-            {/* Color del "Conocer más" */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Color del "Conocer más"
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={currentStyles.linkColor}
-                  onChange={(e) => updateCardStyle('linkColor', e.target.value)}
-                  className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
-                />
-                <input
-                  type="text"
-                  value={currentStyles.linkColor}
-                  onChange={(e) => updateCardStyle('linkColor', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                />
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-1">
+            <div className="w-full min-w-0">
+              <GradientPicker
+                label="Borde de Tarjeta"
+                value={currentStyles.border}
+                onChange={(value) => updateCardStyle('border', value)}
+              />
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Grosor del Borde
+                </label>
+                <select
+                  value={currentStyles.borderWidth}
+                  onChange={(e) => updateCardStyle('borderWidth', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                >
+                  <option value="0px">Sin borde</option>
+                  <option value="1px">Fino (1px)</option>
+                  <option value="2px">Medio (2px)</option>
+                  <option value="3px">Grueso (3px)</option>
+                  <option value="4px">Muy grueso (4px)</option>
+                </select>
               </div>
             </div>
           </div>
+          
         </div>
 
         {/* Estilos del Icono - Grid de 2 columnas */}
@@ -514,11 +541,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 value={currentStyles.iconGradient}
                 onChange={(value) => updateCardStyle('iconGradient', value)}
               />
-            </div>
-
-            {/* Color del Icono */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Color del Icono
               </label>
               <div className="flex gap-2">
@@ -535,6 +558,85 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
               </div>
+
+            </div>
+
+            {/* Color del Icono */}
+            <div>
+  
+            {/* Colores de Texto - Grid de 2 columnas */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-1">
+              <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                ✏️ Colores de Texto
+              </h4>
+              <div className="grid grid-cols-1 gap-4">
+
+                {/* Color del Título */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del Título
+                  </label>
+                  <div className="flex gap-2 w-full min-w-0">
+                    <input
+                      type="color"
+                      value={currentStyles.titleColor}
+                      onChange={(e) => updateCardStyle('titleColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={currentStyles.titleColor}
+                      onChange={(e) => updateCardStyle('titleColor', e.target.value)}
+                      className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+
+
+                {/* Color de la Descripción */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color de la Descripción
+                  </label>
+                  <div className="flex gap-2 w-full min-w-0">
+                    <input
+                      type="color"
+                      value={currentStyles.descriptionColor}
+                      onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={currentStyles.descriptionColor}
+                      onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
+                      className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+
+
+                {/* Color del "Conocer más" */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del "Conocer más"
+                  </label>
+                  <div className="flex gap-2 w-full min-w-0">
+                    <input
+                      type="color"
+                      value={currentStyles.linkColor}
+                      onChange={(e) => updateCardStyle('linkColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={currentStyles.linkColor}
+                      onChange={(e) => updateCardStyle('linkColor', e.target.value)}
+                      className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
             </div>
 
             {/* Fondo del Contenedor - Ancho completo */}

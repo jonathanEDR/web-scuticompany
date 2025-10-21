@@ -11,7 +11,6 @@ import ValueAddedItemsEditor from './ValueAddedItemsEditor';
 import SeoConfigSection from './SeoConfigSection';
 import ThemeConfigSection from './ThemeConfigSection';
 import CardsDesignConfigSection from './CardsDesignConfigSection';
-import ValueAddedCardsDesignSection from './ValueAddedCardsDesignSection';
 import ContactConfigSection from './ContactConfigSection';
 
 const CmsManager: React.FC = () => {
@@ -31,6 +30,9 @@ const CmsManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact'>(getInitialTab());
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [hasGlobalChanges, setHasGlobalChanges] = useState(false); // 🔥 Estado para detectar cambios globales
+
+  // ...existing code...
 
   // Sincronizar tab con URL
   useEffect(() => {
@@ -72,7 +74,10 @@ const CmsManager: React.FC = () => {
   // Update content without auto-save (manual save only)
   const handleUpdateContent = (field: string, value: any) => {
     updateContent(field, value);
-    // Marcar como cambios pendientes sin guardar automáticamente
+    // 🔥 Marcar como cambios pendientes GLOBALMENTE
+    if (!hasGlobalChanges) {
+      setHasGlobalChanges(true);
+    }
     setSaveStatus('idle');
   };
 
@@ -95,45 +100,36 @@ const CmsManager: React.FC = () => {
     try {
       setIsLoading(true);
       setSaveStatus('saving');
-      
       // Guardar componentes específicos según la pestaña activa
       if (activeTab === 'cards') {
-        // Guardar cambios del componente de Solutions si existen
-        if ((window as any).__cardDesignSave) {
-          (window as any).__cardDesignSave();
+        // 🔥 NUEVO: Usar el componente unificado de cards design
+        if ((window as any).__cardsDesignSave) {
+          await (window as any).__cardsDesignSave();  // ← Esperar a que termine
         }
-        
-        // Guardar cambios del componente de Value Added si existen
-        if ((window as any).__valueAddedCardDesignSave) {
-          (window as any).__valueAddedCardDesignSave();
-        }
-        
-        // Esperar un momento para que los estados se actualicen
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      
-      // Si estamos en la pestaña de content, guardar componentes de contenido
-      if (activeTab === 'content') {
+        // ⚠️ NO llamar a handleSave() aquí - __cardsDesignSave ya guarda todo
+      } else if (activeTab === 'content') {
+        // Si estamos en la pestaña de content, guardar componentes de contenido
         // Guardar cambios del componente de Logos Bar Design si existen
         if ((window as any).__logosBarDesignSave) {
           (window as any).__logosBarDesignSave();
         }
-        
         // Guardar cambios del componente de Client Logos Design si existen
         if ((window as any).__clientLogosDesignSave) {
           (window as any).__clientLogosDesignSave();
         }
-        
         // Esperar un momento para que los estados se actualicen
         await new Promise(resolve => setTimeout(resolve, 100));
+        // Para content tab, sí llamamos a handleSave
+        await handleSave();
+      } else {
+        // Para otras pestañas, usar handleSave normal
+        await handleSave();
       }
-      
-      await handleSave();
-      
+      // 🔥 Resetear estado de cambios globales después del guardado exitoso
+      setHasGlobalChanges(false);
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
-      console.error('❌ [CmsManager] Error guardando:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
@@ -220,25 +216,35 @@ const CmsManager: React.FC = () => {
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 mb-6 border border-gray-100 dark:border-gray-700/50">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-3">
                 🎛️ Gestor de Contenido CMS
+                {hasGlobalChanges && (
+                  <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full animate-pulse">
+                    🟡 Cambios sin guardar
+                  </span>
+                )}
               </h1>
               <p className="text-gray-600 dark:text-gray-300">
                 Administra el contenido, SEO y temas de tu página web
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex flex-row flex-wrap items-center gap-3 w-full sm:w-auto">
               {/* Status Badge */}
-              <div className={`px-3 py-2 rounded-lg border text-sm font-medium ${getSaveStatusColor()}`}>
-                {getSaveStatusText()}
+              <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getSaveStatusColor()}`}>
+                {hasGlobalChanges ? '📝 Cambios pendientes' : getSaveStatusText()}
               </div>
-              
               {/* Action Button */}
               <button
                 onClick={handleManualSave}
-                disabled={isLoading}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+                disabled={isLoading || !hasGlobalChanges}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 ${
+                  hasGlobalChanges && !isLoading
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                }`}
+                title={hasGlobalChanges ? 'Guardar cambios pendientes' : 'No hay cambios para guardar'}
+                style={{ minWidth: '120px' }}
               >
                 {isLoading ? (
                   <>
@@ -257,16 +263,17 @@ const CmsManager: React.FC = () => {
 
         {/* Tabs Navigation */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 mb-6 border border-gray-100 dark:border-gray-700/50">
-          <div className="flex border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap sm:flex-nowrap overflow-x-auto border-b border-gray-200 dark:border-gray-700 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`px-6 py-4 font-medium transition-colors duration-200 flex items-center gap-2 ${
+                className={`flex-shrink-0 flex-grow px-4 sm:px-6 py-3 sm:py-4 font-medium transition-colors duration-200 flex items-center gap-2 text-base sm:text-lg ${
                   activeTab === tab.id
                     ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
                 }`}
+                style={{ minWidth: '120px' }}
               >
                 <span className="text-lg">{tab.icon}</span>
                 {tab.label}
@@ -325,16 +332,11 @@ const CmsManager: React.FC = () => {
 
           {activeTab === 'cards' && (
             <div className="space-y-8">
-              {/* Configuración para Soluciones */}
+              {/* 🔥 NUEVO: Configuración Unificada para Solutions y Value Added Cards */}
               <CardsDesignConfigSection
                 pageData={pageData}
                 updateContent={handleUpdateContent}
-              />
-              
-              {/* Configuración para Valor Agregado */}
-              <ValueAddedCardsDesignSection
-                pageData={pageData}
-                updateContent={handleUpdateContent}
+                setHasGlobalChanges={setHasGlobalChanges} // 🔥 PASAR LA FUNCIÓN
               />
             </div>
           )}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_SOLUTIONS_CONFIG } from '../../utils/defaultConfig';
@@ -78,8 +78,16 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   const getCMSCardStyles = (): CardDesignStyles => {
     const cmsStyles = solutionsData.cardsDesign;
     
+    console.log('🔍 [SolutionsSection] Verificando estilos CMS:', {
+      cmsStyles,
+      theme,
+      hasThemeStyles: cmsStyles && cmsStyles[theme],
+      solutionsData
+    });
+    
     if (cmsStyles && cmsStyles[theme]) {
       const styles = cmsStyles[theme];
+      console.log('✅ [SolutionsSection] Usando estilos del CMS:', styles);
       
       // ⚡ CORRECCIÓN: Asegurar que 'transparent' se convierte correctamente
       if (styles.background === 'transparent') {
@@ -89,6 +97,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
       return styles;
     }
     
+    console.log('⚠️ [SolutionsSection] Usando estilos por defecto - NO hay datos del CMS');
     // Fallback a estilos por defecto
     return theme === 'light' ? defaultLightStyles : defaultDarkStyles;
   };
@@ -143,6 +152,22 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   // Obtener estilos actuales según el tema (CMS o defaults)
   const cardStyles = getCMSCardStyles();
 
+  // 🔍 LOGS DE DEPURACIÓN - Para diagnosticar problemas de configuración
+  useEffect(() => {
+    console.log('🎴 [SolutionsSection] Datos recibidos:', {
+      hasData: !!data,
+      hasCardsDesign: !!data?.cardsDesign,
+      currentTheme: theme,
+      cardStyles: {
+        cardMinWidth: cardStyles.cardMinWidth,
+        cardMaxWidth: cardStyles.cardMaxWidth,
+        cardsAlignment: cardStyles.cardsAlignment,
+        background: cardStyles.background,
+        titleColor: cardStyles.titleColor
+      }
+    });
+  }, [data, theme, cardStyles]);
+
   // ⚡ Obtener estilos del botón "Ver más..." desde la configuración de tema
   const getViewMoreButtonStyles = (): ButtonStyle => {
     const themeButtons = themeConfig?.[theme === 'light' ? 'lightMode' : 'darkMode']?.buttons;
@@ -172,6 +197,11 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
     return theme === 'light' 
       ? mappedData.backgroundImage.light 
       : mappedData.backgroundImage.dark;
+  };
+
+  // 🛡️ FUNCIÓN HELPER para CSS robusto - Evita valores undefined/null
+  const getSafeStyle = (value: string | undefined, fallback: string): string => {
+    return value && value !== 'undefined' && value !== 'null' ? value : fallback;
   };
 
   // Función helper para detectar si un string es una URL de imagen
@@ -298,10 +328,10 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                 background: cardStyles.background,
                 // SIN backdrop-filter para máxima nitidez
                 boxShadow: cardStyles.shadow,
-                width: `min(${cardStyles.cardMinWidth || '320px'}, 100%)`, // Responsive pero respeta la configuración
-                maxWidth: cardStyles.cardMaxWidth || '100%',
-                minHeight: cardStyles.cardMinHeight || 'auto',
-                padding: cardStyles.cardPadding || '2rem',
+                width: `min(${getSafeStyle(cardStyles.cardMinWidth, '320px')}, 100%)`, // 🛡️ CSS robusto
+                maxWidth: getSafeStyle(cardStyles.cardMaxWidth, '100%'), // 🛡️ CSS robusto
+                minHeight: getSafeStyle(cardStyles.cardMinHeight, 'auto'), // 🛡️ CSS robusto
+                padding: getSafeStyle(cardStyles.cardPadding, '2rem'), // 🛡️ CSS robusto
                 transition: 'all 0.3s ease'
               } as React.CSSProperties}
               onMouseEnter={(e) => {

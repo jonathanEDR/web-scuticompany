@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPageBySlug, updatePage } from '../../services/cmsApi';
+import { getPageBySlug, updatePage, clearCache } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_PAGE_CONFIG } from '../../utils/defaultConfig';
 import type { PageData, MessageState } from '../../types/cms';
@@ -323,6 +323,9 @@ export const useCmsData = () => {
         theme: pageData.theme,
         isPublished: pageData.isPublished
       });
+      
+      // 🔧 CORRECCIÓN: Limpiar caché para forzar que la página pública use datos frescos
+      clearCache('page-home');
       
       setMessage({ type: 'success', text: '✅ Cambios guardados correctamente' });
       

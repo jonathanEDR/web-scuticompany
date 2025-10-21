@@ -128,8 +128,8 @@ const GradientPicker: React.FC<GradientPickerProps> = ({
 
       {/* Selectores de color */}
       <div className="flex gap-3 items-center">
-        <div className="flex-1">
-          <div className="flex gap-2 items-center">
+        <div className="flex-1 w-full min-w-0">
+          <div className="flex gap-2 items-center w-full min-w-0">
             <input
               type="color"
               value={color1}
@@ -140,7 +140,7 @@ const GradientPicker: React.FC<GradientPickerProps> = ({
               type="text"
               value={color1}
               onChange={handleColor1Change}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+              className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
               placeholder="#8B5CF6"
             />
           </div>
@@ -149,8 +149,8 @@ const GradientPicker: React.FC<GradientPickerProps> = ({
         {!isSolid && (
           <>
             <span className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>→</span>
-            <div className="flex-1">
-              <div className="flex gap-2 items-center">
+            <div className="flex-1 w-full min-w-0">
+              <div className="flex gap-2 items-center w-full min-w-0">
                 <input
                   type="color"
                   value={color2}
@@ -161,7 +161,7 @@ const GradientPicker: React.FC<GradientPickerProps> = ({
                   type="text"
                   value={color2}
                   onChange={handleColor2Change}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                  className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
                   placeholder="#06B6D4"
                 />
               </div>
