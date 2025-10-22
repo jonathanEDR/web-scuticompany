@@ -13,8 +13,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
   pageData,
   updateContent
 }) => {
-  // 🚨 LOG SIMPLE PARA VERIFICAR QUE EL COMPONENTE SE CARGA
-  console.log('🚨 [COMPONENTE] ValueAddedCardsDesignSection cargado!');
   
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -70,103 +68,59 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
   // 🔥 SOLUCIÓN: Memoizar con dependencia de pageData (como en CardsDesignConfigSection)
   const initialLightStyles = useMemo(() => {
-    const dbData = pageData.content.valueAdded?.cardsDesign?.light;
-    console.log('📥 [CARGA INICIAL] ValueAdded Light desde DB:', dbData);
-    return dbData || defaultLightStyles;
+  const dbData = pageData.content.valueAdded?.cardsDesign?.light;
+  return dbData || defaultLightStyles;
   }, []); // ⚠️ TEMPORALMENTE sin dependencias para evitar bucle infinito
 
   const initialDarkStyles = useMemo(() => {
-    const dbData = pageData.content.valueAdded?.cardsDesign?.dark;
-    console.log('📥 [CARGA INICIAL] ValueAdded Dark desde DB:', dbData);
-    return dbData || defaultDarkStyles;
+  const dbData = pageData.content.valueAdded?.cardsDesign?.dark;
+  return dbData || defaultDarkStyles;
   }, []); // ⚠️ TEMPORALMENTE sin dependencias para evitar bucle infinito
 
   // Estado local temporal para los estilos que se están editando
   const [localLightStyles, setLocalLightStyles] = useState<CardDesignStyles>(initialLightStyles);
   const [localDarkStyles, setLocalDarkStyles] = useState<CardDesignStyles>(initialDarkStyles);
 
-  // � TEMPORALMENTE DESHABILITADO - useEffect que causa bucle infinito
-  // useEffect(() => {
-  //   if (!hasUnsavedChanges) {
-  //     setLocalLightStyles(initialLightStyles);
-  //     console.log('🔄 [ACTUALIZACIÓN] ValueAdded Light styles actualizados:', initialLightStyles);
-  //   } else {
-  //     console.log('⚠️ [BLOQUEADO] No se actualizan Light styles - hay cambios pendientes');
-  //   }
-  // }, [initialLightStyles, hasUnsavedChanges]);
-
-  // useEffect(() => {
-  //   if (!hasUnsavedChanges) {
-  //     setLocalDarkStyles(initialDarkStyles);
-  //     console.log('🔄 [ACTUALIZACIÓN] ValueAdded Dark styles actualizados:', initialDarkStyles);
-  //   } else {
-  //     console.log('⚠️ [BLOQUEADO] No se actualizan Dark styles - hay cambios pendientes');
-  //   }
-  // }, [initialDarkStyles, hasUnsavedChanges]);
-
   const currentStyles = activeTheme === 'light' ? localLightStyles : localDarkStyles;
 
   const updateCardStyle = (field: keyof CardDesignStyles, value: string | boolean) => {
-    // 🚨 LOG SIMPLE PARA VERIFICAR QUE LA FUNCIÓN SE EJECUTA
-    console.log('🚨 [TEST] updateCardStyle ejecutándose!!! field:', field, 'value:', value);
-    
-    console.log(`✏️ [CAMBIO LOCAL] Actualizando ${activeTheme}.${field} = ${value}`);
-    
     if (activeTheme === 'light') {
       setLocalLightStyles(prev => {
         const newStyles = { ...prev, [field]: value };
-        console.log('📝 [LIGHT] Nuevo estado local:', newStyles);
         return newStyles;
       });
     } else {
       setLocalDarkStyles(prev => {
         const newStyles = { ...prev, [field]: value };
-        console.log('📝 [DARK] Nuevo estado local:', newStyles);
         return newStyles;
       });
     }
-    
     setHasUnsavedChanges(true);
-    console.log('⚠️ [MARCADO] Cambios marcados como pendientes de guardado');
-    
     // 🔥 SOLUCIÓN: Notificar inmediatamente al sistema global de cada cambio
     const fieldPath = `valueAdded.cardsDesign.${activeTheme}.${field}`;
     updateContent(fieldPath, value);
-    console.log(`🌐 [GLOBAL] Notificando cambio global: ${fieldPath} = ${value}`);
   };
 
   // 🔥 SOLUCIÓN: Guardado directo campo por campo (como en CardsDesignConfigSection)
   const saveChanges = useCallback(() => {
-    console.log('� [INICIO GUARDADO] =================================');
-    console.log('📋 [DATOS LOCALES] Light styles antes de guardar:', localLightStyles);
-    console.log('📋 [DATOS LOCALES] Dark styles antes de guardar:', localDarkStyles);
-    
     try {
       // Guardar cada campo individualmente en lugar de objetos completos
-      console.log('💾 [GUARDANDO LIGHT] Iniciando...');
       Object.entries(localLightStyles).forEach(([key, value]) => {
         const fieldPath = `valueAdded.cardsDesign.light.${key}`;
         updateContent(fieldPath, value);
-        console.log(`  ✅ ${fieldPath} = ${value}`);
       });
-      
-      console.log('💾 [GUARDANDO DARK] Iniciando...');
       Object.entries(localDarkStyles).forEach(([key, value]) => {
         const fieldPath = `valueAdded.cardsDesign.dark.${key}`;
         updateContent(fieldPath, value);
-        console.log(`  ✅ ${fieldPath} = ${value}`);
       });
-      
       setHasUnsavedChanges(false);
-      console.log('🎉 [GUARDADO COMPLETADO] =================================');
     } catch (error) {
-      console.error('❌ [ERROR EN GUARDADO]:', error);
+      // Error en guardado (silenciado)
     }
   }, [localLightStyles, localDarkStyles, updateContent]);
 
   useEffect(() => {
     (window as any).__valueAddedCardDesignSave = saveChanges;
-    console.log('🔌 [CONEXIÓN] Función saveChanges registrada para CmsManager');
     return () => {
       delete (window as any).__valueAddedCardDesignSave;
     };
@@ -188,31 +142,20 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
   // Función para recargar datos desde la DB
   const reloadFromDB = () => {
-    console.log('🔄 [RECARGA MANUAL] Recargando estilos desde DB...');
     const dbLightData = pageData.content.valueAdded?.cardsDesign?.light;
     const dbDarkData = pageData.content.valueAdded?.cardsDesign?.dark;
-    
     setLocalLightStyles(dbLightData || defaultLightStyles);
     setLocalDarkStyles(dbDarkData || defaultDarkStyles);
     setHasUnsavedChanges(false);
-    
-    console.log('✅ [RECARGA MANUAL] Datos recargados desde DB');
-    console.log('📋 [DB LIGHT]:', dbLightData);
-    console.log('📋 [DB DARK]:', dbDarkData);
   };
 
   // Función para aplicar los valores transparentes a AMBOS temas
   const applyTransparentDefaults = () => {
-    console.log('✨ [TRANSPARENCIA] Aplicando valores por defecto...');
-    
     // Aplicar valores transparentes a ambos temas
     setLocalLightStyles(defaultLightStyles);
     setLocalDarkStyles(defaultDarkStyles);
-    
     // Marcar como cambios pendientes
     setHasUnsavedChanges(true);
-    
-    console.log('✨ [TRANSPARENCIA] Valores aplicados localmente, hacer click en Guardar para persistir');
   };
 
   // Cleanup del timeout al desmontar
@@ -241,7 +184,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
         <div className="flex gap-2">
           <button
             onClick={() => {
-              console.log('🚨 [TEST BUTTON] ¡Botón de prueba presionado!');
               updateCardStyle('background', 'rgba(255, 0, 0, 0.5)');
             }}
             className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
@@ -288,7 +230,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
         <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
           <button
             onClick={() => {
-              console.log('🚨 [TEST] Cambiando a tema LIGHT');
               setActiveTheme('light');
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
@@ -301,7 +242,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           </button>
           <button
             onClick={() => {
-              console.log('🚨 [TEST] Cambiando a tema DARK');
               setActiveTheme('dark');
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${

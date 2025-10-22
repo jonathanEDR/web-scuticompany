@@ -286,6 +286,7 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                         description="Imagen PNG recomendada: 64x64px"
                         currentImage={item.iconLight}
                         onImageSelect={(url: string) => updateItem(index, 'iconLight', url)}
+                        hideButtonArea={!!item.iconLight}
                       />
                     </div>
 
@@ -296,6 +297,7 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                         description="Imagen PNG recomendada: 64x64px"
                         currentImage={item.iconDark}
                         onImageSelect={(url: string) => updateItem(index, 'iconDark', url)}
+                        hideButtonArea={!!item.iconDark}
                       />
                     </div>
 

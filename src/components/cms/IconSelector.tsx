@@ -120,6 +120,7 @@ const IconSelector: React.FC<IconSelectorProps> = ({
             currentImage={iconValue}
             onImageSelect={onIconValueChange}
             darkMode={darkMode}
+            hideButtonArea={!!iconValue}
           />
           <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             💡 Recomendado: Imágenes cuadradas de 128x128px o mayores

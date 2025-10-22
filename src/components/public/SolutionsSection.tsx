@@ -77,27 +77,15 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   // ⚡ Usar estilos del CMS si están disponibles, sino usar defaults
   const getCMSCardStyles = (): CardDesignStyles => {
     const cmsStyles = solutionsData.cardsDesign;
-    
-    console.log('🔍 [SolutionsSection] Verificando estilos CMS:', {
-      cmsStyles,
-      theme,
-      hasThemeStyles: cmsStyles && cmsStyles[theme],
-      solutionsData
-    });
-    
     if (cmsStyles && cmsStyles[theme]) {
       const styles = cmsStyles[theme];
-      console.log('✅ [SolutionsSection] Usando estilos del CMS:', styles);
-      
       // ⚡ CORRECCIÓN: Asegurar que 'transparent' se convierte correctamente
       if (styles.background === 'transparent') {
         styles.background = 'transparent';
       }
-      
       return styles;
     }
     
-    console.log('⚠️ [SolutionsSection] Usando estilos por defecto - NO hay datos del CMS');
     // Fallback a estilos por defecto
     return theme === 'light' ? defaultLightStyles : defaultDarkStyles;
   };
@@ -154,18 +142,6 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
 
   // 🔍 LOGS DE DEPURACIÓN - Para diagnosticar problemas de configuración
   useEffect(() => {
-    console.log('🎴 [SolutionsSection] Datos recibidos:', {
-      hasData: !!data,
-      hasCardsDesign: !!data?.cardsDesign,
-      currentTheme: theme,
-      cardStyles: {
-        cardMinWidth: cardStyles.cardMinWidth,
-        cardMaxWidth: cardStyles.cardMaxWidth,
-        cardsAlignment: cardStyles.cardsAlignment,
-        background: cardStyles.background,
-        titleColor: cardStyles.titleColor
-      }
-    });
   }, [data, theme, cardStyles]);
 
   // ⚡ Obtener estilos del botón "Ver más..." desde la configuración de tema
@@ -490,7 +466,6 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
               boxShadow: '0 4px 15px rgba(117, 40, 238, 0.3)'
             }}
             onClick={() => {
-              console.log('🔗 Ver más soluciones...');
               // Aquí puedes agregar navegación o modal
             }}
           >

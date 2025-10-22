@@ -171,21 +171,7 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
   // Obtener estilos actuales según el tema (CMS o defaults)
   const cardStyles = getCMSCardStyles();
 
-  // 🔍 LOGS DE DEPURACIÓN - Para diagnosticar problemas de configuración
-  useEffect(() => {
-    console.log('🎴 [ValueAddedSection] Datos recibidos:', {
-      hasData: !!data,
-      hasCardsDesign: !!data?.cardsDesign,
-      currentTheme: theme,
-      cardStyles: {
-        cardMinWidth: cardStyles.cardMinWidth,
-        cardMaxWidth: cardStyles.cardMaxWidth,
-        cardsAlignment: cardStyles.cardsAlignment,
-        background: cardStyles.background,
-        titleColor: cardStyles.titleColor
-      }
-    });
-  }, [data, theme, cardStyles]);
+  // (Log de depuración eliminado)
 
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {

@@ -292,6 +292,7 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
                         onImageSelect={(imageUrl) => updateLogo(index, 'imageUrl', imageUrl)}
                         label="Imagen del Logo"
                         description="Selecciona una imagen para este logo"
+                        hideButtonArea={!!logo.imageUrl}
                       />
                       
                       {/* Preview más grande */}

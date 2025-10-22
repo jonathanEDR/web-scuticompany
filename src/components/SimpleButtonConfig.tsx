@@ -89,11 +89,11 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
           </div>
           
           {/* Vista Previa del Botón */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 min-w-0">
             {value.borderColor?.includes('gradient') ? (
               // Botón con borde gradiente - técnica especial
               <div
-                className="px-6 py-2 rounded-full text-sm font-medium relative"
+                className="px-3 py-1.5 rounded-full text-[11px] font-medium relative min-w-0 w-full max-w-[140px] truncate overflow-hidden whitespace-nowrap"
                 style={{
                   background: value.background === 'transparent' 
                     ? `linear-gradient(#1F2937, #1F2937) padding-box, ${value.borderColor} border-box`
@@ -109,7 +109,7 @@ export const SimpleButtonConfig: React.FC<SimpleButtonConfigProps> = ({
             ) : (
               // Botón normal con borde sólido
               <div
-                className="px-6 py-2 rounded-full text-sm font-medium border-2 transition-all"
+                className="px-3 py-1.5 rounded-full text-[11px] font-medium border-2 transition-all min-w-0 w-full max-w-[140px] truncate overflow-hidden whitespace-nowrap"
                 style={{
                   background: value.background || 'transparent',
                   color: value.textColor || '#8B5CF6',

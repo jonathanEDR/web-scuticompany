@@ -82,82 +82,80 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
             🌐 Redes Sociales
           </h4>
           
-          {/* Lista de redes sociales existentes */}
-          <div className="space-y-4 mb-6">
+          {/* Lista de redes sociales existentes - ahora en grid compacto */}
+          <div className="mb-6">
             {socialLinks.length > 0 ? (
-              socialLinks.map((link: SocialLink, index: number) => (
-                <div key={index} className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {socialLinks.map((link: SocialLink, index: number) => (
+                  <div key={index} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-200 dark:border-gray-600 flex flex-col items-center justify-between">
+                    {/* Icono compacto arriba */}
+                    <div className="mb-2 flex flex-col items-center w-full">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                        Icono
+                      </label>
+                      <div className="w-12 h-12 flex items-center justify-center bg-white dark:bg-gray-800 rounded border">
+                        {link.icon ? (
+                          <img 
+                            src={link.icon} 
+                            alt={`Icono ${link.name}`}
+                            className="w-8 h-8 object-contain"
+                          />
+                        ) : (
+                          <span className="text-gray-400 text-2xl">?</span>
+                        )}
+                      </div>
+                      <ManagedImageSelector
+                        currentImage={link.icon}
+                        onImageSelect={(newImage: string) => updateSocialLink(index, 'icon', newImage)}
+                        label="Seleccionar icono para red social"
+                        hideButtonArea={!!link.icon}
+                      />
+                    </div>
+                    {/* Info básica */}
+                    <div className="w-full mt-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                         Nombre
                       </label>
                       <input
                         type="text"
                         value={link.name}
                         onChange={(e) => updateSocialLink(index, 'name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                        className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs"
                         placeholder="facebook, instagram, twitter..."
                       />
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                    <div className="w-full mt-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                         URL
                       </label>
                       <input
                         type="url"
                         value={link.url}
                         onChange={(e) => updateSocialLink(index, 'url', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                        className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs"
                         placeholder="https://facebook.com/..."
                       />
                     </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <label className="flex items-center">
+                    <div className="flex items-center justify-between w-full mt-2">
+                      <label className="flex items-center text-xs">
                         <input
                           type="checkbox"
                           checked={link.enabled}
                           onChange={(e) => updateSocialLink(index, 'enabled', e.target.checked)}
                           className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                         />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">Activo</span>
+                        <span className="ml-2 text-gray-700 dark:text-gray-200">Activo</span>
                       </label>
-                    </div>
-                    
-                    <div className="flex items-end">
                       <button
                         onClick={() => removeSocialLink(index)}
-                        className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm"
+                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-xs"
                       >
                         Eliminar
                       </button>
                     </div>
                   </div>
-                  
-                  {/* Selector de Icono */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                      Icono Personalizado
-                    </label>
-                    <ManagedImageSelector
-                      currentImage={link.icon}
-                      onImageSelect={(newImage: string) => updateSocialLink(index, 'icon', newImage)}
-                      label="Seleccionar icono para red social"
-                    />
-                    {link.icon && (
-                      <div className="mt-2 p-2 bg-white dark:bg-gray-800 rounded border">
-                        <img 
-                          src={link.icon} 
-                          alt={`Icono ${link.name}`}
-                          className="w-8 h-8 object-contain"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
               <div className="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
                 <p className="text-gray-500 dark:text-gray-400 mb-2">
@@ -223,6 +221,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                 currentImage={newSocialLink.icon}
                 onImageSelect={(newImage: string) => setNewSocialLink(prev => ({ ...prev, icon: newImage }))}
                 label="Seleccionar icono"
+                hideButtonArea={!!newSocialLink.icon}
               />
               {newSocialLink.icon && (
                 <div className="mt-2 p-2 bg-white dark:bg-gray-800 rounded border">

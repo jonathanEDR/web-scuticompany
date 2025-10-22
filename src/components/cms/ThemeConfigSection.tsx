@@ -23,9 +23,10 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
         🎨 Configuración de Temas
       </h2>
 
-      <div className="space-y-8">
-        {/* Configuración de Tema Claro */}
-        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-lg border border-yellow-200">
+  {/* Grid responsivo para las tarjetas de tema */}
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8 w-full">
+  {/* Configuración de Tema Claro */}
+  <div className="flex-1 min-w-0 w-full bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-lg border border-yellow-200">
           <div className="flex items-center mb-6">
             <div className="bg-white rounded-full p-3 mr-3 shadow-sm">
               <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,9 +38,9 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
               <p className="text-sm text-gray-600">Configuración de colores para modo día</p>
             </div>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            {/* ...inputs de color y texto... */}
+            <div className="min-w-0">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Color Principal
               </label>
@@ -54,12 +55,11 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   type="text"
                   value={pageData.theme?.lightMode?.primary || '#8B5CF6'}
                   onChange={(e) => updateThemeColor('lightMode', 'primary', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
+                  className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
                   placeholder="#8B5CF6"
                 />
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Color Secundario
@@ -71,16 +71,15 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   onChange={(e) => updateThemeColor('lightMode', 'secondary', e.target.value)}
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
-                <input
-                  type="text"
-                  value={pageData.theme?.lightMode?.secondary || '#06B6D4'}
-                  onChange={(e) => updateThemeColor('lightMode', 'secondary', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
-                  placeholder="#06B6D4"
-                />
+                  <input
+                    type="text"
+                    value={pageData.theme?.lightMode?.secondary || '#06B6D4'}
+                    onChange={(e) => updateThemeColor('lightMode', 'secondary', e.target.value)}
+                    className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
+                    placeholder="#06B6D4"
+                  />
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Color de Fondo
@@ -92,16 +91,15 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   onChange={(e) => updateThemeColor('lightMode', 'background', e.target.value)}
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
-                <input
-                  type="text"
-                  value={pageData.theme?.lightMode?.background || '#FFFFFF'}
-                  onChange={(e) => updateThemeColor('lightMode', 'background', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
-                  placeholder="#FFFFFF"
-                />
+                  <input
+                    type="text"
+                    value={pageData.theme?.lightMode?.background || '#FFFFFF'}
+                    onChange={(e) => updateThemeColor('lightMode', 'background', e.target.value)}
+                    className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
+                    placeholder="#FFFFFF"
+                  />
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Color de Texto
@@ -113,33 +111,33 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   onChange={(e) => updateThemeColor('lightMode', 'text', e.target.value)}
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
-                <input
-                  type="text"
-                  value={pageData.theme?.lightMode?.text || '#1F2937'}
-                  onChange={(e) => updateThemeColor('lightMode', 'text', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
-                  placeholder="#1F2937"
-                />
+                  <input
+                    type="text"
+                    value={pageData.theme?.lightMode?.text || '#1F2937'}
+                    onChange={(e) => updateThemeColor('lightMode', 'text', e.target.value)}
+                    className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
+                    placeholder="#1F2937"
+                  />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Configuración de Tema Oscuro */}
-        <div className="bg-gradient-to-br from-slate-900 to-gray-900 p-6 rounded-lg border border-gray-700">
+  {/* Configuración de Tema Oscuro */}
+  <div className="flex-1 min-w-0 w-full bg-gradient-to-br from-slate-900 to-gray-900 p-6 rounded-lg border border-gray-700">
           <div className="flex items-center mb-6">
             <div className="bg-gray-800 rounded-full p-3 mr-3 shadow-sm">
               <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
             </div>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-xl font-bold text-white">🌙 Tema Oscuro</h3>
               <p className="text-sm text-gray-400">Configuración de colores para modo noche</p>
             </div>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* ...inputs de color y texto... */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Color Principal
@@ -155,13 +153,12 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   type="text"
                   value={pageData.theme?.darkMode?.primary || '#A78BFA'}
                   onChange={(e) => updateThemeColor('darkMode', 'primary', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
+                  className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
                   placeholder="#A78BFA"
                 />
               </div>
             </div>
-
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Color Secundario
               </label>
@@ -176,13 +173,12 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   type="text"
                   value={pageData.theme?.darkMode?.secondary || '#22D3EE'}
                   onChange={(e) => updateThemeColor('darkMode', 'secondary', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
+                  className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
                   placeholder="#22D3EE"
                 />
               </div>
             </div>
-
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Color de Fondo
               </label>
@@ -197,13 +193,12 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   type="text"
                   value={pageData.theme?.darkMode?.background || '#111827'}
                   onChange={(e) => updateThemeColor('darkMode', 'background', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
+                  className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
                   placeholder="#111827"
                 />
               </div>
             </div>
-
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Color de Texto
               </label>
@@ -218,95 +213,97 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                   type="text"
                   value={pageData.theme?.darkMode?.text || '#F9FAFB'}
                   onChange={(e) => updateThemeColor('darkMode', 'text', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
+                  className="w-full min-w-0 flex-1 px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white text-sm"
                   placeholder="#F9FAFB"
                 />
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Configuración de Botones - Tema Claro */}
-        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-lg border border-yellow-200">
-          <div className="flex items-center mb-6">
-            <div className="bg-white rounded-full p-3 mr-3 shadow-sm">
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-              </svg>
+        {/* Configuración de Botones - Tema Claro y Oscuro en fila */}
+  {/* Grid responsivo para las tarjetas de botones */}
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8 mt-8 w-full">
+          {/* Tema Claro */}
+          <div className="flex-1 min-w-0 w-full bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-lg border border-yellow-200 min-w-0">
+            <div className="flex items-center mb-6">
+              <div className="bg-white rounded-full p-3 mr-3 shadow-sm min-w-0">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-800 min-w-0">🔘 Botones (Tema Claro)</h3>
+                <p className="text-sm text-gray-600 min-w-0">Configuración de estilos de botones para modo día</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-800">🔘 Botones (Tema Claro)</h3>
-              <p className="text-sm text-gray-600">Configuración de estilos de botones para modo día</p>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <SimpleButtonConfig
-              title="🎯 Botón Principal CTA"
-              icon="🎯"
-              value={pageData.theme?.lightMode?.buttons?.ctaPrimary || { text: 'Conoce nuestros servicios', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
-              onChange={(style) => updateSimpleButtonStyle('lightMode', 'ctaPrimary', style)}
-            />
-            <SimpleButtonConfig
-              title="📞 Botón Contacto"
-              icon="📞"
-              value={pageData.theme?.lightMode?.buttons?.contact || { text: 'CONTÁCTANOS', background: 'transparent', textColor: '#8B5CF6', borderColor: '#8B5CF6' }}
-              onChange={(style) => updateSimpleButtonStyle('lightMode', 'contact', style)}
-            />
-            <SimpleButtonConfig
-              title="📊 Botón Dashboard"
-              icon="📊"
-              value={pageData.theme?.lightMode?.buttons?.dashboard || { text: 'Ir al Dashboard', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
-              onChange={(style) => updateSimpleButtonStyle('lightMode', 'dashboard', style)}
-            />
-            <SimpleButtonConfig
-              title="👁️ Botón Ver más..."
-              icon="👁️"
-              value={pageData.theme?.lightMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)', textColor: '#FFFFFF', borderColor: 'transparent' }}
-              onChange={(style) => updateSimpleButtonStyle('lightMode', 'viewMore', style)}
-            />
-          </div>
-        </div>
-
-        {/* Configuración de Botones - Tema Oscuro */}
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-lg border border-gray-700">
-          <div className="flex items-center mb-6">
-            <div className="bg-gray-700 rounded-full p-3 mr-3 shadow-sm">
-              <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-100">🔘 Botones (Tema Oscuro)</h3>
-              <p className="text-sm text-gray-300">Configuración de estilos de botones para modo noche</p>
+            <div className="space-y-4">
+              <SimpleButtonConfig
+                title="🎯 Botón Principal CTA"
+                icon="🎯"
+                value={pageData.theme?.lightMode?.buttons?.ctaPrimary || { text: 'Conoce nuestros servicios', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('lightMode', 'ctaPrimary', style)}
+              />
+              <SimpleButtonConfig
+                title="📞 Botón Contacto"
+                icon="📞"
+                value={pageData.theme?.lightMode?.buttons?.contact || { text: 'CONTÁCTANOS', background: 'transparent', textColor: '#8B5CF6', borderColor: '#8B5CF6' }}
+                onChange={(style) => updateSimpleButtonStyle('lightMode', 'contact', style)}
+              />
+              <SimpleButtonConfig
+                title="📊 Botón Dashboard"
+                icon="📊"
+                value={pageData.theme?.lightMode?.buttons?.dashboard || { text: 'Ir al Dashboard', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('lightMode', 'dashboard', style)}
+              />
+              <SimpleButtonConfig
+                title="👁️ Botón Ver más..."
+                icon="👁️"
+                value={pageData.theme?.lightMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)', textColor: '#FFFFFF', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('lightMode', 'viewMore', style)}
+              />
             </div>
           </div>
-          
-          <div className="space-y-4">
-            <SimpleButtonConfig
-              title="🎯 Botón Principal CTA"
-              icon="🎯"
-              value={pageData.theme?.darkMode?.buttons?.ctaPrimary || { text: 'Conoce nuestros servicios', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
-              onChange={(style) => updateSimpleButtonStyle('darkMode', 'ctaPrimary', style)}
-            />
-            <SimpleButtonConfig
-              title="📞 Botón Contacto"
-              icon="📞"
-              value={pageData.theme?.darkMode?.buttons?.contact || { text: 'CONTÁCTANOS', background: 'transparent', textColor: '#A78BFA', borderColor: '#A78BFA' }}
-              onChange={(style) => updateSimpleButtonStyle('darkMode', 'contact', style)}
-            />
-            <SimpleButtonConfig
-              title="📊 Botón Dashboard"
-              icon="📊"
-              value={pageData.theme?.darkMode?.buttons?.dashboard || { text: 'Ir al Dashboard', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
-              onChange={(style) => updateSimpleButtonStyle('darkMode', 'dashboard', style)}
-            />
-            <SimpleButtonConfig
-              title="👁️ Botón Ver más..."
-              icon="👁️"
-              value={pageData.theme?.darkMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%)', textColor: '#111827', borderColor: 'transparent' }}
-              onChange={(style) => updateSimpleButtonStyle('darkMode', 'viewMore', style)}
-            />
+          {/* Tema Oscuro */}
+          <div className="flex-1 min-w-0 w-full bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-lg border border-gray-700 min-w-0">
+            <div className="flex items-center mb-6">
+              <div className="bg-gray-700 rounded-full p-3 mr-3 shadow-sm min-w-0">
+                <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-100 min-w-0">🔘 Botones (Tema Oscuro)</h3>
+                <p className="text-sm text-gray-300 min-w-0">Configuración de estilos de botones para modo noche</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <SimpleButtonConfig
+                title="🎯 Botón Principal CTA"
+                icon="🎯"
+                value={pageData.theme?.darkMode?.buttons?.ctaPrimary || { text: 'Conoce nuestros servicios', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('darkMode', 'ctaPrimary', style)}
+              />
+              <SimpleButtonConfig
+                title="📞 Botón Contacto"
+                icon="📞"
+                value={pageData.theme?.darkMode?.buttons?.contact || { text: 'CONTÁCTANOS', background: 'transparent', textColor: '#A78BFA', borderColor: '#A78BFA' }}
+                onChange={(style) => updateSimpleButtonStyle('darkMode', 'contact', style)}
+              />
+              <SimpleButtonConfig
+                title="📊 Botón Dashboard"
+                icon="📊"
+                value={pageData.theme?.darkMode?.buttons?.dashboard || { text: 'Ir al Dashboard', background: '#8B5CF6', textColor: '#FFFFFF', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('darkMode', 'dashboard', style)}
+              />
+              <SimpleButtonConfig
+                title="👁️ Botón Ver más..."
+                icon="👁️"
+                value={pageData.theme?.darkMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%)', textColor: '#111827', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('darkMode', 'viewMore', style)}
+              />
+            </div>
           </div>
         </div>
 
@@ -327,8 +324,7 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
           </div>
         </div>
       </div>
-    </div>
   );
-};
+}
 
 export default ThemeConfigSection;

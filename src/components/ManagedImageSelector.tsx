@@ -7,6 +7,7 @@ interface ManagedImageSelectorProps {
   label?: string;
   description?: string;
   darkMode?: boolean;
+  hideButtonArea?: boolean;
 }
 
 const ManagedImageSelector: React.FC<ManagedImageSelectorProps> = ({
@@ -14,7 +15,8 @@ const ManagedImageSelector: React.FC<ManagedImageSelectorProps> = ({
   onImageSelect,
   label = 'Imagen',
   description,
-  darkMode = false
+  darkMode = false,
+  hideButtonArea = false
 }) => {
   const [showModal, setShowModal] = useState(false);
 
@@ -50,33 +52,35 @@ const ManagedImageSelector: React.FC<ManagedImageSelectorProps> = ({
       )}
 
       {/* Botón para seleccionar/cambiar imagen */}
-      <div>
-        <button
-          onClick={() => setShowModal(true)}
-          className={`w-full px-4 py-3 border-2 border-dashed rounded-lg transition-all ${
-            darkMode
-              ? 'border-gray-600 hover:border-gray-500 bg-gray-700/50 hover:bg-gray-700 text-gray-300'
-              : 'border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100 text-gray-700'
-          } ${currentImage ? '' : 'min-h-[120px]'} flex flex-col items-center justify-center space-y-2`}
-        >
-          <div className="text-3xl">
-            {currentImage ? '🖼️' : '📁'}
-          </div>
-          <div className="text-center">
-            <p className="font-medium">
-              {currentImage ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
-            </p>
-            {description && (
-              <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {description}
+      {!hideButtonArea && (
+        <div>
+          <button
+            onClick={() => setShowModal(true)}
+            className={`w-full px-4 py-3 border-2 border-dashed rounded-lg transition-all ${
+              darkMode
+                ? 'border-gray-600 hover:border-gray-500 bg-gray-700/50 hover:bg-gray-700 text-gray-300'
+                : 'border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100 text-gray-700'
+            } ${currentImage ? '' : 'min-h-[120px]'} flex flex-col items-center justify-center space-y-2`}
+          >
+            <div className="text-3xl">
+              {currentImage ? '🖼️' : '📁'}
+            </div>
+            <div className="text-center">
+              <p className="font-medium">
+                {currentImage ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
               </p>
-            )}
-            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-              Haz clic para abrir la galería de imágenes
-            </p>
-          </div>
-        </button>
-      </div>
+              {description && (
+                <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {description}
+                </p>
+              )}
+              <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                Haz clic para abrir la galería de imágenes
+              </p>
+            </div>
+          </button>
+        </div>
+      )}
 
       {/* Modal de selección */}
       <ImageSelectorModal

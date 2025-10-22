@@ -204,6 +204,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                           description="Imagen PNG para el modo claro"
                           currentImage={item.iconLight}
                           onImageSelect={(url: string) => updateItem(index, 'iconLight', url)}
+                          hideButtonArea={!!item.iconLight}
                         />
                       </div>
 
@@ -214,6 +215,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                           description="Imagen PNG para el modo oscuro"
                           currentImage={item.iconDark}
                           onImageSelect={(url: string) => updateItem(index, 'iconDark', url)}
+                          hideButtonArea={!!item.iconDark}
                         />
                       </div>
                     </div>

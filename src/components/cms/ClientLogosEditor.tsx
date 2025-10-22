@@ -308,6 +308,7 @@ const ClientLogosEditor: React.FC<ClientLogosEditorProps> = ({
                         onImageSelect={(imageUrl) => updateLogo(index, 'imageUrl', imageUrl)}
                         label="Logo del Cliente"
                         description="Selecciona el logo del cliente. Recomendado: formato PNG con fondo transparente"
+                        hideButtonArea={!!logo.imageUrl}
                       />
                     </div>
                   </div>
