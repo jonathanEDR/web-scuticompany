@@ -210,159 +210,148 @@ const CmsManager: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Header */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 mb-6 border border-gray-100 dark:border-gray-700/50">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-3">
-                🎛️ Gestor de Contenido CMS
-                {hasGlobalChanges && (
-                  <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full animate-pulse">
-                    🟡 Cambios sin guardar
-                  </span>
-                )}
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300">
-                Administra el contenido, SEO y temas de tu página web
-              </p>
+    <div className="min-h-screen w-full">
+      {/* Header */}
+      <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 mb-6 border border-gray-100 dark:border-gray-700/50">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-3">
+              🎛️ Gestor de Contenido CMS
+              {hasGlobalChanges && (
+                <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full animate-pulse">
+                  🟡 Cambios sin guardar
+                </span>
+              )}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              Administra el contenido, SEO y temas de tu página web
+            </p>
+          </div>
+          <div className="flex flex-row flex-wrap items-center gap-3 w-full sm:w-auto">
+            {/* Status Badge */}
+            <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getSaveStatusColor()}`}>
+              {hasGlobalChanges ? '📝 Cambios pendientes' : getSaveStatusText()}
             </div>
-            
-            <div className="flex flex-row flex-wrap items-center gap-3 w-full sm:w-auto">
-              {/* Status Badge */}
-              <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getSaveStatusColor()}`}>
-                {hasGlobalChanges ? '📝 Cambios pendientes' : getSaveStatusText()}
-              </div>
-              {/* Action Button */}
-              <button
-                onClick={handleManualSave}
-                disabled={isLoading || !hasGlobalChanges}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 ${
-                  hasGlobalChanges && !isLoading
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                }`}
-                title={hasGlobalChanges ? 'Guardar cambios pendientes' : 'No hay cambios para guardar'}
-                style={{ minWidth: '120px' }}
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <span>💾</span> Guardar
-                  </>
-                )}
-              </button>
-            </div>
+            {/* Action Button */}
+            <button
+              onClick={handleManualSave}
+              disabled={isLoading || !hasGlobalChanges}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 ${
+                hasGlobalChanges && !isLoading
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              }`}
+              title={hasGlobalChanges ? 'Guardar cambios pendientes' : 'No hay cambios para guardar'}
+              style={{ minWidth: '120px' }}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <span>💾</span> Guardar
+                </>
+              )}
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Tabs Navigation */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 mb-6 border border-gray-100 dark:border-gray-700/50">
-          <div className="flex flex-wrap sm:flex-nowrap overflow-x-auto border-b border-gray-200 dark:border-gray-700 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex-shrink-0 flex-grow px-4 sm:px-6 py-3 sm:py-4 font-medium transition-colors duration-200 flex items-center gap-2 text-base sm:text-lg ${
-                  activeTab === tab.id
-                    ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                }`}
-                style={{ minWidth: '120px' }}
-              >
-                <span className="text-lg">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
+      {/* Tabs Navigation */}
+      <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 mb-6 border border-gray-100 dark:border-gray-700/50">
+        <div className="flex flex-wrap sm:flex-nowrap overflow-x-auto border-b border-gray-200 dark:border-gray-700 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`flex-shrink-0 flex-grow px-4 sm:px-6 py-3 sm:py-4 font-medium transition-colors duration-200 flex items-center gap-2 text-base sm:text-lg ${
+                activeTab === tab.id
+                  ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+              }`}
+              style={{ minWidth: '120px' }}
+            >
+              <span className="text-lg">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="w-full space-y-6">
+        {activeTab === 'content' && (
+          <>
+            <HeroConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+              updateTextStyle={handleUpdateTextStyle}
+            />
+            {/* Configuración General de Soluciones (sin gestión de items) */}
+            <SolutionsConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+              updateTextStyle={handleUpdateTextStyle}
+            />
+            {/* Editor de Tarjetas con Upload de Iconos */}
+            <CardItemsEditor
+              items={pageData.content.solutions.items || []}
+              onUpdate={(updatedItems) => handleUpdateContent('solutions.items', updatedItems)}
+              onSave={handleSave} // Función de save manual
+              className="mt-6"
+            />
+            {/* Configuración General de Valor Agregado */}
+            <ValueAddedConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+              updateTextStyle={handleUpdateTextStyle}
+            />
+            {/* Editor de Tarjetas de Valor Agregado */}
+            <ValueAddedItemsEditor
+              items={pageData.content.valueAdded?.items || []}
+              onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
+              onSave={handleSave} // Función de save manual
+              className="mt-6"
+            />
+            {/* Configuración de Logos de Clientes */}
+            <ClientLogosConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+              updateTextStyle={handleUpdateTextStyle}
+            />
+          </>
+        )}
+        {activeTab === 'cards' && (
+          <div className="space-y-8">
+            {/* 🔥 NUEVO: Configuración Unificada para Solutions y Value Added Cards */}
+            <CardsDesignConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+              setHasGlobalChanges={setHasGlobalChanges} // 🔥 PASAR LA FUNCIÓN
+            />
           </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="space-y-6">
-          {activeTab === 'content' && (
-            <>
-              <HeroConfigSection
-                pageData={pageData}
-                updateContent={handleUpdateContent}
-                updateTextStyle={handleUpdateTextStyle}
-              />
-              {/* Configuración General de Soluciones (sin gestión de items) */}
-              <SolutionsConfigSection
-                pageData={pageData}
-                updateContent={handleUpdateContent}
-                updateTextStyle={handleUpdateTextStyle}
-              />
-              
-              {/* Editor de Tarjetas con Upload de Iconos */}
-              <CardItemsEditor
-                items={pageData.content.solutions.items || []}
-                onUpdate={(updatedItems) => handleUpdateContent('solutions.items', updatedItems)}
-                onSave={handleSave} // Función de save manual
-                className="mt-6"
-              />
-
-              {/* Configuración General de Valor Agregado */}
-              <ValueAddedConfigSection
-                pageData={pageData}
-                updateContent={handleUpdateContent}
-                updateTextStyle={handleUpdateTextStyle}
-              />
-              
-              {/* Editor de Tarjetas de Valor Agregado */}
-              <ValueAddedItemsEditor
-                items={pageData.content.valueAdded?.items || []}
-                onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
-                onSave={handleSave} // Función de save manual
-                className="mt-6"
-              />
-
-              {/* Configuración de Logos de Clientes */}
-              <ClientLogosConfigSection
-                pageData={pageData}
-                updateContent={handleUpdateContent}
-                updateTextStyle={handleUpdateTextStyle}
-              />
-            </>
-          )}
-
-          {activeTab === 'cards' && (
-            <div className="space-y-8">
-              {/* 🔥 NUEVO: Configuración Unificada para Solutions y Value Added Cards */}
-              <CardsDesignConfigSection
-                pageData={pageData}
-                updateContent={handleUpdateContent}
-                setHasGlobalChanges={setHasGlobalChanges} // 🔥 PASAR LA FUNCIÓN
-              />
-            </div>
-          )}
-
-          {activeTab === 'contact' && (
-            <ContactConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-            />
-          )}
-
-          {activeTab === 'seo' && (
-            <SeoConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-            />
-          )}
-
-          {activeTab === 'theme' && (
-            <ThemeConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-              updateSimpleButtonStyle={handleUpdateSimpleButtonStyle}
-            />
-          )}
-        </div>
+        )}
+        {activeTab === 'contact' && (
+          <ContactConfigSection
+            pageData={pageData}
+            updateContent={handleUpdateContent}
+          />
+        )}
+        {activeTab === 'seo' && (
+          <SeoConfigSection
+            pageData={pageData}
+            updateContent={handleUpdateContent}
+          />
+        )}
+        {activeTab === 'theme' && (
+          <ThemeConfigSection
+            pageData={pageData}
+            updateContent={handleUpdateContent}
+            updateSimpleButtonStyle={handleUpdateSimpleButtonStyle}
+          />
+        )}
       </div>
     </div>
   );

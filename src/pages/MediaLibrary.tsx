@@ -176,7 +176,7 @@ const MediaLibrary = () => {
             </div>
 
           {/* Tabs */}
-          <div className="flex space-x-4 mt-4">
+          <div className="flex flex-wrap space-x-4 mt-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
             <button
               onClick={() => setActiveTab('all')}
               className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
@@ -228,7 +228,7 @@ const MediaLibrary = () => {
         {/* Toolbar */}
         {activeTab === 'all' && (
           <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow p-4 mb-6`}>
-            <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center justify-between flex-wrap gap-4 overflow-x-auto min-w-0">
               {/* Búsqueda */}
               <div className="flex items-center space-x-2 flex-1 min-w-[300px]">
                 <input

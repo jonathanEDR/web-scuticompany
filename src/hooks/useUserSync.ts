@@ -53,9 +53,6 @@ export const useUserSync = (): UserSyncStatus => {
       setSyncStatus(prev => ({ ...prev, isLoading: true, isError: false }));
 
       try {
-        console.log('🔄 Sincronizando usuario con backend...');
-        console.log('🔗 API URL:', getApiBaseUrl());
-        
         const userData = {
           clerkId: user.id,
           email: user.primaryEmailAddress?.emailAddress || '',
@@ -64,12 +61,6 @@ export const useUserSync = (): UserSyncStatus => {
           username: user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || '',
           profileImage: user.imageUrl || ''
         };
-
-        console.log('👤 Datos del usuario a sincronizar:', {
-          clerkId: userData.clerkId,
-          email: userData.email,
-          firstName: userData.firstName
-        });
 
         const response = await fetch(`${getApiBaseUrl()}/api/users/sync`, {
           method: 'POST',
@@ -82,9 +73,6 @@ export const useUserSync = (): UserSyncStatus => {
         const result = await response.json();
 
         if (response.ok) {
-          console.log('✅ Usuario sincronizado exitosamente:', result.message);
-          console.log('📊 Es usuario nuevo:', result.user.isNewUser);
-          
           setSyncStatus({
             isLoading: false,
             isSuccess: true,
@@ -93,15 +81,11 @@ export const useUserSync = (): UserSyncStatus => {
             userData: result.user
           });
         } else {
-          console.error('❌ Error en respuesta del servidor:', result.message);
           throw new Error(result.message || 'Error al sincronizar usuario');
         }
 
       } catch (error) {
-        console.error('❌ Error sincronizando usuario:', error);
         const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-        console.error('🔍 Detalles del error:', errorMessage);
-        
         setSyncStatus({
           isLoading: false,
           isSuccess: false,

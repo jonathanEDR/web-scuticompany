@@ -59,46 +59,30 @@ interface ProjectData {
 
 // 🔧 Configuración de API  
 const getApiBaseUrl = () => {
-  console.log('🔍 Detectando configuración de API...');
-  console.log('🌍 VITE_API_URL:', import.meta.env.VITE_API_URL);
-  console.log('🏷️ MODE:', import.meta.env.MODE);
-  console.log('🔗 Current hostname:', window.location.hostname);
-  
   // En producción (Vercel), usar backend de Render
   if (typeof window !== 'undefined' && window.location.hostname === 'web-scuticompany.vercel.app') {
-    console.log('🚀 Detectado entorno de producción - Usando backend de Render');
     return 'https://web-scuticompany-back.onrender.com';
   }
-  
   // Si hay variable de entorno específica, usarla
   if (import.meta.env.VITE_API_URL) {
     const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
-    console.log('✅ Usando VITE_API_URL:', baseUrl);
     return baseUrl;
   }
-  
   // Auto-detección basada en el entorno
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    console.log('🏠 Hostname detectado:', hostname);
-    
     // Si estamos en Vercel (producción)
     if (hostname.includes('vercel.app')) {
       // TEMPORAL: Necesitamos la URL real del backend
       // Por ahora, mostrar error claro
-      console.warn('⚠️ Producción detectada pero backend URL no configurada');
       return 'BACKEND_URL_NOT_CONFIGURED';
     }
-    
     // Si estamos en localhost (desarrollo)
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      console.log('🏠 Desarrollo local detectado');
       return 'http://localhost:5000';
     }
   }
-  
   // Fallback
-  console.log('🔄 Usando fallback localhost');
   return 'http://localhost:5000';
 };
 
@@ -127,19 +111,13 @@ export default function Dashboard() {
     setError('');
     
     try {
-      console.log('🔄 Actualizando datos del dashboard...');
-      console.log('🌐 Backend URL configurada:', API_CONFIG.BASE_URL);
-      console.log('🏠 Hostname actual:', window.location.hostname);
-      
       // Verificar si la URL del backend está configurada
       if (API_CONFIG.BASE_URL === 'BACKEND_URL_NOT_CONFIGURED') {
         throw new Error('Backend URL no configurada para producción. Necesitas configurar VITE_API_URL en las variables de entorno de Vercel.');
       }
-      
       // Crear controller para timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-      
       // Fetch paralelo para mejor performance
       const [backendResponse, projectResponse] = await Promise.all([
         fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DASHBOARD_STATUS}`, {
@@ -151,36 +129,26 @@ export default function Dashboard() {
           headers: { 'Content-Type': 'application/json' }
         })
       ]);
-      
       clearTimeout(timeoutId);
-      
       // Procesar respuesta del backend
       if (!backendResponse.ok) {
         throw new Error(`Error del servidor: ${backendResponse.status} ${backendResponse.statusText}`);
       }
-      
       const backendResult = await backendResponse.json();
       if (backendResult.success && backendResult.data) {
         setBackendData(backendResult.data);
-        console.log('✅ Estado del backend actualizado');
       } else {
         throw new Error(backendResult.message || 'Error en la respuesta del backend');
       }
-
       // Procesar información del proyecto
       if (projectResponse.ok) {
         const projectResult = await projectResponse.json();
         if (projectResult.success && projectResult.data) {
           setProjectData(projectResult.data);
-          console.log('✅ Información del proyecto actualizada');
         }
       }
-
       setLastUpdate(new Date());
-      
     } catch (err) {
-      console.error('❌ Error al obtener datos:', err);
-      
       let errorMessage = 'Error desconocido';
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
@@ -191,7 +159,6 @@ export default function Dashboard() {
           errorMessage = err.message;
         }
       }
-      
       setError(errorMessage);
     } finally {
       setLoading(false);
