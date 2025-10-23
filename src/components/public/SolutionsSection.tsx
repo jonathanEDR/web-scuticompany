@@ -105,11 +105,11 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
     titleColor: '#333333', // Color específico de la maqueta para títulos
     descriptionColor: '#6B7280', // Gris medio más legible
     linkColor: '#7528ee', // Violeta para enlaces
-    cardMinWidth: '200px',
-    cardMaxWidth: '100%',
-    cardMinHeight: 'auto',
-    cardPadding: '2rem',
-    cardsAlignment: 'left',
+    cardMinWidth: '340px',
+    cardMaxWidth: '380px',
+    cardMinHeight: '260px',
+    cardPadding: '1.5rem',
+    cardsAlignment: 'center',
     iconBorderEnabled: false,
     iconAlignment: 'center'
   };
@@ -128,11 +128,11 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
     titleColor: '#ffffff',
     descriptionColor: '#d1d5db',
     linkColor: '#a78bfa',
-    cardMinWidth: '280px',
-    cardMaxWidth: '100%',
-    cardMinHeight: 'auto',
-    cardPadding: '2rem',
-    cardsAlignment: 'left',
+    cardMinWidth: '340px',
+    cardMaxWidth: '380px',
+    cardMinHeight: '260px',
+    cardPadding: '1.5rem',
+    cardsAlignment: 'center',
     iconBorderEnabled: false,
     iconAlignment: 'center'
   };
@@ -422,14 +422,14 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
               {/* Content */}
               <div className="relative">
                 <div
-                  className="text-2xl font-bold mb-4 transition-colors"
+                  className="text-2xl font-bold mb-4 transition-colors text-center"
                   style={{
                     color: cardStyles.titleColor
                   }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.title) }}
                 />
                 <div
-                  className="leading-relaxed transition-colors"
+                  className="leading-relaxed transition-colors text-center"
                   style={{
                     color: cardStyles.descriptionColor
                   }}
