@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Logo from '../Logo';
 import type { PageData } from '../../types/cms';
+import { getCmsApiUrl, logApiCall, testBackendConnection } from '../../utils/apiHelper';
 
 const PublicFooter = () => {
   const navigate = useNavigate();
@@ -12,7 +13,12 @@ const PublicFooter = () => {
       try {
         // 🔥 SOLUCIÓN 1: Agregar timestamp para evitar caché del navegador
         const timestamp = new Date().getTime();
-        const response = await fetch(`/api/cms/pages/home?t=${timestamp}`, {
+        // 🔥 SOLUCIÓN NUEVA: URL correcta para desarrollo y producción
+        const apiUrl = `${getCmsApiUrl('/pages/home')}?t=${timestamp}`;
+        
+        logApiCall(apiUrl, 'Obteniendo datos de página home');
+        
+        const response = await fetch(apiUrl, {
           // 🔥 SOLUCIÓN 2: Deshabilitar caché explícitamente
           cache: 'no-cache',
           headers: {
@@ -29,15 +35,26 @@ const PublicFooter = () => {
             phone: data.content?.contact?.phone,
             email: data.content?.contact?.email,
             socialLinksCount: data.content?.contact?.socialLinks?.length || 0,
-            socialLinks: data.content?.contact?.socialLinks
+            socialLinks: data.content?.contact?.socialLinks,
+            environment: import.meta.env.DEV ? 'development' : 'production',
+            apiUrlUsed: apiUrl
           });
           setPageData(data);
+        } else {
+          console.error('❌ [PublicFooter] Error en respuesta:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: apiUrl
+          });
         }
       } catch (error) {
         console.error('❌ [PublicFooter] Error fetching page data:', error);
       }
     };
 
+    // 🔥 NUEVO: Probar conexión con backend al inicio
+    testBackendConnection();
+    
     fetchPageData();
     
     // 🔥 SOLUCIÓN 3: Recargar datos cada 30 segundos para mantener sincronizado
