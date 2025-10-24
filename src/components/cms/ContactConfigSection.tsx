@@ -17,8 +17,36 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
     icon: '',
     enabled: true
   });
+  const [testingIcons, setTestingIcons] = useState(false);
+  const [iconTestResults, setIconTestResults] = useState<{[key: string]: 'loading' | 'success' | 'error'}>({});
 
   const socialLinks = pageData.content.contact?.socialLinks || [];
+
+  // 🔥 NUEVA FUNCIÓN: Probar si los iconos se pueden cargar
+  const testAllIcons = async () => {
+    setTestingIcons(true);
+    setIconTestResults({});
+    
+    const results: {[key: string]: 'loading' | 'success' | 'error'} = {};
+    
+    for (const link of socialLinks) {
+      if (link.icon) {
+        results[link.name] = 'loading';
+        setIconTestResults({...results});
+        
+        try {
+          const response = await fetch(link.icon, { method: 'HEAD' });
+          results[link.name] = response.ok ? 'success' : 'error';
+        } catch (error) {
+          results[link.name] = 'error';
+        }
+        
+        setIconTestResults({...results});
+      }
+    }
+    
+    setTestingIcons(false);
+  };
 
   const addSocialLink = () => {
     if (newSocialLink.name && newSocialLink.url) {
@@ -136,6 +164,17 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                         placeholder="https://facebook.com/..."
                       />
                     </div>
+                    {/* 🔥 NUEVO: Mostrar URL del icono para debugging */}
+                    {link.icon && (
+                      <div className="w-full mt-2">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                          URL del Icono
+                        </label>
+                        <div className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs break-all text-gray-600 dark:text-gray-400">
+                          {link.icon}
+                        </div>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between w-full mt-2">
                       <label className="flex items-center text-xs">
                         <input
@@ -238,14 +277,50 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
 
         {/* Información de estado */}
         <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
-          <div className="flex items-center mb-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-            <h3 className="font-semibold text-green-800 dark:text-green-200">Estado del Sistema</h3>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+              <h3 className="font-semibold text-green-800 dark:text-green-200">Estado del Sistema</h3>
+            </div>
+            {/* 🔥 NUEVO: Botón para probar iconos */}
+            <button
+              onClick={testAllIcons}
+              disabled={testingIcons || socialLinks.length === 0}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-md text-sm transition-colors flex items-center gap-2"
+            >
+              {testingIcons ? (
+                <>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  Probando...
+                </>
+              ) : (
+                <>🧪 Probar Iconos</>
+              )}
+            </button>
           </div>
           <div className="text-sm text-green-700 dark:text-green-300 space-y-1">
             <p>✅ Redes sociales configuradas: {socialLinks.length}</p>
             <p>✅ Redes sociales activas: {socialLinks.filter(link => link.enabled).length}</p>
             <p>✅ Footer actualizado automáticamente</p>
+            {/* 🔥 NUEVO: Mostrar resultados de pruebas de iconos */}
+            {Object.keys(iconTestResults).length > 0 && (
+              <div className="mt-3 pt-3 border-t border-green-300 dark:border-green-700">
+                <p className="font-semibold mb-2">Resultados de prueba de iconos:</p>
+                {socialLinks.map((link) => {
+                  const status = iconTestResults[link.name];
+                  if (!status || !link.icon) return null;
+                  return (
+                    <div key={link.name} className="flex items-center gap-2 text-xs">
+                      {status === 'loading' && <span>⏳</span>}
+                      {status === 'success' && <span>✅</span>}
+                      {status === 'error' && <span>❌</span>}
+                      <span>{link.name}</span>
+                      {status === 'error' && <span className="text-red-600">(Error al cargar)</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

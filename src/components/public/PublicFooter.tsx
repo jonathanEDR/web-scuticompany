@@ -6,22 +6,48 @@ import type { PageData } from '../../types/cms';
 const PublicFooter = () => {
   const navigate = useNavigate();
   const [pageData, setPageData] = useState<PageData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     const fetchPageData = async () => {
       try {
-        const response = await fetch('/api/cms/pages/home');
+        setIsLoading(true);
+        // 🔥 SOLUCIÓN 1: Agregar timestamp para evitar caché del navegador
+        const timestamp = new Date().getTime();
+        const response = await fetch(`/api/cms/pages/home?t=${timestamp}`, {
+          // 🔥 SOLUCIÓN 2: Deshabilitar caché explícitamente
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        
         if (response.ok) {
           const result = await response.json();
           const data = result.data || result;
+          console.log('📥 [PublicFooter] Datos de contacto recibidos:', {
+            phone: data.content?.contact?.phone,
+            email: data.content?.contact?.email,
+            socialLinksCount: data.content?.contact?.socialLinks?.length || 0,
+            socialLinks: data.content?.contact?.socialLinks
+          });
           setPageData(data);
         }
       } catch (error) {
-        console.error('Error fetching page data:', error);
+        console.error('❌ [PublicFooter] Error fetching page data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPageData();
+    
+    // 🔥 SOLUCIÓN 3: Recargar datos cada 30 segundos para mantener sincronizado
+    const intervalId = setInterval(fetchPageData, 30000);
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   const contactData = pageData?.content?.contact;
@@ -111,27 +137,49 @@ const PublicFooter = () => {
                 {/* Redes sociales dinámicas */}
                 <div className="mt-4">
                   <div className="flex space-x-3">
-                    {contactData?.socialLinks && contactData.socialLinks.filter(link => link.enabled).length > 0 ? (
-                      contactData.socialLinks.filter(link => link.enabled).map((link, index) => (
-                        <a 
-                          key={index}
-                          href={link.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="p-2 bg-gray-800 rounded-lg hover:bg-purple-600 transition-colors group"
-                          title={link.name}
-                        >
-                          {link.icon ? (
-                            <img 
-                              src={link.icon} 
-                              alt={link.name}
-                              className="w-4 h-4 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
-                            />
-                          ) : (
-                            <div className="w-4 h-4 bg-white rounded-sm"></div>
-                          )}
-                        </a>
-                      ))
+                    {/* 🔥 SOLUCIÓN 4: Mejorar validación y logging */}
+                    {contactData?.socialLinks && Array.isArray(contactData.socialLinks) && contactData.socialLinks.length > 0 ? (
+                      <>
+                        {console.log('🌐 [Desktop] Redes sociales disponibles:', contactData.socialLinks)}
+                        {contactData.socialLinks
+                          .filter(link => link && link.enabled)
+                          .map((link, index) => {
+                            console.log(`🔍 [Desktop] Renderizando red social #${index}:`, {
+                              name: link.name,
+                              url: link.url,
+                              icon: link.icon,
+                              enabled: link.enabled
+                            });
+                            return (
+                              <a 
+                                key={`${link.name}-${index}`}
+                                href={link.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="p-2 bg-gray-800 rounded-lg hover:bg-purple-600 transition-colors group"
+                                title={link.name}
+                              >
+                                {link.icon ? (
+                                  <img 
+                                    src={link.icon} 
+                                    alt={link.name}
+                                    className="w-4 h-4 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
+                                    onError={(e) => {
+                                      console.error(`❌ Error cargando icono para ${link.name}:`, link.icon);
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                    onLoad={() => {
+                                      console.log(`✅ Icono cargado exitosamente para ${link.name}`);
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-4 h-4 bg-white rounded-sm" title="Sin icono configurado"></div>
+                                )}
+                              </a>
+                            );
+                          })
+                        }
+                      </>
                     ) : (
                       // Fallback con iconos por defecto si no hay redes sociales configuradas
                       <>
@@ -278,27 +326,49 @@ const PublicFooter = () => {
                     {/* Redes sociales dinámicas */}
                     <div className="mt-4">
                       <div className="flex space-x-3">
-                        {contactData?.socialLinks && contactData.socialLinks.filter(link => link.enabled).length > 0 ? (
-                          contactData.socialLinks.filter(link => link.enabled).map((link, index) => (
-                            <a 
-                              key={index}
-                              href={link.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="p-2 bg-gray-800 rounded-lg hover:bg-purple-600 transition-colors group"
-                              title={link.name}
-                            >
-                              {link.icon ? (
-                                <img 
-                                  src={link.icon} 
-                                  alt={link.name}
-                                  className="w-4 h-4 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
-                                />
-                              ) : (
-                                <div className="w-4 h-4 bg-white rounded-sm"></div>
-                              )}
-                            </a>
-                          ))
+                        {/* 🔥 SOLUCIÓN 5: Mejorar validación y logging para móvil */}
+                        {contactData?.socialLinks && Array.isArray(contactData.socialLinks) && contactData.socialLinks.length > 0 ? (
+                          <>
+                            {console.log('🌐 [Móvil] Redes sociales disponibles:', contactData.socialLinks)}
+                            {contactData.socialLinks
+                              .filter(link => link && link.enabled)
+                              .map((link, index) => {
+                                console.log(`🔍 [Móvil] Renderizando red social #${index}:`, {
+                                  name: link.name,
+                                  url: link.url,
+                                  icon: link.icon,
+                                  enabled: link.enabled
+                                });
+                                return (
+                                  <a 
+                                    key={`${link.name}-mobile-${index}`}
+                                    href={link.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="p-2 bg-gray-800 rounded-lg hover:bg-purple-600 transition-colors group"
+                                    title={link.name}
+                                  >
+                                    {link.icon ? (
+                                      <img 
+                                        src={link.icon} 
+                                        alt={link.name}
+                                        className="w-4 h-4 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
+                                        onError={(e) => {
+                                          console.error(`❌ Error cargando icono para ${link.name}:`, link.icon);
+                                          e.currentTarget.style.display = 'none';
+                                        }}
+                                        onLoad={() => {
+                                          console.log(`✅ Icono cargado exitosamente para ${link.name}`);
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-4 h-4 bg-white rounded-sm" title="Sin icono configurado"></div>
+                                    )}
+                                  </a>
+                                );
+                              })
+                            }
+                          </>
                         ) : (
                           // Fallback con iconos por defecto si no hay redes sociales configuradas
                           <>
