@@ -18,15 +18,10 @@ const PublicFooter = () => {
         
         logApiCall(apiUrl, 'Obteniendo datos de página home');
         
-        const response = await fetch(apiUrl, {
-          // 🔥 SOLUCIÓN 2: Deshabilitar caché explícitamente
-          cache: 'no-cache',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
+        console.log('🔍 [DEBUG] URL exacta generada:', apiUrl);
+        console.log('🔍 [DEBUG] Realizando fetch sin headers especiales...');
+        
+        const response = await fetch(apiUrl);
         
         if (response.ok) {
           const result = await response.json();
