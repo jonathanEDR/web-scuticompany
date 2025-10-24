@@ -242,6 +242,11 @@ export interface SocialLink {
 export interface ContactContent {
   phone: string;
   email: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  businessHours?: string;
+  description?: string;
   socialLinks: SocialLink[];
 }
 

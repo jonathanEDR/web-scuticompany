@@ -76,9 +76,39 @@ const PublicFooter = () => {
         <div className="space-y-8 lg:space-y-0">
           {/* Layout Desktop: Todo en una fila horizontal */}
           <div className="hidden lg:flex lg:items-start lg:justify-between lg:gap-12">
-            {/* Logo */}
-            <div className="flex-shrink-0">
-              <Logo size="lg" withText variant="white" />
+            {/* Logo y Descripción de la Empresa */}
+            <div className="flex-shrink-0 max-w-sm">
+              <div className="mb-4">
+                <Logo size="lg" withText variant="white" />
+              </div>
+              {/* 🆕 Descripción de la empresa */}
+              {contactData?.description && (
+                <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                  {contactData.description}
+                </p>
+              )}
+              
+              {/* 🆕 Información estructurada (Schema.org) */}
+              <div 
+                itemScope 
+                itemType="https://schema.org/Organization"
+                className="hidden"
+              >
+                <meta itemProp="name" content="SCUTI Company" />
+                <meta itemProp="url" content="https://web-scuticompany.vercel.app" />
+                <meta itemProp="email" content={contactData?.email || 'gscutic@gmail.com'} />
+                <meta itemProp="telephone" content={contactData?.phone || '+51 973 397 306'} />
+                {contactData?.address && (
+                  <div itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                    <meta itemProp="streetAddress" content={contactData.address} />
+                    <meta itemProp="addressLocality" content={contactData?.city || 'Lima'} />
+                    <meta itemProp="addressRegion" content={contactData?.country || 'Perú'} />
+                  </div>
+                )}
+                {contactData?.businessHours && (
+                  <meta itemProp="openingHours" content="Mo-Fr 09:00-18:00" />
+                )}
+              </div>
             </div>
 
             {/* Soluciones */}
@@ -126,12 +156,30 @@ const PublicFooter = () => {
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-4">Contáctanos</h3>
               <div className="space-y-3 text-sm">
+                {/* 🆕 Dirección */}
+                {(contactData?.address || contactData?.city) && (
+                  <div className="flex items-start space-x-2 text-gray-200">
+                    <svg className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <div>
+                      {contactData?.address && <div>{contactData.address}</div>}
+                      <div>
+                        {contactData?.city || 'Lima'}, {contactData?.country || 'Perú'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Teléfono */}
                 <div className="flex items-center space-x-2 text-gray-200">
                   <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <span>{contactData?.phone || '+51 973 397 306'}</span>
+                  <a href={`tel:${contactData?.phone || '+51973397306'}`} className="hover:text-purple-400 transition-colors">
+                    {contactData?.phone || '+51 973 397 306'}
+                  </a>
                 </div>
                 
                 {/* Email */}
@@ -139,8 +187,23 @@ const PublicFooter = () => {
                   <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <span>{contactData?.email || 'gscutic@gmail.com'}</span>
+                  <a href={`mailto:${contactData?.email || 'gscutic@gmail.com'}`} className="hover:text-purple-400 transition-colors">
+                    {contactData?.email || 'gscutic@gmail.com'}
+                  </a>
                 </div>
+
+                {/* 🆕 Horario de atención */}
+                {contactData?.businessHours && (
+                  <div className="flex items-start space-x-2 text-gray-200">
+                    <svg className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <div className="font-medium text-white text-xs">Horario de Atención</div>
+                      <div>{contactData.businessHours}</div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Redes sociales dinámicas */}
                 <div className="mt-4">
@@ -240,9 +303,17 @@ const PublicFooter = () => {
 
           {/* Layout Móvil/Tablet: Mantenemos el diseño original */}
           <div className="lg:hidden space-y-8">
-            {/* Brand - Centrado en móvil */}
-            <div className="flex justify-center md:justify-start">
-              <Logo size="lg" withText variant="white" />
+            {/* Brand y Descripción - Centrado en móvil */}
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
+              <div className="mb-4">
+                <Logo size="lg" withText variant="white" />
+              </div>
+              {/* 🆕 Descripción para móvil */}
+              {contactData?.description && (
+                <p className="text-gray-300 text-sm leading-relaxed max-w-md">
+                  {contactData.description}
+                </p>
+              )}
             </div>
 
             {/* Contenido principal - Grid responsive */}
@@ -315,12 +386,30 @@ const PublicFooter = () => {
                 <div>
                   <h3 className="text-white font-semibold mb-4">Contáctanos</h3>
                   <div className="space-y-3 text-sm">
+                    {/* 🆕 Dirección para móvil */}
+                    {(contactData?.address || contactData?.city) && (
+                      <div className="flex items-start space-x-2 text-gray-200">
+                        <svg className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <div>
+                          {contactData?.address && <div>{contactData.address}</div>}
+                          <div>
+                            {contactData?.city || 'Lima'}, {contactData?.country || 'Perú'}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* Teléfono */}
                     <div className="flex items-center space-x-2 text-gray-200">
                       <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
-                      <span>{contactData?.phone || '+51 973 397 306'}</span>
+                      <a href={`tel:${contactData?.phone || '+51973397306'}`} className="hover:text-purple-400 transition-colors">
+                        {contactData?.phone || '+51 973 397 306'}
+                      </a>
                     </div>
                     
                     {/* Email */}
@@ -328,8 +417,23 @@ const PublicFooter = () => {
                       <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span>{contactData?.email || 'corpocomunicados@gmail.com'}</span>
+                      <a href={`mailto:${contactData?.email || 'gscutic@gmail.com'}`} className="hover:text-purple-400 transition-colors">
+                        {contactData?.email || 'gscutic@gmail.com'}
+                      </a>
                     </div>
+
+                    {/* 🆕 Horario de atención para móvil */}
+                    {contactData?.businessHours && (
+                      <div className="flex items-start space-x-2 text-gray-200">
+                        <svg className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <div className="font-medium text-white text-xs">Horario de Atención</div>
+                          <div>{contactData.businessHours}</div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Redes sociales dinámicas */}
                     <div className="mt-4">
@@ -413,17 +517,42 @@ const PublicFooter = () => {
 
      
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-gray-800 flex justify-center items-center bg-black/90 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-8">
-          <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} Scuti Company. Todos los derechos reservados.
-          </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link to="/privacidad" className="text-gray-400 hover:text-purple-400 transition-colors text-sm">
-              Política de Privacidad
-            </Link>
-            <Link to="/terminos" className="text-gray-400 hover:text-purple-400 transition-colors text-sm">
-              Términos de Servicio
-            </Link>
+        <div className="mt-12 pt-8 border-t border-gray-800 bg-black/90 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            {/* Copyright */}
+            <p className="text-gray-400 text-sm">
+              © {new Date().getFullYear()} Scuti Company. Todos los derechos reservados.
+            </p>
+            
+            {/* Enlaces legales */}
+            <div className="flex flex-wrap justify-center space-x-6 text-sm">
+              <Link to="/privacidad" className="text-gray-400 hover:text-purple-400 transition-colors">
+                Política de Privacidad
+              </Link>
+              <Link to="/terminos" className="text-gray-400 hover:text-purple-400 transition-colors">
+                Términos de Servicio
+              </Link>
+              <a href="/sitemap.xml" className="text-gray-400 hover:text-purple-400 transition-colors">
+                Sitemap
+              </a>
+            </div>
+
+            {/* 🆕 Badges de confianza */}
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1 text-green-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span className="text-xs">SSL Seguro</span>
+              </div>
+              
+              <div className="flex items-center space-x-1 text-blue-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className="text-xs">Desarrollo Rápido</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

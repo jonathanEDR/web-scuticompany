@@ -76,30 +76,102 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
       
       <div className="space-y-6">
         {/* Información de Contacto Básica */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Número de Teléfono
+              </label>
+              <input
+                type="text"
+                value={pageData.content.contact?.phone || ''}
+                onChange={(e) => updateContent('contact.phone', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="+51 973 397 306"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Correo Electrónico
+              </label>
+              <input
+                type="email"
+                value={pageData.content.contact?.email || ''}
+                onChange={(e) => updateContent('contact.email', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="gscutic@gmail.com"
+              />
+            </div>
+          </div>
+
+          {/* 🆕 Descripción de la empresa */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-              Número de Teléfono
+              📖 Descripción de la Empresa
+            </label>
+            <textarea
+              rows={3}
+              value={pageData.content.contact?.description || ''}
+              onChange={(e) => updateContent('contact.description', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              placeholder="Empresa líder en desarrollo de software en Perú. Creamos soluciones digitales..."
+            />
+          </div>
+
+          {/* 🆕 Ubicación */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                📍 Dirección
+              </label>
+              <input
+                type="text"
+                value={pageData.content.contact?.address || ''}
+                onChange={(e) => updateContent('contact.address', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Av. Principal 123"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                🏙️ Ciudad
+              </label>
+              <input
+                type="text"
+                value={pageData.content.contact?.city || ''}
+                onChange={(e) => updateContent('contact.city', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Lima"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                🌎 País
+              </label>
+              <input
+                type="text"
+                value={pageData.content.contact?.country || ''}
+                onChange={(e) => updateContent('contact.country', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Perú"
+              />
+            </div>
+          </div>
+
+          {/* 🆕 Horario de atención */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              🕒 Horario de Atención
             </label>
             <input
               type="text"
-              value={pageData.content.contact?.phone || ''}
-              onChange={(e) => updateContent('contact.phone', e.target.value)}
+              value={pageData.content.contact?.businessHours || ''}
+              onChange={(e) => updateContent('contact.businessHours', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder="+51 973 397 306"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              value={pageData.content.contact?.email || ''}
-              onChange={(e) => updateContent('contact.email', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder="corpocomunicados@gmail.com"
+              placeholder="Lunes a Viernes: 9:00 AM - 6:00 PM"
             />
           </div>
         </div>
