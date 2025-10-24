@@ -6,12 +6,10 @@ import type { PageData } from '../../types/cms';
 const PublicFooter = () => {
   const navigate = useNavigate();
   const [pageData, setPageData] = useState<PageData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     const fetchPageData = async () => {
       try {
-        setIsLoading(true);
         // 🔥 SOLUCIÓN 1: Agregar timestamp para evitar caché del navegador
         const timestamp = new Date().getTime();
         const response = await fetch(`/api/cms/pages/home?t=${timestamp}`, {
@@ -37,8 +35,6 @@ const PublicFooter = () => {
         }
       } catch (error) {
         console.error('❌ [PublicFooter] Error fetching page data:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
