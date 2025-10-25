@@ -15,6 +15,7 @@ import './App.css';
 const Home = lazy(() => import('./pages/public/Home'));
 const About = lazy(() => import('./pages/public/About'));
 const ServicesPublic = lazy(() => import('./pages/public/ServicesPublic'));
+const Contact = lazy(() => import('./pages/public/Contact'));
 
 // Páginas de autenticación - CON Clerk optimizado
 const Login = lazy(() => import('./pages/auth/Login'));
@@ -72,6 +73,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/nosotros" element={<About />} />
               <Route path="/servicios" element={<ServicesPublic />} />
+              <Route path="/contacto" element={<Contact />} />
               
               {/* 🔐 RUTAS DE AUTENTICACIÓN - Clerk con diseño optimizado */}
               <Route path="/login" element={

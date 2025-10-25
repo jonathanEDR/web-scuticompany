@@ -88,6 +88,39 @@ export interface DefaultValueAddedConfig {
   };
 }
 
+export interface DefaultContactConfig {
+  title: string;
+  subtitle: string;
+  description: string;
+  fields: {
+    nombre: {
+      label: string;
+      placeholder: string;
+    };
+    celular: {
+      label: string;
+      placeholder: string;
+    };
+    correo: {
+      label: string;
+      placeholder: string;
+    };
+    mensaje: {
+      label: string;
+      placeholder: string;
+    };
+  };
+  submitButton: {
+    text: string;
+    loadingText: string;
+  };
+  termsText: string;
+  successMessage: string;
+  errorMessage: string;
+  backgroundImage?: DefaultImageConfig;
+  backgroundImageAlt?: string;
+}
+
 export interface DefaultThemeConfig {
   colors: {
     primary: string;
@@ -121,6 +154,11 @@ export const getSolutionsBackgroundImages = (): DefaultImageConfig => ({
 export const getValueAddedBackgroundImages = (): DefaultImageConfig => ({
   light: '/11.webp',   // Imagen 11 para tema claro
   dark: '/3.webp'      // Imagen 3 para tema oscuro
+});
+
+export const getContactBackgroundImages = (): DefaultImageConfig => ({
+  light: '/12.webp',   // Imagen 12 para tema claro
+  dark: '/4.webp'      // Imagen 4 para tema oscuro
 });
 
 // Configuración predeterminada para Hero Section
@@ -225,6 +263,40 @@ export const DEFAULT_VALUE_ADDED_CONFIG: DefaultValueAddedConfig = {
   ]
 };
 
+// Configuración predeterminada para Contact Form
+export const DEFAULT_CONTACT_CONFIG: DefaultContactConfig = {
+  title: 'Contáctanos',
+  subtitle: 'Escríbenos',
+  description: 'Déjanos tus datos y nos pondremos en contacto contigo para brindarte la mejor asesoría.',
+  fields: {
+    nombre: {
+      label: 'Nombre completo',
+      placeholder: 'Ingresa tu nombre completo'
+    },
+    celular: {
+      label: 'Número de celular',
+      placeholder: 'Ingresa tu número de celular'
+    },
+    correo: {
+      label: 'Correo electrónico',
+      placeholder: 'Ingresa tu correo electrónico'
+    },
+    mensaje: {
+      label: 'Mensaje',
+      placeholder: 'Escribe tu mensaje aquí...'
+    }
+  },
+  submitButton: {
+    text: 'Enviar mensaje',
+    loadingText: 'Enviando...'
+  },
+  termsText: 'Al enviar este formulario, acepto los términos y condiciones de privacidad.',
+  successMessage: '¡Mensaje enviado exitosamente! Nos pondremos en contacto contigo pronto.',
+  errorMessage: 'Error al enviar el mensaje. Por favor, inténtalo nuevamente.',
+  backgroundImage: getContactBackgroundImages(),
+  backgroundImageAlt: 'Fondo de contacto Scuti Company'
+};
+
 // Configuración predeterminada de tema
 export const DEFAULT_THEME_CONFIG: DefaultThemeConfig = {
   colors: {
@@ -270,5 +342,6 @@ export const DEFAULT_PAGE_CONFIG = {
   hero: DEFAULT_HERO_CONFIG,
   solutions: DEFAULT_SOLUTIONS_CONFIG,
   valueAdded: DEFAULT_VALUE_ADDED_CONFIG,
+  contactForm: DEFAULT_CONTACT_CONFIG,
   theme: DEFAULT_THEME_CONFIG
 };

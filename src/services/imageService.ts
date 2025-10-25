@@ -135,8 +135,26 @@ export const uploadImage = async (options: UploadImageOptions): Promise<ImageDat
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Error al subir imagen' }));
-    throw new Error(error.message || `Error ${response.status}`);
+    let errorMessage = `Error ${response.status}`;
+    
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorData.error || errorMessage;
+      console.error('🔍 Upload Error Details:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorData,
+        url: `${API_URL}/upload/image`
+      });
+    } catch (parseError) {
+      console.error('🔍 Upload Error (failed to parse):', {
+        status: response.status,
+        statusText: response.statusText,
+        url: `${API_URL}/upload/image`
+      });
+    }
+    
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();

@@ -252,6 +252,43 @@ export interface ContactContent {
   socialLinks: SocialLink[];
 }
 
+export interface ContactFormContent {
+  title: string;
+  subtitle: string;
+  description: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
+  };
+  backgroundImageAlt?: string;
+  fields?: {
+    nombreLabel?: string;
+    nombrePlaceholder?: string;
+    nombreRequired?: boolean;
+    celularLabel?: string;
+    celularPlaceholder?: string;
+    celularRequired?: boolean;
+    correoLabel?: string;
+    correoPlaceholder?: string;
+    correoRequired?: boolean;
+    mensajeLabel?: string;
+    mensajePlaceholder?: string;
+    mensajeRequired?: boolean;
+    mensajeRows?: number;
+    termsText?: string;
+    termsLink?: string;
+    termsRequired?: boolean;
+  };
+  button?: {
+    text?: string;
+    loadingText?: string;
+  };
+  messages?: {
+    success?: string;
+    error?: string;
+  };
+}
+
 export interface PageSection {
   type: 'text' | 'image' | 'grid' | 'cta';
   title?: string;
@@ -265,6 +302,7 @@ export interface PageContent {
   valueAdded?: ValueAddedContent;
   clientLogos?: ClientLogosContent;
   contact?: ContactContent;
+  contactForm?: ContactFormContent;
   sections?: PageSection[];
 }
 

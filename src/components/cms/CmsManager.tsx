@@ -12,6 +12,7 @@ import SeoConfigSection from './SeoConfigSection';
 import ThemeConfigSection from './ThemeConfigSection';
 import CardsDesignConfigSection from './CardsDesignConfigSection';
 import ContactConfigSection from './ContactConfigSection';
+import ContactFormEditor from './ContactFormEditor';
 
 const CmsManager: React.FC = () => {
   const navigate = useNavigate();
@@ -397,10 +398,16 @@ const CmsManager: React.FC = () => {
           </div>
         )}
         {activeTab === 'contact' && (
-          <ContactConfigSection
-            pageData={pageData}
-            updateContent={handleUpdateContent}
-          />
+          <div className="space-y-8">
+            <ContactConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+            />
+            <ContactFormEditor
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+            />
+          </div>
         )}
         {activeTab === 'seo' && (
           <SeoConfigSection

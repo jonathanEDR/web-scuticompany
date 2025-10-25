@@ -49,6 +49,42 @@ export interface UseDefaultPageDataReturn {
       gradient: string;
     }>;
   };
+  contactFormData: {
+    title: string;
+    subtitle: string;
+    description: string;
+    backgroundImage?: {
+      light?: string;
+      dark?: string;
+    };
+    backgroundImageAlt?: string;
+    fields?: {
+      nombreLabel?: string;
+      nombrePlaceholder?: string;
+      nombreRequired?: boolean;
+      celularLabel?: string;
+      celularPlaceholder?: string;
+      celularRequired?: boolean;
+      correoLabel?: string;
+      correoPlaceholder?: string;
+      correoRequired?: boolean;
+      mensajeLabel?: string;
+      mensajePlaceholder?: string;
+      mensajeRequired?: boolean;
+      mensajeRows?: number;
+      termsText?: string;
+      termsLink?: string;
+      termsRequired?: boolean;
+    };
+    button?: {
+      text?: string;
+      loadingText?: string;
+    };
+    messages?: {
+      success?: string;
+      error?: string;
+    };
+  };
   currentBackgroundImageHero: string;
   currentBackgroundImageSolutions: string;
   loading: boolean;
@@ -84,6 +120,44 @@ export const useDefaultPageData = (): UseDefaultPageDataReturn => {
     }))
   };
 
+  // Datos Contact Form con configuración predeterminada
+  const contactFormData = {
+    title: DEFAULT_PAGE_CONFIG.contactForm.title,
+    subtitle: DEFAULT_PAGE_CONFIG.contactForm.subtitle,
+    description: DEFAULT_PAGE_CONFIG.contactForm.description,
+    backgroundImage: DEFAULT_PAGE_CONFIG.contactForm.backgroundImage ? {
+      light: DEFAULT_PAGE_CONFIG.contactForm.backgroundImage.light,
+      dark: DEFAULT_PAGE_CONFIG.contactForm.backgroundImage.dark
+    } : undefined,
+    backgroundImageAlt: DEFAULT_PAGE_CONFIG.contactForm.backgroundImageAlt,
+    fields: {
+      nombreLabel: 'Nombre',
+      nombrePlaceholder: 'Tu nombre completo',
+      nombreRequired: true,
+      celularLabel: 'Celular / Teléfono',
+      celularPlaceholder: '+51 999 999 999',
+      celularRequired: true,
+      correoLabel: 'Correo Electrónico',
+      correoPlaceholder: 'tu@email.com',
+      correoRequired: true,
+      mensajeLabel: 'Cuéntanos sobre tu proyecto',
+      mensajePlaceholder: 'Describe tu proyecto, necesidades o consulta...',
+      mensajeRequired: true,
+      mensajeRows: 5,
+      termsText: 'Acepto la Política de Privacidad y Términos de Servicio',
+      termsLink: '/terminos',
+      termsRequired: true,
+    },
+    button: {
+      text: 'ENVIAR',
+      loadingText: 'Enviando...',
+    },
+    messages: {
+      success: '¡Gracias por contactarnos! Te responderemos pronto.',
+      error: 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.',
+    },
+  };
+
   // Obtener imágenes según tema actual con fallback
   const currentBackgroundImageHero = getImageWithFallback(1, 'hero', theme as 'light' | 'dark');
   const currentBackgroundImageSolutions = getImageWithFallback(2, 'solutions', theme as 'light' | 'dark');
@@ -100,6 +174,7 @@ export const useDefaultPageData = (): UseDefaultPageDataReturn => {
   return {
     heroData,
     solutionsData,
+    contactFormData,
     currentBackgroundImageHero,
     currentBackgroundImageSolutions,
     loading

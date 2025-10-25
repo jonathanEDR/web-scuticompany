@@ -4,11 +4,12 @@ import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import ValueAddedSection from '../../components/public/ValueAddedSection';
 import ClientLogosSection from '../../components/public/ClientLogosSection';
+import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import { getPageBySlug, clearCache, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSeo } from '../../hooks/useSeo';
-import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG } from '../../utils/defaultConfig';
+import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 import type { ClientLogosContent } from '../../types/cms';
 
@@ -85,6 +86,7 @@ interface PageData {
       }>;
     };
     clientLogos?: ClientLogosContent;
+    contactForm?: any;
   };
   seo: {
     metaTitle: string;
@@ -102,7 +104,8 @@ const DEFAULT_PAGE_DATA: PageData = {
   content: {
     hero: DEFAULT_HERO_CONFIG,
     solutions: DEFAULT_SOLUTIONS_CONFIG,
-    valueAdded: DEFAULT_VALUE_ADDED_CONFIG
+    valueAdded: DEFAULT_VALUE_ADDED_CONFIG,
+    contactForm: DEFAULT_CONTACT_CONFIG
   },
   seo: {
     metaTitle: 'Scuti Company - Transformamos tu empresa con tecnología inteligente',
@@ -185,6 +188,8 @@ const HomeOptimized = () => {
       
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
+        // Datos del CMS cargados correctamente
+        
         // ⚠️ IMPORTANTE: Eliminar datos de SEO para evitar conflictos con useSeo hook
         const dataWithoutSeo = {
           ...data,
@@ -235,6 +240,10 @@ const HomeOptimized = () => {
           />
           <ClientLogosSection 
             data={pageData.content.clientLogos}
+          />
+
+          <ContactSection 
+            data={pageData.content.contactForm}
           />
         </main>
         <PublicFooter />

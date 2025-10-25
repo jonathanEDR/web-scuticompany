@@ -95,7 +95,25 @@ const ImageSelectorModal: React.FC<ImageSelectorModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Error al subir imagen');
+      
+      // Mejor manejo de errores
+      let errorMessage = 'Error desconocido al subir imagen';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
+      // Mostrar error específico
+      if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+        alert('Error de autenticación. Por favor, recarga la página e intenta nuevamente.');
+      } else if (errorMessage.includes('413') || errorMessage.includes('too large')) {
+        alert('El archivo es demasiado grande. Por favor, selecciona una imagen más pequeña.');
+      } else if (errorMessage.includes('415') || errorMessage.includes('format')) {
+        alert('Formato de archivo no soportado. Usa JPG, PNG o WebP.');
+      } else {
+        alert(`Error al subir imagen: ${errorMessage}`);
+      }
     } finally {
       setUploading(false);
     }

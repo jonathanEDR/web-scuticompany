@@ -82,7 +82,6 @@ export const CrmStats: React.FC = () => {
 
   // Convertir stats a formato fácil de usar
   const estadoPorNombre = stats ? arrayToObject(stats.porEstado) : {};
-  const prioridadPorNombre = stats ? arrayToObject(stats.porPrioridad) : {};
 
   // ========================================
   // 🎨 RENDERIZADO
