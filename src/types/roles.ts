@@ -414,17 +414,39 @@ export function isAdmin(role: UserRole): boolean {
 }
 
 /**
- * Verifica si el usuario puede acceder al dashboard administrativo
+ * Normaliza un rol a formato estándar (UPPERCASE)
+ * @param role - Rol a normalizar
+ * @returns Rol normalizado o null si es inválido
  */
-export function canAccessAdminDashboard(role: UserRole): boolean {
-  const adminRoles: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR];
-  return adminRoles.includes(role);
+export function normalizeRole(role: any): UserRole | null {
+  if (!role || typeof role !== 'string') {
+    return null;
+  }
+
+  const normalized = role.toUpperCase().trim() as UserRole;
+  const validRoles = Object.values(UserRole);
+  
+  return validRoles.includes(normalized) ? normalized : null;
 }
 
 /**
- * Verifica si el usuario debe usar el dashboard de cliente
+ * Verifica si el usuario puede acceder al dashboard administrativo (case-insensitive)
  */
-export function shouldUseClientDashboard(role: UserRole): boolean {
+export function canAccessAdminDashboard(role: UserRole | string): boolean {
+  const normalizedRole = normalizeRole(role);
+  if (!normalizedRole) return false;
+
+  const adminRoles: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR];
+  return adminRoles.includes(normalizedRole);
+}
+
+/**
+ * Verifica si el usuario debe usar el dashboard de cliente (case-insensitive)
+ */
+export function shouldUseClientDashboard(role: UserRole | string): boolean {
+  const normalizedRole = normalizeRole(role);
+  if (!normalizedRole) return false;
+
   const clientRoles: UserRole[] = [UserRole.USER, UserRole.CLIENT];
-  return clientRoles.includes(role);
+  return clientRoles.includes(normalizedRole);
 }
