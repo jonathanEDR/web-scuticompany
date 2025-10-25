@@ -1,4 +1,4 @@
-import DashboardLayout from '../components/DashboardLayout';
+import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import { Card, Button, Alert } from '../components/UI';
 import { useState } from 'react';
 
@@ -13,7 +13,7 @@ export default function Settings() {
   const [language, setLanguage] = useState('es');
 
   return (
-    <DashboardLayout>
+    <SmartDashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div>
@@ -245,6 +245,6 @@ export default function Settings() {
           </Button>
         </div>
       </div>
-    </DashboardLayout>
+    </SmartDashboardLayout>
   );
 }

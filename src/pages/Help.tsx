@@ -1,4 +1,4 @@
-import DashboardLayout from '../components/DashboardLayout';
+import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import { Card, Button } from '../components/UI';
 
 export default function Help() {
@@ -49,7 +49,7 @@ export default function Help() {
   ];
 
   return (
-    <DashboardLayout>
+    <SmartDashboardLayout>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -242,6 +242,6 @@ export default function Help() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </SmartDashboardLayout>
   );
 }

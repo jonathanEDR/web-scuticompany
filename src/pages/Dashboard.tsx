@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SignedIn, useUser } from '@clerk/clerk-react';
-import DashboardLayout from '../components/DashboardLayout';
+import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import { Button, LoadingSpinner } from '../components/UI';
 import { useUserSync } from '../hooks/useUserSync';
 import { useSeo } from '../hooks/useSeo';
@@ -189,7 +189,7 @@ export default function Dashboard() {
       {/* 🎯 SEO Dinámico */}
       <SeoHelmet />
       
-      <DashboardLayout>
+      <SmartDashboardLayout>
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 mb-8 text-white">
           <h1 className="text-3xl font-bold mb-2">
@@ -508,7 +508,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </DashboardLayout>
+      </SmartDashboardLayout>
     </SignedIn>
   );
 }

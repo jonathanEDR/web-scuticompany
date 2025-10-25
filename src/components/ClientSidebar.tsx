@@ -1,11 +1,15 @@
+/**
+ * 🏠 Sidebar Simplificado para Clientes
+ * Sidebar minimalista para USER y CLIENT con opciones básicas
+ */
+
 import { SignOutButton } from '@clerk/clerk-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
-import { UserRole, Permission } from '../types/roles';
 import RoleBadge from './RoleBadge';
 
-interface SidebarProps {
+interface ClientSidebarProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
@@ -15,107 +19,28 @@ interface MenuItem {
   icon: string;
   path: string;
   description: string;
-  // Control de acceso
-  roles?: UserRole[]; // Roles que pueden ver este item (si está vacío, todos lo ven)
-  permission?: Permission; // Permiso específico requerido
-  adminOnly?: boolean; // Solo para ADMIN, MODERATOR, SUPER_ADMIN
 }
 
-export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
+export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, role, hasPermission, canAccessAdmin, shouldUseClientDashboard: isClientUser } = useAuth();
+  const { user, role } = useAuth();
 
-  // Definir items del menú con control de acceso
+  // Menú simplificado solo para USER y CLIENT
   const menuItems: MenuItem[] = [
     {
       name: 'Dashboard',
       icon: '🏠',
-      path: isClientUser ? '/dashboard/client' : '/dashboard/admin',
-      description: 'Panel principal',
-      // Todos pueden ver el dashboard
-    },
-    {
-      name: 'Perfil',
-      icon: '👤',
-      path: '/dashboard/profile',
-      description: 'Tu información personal',
-      // Todos pueden ver su perfil
-    },
-    {
-      name: 'Servicios',
-      icon: '⚙️',
-      path: '/dashboard/services',
-      description: 'Gestión de servicios',
-      permission: Permission.VIEW_SERVICES,
-      // Todos tienen VIEW_SERVICES
-    },
-    {
-      name: 'CMS',
-      icon: '📝',
-      path: '/dashboard/cms',
-      description: 'Gestor de contenido',
-      permission: Permission.MANAGE_CONTENT,
-      adminOnly: true,
-      // Solo ADMIN, MODERATOR, SUPER_ADMIN
-    },
-    {
-      name: 'Media Library',
-      icon: '🖼️',
-      path: '/dashboard/media',
-      description: 'Gestión de imágenes',
-      permission: Permission.MANAGE_UPLOADS,
-      adminOnly: true,
-      // Solo roles administrativos con MANAGE_UPLOADS
-    },
-    {
-      name: 'Gestión de Usuarios',
-      icon: '👥',
-      path: '/dashboard/admin/users',
-      description: 'Administrar usuarios y roles',
-      permission: Permission.MANAGE_USERS,
-      roles: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
-      // Solo ADMIN y SUPER_ADMIN
-    },
-    {
-      name: 'Configuración',
-      icon: '🔧',
-      path: '/dashboard/settings',
-      description: 'Ajustes de la cuenta',
-      // Todos pueden configurar su cuenta
+      path: '/dashboard/client',
+      description: 'Panel principal'
     },
     {
       name: 'Ayuda',
       icon: '❓',
       path: '/dashboard/help',
-      description: 'Centro de ayuda',
-      // Todos pueden acceder a ayuda
+      description: 'Centro de ayuda'
     }
   ];
-
-  // Filtrar items del menú según permisos y rol
-  const visibleMenuItems = menuItems.filter(item => {
-    // Si no hay usuario autenticado, no mostrar nada
-    if (!user || !role) return false;
-
-    // Si el item requiere roles específicos
-    if (item.roles && !item.roles.includes(role)) {
-      return false;
-    }
-
-    // Si el item es solo para admins
-    if (item.adminOnly && !canAccessAdmin) {
-      return false;
-    }
-
-    // Si el item requiere un permiso específico
-    if (item.permission && !hasPermission(item.permission)) {
-      return false;
-    }
-
-    // Si pasa todas las validaciones, mostrar el item
-    return true;
-  });
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -127,7 +52,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
   return (
     <>
-      {/* Overlay para móvil - mejorado */}
+      {/* Overlay para móvil */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 md:hidden transition-opacity duration-300"
@@ -145,7 +70,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         `}
       >
         {/* Header del Sidebar */}
-        <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-purple-600 dark:via-blue-600 dark:to-indigo-600 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 dark:from-blue-600 dark:via-purple-600 dark:to-indigo-600 relative overflow-hidden">
           {/* Efecto de fondo */}
           <div className="absolute inset-0 bg-white/10 dark:bg-black/10"></div>
           
@@ -180,7 +105,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
                     <div className="flex-1">
                       <p className="font-semibold text-white text-xs">
-                        {canAccessAdmin ? 'Panel Administrativo' : 'Panel de Usuario'}
+                        Panel de Usuario
                       </p>
                       <p className="text-xs text-blue-50 opacity-80">
                         Sesión Activa
@@ -214,18 +139,18 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           </div>
         </div>
 
-        {/* Navegación */}
+        {/* Navegación Simplificada */}
         <nav className="flex-1 overflow-y-auto bg-slate-50/80 dark:bg-gray-900/80 backdrop-blur-sm transition-colors duration-300">
           {isOpen ? (
             // Navegación expandida
             <div className="p-3">
               <div className="mb-2">
                 <p className="text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-1">
-                  Navegación Principal
+                  Navegación
                 </p>
               </div>
               <div className="space-y-1">
-                {visibleMenuItems.map((item) => {
+                {menuItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (
                     <button
@@ -234,7 +159,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       className={`
                         group w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200
                         ${isActive
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 dark:from-purple-600 dark:to-pink-600 text-white shadow-lg shadow-blue-500/20 dark:shadow-purple-500/20 scale-[1.01]'
+                          ? 'bg-gradient-to-r from-green-500 to-blue-500 dark:from-blue-600 dark:to-purple-600 text-white shadow-lg shadow-green-500/20 dark:shadow-blue-500/20 scale-[1.01]'
                           : 'text-slate-700 dark:text-gray-200 hover:bg-slate-100/80 dark:hover:bg-gray-800/80 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5'
                         }
                       `}
@@ -246,7 +171,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                         <div className={`font-medium text-sm ${isActive ? 'text-white' : ''}`}>
                           {item.name}
                         </div>
-                        <div className={`text-xs leading-tight ${isActive ? 'text-blue-50 dark:text-purple-50' : 'text-slate-500 dark:text-gray-400 group-hover:text-slate-600 dark:group-hover:text-gray-300'}`}>
+                        <div className={`text-xs leading-tight ${isActive ? 'text-green-50 dark:text-blue-50' : 'text-slate-500 dark:text-gray-400 group-hover:text-slate-600 dark:group-hover:text-gray-300'}`}>
                           {item.description}
                         </div>
                       </div>
@@ -257,12 +182,39 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                   );
                 })}
               </div>
+
+              {/* Información del usuario */}
+              {user && (
+                <div className="mt-6 p-3 bg-slate-100/50 dark:bg-gray-800/50 rounded-lg border border-slate-200/50 dark:border-gray-700/50">
+                  <div className="flex items-center gap-3">
+                    {user.profileImage ? (
+                      <img
+                        src={user.profileImage}
+                        alt="Tu foto"
+                        className="w-10 h-10 rounded-full object-cover border-2 border-slate-300 dark:border-gray-600"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                        {(user.firstName || user.email).charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
+                        {user.firstName || user.email.split('@')[0]}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-gray-400 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             // Navegación colapsada (solo iconos)
             <div className="p-1">
               <div className="space-y-1">
-                {visibleMenuItems.map((item) => {
+                {menuItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (
                     <button
@@ -271,7 +223,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       className={`
                         group w-full flex items-center justify-center p-2.5 rounded-lg transition-all duration-200
                         ${isActive
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 dark:from-purple-600 dark:to-pink-600 text-white shadow-lg scale-105'
+                          ? 'bg-gradient-to-r from-green-500 to-blue-500 dark:from-blue-600 dark:to-purple-600 text-white shadow-lg scale-105'
                           : 'text-slate-700 dark:text-gray-200 hover:bg-slate-100/80 dark:hover:bg-gray-800/80 hover:text-slate-900 dark:hover:text-white hover:scale-105'
                         }
                       `}
@@ -288,7 +240,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           )}
         </nav>
 
-        {/* Footer con botón de cerrar sesión */}
+        {/* Footer con Theme Toggle y Cerrar Sesión */}
         <div className="bg-slate-100/80 dark:bg-gray-950/80 backdrop-blur-sm border-t border-slate-200/80 dark:border-gray-700/80 transition-colors duration-300">
           {isOpen ? (
             // Footer expandido

@@ -3,7 +3,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useImageLibrary } from '../hooks/cms/useImageLibrary';
 import { uploadImage, getImageStatistics, getOrphanImages, cleanupOrphanImages, updateImageMetadata } from '../services/imageService';
 import imageCompression from 'browser-image-compression';
-import DashboardLayout from '../components/DashboardLayout';
+import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import ImageMetadataEditor from '../components/ImageMetadataEditor';
 
 const MediaLibrary = () => {
@@ -150,7 +150,7 @@ const MediaLibrary = () => {
   };
 
   return (
-    <DashboardLayout>
+    <SmartDashboardLayout>
       <div className="h-full">
         {/* Header */}
         <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b sticky top-0 z-10`}>
@@ -575,7 +575,7 @@ const MediaLibrary = () => {
       )}
       
       </div>
-    </DashboardLayout>
+    </SmartDashboardLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import DashboardLayout from '../components/DashboardLayout';
+import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import { useUserSync } from '../hooks/useUserSync';
 import DashboardSeo from '../components/DashboardSeo';
 import { 
@@ -76,21 +76,21 @@ export default function Profile() {
 
   if (!isLoaded || loading) {
     return (
-      <DashboardLayout>
+      <SmartDashboardLayout>
         <div className="flex items-center justify-center min-h-96">
           <LoadingSpinner size="lg" text="Cargando perfil..." />
         </div>
-      </DashboardLayout>
+      </SmartDashboardLayout>
     );
   }
 
   if (!user) {
     return (
-      <DashboardLayout>
+      <SmartDashboardLayout>
         <Alert type="error">
           No se pudo cargar la información del usuario.
         </Alert>
-      </DashboardLayout>
+      </SmartDashboardLayout>
     );
   }
 
@@ -100,7 +100,7 @@ export default function Profile() {
       fallbackTitle="Mi Perfil - SCUTI Company"
       fallbackDescription="Gestiona tu información personal y configuración de cuenta."
     >
-      <DashboardLayout>
+      <SmartDashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -374,7 +374,7 @@ export default function Profile() {
           </div>
         </Card>
       </div>
-    </DashboardLayout>
+    </SmartDashboardLayout>
     </DashboardSeo>
   );
 }

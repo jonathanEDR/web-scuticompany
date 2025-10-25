@@ -1,9 +1,13 @@
 ﻿import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { DashboardProviders } from './components/DashboardProviders';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleBasedRoute from './components/RoleBasedRoute';
+import DashboardRouter from './components/DashboardRouter';
+import { UserRole } from './types/roles';
 import './App.css';
 
 // ⚡ OPTIMIZACIÓN: Lazy loading agresivo
@@ -16,14 +20,20 @@ const ServicesPublic = lazy(() => import('./pages/public/ServicesPublic'));
 const Login = lazy(() => import('./pages/auth/Login'));
 const Signup = lazy(() => import('./pages/auth/Signup'));
 
+// Dashboards con roles
+const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+
 // Páginas del dashboard - Con autenticación
-const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Services = lazy(() => import('./pages/Services'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Help = lazy(() => import('./pages/Help'));
 const CmsManager = lazy(() => import('./pages/CmsManager'));
 const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
+
+// Páginas administrativas
+const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
 
 // Componente de loading minimalista
 const LoadingSpinner = () => (
@@ -36,14 +46,16 @@ const LoadingSpinner = () => (
 );
 
 /**
- * Wrapper para rutas del dashboard con providers de autenticación
- * Clerk solo se carga aquí, NO en páginas públicas
+ * Wrapper para rutas del dashboard con providers de autenticación y roles
+ * Clerk + AuthContext se cargan aquí
  */
 const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
   <DashboardProviders>
-    <ProtectedRoute>
-      {children}
-    </ProtectedRoute>
+    <AuthProvider>
+      <ProtectedRoute>
+        {children}
+      </ProtectedRoute>
+    </AuthProvider>
   </DashboardProviders>
 );
 
@@ -73,76 +85,125 @@ function App() {
                 </DashboardProviders>
               } />
       
-              {/* 🔒 RUTAS PROTEGIDAS - Clerk se carga solo aquí */}
+              {/* 🔒 RUTAS PROTEGIDAS CON SISTEMA DE ROLES */}
+              
+              {/* Dashboard Principal - Redirige según rol */}
               <Route path="/dashboard" element={
                 <DashboardRoute>
-                  <Dashboard />
+                  <DashboardRouter />
                 </DashboardRoute>
               } />
               
+              {/* 👤 Dashboard para USER y CLIENT */}
+              <Route path="/dashboard/client" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
+                    <ClientDashboard />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* ⚡ Dashboard para ADMIN, MODERATOR y SUPER_ADMIN */}
+              <Route path="/dashboard/admin" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <AdminDashboard />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Perfil - Accesible para todos los usuarios autenticados */}
               <Route path="/dashboard/profile" element={
                 <DashboardRoute>
                   <Profile />
                 </DashboardRoute>
               } />
               
+              {/* Servicios - Accesible para todos */}
               <Route path="/dashboard/services" element={
                 <DashboardRoute>
                   <Services />
                 </DashboardRoute>
               } />
               
+              {/* Configuración - Accesible para todos */}
               <Route path="/dashboard/settings" element={
                 <DashboardRoute>
                   <Settings />
                 </DashboardRoute>
               } />
               
+              {/* Ayuda - Accesible para todos */}
               <Route path="/dashboard/help" element={
                 <DashboardRoute>
                   <Help />
                 </DashboardRoute>
               } />
               
+              {/* 📝 CMS - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
               <Route path="/dashboard/cms" element={
                 <DashboardRoute>
-                  <CmsManager />
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CmsManager />
+                  </RoleBasedRoute>
                 </DashboardRoute>
               } />
               
               <Route path="/dashboard/cms/content" element={
                 <DashboardRoute>
-                  <CmsManager />
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CmsManager />
+                  </RoleBasedRoute>
                 </DashboardRoute>
               } />
               
               <Route path="/dashboard/cms/seo" element={
                 <DashboardRoute>
-                  <CmsManager />
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CmsManager />
+                  </RoleBasedRoute>
                 </DashboardRoute>
               } />
               
               <Route path="/dashboard/cms/theme" element={
                 <DashboardRoute>
-                  <CmsManager />
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CmsManager />
+                  </RoleBasedRoute>
                 </DashboardRoute>
               } />
               
               <Route path="/dashboard/cms/cards" element={
                 <DashboardRoute>
-                  <CmsManager />
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CmsManager />
+                  </RoleBasedRoute>
                 </DashboardRoute>
               } />
               
               <Route path="/dashboard/cms/contact" element={
                 <DashboardRoute>
-                  <CmsManager />
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CmsManager />
+                  </RoleBasedRoute>
                 </DashboardRoute>
               } />
               
+              {/* 🖼️ Media Library - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
               <Route path="/dashboard/media" element={
                 <DashboardRoute>
-                  <MediaLibrary />
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <MediaLibrary />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
+              <Route path="/dashboard/admin/users" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <UsersManagement />
+                  </RoleBasedRoute>
                 </DashboardRoute>
               } />
             </Routes>
