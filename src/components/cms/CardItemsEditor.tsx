@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
-import type { SolutionItem } from '../../types/cms';
+import type { SolutionItem, PageData } from '../../types/cms';
 import ManagedImageSelector from '../ManagedImageSelector';
 import RichTextEditor from '../RichTextEditor';
+import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
 
 interface CardItemsEditorProps {
   items: SolutionItem[];
   onUpdate: (updatedItems: SolutionItem[]) => void;
   onSave?: () => Promise<void>; // Función de save manual
+  pageData?: PageData; // Datos para obtener estilos actuales
+  updateTextStyle?: (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos', field: string, mode: 'light' | 'dark', color: string) => void;
   className?: string;
 }
 
@@ -15,12 +18,31 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
   items,
   onUpdate,
   onSave,
+  pageData,
+  updateTextStyle,
   className = ''
 }) => {
   const [localItems, setLocalItems] = useState<SolutionItem[]>(items || []);
   const [expandedCard, setExpandedCard] = useState<number | null>(0); // Primera tarjeta expandida por defecto
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // 🔧 Asegurar que todos los items tengan estructura de estilos
+  const ensureItemStyles = (item: SolutionItem): SolutionItem => {
+    return {
+      ...item,
+      styles: {
+        light: {
+          titleColor: item.styles?.light?.titleColor || '',
+          descriptionColor: item.styles?.light?.descriptionColor || ''
+        },
+        dark: {
+          titleColor: item.styles?.dark?.titleColor || '',
+          descriptionColor: item.styles?.dark?.descriptionColor || ''
+        }
+      }
+    };
+  };
 
   // Valores por defecto para nuevas tarjetas
   const createDefaultItem = (index: number): SolutionItem => {
@@ -46,18 +68,42 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
       iconDark: '',
       title: defaultTitles[index] || `Solución ${index + 1}`,
       description: defaultDescriptions[index] || `Descripción de la solución ${index + 1}`,
-      gradient: defaultGradients[index] || 'from-gray-500 to-gray-700'
+      gradient: defaultGradients[index] || 'from-gray-500 to-gray-700',
+      styles: {
+        light: {
+          titleColor: '',
+          descriptionColor: ''
+        },
+        dark: {
+          titleColor: '',
+          descriptionColor: ''
+        }
+      }
     };
   };
 
-  // Inicializar con 3 tarjetas si no hay datos
+  // Inicializar con 3 tarjetas si no hay datos y asegurar estructura de estilos
   useEffect(() => {
-    if (localItems.length === 0) {
-      const defaultItems = Array.from({ length: 3 }, (_, i) => createDefaultItem(i));
+    if (items.length === 0) {
+      const defaultItems = Array.from({ length: 3 }, (_, i) => ensureItemStyles(createDefaultItem(i)));
       setLocalItems(defaultItems);
       setHasUnsavedChanges(true);
+    } else {
+      // Asegurar que items existentes tengan estructura de estilos
+      const itemsWithStyles = items.map(item => ensureItemStyles(item));
+      setLocalItems(itemsWithStyles);
+      
+      // Solo marcar como cambios sin guardar si realmente se agregaron estilos
+      const hasNewStyles = items.some(item => 
+        !item.styles || 
+        !item.styles.light || 
+        !item.styles.dark
+      );
+      if (hasNewStyles) {
+        setHasUnsavedChanges(true);
+      }
     }
-  }, []);
+  }, [items]);
 
   // Actualizar un item específico
   const updateItem = (index: number, field: keyof SolutionItem, value: string) => {
@@ -71,7 +117,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
 
   // Agregar nueva tarjeta
   const addItem = () => {
-    const newItem = createDefaultItem(localItems.length);
+    const newItem = ensureItemStyles(createDefaultItem(localItems.length));
     setLocalItems(prev => [...prev, newItem]);
     setExpandedCard(localItems.length); // Expandir la nueva tarjeta
     setHasUnsavedChanges(true);
@@ -221,14 +267,31 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                     </div>
                   </div>
 
-                  {/* Título */}
+                  {/* Título con colores por tema */}
                   <div>
-                    <RichTextEditor
-                      label="✏️ Título"
-                      value={item.title}
-                      onChange={(html) => updateItem(index, 'title', html)}
-                      placeholder="Título de la solución"
-                    />
+                    {pageData && updateTextStyle ? (
+                      <RichTextEditorWithTheme
+                        label="✏️ Título"
+                        value={item.title}
+                        onChange={(html) => updateItem(index, 'title', html)}
+                        placeholder="Título de la solución"
+                        themeColors={{
+                          light: pageData.content.solutions.items?.[index]?.styles?.light?.titleColor || '',
+                          dark: pageData.content.solutions.items?.[index]?.styles?.dark?.titleColor || ''
+                        }}
+                        onThemeColorChange={(mode, color) => {
+                          // Crear estructura para el item específico
+                          updateTextStyle('solutions', `items.${index}.titleColor`, mode, color);
+                        }}
+                      />
+                    ) : (
+                      <RichTextEditor
+                        label="✏️ Título"
+                        value={item.title}
+                        onChange={(html) => updateItem(index, 'title', html)}
+                        placeholder="Título de la solución"
+                      />
+                    )}
                   </div>
 
                   {/* Gradiente (opcional) */}
@@ -245,14 +308,31 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                     />
                   </div>
 
-                  {/* Descripción */}
+                  {/* Descripción con colores por tema */}
                   <div className="lg:col-span-2">
-                    <RichTextEditor
-                      label="📄 Descripción"
-                      value={item.description}
-                      onChange={(html) => updateItem(index, 'description', html)}
-                      placeholder="Descripción detallada de la solución..."
-                    />
+                    {pageData && updateTextStyle ? (
+                      <RichTextEditorWithTheme
+                        label="📄 Descripción"
+                        value={item.description}
+                        onChange={(html) => updateItem(index, 'description', html)}
+                        placeholder="Descripción detallada de la solución..."
+                        themeColors={{
+                          light: pageData.content.solutions.items?.[index]?.styles?.light?.descriptionColor || '',
+                          dark: pageData.content.solutions.items?.[index]?.styles?.dark?.descriptionColor || ''
+                        }}
+                        onThemeColorChange={(mode, color) => {
+                          // Crear estructura para el item específico
+                          updateTextStyle('solutions', `items.${index}.descriptionColor`, mode, color);
+                        }}
+                      />
+                    ) : (
+                      <RichTextEditor
+                        label="📄 Descripción"
+                        value={item.description}
+                        onChange={(html) => updateItem(index, 'description', html)}
+                        placeholder="Descripción detallada de la solución..."
+                      />
+                    )}
                   </div>
 
                   {/* Preview */}

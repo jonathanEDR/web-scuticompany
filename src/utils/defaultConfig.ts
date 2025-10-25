@@ -55,6 +55,16 @@ export interface DefaultSolutionsConfig {
     iconLight?: string;
     iconDark?: string;
   }>;
+  styles?: {
+    light?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+  };
 }
 
 export interface DefaultValueAddedConfig {
@@ -142,6 +152,16 @@ export const DEFAULT_SOLUTIONS_CONFIG: DefaultSolutionsConfig = {
   subtitle: 'En el dinámico entorno empresarial de hoy, la tecnología es la columna vertebral del éxito. Impulsa la innovación, seguridad y el crecimiento de tu negocio.',
   backgroundImage: getSolutionsBackgroundImages(),
   backgroundImageAlt: 'Scuti Company - Soluciones tecnológicas',
+  styles: {
+    light: {
+      titleColor: '#333333', // Color específico maqueta tema claro
+      descriptionColor: '#7528ee' // Violeta específico maqueta
+    },
+    dark: {
+      titleColor: '#FFFFFF', // Blanco para tema oscuro
+      descriptionColor: '#D1D5DB' // Gris claro para tema oscuro
+    }
+  },
   cards: [
     {
       id: '1',

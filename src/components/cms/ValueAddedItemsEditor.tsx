@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
-import type { ValueAddedItem } from '../../types/cms';
+import type { ValueAddedItem, PageData } from '../../types/cms';
 import ManagedImageSelector from '../ManagedImageSelector';
 import RichTextEditor from '../RichTextEditor';
+import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
 
 interface ValueAddedItemsEditorProps {
   items: ValueAddedItem[];
   onUpdate: (updatedItems: ValueAddedItem[]) => void;
   onSave?: () => Promise<void>; // Función de save manual
+  pageData?: PageData; // Datos para obtener estilos actuales
+  updateTextStyle?: (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos', field: string, mode: 'light' | 'dark', color: string) => void;
   className?: string;
 }
 
@@ -15,12 +18,31 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
   items,
   onUpdate,
   onSave,
+  pageData,
+  updateTextStyle,
   className = ''
 }) => {
   const [localItems, setLocalItems] = useState<ValueAddedItem[]>(items || []);
   const [expandedCard, setExpandedCard] = useState<number | null>(0); // Primera tarjeta expandida por defecto
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // 🔧 Asegurar que todos los items tengan estructura de estilos
+  const ensureItemStyles = (item: ValueAddedItem): ValueAddedItem => {
+    return {
+      ...item,
+      styles: {
+        light: {
+          titleColor: item.styles?.light?.titleColor || '',
+          descriptionColor: item.styles?.light?.descriptionColor || ''
+        },
+        dark: {
+          titleColor: item.styles?.dark?.titleColor || '',
+          descriptionColor: item.styles?.dark?.descriptionColor || ''
+        }
+      }
+    };
+  };
 
   // Valores por defecto para nuevas tarjetas de valor agregado
   const createDefaultItem = (index: number): ValueAddedItem => {
@@ -46,18 +68,42 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
       iconDark: '',
       title: defaultTitles[index] || `Valor ${index + 1}`,
       description: defaultDescriptions[index] || `Descripción del valor agregado ${index + 1}`,
-      gradient: defaultGradients[index] || 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
+      gradient: defaultGradients[index] || 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+      styles: {
+        light: {
+          titleColor: '',
+          descriptionColor: ''
+        },
+        dark: {
+          titleColor: '',
+          descriptionColor: ''
+        }
+      }
     };
   };
 
-  // Inicializar con 3 tarjetas si no hay datos
+  // Inicializar con 3 tarjetas si no hay datos y asegurar estructura de estilos
   useEffect(() => {
-    if (localItems.length === 0) {
-      const defaultItems = Array.from({ length: 3 }, (_, i) => createDefaultItem(i));
+    if (items.length === 0) {
+      const defaultItems = Array.from({ length: 3 }, (_, i) => ensureItemStyles(createDefaultItem(i)));
       setLocalItems(defaultItems);
       setHasUnsavedChanges(true);
+    } else {
+      // Asegurar que items existentes tengan estructura de estilos
+      const itemsWithStyles = items.map(item => ensureItemStyles(item));
+      setLocalItems(itemsWithStyles);
+      
+      // Solo marcar como cambios sin guardar si realmente se agregaron estilos
+      const hasNewStyles = items.some(item => 
+        !item.styles || 
+        !item.styles.light || 
+        !item.styles.dark
+      );
+      if (hasNewStyles) {
+        setHasUnsavedChanges(true);
+      }
     }
-  }, []);
+  }, [items]);
 
   // Actualizar un item específico
   const updateItem = (index: number, field: keyof ValueAddedItem, value: string) => {
@@ -71,7 +117,7 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
 
   // Agregar nueva tarjeta
   const addItem = () => {
-    const newItem = createDefaultItem(localItems.length);
+    const newItem = ensureItemStyles(createDefaultItem(localItems.length));
     setLocalItems(prev => [...prev, newItem]);
     setExpandedCard(localItems.length); // Expandir la nueva tarjeta
     setHasUnsavedChanges(true);
@@ -228,30 +274,68 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Columna izquierda: Texto */}
                   <div className="space-y-4">
-                    {/* Título */}
+                    {/* Título con colores por tema */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        📝 Título
-                      </label>
-                      <input
-                        type="text"
-                        value={item.title}
-                        onChange={(e) => updateItem(index, 'title', e.target.value)}
-                        placeholder="Título del valor agregado"
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                      />
+                      {pageData && updateTextStyle ? (
+                        <RichTextEditorWithTheme
+                          label="📝 Título"
+                          value={item.title}
+                          onChange={(html) => updateItem(index, 'title', html)}
+                          placeholder="Título del valor agregado"
+                          themeColors={{
+                            light: pageData.content.valueAdded?.items?.[index]?.styles?.light?.titleColor || '',
+                            dark: pageData.content.valueAdded?.items?.[index]?.styles?.dark?.titleColor || ''
+                          }}
+                          onThemeColorChange={(mode, color) => {
+                            // Crear estructura para el item específico
+                            updateTextStyle('valueAdded', `items.${index}.titleColor`, mode, color);
+                          }}
+                        />
+                      ) : (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            📝 Título
+                          </label>
+                          <input
+                            type="text"
+                            value={item.title}
+                            onChange={(e) => updateItem(index, 'title', e.target.value)}
+                            placeholder="Título del valor agregado"
+                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    {/* Descripción */}
+                    {/* Descripción con colores por tema */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        📄 Descripción
-                      </label>
-                      <RichTextEditor
-                        value={item.description}
-                        onChange={(html) => updateItem(index, 'description', html)}
-                        placeholder="Describe el valor agregado que ofreces..."
-                      />
+                      {pageData && updateTextStyle ? (
+                        <RichTextEditorWithTheme
+                          label="📄 Descripción"
+                          value={item.description}
+                          onChange={(html) => updateItem(index, 'description', html)}
+                          placeholder="Describe el valor agregado que ofreces..."
+                          themeColors={{
+                            light: pageData.content.valueAdded?.items?.[index]?.styles?.light?.descriptionColor || '',
+                            dark: pageData.content.valueAdded?.items?.[index]?.styles?.dark?.descriptionColor || ''
+                          }}
+                          onThemeColorChange={(mode, color) => {
+                            // Crear estructura para el item específico
+                            updateTextStyle('valueAdded', `items.${index}.descriptionColor`, mode, color);
+                          }}
+                        />
+                      ) : (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            📄 Descripción
+                          </label>
+                          <RichTextEditor
+                            value={item.description}
+                            onChange={(html) => updateItem(index, 'description', html)}
+                            placeholder="Describe el valor agregado que ofreces..."
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Nota: Eliminado campo de emoji. Solo se usan imágenes (tema claro/oscuro). */}

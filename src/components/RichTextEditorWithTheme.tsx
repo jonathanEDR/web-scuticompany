@@ -59,7 +59,14 @@ const RichTextEditorWithTheme = ({
                   <input
                     type="text"
                     value={themeColors.light || '#1F2937'}
-                    onChange={(e) => onThemeColorChange('light', e.target.value)}
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      // Evitar doble # si el usuario escribe ##
+                      if (value.startsWith('##')) {
+                        value = value.substring(1);
+                      }
+                      onThemeColorChange('light', value);
+                    }}
                     className="flex-1 px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded focus:ring-1 focus:ring-yellow-400 focus:border-transparent"
                     placeholder="#1F2937"
                   />
@@ -90,7 +97,14 @@ const RichTextEditorWithTheme = ({
                   <input
                     type="text"
                     value={themeColors.dark || '#F9FAFB'}
-                    onChange={(e) => onThemeColorChange('dark', e.target.value)}
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      // Evitar doble # si el usuario escribe ##
+                      if (value.startsWith('##')) {
+                        value = value.substring(1);
+                      }
+                      onThemeColorChange('dark', value);
+                    }}
                     className="flex-1 px-2 py-1.5 text-xs bg-gray-700 border border-gray-500 rounded text-white focus:ring-1 focus:ring-blue-400 focus:border-transparent"
                     placeholder="#F9FAFB"
                   />

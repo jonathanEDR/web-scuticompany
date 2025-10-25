@@ -13,6 +13,16 @@ interface SolutionItem {
   iconDark?: string;
   gradient?: string;
   _id?: any; // Para compatibilidad con MongoDB
+  styles?: {
+    light?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+  };
 }
 
 interface SolutionsData {
@@ -29,6 +39,16 @@ interface SolutionsData {
   cardsDesign?: {
     light: CardDesignStyles;
     dark: CardDesignStyles;
+  };
+  styles?: {
+    light?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
   };
 }
 
@@ -59,7 +79,9 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
           icon: item.icon || '📄',
           iconLight: item.iconLight,
           iconDark: item.iconDark,
-          gradient: item.gradient
+          gradient: item.gradient,
+          styles: item.styles, // ✅ Preservar estilos individuales
+          _id: item._id // Preservar _id para compatibilidad
         }))
       };
     }
@@ -264,27 +286,31 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
         </>
       )}
 
-      {/* Section Header - SIN SOMBRAS, colores según maqueta */}
+      {/* Section Header - Conectado con estilos del CMS */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
         <div
           className="text-4xl sm:text-5xl font-bold mb-4 theme-transition"
           style={{
-            color: theme === 'light' 
-              ? '#333333' // Color específico de la maqueta para tema claro
-              : '#FFFFFF', // Blanco para tema oscuro
+            color: getSafeStyle(
+              solutionsData.styles?.[theme]?.titleColor,
+              theme === 'light' ? '#333333' : '#FFFFFF'
+            ),
             fontWeight: '700'
           }}
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.title) }}
         />
         <div className="max-w-3xl mx-auto">
           <div
-            className="text-xl theme-transition"
+            className="theme-transition"
             style={{
-              color: theme === 'light' 
-                ? '#7528ee' // Color violeta específico de la maqueta
-                : '#D1D5DB', // Gris claro para tema oscuro
+              color: getSafeStyle(
+                solutionsData.styles?.[theme]?.descriptionColor,
+                theme === 'light' ? '#7528ee' : '#D1D5DB'
+              ),
               fontWeight: '400',
-              lineHeight: '1.6'
+              lineHeight: '1.6',
+              // 🎯 Permitir que los tamaños de letra del RichTextEditor se apliquen
+              fontSize: 'inherit' // Hereda el tamaño del contenido HTML
             }}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.subtitle || '') }}
           />
@@ -424,14 +450,22 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                 <div
                   className="text-2xl font-bold mb-4 transition-colors text-center"
                   style={{
-                    color: cardStyles.titleColor
+                    color: getSafeStyle(
+                      solution.styles?.[theme]?.titleColor,
+                      cardStyles.titleColor
+                    ),
+                    fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.title) }}
                 />
                 <div
                   className="leading-relaxed transition-colors text-center"
                   style={{
-                    color: cardStyles.descriptionColor
+                    color: getSafeStyle(
+                      solution.styles?.[theme]?.descriptionColor,
+                      cardStyles.descriptionColor
+                    ),
+                    fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.description) }}
                 />

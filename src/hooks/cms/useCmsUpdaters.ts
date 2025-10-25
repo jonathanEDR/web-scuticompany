@@ -40,6 +40,45 @@ export const useCmsUpdaters = (
     const currentSection = pageData.content[section];
     if (!currentSection) return;
 
+    // 🎯 Manejar estilos de items individuales (e.g., "items.0.titleColor")
+    if (field.includes('items.')) {
+      const [, itemIndex, itemField] = field.split('.');
+      const index = parseInt(itemIndex, 10);
+      
+      if ((section === 'solutions' || section === 'valueAdded') && 'items' in currentSection && currentSection.items && currentSection.items[index]) {
+        const updatedItems = [...currentSection.items];
+        const item = updatedItems[index] as any; // Type cast para manejar estilos
+        
+        // Asegurar que el item tiene la estructura de estilos
+        if (!item.styles) {
+          item.styles = {
+            light: { titleColor: '', descriptionColor: '' },
+            dark: { titleColor: '', descriptionColor: '' }
+          };
+        }
+        
+        if (!item.styles[mode]) {
+          item.styles[mode] = { titleColor: '', descriptionColor: '' };
+        }
+        
+        // Actualizar el color específico
+        item.styles[mode][itemField as 'titleColor' | 'descriptionColor'] = color;
+        
+        setPageData({
+          ...pageData,
+          content: {
+            ...pageData.content,
+            [section]: {
+              ...currentSection,
+              items: updatedItems
+            } as any
+          }
+        });
+      }
+      return;
+    }
+
+    // 🎯 Manejar estilos de sección general (comportamiento original)
     setPageData({
       ...pageData,
       content: {

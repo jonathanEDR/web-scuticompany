@@ -95,6 +95,7 @@ export interface SolutionItem {
   title: string;
   description: string;
   gradient: string;
+  styles?: SolutionTextStyles; // Estilos de texto por tema
 }
 
 export interface HeroContent {
@@ -126,6 +127,7 @@ export interface ValueAddedItem {
   iconLight?: string;
   iconDark?: string;
   gradient?: string;
+  styles?: SolutionTextStyles; // Estilos de texto por tema (reutilizamos la interface)
 }
 
 export interface ValueAddedLogo {

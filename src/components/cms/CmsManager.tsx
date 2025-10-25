@@ -359,6 +359,8 @@ const CmsManager: React.FC = () => {
               items={pageData.content.solutions.items || []}
               onUpdate={(updatedItems) => handleUpdateContent('solutions.items', updatedItems)}
               onSave={handleSave} // Función de save manual
+              pageData={pageData} // Para obtener estilos actuales
+              updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
               className="mt-6"
             />
             {/* Configuración General de Valor Agregado */}
@@ -372,6 +374,8 @@ const CmsManager: React.FC = () => {
               items={pageData.content.valueAdded?.items || []}
               onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
               onSave={handleSave} // Función de save manual
+              pageData={pageData} // Para obtener estilos actuales
+              updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
               className="mt-6"
             />
             {/* Configuración de Logos de Clientes */}

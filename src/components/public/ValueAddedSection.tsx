@@ -12,6 +12,16 @@ interface ValueAddedItem {
   iconDark?: string;
   gradient?: string;
   _id?: any; // Para compatibilidad con MongoDB
+  styles?: {
+    light?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+  };
 }
 
 interface ValueAddedLogo {
@@ -43,6 +53,16 @@ interface ValueAddedData {
   logosBarDesign?: {
     light: LogosBarDesignStyles;
     dark: LogosBarDesignStyles;
+  };
+  styles?: {
+    light?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
   };
 }
 
@@ -82,7 +102,9 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
           // Solo usamos imágenes (iconLight/iconDark/iconUrl) — no emojis
           iconLight: item.iconLight,
           iconDark: item.iconDark,
-          gradient: item.gradient || 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
+          gradient: item.gradient || 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+          styles: item.styles, // ✅ Preservar estilos individuales
+          _id: item._id // Preservar _id para compatibilidad
         })),
         // Incluir logos del CMS si existen
         logos: valueAddedData.logos || []
@@ -188,6 +210,20 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
     return value && value !== 'undefined' && value !== 'null' ? value : fallback;
   };
 
+  // 🎨 FUNCIÓN para remover colores inline y dejar que nuestro sistema de temas tome control
+  const cleanInlineColors = (html: string): string => {
+    if (!html) return html;
+    
+    // Remover atributos style que contengan color
+    let cleanedHtml = html
+      .replace(/style\s*=\s*["'][^"']*color[^"']*["']/gi, '') // Remover style="...color..."
+      .replace(/color\s*:\s*[^;"}]+[;}]/gi, '') // Remover color: xxx; dentro de styles
+      .replace(/style\s*=\s*["']\s*["']/gi, '') // Remover style="" vacíos
+      .replace(/style\s*=\s*["']\s*;\s*["']/gi, ''); // Remover style="; " vacíos
+    
+    return cleanedHtml;
+  };
+
   // Función helper para detectar si un string es una URL de imagen
   const getLogosBarStyles = () => {
     const logosBarDesign = mappedData.logosBarDesign;
@@ -262,6 +298,8 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
 
   // Usar items mapeados correctamente
   const valueItems = mappedData.cards || [];
+
+
 
   // Función para obtener clases de alineación de tarjetas
   const getCardsAlignmentClasses = () => {
@@ -504,22 +542,29 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
                 <h3 
                   className="text-xl font-bold mb-4 group-hover:scale-105 transition-all duration-300"
                   style={{ 
-                    color: cardStyles.titleColor,
-                    textAlign: cardStyles.iconAlignment || 'left'
+                    color: getSafeStyle(
+                      valueItem.styles?.[theme]?.titleColor,
+                      cardStyles.titleColor
+                    ),
+                    textAlign: cardStyles.iconAlignment || 'left',
+                    fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
-                >
-                  {valueItem.title}
-                </h3>
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cleanInlineColors(valueItem.title)) }}
+                />
 
                 {/* Descripción */}
                 <p 
                   className="text-sm leading-relaxed"
                   style={{ 
-                    color: cardStyles.descriptionColor,
+                    color: getSafeStyle(
+                      valueItem.styles?.[theme]?.descriptionColor,
+                      cardStyles.descriptionColor
+                    ),
                     textAlign: cardStyles.iconAlignment || 'left',
-                    lineHeight: '1.6'
+                    lineHeight: '1.6',
+                    fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(valueItem.description) }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cleanInlineColors(valueItem.description)) }}
                 />
               </div>
             </div>
