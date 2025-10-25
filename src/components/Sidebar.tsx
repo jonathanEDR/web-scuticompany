@@ -60,6 +60,15 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       // Solo ADMIN, MODERATOR, SUPER_ADMIN
     },
     {
+      name: 'CRM',
+      icon: '💼',
+      path: '/dashboard/crm',
+      description: 'Gestión de leads',
+      permission: Permission.MANAGE_CONTENT,
+      adminOnly: true,
+      // Solo roles administrativos - CRM para gestión de clientes potenciales
+    },
+    {
       name: 'Media Library',
       icon: '🖼️',
       path: '/dashboard/media',

@@ -28,6 +28,7 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Services = lazy(() => import('./pages/Services'));
 const Settings = lazy(() => import('./pages/Settings'));
+const LeadsManagement = lazy(() => import('./pages/admin/LeadsManagement'));
 const Help = lazy(() => import('./pages/Help'));
 const CmsManager = lazy(() => import('./pages/CmsManager'));
 const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
@@ -198,7 +199,16 @@ function App() {
                 </DashboardRoute>
               } />
               
-              {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
+              {/* � CRM - Gestión de Leads - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
+              <Route path="/dashboard/crm" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <LeadsManagement />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* �👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
               <Route path="/dashboard/admin/users" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
