@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import type { ValueAddedItem, PageData } from '../../types/cms';
 import ManagedImageSelector from '../ManagedImageSelector';
 import RichTextEditor from '../RichTextEditor';
-import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
+import RichTextEditorCompact from '../RichTextEditorCompact';
 
 interface ValueAddedItemsEditorProps {
   items: ValueAddedItem[];
@@ -23,7 +23,7 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
   className = ''
 }) => {
   const [localItems, setLocalItems] = useState<ValueAddedItem[]>(items || []);
-  const [expandedCard, setExpandedCard] = useState<number | null>(0); // Primera tarjeta expandida por defecto
+  const [expandedCard, setExpandedCard] = useState<number | null>(null); // Todas las tarjetas cerradas por defecto
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -271,22 +271,22 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
             {/* Contenido expandido */}
             {expandedCard === index && (
               <div className="p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Columna izquierda: Texto */}
-                  <div className="space-y-4">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                  {/* Columna izquierda: Texto (2/3 del espacio) */}
+                  <div className="xl:col-span-2 space-y-4">
                     {/* Título con colores por tema */}
                     <div>
                       {pageData && updateTextStyle ? (
-                        <RichTextEditorWithTheme
+                        <RichTextEditorCompact
                           label="📝 Título"
                           value={item.title}
-                          onChange={(html) => updateItem(index, 'title', html)}
+                          onChange={(html: string) => updateItem(index, 'title', html)}
                           placeholder="Título del valor agregado"
                           themeColors={{
                             light: pageData.content.valueAdded?.items?.[index]?.styles?.light?.titleColor || '',
                             dark: pageData.content.valueAdded?.items?.[index]?.styles?.dark?.titleColor || ''
                           }}
-                          onThemeColorChange={(mode, color) => {
+                          onThemeColorChange={(mode: 'light' | 'dark', color: string) => {
                             // Crear estructura para el item específico
                             updateTextStyle('valueAdded', `items.${index}.titleColor`, mode, color);
                           }}
@@ -310,16 +310,16 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                     {/* Descripción con colores por tema */}
                     <div>
                       {pageData && updateTextStyle ? (
-                        <RichTextEditorWithTheme
+                        <RichTextEditorCompact
                           label="📄 Descripción"
                           value={item.description}
-                          onChange={(html) => updateItem(index, 'description', html)}
+                          onChange={(html: string) => updateItem(index, 'description', html)}
                           placeholder="Describe el valor agregado que ofreces..."
                           themeColors={{
                             light: pageData.content.valueAdded?.items?.[index]?.styles?.light?.descriptionColor || '',
                             dark: pageData.content.valueAdded?.items?.[index]?.styles?.dark?.descriptionColor || ''
                           }}
-                          onThemeColorChange={(mode, color) => {
+                          onThemeColorChange={(mode: 'light' | 'dark', color: string) => {
                             // Crear estructura para el item específico
                             updateTextStyle('valueAdded', `items.${index}.descriptionColor`, mode, color);
                           }}
@@ -331,7 +331,7 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                           </label>
                           <RichTextEditor
                             value={item.description}
-                            onChange={(html) => updateItem(index, 'description', html)}
+                            onChange={(html: string) => updateItem(index, 'description', html)}
                             placeholder="Describe el valor agregado que ofreces..."
                           />
                         </div>
@@ -361,8 +361,8 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                     </div>
                   </div>
 
-                  {/* Columna derecha: Iconos */}
-                  <div className="space-y-4">
+                  {/* Columna derecha: Iconos (1/3 del espacio) */}
+                  <div className="xl:col-span-1 space-y-4">
                     {/* Icono tema claro */}
                     <div>
                       <ManagedImageSelector

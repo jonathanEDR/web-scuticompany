@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import type { SolutionItem, PageData } from '../../types/cms';
 import ManagedImageSelector from '../ManagedImageSelector';
 import RichTextEditor from '../RichTextEditor';
-import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
+import RichTextEditorCompact from '../RichTextEditorCompact';
 
 interface CardItemsEditorProps {
   items: SolutionItem[];
@@ -23,7 +23,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
   className = ''
 }) => {
   const [localItems, setLocalItems] = useState<SolutionItem[]>(items || []);
-  const [expandedCard, setExpandedCard] = useState<number | null>(0); // Primera tarjeta expandida por defecto
+  const [expandedCard, setExpandedCard] = useState<number | null>(null); // Todas las tarjetas cerradas por defecto
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -234,19 +234,103 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
             {/* Contenido expandible */}
             {expandedCard === index && (
               <div className="p-6 bg-white dark:bg-gray-800">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                   
-                  {/* Sección de Iconos */}
-                  <div className="lg:col-span-2">
-                    <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                  {/* Columna izquierda: Contenido de texto (2/3) */}
+                  <div className="xl:col-span-2 space-y-4">
+                    
+                    {/* Título con colores por tema */}
+                    <div>
+                      {pageData && updateTextStyle ? (
+                        <RichTextEditorCompact
+                          label="✏️ Título"
+                          value={item.title}
+                          onChange={(html: string) => updateItem(index, 'title', html)}
+                          placeholder="Título de la solución"
+                          themeColors={{
+                            light: pageData.content.solutions.items?.[index]?.styles?.light?.titleColor || '',
+                            dark: pageData.content.solutions.items?.[index]?.styles?.dark?.titleColor || ''
+                          }}
+                          onThemeColorChange={(mode: 'light' | 'dark', color: string) => {
+                            // Crear estructura para el item específico
+                            updateTextStyle('solutions', `items.${index}.titleColor`, mode, color);
+                          }}
+                        />
+                      ) : (
+                        <RichTextEditor
+                          label="✏️ Título"
+                          value={item.title}
+                          onChange={(html: string) => updateItem(index, 'title', html)}
+                          placeholder="Título de la solución"
+                        />
+                      )}
+                    </div>
+
+                    {/* Descripción con colores por tema */}
+                    <div>
+                      {pageData && updateTextStyle ? (
+                        <RichTextEditorCompact
+                          label="📄 Descripción"
+                          value={item.description}
+                          onChange={(html: string) => updateItem(index, 'description', html)}
+                          placeholder="Descripción detallada de la solución..."
+                          themeColors={{
+                            light: pageData.content.solutions.items?.[index]?.styles?.light?.descriptionColor || '',
+                            dark: pageData.content.solutions.items?.[index]?.styles?.dark?.descriptionColor || ''
+                          }}
+                          onThemeColorChange={(mode: 'light' | 'dark', color: string) => {
+                            // Crear estructura para el item específico
+                            updateTextStyle('solutions', `items.${index}.descriptionColor`, mode, color);
+                          }}
+                        />
+                      ) : (
+                        <RichTextEditor
+                          label="📄 Descripción"
+                          value={item.description}
+                          onChange={(html: string) => updateItem(index, 'description', html)}
+                          placeholder="Descripción detallada de la solución..."
+                        />
+                      )}
+                    </div>
+
+                    {/* Gradiente (opcional) */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        🎨 Gradiente (Tailwind)
+                      </label>
+                      <input
+                        type="text"
+                        value={item.gradient}
+                        onChange={(e) => updateItem(index, 'gradient', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="from-purple-500 to-purple-700"
+                      />
+                    </div>
+                    
+                  </div>
+
+                  {/* Columna derecha: Iconos por tema (1/3) */}
+                  <div className="xl:col-span-1">
+                    <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                       🖼️ Iconos por Tema
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       
                       {/* Icono Tema Claro */}
-                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700/50">
+                        <div className="flex items-center mb-3">
+                          <div className="bg-white dark:bg-gray-800 rounded-full p-2 mr-3 shadow-sm">
+                            <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h5 className="text-sm font-bold text-gray-800 dark:text-gray-200">🌞 Tema Claro</h5>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">Icono para modo día</p>
+                          </div>
+                        </div>
                         <ManagedImageSelector
-                          label="🌞 Icono Tema Claro"
+                          label="Icono Tema Claro"
                           description="Imagen PNG para el modo claro"
                           currentImage={item.iconLight}
                           onImageSelect={(url: string) => updateItem(index, 'iconLight', url)}
@@ -255,88 +339,34 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                       </div>
 
                       {/* Icono Tema Oscuro */}
-                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                      <div className="bg-gradient-to-br from-slate-900 to-gray-900 dark:from-slate-800/50 dark:to-gray-800/50 p-4 rounded-lg border border-gray-700 dark:border-gray-600">
+                        <div className="flex items-center mb-3">
+                          <div className="bg-gray-800 dark:bg-gray-700 rounded-full p-2 mr-3 shadow-sm">
+                            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h5 className="text-sm font-bold text-white dark:text-gray-200">🌙 Tema Oscuro</h5>
+                            <p className="text-xs text-gray-400 dark:text-gray-500">Icono para modo noche</p>
+                          </div>
+                        </div>
                         <ManagedImageSelector
-                          label="🌙 Icono Tema Oscuro"
+                          label="Icono Tema Oscuro"
                           description="Imagen PNG para el modo oscuro"
                           currentImage={item.iconDark}
                           onImageSelect={(url: string) => updateItem(index, 'iconDark', url)}
                           hideButtonArea={!!item.iconDark}
+                          darkMode={true}
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Título con colores por tema */}
-                  <div>
-                    {pageData && updateTextStyle ? (
-                      <RichTextEditorWithTheme
-                        label="✏️ Título"
-                        value={item.title}
-                        onChange={(html) => updateItem(index, 'title', html)}
-                        placeholder="Título de la solución"
-                        themeColors={{
-                          light: pageData.content.solutions.items?.[index]?.styles?.light?.titleColor || '',
-                          dark: pageData.content.solutions.items?.[index]?.styles?.dark?.titleColor || ''
-                        }}
-                        onThemeColorChange={(mode, color) => {
-                          // Crear estructura para el item específico
-                          updateTextStyle('solutions', `items.${index}.titleColor`, mode, color);
-                        }}
-                      />
-                    ) : (
-                      <RichTextEditor
-                        label="✏️ Título"
-                        value={item.title}
-                        onChange={(html) => updateItem(index, 'title', html)}
-                        placeholder="Título de la solución"
-                      />
-                    )}
-                  </div>
+                </div>
 
-                  {/* Gradiente (opcional) */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      🎨 Gradiente (Tailwind)
-                    </label>
-                    <input
-                      type="text"
-                      value={item.gradient}
-                      onChange={(e) => updateItem(index, 'gradient', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="from-purple-500 to-purple-700"
-                    />
-                  </div>
-
-                  {/* Descripción con colores por tema */}
-                  <div className="lg:col-span-2">
-                    {pageData && updateTextStyle ? (
-                      <RichTextEditorWithTheme
-                        label="📄 Descripción"
-                        value={item.description}
-                        onChange={(html) => updateItem(index, 'description', html)}
-                        placeholder="Descripción detallada de la solución..."
-                        themeColors={{
-                          light: pageData.content.solutions.items?.[index]?.styles?.light?.descriptionColor || '',
-                          dark: pageData.content.solutions.items?.[index]?.styles?.dark?.descriptionColor || ''
-                        }}
-                        onThemeColorChange={(mode, color) => {
-                          // Crear estructura para el item específico
-                          updateTextStyle('solutions', `items.${index}.descriptionColor`, mode, color);
-                        }}
-                      />
-                    ) : (
-                      <RichTextEditor
-                        label="📄 Descripción"
-                        value={item.description}
-                        onChange={(html) => updateItem(index, 'description', html)}
-                        placeholder="Descripción detallada de la solución..."
-                      />
-                    )}
-                  </div>
-
-                  {/* Preview */}
-                  <div className="lg:col-span-2 mt-4">
+                  {/* Preview - Abarca toda la fila */}
+                  <div className="xl:col-span-3 mt-6">
                     <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">
                       👁️ Vista Previa
                     </h4>
@@ -391,7 +421,6 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                   </div>
 
                 </div>
-              </div>
             )}
           </div>
         ))}

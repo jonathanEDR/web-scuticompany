@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import RichTextEditorWithTheme from '../RichTextEditorWithTheme';
-import ManagedImageSelector from '../ManagedImageSelector';
+import RichTextEditorCompact from '../RichTextEditorCompact';
 import ClientLogosEditor from './ClientLogosEditor';
 import ClientLogosDesignSection from './ClientLogosDesignSection';
 import type { PageData, ClientLogo } from '../../types/cms';
@@ -17,7 +16,7 @@ const ClientLogosConfigSection: React.FC<ClientLogosConfigSectionProps> = ({
   updateTextStyle
 }) => {
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
@@ -92,138 +91,53 @@ const ClientLogosConfigSection: React.FC<ClientLogosConfigSectionProps> = ({
             </div>
           </div>
 
-          {/* Título y descripción de la sección */}
-          <div className="space-y-4 mb-8">
-            <div>
-              <RichTextEditorWithTheme
-                label="Título de la Sección"
-                value={pageData.content.clientLogos?.title || 'Nuestros clientes'}
-                onChange={(html) => updateContent('clientLogos.title', html)}
-                placeholder="Nuestros clientes"
-                themeColors={{
-                  light: pageData.content.clientLogos?.styles?.light?.titleColor || '',
-                  dark: pageData.content.clientLogos?.styles?.dark?.titleColor || ''
-                }}
-                onThemeColorChange={(mode, color) => updateTextStyle('clientLogos', 'titleColor', mode, color)}
-              />
-            </div>
-
-            <div>
-              <RichTextEditorWithTheme
-                label="Descripción de la Sección"
-                value={pageData.content.clientLogos?.description || ''}
-                onChange={(html) => updateContent('clientLogos.description', html)}
-                placeholder="Empresas que confían en nosotros..."
-                themeColors={{
-                  light: pageData.content.clientLogos?.styles?.light?.descriptionColor || '',
-                  dark: pageData.content.clientLogos?.styles?.dark?.descriptionColor || ''
-                }}
-                onThemeColorChange={(mode, color) => updateTextStyle('clientLogos', 'descriptionColor', mode, color)}
-              />
-            </div>
-          </div>
-
-          {/* Configuración de imagen de fondo única */}
-          <div className="space-y-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-              🖼️ Imagen de Fondo
-            </h3>
-            <div className="space-y-4">
-              {/* Imagen de fondo única */}
+          {/* Layout principal con 2 columnas: Contenido y Imagen */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+            
+            {/* Columna izquierda: Editores de texto (2/3) */}
+            <div className="xl:col-span-2 space-y-4">
+              
+              {/* Título de la Sección */}
               <div>
-                <ManagedImageSelector
-                  label="Imagen de Fondo de la Sección"
-                  currentImage={pageData.content.clientLogos?.backgroundImage || ''}
-                  onImageSelect={(imageUrl) => updateContent('clientLogos.backgroundImage', imageUrl)}
-                  description="Imagen que se mostrará como fondo de la sección (funciona en ambos temas)"
-                  hideButtonArea={!!pageData.content.clientLogos?.backgroundImage}
+                <RichTextEditorCompact
+                  label="Título de la Sección"
+                  value={pageData.content.clientLogos?.title || 'Nuestros clientes'}
+                  onChange={(html: string) => updateContent('clientLogos.title', html)}
+                  placeholder="Nuestros clientes"
+                  themeColors={{
+                    light: pageData.content.clientLogos?.styles?.light?.titleColor || '',
+                    dark: pageData.content.clientLogos?.styles?.dark?.titleColor || ''
+                  }}
+                  onThemeColorChange={(mode: 'light' | 'dark', color: string) => updateTextStyle('clientLogos', 'titleColor', mode, color)}
                 />
               </div>
 
-              {/* Texto alternativo para la imagen */}
+              {/* Descripción de la Sección */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Texto alternativo para la imagen
-                </label>
-                <input
-                  type="text"
-                  value={pageData.content.clientLogos?.backgroundImageAlt || ''}
-                  onChange={(e) => updateContent('clientLogos.backgroundImageAlt', e.target.value)}
-                  placeholder="Client logos background"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                <RichTextEditorCompact
+                  label="Descripción de la Sección"
+                  value={pageData.content.clientLogos?.description || ''}
+                  onChange={(html: string) => updateContent('clientLogos.description', html)}
+                  placeholder="Empresas que confían en nosotros..."
+                  themeColors={{
+                    light: pageData.content.clientLogos?.styles?.light?.descriptionColor || '',
+                    dark: pageData.content.clientLogos?.styles?.dark?.descriptionColor || ''
+                  }}
+                  onThemeColorChange={(mode: 'light' | 'dark', color: string) => updateTextStyle('clientLogos', 'descriptionColor', mode, color)}
                 />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Texto descriptivo para accesibilidad (screen readers)
-                </p>
               </div>
+            </div>
+
+            {/* Columna derecha: Editor de Logos (1/3) */}
+            <div className="xl:col-span-1">
+              <ClientLogosEditor
+                logos={pageData.content.clientLogos?.logos || []}
+                onUpdate={(updatedLogos: ClientLogo[]) => updateContent('clientLogos.logos', updatedLogos)}
+              />
             </div>
           </div>
 
-          {/* Configuración de diseño y espaciado */}
-          <div className="space-y-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-              📐 Diseño y Espaciado
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Espaciado vertical de la sección */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Espaciado Vertical de la Sección
-                </label>
-                <div className="space-y-2">
-                  <input
-                    type="range"
-                    min="1"
-                    max="8"
-                    step="0.5"
-                    value={parseFloat((pageData.content.clientLogos?.sectionPaddingY || '4rem').replace('rem', ''))}
-                    onChange={(e) => updateContent('clientLogos.sectionPaddingY', `${e.target.value}rem`)}
-                    className="w-full"
-                  />
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {pageData.content.clientLogos?.sectionPaddingY || '4rem'} ({Math.round(parseFloat((pageData.content.clientLogos?.sectionPaddingY || '4rem').replace('rem', '')) * 16)}px)
-                  </div>
-                </div>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Controla el espacio arriba y abajo de la sección
-                </p>
-              </div>
-
-              {/* Altura de los logos */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Altura de los Logos
-                </label>
-                <div className="space-y-2">
-                  <input
-                    type="range"
-                    min="30"
-                    max="120"
-                    step="5"
-                    value={parseInt((pageData.content.clientLogos?.logosHeight || '60px').replace('px', ''))}
-                    onChange={(e) => updateContent('clientLogos.logosHeight', `${e.target.value}px`)}
-                    className="w-full"
-                  />
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {pageData.content.clientLogos?.logosHeight || '60px'}
-                  </div>
-                </div>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Altura específica para todos los logos
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Editor de logos */}
-          <div className="mb-8">
-            <ClientLogosEditor
-              logos={pageData.content.clientLogos?.logos || []}
-              onUpdate={(updatedLogos: ClientLogo[]) => updateContent('clientLogos.logos', updatedLogos)}
-            />
-          </div>
-
-          {/* Configuración de diseño */}
+          {/* Configuración de diseño - Ancho completo */}
           <div className="mb-8">
             <ClientLogosDesignSection
               pageData={pageData}
