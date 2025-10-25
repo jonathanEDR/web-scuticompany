@@ -9,45 +9,13 @@ import type {
   UserWithRole,
   SyncUserResponse
 } from '../types/roles';
+import { getBackendUrl } from '../utils/apiConfig';
 
 // ============================================
 // CONFIGURACIÓN DE API
 // ============================================
 
-/**
- * Obtiene la URL base de la API según el entorno
- */
-const getApiBaseUrl = (): string => {
-  // En producción (Vercel), usar backend de Render
-  if (typeof window !== 'undefined' && window.location.hostname === 'web-scuticompany.vercel.app') {
-    return 'https://web-scuticompany-back.onrender.com';
-  }
-  
-  // Si hay variable de entorno específica, usarla
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace('/api', '');
-  }
-  
-  // Auto-detección basada en el entorno
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    
-    // Si estamos en Vercel (producción)
-    if (hostname.includes('vercel.app')) {
-      return 'https://web-scuticompany-back.onrender.com';
-    }
-    
-    // Si estamos en localhost (desarrollo)
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:5000';
-    }
-  }
-  
-  // Fallback
-  return 'http://localhost:5000';
-};
-
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL = getBackendUrl();
 
 // ============================================
 // CONFIGURACIÓN DE AXIOS
