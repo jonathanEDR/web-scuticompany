@@ -12,19 +12,28 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
 }) => {
   const addKeyword = () => {
     const currentKeywords = pageData.seo.keywords || [];
+    console.log('🔍 [SEO] Agregando keyword');
     updateContent('seo.keywords', [...currentKeywords, '']);
   };
 
   const removeKeyword = (index: number) => {
     const currentKeywords = pageData.seo.keywords || [];
     const updatedKeywords = currentKeywords.filter((_: any, i: number) => i !== index);
+    console.log('🔍 [SEO] Removiendo keyword en índice:', index);
     updateContent('seo.keywords', updatedKeywords);
   };
 
   const updateKeyword = (index: number, value: string) => {
     const currentKeywords = [...(pageData.seo.keywords || [])];
     currentKeywords[index] = value;
+    console.log('🔍 [SEO] Actualizando keyword:', value);
     updateContent('seo.keywords', currentKeywords);
+  };
+
+  // 🔥 NUEVO: Función helper para actualizar campos SEO con logging
+  const handleSeoFieldUpdate = (field: string, value: string) => {
+    console.log(`🔍 [SEO] Actualizando ${field}:`, value);
+    updateContent(`seo.${field}`, value);
   };
 
   return (
@@ -32,6 +41,19 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
       <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center">
         🔍 Configuración SEO
       </h2>
+
+      {/* 🔥 NUEVO: Banner de Preview en Tiempo Real */}
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+        <div className="flex items-center space-x-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-sm font-medium text-purple-800 dark:text-purple-200">
+            🎯 Preview en Tiempo Real
+          </span>
+        </div>
+        <p className="text-xs text-purple-600 dark:text-purple-300 mt-1">
+          Los cambios se aplican inmediatamente en el título de la pestaña del navegador. Guarda para aplicar en el sitio público.
+        </p>
+      </div>
 
       <div className="space-y-6">
         {/* Meta Tags Básicos */}
@@ -48,7 +70,7 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
               <input
                 type="text"
                 value={pageData.seo.metaTitle || ''}
-                onChange={(e) => updateContent('seo.metaTitle', e.target.value)}
+                onChange={(e) => handleSeoFieldUpdate('metaTitle', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Título de la página (50-60 caracteres)"
                 maxLength={60}
@@ -64,7 +86,7 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
               </label>
               <textarea
                 value={pageData.seo.metaDescription || ''}
-                onChange={(e) => updateContent('seo.metaDescription', e.target.value)}
+                onChange={(e) => handleSeoFieldUpdate('metaDescription', e.target.value)}
                 rows={3}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Descripción que aparecerá en los resultados de búsqueda (150-160 caracteres)"
@@ -139,7 +161,7 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
                 <input
                   type="text"
                   value={pageData.seo.ogTitle || ''}
-                  onChange={(e) => updateContent('seo.ogTitle', e.target.value)}
+                  onChange={(e) => handleSeoFieldUpdate('ogTitle', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                   placeholder="Título para redes sociales"
                 />
@@ -151,7 +173,7 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
                 </label>
                 <select
                   value={pageData.seo.twitterCard || 'summary_large_image'}
-                  onChange={(e) => updateContent('seo.twitterCard', e.target.value)}
+                  onChange={(e) => handleSeoFieldUpdate('twitterCard', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                 >
                   <option value="summary">Summary</option>
@@ -168,7 +190,7 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
               </label>
               <textarea
                 value={pageData.seo.ogDescription || ''}
-                onChange={(e) => updateContent('seo.ogDescription', e.target.value)}
+                onChange={(e) => handleSeoFieldUpdate('ogDescription', e.target.value)}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                 placeholder="Descripción para redes sociales"
@@ -182,7 +204,7 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
               <input
                 type="url"
                 value={pageData.seo.ogImage || ''}
-                onChange={(e) => updateContent('seo.ogImage', e.target.value)}
+                onChange={(e) => handleSeoFieldUpdate('ogImage', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                 placeholder="URL de la imagen para redes sociales"
               />

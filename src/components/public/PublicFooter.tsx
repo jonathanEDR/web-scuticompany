@@ -18,22 +18,11 @@ const PublicFooter = () => {
         
         logApiCall(apiUrl, 'Obteniendo datos de página home');
         
-        console.log('🔍 [DEBUG] URL exacta generada:', apiUrl);
-        console.log('🔍 [DEBUG] Realizando fetch sin headers especiales...');
-        
         const response = await fetch(apiUrl);
         
         if (response.ok) {
           const result = await response.json();
           const data = result.data || result;
-          console.log('📥 [PublicFooter] Datos de contacto recibidos:', {
-            phone: data.content?.contact?.phone,
-            email: data.content?.contact?.email,
-            socialLinksCount: data.content?.contact?.socialLinks?.length || 0,
-            socialLinks: data.content?.contact?.socialLinks,
-            environment: import.meta.env.DEV ? 'development' : 'production',
-            apiUrlUsed: apiUrl
-          });
           setPageData(data);
         } else {
           console.error('❌ [PublicFooter] Error en respuesta:', {
@@ -208,19 +197,12 @@ const PublicFooter = () => {
                 {/* Redes sociales dinámicas */}
                 <div className="mt-4">
                   <div className="flex space-x-3">
-                    {/* 🔥 SOLUCIÓN 4: Mejorar validación y logging */}
+                    {/* Redes sociales dinámicas */}
                     {contactData?.socialLinks && Array.isArray(contactData.socialLinks) && contactData.socialLinks.length > 0 ? (
                       <>
-                        {console.log('🌐 [Desktop] Redes sociales disponibles:', contactData.socialLinks)}
                         {contactData.socialLinks
                           .filter(link => link && link.enabled)
                           .map((link, index) => {
-                            console.log(`🔍 [Desktop] Renderizando red social #${index}:`, {
-                              name: link.name,
-                              url: link.url,
-                              icon: link.icon,
-                              enabled: link.enabled
-                            });
                             return (
                               <a 
                                 key={`${link.name}-${index}`}
@@ -236,11 +218,7 @@ const PublicFooter = () => {
                                     alt={link.name}
                                     className="w-4 h-4 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
                                     onError={(e) => {
-                                      console.error(`❌ Error cargando icono para ${link.name}:`, link.icon);
                                       e.currentTarget.style.display = 'none';
-                                    }}
-                                    onLoad={() => {
-                                      console.log(`✅ Icono cargado exitosamente para ${link.name}`);
                                     }}
                                   />
                                 ) : (
@@ -441,16 +419,9 @@ const PublicFooter = () => {
                         {/* 🔥 SOLUCIÓN 5: Mejorar validación y logging para móvil */}
                         {contactData?.socialLinks && Array.isArray(contactData.socialLinks) && contactData.socialLinks.length > 0 ? (
                           <>
-                            {console.log('🌐 [Móvil] Redes sociales disponibles:', contactData.socialLinks)}
                             {contactData.socialLinks
                               .filter(link => link && link.enabled)
                               .map((link, index) => {
-                                console.log(`🔍 [Móvil] Renderizando red social #${index}:`, {
-                                  name: link.name,
-                                  url: link.url,
-                                  icon: link.icon,
-                                  enabled: link.enabled
-                                });
                                 return (
                                   <a 
                                     key={`${link.name}-mobile-${index}`}
@@ -466,11 +437,7 @@ const PublicFooter = () => {
                                         alt={link.name}
                                         className="w-4 h-4 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
                                         onError={(e) => {
-                                          console.error(`❌ Error cargando icono para ${link.name}:`, link.icon);
                                           e.currentTarget.style.display = 'none';
-                                        }}
-                                        onLoad={() => {
-                                          console.log(`✅ Icono cargado exitosamente para ${link.name}`);
                                         }}
                                       />
                                     ) : (

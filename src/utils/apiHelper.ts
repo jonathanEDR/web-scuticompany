@@ -14,37 +14,32 @@ export const getCmsApiUrl = (endpoint: string): string => {
   return getApiUrl(`/cms${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`);
 };
 
-// Log para debugging
+// Log para debugging (solo en desarrollo)
 export const logApiCall = (url: string, description: string) => {
-  console.log(`🌐 [API] ${description}:`, {
-    environment: import.meta.env.DEV ? 'development' : 'production',
-    fullUrl: url,
-    baseApiUrl: API_URL,
-    configuredApiUrl: import.meta.env.VITE_API_URL,
-    configuredBackendUrl: import.meta.env.VITE_BACKEND_URL,
-  });
+  if (import.meta.env.DEV) {
+    console.log(`🌐 [API] ${description}:`, {
+      environment: 'development',
+      fullUrl: url,
+      baseApiUrl: API_URL,
+    });
+  }
 };
 
 // Función para probar conectividad con el backend
 export const testBackendConnection = async (): Promise<boolean> => {
   try {
     const testUrl = `${API_URL}/health`;
-    console.log('🔄 [API] Probando conexión con backend:', testUrl);
     
     const response = await fetch(testUrl, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
     
-    const isOk = response.ok;
-    console.log(isOk ? '✅ [API] Backend conectado' : '❌ [API] Backend no responde', {
-      status: response.status,
-      url: testUrl
-    });
-    
-    return isOk;
+    return response.ok;
   } catch (error) {
-    console.error('❌ [API] Error conectando con backend:', error);
+    if (import.meta.env.DEV) {
+      console.error('❌ [API] Error conectando con backend:', error);
+    }
     return false;
   }
 };

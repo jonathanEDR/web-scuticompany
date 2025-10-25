@@ -9,6 +9,8 @@ import './App.css';
 // ⚡ OPTIMIZACIÓN: Lazy loading agresivo
 // Páginas públicas - Sin dependencias de autenticación
 const Home = lazy(() => import('./pages/public/Home'));
+const About = lazy(() => import('./pages/public/About'));
+const ServicesPublic = lazy(() => import('./pages/public/ServicesPublic'));
 
 // Páginas de autenticación - CON Clerk optimizado
 const Login = lazy(() => import('./pages/auth/Login'));
@@ -55,6 +57,8 @@ function App() {
             <Routes>
               {/* ⚡ PÁGINAS PÚBLICAS - SIN CLERK, CARGA INSTANTÁNEA */}
               <Route path="/" element={<Home />} />
+              <Route path="/nosotros" element={<About />} />
+              <Route path="/servicios" element={<ServicesPublic />} />
               
               {/* 🔐 RUTAS DE AUTENTICACIÓN - Clerk con diseño optimizado */}
               <Route path="/login" element={

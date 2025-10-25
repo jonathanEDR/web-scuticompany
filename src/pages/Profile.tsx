@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useUserSync } from '../hooks/useUserSync';
+import DashboardSeo from '../components/DashboardSeo';
 import { 
   Button, 
   Card, 
@@ -94,7 +95,12 @@ export default function Profile() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardSeo
+      pageName="profile"
+      fallbackTitle="Mi Perfil - SCUTI Company"
+      fallbackDescription="Gestiona tu información personal y configuración de cuenta."
+    >
+      <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -369,5 +375,6 @@ export default function Profile() {
         </Card>
       </div>
     </DashboardLayout>
+    </DashboardSeo>
   );
 }

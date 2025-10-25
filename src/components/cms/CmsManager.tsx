@@ -66,7 +66,8 @@ const CmsManager: React.FC = () => {
   const {
     updateContent,
     updateTextStyle,
-    updateSimpleButtonStyle
+    updateSimpleButtonStyle,
+    updateSeo
   } = useCmsUpdaters(pageData, setPageData, setThemeConfig);
 
 
@@ -92,6 +93,64 @@ const CmsManager: React.FC = () => {
   const handleUpdateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: any) => {
     updateSimpleButtonStyle(mode, buttonType, style);
     // Marcar como cambios pendientes
+    setSaveStatus('idle');
+  };
+
+  // 🔥 NUEVO: Función para actualizar meta tags en tiempo real
+  const updateMetaTagsPreview = (field: string, value: any) => {
+    try {
+      const seoField = field.startsWith('seo.') ? field.replace('seo.', '') : field;
+      
+      switch (seoField) {
+        case 'metaTitle':
+          if (value && typeof value === 'string') {
+            document.title = `[CMS Preview] ${value}`;
+            console.log('🔍 [SEO Preview] Título actualizado:', value);
+          }
+          break;
+          
+        case 'metaDescription':
+          const metaDescription = document.querySelector('meta[name="description"]');
+          if (metaDescription && value && typeof value === 'string') {
+            metaDescription.setAttribute('content', value);
+            console.log('🔍 [SEO Preview] Description actualizada:', value.substring(0, 50) + '...');
+          }
+          break;
+          
+        case 'ogTitle':
+          const ogTitle = document.querySelector('meta[property="og:title"]');
+          if (ogTitle && value && typeof value === 'string') {
+            ogTitle.setAttribute('content', value);
+            console.log('🔍 [SEO Preview] OG Title actualizado:', value);
+          }
+          break;
+          
+        case 'ogDescription':
+          const ogDescription = document.querySelector('meta[property="og:description"]');
+          if (ogDescription && value && typeof value === 'string') {
+            ogDescription.setAttribute('content', value);
+            console.log('🔍 [SEO Preview] OG Description actualizada:', value.substring(0, 50) + '...');
+          }
+          break;
+      }
+    } catch (error) {
+      console.warn('⚠️ [SEO Preview] Error actualizando meta tags:', error);
+    }
+  };
+
+  // Update SEO without auto-save (manual save only)
+  const handleUpdateSeo = (field: string, value: any) => {
+    // Manejar dot notation para SEO: "seo.metaTitle" -> "metaTitle"
+    const seoField = field.startsWith('seo.') ? field.replace('seo.', '') : field;
+    updateSeo(seoField as any, value);
+    
+    // 🔥 NUEVO: Actualizar meta tags inmediatamente para preview
+    updateMetaTagsPreview(field, value);
+    
+    // Marcar como cambios pendientes
+    if (!hasGlobalChanges) {
+      setHasGlobalChanges(true);
+    }
     setSaveStatus('idle');
   };
 
@@ -342,7 +401,7 @@ const CmsManager: React.FC = () => {
         {activeTab === 'seo' && (
           <SeoConfigSection
             pageData={pageData}
-            updateContent={handleUpdateContent}
+            updateContent={handleUpdateSeo}
           />
         )}
         {activeTab === 'theme' && (

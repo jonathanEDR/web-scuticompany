@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
 import PublicHeader from '../../components/public/PublicHeader';
 import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
@@ -8,6 +7,7 @@ import ClientLogosSection from '../../components/public/ClientLogosSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import { getPageBySlug, clearCache, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSeo } from '../../hooks/useSeo';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG } from '../../utils/defaultConfig';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 import type { ClientLogosContent } from '../../types/cms';
@@ -125,24 +125,35 @@ const HomeOptimized = () => {
   const [pageData, setPageData] = useState<PageData>(DEFAULT_PAGE_DATA);
   const [isLoadingCMS, setIsLoadingCMS] = useState(false);
   const { setThemeConfig } = useTheme();
+  
+  // 🎯 Hook global de SEO - maneja meta tags automáticamente
+    const { SeoHelmet } = useSeo({
+      pageName: 'home',
+      fallbackTitle: 'SCUTI Company - Transformamos tu empresa con tecnología inteligente',
+      fallbackDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.'
+    });
+  
+    // ✅ SEO ahora es manejado completamente por el hook useSeo()
 
   // ⚡ Limpiar caché al montar el componente para asegurar datos frescos
   useEffect(() => {
     clearCache('page-home');
     
-    // Cargar datos del CMS en background (no bloquea renderizado inicial)
+    // 🔍 Cargar contenido (sin SEO) para el resto de la página
     loadPageData();
   }, []);
 
-  // Refrescar datos cada 60 segundos (reducido de 30s para mejor rendimiento)
+  // ⏰ Sistema de eventos CMS para mantener contenido sincronizado
   useEffect(() => {
+    
+    // Refrescar contenido cada 60 segundos (sin SEO)
     const interval = setInterval(() => {
       loadPageData(true); // Recarga silenciosa
     }, 60000); // 60 segundos
 
     // Escuchar eventos de actualización del CMS
     const handleCMSUpdate = () => {
-      // SIEMPRE limpiar caché y forzar refresh cuando viene de un evento CMS
+      // Limpiar caché y forzar refresh cuando viene del CMS
       clearCache('page-home');
       loadPageData(true, true); // silent=true, forceRefresh=true
     };
@@ -174,7 +185,15 @@ const HomeOptimized = () => {
       
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
-        setPageData(data);
+        // ⚠️ IMPORTANTE: Eliminar datos de SEO para evitar conflictos con useSeo hook
+        const dataWithoutSeo = {
+          ...data,
+          seo: undefined // El hook useSeo() maneja esto
+        };
+        
+        setPageData(dataWithoutSeo);
+        
+        // ✅ Meta tags ahora se manejan automáticamente por React Helmet optimizado
         
         // Cargar configuración de tema si existe
         if (data.theme) {
@@ -196,24 +215,10 @@ const HomeOptimized = () => {
 
   return (
     <>
-      {/* SEO Meta Tags */}
-      <Helmet>
-        <title>{pageData.seo.metaTitle}</title>
-        <meta name="description" content={pageData.seo.metaDescription} />
-        <meta name="keywords" content={pageData.seo.keywords.join(', ')} />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={pageData.seo.ogTitle} />
-        <meta property="og:description" content={pageData.seo.ogDescription} />
-        {pageData.seo.ogImage && <meta property="og:image" content={pageData.seo.ogImage} />}
-        <meta property="og:type" content="website" />
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageData.seo.ogTitle} />
-        <meta name="twitter:description" content={pageData.seo.ogDescription} />
-        {pageData.seo.ogImage && <meta name="twitter:image" content={pageData.seo.ogImage} />}
-      </Helmet>
+      {/* 🎯 SEO Meta Tags - Manejado por Hook Global */}
+      <SeoHelmet />
+      
+      {/* 🎯 SEO aplicado por hook useSeo */}
 
       {/* ⚡ Contenido se renderiza INMEDIATAMENTE sin esperar autenticación ni CMS */}
       <div className="min-h-screen w-full overflow-x-hidden bg-transparent">

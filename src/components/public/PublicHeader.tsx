@@ -114,6 +114,15 @@ const PublicHeaderOptimized = () => {
             >
               Nosotros
             </Link>
+            <Link 
+              to="/servicios" 
+              className="theme-text-secondary theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+              onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
+              onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
+              aria-label="Servicios"
+            >
+              Servicios
+            </Link>
             <div className="relative group">
               <button 
                 className="theme-text-secondary theme-transition flex items-center px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"

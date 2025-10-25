@@ -3,6 +3,7 @@ import { SignedIn, useUser } from '@clerk/clerk-react';
 import DashboardLayout from '../components/DashboardLayout';
 import { Button, LoadingSpinner } from '../components/UI';
 import { useUserSync } from '../hooks/useUserSync';
+import { useSeo } from '../hooks/useSeo';
 
 // 🎯 Tipos TypeScript optimizados
 interface DatabaseInfo {
@@ -99,6 +100,14 @@ const API_CONFIG = {
 export default function Dashboard() {
   const { user, isLoaded, isSignedIn } = useUser();
   const userSyncStatus = useUserSync(); // Hook para auto-registro
+  
+  // 🎯 SEO dinámico para Dashboard
+  const { SeoHelmet } = useSeo({
+    pageName: 'dashboard',
+    fallbackTitle: 'Dashboard - SCUTI Company',
+    fallbackDescription: 'Panel de administración y gestión de contenidos de SCUTI Company.'
+  });
+  
   const [backendData, setBackendData] = useState<BackendStatus | null>(null);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -177,6 +186,9 @@ export default function Dashboard() {
 
   return (
     <SignedIn>
+      {/* 🎯 SEO Dinámico */}
+      <SeoHelmet />
+      
       <DashboardLayout>
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 mb-8 text-white">
