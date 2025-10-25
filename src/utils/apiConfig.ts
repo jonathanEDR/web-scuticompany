@@ -14,18 +14,6 @@ interface ApiConfigType {
  * Detecta el entorno y configura las URLs correctas
  */
 function detectApiConfiguration(): ApiConfigType {
-  const logContext = '[ApiConfig]';
-  
-  console.log(`${logContext} Iniciando detección de configuración...`, {
-    mode: import.meta.env.MODE,
-    prod: import.meta.env.PROD,
-    hostname: typeof window !== 'undefined' ? window.location.hostname : 'SSR',
-    VITE_API_URL: import.meta.env.VITE_API_URL,
-    VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
-    VITE_NODE_ENV: import.meta.env.VITE_NODE_ENV,
-    NODE_ENV: import.meta.env.NODE_ENV
-  });
-
   let baseUrl: string;
   let environment: 'development' | 'production';
 
@@ -33,13 +21,11 @@ function detectApiConfiguration(): ApiConfigType {
   if (import.meta.env.VITE_BACKEND_URL) {
     baseUrl = import.meta.env.VITE_BACKEND_URL;
     environment = import.meta.env.PROD ? 'production' : 'development';
-    console.log(`${logContext} Usando VITE_BACKEND_URL:`, baseUrl);
   }
   // 2. Variable de entorno VITE_API_URL (remover /api)
   else if (import.meta.env.VITE_API_URL) {
     baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
     environment = import.meta.env.PROD ? 'production' : 'development';
-    console.log(`${logContext} Usando VITE_API_URL (sin /api):`, baseUrl);
   }
   // 3. Detección automática por hostname
   else if (typeof window !== 'undefined') {
@@ -52,7 +38,6 @@ function detectApiConfiguration(): ApiConfigType {
       // Producción
       baseUrl = 'https://web-scuticompany-back.onrender.com';
       environment = 'production';
-      console.log(`${logContext} Detectado entorno de producción (${hostname}):`, baseUrl);
     } else if (hostname === 'localhost' || 
                hostname === '127.0.0.1' || 
                hostname.includes('127.0.0.1') ||
@@ -60,14 +45,12 @@ function detectApiConfiguration(): ApiConfigType {
       // Desarrollo local
       baseUrl = 'http://localhost:5000';
       environment = 'development';
-      console.log(`${logContext} Detectado entorno local (${hostname}):`, baseUrl);
     } else {
       // Fallback para otros dominios
       baseUrl = import.meta.env.PROD 
         ? 'https://web-scuticompany-back.onrender.com'
         : 'http://localhost:5000';
       environment = import.meta.env.PROD ? 'production' : 'development';
-      console.warn(`${logContext} Hostname desconocido (${hostname}), usando fallback:`, baseUrl);
     }
   }
   // 4. Fallback absoluto (SSR o caso extremo)
@@ -76,7 +59,6 @@ function detectApiConfiguration(): ApiConfigType {
       ? 'https://web-scuticompany-back.onrender.com'
       : 'http://localhost:5000';
     environment = import.meta.env.PROD ? 'production' : 'development';
-    console.warn(`${logContext} No hay window disponible, usando fallback:`, baseUrl);
   }
 
   const config: ApiConfigType = {
@@ -85,13 +67,6 @@ function detectApiConfiguration(): ApiConfigType {
     environment,
     isProduction: environment === 'production'
   };
-
-  console.log(`${logContext} Configuración final:`, {
-    baseUrl: config.baseUrl,
-    apiUrl: config.apiUrl,
-    environment: config.environment,
-    isProduction: config.isProduction
-  });
 
   return config;
 }

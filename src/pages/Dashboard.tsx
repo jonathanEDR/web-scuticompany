@@ -4,6 +4,7 @@ import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import { Button, LoadingSpinner } from '../components/UI';
 import { useUserSync } from '../hooks/useUserSync';
 import { useSeo } from '../hooks/useSeo';
+import { getBackendUrl } from '../utils/apiConfig';
 
 // 🎯 Tipos TypeScript optimizados
 interface DatabaseInfo {
@@ -59,57 +60,8 @@ interface ProjectData {
 }
 
 // 🔧 Configuración de API  
-const getApiBaseUrl = () => {
-  console.log('[Dashboard] Detectando entorno...', {
-    env: import.meta.env.MODE,
-    hostname: typeof window !== 'undefined' ? window.location.hostname : 'N/A',
-    VITE_API_URL: import.meta.env.VITE_API_URL,
-    VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL
-  });
-
-  // 1. PRIORIDAD: Variable de entorno VITE_BACKEND_URL (sin /api)
-  if (import.meta.env.VITE_BACKEND_URL) {
-    console.log('[Dashboard] Usando VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
-    return import.meta.env.VITE_BACKEND_URL;
-  }
-
-  // 2. Variable de entorno VITE_API_URL (remover /api si está presente)
-  if (import.meta.env.VITE_API_URL) {
-    const apiUrl = import.meta.env.VITE_API_URL.replace('/api', '');
-    console.log('[Dashboard] Usando VITE_API_URL (sin /api):', apiUrl);
-    return apiUrl;
-  }
-  
-  // 3. Detección automática basada en el hostname
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    
-    // Si estamos en cualquier dominio de Vercel (producción)
-    if (hostname.includes('vercel.app') || hostname.includes('web-scuti')) {
-      const productionUrl = 'https://web-scuticompany-back.onrender.com';
-      console.log('[Dashboard] Detectado entorno Vercel, usando:', productionUrl);
-      return productionUrl;
-    }
-    
-    // Si estamos en localhost (desarrollo)
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('127.0.0.1')) {
-      const devUrl = 'http://localhost:5000';
-      console.log('[Dashboard] Detectado entorno local, usando:', devUrl);
-      return devUrl;
-    }
-  }
-  
-  // 4. Fallback basado en el modo de construcción
-  const fallbackUrl = import.meta.env.PROD 
-    ? 'https://web-scuticompany-back.onrender.com'  // Producción
-    : 'http://localhost:5000';                       // Desarrollo
-  
-  console.warn('[Dashboard] Usando fallback URL:', fallbackUrl);
-  return fallbackUrl;
-};
-
 const API_CONFIG = {
-  BASE_URL: getApiBaseUrl(),
+  BASE_URL: getBackendUrl(),
   ENDPOINTS: {
     DASHBOARD_STATUS: '/api/dashboard-status',
     PROJECT_INFO: '/api/project-info',

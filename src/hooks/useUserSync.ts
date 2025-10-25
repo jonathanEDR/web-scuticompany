@@ -20,55 +20,7 @@ interface UserSyncStatus {
   userData: UserSyncData | null;
 }
 
-// 🔧 Configuración de API (igual que en Dashboard)
-const getApiBaseUrl = () => {
-  console.log('[UserSync] Detectando entorno...', {
-    env: import.meta.env.MODE,
-    hostname: typeof window !== 'undefined' ? window.location.hostname : 'N/A',
-    VITE_API_URL: import.meta.env.VITE_API_URL,
-    VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL
-  });
-
-  // 1. PRIORIDAD: Variable de entorno VITE_BACKEND_URL (sin /api)
-  if (import.meta.env.VITE_BACKEND_URL) {
-    console.log('[UserSync] Usando VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
-    return import.meta.env.VITE_BACKEND_URL;
-  }
-
-  // 2. Variable de entorno VITE_API_URL (remover /api si está presente)
-  if (import.meta.env.VITE_API_URL) {
-    const apiUrl = import.meta.env.VITE_API_URL.replace('/api', '');
-    console.log('[UserSync] Usando VITE_API_URL (sin /api):', apiUrl);
-    return apiUrl;
-  }
-  
-  // 3. Detección automática basada en el hostname
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    
-    // Si estamos en cualquier dominio de Vercel (producción)
-    if (hostname.includes('vercel.app') || hostname.includes('web-scuti')) {
-      const productionUrl = 'https://web-scuticompany-back.onrender.com';
-      console.log('[UserSync] Detectado entorno Vercel, usando:', productionUrl);
-      return productionUrl;
-    }
-    
-    // Si estamos en localhost (desarrollo)
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('127.0.0.1')) {
-      const devUrl = 'http://localhost:5000';
-      console.log('[UserSync] Detectado entorno local, usando:', devUrl);
-      return devUrl;
-    }
-  }
-  
-  // 4. Fallback basado en el modo de construcción
-  const fallbackUrl = import.meta.env.PROD 
-    ? 'https://web-scuticompany-back.onrender.com'  // Producción
-    : 'http://localhost:5000';                       // Desarrollo
-  
-  console.warn('[UserSync] Usando fallback URL:', fallbackUrl);
-  return fallbackUrl;
-};
+import { getBackendUrl } from '../utils/apiConfig';
 
 
 /**
@@ -102,7 +54,7 @@ export const useUserSync = (): UserSyncStatus => {
           profileImage: user.imageUrl || ''
         };
 
-        const response = await fetch(`${getApiBaseUrl()}/api/users/sync`, {
+        const response = await fetch(`${getBackendUrl()}/api/users/sync`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

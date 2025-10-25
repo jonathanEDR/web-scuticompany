@@ -103,25 +103,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const syncedUser = await authService.getOrSyncUser(token, userData);
       
       setUser(syncedUser);
-
-      console.log('[AuthContext] Usuario sincronizado:', {
-        email: syncedUser.email,
-        role: syncedUser.role,
-        isActive: syncedUser.isActive
-      });
-
-      // 🔍 DEBUG: Verificar funciones de roles
-      console.log('[AuthContext] DEBUG ROLES:', {
-        role: syncedUser.role,
-        roleType: typeof syncedUser.role,
-        shouldUseClient: shouldUseClientDashboard(syncedUser.role),
-        canAccessAdmin: canAccessAdminDashboard(syncedUser.role),
-        comparison: {
-          isUSER: syncedUser.role === 'USER',
-          isCLIENT: syncedUser.role === 'CLIENT',
-          isString: typeof syncedUser.role === 'string'
-        }
-      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al sincronizar usuario';
       console.error('[AuthContext] Error:', errorMessage, err);
