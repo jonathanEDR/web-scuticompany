@@ -7,14 +7,14 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { useUser, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import type { 
   UserWithRole, 
-  UserRole, 
   Permission 
 } from '../types/roles';
 import {
   hasPermission as checkPermission,
   getRolePermissions,
   canAccessAdminDashboard,
-  shouldUseClientDashboard
+  shouldUseClientDashboard,
+  UserRole
 } from '../types/roles';
 import { authService } from '../services/authService';
 
@@ -108,6 +108,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email: syncedUser.email,
         role: syncedUser.role,
         isActive: syncedUser.isActive
+      });
+
+      // 🔍 DEBUG: Verificar funciones de roles
+      console.log('[AuthContext] DEBUG ROLES:', {
+        role: syncedUser.role,
+        roleType: typeof syncedUser.role,
+        shouldUseClient: shouldUseClientDashboard(syncedUser.role),
+        canAccessAdmin: canAccessAdminDashboard(syncedUser.role),
+        comparison: {
+          isUSER: syncedUser.role === 'USER',
+          isCLIENT: syncedUser.role === 'CLIENT',
+          isString: typeof syncedUser.role === 'string'
+        }
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al sincronizar usuario';
