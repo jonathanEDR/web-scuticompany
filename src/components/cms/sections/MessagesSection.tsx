@@ -1,8 +1,10 @@
 import React from 'react';
+import CollapsibleSection from '../../ui/CollapsibleSection';
 import type { ContactFormSectionProps } from '../types/ContactFormTypes';
 
 interface MessagesSectionProps extends ContactFormSectionProps {
-  // Esta sección no usa CollapsibleSection porque no estaba envuelta
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 /**
@@ -10,13 +12,18 @@ interface MessagesSectionProps extends ContactFormSectionProps {
  */
 const MessagesSection: React.FC<MessagesSectionProps> = ({
   contactForm,
-  updateContent
+  updateContent,
+  isOpen,
+  onToggle
 }) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
-        💬 Mensajes de Respuesta
-      </h3>
+    <CollapsibleSection
+      title="Mensajes de Respuesta"
+      icon="💬"
+      isOpen={isOpen}
+      onToggle={onToggle}
+      badge="Mensajes"
+    >
       
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-4">
         <div>
@@ -44,7 +51,7 @@ const MessagesSection: React.FC<MessagesSectionProps> = ({
           />
         </div>
       </div>
-    </div>
+    </CollapsibleSection>
   );
 };
 

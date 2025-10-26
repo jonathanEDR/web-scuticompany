@@ -25,37 +25,40 @@ const TextsSection: React.FC<TextsSectionProps> = ({
       onToggle={onToggle}
       badge="Básico"
     >
-      <div className="space-y-6">
-        {/* Título Principal con Rich Text Editor */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-          <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">✏️ Título Principal</h4>
-          <RichTextEditor
-            value={contactForm.title || ''}
-            onChange={(value) => updateContent('contactForm.title', value)}
-            placeholder="Contáctanos"
-            label="Contenido del título (admite formato rich text)"
-          />
+      <div className="space-y-4">
+        {/* Layout compacto con grid para pantallas grandes */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Título Principal con Rich Text Editor */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-2 text-sm">✏️ Título Principal</h4>
+            <RichTextEditor
+              value={contactForm.title || ''}
+              onChange={(value) => updateContent('contactForm.title', value)}
+              placeholder="Contáctanos"
+              label="Título del formulario"
+            />
+          </div>
+          
+          {/* Subtítulo con Rich Text Editor */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-2 text-sm">🏷️ Subtítulo</h4>
+            <RichTextEditor
+              value={contactForm.subtitle || ''}
+              onChange={(value) => updateContent('contactForm.subtitle', value)}
+              placeholder="Estamos aquí para ayudarte"
+              label="Subtítulo del formulario"
+            />
+          </div>
         </div>
         
-        {/* Subtítulo con Rich Text Editor */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-          <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">🏷️ Subtítulo</h4>
-          <RichTextEditor
-            value={contactForm.subtitle || ''}
-            onChange={(value) => updateContent('contactForm.subtitle', value)}
-            placeholder="Estamos aquí para ayudarte"
-            label="Contenido del subtítulo (admite formato rich text)"
-          />
-        </div>
-        
-        {/* Descripción con Rich Text Editor */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-          <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">📝 Descripción</h4>
+        {/* Descripción con Rich Text Editor - ancho completo pero más compacta */}
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+          <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-2 text-sm">📝 Descripción</h4>
           <RichTextEditor
             value={contactForm.description || ''}
             onChange={(value) => updateContent('contactForm.description', value)}
             placeholder="¿Tienes un proyecto en mente? Cuéntanos sobre él y te responderemos pronto."
-            label="Contenido de la descripción (admite formato rich text)"
+            label="Descripción del formulario"
           />
         </div>
       </div>

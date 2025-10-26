@@ -216,7 +216,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
   return (
     <section
       id="contacto"
-      className="relative min-h-screen py-20 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen py-24 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden"
       style={sectionStyles}
     >
       {/* Overlay removido para mostrar imagen de fondo sin filtros */}
@@ -236,16 +236,16 @@ const ContactSection = ({ data }: ContactSectionProps) => {
       {/* Contenido */}
       <div 
         className={`
-          relative z-10 w-full transition-all duration-1000
+          relative z-10 w-full transition-all duration-1000 px-2 sm:px-4
           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
         `}
         style={{ maxWidth: data?.map?.enabled ? '1400px' : (data?.layout?.maxWidth || '600px') }}
       >
         {/* Cabecera */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-16">
           {data?.subtitle && (
             <p 
-              className="text-sm font-semibold tracking-wider uppercase mb-2"
+              className="text-sm font-semibold tracking-wider uppercase mb-3"
               style={{ color: currentStyles?.subtitleColor || '#6b7280' }}
             >
               {data.subtitle}
@@ -253,7 +253,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           )}
           
           <h2 
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-4xl md:text-5xl font-bold mb-6"
             style={{ color: currentStyles?.titleColor || currentCardsDesign?.titleColor || '#1f2937' }}
           >
             {data?.title || 'Contáctanos'}
@@ -261,7 +261,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           
           {data?.description && (
             <p 
-              className="text-lg"
+              className="text-lg max-w-3xl mx-auto"
               style={{ color: currentStyles?.descriptionColor || currentCardsDesign?.descriptionColor || '#4b5563' }}
             >
               {data.description}
@@ -270,11 +270,11 @@ const ContactSection = ({ data }: ContactSectionProps) => {
         </div>
 
         {/* Contenido principal: Formulario + Mapa */}
-        <div className={`grid gap-8 ${data?.map?.enabled ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'} items-start`}>
+        <div className={`grid gap-8 lg:gap-6 ${data?.map?.enabled ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 max-w-2xl mx-auto'} items-center justify-items-center`}>
           
           {/* Formulario */}
           <div 
-            className="transition-all duration-300 hover:shadow-lg"
+            className="w-full max-w-lg mx-auto transition-all duration-300 hover:shadow-lg"
             style={{
               background: currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)',
               border: `${currentCardsDesign?.borderWidth || '1px'} solid ${currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)'}`,

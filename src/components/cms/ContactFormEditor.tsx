@@ -40,28 +40,28 @@ const ContactFormEditor: React.FC<ContactFormEditorProps> = ({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
            Editor del Formulario de Contacto
         </h2>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
-            {Object.values(accordionStates).filter(Boolean).length} de {Object.keys(accordionStates).length} secciones abiertas
+            {Object.values(accordionStates).filter(Boolean).length}/{Object.keys(accordionStates).length} abiertas
           </div>
-          <div className="flex gap-2">
-            <button onClick={expandAll} className="px-3 py-1 text-xs bg-green-100 rounded-lg">
-              Expandir
+          <div className="flex gap-1">
+            <button onClick={expandAll} className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 rounded text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50">
+              ↗️ Todo
             </button>
-            <button onClick={collapseAll} className="px-3 py-1 text-xs bg-red-100 rounded-lg">
-              Colapsar
+            <button onClick={collapseAll} className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 rounded text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50">
+              ↙️ Nada
             </button>
           </div>
         </div>
       </div>
       
-      <div className="space-y-8">
+      <div className="space-y-4">
         <TextsSection
           contactForm={contactForm}
           updateContent={updateContent}
@@ -82,24 +82,32 @@ const ContactFormEditor: React.FC<ContactFormEditorProps> = ({
           contactForm={contactForm}
           updateContent={updateContent}
           isDark={isDark}
+          isOpen={accordionStates.fields}
+          onToggle={() => toggleAccordion('fields')}
         />
 
         <ButtonSection
           contactForm={contactForm}
           updateContent={updateContent}
           isDark={isDark}
+          isOpen={accordionStates.button}
+          onToggle={() => toggleAccordion('button')}
         />
 
         <MessagesSection
           contactForm={contactForm}
           updateContent={updateContent}
           isDark={isDark}
+          isOpen={accordionStates.messages}
+          onToggle={() => toggleAccordion('messages')}
         />
 
         <BackgroundImageSection
           contactForm={contactForm}
           updateContent={updateContent}
           isDark={isDark}
+          isOpen={accordionStates.backgroundImage}
+          onToggle={() => toggleAccordion('backgroundImage')}
         />
 
         <MapSection

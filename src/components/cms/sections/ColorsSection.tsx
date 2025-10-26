@@ -27,36 +27,36 @@ const ColorsSection: React.FC<ColorsSectionProps> = ({
       onToggle={onToggle}
       badge="Estilo"
     >
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          {/* Selector de Tema para Colores */}
-          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+      <div className="space-y-4">
+        {/* Selector de Tema para Colores - más compacto */}
+        <div className="flex items-center justify-center">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
             <button
               onClick={() => setActiveColorTheme('light')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              className={`px-3 py-1.5 rounded-md font-medium transition-all duration-200 text-sm ${
                 activeColorTheme === 'light'
                   ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400'
               }`}
             >
-              🌞 Tema Claro
+              🌞 Claro
             </button>
             <button
               onClick={() => setActiveColorTheme('dark')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              className={`px-3 py-1.5 rounded-md font-medium transition-all duration-200 text-sm ${
                 activeColorTheme === 'dark'
                   ? 'bg-gray-800 text-gray-100 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400'
               }`}
             >
-              🌙 Tema Oscuro
+              🌙 Oscuro
             </button>
           </div>
         </div>
         
         {/* Configuración de Colores según el tema activo */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-          <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+          <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-3 text-sm">
             {activeColorTheme === 'light' ? '🌞 Colores para Tema Claro' : '🌙 Colores para Tema Oscuro'}
           </h4>
           

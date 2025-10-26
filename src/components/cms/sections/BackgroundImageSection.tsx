@@ -1,9 +1,11 @@
 import React from 'react';
+import CollapsibleSection from '../../ui/CollapsibleSection';
 import ManagedImageSelector from '../../ManagedImageSelector';
 import type { ContactFormSectionProps } from '../types/ContactFormTypes';
 
 interface BackgroundImageSectionProps extends ContactFormSectionProps {
-  // Esta sección no usa CollapsibleSection porque no estaba envuelta
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 /**
@@ -12,28 +14,78 @@ interface BackgroundImageSectionProps extends ContactFormSectionProps {
 const BackgroundImageSection: React.FC<BackgroundImageSectionProps> = ({
   contactForm,
   updateContent,
-  isDark
+  isOpen,
+  onToggle
 }) => {
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
-        🖼️ Imagen de Fondo
-      </h3>
+    <CollapsibleSection
+      title="Imagen de Fondo"
+      icon="🖼️"
+      isOpen={isOpen}
+      onToggle={onToggle}
+      badge="Diseño"
+    >
+      <div className="space-y-4">
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Imagen para Tema Claro */}
         <div className="space-y-3">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
             Imagen - Tema Claro
           </label>
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-            <ManagedImageSelector
-              currentImage={contactForm.backgroundImage?.light || ''}
-              onImageSelect={(imageUrl) => updateContent('contactForm.backgroundImage.light', imageUrl)}
-              label="Fondo Tema Claro"
-              description="Imagen que se mostrará cuando esté activo el tema claro"
-              darkMode={isDark}
-            />
+            {contactForm.backgroundImage?.light ? (
+              /* CON imagen - mostrar preview + hover */
+              <div className="relative group">
+                <div className="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border">
+                  <img 
+                    src={contactForm.backgroundImage.light} 
+                    alt="Fondo tema claro"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                {/* Hover overlay para cambiar */}
+                <div className="absolute inset-0 bg-black bg-opacity-70 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="text-center">
+                    <ManagedImageSelector
+                      currentImage={contactForm.backgroundImage.light}
+                      onImageSelect={(imageUrl) => updateContent('contactForm.backgroundImage.light', imageUrl)}
+                      label=""
+                      hideButtonArea={true}
+                    />
+                    <div className="text-white text-sm font-medium mt-2 pointer-events-none">
+                      Cambiar Imagen
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Botón eliminar */}
+                <button
+                  onClick={() => updateContent('contactForm.backgroundImage.light', '')}
+                  className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors text-sm flex items-center justify-center opacity-0 group-hover:opacity-100"
+                  title="Eliminar imagen"
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              /* SIN imagen - mostrar selector */
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <span className="text-2xl text-gray-400">🖼️</span>
+                </div>
+                <ManagedImageSelector
+                  currentImage=""
+                  onImageSelect={(imageUrl) => updateContent('contactForm.backgroundImage.light', imageUrl)}
+                  label="📷 Seleccionar Imagen"
+                  hideButtonArea={false}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Imagen para tema claro
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -43,13 +95,58 @@ const BackgroundImageSection: React.FC<BackgroundImageSectionProps> = ({
             Imagen - Tema Oscuro
           </label>
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-            <ManagedImageSelector
-              currentImage={contactForm.backgroundImage?.dark || ''}
-              onImageSelect={(imageUrl) => updateContent('contactForm.backgroundImage.dark', imageUrl)}
-              label="Fondo Tema Oscuro"
-              description="Imagen que se mostrará cuando esté activo el tema oscuro"
-              darkMode={isDark}
-            />
+            {contactForm.backgroundImage?.dark ? (
+              /* CON imagen - mostrar preview + hover */
+              <div className="relative group">
+                <div className="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border">
+                  <img 
+                    src={contactForm.backgroundImage.dark} 
+                    alt="Fondo tema oscuro"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                {/* Hover overlay para cambiar */}
+                <div className="absolute inset-0 bg-black bg-opacity-70 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="text-center">
+                    <ManagedImageSelector
+                      currentImage={contactForm.backgroundImage.dark}
+                      onImageSelect={(imageUrl) => updateContent('contactForm.backgroundImage.dark', imageUrl)}
+                      label=""
+                      hideButtonArea={true}
+                    />
+                    <div className="text-white text-sm font-medium mt-2 pointer-events-none">
+                      Cambiar Imagen
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Botón eliminar */}
+                <button
+                  onClick={() => updateContent('contactForm.backgroundImage.dark', '')}
+                  className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors text-sm flex items-center justify-center opacity-0 group-hover:opacity-100"
+                  title="Eliminar imagen"
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              /* SIN imagen - mostrar selector */
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <span className="text-2xl text-gray-400">🖼️</span>
+                </div>
+                <ManagedImageSelector
+                  currentImage=""
+                  onImageSelect={(imageUrl) => updateContent('contactForm.backgroundImage.dark', imageUrl)}
+                  label="📷 Seleccionar Imagen"
+                  hideButtonArea={false}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Imagen para tema oscuro
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -97,7 +194,8 @@ const BackgroundImageSection: React.FC<BackgroundImageSectionProps> = ({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </CollapsibleSection>
   );
 };
 

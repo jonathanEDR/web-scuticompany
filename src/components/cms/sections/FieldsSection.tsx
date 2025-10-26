@@ -1,8 +1,10 @@
 import React from 'react';
+import CollapsibleSection from '../../ui/CollapsibleSection';
 import type { ContactFormSectionProps } from '../types/ContactFormTypes';
 
 interface FieldsSectionProps extends ContactFormSectionProps {
-  // Esta sección no usa CollapsibleSection porque no estaba envuelta
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 /**
@@ -10,13 +12,19 @@ interface FieldsSectionProps extends ContactFormSectionProps {
  */
 const FieldsSection: React.FC<FieldsSectionProps> = ({
   contactForm,
-  updateContent
+  updateContent,
+  isOpen,
+  onToggle
 }) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
-        📝 Configuración de Campos
-      </h3>
+    <CollapsibleSection
+      title="Configuración de Campos"
+      icon="📝"
+      isOpen={isOpen}
+      onToggle={onToggle}
+      badge="Formulario"
+    >
+      <div className="space-y-4">
       
       {/* Campo Nombre */}
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
@@ -244,7 +252,8 @@ const FieldsSection: React.FC<FieldsSectionProps> = ({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </CollapsibleSection>
   );
 };
 
