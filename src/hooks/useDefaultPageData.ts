@@ -156,6 +156,19 @@ export const useDefaultPageData = (): UseDefaultPageDataReturn => {
       success: '¡Gracias por contactarnos! Te responderemos pronto.',
       error: 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.',
     },
+    // Configuración del mapa (habilitado por defecto para demostrar la funcionalidad)
+    map: {
+      enabled: true,
+      googleMapsUrl: 'https://maps.app.goo.gl/MiMpNHWrRQUVqihz5', // URL de ejemplo de Lima, Perú
+      latitude: -12.0464,
+      longitude: -77.0428,
+      zoom: 15,
+      height: '400px',
+      companyName: 'Scuti Company',
+      address: 'Lima, Perú',
+      markerColor: '#8B5CF6',
+      pulseColor: '#8B5CF6'
+    },
   };
 
   // Obtener imágenes según tema actual con fallback

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useContactForm } from '../../hooks/useContactForm';
+import SimpleGoogleMap from './SimpleGoogleMap';
 
 interface ContactFormData {
   title: string;
@@ -130,6 +131,18 @@ interface ContactFormData {
     borderRadius: string;
     gap: string;
   };
+  map?: {
+    enabled: boolean;
+    googleMapsUrl: string;
+    latitude: number;
+    longitude: number;
+    zoom: number;
+    height: string;
+    companyName: string;
+    address: string;
+    markerColor: string;
+    pulseColor: string;
+  };
   enabled: boolean;
 }
 
@@ -209,7 +222,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           relative z-10 w-full transition-all duration-1000
           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
         `}
-        style={{ maxWidth: data?.layout?.maxWidth || '600px' }}
+        style={{ maxWidth: data?.map?.enabled ? '1400px' : (data?.layout?.maxWidth || '600px') }}
       >
         {/* Cabecera */}
         <div className="text-center mb-8">
@@ -239,36 +252,39 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           )}
         </div>
 
-        {/* Formulario */}
-        <div 
-          className="transition-all duration-300 hover:shadow-lg"
-          style={{
-            background: currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)',
-            border: `${currentCardsDesign?.borderWidth || '1px'} solid ${currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)'}`,
-            borderRadius: data?.layout?.borderRadius || '1rem',
-            boxShadow: currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)',
-            padding: currentCardsDesign?.cardPadding || data?.layout?.padding || '3rem',
-            minWidth: currentCardsDesign?.cardMinWidth || 'auto',
-            maxWidth: currentCardsDesign?.cardMaxWidth || 'none',
-            minHeight: currentCardsDesign?.cardMinHeight || 'auto',
-          }}
-          onMouseEnter={(e) => {
-            if (currentCardsDesign?.hoverBackground) {
-              e.currentTarget.style.background = currentCardsDesign.hoverBackground;
-            }
-            if (currentCardsDesign?.hoverBorder) {
-              e.currentTarget.style.borderColor = currentCardsDesign.hoverBorder;
-            }
-            if (currentCardsDesign?.hoverShadow) {
-              e.currentTarget.style.boxShadow = currentCardsDesign.hoverShadow;
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)';
-            e.currentTarget.style.borderColor = currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)';
-            e.currentTarget.style.boxShadow = currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)';
-          }}
-        >
+        {/* Contenido principal: Formulario + Mapa */}
+        <div className={`grid gap-8 ${data?.map?.enabled ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'} items-start`}>
+          
+          {/* Formulario */}
+          <div 
+            className="transition-all duration-300 hover:shadow-lg"
+            style={{
+              background: currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)',
+              border: `${currentCardsDesign?.borderWidth || '1px'} solid ${currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)'}`,
+              borderRadius: data?.layout?.borderRadius || '1rem',
+              boxShadow: currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)',
+              padding: currentCardsDesign?.cardPadding || data?.layout?.padding || '3rem',
+              minWidth: currentCardsDesign?.cardMinWidth || 'auto',
+              maxWidth: currentCardsDesign?.cardMaxWidth || 'none',
+              minHeight: currentCardsDesign?.cardMinHeight || 'auto',
+            }}
+            onMouseEnter={(e) => {
+              if (currentCardsDesign?.hoverBackground) {
+                e.currentTarget.style.background = currentCardsDesign.hoverBackground;
+              }
+              if (currentCardsDesign?.hoverBorder) {
+                e.currentTarget.style.borderColor = currentCardsDesign.hoverBorder;
+              }
+              if (currentCardsDesign?.hoverShadow) {
+                e.currentTarget.style.boxShadow = currentCardsDesign.hoverShadow;
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)';
+              e.currentTarget.style.borderColor = currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)';
+              e.currentTarget.style.boxShadow = currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)';
+            }}
+          >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Campo: Nombre */}
             <div>
@@ -481,7 +497,30 @@ const ContactSection = ({ data }: ContactSectionProps) => {
               }
             </button>
           </form>
+          </div>
+
+          {/* Mapa de Google (solo si está habilitado) */}
+          {data?.map?.enabled && (
+            <div className="flex items-center lg:sticky lg:top-8">
+              <SimpleGoogleMap
+                googleMapsUrl={data.map.googleMapsUrl || ''}
+                height={data.map.height || '400px'}
+                companyName={data.map.companyName || 'Nuestra Ubicación'}
+                address={data.map.address || ''}
+                borderRadius={data?.layout?.borderRadius || '1rem'}
+              />
+            </div>
+          )}
+          
+          {/* Debug: Mostrar si el mapa NO está habilitado */}
+          {!data?.map?.enabled && (
+            <div className="w-full bg-yellow-200 border-2 border-yellow-500 p-4 text-sm">
+              DEBUG: Mapa NO habilitado. data.map = {JSON.stringify(data?.map)}
+            </div>
+          )}
+
         </div>
+
       </div>
     </section>
   );

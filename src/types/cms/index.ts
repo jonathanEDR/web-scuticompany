@@ -328,6 +328,18 @@ export interface ContactFormContent {
     success?: string;
     error?: string;
   };
+  map?: {
+    enabled: boolean;
+    googleMapsUrl: string;
+    latitude: number;
+    longitude: number;
+    zoom: number;
+    height: string;
+    companyName: string;
+    address: string;
+    markerColor: string;
+    pulseColor: string;
+  };
 }
 
 export interface PageSection {
