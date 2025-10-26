@@ -530,7 +530,6 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 address={data.map.address || ''}
                 customLogo={data.map.customLogo}
                 logoSize={data.map.logoSize || 'medium'}
-                showCompanyName={data.map.showCompanyName || false}
                 borderRadius={data.map.borderRadius || data?.layout?.borderRadius || '1rem'}
                 shadow={data.map.shadow || 'medium'}
                 markerBackground={data.map.markerBackground || '#8B5CF6'}
