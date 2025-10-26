@@ -4,47 +4,218 @@ import '../../styles/SimpleGoogleMap.css';
 interface SimpleGoogleMapProps {
   googleMapsUrl?: string;
   height?: string;
+  width?: string;  // 🆕 NUEVO - Ancho personalizado
+  aspectRatio?: 'square' | 'landscape' | 'portrait' | 'custom'; // 🆕 NUEVO - Proporción
+  alignment?: 'left' | 'center' | 'right' | 'full'; // 🆕 NUEVO - Alineación
+  containerSize?: 'small' | 'medium' | 'large' | 'xl'; // 🆕 NUEVO - Tamaño predefinido
   borderRadius?: string;
   companyName?: string;
   address?: string;
+  customLogo?: string; // 🆕 NUEVO - URL del logo personalizado
+  logoSize?: 'small' | 'medium' | 'large'; // 🆕 NUEVO - Tamaño del logo
+  showCompanyName?: boolean; // 🆕 NUEVO - Mostrar nombre de empresa
+  shadow?: 'none' | 'small' | 'medium' | 'large'; // 🆕 NUEVO - Sombra
+  markerBackground?: string; // 🆕 NUEVO - Color de fondo del marcador
+  markerBorderColor?: string; // 🆕 NUEVO - Color del borde del marcador
+  markerBorderWidth?: string; // 🆕 NUEVO - Grosor del borde del marcador
+  markerStyle?: 'solid' | 'gradient' | 'custom'; // 🆕 NUEVO - Estilo del fondo
+  pulseIntensity?: 'none' | 'low' | 'medium' | 'high' | 'extreme'; // 🆕 NUEVO - Intensidad del pulso
+  pulseSpeed?: 'slow' | 'normal' | 'fast' | 'ultra'; // 🆕 NUEVO - Velocidad del pulso
+  hoverEffect?: 'none' | 'glow' | 'thunder' | 'rainbow' | 'shake'; // 🆕 NUEVO - Efecto al hacer hover
+  animationEnabled?: boolean; // 🆕 NUEVO - Habilitar/deshabilitar animaciones
 }
 
 const SimpleGoogleMap = ({
   googleMapsUrl = '',
   height = '400px',
+  width,  // 🆕 NUEVO - Ancho personalizado
+  aspectRatio = 'landscape', // 🆕 NUEVO - Proporción por defecto
+  alignment = 'center', // 🆕 NUEVO - Alineación por defecto
+  containerSize = 'medium', // 🆕 NUEVO - Tamaño predefinido por defecto
   borderRadius = '1rem',
   companyName = 'Nuestra Ubicación',
-  address = ''
+  address = '',
+  customLogo, // 🆕 NUEVO - Logo personalizado
+  logoSize = 'medium', // 🆕 NUEVO - Tamaño del logo por defecto
+  showCompanyName = true, // 🆕 NUEVO - Mostrar nombre por defecto
+  shadow = 'medium', // 🆕 NUEVO - Sombra por defecto
+  markerBackground = '#8B5CF6', // 🆕 NUEVO - Color de fondo por defecto
+  markerBorderColor = '#ffffff', // 🆕 NUEVO - Color del borde por defecto
+  markerBorderWidth = '4px', // 🆕 NUEVO - Grosor del borde por defecto
+  markerStyle = 'gradient', // 🆕 NUEVO - Estilo por defecto
+  pulseIntensity = 'medium', // 🆕 NUEVO - Intensidad del pulso por defecto
+  pulseSpeed = 'normal', // 🆕 NUEVO - Velocidad del pulso por defecto
+  hoverEffect = 'glow', // 🆕 NUEVO - Efecto hover por defecto
+  animationEnabled = true // 🆕 NUEVO - Animaciones habilitadas por defecto
 }: SimpleGoogleMapProps) => {
   const { theme } = useTheme();
 
+  // 🆕 NUEVO: Función para obtener dimensiones basadas en el tamaño del contenedor
+  const getContainerDimensions = () => {
+    const sizes = {
+      small: { width: '300px', height: '200px' },
+      medium: { width: '400px', height: '300px' },
+      large: { width: '500px', height: '400px' },
+      xl: { width: '600px', height: '500px' }
+    };
+    
+    const defaultSize = sizes[containerSize] || sizes.medium;
+    
+    return {
+      width: width || defaultSize.width,
+      height: height || defaultSize.height
+    };
+  };
+
+  // 🆕 NUEVO: Función para obtener clases de alineación
+  const getAlignmentClasses = () => {
+    const alignmentMap = {
+      left: 'ml-0 mr-auto',
+      center: 'mx-auto',
+      right: 'ml-auto mr-0',
+      full: 'w-full'
+    };
+    return alignmentMap[alignment] || alignmentMap.center;
+  };
+
+  // 🆕 NUEVO: Función para obtener clases de aspect ratio
+  const getAspectRatioClasses = () => {
+    const ratioMap = {
+      square: 'aspect-square',
+      landscape: 'aspect-video',
+      portrait: 'aspect-[9/16]',
+      custom: ''
+    };
+    return ratioMap[aspectRatio] || '';
+  };
+
+  // 🆕 NUEVO: Función para obtener clases de sombra
+  const getShadowClasses = () => {
+    const shadowMap = {
+      none: '',
+      small: 'shadow-sm',
+      medium: 'shadow-lg',
+      large: 'shadow-2xl'
+    };
+    return shadowMap[shadow] || shadowMap.medium;
+  };
+
+  // 🆕 NUEVO: Función para obtener tamaño del logo
+  const getLogoSize = () => {
+    const logoSizes = {
+      small: { width: '24px', height: '24px' },
+      medium: { width: '32px', height: '32px' },
+      large: { width: '48px', height: '48px' }
+    };
+    return logoSizes[logoSize] || logoSizes.medium;
+  };
+
+  // 🆕 NUEVO: Función para obtener el estilo del fondo del marcador
+  const getMarkerBackgroundStyle = () => {
+    const baseColor = markerBackground || '#8B5CF6';
+    
+    switch (markerStyle) {
+      case 'solid':
+        return {
+          background: baseColor
+        };
+      case 'gradient':
+        // Generar gradiente automático basado en el color base
+        const lightColor = adjustColorBrightness(baseColor, 20);
+        const darkColor = adjustColorBrightness(baseColor, -20);
+        return {
+          background: `linear-gradient(135deg, ${lightColor} 0%, ${darkColor} 100%)`
+        };
+      case 'custom':
+        // Permitir gradientes personalizados
+        return {
+          background: baseColor.includes('gradient') ? baseColor : `linear-gradient(135deg, ${baseColor} 0%, #7C3AED 100%)`
+        };
+      default:
+        return {
+          background: `linear-gradient(135deg, ${baseColor} 0%, #7C3AED 100%)`
+        };
+    }
+  };
+
+  // 🆕 NUEVO: Función helper para ajustar el brillo de un color
+  const adjustColorBrightness = (color: string, percent: number) => {
+    // Si es un color hex
+    if (color.startsWith('#')) {
+      const num = parseInt(color.replace('#', ''), 16);
+      const amt = Math.round(2.55 * percent);
+      const R = (num >> 16) + amt;
+      const G = (num >> 8 & 0x00FF) + amt;
+      const B = (num & 0x0000FF) + amt;
+      return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+        (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    }
+    // Si no es hex, devolver el color original
+    return color;
+  };
+
+  // 🆕 NUEVO: Función para obtener clases de animación
+  const getAnimationClasses = () => {
+    if (!animationEnabled) return 'animations-disabled';
+    
+    const pulseClass = `pulse-${pulseIntensity}`;
+    const speedClass = `speed-${pulseSpeed}`;
+    const hoverClass = `hover-${hoverEffect}`;
+    
+    return `${pulseClass} ${speedClass} ${hoverClass}`.trim();
+  };
+
+  // 🆕 NUEVO: Función para obtener la duración de animación dinámica
+  const getAnimationDuration = () => {
+    if (!animationEnabled) return '0s';
+    
+    const speedMap = {
+      slow: '8s',
+      normal: '4s', 
+      fast: '2s',
+      ultra: '1s'
+    };
+    
+    return speedMap[pulseSpeed] || '4s';
+  };
+
+  // 🆕 NUEVO: Función para obtener la escala del pulso según intensidad
+  const getPulseScale = (ringIndex: number) => {
+    if (!animationEnabled || pulseIntensity === 'none') return { transform: 'translate(-50%, -50%) scale(1)' };
+    
+    const baseScales = {
+      none: [1, 1, 1],
+      low: [1.05, 1.03, 1.01],
+      medium: [1.2, 1.15, 1.1],
+      high: [1.4, 1.3, 1.2],
+      extreme: [1.8, 1.6, 1.4]
+    };
+    
+    const scales = baseScales[pulseIntensity] || baseScales.medium;
+    return { transform: `translate(-50%, -50%) scale(${scales[ringIndex] || 1})` };
+  };
+
+  const dimensions = getContainerDimensions();
+
   // Función mejorada para convertir URL de Google Maps a embed
   const getEmbedUrl = () => {
-    console.log('🗺️ URL recibida:', googleMapsUrl);
-    console.log('🏢 Empresa:', companyName);
-    console.log('📍 Dirección:', address);
-    
     if (!googleMapsUrl) {
-      console.log('❌ No hay URL, usando default');
       return "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15057.334840628334!2d-77.04276278715878!3d-12.04635330943029!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c6f0d54871b7%3A0x11b9b5b4c5a2b5c3!2sLima%2C%20Peru!5e0!3m2!1sen!2spe!4v1635959562000!5m2!1sen!2spe";
     }
     
     // Si ya es embed, usarla directamente
     if (googleMapsUrl.includes('/embed')) {
-      console.log('✅ Ya es embed URL');
       return googleMapsUrl;
     }
     
     // NUEVO: Manejar URLs acortadas de Google Maps (goo.gl o maps.app.goo.gl)
     if (googleMapsUrl.includes('goo.gl') || googleMapsUrl.includes('maps.app.goo.gl')) {
-      console.log('🔗 URL acortada detectada, creando embed personalizado...');
-      
       // Método EFECTIVO: búsqueda específica en Perú usando la dirección real
       // Agregamos "Perú" al final para asegurar geolocalización correcta
       const locationQuery = `${address}, Huánuco, Perú`.replace(/\s+/g, '+').toLowerCase();
       const peruEmbedUrl = `https://maps.google.com/maps?width=100%25&height=600&hl=es&q=${locationQuery}&t=&z=17&ie=UTF8&iwloc=B&output=embed`;
       
-      console.log('✅ URL embed creada para Perú:', peruEmbedUrl);
       return peruEmbedUrl;
     }
     
@@ -55,18 +226,15 @@ const SimpleGoogleMap = ({
       if (coordMatch) {
         const [, lat, lng] = coordMatch;
         const convertedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15057!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z!5e0!3m2!1sen!2spe!4v1635959562000!5m2!1sen!2spe`;
-        console.log('✅ Convertida con coordenadas:', convertedUrl);
         return convertedUrl;
       }
       
       // Método 2: Reemplazar /maps/ por /maps/embed
       const simpleConvert = googleMapsUrl.replace('/maps/', '/maps/embed?pb=!1m18!1m12!1m3!1d15057!2d-77.042!3d-12.046!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z!5e0!3m2!1sen!2spe!4v1635959562000!5m2!1sen!2spe&');
-      console.log('✅ Conversión simple:', simpleConvert);
       return simpleConvert;
     }
     
     // Fallback: usar búsqueda por nombre y dirección
-    console.log('⚠️ Usando fallback con búsqueda');
     const searchQuery = encodeURIComponent(`${companyName} ${address}`);
     return `https://www.google.com/maps/embed/v1/place?key=&q=${searchQuery}`;
   };
@@ -75,11 +243,8 @@ const SimpleGoogleMap = ({
 
   // Función para abrir Google Maps en nueva pestaña
   const openInGoogleMaps = () => {
-    console.log('🔗 Abriendo Google Maps...');
-    
     if (googleMapsUrl && !googleMapsUrl.includes('/embed')) {
       // Si tenemos URL original, usarla
-      console.log('✅ Usando URL original:', googleMapsUrl);
       window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
     } else {
       // Fallback: buscar coordenadas o usar búsqueda
@@ -87,12 +252,10 @@ const SimpleGoogleMap = ({
       if (coordMatch) {
         const [, lng, lat] = coordMatch;
         const mapsUrl = `https://www.google.com/maps/@${lat},${lng},15z`;
-        console.log('✅ Usando coordenadas extraídas:', mapsUrl);
         window.open(mapsUrl, '_blank', 'noopener,noreferrer');
       } else {
         // Último recurso: búsqueda por nombre con ubicación específica en Perú
         const searchUrl = `https://www.google.com/maps/search/${encodeURIComponent(address + ', Lima, Perú')}`;
-        console.log('✅ Usando búsqueda en Perú:', searchUrl);
         window.open(searchUrl, '_blank', 'noopener,noreferrer');
       }
     }
@@ -102,15 +265,16 @@ const SimpleGoogleMap = ({
 
   return (
     <div 
-      className="map-container"
+      className={`map-container ${getAlignmentClasses()} ${getAspectRatioClasses()} ${getShadowClasses()} ${getAnimationClasses()}`}
       style={{ 
         position: 'relative', 
-        height, 
+        width: dimensions.width,
+        height: aspectRatio === 'custom' ? dimensions.height : undefined,
         borderRadius, 
         overflow: 'hidden',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         border: '1px solid rgba(139, 92, 246, 0.1)',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        maxWidth: alignment === 'full' ? '100%' : dimensions.width
       }}
       onClick={openInGoogleMaps}
       role="button"
@@ -146,55 +310,70 @@ const SimpleGoogleMap = ({
         zIndex: 10,
         pointerEvents: 'none'
       }}>
-        {/* Ondas de radar con mayor contraste */}
-        <div style={{
-          width: '140px',
-          height: '140px',
-          borderRadius: '50%',
-          border: '3px solid rgba(139, 92, 246, 0.7)',
-          backgroundColor: 'rgba(139, 92, 246, 0.1)',
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          animation: 'radarPulse 4s infinite',
-          backdropFilter: 'blur(1px)'
-        }} />
-        <div style={{
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          border: '3px solid rgba(139, 92, 246, 0.8)',
-          backgroundColor: 'rgba(139, 92, 246, 0.15)',
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          animation: 'radarPulse 4s infinite 1.3s',
-          backdropFilter: 'blur(1px)'
-        }} />
-        <div style={{
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          border: '3px solid rgba(139, 92, 246, 0.9)',
-          backgroundColor: 'rgba(139, 92, 246, 0.2)',
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          animation: 'radarPulse 4s infinite 2.6s',
-          backdropFilter: 'blur(1px)'
-        }} />
+        {/* Ondas de radar con configuración personalizable */}
+        <div 
+          className="radar-ring"
+          style={{
+            width: pulseIntensity === 'extreme' ? '180px' : pulseIntensity === 'high' ? '160px' : '140px',
+            height: pulseIntensity === 'extreme' ? '180px' : pulseIntensity === 'high' ? '160px' : '140px',
+            borderRadius: '50%',
+            border: '3px solid rgba(139, 92, 246, 0.7)',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            ...getPulseScale(0),
+            animationDuration: getAnimationDuration(),
+            animationDelay: '0s',
+            backdropFilter: 'blur(1px)',
+            pointerEvents: 'none'
+          }} 
+        />
+        <div 
+          className="radar-ring"
+          style={{
+            width: pulseIntensity === 'extreme' ? '130px' : pulseIntensity === 'high' ? '120px' : '100px',
+            height: pulseIntensity === 'extreme' ? '130px' : pulseIntensity === 'high' ? '120px' : '100px',
+            borderRadius: '50%',
+            border: '3px solid rgba(139, 92, 246, 0.8)',
+            backgroundColor: 'rgba(139, 92, 246, 0.15)',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            ...getPulseScale(1),
+            animationDuration: getAnimationDuration(),
+            animationDelay: '1.3s',
+            backdropFilter: 'blur(1px)',
+            pointerEvents: 'none'
+          }} 
+        />
+        <div 
+          className="radar-ring"
+          style={{
+            width: pulseIntensity === 'extreme' ? '80px' : pulseIntensity === 'high' ? '70px' : '60px',
+            height: pulseIntensity === 'extreme' ? '80px' : pulseIntensity === 'high' ? '70px' : '60px',
+            borderRadius: '50%',
+            border: '3px solid rgba(139, 92, 246, 0.9)',
+            backgroundColor: 'rgba(139, 92, 246, 0.2)',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            ...getPulseScale(2),
+            animationDuration: getAnimationDuration(),
+            animationDelay: '2.6s',
+            backdropFilter: 'blur(1px)',
+            pointerEvents: 'none'
+          }} 
+        />
         
         {/* Marcador central más visible */}
         <div style={{
-          width: '40px',
-          height: '40px',
+          width: logoSize === 'large' ? '60px' : logoSize === 'medium' ? '48px' : '40px',
+          height: logoSize === 'large' ? '60px' : logoSize === 'medium' ? '48px' : '40px',
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
-          border: '4px solid white',
-          boxShadow: '0 6px 20px rgba(139, 92, 246, 0.9), 0 0 0 3px rgba(139, 92, 246, 0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+          ...getMarkerBackgroundStyle(),
+          border: `${markerBorderWidth || '4px'} solid ${markerBorderColor || 'white'}`,
+          boxShadow: `0 6px 20px rgba(139, 92, 246, 0.9), 0 0 0 3px rgba(139, 92, 246, 0.4), inset 0 2px 4px rgba(255,255,255,0.3)`,
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
@@ -202,23 +381,71 @@ const SimpleGoogleMap = ({
           animation: 'markerPulse 2s infinite alternate',
           backdropFilter: 'blur(2px)'
         }}>
-          {/* Icono de ubicación */}
-          <div style={{
-            width: '16px',
-            height: '16px',
-            borderRadius: '50%',
-            backgroundColor: 'white',
-            fontWeight: 'bold',
-            fontSize: '10px',
-            color: '#8B5CF6',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: 'inset 0 1px 2px rgba(139, 92, 246, 0.2)'
-          }}>
-            📍
-          </div>
+          {/* Logo personalizado o icono de ubicación */}
+          {customLogo ? (
+            <img 
+              src={customLogo}
+              alt={`Logo ${companyName}`}
+              style={{
+                ...getLogoSize(),
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1px solid rgba(255,255,255,0.3)'
+              }}
+              onError={(e) => {
+                // Fallback al emoji si la imagen no carga
+                e.currentTarget.style.display = 'none';
+                const fallback = document.createElement('div');
+                fallback.innerHTML = '📍';
+                fallback.style.cssText = `
+                  width: 16px; height: 16px; border-radius: 50%; 
+                  background: white; font-weight: bold; font-size: 10px; 
+                  color: #8B5CF6; display: flex; align-items: center; 
+                  justify-content: center; box-shadow: inset 0 1px 2px rgba(139, 92, 246, 0.2);
+                `;
+                e.currentTarget.parentNode?.appendChild(fallback);
+              }}
+            />
+          ) : (
+            <div style={{
+              width: '16px',
+              height: '16px',
+              borderRadius: '50%',
+              backgroundColor: 'white',
+              fontWeight: 'bold',
+              fontSize: '10px',
+              color: '#8B5CF6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'inset 0 1px 2px rgba(139, 92, 246, 0.2)'
+            }}>
+              📍
+            </div>
+          )}
         </div>
+        
+        {/* 🆕 NUEVO: Nombre de la empresa debajo del marcador (opcional) */}
+        {showCompanyName && customLogo && (
+          <div style={{
+            position: 'absolute',
+            top: '60%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(139, 92, 246, 0.9)',
+            color: 'white',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            fontSize: '10px',
+            fontWeight: '600',
+            whiteSpace: 'nowrap',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}>
+            {companyName}
+          </div>
+        )}
       </div>
 
       {/* Overlay con información y click */}

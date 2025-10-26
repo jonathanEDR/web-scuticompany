@@ -136,7 +136,6 @@ export const getAllPages = async (useCache = true) => {
   if (useCache) {
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log('📦 Usando datos en caché para getAllPages');
       return cached;
     }
   }
@@ -167,7 +166,6 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
   if (useCache) {
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log(`📦 Usando datos en caché para página ${slug}`);
       return cached;
     }
   }

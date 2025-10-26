@@ -138,10 +138,27 @@ interface ContactFormData {
     longitude: number;
     zoom: number;
     height: string;
+    width?: string;  // 🆕 NUEVO - Ancho personalizado
+    aspectRatio?: 'square' | 'landscape' | 'portrait' | 'custom'; // 🆕 NUEVO - Proporción
+    alignment?: 'left' | 'center' | 'right' | 'full'; // 🆕 NUEVO - Alineación
+    containerSize?: 'small' | 'medium' | 'large' | 'xl'; // 🆕 NUEVO - Tamaño predefinido
     companyName: string;
     address: string;
     markerColor: string;
     pulseColor: string;
+    customLogo?: string; // 🆕 NUEVO - URL del logo personalizado
+    logoSize?: 'small' | 'medium' | 'large'; // 🆕 NUEVO - Tamaño del logo
+    showCompanyName?: boolean; // 🆕 NUEVO - Mostrar nombre de empresa
+    borderRadius?: string; // 🆕 NUEVO - Radio de borde personalizado
+    shadow?: 'none' | 'small' | 'medium' | 'large'; // 🆕 NUEVO - Sombra
+    markerBackground?: string; // 🆕 NUEVO - Color de fondo del marcador
+    markerBorderColor?: string; // 🆕 NUEVO - Color del borde del marcador
+    markerBorderWidth?: string; // 🆕 NUEVO - Grosor del borde del marcador
+    markerStyle?: 'solid' | 'gradient' | 'custom'; // 🆕 NUEVO - Estilo del fondo
+    pulseIntensity?: 'none' | 'low' | 'medium' | 'high' | 'extreme'; // 🆕 NUEVO - Intensidad del pulso
+    pulseSpeed?: 'slow' | 'normal' | 'fast' | 'ultra'; // 🆕 NUEVO - Velocidad del pulso
+    hoverEffect?: 'none' | 'glow' | 'electric' | 'rainbow' | 'shake'; // 🆕 NUEVO - Efecto al hacer hover
+    animationEnabled?: boolean; // 🆕 NUEVO - Habilitar/deshabilitar animaciones
   };
   enabled: boolean;
 }
@@ -505,9 +522,25 @@ const ContactSection = ({ data }: ContactSectionProps) => {
               <SimpleGoogleMap
                 googleMapsUrl={data.map.googleMapsUrl || ''}
                 height={data.map.height || '400px'}
+                width={data.map.width}
+                aspectRatio={data.map.aspectRatio || 'landscape'}
+                alignment={data.map.alignment || 'center'}
+                containerSize={data.map.containerSize || 'medium'}
                 companyName={data.map.companyName || 'Nuestra Ubicación'}
                 address={data.map.address || ''}
-                borderRadius={data?.layout?.borderRadius || '1rem'}
+                customLogo={data.map.customLogo}
+                logoSize={data.map.logoSize || 'medium'}
+                showCompanyName={data.map.showCompanyName || false}
+                borderRadius={data.map.borderRadius || data?.layout?.borderRadius || '1rem'}
+                shadow={data.map.shadow || 'medium'}
+                markerBackground={data.map.markerBackground || '#8B5CF6'}
+                markerBorderColor={data.map.markerBorderColor || '#ffffff'}
+                markerBorderWidth={data.map.markerBorderWidth || '4px'}
+                markerStyle={data.map.markerStyle || 'gradient'}
+                pulseIntensity={data.map.pulseIntensity || 'medium'}
+                pulseSpeed={data.map.pulseSpeed || 'normal'}
+                hoverEffect={data.map.hoverEffect === 'electric' ? 'thunder' : (data.map.hoverEffect || 'glow')}
+                animationEnabled={data.map.animationEnabled !== false}
               />
             </div>
           )}

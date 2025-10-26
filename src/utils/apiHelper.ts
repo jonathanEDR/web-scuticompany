@@ -14,15 +14,9 @@ export const getCmsApiUrl = (endpoint: string): string => {
   return getApiUrl(`/cms${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`);
 };
 
-// Log para debugging (solo en desarrollo)
-export const logApiCall = (url: string, description: string) => {
-  if (import.meta.env.DEV) {
-    console.log(`🌐 [API] ${description}:`, {
-      environment: 'development',
-      fullUrl: url,
-      baseApiUrl: API_URL,
-    });
-  }
+// Log para debugging (deshabilitado en producción)
+export const logApiCall = (_url: string, _description: string) => {
+  // Logs deshabilitados para producción
 };
 
 // Función para probar conectividad con el backend

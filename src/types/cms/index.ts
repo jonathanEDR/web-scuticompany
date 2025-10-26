@@ -335,10 +335,27 @@ export interface ContactFormContent {
     longitude: number;
     zoom: number;
     height: string;
+    width?: string;  // 🆕 NUEVO - Ancho personalizado
+    aspectRatio?: 'square' | 'landscape' | 'portrait' | 'custom'; // 🆕 NUEVO - Proporción
+    alignment?: 'left' | 'center' | 'right' | 'full'; // 🆕 NUEVO - Alineación
+    containerSize?: 'small' | 'medium' | 'large' | 'xl'; // 🆕 NUEVO - Tamaño predefinido
     companyName: string;
     address: string;
     markerColor: string;
     pulseColor: string;
+    customLogo?: string; // 🆕 NUEVO - URL del logo personalizado
+    logoSize?: 'small' | 'medium' | 'large'; // 🆕 NUEVO - Tamaño del logo
+    showCompanyName?: boolean; // 🆕 NUEVO - Mostrar nombre de empresa
+    borderRadius?: string; // 🆕 NUEVO - Radio de borde personalizado
+    shadow?: 'none' | 'small' | 'medium' | 'large'; // 🆕 NUEVO - Sombra
+    markerBackground?: string; // 🆕 NUEVO - Color de fondo del marcador
+    markerBorderColor?: string; // 🆕 NUEVO - Color del borde del marcador
+    markerBorderWidth?: string; // 🆕 NUEVO - Grosor del borde del marcador
+    markerStyle?: 'solid' | 'gradient' | 'custom'; // 🆕 NUEVO - Estilo del fondo
+    pulseIntensity?: 'none' | 'low' | 'medium' | 'high' | 'extreme'; // 🆕 NUEVO - Intensidad del pulso
+    pulseSpeed?: 'slow' | 'normal' | 'fast' | 'ultra'; // 🆕 NUEVO - Velocidad del pulso
+    hoverEffect?: 'none' | 'glow' | 'thunder' | 'rainbow' | 'shake'; // 🆕 NUEVO - Efecto al hacer hover
+    animationEnabled?: boolean; // 🆕 NUEVO - Habilitar/deshabilitar animaciones
   };
 }
 
