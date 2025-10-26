@@ -8,15 +8,15 @@ import { updatePage } from '../../services/cmsApi';
 interface CardsDesignConfigSectionProps {
   pageData: PageData;
   updateContent: (field: string, value: any) => void;
-  setHasGlobalChanges: (value: boolean) => void; // 🔥 NUEVA PROP
+  setHasGlobalChanges: (value: boolean) => void;
 }
 
 const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   pageData,
-  setHasGlobalChanges // 🔥 RECIBIR LA FUNCIÓN
+  setHasGlobalChanges
 }) => {
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
-  const [activeSection, setActiveSection] = useState<'solutions' | 'valueAdded'>('solutions'); // 🔥 NUEVO: Selector de sección
+  const [activeSection, setActiveSection] = useState<'solutions' | 'valueAdded' | 'contact'>('solutions');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -67,7 +67,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     iconAlignment: 'left'
   };
 
-  // 🔥 NUEVO: Valores por defecto para Value Added
+  // Valores por defecto para Value Added
   const defaultValueAddedLightStyles: CardDesignStyles = {
     background: 'rgba(255, 255, 255, 0.9)',
     border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
@@ -114,50 +114,104 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     iconAlignment: 'center'
   };
 
-  // 🔥 NUEVO: Data loader unificado para ambas secciones
+  // Valores por defecto para Contact
+  const defaultContactLightStyles: CardDesignStyles = {
+    background: 'rgba(255, 255, 255, 0.95)',
+    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    borderWidth: '1px',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    hoverBackground: 'rgba(255, 255, 255, 1)',
+    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
+    hoverShadow: '0 8px 30px rgba(139, 92, 246, 0.15)',
+    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    iconBackground: 'rgba(255, 255, 255, 0.9)',
+    iconColor: '#4F46E5',
+    titleColor: '#1F2937',
+    descriptionColor: '#4B5563',
+    linkColor: '#8B5CF6',
+    cardMinWidth: '300px',
+    cardMaxWidth: '400px',
+    cardMinHeight: 'auto',
+    cardPadding: '2rem',
+    cardsAlignment: 'center',
+    iconBorderEnabled: true,
+    iconAlignment: 'center'
+  };
+
+  const defaultContactDarkStyles: CardDesignStyles = {
+    background: 'rgba(17, 24, 39, 0.95)',
+    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    borderWidth: '1px',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    hoverBackground: 'rgba(31, 41, 55, 0.95)',
+    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
+    hoverShadow: '0 8px 30px rgba(139, 92, 246, 0.25)',
+    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    iconBackground: 'rgba(17, 24, 39, 0.8)',
+    iconColor: '#FFFFFF',
+    titleColor: '#FFFFFF',
+    descriptionColor: '#D1D5DB',
+    linkColor: '#a78bfa',
+    cardMinWidth: '300px',
+    cardMaxWidth: '400px',
+    cardMinHeight: 'auto',
+    cardPadding: '2rem',
+    cardsAlignment: 'center',
+    iconBorderEnabled: true,
+    iconAlignment: 'center'
+  };
+
+  // Data loader unificado para todas las secciones
   const initialData = useMemo(() => {
     let cardData;
     if (activeSection === 'solutions') {
       cardData = pageData.content.solutions.cardsDesign;
-    } else {
+    } else if (activeSection === 'valueAdded') {
       cardData = pageData.content.valueAdded?.cardsDesign;
+    } else if (activeSection === 'contact') {
+      cardData = pageData.content.contactForm?.cardsDesign;
     }
     return cardData;
   }, [pageData.content, activeSection]);
 
-  // 🔥 NUEVO: Determinar defaults según la sección activa
+  // Determinar defaults según la sección activa
   const currentDefaults = useMemo(() => {
     if (activeSection === 'solutions') {
       return { light: defaultSolutionsLightStyles, dark: defaultSolutionsDarkStyles };
-    } else {
+    } else if (activeSection === 'valueAdded') {
       return { light: defaultValueAddedLightStyles, dark: defaultValueAddedDarkStyles };
+    } else if (activeSection === 'contact') {
+      return { light: defaultContactLightStyles, dark: defaultContactDarkStyles };
     }
-  }, [activeSection]);
+    return { light: defaultSolutionsLightStyles, dark: defaultSolutionsDarkStyles }; // Fallback
+  }, [
+    activeSection, 
+    defaultSolutionsLightStyles, defaultSolutionsDarkStyles,
+    defaultValueAddedLightStyles, defaultValueAddedDarkStyles,
+    defaultContactLightStyles, defaultContactDarkStyles
+  ]);
 
-  // 🔥 NUEVO: Estados unificados SIN defaults automáticos
+  // Estados unificados con inicialización simple
   const [lightStyles, setLightStyles] = useState<CardDesignStyles>(() => {
-    // Solo cargar datos reales de BD, NO defaults
     return initialData?.light || {} as CardDesignStyles;
   });
   
   const [darkStyles, setDarkStyles] = useState<CardDesignStyles>(() => {
-    // Solo cargar datos reales de BD, NO defaults  
     return initialData?.dark || {} as CardDesignStyles;
   });
 
-  // 🔄 ACTUALIZAR: Solo cargar datos reales de BD, NO defaults automáticos
+  // Solo cargar datos reales de BD, NO defaults automáticos
   const [justSaved, setJustSaved] = useState(false);
 
   useEffect(() => {
     // No actualizar si acabamos de guardar (evitar sobreescritura)
     if (justSaved) {
-      return; // No resetear justSaved aquí
+      return;
     }
-    // Solo cargar datos reales de BD
-    const data = initialData?.light;
-    if (data) {
-      setLightStyles(data);
-    }
+    
+    // Cargar datos guardados o usar defaults de la sección actual
+    const data = initialData?.light || currentDefaults.light;
+    setLightStyles(data);
   }, [initialData, activeSection, justSaved]);
 
   useEffect(() => {
@@ -165,57 +219,72 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     if (justSaved) {
       return;
     }
-    // Solo cargar datos reales de BD
-    const data = initialData?.dark;
-    if (data) {
-      setDarkStyles(data);
-    }
+    
+    // Cargar datos guardados o usar defaults de la sección actual
+    const data = initialData?.dark || currentDefaults.dark;
+    setDarkStyles(data);
   }, [initialData, activeSection, justSaved]);
 
   const currentStyles = activeTheme === 'light' ? lightStyles : darkStyles;
 
   const updateCardStyle = (field: keyof CardDesignStyles, value: string | boolean) => {
     if (activeTheme === 'light') {
-      setLightStyles(prev => ({ ...prev, [field]: value }));
+      setLightStyles(prev => {
+        const newStyles = { ...prev, [field]: value };
+        return newStyles;
+      });
     } else {
-      setDarkStyles(prev => ({ ...prev, [field]: value }));
+      setDarkStyles(prev => {
+        const newStyles = { ...prev, [field]: value };
+        return newStyles;
+      });
     }
-    // 🔥 CONECTAR CON EL SISTEMA GLOBAL
     setHasUnsavedChanges(true);
-    setHasGlobalChanges(true); // ← ESTA ES LA CONEXIÓN CLAVE
+    setHasGlobalChanges(true);
   };
 
-  // 🔥 NUEVO: Guardado directo usando updatePage (con autenticación automática)
+  // Guardado directo usando updatePage (con autenticación automática)
   const saveChanges = async () => {
     try {
-      // 🔧 SOLUCIÓN: Construir objeto completo con los datos actuales del estado
+      // Mapear la sección activa al campo correcto en el contenido
+      const getSectionKey = (section: string) => {
+        if (section === 'contact') return 'contactForm';
+        return section;
+      };
+
+      const sectionKey = getSectionKey(activeSection);
+      
+      // Construir objeto completo con los datos actuales del estado
       const updatedContent = {
         ...pageData.content,
-        [activeSection]: {
-          ...pageData.content[activeSection],
+        [sectionKey]: {
+          ...pageData.content[sectionKey as keyof typeof pageData.content],
           cardsDesign: {
-            light: { ...lightStyles },  // ← Usar estado actual
-            dark: { ...darkStyles }     // ← Usar estado actual
+            light: { ...lightStyles },
+            dark: { ...darkStyles }
           }
         }
       };
-      // 🔧 SOLUCIÓN: Usar updatePage que maneja autenticación automáticamente
+      
+      // Usar updatePage que maneja autenticación automáticamente
       await updatePage('home', {
         content: updatedContent,
         seo: pageData.seo,
         theme: pageData.theme,
         isPublished: pageData.isPublished
       });
+      
       // Marcar que acabamos de guardar para evitar recargas automáticas
       setJustSaved(true);
       setHasUnsavedChanges(false);
-      setHasGlobalChanges(false); // ← LIMPIAR ESTADO GLOBAL
-      // 🔧 NUEVO: Resetear flag después de un tiempo para permitir futuras recargas
+      setHasGlobalChanges(false);
+      
+      // Resetear flag después de un tiempo para permitir futuras recargas
       setTimeout(() => {
         setJustSaved(false);
-      }, 2000); // 2 segundos de gracia
+      }, 2000);
     } catch (error) {
-      // No cambiar estados si falló el guardado
+      console.error('Error saving card design changes:', error);
     }
   };
 
@@ -238,10 +307,15 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   };
 
   const applyTransparentDefaults = () => {
+    console.log('✨ Aplicando transparencia para sección:', activeSection);
+    console.log('📋 Defaults que se van a aplicar:', currentDefaults);
+    
     setLightStyles(currentDefaults.light);
     setDarkStyles(currentDefaults.dark);
     setHasUnsavedChanges(true);
     setHasGlobalChanges(true);
+    
+    console.log('✅ Transparencia aplicada');
   };
 
   return (
@@ -257,7 +331,10 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             {/* 🔥 NUEVO: Selector de sección */}
             <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
               <button
-                onClick={() => setActiveSection('solutions')}
+                onClick={() => {
+                  console.log('🔄 Cambiando a sección: solutions');
+                  setActiveSection('solutions');
+                }}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   activeSection === 'solutions'
                     ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
@@ -267,7 +344,10 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 Solutions
               </button>
               <button
-                onClick={() => setActiveSection('valueAdded')}
+                onClick={() => {
+                  console.log('🔄 Cambiando a sección: valueAdded');
+                  setActiveSection('valueAdded');
+                }}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   activeSection === 'valueAdded'
                     ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
@@ -275,6 +355,19 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 }`}
               >
                 Value Added
+              </button>
+              <button
+                onClick={() => {
+                  console.log('🔄 Cambiando a sección: contact');
+                  setActiveSection('contact');
+                }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  activeSection === 'contact'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                📧 Contact
               </button>
             </div>
           </div>
@@ -384,31 +477,37 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                   color: currentStyles.iconColor
                 }}
               >
-                💡
+                {activeSection === 'contact' ? '📧' : '💡'}
               </div>
             </div>
           ) : (
             <div className="relative mb-6 w-16 h-16 flex items-center justify-center text-3xl"
                  style={{ color: currentStyles.iconColor }}>
-              💡
+              {activeSection === 'contact' ? '📧' : '💡'}
             </div>
           )}
 
           {/* Content Preview */}
            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
-          👁️ Vista Previa en Tiempo Real
+          👁️ Vista Previa en Tiempo Real - {activeSection.toUpperCase()}
         </h3>
+        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-mono">
+          Debug: {activeTheme} | {Object.keys(currentStyles).length} estilos cargados
+        </div>
           <h4
             className="text-2xl font-bold mb-4"
             style={{ color: currentStyles.titleColor }}
           >
-            Título de Ejemplo
+            {activeSection === 'contact' ? 'Contáctanos' : 'Título de Ejemplo'}
           </h4>
           <p
             className="leading-relaxed mb-4"
             style={{ color: currentStyles.descriptionColor }}
           >
-            Esta es una descripción de ejemplo para mostrar cómo se verá el diseño de la tarjeta.
+            {activeSection === 'contact' 
+              ? '¿Tienes un proyecto en mente? Cuéntanos sobre él y te responderemos pronto.'
+              : 'Esta es una descripción de ejemplo para mostrar cómo se verá el diseño de la tarjeta.'
+            }
           </p>
 
           {/* Link Preview */}
@@ -417,7 +516,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               className="text-sm font-medium mr-2"
               style={{ color: currentStyles.linkColor }}
             >
-              Conocer más
+              {activeSection === 'contact' ? 'Contactar ahora' : 'Conocer más'}
             </span>
             <svg
               className="w-4 h-4"

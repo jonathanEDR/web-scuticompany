@@ -7,6 +7,52 @@ interface ContactFormData {
   title: string;
   subtitle: string;
   description: string;
+  cardsDesign?: {
+    light: {
+      background: string;
+      border: string;
+      borderWidth: string;
+      shadow: string;
+      hoverBackground: string;
+      hoverBorder: string;
+      hoverShadow: string;
+      iconGradient: string;
+      iconBackground: string;
+      iconColor: string;
+      titleColor: string;
+      descriptionColor: string;
+      linkColor: string;
+      cardMinWidth?: string;
+      cardMaxWidth?: string;
+      cardMinHeight?: string;
+      cardPadding?: string;
+      cardsAlignment?: 'left' | 'center' | 'right';
+      iconBorderEnabled?: boolean;
+      iconAlignment?: 'left' | 'center' | 'right';
+    };
+    dark: {
+      background: string;
+      border: string;
+      borderWidth: string;
+      shadow: string;
+      hoverBackground: string;
+      hoverBorder: string;
+      hoverShadow: string;
+      iconGradient: string;
+      iconBackground: string;
+      iconColor: string;
+      titleColor: string;
+      descriptionColor: string;
+      linkColor: string;
+      cardMinWidth?: string;
+      cardMaxWidth?: string;
+      cardMinHeight?: string;
+      cardPadding?: string;
+      cardsAlignment?: 'left' | 'center' | 'right';
+      iconBorderEnabled?: boolean;
+      iconAlignment?: 'left' | 'center' | 'right';
+    };
+  };
   fields: {
     nombreLabel: string;
     nombrePlaceholder: string;
@@ -113,7 +159,10 @@ const ContactSection = ({ data }: ContactSectionProps) => {
 
   // Obtener estilos según el tema activo
   const currentStyles = data?.styles?.[currentTheme === 'light' ? 'light' : 'dark'];
+  const currentCardsDesign = data?.cardsDesign?.[currentTheme === 'light' ? 'light' : 'dark'];
   // currentBackground ya está declarado arriba con los logs
+  
+
 
   // Animación de entrada
   useEffect(() => {
@@ -140,17 +189,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
       className="relative min-h-screen py-20 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden"
       style={sectionStyles}
     >
-      {/* Overlay con tema - Más transparente para mostrar imagen de fondo */}
-      {currentBackground && (
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: currentTheme === 'light'
-              ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(248, 250, 252, 0.3) 100%)'
-              : 'linear-gradient(135deg, rgba(17, 24, 39, 0.4) 0%, rgba(31, 41, 55, 0.3) 100%)',
-          }}
-        />
-      )}
+      {/* Overlay removido para mostrar imagen de fondo sin filtros */}
       
       {/* Fondo por defecto si no hay imagen */}
       {!currentBackground && (
@@ -185,7 +224,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           
           <h2 
             className="text-4xl md:text-5xl font-bold mb-4"
-            style={{ color: currentStyles?.titleColor || '#1f2937' }}
+            style={{ color: currentStyles?.titleColor || currentCardsDesign?.titleColor || '#1f2937' }}
           >
             {data?.title || 'Contáctanos'}
           </h2>
@@ -193,7 +232,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           {data?.description && (
             <p 
               className="text-lg"
-              style={{ color: currentStyles?.descriptionColor || '#4b5563' }}
+              style={{ color: currentStyles?.descriptionColor || currentCardsDesign?.descriptionColor || '#4b5563' }}
             >
               {data.description}
             </p>
@@ -202,13 +241,32 @@ const ContactSection = ({ data }: ContactSectionProps) => {
 
         {/* Formulario */}
         <div 
-          className="backdrop-blur-sm"
+          className="transition-all duration-300 hover:shadow-lg"
           style={{
-            background: currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)',
-            border: `1px solid ${currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)'}`,
+            background: currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)',
+            border: `${currentCardsDesign?.borderWidth || '1px'} solid ${currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)'}`,
             borderRadius: data?.layout?.borderRadius || '1rem',
-            boxShadow: currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)',
-            padding: data?.layout?.padding || '3rem',
+            boxShadow: currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)',
+            padding: currentCardsDesign?.cardPadding || data?.layout?.padding || '3rem',
+            minWidth: currentCardsDesign?.cardMinWidth || 'auto',
+            maxWidth: currentCardsDesign?.cardMaxWidth || 'none',
+            minHeight: currentCardsDesign?.cardMinHeight || 'auto',
+          }}
+          onMouseEnter={(e) => {
+            if (currentCardsDesign?.hoverBackground) {
+              e.currentTarget.style.background = currentCardsDesign.hoverBackground;
+            }
+            if (currentCardsDesign?.hoverBorder) {
+              e.currentTarget.style.borderColor = currentCardsDesign.hoverBorder;
+            }
+            if (currentCardsDesign?.hoverShadow) {
+              e.currentTarget.style.boxShadow = currentCardsDesign.hoverShadow;
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)';
+            e.currentTarget.style.borderColor = currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.boxShadow = currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)';
           }}
         >
           <form onSubmit={handleSubmit} className="space-y-6">

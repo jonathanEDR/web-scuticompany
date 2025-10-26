@@ -20,7 +20,53 @@ export const useCmsUpdaters = (
     for (let i = 0; i < keys.length - 1; i++) {
       // Si no existe el objeto, crearlo
       if (!current[keys[i]]) {
-        current[keys[i]] = {};
+        // SOLUCIÓN: Crear estructura específica para styles
+        if (keys[i] === 'styles') {
+          current[keys[i]] = {
+            light: {
+              titleColor: '#1f2937',
+              subtitleColor: '#6b7280', 
+              descriptionColor: '#4b5563',
+              formBackground: 'rgba(255, 255, 255, 0.95)',
+              formBorder: 'rgba(0, 0, 0, 0.1)',
+              formShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
+              inputBackground: '#ffffff',
+              inputBorder: '#e5e7eb',
+              inputText: '#1f2937',
+              inputPlaceholder: '#9ca3af',
+              inputFocusBorder: '#3b82f6',
+              labelColor: '#374151',
+              buttonBackground: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+              buttonText: '#ffffff',
+              buttonHover: 'linear-gradient(135deg, #7c3aed, #0891b2)',
+              linkColor: '#3b82f6',
+              errorColor: '#ef4444',
+              successColor: '#10b981'
+            },
+            dark: {
+              titleColor: '#ffffff',
+              subtitleColor: '#d1d5db',
+              descriptionColor: '#9ca3af',
+              formBackground: 'rgba(31, 41, 55, 0.95)',
+              formBorder: 'rgba(75, 85, 99, 0.3)',
+              formShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+              inputBackground: '#374151',
+              inputBorder: '#4b5563',
+              inputText: '#f9fafb',
+              inputPlaceholder: '#6b7280',
+              inputFocusBorder: '#60a5fa',
+              labelColor: '#d1d5db',
+              buttonBackground: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+              buttonText: '#ffffff',
+              buttonHover: 'linear-gradient(135deg, #7c3aed, #0891b2)',
+              linkColor: '#60a5fa',
+              errorColor: '#f87171',
+              successColor: '#34d399'
+            }
+          };
+        } else {
+          current[keys[i]] = {};
+        }
       }
       // Si es un string (formato anterior) y necesitamos convertir a objeto
       if (typeof current[keys[i]] === 'string' && keys[i] === 'backgroundImage') {

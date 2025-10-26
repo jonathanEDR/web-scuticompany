@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { PageData } from '../../types/cms';
 import ManagedImageSelector from '../ManagedImageSelector';
+import RichTextEditor from '../RichTextEditor';
 import { useTheme } from '../../contexts/ThemeContext';
 
 interface ContactFormEditorProps {
@@ -15,6 +16,17 @@ const ContactFormEditor: React.FC<ContactFormEditorProps> = ({
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const contactForm = pageData.content.contactForm;
+  
+  // Estado para el selector de tema para colores
+  const [activeColorTheme, setActiveColorTheme] = useState<'light' | 'dark'>('light');
+
+  // SOLUCIÓN: Inicializar styles automáticamente si no existen
+  React.useEffect(() => {
+    if (contactForm && !contactForm.styles) {
+      // Forzar la creación de la estructura de styles
+      updateContent('contactForm.styles.light.titleColor', '#1f2937');
+    }
+  }, [contactForm, updateContent]);
 
   if (!contactForm) {
     return (
@@ -34,49 +46,201 @@ const ContactFormEditor: React.FC<ContactFormEditorProps> = ({
       
       <div className="space-y-8">
         {/* Textos Principales */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
             📋 Textos Principales
           </h3>
           
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Título Principal
-              </label>
-              <input
-                type="text"
-                value={contactForm.title || ''}
-                onChange={(e) => updateContent('contactForm.title', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="Contáctanos"
-              />
+          {/* Título Principal con Rich Text Editor */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">✏️ Título Principal</h4>
+            <RichTextEditor
+              value={contactForm.title || ''}
+              onChange={(value) => updateContent('contactForm.title', value)}
+              placeholder="Contáctanos"
+              label="Contenido del título (admite formato rich text)"
+            />
+          </div>
+          
+          {/* Subtítulo con Rich Text Editor */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">🏷️ Subtítulo</h4>
+            <RichTextEditor
+              value={contactForm.subtitle || ''}
+              onChange={(value) => updateContent('contactForm.subtitle', value)}
+              placeholder="Estamos aquí para ayudarte"
+              label="Contenido del subtítulo (admite formato rich text)"
+            />
+          </div>
+          
+          {/* Descripción con Rich Text Editor */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">📝 Descripción</h4>
+            <RichTextEditor
+              value={contactForm.description || ''}
+              onChange={(value) => updateContent('contactForm.description', value)}
+              placeholder="¿Tienes un proyecto en mente? Cuéntanos sobre él y te responderemos pronto."
+              label="Contenido de la descripción (admite formato rich text)"
+            />
+          </div>
+        </div>
+
+        {/* Colores por Tema */}
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
+              🎨 Colores por Tema
+            </h3>
+            
+            {/* Selector de Tema para Colores */}
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+              <button
+                onClick={() => setActiveColorTheme('light')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeColorTheme === 'light'
+                    ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                🌞 Tema Claro
+              </button>
+              <button
+                onClick={() => setActiveColorTheme('dark')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeColorTheme === 'dark'
+                    ? 'bg-gray-800 text-gray-100 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                🌙 Tema Oscuro
+              </button>
+            </div>
+          </div>
+          
+          {/* Configuración de Colores según el tema activo */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-4">
+              {activeColorTheme === 'light' ? '🌞 Colores para Tema Claro' : '🌙 Colores para Tema Oscuro'}
+            </h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Color del Título */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Color del Título
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={contactForm.styles?.[activeColorTheme]?.titleColor || (activeColorTheme === 'light' ? '#1f2937' : '#ffffff')}
+                    onChange={(e) => updateContent(`contactForm.styles.${activeColorTheme}.titleColor`, e.target.value)}
+                    className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={contactForm.styles?.[activeColorTheme]?.titleColor || (activeColorTheme === 'light' ? '#1f2937' : '#ffffff')}
+                    onChange={(e) => updateContent(`contactForm.styles.${activeColorTheme}.titleColor`, e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    placeholder={activeColorTheme === 'light' ? '#1f2937' : '#ffffff'}
+                  />
+                </div>
+              </div>
+
+              {/* Color del Subtítulo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Color del Subtítulo
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={contactForm.styles?.[activeColorTheme]?.subtitleColor || (activeColorTheme === 'light' ? '#6b7280' : '#d1d5db')}
+                    onChange={(e) => updateContent(`contactForm.styles.${activeColorTheme}.subtitleColor`, e.target.value)}
+                    className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={contactForm.styles?.[activeColorTheme]?.subtitleColor || (activeColorTheme === 'light' ? '#6b7280' : '#d1d5db')}
+                    onChange={(e) => updateContent(`contactForm.styles.${activeColorTheme}.subtitleColor`, e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    placeholder={activeColorTheme === 'light' ? '#6b7280' : '#d1d5db'}
+                  />
+                </div>
+              </div>
+
+              {/* Color de la Descripción */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Color de la Descripción
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={contactForm.styles?.[activeColorTheme]?.descriptionColor || (activeColorTheme === 'light' ? '#4b5563' : '#9ca3af')}
+                    onChange={(e) => updateContent(`contactForm.styles.${activeColorTheme}.descriptionColor`, e.target.value)}
+                    className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={contactForm.styles?.[activeColorTheme]?.descriptionColor || (activeColorTheme === 'light' ? '#4b5563' : '#9ca3af')}
+                    onChange={(e) => updateContent(`contactForm.styles.${activeColorTheme}.descriptionColor`, e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    placeholder={activeColorTheme === 'light' ? '#4b5563' : '#9ca3af'}
+                  />
+                </div>
+              </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Subtítulo
-              </label>
-              <input
-                type="text"
-                value={contactForm.subtitle || ''}
-                onChange={(e) => updateContent('contactForm.subtitle', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="Estamos aquí para ayudarte"
-              />
+            {/* Botón de restablecer colores por defecto */}
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => {
+                  // Restablecer colores por defecto para el tema activo
+                  const defaultColors = activeColorTheme === 'light' 
+                    ? { titleColor: '#1f2937', subtitleColor: '#6b7280', descriptionColor: '#4b5563' }
+                    : { titleColor: '#ffffff', subtitleColor: '#d1d5db', descriptionColor: '#9ca3af' };
+                  
+                  Object.entries(defaultColors).forEach(([key, value]) => {
+                    updateContent(`contactForm.styles.${activeColorTheme}.${key}`, value);
+                  });
+                }}
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 text-sm"
+              >
+                🔄 Restablecer Colores por Defecto
+              </button>
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Descripción
-              </label>
-              <textarea
-                value={contactForm.description || ''}
-                onChange={(e) => updateContent('contactForm.description', e.target.value)}
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
-                placeholder="¿Tienes un proyecto en mente? Cuéntanos sobre él y te responderemos pronto."
-              />
+
+            {/* Vista previa de colores */}
+            <div className="mt-6 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                👁️ Vista Previa - {activeColorTheme === 'light' ? 'Tema Claro' : 'Tema Oscuro'}
+              </h5>
+              <div className="space-y-2">
+                <div 
+                  className="text-sm font-medium"
+                  style={{ 
+                    color: contactForm.styles?.[activeColorTheme]?.subtitleColor || (activeColorTheme === 'light' ? '#6b7280' : '#d1d5db')
+                  }}
+                >
+                  Subtítulo de ejemplo
+                </div>
+                <div 
+                  className="text-xl font-bold"
+                  style={{ 
+                    color: contactForm.styles?.[activeColorTheme]?.titleColor || (activeColorTheme === 'light' ? '#1f2937' : '#ffffff')
+                  }}
+                >
+                  Título Principal de Ejemplo
+                </div>
+                <div 
+                  className="text-base"
+                  style={{ 
+                    color: contactForm.styles?.[activeColorTheme]?.descriptionColor || (activeColorTheme === 'light' ? '#4b5563' : '#9ca3af')
+                  }}
+                >
+                  Esta es una descripción de ejemplo para mostrar cómo se verán los colores en la página pública.
+                </div>
+              </div>
             </div>
           </div>
         </div>

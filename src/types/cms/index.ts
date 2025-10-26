@@ -261,6 +261,47 @@ export interface ContactFormContent {
     dark?: string;
   };
   backgroundImageAlt?: string;
+  cardsDesign?: CardsDesign;
+  styles?: {
+    light?: {
+      titleColor?: string;
+      subtitleColor?: string;
+      descriptionColor?: string;
+      formBackground?: string;
+      formBorder?: string;
+      formShadow?: string;
+      inputBackground?: string;
+      inputBorder?: string;
+      inputText?: string;
+      inputPlaceholder?: string;
+      inputFocusBorder?: string;
+      labelColor?: string;
+      buttonBackground?: string;
+      buttonText?: string;
+      buttonHoverBackground?: string;
+      errorColor?: string;
+      successColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      subtitleColor?: string;
+      descriptionColor?: string;
+      formBackground?: string;
+      formBorder?: string;
+      formShadow?: string;
+      inputBackground?: string;
+      inputBorder?: string;
+      inputText?: string;
+      inputPlaceholder?: string;
+      inputFocusBorder?: string;
+      labelColor?: string;
+      buttonBackground?: string;
+      buttonText?: string;
+      buttonHoverBackground?: string;
+      errorColor?: string;
+      successColor?: string;
+    };
+  };
   fields?: {
     nombreLabel?: string;
     nombrePlaceholder?: string;
