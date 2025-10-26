@@ -13,7 +13,7 @@ interface SimpleGoogleMapProps {
   address?: string;
   customLogo?: string; // 🆕 NUEVO - URL del logo personalizado
   logoSize?: 'small' | 'medium' | 'large'; // 🆕 NUEVO - Tamaño del logo
-  showCompanyName?: boolean; // 🆕 NUEVO - Mostrar nombre de empresa
+
   shadow?: 'none' | 'small' | 'medium' | 'large'; // 🆕 NUEVO - Sombra
   markerBackground?: string; // 🆕 NUEVO - Color de fondo del marcador
   markerBorderColor?: string; // 🆕 NUEVO - Color del borde del marcador
@@ -37,7 +37,7 @@ const SimpleGoogleMap = ({
   address = '',
   customLogo, // 🆕 NUEVO - Logo personalizado
   logoSize = 'medium', // 🆕 NUEVO - Tamaño del logo por defecto
-  showCompanyName = true, // 🆕 NUEVO - Mostrar nombre por defecto
+
   shadow = 'medium', // 🆕 NUEVO - Sombra por defecto
   markerBackground = '#8B5CF6', // 🆕 NUEVO - Color de fondo por defecto
   markerBorderColor = '#ffffff', // 🆕 NUEVO - Color del borde por defecto
@@ -425,27 +425,7 @@ const SimpleGoogleMap = ({
           )}
         </div>
         
-        {/* 🆕 NUEVO: Nombre de la empresa debajo del marcador (opcional) */}
-        {showCompanyName && customLogo && (
-          <div style={{
-            position: 'absolute',
-            top: '60%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'rgba(139, 92, 246, 0.9)',
-            color: 'white',
-            padding: '4px 8px',
-            borderRadius: '12px',
-            fontSize: '10px',
-            fontWeight: '600',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255,255,255,0.2)'
-          }}>
-            {companyName}
-          </div>
-        )}
+
       </div>
 
       {/* Overlay con información y click */}

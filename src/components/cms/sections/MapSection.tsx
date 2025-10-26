@@ -1,6 +1,7 @@
 import React from 'react';
 import CollapsibleSection from '../../ui/CollapsibleSection';
 import GoogleMapsHelper from '../GoogleMapsHelper';
+import ManagedImageSelector from '../../ManagedImageSelector';
 import { parseGoogleMapsLink } from '../../../utils/googleMapsUtils';
 import type { ContactFormSectionProps } from '../types/ContactFormTypes';
 
@@ -18,6 +19,40 @@ const MapSection: React.FC<MapSectionProps> = ({
   isOpen,
   onToggle
 }) => {
+  // Agregar estilos para las animaciones personalizadas
+  React.useEffect(() => {
+    const styleId = 'map-preview-animations';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        @keyframes thunderPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        @keyframes rainbowSpin {
+          0% { filter: hue-rotate(0deg); }
+          100% { filter: hue-rotate(360deg); }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-2px); }
+          75% { transform: translateX(2px); }
+        }
+        .thunder-effect {
+          animation: thunderPulse 0.3s ease-in-out 3;
+        }
+        .rainbow-effect {
+          animation: rainbowSpin 1s ease-in-out infinite;
+        }
+        .shake-effect {
+          animation: shake 0.5s ease-in-out 3;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <CollapsibleSection
       title="Configuración del Mapa"
@@ -315,16 +350,77 @@ const MapSection: React.FC<MapSectionProps> = ({
 
                 {/* Logo personalizado */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-2">
                     Logo Personalizado
                   </label>
-                  <input
-                    type="url"
-                    value={contactForm.map?.customLogo || ''}
-                    onChange={(e) => updateContent('contactForm.map.customLogo', e.target.value)}
-                    className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs"
-                    placeholder="https://ejemplo.com/logo.png"
-                  />
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                    {contactForm.map?.customLogo ? (
+                      /* CON logo - mostrar preview + hover */
+                      <div className="relative group">
+                        <div className="w-full h-16 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border flex items-center justify-center">
+                          <img 
+                            src={contactForm.map.customLogo} 
+                            alt="Logo del marcador"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                        
+                        {/* Hover overlay para cambiar */}
+                        <div className="absolute inset-0 bg-black bg-opacity-70 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="text-center">
+                            <ManagedImageSelector
+                              currentImage={contactForm.map.customLogo}
+                              onImageSelect={(imageUrl) => updateContent('contactForm.map.customLogo', imageUrl)}
+                              label=""
+                              hideButtonArea={true}
+                            />
+                            <div className="text-white text-xs font-medium mt-1 pointer-events-none">
+                              Cambiar Logo
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Botón eliminar */}
+                        <button
+                          onClick={() => updateContent('contactForm.map.customLogo', '')}
+                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors text-xs flex items-center justify-center opacity-0 group-hover:opacity-100"
+                          title="Eliminar logo"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ) : (
+                      /* SIN logo - mostrar selector */
+                      <div className="text-center py-4">
+                        <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+                          <span className="text-lg text-gray-400">🏢</span>
+                        </div>
+                        <ManagedImageSelector
+                          currentImage=""
+                          onImageSelect={(imageUrl) => updateContent('contactForm.map.customLogo', imageUrl)}
+                          label="📷 Seleccionar Logo"
+                          hideButtonArea={false}
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Logo para el marcador del mapa
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* URL manual como alternativa */}
+                    <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-600">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        O pegar URL directamente:
+                      </label>
+                      <input
+                        type="url"
+                        value={contactForm.map?.customLogo || ''}
+                        onChange={(e) => updateContent('contactForm.map.customLogo', e.target.value)}
+                        className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs"
+                        placeholder="https://ejemplo.com/logo.png"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Opciones del logo */}
@@ -549,6 +645,270 @@ const MapSection: React.FC<MapSectionProps> = ({
                 )}
               </div>
               
+              {/* Vista Previa del Mapa */}
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                    👀 Vista Previa del Mapa
+                  </h4>
+                  <div className={`px-2 py-1 rounded text-xs font-medium ${
+                    contactForm.map?.latitude && contactForm.map?.longitude
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                      : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                  }`}>
+                    {contactForm.map?.latitude && contactForm.map?.longitude ? 'Configurado' : 'Faltan coordenadas'}
+                  </div>
+                </div>
+
+                {contactForm.map?.latitude && contactForm.map?.longitude ? (
+                  <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
+                    {/* Simulador del mapa */}
+                    <div 
+                      className="relative bg-gradient-to-br from-green-100 to-blue-100 dark:from-green-900/20 dark:to-blue-900/20"
+                      style={{ 
+                        height: contactForm.map?.aspectRatio === 'custom' ? contactForm.map?.height : 
+                               contactForm.map?.aspectRatio === 'square' ? '200px' :
+                               contactForm.map?.aspectRatio === 'portrait' ? '250px' : '180px'
+                      }}
+                    >
+                      {/* Marcador simulado */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative">
+                          {/* Círculos de pulso animados (si están habilitados) */}
+                          {contactForm.map?.animationEnabled !== false && contactForm.map?.pulseIntensity !== 'none' && (
+                            <>
+                              {/* Primer círculo de pulso */}
+                              <div 
+                                className="absolute w-12 h-12 -top-2 -left-2 rounded-full animate-ping"
+                                style={{ 
+                                  backgroundColor: contactForm.map?.pulseColor || '#ef4444',
+                                  opacity: contactForm.map?.pulseIntensity === 'low' ? 0.3 :
+                                          contactForm.map?.pulseIntensity === 'high' ? 0.7 :
+                                          contactForm.map?.pulseIntensity === 'extreme' ? 0.9 : 0.5,
+                                  animationDuration: contactForm.map?.pulseSpeed === 'slow' ? '3s' :
+                                                    contactForm.map?.pulseSpeed === 'fast' ? '0.5s' :
+                                                    contactForm.map?.pulseSpeed === 'ultra' ? '0.3s' : '1s',
+                                  animationIterationCount: 'infinite'
+                                }}
+                              />
+                              {/* Segundo círculo de pulso (para efecto más intenso) */}
+                              {(contactForm.map?.pulseIntensity === 'high' || contactForm.map?.pulseIntensity === 'extreme') && (
+                                <div 
+                                  className="absolute w-16 h-16 -top-4 -left-4 rounded-full animate-ping"
+                                  style={{ 
+                                    backgroundColor: contactForm.map?.pulseColor || '#ef4444',
+                                    opacity: contactForm.map?.pulseIntensity === 'extreme' ? 0.4 : 0.25,
+                                    animationDuration: contactForm.map?.pulseSpeed === 'slow' ? '4s' :
+                                                      contactForm.map?.pulseSpeed === 'fast' ? '0.8s' :
+                                                      contactForm.map?.pulseSpeed === 'ultra' ? '0.5s' : '1.5s',
+                                    animationDelay: '0.3s',
+                                    animationIterationCount: 'infinite'
+                                  }}
+                                />
+                              )}
+                              {/* Tercer círculo para efecto extreme */}
+                              {contactForm.map?.pulseIntensity === 'extreme' && (
+                                <div 
+                                  className="absolute w-20 h-20 -top-6 -left-6 rounded-full animate-ping"
+                                  style={{ 
+                                    backgroundColor: contactForm.map?.pulseColor || '#ef4444',
+                                    opacity: 0.15,
+                                    animationDuration: contactForm.map?.pulseSpeed === 'slow' ? '5s' :
+                                                      contactForm.map?.pulseSpeed === 'fast' ? '1s' :
+                                                      contactForm.map?.pulseSpeed === 'ultra' ? '0.7s' : '2s',
+                                    animationDelay: '0.6s',
+                                    animationIterationCount: 'infinite'
+                                  }}
+                                />
+                              )}
+                            </>
+                          )}
+                          
+                          {/* Marcador principal con efectos hover */}
+                          <div 
+                            className={`relative w-8 h-8 rounded-full border flex items-center justify-center shadow-lg transition-all duration-300 cursor-pointer group ${
+                              contactForm.map?.hoverEffect === 'glow' ? 'hover:shadow-2xl hover:scale-110 hover:shadow-red-400/50' :
+                              contactForm.map?.hoverEffect === 'thunder' ? 'hover:scale-125 hover:shadow-yellow-400/70' :
+                              contactForm.map?.hoverEffect === 'rainbow' ? 'hover:scale-110 hover:shadow-purple-400/70' :
+                              contactForm.map?.hoverEffect === 'shake' ? 'hover:scale-105 hover:shadow-blue-400/50' :
+                              contactForm.map?.hoverEffect !== 'none' ? 'hover:scale-105' : ''
+                            }`}
+                            style={{
+                              backgroundColor: contactForm.map?.markerBackground || '#ffffff',
+                              borderColor: contactForm.map?.markerBorderColor || '#000000',
+                              borderWidth: contactForm.map?.markerBorderWidth || '2px'
+                            }}
+                            onMouseEnter={(e) => {
+                              const element = e.currentTarget;
+                              
+                              // Aplicar efectos específicos
+                              switch (contactForm.map?.hoverEffect) {
+                                case 'glow':
+                                  element.style.boxShadow = `0 0 25px ${contactForm.map?.pulseColor || '#ef4444'}CC, 0 0 50px ${contactForm.map?.pulseColor || '#ef4444'}66`;
+                                  element.style.transform = 'scale(1.1)';
+                                  break;
+                                case 'thunder':
+                                  element.style.boxShadow = '0 0 30px #FFD700DD, 0 0 60px #FFD70099';
+                                  element.style.transform = 'scale(1.25)';
+                                  element.classList.add('thunder-effect');
+                                  break;
+                                case 'rainbow':
+                                  element.style.boxShadow = '0 0 35px #8A2BE2CC, 0 0 70px #FF1493AA';
+                                  element.style.transform = 'scale(1.1)';
+                                  element.classList.add('rainbow-effect');
+                                  break;
+                                case 'shake':
+                                  element.style.boxShadow = '0 0 20px #3B82F6CC';
+                                  element.style.transform = 'scale(1.05)';
+                                  element.classList.add('shake-effect');
+                                  break;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              const element = e.currentTarget;
+                              
+                              // Resetear estilos y clases
+                              element.style.boxShadow = '';
+                              element.style.transform = '';
+                              element.classList.remove('thunder-effect', 'rainbow-effect', 'shake-effect');
+                            }}
+                          >
+                            {contactForm.map?.customLogo ? (
+                              <img 
+                                src={contactForm.map.customLogo} 
+                                alt="Logo del marcador"
+                                className={`rounded-full object-cover ${
+                                  contactForm.map?.logoSize === 'small' ? 'w-4 h-4' :
+                                  contactForm.map?.logoSize === 'large' ? 'w-6 h-6' : 'w-5 h-5'
+                                }`}
+                              />
+                            ) : (
+                              <div 
+                                className="w-4 h-4 rounded-full"
+                                style={{ backgroundColor: contactForm.map?.markerColor || '#ef4444' }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+
+
+                      {/* Coordenadas en esquina superior derecha */}
+                      <div className="absolute top-2 right-2">
+                        <div className="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                          {contactForm.map.latitude?.toFixed(4)}, {contactForm.map.longitude?.toFixed(4)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Información del preview */}
+                    <div className="p-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-600">
+                      <div className="grid grid-cols-2 gap-3 text-xs mb-3">
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400">Tamaño</div>
+                          <div className="font-medium text-gray-900 dark:text-gray-100">
+                            {contactForm.map?.containerSize || 'medium'}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400">Proporción</div>
+                          <div className="font-medium text-gray-900 dark:text-gray-100">
+                            {contactForm.map?.aspectRatio || 'landscape'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Efectos actuales */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">Animación:</span>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            contactForm.map?.animationEnabled !== false ? 
+                            'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 
+                            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                          }`}>
+                            {contactForm.map?.animationEnabled !== false ? 'Activa' : 'Inactiva'}
+                          </span>
+                        </div>
+
+                        {contactForm.map?.animationEnabled !== false && (
+                          <>
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Pulso:</span>
+                              <span className="text-gray-900 dark:text-gray-100 font-medium">
+                                {contactForm.map?.pulseIntensity || 'medium'} / {contactForm.map?.pulseSpeed || 'normal'}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Hover:</span>
+                              <div className="flex items-center gap-1">
+                                <span className="text-gray-900 dark:text-gray-100 font-medium">
+                                  {contactForm.map?.hoverEffect || 'glow'}
+                                </span>
+                                <span className="text-lg">
+                                  {contactForm.map?.hoverEffect === 'glow' ? '✨' :
+                                   contactForm.map?.hoverEffect === 'thunder' ? '⚡' :
+                                   contactForm.map?.hoverEffect === 'rainbow' ? '🌈' :
+                                   contactForm.map?.hoverEffect === 'shake' ? '📳' : '🚫'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Colores de efectos */}
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Colores:</span>
+                              <div className="flex items-center gap-1">
+                                <div 
+                                  className="w-3 h-3 rounded-full border border-gray-300"
+                                  style={{ backgroundColor: contactForm.map?.markerColor || '#ef4444' }}
+                                  title="Color del marcador"
+                                />
+                                <div 
+                                  className="w-3 h-3 rounded-full border border-gray-300"
+                                  style={{ backgroundColor: contactForm.map?.pulseColor || '#ef4444' }}
+                                  title="Color del pulso"
+                                />
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Instrucción de interacción */}
+                      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                        <div className="text-center">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                            💡 Pasa el cursor sobre el marcador para ver el efecto hover
+                          </div>
+                          {contactForm.map?.googleMapsUrl && (
+                            <a
+                              href={contactForm.map.googleMapsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center gap-1"
+                            >
+                              🔗 Ver en Google Maps
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-600 text-center">
+                    <div className="text-4xl mb-2">🗺️</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
+                      Configura las coordenadas
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      Pega un enlace de Google Maps para ver la vista previa
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Guía paso a paso */}
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
                 <h4 className="text-blue-800 dark:text-blue-200 font-medium mb-3 flex items-center">
