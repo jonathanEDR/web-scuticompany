@@ -241,11 +241,40 @@ const SimpleGoogleMap = ({
 
   const embedUrl = getEmbedUrl();
 
+  // Función para normalizar URL de Google Maps
+  const normalizeGoogleMapsUrl = (url: string): string => {
+    if (!url) return '';
+    
+    // Si ya tiene protocolo, devolverla tal como está
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    // Si es una URL de Google Maps sin protocolo, agregar https://
+    if (url.startsWith('google.com/') || url.startsWith('maps.google.com/') || url.startsWith('www.google.com/')) {
+      return `https://${url}`;
+    }
+    
+    // Si es una URL de maps.app.goo.gl sin protocolo
+    if (url.startsWith('maps.app.goo.gl/')) {
+      return `https://${url}`;
+    }
+    
+    // Si es una URL goo.gl sin protocolo
+    if (url.startsWith('goo.gl/')) {
+      return `https://${url}`;
+    }
+    
+    // Por defecto, agregar https://
+    return `https://${url}`;
+  };
+
   // Función para abrir Google Maps en nueva pestaña
   const openInGoogleMaps = () => {
     if (googleMapsUrl && !googleMapsUrl.includes('/embed')) {
-      // Si tenemos URL original, usarla
-      window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+      // Normalizar la URL antes de usarla
+      const normalizedUrl = normalizeGoogleMapsUrl(googleMapsUrl);
+      window.open(normalizedUrl, '_blank', 'noopener,noreferrer');
     } else {
       // Fallback: buscar coordenadas o usar búsqueda
       const coordMatch = embedUrl.match(/2d(-?\d+\.?\d*)!3d(-?\d+\.?\d*)/);

@@ -53,6 +53,7 @@ export interface UseDefaultPageDataReturn {
     title: string;
     subtitle: string;
     description: string;
+    enabled: boolean;
     backgroundImage?: {
       light?: string;
       dark?: string;
@@ -83,6 +84,35 @@ export interface UseDefaultPageDataReturn {
     messages?: {
       success?: string;
       error?: string;
+    };
+    map?: {
+      enabled: boolean;
+      googleMapsUrl: string;
+      latitude: number;
+      longitude: number;
+      zoom: number;
+      height: string;
+      width?: string;
+      aspectRatio?: 'square' | 'landscape' | 'portrait' | 'custom';
+      alignment?: 'left' | 'center' | 'right' | 'full';
+      containerSize?: 'small' | 'medium' | 'large' | 'xl';
+      companyName: string;
+      address: string;
+      markerColor: string;
+      pulseColor: string;
+      customLogo?: string;
+      logoSize?: 'small' | 'medium' | 'large';
+      showCompanyName?: boolean;
+      borderRadius?: string;
+      shadow?: 'none' | 'small' | 'medium' | 'large';
+      markerBackground?: string;
+      markerBorderColor?: string;
+      markerBorderWidth?: string;
+      markerStyle?: 'solid' | 'gradient' | 'custom';
+      pulseIntensity?: 'none' | 'low' | 'medium' | 'high' | 'extreme';
+      pulseSpeed?: 'slow' | 'normal' | 'fast' | 'ultra';
+      hoverEffect?: 'none' | 'glow' | 'electric' | 'rainbow' | 'shake';
+      animationEnabled?: boolean;
     };
   };
   currentBackgroundImageHero: string;
@@ -156,18 +186,37 @@ export const useDefaultPageData = (): UseDefaultPageDataReturn => {
       success: '¡Gracias por contactarnos! Te responderemos pronto.',
       error: 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.',
     },
-    // Configuración del mapa (habilitado por defecto para demostrar la funcionalidad)
+    // Habilitar el formulario de contacto
+    enabled: true,
+    // Configuración del mapa (configuración idéntica a la página Home)
     map: {
       enabled: true,
-      googleMapsUrl: 'https://maps.app.goo.gl/MiMpNHWrRQUVqihz5', // URL de ejemplo de Lima, Perú
-      latitude: -12.0464,
-      longitude: -77.0428,
-      zoom: 15,
-      height: '400px',
-      companyName: 'Scuti Company',
-      address: 'Lima, Perú',
-      markerColor: '#8B5CF6',
-      pulseColor: '#8B5CF6'
+      googleMapsUrl: 'https://www.google.com/maps/place/Scuti+Company+S.A.C/@-9.9306,-76.2422,16z', // URL actualizada para Scuti Company
+      latitude: -9.9306,
+      longitude: -76.2422,
+      zoom: 16,
+      height: '400px', // Altura igual que en Home
+      width: '100%',
+      aspectRatio: 'landscape' as const,
+      alignment: 'center' as const,
+      containerSize: 'medium' as const, // Tamaño igual que en Home
+      companyName: 'Scuti Company S.A.C',
+      address: 'calles los molles It-02, Huánuco, Perú',
+      markerColor: '#ef4444',
+      pulseColor: '#ef4444',
+      customLogo: undefined,
+      logoSize: 'medium' as const, // Tamaño igual que en Home
+      showCompanyName: true,
+      borderRadius: '1rem', // Radio igual que en Home
+      shadow: 'medium' as const, // Sombra igual que en Home
+      markerBackground: '#ef4444',
+      markerBorderColor: '#ffffff',
+      markerBorderWidth: '4px', // Borde igual que en Home
+      markerStyle: 'gradient' as const,
+      pulseIntensity: 'medium' as const, // Intensidad igual que en Home
+      pulseSpeed: 'normal' as const,
+      hoverEffect: 'glow' as const,
+      animationEnabled: true
     },
   };
 

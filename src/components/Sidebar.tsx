@@ -43,12 +43,13 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       // Todos pueden ver su perfil
     },
     {
-      name: 'Servicios',
-      icon: '⚙️',
-      path: '/dashboard/services',
-      description: 'Gestión de servicios',
-      permission: Permission.VIEW_SERVICES,
-      // Todos tienen VIEW_SERVICES
+      name: 'Módulo Servicios',
+      icon: '🚀',
+      path: '/dashboard/servicios/management',
+      description: 'Gestión avanzada de servicios',
+      permission: Permission.MANAGE_CONTENT,
+      adminOnly: true,
+      // Solo ADMIN, MODERATOR, SUPER_ADMIN - Panel de gestión de servicios
     },
     {
       name: 'CMS',

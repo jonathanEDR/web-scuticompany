@@ -23,9 +23,23 @@ const Contact = () => {
     routePath: '/contacto'
   });
 
-  // Scroll to top al montar
+  // Scroll to top al montar o al formulario si hay hash
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const hash = window.location.hash;
+    if (hash === '#formulario') {
+      // Pequeño delay para asegurar que el contenido se haya renderizado
+      setTimeout(() => {
+        const formularioElement = document.getElementById('formulario');
+        if (formularioElement) {
+          formularioElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 500);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, []);
 
   if (loading) {

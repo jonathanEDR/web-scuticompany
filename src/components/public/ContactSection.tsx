@@ -216,7 +216,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
   return (
     <section
       id="contacto"
-      className="relative min-h-screen py-24 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden"
       style={sectionStyles}
     >
       {/* Overlay removido para mostrar imagen de fondo sin filtros */}
@@ -242,10 +242,10 @@ const ContactSection = ({ data }: ContactSectionProps) => {
         style={{ maxWidth: data?.map?.enabled ? '1400px' : (data?.layout?.maxWidth || '600px') }}
       >
         {/* Cabecera */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           {data?.subtitle && (
             <p 
-              className="text-sm font-semibold tracking-wider uppercase mb-3"
+              className="text-xs font-semibold tracking-wider uppercase mb-2"
               style={{ color: currentStyles?.subtitleColor || '#6b7280' }}
             >
               {data.subtitle}
@@ -253,7 +253,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           )}
           
           <h2 
-            className="text-4xl md:text-5xl font-bold mb-6"
+            className="text-2xl md:text-3xl font-bold mb-3"
             style={{ color: currentStyles?.titleColor || currentCardsDesign?.titleColor || '#1f2937' }}
           >
             {data?.title || 'Contáctanos'}
@@ -261,7 +261,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
           
           {data?.description && (
             <p 
-              className="text-lg max-w-3xl mx-auto"
+              className="text-sm max-w-2xl mx-auto"
               style={{ color: currentStyles?.descriptionColor || currentCardsDesign?.descriptionColor || '#4b5563' }}
             >
               {data.description}
@@ -270,17 +270,17 @@ const ContactSection = ({ data }: ContactSectionProps) => {
         </div>
 
         {/* Contenido principal: Formulario + Mapa */}
-        <div className={`grid gap-8 lg:gap-6 ${data?.map?.enabled ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 max-w-2xl mx-auto'} items-center justify-items-center`}>
+        <div className={`grid gap-6 lg:gap-4 ${data?.map?.enabled ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 max-w-lg mx-auto'} items-start justify-items-center`}>
           
           {/* Formulario */}
           <div 
-            className="w-full max-w-lg mx-auto transition-all duration-300 hover:shadow-lg"
+            className="w-full max-w-md mx-auto transition-all duration-300 hover:shadow-lg"
             style={{
               background: currentCardsDesign?.background || currentStyles?.formBackground || 'rgba(255, 255, 255, 0.95)',
               border: `${currentCardsDesign?.borderWidth || '1px'} solid ${currentCardsDesign?.border || currentStyles?.formBorder || 'rgba(0, 0, 0, 0.1)'}`,
-              borderRadius: data?.layout?.borderRadius || '1rem',
-              boxShadow: currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)',
-              padding: currentCardsDesign?.cardPadding || data?.layout?.padding || '3rem',
+              borderRadius: data?.layout?.borderRadius || '0.75rem',
+              boxShadow: currentCardsDesign?.shadow || currentStyles?.formShadow || '0 8px 32px rgba(0, 0, 0, 0.1)',
+              padding: currentCardsDesign?.cardPadding || data?.layout?.padding || '1.5rem',
               minWidth: currentCardsDesign?.cardMinWidth || 'auto',
               maxWidth: currentCardsDesign?.cardMaxWidth || 'none',
               minHeight: currentCardsDesign?.cardMinHeight || 'auto',
@@ -302,12 +302,12 @@ const ContactSection = ({ data }: ContactSectionProps) => {
               e.currentTarget.style.boxShadow = currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)';
             }}
           >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="formulario" onSubmit={handleSubmit} className="space-y-4">
             {/* Campo: Nombre */}
             <div>
               <label 
                 htmlFor="nombre"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-1"
                 style={{ color: currentStyles?.labelColor || '#374151' }}
               >
                 {data?.fields?.nombreLabel || 'Nombre'}
@@ -321,7 +321,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 placeholder={data?.fields?.nombrePlaceholder || 'Tu nombre completo'}
                 required={data?.fields?.nombreRequired}
                 disabled={isLoading || isSuccess}
-                className="w-full px-4 py-3 rounded-lg transition-all duration-300 outline-none focus:ring-2"
+                className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
                 style={{
                   background: currentStyles?.inputBackground || '#ffffff',
                   border: `1px solid ${errors.nombre ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
@@ -329,7 +329,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 }}
               />
               {errors.nombre && (
-                <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
                   {errors.nombre}
                 </p>
               )}
@@ -339,7 +339,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
             <div>
               <label 
                 htmlFor="celular"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-1"
                 style={{ color: currentStyles?.labelColor || '#374151' }}
               >
                 {data?.fields?.celularLabel || 'Celular / Teléfono'}
@@ -353,7 +353,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 placeholder={data?.fields?.celularPlaceholder || '+51 999 999 999'}
                 required={data?.fields?.celularRequired}
                 disabled={isLoading || isSuccess}
-                className="w-full px-4 py-3 rounded-lg transition-all duration-300 outline-none focus:ring-2"
+                className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
                 style={{
                   background: currentStyles?.inputBackground || '#ffffff',
                   border: `1px solid ${errors.celular ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
@@ -361,7 +361,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 }}
               />
               {errors.celular && (
-                <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
                   {errors.celular}
                 </p>
               )}
@@ -371,7 +371,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
             <div>
               <label 
                 htmlFor="correo"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-1"
                 style={{ color: currentStyles?.labelColor || '#374151' }}
               >
                 {data?.fields?.correoLabel || 'Correo Electrónico'}
@@ -385,7 +385,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 placeholder={data?.fields?.correoPlaceholder || 'tu@email.com'}
                 required={data?.fields?.correoRequired}
                 disabled={isLoading || isSuccess}
-                className="w-full px-4 py-3 rounded-lg transition-all duration-300 outline-none focus:ring-2"
+                className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
                 style={{
                   background: currentStyles?.inputBackground || '#ffffff',
                   border: `1px solid ${errors.correo ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
@@ -393,7 +393,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 }}
               />
               {errors.correo && (
-                <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
                   {errors.correo}
                 </p>
               )}
@@ -403,7 +403,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
             <div>
               <label 
                 htmlFor="mensaje"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-1"
                 style={{ color: currentStyles?.labelColor || '#374151' }}
               >
                 {data?.fields?.mensajeLabel || 'Cuéntanos sobre tu proyecto'}
@@ -416,8 +416,8 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 placeholder={data?.fields?.mensajePlaceholder || 'Describe tu proyecto, necesidades o consulta...'}
                 required={data?.fields?.mensajeRequired}
                 disabled={isLoading || isSuccess}
-                rows={data?.fields?.mensajeRows || 5}
-                className="w-full px-4 py-3 rounded-lg transition-all duration-300 outline-none focus:ring-2 resize-none"
+                rows={3}
+                className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2 resize-none"
                 style={{
                   background: currentStyles?.inputBackground || '#ffffff',
                   border: `1px solid ${errors.mensaje ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
@@ -425,7 +425,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 }}
               />
               {errors.mensaje && (
-                <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
                   {errors.mensaje}
                 </p>
               )}
@@ -440,14 +440,14 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                   checked={formData.acceptTerms}
                   onChange={(e) => handleChange('acceptTerms', e.target.checked)}
                   disabled={isLoading || isSuccess}
-                  className="mt-1 mr-3 h-4 w-4 rounded"
+                  className="mt-0.5 mr-2 h-3 w-3 rounded"
                   style={{
                     accentColor: currentStyles?.inputFocusBorder || '#8B5CF6',
                   }}
                 />
                 <label 
                   htmlFor="acceptTerms"
-                  className="text-sm"
+                  className="text-xs"
                   style={{ color: currentStyles?.labelColor || '#374151' }}
                 >
                   {data.fields.termsText || 'Acepto la Política de Privacidad y Términos de Servicio'}
@@ -464,7 +464,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
               </div>
             )}
             {errors.acceptTerms && (
-              <p className="text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+              <p className="text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
                 {errors.acceptTerms}
               </p>
             )}
@@ -472,7 +472,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
             {/* Mensajes de estado */}
             {isSuccess && successMessage && (
               <div 
-                className="p-4 rounded-lg text-center font-medium animate-fade-in"
+                className="p-3 rounded-md text-center font-medium animate-fade-in text-sm"
                 style={{
                   background: currentStyles?.successColor ? `${currentStyles.successColor}15` : 'rgba(16, 185, 129, 0.1)',
                   color: currentStyles?.successColor || '#10b981',
@@ -485,7 +485,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
 
             {isError && errorMessage && !isSuccess && (
               <div 
-                className="p-4 rounded-lg text-center font-medium animate-fade-in"
+                className="p-3 rounded-md text-center font-medium animate-fade-in text-sm"
                 style={{
                   background: currentStyles?.errorColor ? `${currentStyles.errorColor}15` : 'rgba(239, 68, 68, 0.1)',
                   color: currentStyles?.errorColor || '#ef4444',
@@ -500,7 +500,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
             <button
               type="submit"
               disabled={isLoading || isSuccess}
-              className="w-full py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full py-3 rounded-md font-semibold text-sm transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               style={{
                 background: currentStyles?.buttonBackground || 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
                 color: currentStyles?.buttonText || '#ffffff',
@@ -518,7 +518,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
 
           {/* Mapa de Google (solo si está habilitado) */}
           {data?.map?.enabled && (
-            <div className="flex items-center lg:sticky lg:top-8">
+            <div className="flex items-start lg:sticky lg:top-4">
               <SimpleGoogleMap
                 googleMapsUrl={data.map.googleMapsUrl || ''}
                 height={data.map.height || '400px'}
@@ -526,13 +526,13 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 aspectRatio={data.map.aspectRatio || 'landscape'}
                 alignment={data.map.alignment || 'center'}
                 containerSize={data.map.containerSize || 'medium'}
-                companyName={data.map.companyName || 'Nuestra Ubicación'}
-                address={data.map.address || ''}
+                companyName={data.map.companyName || 'Scuti Company S.A.C'}
+                address={data.map.address || 'calles los molles It-02, Huánuco, Perú'}
                 customLogo={data.map.customLogo}
                 logoSize={data.map.logoSize || 'medium'}
                 borderRadius={data.map.borderRadius || data?.layout?.borderRadius || '1rem'}
                 shadow={data.map.shadow || 'medium'}
-                markerBackground={data.map.markerBackground || '#8B5CF6'}
+                markerBackground={data.map.markerBackground || '#ef4444'}
                 markerBorderColor={data.map.markerBorderColor || '#ffffff'}
                 markerBorderWidth={data.map.markerBorderWidth || '4px'}
                 markerStyle={data.map.markerStyle || 'gradient'}
@@ -543,13 +543,7 @@ const ContactSection = ({ data }: ContactSectionProps) => {
               />
             </div>
           )}
-          
-          {/* Debug: Mostrar si el mapa NO está habilitado */}
-          {!data?.map?.enabled && (
-            <div className="w-full bg-yellow-200 border-2 border-yellow-500 p-4 text-sm">
-              DEBUG: Mapa NO habilitado. data.map = {JSON.stringify(data?.map)}
-            </div>
-          )}
+
 
         </div>
 

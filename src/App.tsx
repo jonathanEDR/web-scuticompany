@@ -2,6 +2,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import ToastContainer from './components/common/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary';
 import { DashboardProviders } from './components/DashboardProviders';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -14,7 +16,8 @@ import './App.css';
 // Páginas públicas - Sin dependencias de autenticación
 const Home = lazy(() => import('./pages/public/Home'));
 const About = lazy(() => import('./pages/public/About'));
-const ServicesPublic = lazy(() => import('./pages/public/ServicesPublic'));
+const ServicesPublic = lazy(() => import('./pages/public/ServicesPublicV2'));
+const ServicioDetail = lazy(() => import('./pages/public/ServicioDetail'));
 const Contact = lazy(() => import('./pages/public/Contact'));
 
 // Páginas de autenticación - CON Clerk optimizado
@@ -36,6 +39,15 @@ const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
 
 // Páginas administrativas
 const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
+
+// Páginas demo
+const NotificationDemo = lazy(() => import('./pages/demo/NotificationDemo'));
+const PerformanceDemo = lazy(() => import('./pages/demo/PerformanceDemo'));
+
+// Módulo de Servicios
+const ServicioDashboard = lazy(() => import('./pages/admin/ServicioDashboard'));
+const ServiciosManagement = lazy(() => import('./pages/admin/ServiciosManagement'));
+const ServicioForm = lazy(() => import('./pages/admin/ServicioFormV3'));
 
 // Componente de loading minimalista
 const LoadingSpinner = () => (
@@ -66,13 +78,16 @@ function App() {
     <ErrorBoundary>
       {/* ⚡ ThemeProvider es ligero, se mantiene global */}
       <ThemeProvider>
-        <BrowserRouter>
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes>
+        {/* 🔔 Sistema de notificaciones global */}
+        <NotificationProvider>
+          <BrowserRouter>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
               {/* ⚡ PÁGINAS PÚBLICAS - SIN CLERK, CARGA INSTANTÁNEA */}
               <Route path="/" element={<Home />} />
               <Route path="/nosotros" element={<About />} />
               <Route path="/servicios" element={<ServicesPublic />} />
+              <Route path="/servicios/:slug" element={<ServicioDetail />} />
               <Route path="/contacto" element={<Contact />} />
               
               {/* 🔐 RUTAS DE AUTENTICACIÓN - Clerk con diseño optimizado */}
@@ -201,7 +216,7 @@ function App() {
                 </DashboardRoute>
               } />
               
-              {/* � CRM - Gestión de Leads - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
+              {/* 📋 CRM - Gestión de Leads - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
               <Route path="/dashboard/crm" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
@@ -210,7 +225,45 @@ function App() {
                 </DashboardRoute>
               } />
               
-              {/* �👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
+              {/* 🚀 MÓDULO DE SERVICIOS - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
+              
+              {/* Dashboard Principal de Servicios - Estadísticas y métricas */}
+              <Route path="/dashboard/servicios" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <ServicioDashboard />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Gestión de Servicios - Lista, filtros, CRUD */}
+              <Route path="/dashboard/servicios/management" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <ServiciosManagement />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Crear Nuevo Servicio */}
+              <Route path="/dashboard/servicios/new" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <ServicioForm />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Editar Servicio Existente */}
+              <Route path="/dashboard/servicios/:id/edit" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <ServicioForm />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
               <Route path="/dashboard/admin/users" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
@@ -218,12 +271,35 @@ function App() {
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
+
+              {/* 🎨 PÁGINAS DEMO - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
+              
+              {/* Demo de Notificaciones */}
+              <Route path="/demo/notifications" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <NotificationDemo />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Demo de Optimizaciones de Rendimiento */}
+              <Route path="/demo/performance" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <PerformanceDemo />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
             </Routes>
           </Suspense>
+          {/* 🔔 Contenedor de notificaciones Toast */}
+          <ToastContainer position="top-right" />
         </BrowserRouter>
-      </ThemeProvider>
-    </ErrorBoundary>
-  );
+      </NotificationProvider>
+    </ThemeProvider>
+  </ErrorBoundary>
+);
 }
 
 export default App;
