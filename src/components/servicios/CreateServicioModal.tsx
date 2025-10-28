@@ -24,6 +24,7 @@ interface FormData {
   categoria: 'desarrollo' | 'diseño' | 'marketing' | 'consultoría' | 'mantenimiento' | 'otro';
   precio?: number;
   tipoPrecio: 'fijo' | 'rango' | 'personalizado';
+  moneda?: 'USD' | 'MXN' | 'EUR' | 'PEN';
   destacado: boolean;
   activo: boolean;
   caracteristicas: string[];
@@ -63,7 +64,8 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
       activo: true,
       caracteristicas: [],
       etiquetas: [],
-      imagenes: []
+      imagenes: [],
+      moneda: 'PEN' // Soles peruanos por defecto
     }
   });
 
@@ -134,10 +136,21 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
   const onSubmit = async (formData: FormData) => {
     setIsSubmitting(true);
     try {
+      // Generar un slug único basado en el título + timestamp
+      const timestamp = Date.now();
+      const slugBase = formData.titulo
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+        .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales
+        .replace(/^-+|-+$/g, ''); // Quitar guiones del inicio y final
+      
+      const slug = `${slugBase}-${timestamp}`;
+
       // Preparar datos para la API
       const servicioData = {
         titulo: formData.titulo,
-        descripcion: formData.descripcion || '',
+        descripcion: formData.descripcion || formData.titulo, // Usar título como descripción si no hay
         descripcionCorta: formData.descripcionCorta || '',
         categoria: formData.categoria,
         precio: formData.precio,
@@ -147,15 +160,23 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
         caracteristicas: formData.caracteristicas,
         etiquetas: formData.etiquetas,
         imagenPrincipal: formData.imagenPrincipal,
-        imagenes: formData.imagenes
+        imagenes: formData.imagenes,
+        slug: slug, // Slug único generado
+        estado: 'activo' as const,
+        visibleEnWeb: true,
+        moneda: formData.moneda || 'PEN' as const,
+        icono: '🚀'
       };
+      
+      console.log('📤 Creando servicio con slug único:', slug);
       
       await serviciosApi.create(servicioData);
       success('Servicio creado exitosamente');
       handleClose();
       onSuccess?.();
-    } catch (err) {
-      error('Error al crear el servicio');
+    } catch (err: any) {
+      console.error('❌ Error al crear servicio:', err);
+      error('Error al crear el servicio', err.response?.data?.error || err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -218,10 +239,25 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
             </select>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Moneda
+            </label>
+            <select
+              {...register('moneda')}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            >
+              <option value="PEN">🇵🇪 Soles (S/)</option>
+              <option value="USD">🇺🇸 Dólares ($)</option>
+              <option value="MXN">🇲🇽 Pesos Mexicanos (MXN)</option>
+              <option value="EUR">🇪🇺 Euros (€)</option>
+            </select>
+          </div>
+
           {watchedFields.tipoPrecio !== 'personalizado' && (
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Precio (USD)
+                Precio ({watchedFields.moneda || 'PEN'})
               </label>
               <input
                 type="number"

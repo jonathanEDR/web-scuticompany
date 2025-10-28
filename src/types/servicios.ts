@@ -35,7 +35,7 @@ export interface Servicio {
   precioMin?: number;
   precioMax?: number;
   tipoPrecio: 'fijo' | 'rango' | 'paquetes' | 'personalizado' | 'suscripcion' | 'desde' | 'consultar';
-  moneda: 'USD' | 'MXN' | 'EUR' | 'COP';
+  moneda: 'USD' | 'MXN' | 'EUR' | 'COP' | 'PEN';
   descuento?: number; // Porcentaje de descuento
   fechaPromocion?: string; // Fecha límite de promoción
   etiquetaPromocion?: string; // Texto promocional personalizado
@@ -55,7 +55,10 @@ export interface Servicio {
   beneficios?: string[]; // Beneficios clave del servicio
   incluye?: string[]; // Lista de lo que incluye el servicio
   noIncluye?: string[]; // Lista de lo que NO incluye el servicio
-  faq?: string[]; // Preguntas frecuentes
+  faq?: { // Preguntas frecuentes
+    pregunta: string;
+    respuesta: string;
+  }[];
   tecnologias?: string[];
   etiquetas: string[];
   
@@ -125,7 +128,7 @@ export interface PaqueteServicio {
   descripcion?: string;
   precio: number;
   precioOriginal?: number;
-  moneda: 'USD' | 'MXN' | 'EUR';
+  moneda: 'USD' | 'MXN' | 'EUR' | 'PEN';
   tipoFacturacion: 'unico' | 'mensual' | 'trimestral' | 'anual';
   
   // Características incluidas
@@ -348,7 +351,7 @@ export interface CreateServicioRequest {
   precioMin?: number;
   precioMax?: number;
   tipoPrecio: 'fijo' | 'rango' | 'paquetes' | 'personalizado' | 'suscripcion';
-  moneda?: 'USD' | 'MXN' | 'EUR';
+  moneda?: 'USD' | 'MXN' | 'EUR' | 'PEN';
   duracion?: {
     valor: number;
     unidad: 'horas' | 'días' | 'semanas' | 'meses' | 'años';
@@ -386,7 +389,7 @@ export interface CreatePaqueteRequest {
   descripcion?: string;
   precio: number;
   precioOriginal?: number;
-  moneda?: 'USD' | 'MXN' | 'EUR';
+  moneda?: 'USD' | 'MXN' | 'EUR' | 'PEN';
   tipoFacturacion?: 'unico' | 'mensual' | 'trimestral' | 'anual';
   caracteristicas: {
     texto: string;
@@ -474,7 +477,8 @@ export type TipoPrecioType = typeof TipoPrecio[keyof typeof TipoPrecio];
 export const Moneda = {
   USD: 'USD' as const,
   MXN: 'MXN' as const,
-  EUR: 'EUR' as const
+  EUR: 'EUR' as const,
+  PEN: 'PEN' as const
 };
 
 export type MonedaType = typeof Moneda[keyof typeof Moneda];

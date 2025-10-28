@@ -194,6 +194,47 @@ export const ServicioDetail: React.FC = () => {
                 )}
               </div>
 
+              {/* Badges informativos adicionales */}
+              {(servicio.tiempoEntrega || servicio.garantia || servicio.soporte) && (
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {servicio.tiempoEntrega && (
+                    <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/50 px-4 py-2 rounded-full border border-blue-300 dark:border-blue-700">
+                      <span className="text-lg">⏱️</span>
+                      <div>
+                        <span className="text-xs text-blue-700 dark:text-blue-300 font-medium">Entrega:</span>
+                        <span className="ml-1 text-sm font-semibold text-blue-900 dark:text-blue-100">
+                          {servicio.tiempoEntrega}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {servicio.garantia && (
+                    <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/50 px-4 py-2 rounded-full border border-green-300 dark:border-green-700">
+                      <span className="text-lg">🛡️</span>
+                      <div>
+                        <span className="text-xs text-green-700 dark:text-green-300 font-medium">Garantía:</span>
+                        <span className="ml-1 text-sm font-semibold text-green-900 dark:text-green-100">
+                          {servicio.garantia}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {servicio.soporte && (
+                    <div className="inline-flex items-center gap-2 bg-purple-100 dark:bg-purple-900/50 px-4 py-2 rounded-full border border-purple-300 dark:border-purple-700">
+                      <span className="text-lg">💬</span>
+                      <div>
+                        <span className="text-xs text-purple-700 dark:text-purple-300 font-medium">Soporte:</span>
+                        <span className="ml-1 text-sm font-semibold text-purple-900 dark:text-purple-100 capitalize">
+                          {servicio.soporte}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* CTA */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -391,6 +432,131 @@ export const ServicioDetail: React.FC = () => {
                 >
                   {tecnologia}
                 </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Beneficios */}
+      {servicio.beneficios && servicio.beneficios.length > 0 && (
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
+              🎯 Beneficios Clave
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {servicio.beneficios.map((beneficio, index) => (
+                <div
+                  key={index}
+                  className="group relative bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 transition-all hover:shadow-xl hover:-translate-y-1"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center text-2xl shadow-lg">
+                      ⭐
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-900 dark:text-white font-semibold text-lg leading-relaxed">
+                        {beneficio}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Incluye / No Incluye */}
+      {((servicio.incluye && servicio.incluye.length > 0) || (servicio.noIncluye && servicio.noIncluye.length > 0)) && (
+        <section className="py-16 bg-white/50 dark:bg-gray-800/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
+              📋 ¿Qué está incluido?
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {/* Lo que INCLUYE */}
+              {servicio.incluye && servicio.incluye.length > 0 && (
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-8 border-2 border-green-300 dark:border-green-700">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-xl">
+                      ✅
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      Incluye
+                    </h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {servicio.incluye.map((item, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="text-green-600 dark:text-green-400 text-xl mt-0.5">✓</span>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">
+                          {item}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Lo que NO INCLUYE */}
+              {servicio.noIncluye && servicio.noIncluye.length > 0 && (
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-8 border-2 border-red-300 dark:border-red-700">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-xl">
+                      ❌
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      No Incluye
+                    </h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {servicio.noIncluye.map((item, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="text-red-600 dark:text-red-400 text-xl mt-0.5">✗</span>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">
+                          {item}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ - Preguntas Frecuentes */}
+      {servicio.faq && servicio.faq.length > 0 && (
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
+              ❓ Preguntas Frecuentes
+            </h2>
+            <div className="space-y-4">
+              {servicio.faq.map((item, index) => (
+                <details
+                  key={index}
+                  className="group bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:border-purple-400 dark:hover:border-purple-500 transition-colors"
+                >
+                  <summary className="cursor-pointer px-6 py-4 font-semibold text-gray-900 dark:text-white flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <span className="flex items-center gap-3">
+                      <span className="text-purple-600 dark:text-purple-400">Q:</span>
+                      {item.pregunta}
+                    </span>
+                    <span className="text-purple-600 dark:text-purple-400 group-open:rotate-180 transition-transform">
+                      ▼
+                    </span>
+                  </summary>
+                  <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                      <span className="font-semibold text-purple-600 dark:text-purple-400 mr-2">A:</span>
+                      {item.respuesta}
+                    </p>
+                  </div>
+                </details>
               ))}
             </div>
           </div>

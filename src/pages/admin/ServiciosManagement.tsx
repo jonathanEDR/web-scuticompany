@@ -14,6 +14,7 @@ import { ServicioCard } from '../../components/servicios/ServicioCard';
 import { SearchWithAutocomplete } from '../../components/common/SearchWithAutocomplete';
 import { PaginationControls } from '../../components/common/PaginationControls';
 import { SkeletonGrid } from '../../components/common/Skeleton';
+import { CreateServicioModal } from '../../components/servicios/CreateServicioModal';
 import type { ServicioFilters, SortOption } from '../../types/filters';
 import { SORT_OPTIONS } from '../../types/filters';
 import type { Servicio } from '../../types/servicios';
@@ -69,6 +70,7 @@ export const ServiciosManagementOptimized = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // ============================================
   // HOOKS
@@ -79,7 +81,8 @@ export const ServiciosManagementOptimized = () => {
     loading,
     error,
     deleteServicio: deleteServicioHook,
-    duplicateServicio: duplicateServicioHook
+    duplicateServicio: duplicateServicioHook,
+    refresh
   } = useServicios({ autoFetch: true });
 
   // ============================================
@@ -265,7 +268,7 @@ export const ServiciosManagementOptimized = () => {
               </button>
               
               <button
-                onClick={() => navigate('/dashboard/servicios/new')}
+                onClick={() => setShowCreateModal(true)}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-sm"
               >
                 <PlusIcon />
@@ -339,87 +342,109 @@ export const ServiciosManagementOptimized = () => {
           </div>
         </div>
 
-        {/* Panel de filtros */}
-        {showFilters && (
-          <div className="mb-6">
-            <FiltersPanel
-              filters={filters}
-              onFiltersChange={setFilters}
-            />
-          </div>
-        )}
-
-        {/* Contenido */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <p className="text-red-700 dark:text-red-400">{error}</p>
-          </div>
-        )}
-
-        {loading ? (
-          <SkeletonGrid items={12} columns={viewMode === 'grid' ? 3 : 1} />
-        ) : pageData.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No se encontraron servicios
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {searchTerm || activeFiltersCount > 0
-                ? 'Intenta ajustar los filtros o la búsqueda'
-                : 'Comienza creando tu primer servicio'
-              }
-            </p>
-            {(searchTerm || activeFiltersCount > 0) && (
-              <button
-                onClick={handleResetFilters}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                Limpiar filtros
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            {/* Grid/List de servicios */}
-            <div className={`
-              ${viewMode === 'grid'
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                : 'space-y-4'
-              }
-              mb-6
-            `}>
-              {pageData.map((servicio) => (
-                <ServicioCard
-                  key={servicio._id}
-                  servicio={servicio}
-                  onEdit={() => handleEdit(servicio._id)}
-                  onDelete={() => handleDelete(servicio._id)}
-                  onDuplicate={() => handleDuplicate(servicio._id)}
-                  viewMode={viewMode}
+        {/* Layout con Filtros y Contenido lado a lado */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Panel de filtros - Sidebar */}
+          {showFilters && (
+            <div className="w-full lg:w-80 flex-shrink-0">
+              <div className="lg:sticky lg:top-6">
+                <FiltersPanel
+                  filters={filters}
+                  onFiltersChange={setFilters}
                 />
-              ))}
+              </div>
             </div>
+          )}
 
-            {/* Paginación */}
-            {totalPages > 1 && (
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={goToPage}
-                hasNextPage={hasNextPage}
-                hasPreviousPage={hasPreviousPage}
-                startIndex={startIndex}
-                endIndex={endIndex}
-                totalItems={totalItems}
-                itemsPerPage={itemsPerPage}
-                onItemsPerPageChange={setItemsPerPage}
-                className="mt-6"
-              />
+          {/* Contenido principal */}
+          <div className="flex-1 min-w-0">
+            {/* Contenido */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                <p className="text-red-700 dark:text-red-400">{error}</p>
+              </div>
             )}
-          </>
-        )}
+
+            {loading ? (
+              <SkeletonGrid items={12} columns={viewMode === 'grid' ? 3 : 1} />
+            ) : pageData.length === 0 ? (
+              <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700">
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  No se encontraron servicios
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  {searchTerm || activeFiltersCount > 0
+                    ? 'Intenta ajustar los filtros o la búsqueda'
+                    : 'Comienza creando tu primer servicio'
+                  }
+                </p>
+                {(searchTerm || activeFiltersCount > 0) && (
+                  <button
+                    onClick={handleResetFilters}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Limpiar filtros
+                  </button>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* Grid/List de servicios */}
+                <div className={`
+                  ${viewMode === 'grid'
+                    ? showFilters 
+                      ? 'grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6'
+                      : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                    : 'space-y-4'
+                  }
+                  mb-6
+                `}>
+                  {pageData.map((servicio) => (
+                    <ServicioCard
+                      key={servicio._id}
+                      servicio={servicio}
+                      onEdit={() => handleEdit(servicio._id)}
+                      onDelete={() => handleDelete(servicio._id)}
+                      onDuplicate={() => handleDuplicate(servicio._id)}
+                      showActions={true}
+                      viewMode="admin"
+                    />
+                  ))}
+                </div>
+
+                {/* Paginación */}
+                {totalPages > 1 && (
+                  <PaginationControls
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={goToPage}
+                    hasNextPage={hasNextPage}
+                    hasPreviousPage={hasPreviousPage}
+                    startIndex={startIndex}
+                    endIndex={endIndex}
+                    totalItems={totalItems}
+                    itemsPerPage={itemsPerPage}
+                    onItemsPerPageChange={setItemsPerPage}
+                    className="mt-6"
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Modal de crear servicio */}
+      <CreateServicioModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={async () => {
+          setShowCreateModal(false);
+          await refresh(); // Refrescar sin recargar toda la página
+          success('Servicio creado', 'El servicio se agregó correctamente');
+        }}
+      />
     </div>
   );
 };

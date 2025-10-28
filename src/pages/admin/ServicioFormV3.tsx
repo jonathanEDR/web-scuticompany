@@ -9,8 +9,10 @@ import { useForm } from 'react-hook-form';
 import { serviciosApi } from '../../services/serviciosApi';
 import { RichTextEditor } from '../../components/common/RichTextEditor';
 import { MultipleImageGallery } from '../../components/common/MultipleImageGallery';
+import { ImageUploader } from '../../components/common/ImageUploader';
 import { TabNavigator, useTabNavigation, type Tab } from '../../components/common/TabNavigator';
 import { useNotification } from '../../hooks/useNotification';
+import * as uploadApi from '../../services/uploadApi';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -27,6 +29,7 @@ export const ServicioFormV3: React.FC = () => {
   // ============================================
 
   const [loadingData, setLoadingData] = useState(isEditMode);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // ============================================
   // REACT HOOK FORM
@@ -47,7 +50,7 @@ export const ServicioFormV3: React.FC = () => {
       categoria: 'desarrollo',
       tipoPrecio: 'fijo',
       precio: 0,
-      moneda: 'USD',
+      moneda: 'PEN',
       estado: 'activo',
       icono: '🚀',
       destacado: false,
@@ -69,12 +72,12 @@ export const ServicioFormV3: React.FC = () => {
       colorSecundario: '#06B6D4',
       imagen: '',
       
-      // Características
-      caracteristicas: [],
-      beneficios: [],
-      incluye: [],
-      noIncluye: [],
-      faq: [],
+      // Características (como strings para textareas)
+      caracteristicas: '',
+      beneficios: '',
+      incluye: '',
+      noIncluye: '',
+      faq: '',
       
       // Configuraciones adicionales
       seo: {
@@ -202,12 +205,22 @@ export const ServicioFormV3: React.FC = () => {
           colorSecundario: servicio.colorSecundario || '#06B6D4',
           imagen: servicio.imagen || '',
           
-          // Características
-          caracteristicas: servicio.caracteristicas || [],
-          beneficios: servicio.beneficios || [],
-          incluye: servicio.incluye || [],
-          noIncluye: servicio.noIncluye || [],
-          faq: servicio.faq || [],
+          // Características - Convertir arrays a texto para textareas
+          caracteristicas: Array.isArray(servicio.caracteristicas) 
+            ? servicio.caracteristicas.map(c => `• ${c}`).join('\n')
+            : servicio.caracteristicas || '',
+          beneficios: Array.isArray(servicio.beneficios)
+            ? servicio.beneficios.map(b => `• ${b}`).join('\n')
+            : servicio.beneficios || '',
+          incluye: Array.isArray(servicio.incluye)
+            ? servicio.incluye.map(i => `• ${i}`).join('\n')
+            : servicio.incluye || '',
+          noIncluye: Array.isArray(servicio.noIncluye)
+            ? servicio.noIncluye.map(n => `• ${n}`).join('\n')
+            : servicio.noIncluye || '',
+          faq: Array.isArray(servicio.faq) && servicio.faq.length > 0 && typeof servicio.faq[0] === 'object'
+            ? servicio.faq.map((f: any) => `P: ${f.pregunta}\nR: ${f.respuesta}`).join('\n\n')
+            : servicio.faq || '',
           
           // Configuraciones adicionales
           seo: servicio.seo || { titulo: '', descripcion: '', palabrasClave: '' },
@@ -230,11 +243,71 @@ export const ServicioFormV3: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
+      // Procesar campos de texto a arrays (eliminar viñetas y líneas vacías)
+      const processTextToArray = (text: string | string[]): string[] => {
+        if (Array.isArray(text)) return text;
+        if (!text) return [];
+        return text
+          .split('\n')
+          .map(line => line.trim().replace(/^[•\-\*]\s*/, ''))
+          .filter(line => line.length > 0);
+      };
+
+      // Procesar FAQ de texto a array de objetos {pregunta, respuesta}
+      const processFaqText = (text: string | any[]): Array<{pregunta: string, respuesta: string}> => {
+        if (Array.isArray(text) && text.length > 0 && typeof text[0] === 'object') {
+          return text; // Ya está en formato correcto
+        }
+        if (!text || typeof text !== 'string') return [];
+        
+        const faqs: Array<{pregunta: string, respuesta: string}> = [];
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+        
+        let currentPregunta = '';
+        let currentRespuesta = '';
+        
+        for (const line of lines) {
+          if (line.match(/^P:/i)) {
+            // Si hay una pregunta previa, guardarla
+            if (currentPregunta && currentRespuesta) {
+              faqs.push({ pregunta: currentPregunta, respuesta: currentRespuesta });
+            }
+            currentPregunta = line.replace(/^P:\s*/i, '').trim();
+            currentRespuesta = '';
+          } else if (line.match(/^R:/i)) {
+            currentRespuesta = line.replace(/^R:\s*/i, '').trim();
+          } else if (currentRespuesta) {
+            // Continuar respuesta en múltiples líneas
+            currentRespuesta += ' ' + line;
+          } else if (currentPregunta) {
+            // Continuar pregunta en múltiples líneas
+            currentPregunta += ' ' + line;
+          }
+        }
+        
+        // Agregar el último par P/R
+        if (currentPregunta && currentRespuesta) {
+          faqs.push({ pregunta: currentPregunta, respuesta: currentRespuesta });
+        }
+        
+        return faqs;
+      };
+
+      // Preparar datos procesados
+      const processedData = {
+        ...data,
+        caracteristicas: processTextToArray(data.caracteristicas),
+        beneficios: processTextToArray(data.beneficios),
+        incluye: processTextToArray(data.incluye),
+        noIncluye: processTextToArray(data.noIncluye),
+        faq: processFaqText(data.faq),
+      };
+
       if (isEditMode && id) {
-        await serviciosApi.update(id, data);
+        await serviciosApi.update(id, processedData);
         success('Servicio actualizado', 'Los cambios se guardaron correctamente');
       } else {
-        const response = await serviciosApi.create(data);
+        const response = await serviciosApi.create(processedData);
         success('Servicio creado', 'El servicio se creó correctamente');
         if (response.data?._id) {
           navigate(`/dashboard/servicios/${response.data._id}/edit`);
@@ -538,9 +611,9 @@ export const ServicioFormV3: React.FC = () => {
               {...register('moneda')}
               className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="USD">💵 USD (Dólares)</option>
-              <option value="EUR">💶 EUR (Euros)</option>
-              <option value="COP">💴 COP (Pesos Colombianos)</option>
+              <option value="PEN">🇵🇪 PEN (Soles)</option>
+              <option value="USD">� USD (Dólares)</option>
+              <option value="EUR">� EUR (Euros)</option>
               <option value="MXN">💸 MXN (Pesos Mexicanos)</option>
             </select>
           </div>
@@ -618,16 +691,46 @@ export const ServicioFormV3: React.FC = () => {
           </div>
 
           {/* Imagen Principal */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Imagen Principal (URL)
-            </label>
-            <input
-              type="url"
-              {...register('imagen')}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          <div className="md:col-span-2">
+            <ImageUploader
+              label="Imagen Principal del Servicio"
+              currentImage={watch('imagen')}
+              onImageChange={async (file, _previewUrl) => {
+                if (file) {
+                  setUploadingImage(true);
+                  try {
+                    const response = await uploadApi.uploadImage(file);
+                    if (response.success && response.data) {
+                      setValue('imagen', response.data.url);
+                      success('Imagen subida correctamente');
+                    } else {
+                      error('Error al subir imagen', response.error || 'Intenta nuevamente');
+                    }
+                  } catch (err) {
+                    error('Error al subir imagen');
+                  } finally {
+                    setUploadingImage(false);
+                  }
+                } else {
+                  setValue('imagen', '');
+                }
+              }}
+              helpText="Sube una imagen desde tu computadora o pega una URL. Tamaño recomendado: 1200x630px"
+              uploading={uploadingImage}
+              aspectRatio="16:9"
+              maxSizeMB={5}
             />
+            {watch('imagen') && (
+              <div className="mt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">URL de la imagen:</p>
+                <input
+                  type="url"
+                  {...register('imagen')}
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            )}
           </div>
 
           {/* Color Primario */}
