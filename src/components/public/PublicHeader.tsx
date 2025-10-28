@@ -60,10 +60,10 @@ const PublicHeaderOptimized = () => {
         backdropFilter: lastScrollY > 50 ? 'blur(10px)' : 'none'
       }}
     >
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 w-full">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center h-auto sm:h-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 w-full">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center h-auto sm:h-14">
           {/* Desktop: Logo izquierda | Mobile: Logo centrado + Toggle tema derecha */}
-          <div className="flex justify-between items-center sm:justify-start py-4 sm:py-0 w-full sm:w-auto sm:flex-shrink-0">
+          <div className="flex justify-between items-center sm:justify-start py-2 sm:py-0 w-full sm:w-auto sm:flex-shrink-0">
             {/* Logo - Centrado en móvil, izquierda en desktop */}
             <div className="flex-1 flex justify-center sm:justify-start sm:flex-initial">
               <Link 
@@ -71,7 +71,7 @@ const PublicHeaderOptimized = () => {
                 aria-label="Scuti Company - Ir al inicio"
                 className="flex items-center transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 rounded-lg"
               >
-                <Logo size="md" animated compact />
+                <Logo size="sm" animated compact />
               </Link>
             </div>
 
@@ -79,15 +79,15 @@ const PublicHeaderOptimized = () => {
             <div className="sm:hidden flex-shrink-0">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
+                className="p-1.5 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
                 aria-label="Cambiar tema"
               >
                 {theme === 'light' ? (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
                 ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 )}
@@ -96,10 +96,10 @@ const PublicHeaderOptimized = () => {
           </div>
 
           {/* Navegación - Mobile: fila separada | Desktop: centrada entre logo y acciones */}
-          <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 py-3 sm:py-0 sm:space-x-6 lg:space-x-8 sm:flex-1 sm:justify-center w-full sm:w-auto" role="navigation" aria-label="Navegación principal">
+          <nav className="flex flex-wrap justify-center items-center gap-x-2 gap-y-1 py-2 sm:py-0 sm:space-x-4 lg:space-x-6 sm:flex-1 sm:justify-center w-full sm:w-auto" role="navigation" aria-label="Navegación principal">
             <Link 
               to="/" 
-              className="theme-text-primary font-medium theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+              className="theme-text-primary font-medium theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
               onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
               onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text)'}
               aria-current="page"
@@ -108,7 +108,7 @@ const PublicHeaderOptimized = () => {
             </Link>
             <Link 
               to="/nosotros" 
-              className="theme-text-secondary theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
               onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
               onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
             >
@@ -116,7 +116,7 @@ const PublicHeaderOptimized = () => {
             </Link>
             <Link 
               to="/servicios" 
-              className="theme-text-secondary theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
               onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
               onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
               aria-label="Servicios"
@@ -125,33 +125,33 @@ const PublicHeaderOptimized = () => {
             </Link>
             <div className="relative group">
               <button 
-                className="theme-text-secondary theme-transition flex items-center px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+                className="theme-text-secondary theme-transition flex items-center px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
                 onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
                 aria-label="Menú de soluciones"
               >
                 Soluciones
-                <svg className="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
             </div>
             <div className="relative group">
               <button 
-                className="theme-text-secondary theme-transition flex items-center px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+                className="theme-text-secondary theme-transition flex items-center px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
                 onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
                 aria-label="Menú de recursos"
               >
                 Recursos
-                <svg className="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
             </div>
             <Link 
               to="/proyectos" 
-              className="theme-text-secondary theme-transition px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
               onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
               onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
             >
@@ -161,7 +161,7 @@ const PublicHeaderOptimized = () => {
             {/* CONTÁCTANOS en navegación - Solo visible en móvil */}
             <Link 
               to="/contacto"
-              className="sm:hidden px-6 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
+              className="sm:hidden px-4 py-1.5 rounded-full transition-all duration-300 font-medium text-xs border-2"
               style={{
                 borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
                 color: theme === 'light' ? '#7528ee' : '#7528ee',
@@ -183,19 +183,19 @@ const PublicHeaderOptimized = () => {
           </nav>
 
           {/* Actions Desktop - Toggle de tema + CONTÁCTANOS + Avatar */}
-          <div className="hidden sm:flex items-center space-x-4 flex-shrink-0">
+          <div className="hidden sm:flex items-center space-x-2 flex-shrink-0">
             {/* Theme Toggle - Solo visible en desktop */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
+              className="p-1.5 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
               aria-label="Cambiar tema"
             >
               {theme === 'light' ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               )}
@@ -204,7 +204,7 @@ const PublicHeaderOptimized = () => {
             {/* CONTÁCTANOS - Color rosado en tema blanco */}
             <Link 
               to="/contacto"
-              className="px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm border-2"
+              className="px-3 py-1.5 rounded-full transition-all duration-300 font-medium text-xs border-2"
               style={{
                 borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
                 color: theme === 'light' ? '#7528ee' : '#7528ee',
@@ -231,7 +231,7 @@ const PublicHeaderOptimized = () => {
                   console.log('🚀 Redirigiendo al dashboard...');
                   navigate('/dashboard');
                 }}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg theme-bg-card border theme-border hover:bg-white/5 transition-all duration-200 group"
+                className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg theme-bg-card border theme-border hover:bg-white/5 transition-all duration-200 group"
                 aria-label={`Dashboard de ${userData.firstName || 'Usuario'}`}
                 title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
               >
@@ -240,7 +240,7 @@ const PublicHeaderOptimized = () => {
                   <img 
                     src={userData.imageUrl} 
                     alt={`Avatar de ${userData.firstName || 'Usuario'}`}
-                    className="w-8 h-8 rounded-full object-cover border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200"
+                    className="w-6 h-6 rounded-full object-cover border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200"
                     onError={(e) => {
                       // Si falla la imagen, mostrar iniciales
                       const target = e.target as HTMLImageElement;
@@ -252,7 +252,7 @@ const PublicHeaderOptimized = () => {
                 
                 {/* Fallback con iniciales */}
                 <div 
-                  className={`w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-white font-medium text-sm border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200 ${
+                  className={`w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-white font-medium text-xs border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200 ${
                     userData.imageUrl ? 'hidden' : ''
                   }`}
                 >
@@ -260,7 +260,7 @@ const PublicHeaderOptimized = () => {
                 </div>
                 
                 {/* Flecha indicadora */}
-                <svg className="w-4 h-4 theme-text-secondary group-hover:text-purple-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 theme-text-secondary group-hover:text-purple-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>

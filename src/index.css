@@ -99,9 +99,29 @@
   50% { transform: translateY(-10px); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+
+
+/* Animación para rotar todo el contenedor de logos */
+/* KEYFRAMES DE ENGRANAJE ELIMINADOS */
+
+/* CARRUSEL INFINITO ELIMINADO - Solo animaciones individuales */
+
+/* Animación para logos individuales en carrusel infinito */
+@keyframes logoFadeScroll {
+  0% { 
+    transform: translateX(0px);
+    opacity: 0;
+  }
+  10% { 
+    opacity: 1;
+  }
+  90% { 
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(-200px);
+    opacity: 0;
+  }
 }
 
 /* Estilos personalizados para Web Scuti */
@@ -152,11 +172,22 @@
   animation: float 3s ease-in-out infinite;
 }
 
-.animate-shimmer {
-  background: linear-gradient(90deg, #f0f0f0 0px, rgba(229, 229, 229, 0.8) 40px, #f0f0f0 80px);
-  background-size: 200px;
-  animation: shimmer 1.5s infinite;
+
+
+/* Animaciones específicas para logos individuales - ELIMINADAS LAS DE ENGRANAJE */
+
+/* CLASES DE CARRUSEL ELIMINADAS - Solo animaciones individuales básicas */
+
+/* CLASES DE CARRUSEL COMPLETAMENTE ELIMINADAS */
+
+/* Logos completamente estáticos - SIN animaciones complejas */
+.logo-static {
+  animation: none !important;
+  transform: none !important;
+  transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
 }
+
+/* CLASES DE ENGRANAJE Y CARRUSEL ELIMINADAS */
 
 /* Mejoras de performance */
 .gpu-accelerated {

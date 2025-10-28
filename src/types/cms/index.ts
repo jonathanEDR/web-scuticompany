@@ -157,6 +157,21 @@ export interface LogosBarDesignStyles {
   shadow: string;
   backdropBlur: boolean;
   disperseEffect: boolean;
+  // 🆕 Configuraciones de animación
+  animationsEnabled?: boolean;
+  rotationMode?: 'none' | 'individual' | 'carousel' | 'gear';
+  animationSpeed?: 'slow' | 'normal' | 'fast';
+  hoverEffects?: boolean;
+  hoverIntensity?: 'subtle' | 'normal' | 'intense';
+  particleEffects?: boolean;
+  glowEffects?: boolean;
+  autoDetectTech?: boolean;
+  logoSize?: 'small' | 'medium' | 'large';
+  logoSpacing?: 'compact' | 'normal' | 'wide';
+  // 🔳 Configuración de formato de logos
+  logoFormat?: 'square' | 'rectangle' | 'original';
+  maxLogoWidth?: 'small' | 'medium' | 'large';
+  uniformSize?: boolean;
 }
 
 export interface LogosBarDesign {

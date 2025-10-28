@@ -110,7 +110,7 @@ export interface DefaultContactConfig {
       placeholder: string;
     };
   };
-  submitButton: {
+  button: {
     text: string;
     loadingText: string;
   };
@@ -286,7 +286,7 @@ export const DEFAULT_CONTACT_CONFIG: DefaultContactConfig = {
       placeholder: 'Escribe tu mensaje aquí...'
     }
   },
-  submitButton: {
+  button: {
     text: 'Enviar mensaje',
     loadingText: 'Enviando...'
   },

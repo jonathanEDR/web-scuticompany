@@ -24,7 +24,22 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
     borderRadius: '1rem',
     shadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)',
     backdropBlur: true,
-    disperseEffect: false
+    disperseEffect: false,
+    // 🆕 Configuraciones de animación por defecto
+    animationsEnabled: true,
+    rotationMode: 'individual',
+    animationSpeed: 'normal',
+    hoverEffects: true,
+    hoverIntensity: 'normal',
+    particleEffects: true,
+    glowEffects: true,
+    autoDetectTech: true,
+    logoSize: 'medium',
+    logoSpacing: 'normal',
+    // 🔳 Configuración de formato
+    logoFormat: 'rectangle',
+    maxLogoWidth: 'medium',
+    uniformSize: false
   };
 
   const defaultDarkStyles: LogosBarDesignStyles = {
@@ -34,7 +49,22 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
     borderRadius: '1rem',
     shadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(255, 255, 255, 0.05)',
     backdropBlur: true,
-    disperseEffect: false
+    disperseEffect: false,
+    // 🆕 Configuraciones de animación por defecto
+    animationsEnabled: true,
+    rotationMode: 'individual',
+    animationSpeed: 'normal',
+    hoverEffects: true,
+    hoverIntensity: 'normal',
+    particleEffects: true,
+    glowEffects: true,
+    autoDetectTech: true,
+    logoSize: 'medium',
+    logoSpacing: 'normal',
+    // 🔳 Configuración de formato
+    logoFormat: 'rectangle',
+    maxLogoWidth: 'medium',
+    uniformSize: false
   };
 
   // Estado local temporal para los estilos que se están editando
@@ -66,13 +96,40 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
 
   // Obtener estilos actuales del estado local según el tema activo
   const currentStyles = activeTheme === 'light' ? localLightStyles : localDarkStyles;
+  
+  // 🐛 LOG CMS: Ver estilos actuales del selector
+  console.log('🎨 DEBUG CMS - Estilos actuales del selector:', {
+    activeTheme,
+    currentStyles: {
+      rotationMode: currentStyles.rotationMode,
+      animationsEnabled: currentStyles.animationsEnabled,
+      animationSpeed: currentStyles.animationSpeed,
+      logoFormat: currentStyles.logoFormat
+    }
+  });
 
   const updateBarStyle = (field: keyof LogosBarDesignStyles, value: string | boolean) => {
+    // 🐛 LOG CMS: Ver qué se está cambiando
+    console.log('🔧 DEBUG CMS - Cambiando configuración:', {
+      field,
+      value,
+      activeTheme,
+      path: `valueAdded.logosBarDesign.${activeTheme}.${field}`
+    });
+
     // Actualizar estado local inmediatamente (para vista previa)
     if (activeTheme === 'light') {
-      setLocalLightStyles(prev => ({ ...prev, [field]: value }));
+      setLocalLightStyles(prev => {
+        const newStyles = { ...prev, [field]: value };
+        console.log('💡 DEBUG CMS - Nuevos estilos Light:', newStyles);
+        return newStyles;
+      });
     } else {
-      setLocalDarkStyles(prev => ({ ...prev, [field]: value }));
+      setLocalDarkStyles(prev => {
+        const newStyles = { ...prev, [field]: value };
+        console.log('🌙 DEBUG CMS - Nuevos estilos Dark:', newStyles);
+        return newStyles;
+      });
     }
 
     // También actualizar pageData inmediatamente para sincronización completa
@@ -91,6 +148,13 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
       light: { ...localLightStyles },
       dark: { ...localDarkStyles }
     };
+    
+    // 🐛 LOG GUARDAR: Ver qué se está guardando
+    console.log('💾 DEBUG GUARDAR - Configuración completa a guardar:', {
+      completeLogosBarDesign,
+      lightRotationMode: completeLogosBarDesign.light.rotationMode,
+      darkRotationMode: completeLogosBarDesign.dark.rotationMode
+    });
     
     // Actualizar la configuración completa de una vez
     updateContent('valueAdded.logosBarDesign', completeLogosBarDesign);
@@ -344,6 +408,265 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
                   }`}
                 />
               </button>
+            </div>
+
+            {/* 🎬 Configuración de Animaciones */}
+            <div className="space-y-6 border-t border-gray-200 dark:border-gray-600 pt-6">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                🎬 Configuración de Animaciones
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Activar/Desactivar Animaciones */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Activar Animaciones
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Habilita todos los efectos de animación
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => updateBarStyle('animationsEnabled', !currentStyles.animationsEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      currentStyles.animationsEnabled ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        currentStyles.animationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Modo de Rotación */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Modo de Rotación
+                  </label>
+                  <select
+                    value={currentStyles.rotationMode || 'individual'}
+                    onChange={(e) => updateBarStyle('rotationMode', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                    disabled={!currentStyles.animationsEnabled}
+                  >
+                    <option value="none">
+                      Sin animaciones{(currentStyles.rotationMode || 'individual') === 'none' ? ' (actual)' : ''}
+                    </option>
+                    <option value="individual">
+                      Efectos elegantes individuales{(currentStyles.rotationMode || 'individual') === 'individual' ? ' (actual)' : ''}
+                    </option>
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {currentStyles.rotationMode === 'individual' && '✨ Efectos suaves adaptados por categoría: rebote, pulso, flotación, brillo'}
+                    {currentStyles.rotationMode === 'none' && '🚫 Sin efectos de animación'}
+                  </p>
+                </div>
+
+                {/* Velocidad de Animación */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Velocidad de Animación
+                  </label>
+                  <select
+                    value={currentStyles.animationSpeed || 'normal'}
+                    onChange={(e) => updateBarStyle('animationSpeed', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                    disabled={!currentStyles.animationsEnabled}
+                  >
+                    <option value="slow">Lenta (20-30s)</option>
+                    <option value="normal">Normal (12-18s)</option>
+                    <option value="fast">Rápida (6-10s)</option>
+                  </select>
+                </div>
+
+                {/* Intensidad de Hover */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Intensidad de Hover
+                  </label>
+                  <select
+                    value={currentStyles.hoverIntensity || 'normal'}
+                    onChange={(e) => updateBarStyle('hoverIntensity', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                    disabled={!currentStyles.hoverEffects}
+                  >
+                    <option value="subtle">Sutil (1.1x)</option>
+                    <option value="normal">Normal (1.3x)</option>
+                    <option value="intense">Intensa (1.5x)</option>
+                  </select>
+                </div>
+
+                {/* Tamaño de Logos */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Tamaño de Logos
+                  </label>
+                  <select
+                    value={currentStyles.logoSize || 'medium'}
+                    onChange={(e) => updateBarStyle('logoSize', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                  >
+                    <option value="small">Pequeño (h-10)</option>
+                    <option value="medium">Mediano (h-16)</option>
+                    <option value="large">Grande (h-20)</option>
+                  </select>
+                </div>
+
+                {/* Espaciado de Logos */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Espaciado entre Logos
+                  </label>
+                  <select
+                    value={currentStyles.logoSpacing || 'normal'}
+                    onChange={(e) => updateBarStyle('logoSpacing', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                  >
+                    <option value="compact">Compacto (gap-4)</option>
+                    <option value="normal">Normal (gap-8)</option>
+                    <option value="wide">Amplio (gap-12)</option>
+                  </select>
+                </div>
+
+                {/* 🔳 Formato de Logos */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Formato de Logos
+                  </label>
+                  <select
+                    value={currentStyles.logoFormat || 'rectangle'}
+                    onChange={(e) => updateBarStyle('logoFormat', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                  >
+                    <option value="rectangle">📏 Rectangular (mantiene proporciones)</option>
+                    <option value="square">⬜ Cuadrado (altura fija)</option>
+                    <option value="original">🖼️ Original (sin restricciones)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {currentStyles.logoFormat === 'rectangle' && '📏 Los logos mantienen su aspect ratio original'}
+                    {currentStyles.logoFormat === 'square' && '⬜ Todos los logos tienen la misma altura (puede distorsionar)'}
+                    {currentStyles.logoFormat === 'original' && '🖼️ Sin restricciones de tamaño'}
+                  </p>
+                </div>
+
+                {/* Ancho máximo (solo para modo rectangle y original) */}
+                {(currentStyles.logoFormat === 'rectangle' || currentStyles.logoFormat === 'original') && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Ancho Máximo
+                    </label>
+                    <select
+                      value={currentStyles.maxLogoWidth || 'medium'}
+                      onChange={(e) => updateBarStyle('maxLogoWidth', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+                    >
+                      <option value="small">Pequeño (80px)</option>
+                      <option value="medium">Mediano (120px)</option>
+                      <option value="large">Grande (160px)</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Efectos Adicionales */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Efectos Hover
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Escala y rotación
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => updateBarStyle('hoverEffects', !currentStyles.hoverEffects)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      currentStyles.hoverEffects ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        currentStyles.hoverEffects ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Partículas
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Puntos flotantes
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => updateBarStyle('particleEffects', !currentStyles.particleEffects)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      currentStyles.particleEffects ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
+                    }`}
+                    disabled={!currentStyles.hoverEffects}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        currentStyles.particleEffects ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Glow Effects
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Brillo y sombras
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => updateBarStyle('glowEffects', !currentStyles.glowEffects)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      currentStyles.glowEffects ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
+                    }`}
+                    disabled={!currentStyles.hoverEffects}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        currentStyles.glowEffects ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Auto-Detección
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Categorías smart
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => updateBarStyle('autoDetectTech', !currentStyles.autoDetectTech)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      currentStyles.autoDetectTech ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        currentStyles.autoDetectTech ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
