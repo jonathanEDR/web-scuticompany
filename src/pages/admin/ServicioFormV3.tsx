@@ -303,6 +303,9 @@ export const ServicioFormV3: React.FC = () => {
         faq: processFaqText(data.faq),
       };
 
+      console.log('📤 Datos a enviar:', processedData);
+      console.log('🖼️ Imagen en datos:', processedData.imagen);
+
       if (isEditMode && id) {
         await serviciosApi.update(id, processedData);
         success('Servicio actualizado', 'Los cambios se guardaron correctamente');
@@ -695,7 +698,8 @@ export const ServicioFormV3: React.FC = () => {
             <ImageUploader
               label="Imagen Principal del Servicio"
               currentImage={watch('imagen')}
-              onImageChange={async (file, _previewUrl) => {
+              onImageChange={async (file, previewUrl) => {
+                // Si es un archivo (subida desde PC)
                 if (file) {
                   setUploadingImage(true);
                   try {
@@ -711,14 +715,20 @@ export const ServicioFormV3: React.FC = () => {
                   } finally {
                     setUploadingImage(false);
                   }
-                } else {
+                } 
+                // Si es una URL (selección desde galería)
+                else if (previewUrl) {
+                  setValue('imagen', previewUrl);
+                  success('Imagen seleccionada de la galería');
+                } 
+                // Si es null (eliminar imagen)
+                else {
                   setValue('imagen', '');
                 }
               }}
-              helpText="Sube una imagen desde tu computadora o pega una URL. Tamaño recomendado: 1200x630px"
+              helpText="Selecciona desde la galería o pega una URL. Tamaño recomendado: 1200x630px"
               uploading={uploadingImage}
               aspectRatio="16:9"
-              maxSizeMB={5}
             />
             {watch('imagen') && (
               <div className="mt-3">

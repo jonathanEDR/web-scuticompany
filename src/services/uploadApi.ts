@@ -4,9 +4,35 @@
  */
 
 import axios from 'axios';
-import { getBackendUrl } from '../utils/apiConfig';
+import { getApiUrl } from '../utils/apiConfig';
 
-const API_BASE_URL = getBackendUrl();
+// Declaración de tipo para Clerk en window
+declare global {
+  interface Window {
+    Clerk?: {
+      session?: {
+        getToken: () => Promise<string | null>;
+      };
+    };
+  }
+}
+
+const API_BASE_URL = getApiUrl(); // Cambiado para usar getApiUrl() que incluye /api
+
+/**
+ * Obtener token de autenticación de Clerk
+ */
+const getAuthToken = async (): Promise<string | null> => {
+  try {
+    if (window.Clerk?.session) {
+      const token = await window.Clerk.session.getToken();
+      return token;
+    }
+  } catch (error) {
+    console.error('Error obteniendo token de Clerk:', error);
+  }
+  return null;
+};
 
 /**
  * Subir una imagen al servidor
@@ -29,10 +55,19 @@ export const uploadImage = async (file: File): Promise<{
     const formData = new FormData();
     formData.append('image', file);
 
+    // Obtener token de autenticación
+    const token = await getAuthToken();
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'multipart/form-data',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const { data } = await axios.post(`${API_BASE_URL}/upload/image`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers,
     });
 
     return data;
@@ -53,7 +88,17 @@ export const deleteImage = async (imageId: string): Promise<{
   error?: string;
 }> => {
   try {
-    const { data } = await axios.delete(`${API_BASE_URL}/upload/images/${imageId}`);
+    // Obtener token de autenticación
+    const token = await getAuthToken();
+    
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const { data } = await axios.delete(`${API_BASE_URL}/upload/images/${imageId}`, {
+      headers,
+    });
     return data;
   } catch (error: any) {
     console.error('Error al eliminar imagen:', error);
@@ -78,7 +123,18 @@ export const getImages = async (params?: {
   error?: string;
 }> => {
   try {
-    const { data } = await axios.get(`${API_BASE_URL}/upload/images`, { params });
+    // Obtener token de autenticación
+    const token = await getAuthToken();
+    
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const { data } = await axios.get(`${API_BASE_URL}/upload/images`, { 
+      params,
+      headers,
+    });
     return data;
   } catch (error: any) {
     console.error('Error al obtener imágenes:', error);

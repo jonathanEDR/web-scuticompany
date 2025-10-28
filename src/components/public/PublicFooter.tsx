@@ -9,8 +9,8 @@ const PublicFooter = () => {
   const navigate = useNavigate();
   const [pageData, setPageData] = useState<PageData | null>(null);
   
-  // Hook para detectar usuario autenticado
-  const { userData, getUserInitials } = useClerkDetection();
+  // Hook para detectar usuario autenticado (mejorado para producción)
+  const { userData, getUserInitials, isLoading } = useClerkDetection();
   
   useEffect(() => {
     const fetchPageData = async () => {
@@ -265,7 +265,18 @@ const PublicFooter = () => {
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-4">Acceso</h3>
               <div className="space-y-3">
-                {userData ? (
+                {/* 🔥 MEJORA: Mostrar estado de carga mientras verifica autenticación */}
+                {isLoading ? (
+                  // Cargando estado de autenticación
+                  <div className="space-y-3">
+                    <div className="w-full px-4 py-2 bg-gray-700/50 rounded-lg animate-pulse">
+                      <div className="flex items-center justify-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-gray-300 text-sm">Verificando sesión...</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : userData ? (
                   // Usuario autenticado - Mostrar botón al dashboard
                   <div className="space-y-3">
                     <button
@@ -303,6 +314,13 @@ const PublicFooter = () => {
                     <div className="text-center text-gray-400 text-xs">
                       Hola, {userData.firstName || 'Usuario'} 👋
                     </div>
+                    
+                    {/* 🔥 DEBUG: Información para desarrollo */}
+                    {import.meta.env.DEV && (
+                      <div className="text-center text-gray-500 text-xs bg-gray-800/50 rounded p-2">
+                        DEBUG: Usuario detectado ✅
+                      </div>
+                    )}
                   </div>
                 ) : (
                   // Usuario no autenticado - Mostrar botones de acceso
@@ -320,6 +338,13 @@ const PublicFooter = () => {
                     >
                       🚀 Crear Cuenta
                     </button>
+                    
+                    {/* 🔥 DEBUG: Información para desarrollo */}
+                    {import.meta.env.DEV && (
+                      <div className="text-center text-gray-500 text-xs bg-gray-800/50 rounded p-2">
+                        DEBUG: Sin usuario ❌
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -388,7 +413,18 @@ const PublicFooter = () => {
                 <div>
                   <h3 className="text-white font-semibold mb-4">Acceso</h3>
                   <div className="space-y-3">
-                    {userData ? (
+                    {/* 🔥 MEJORA MÓVIL: Mostrar estado de carga mientras verifica autenticación */}
+                    {isLoading ? (
+                      // Cargando estado de autenticación
+                      <div className="space-y-3">
+                        <div className="w-full px-4 py-2 bg-gray-700/50 rounded-lg animate-pulse">
+                          <div className="flex items-center justify-center space-x-2">
+                            <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-gray-300 text-sm">Verificando sesión...</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : userData ? (
                       // Usuario autenticado - Mostrar botón al dashboard
                       <div className="space-y-3">
                         <button

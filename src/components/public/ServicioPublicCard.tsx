@@ -103,9 +103,9 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
 
       {/* Imagen principal */}
       <div className="relative h-48 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 overflow-hidden">
-        {servicio.imagenPrincipal ? (
+        {servicio.imagen ? (
           <img
-            src={servicio.imagenPrincipal}
+            src={servicio.imagen}
             alt={servicio.titulo}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />

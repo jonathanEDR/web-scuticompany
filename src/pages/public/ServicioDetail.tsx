@@ -254,9 +254,9 @@ export const ServicioDetail: React.FC = () => {
 
             {/* Imagen principal */}
             <div className="lg:order-first lg:order-none">
-              {servicio.imagenPrincipal ? (
+              {servicio.imagen ? (
                 <img
-                  src={servicio.imagenPrincipal}
+                  src={servicio.imagen}
                   alt={servicio.titulo}
                   className="w-full h-96 object-cover rounded-2xl shadow-2xl"
                 />
