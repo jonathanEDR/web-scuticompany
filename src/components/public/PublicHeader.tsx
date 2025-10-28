@@ -227,10 +227,7 @@ const PublicHeaderOptimized = () => {
             {/* Avatar del usuario - Solo si está logueado */}
             {userData ? (
               <button
-                onClick={() => {
-                  console.log('🚀 Redirigiendo al dashboard...');
-                  navigate('/dashboard');
-                }}
+                onClick={() => navigate('/dashboard')}
                 className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg theme-bg-card border theme-border hover:bg-white/5 transition-all duration-200 group"
                 aria-label={`Dashboard de ${userData.firstName || 'Usuario'}`}
                 title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}

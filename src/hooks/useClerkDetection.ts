@@ -58,8 +58,8 @@ export const useClerkDetection = () => {
     // Verificación inicial
     checkClerkUser();
 
-    // Verificar periódicamente
-    const interval = setInterval(checkClerkUser, 5000);
+    // Verificar periódicamente (reducido ya que Clerk está disponible globalmente)
+    const interval = setInterval(checkClerkUser, 10000);
 
     // Escuchar eventos de Clerk
     const handleClerkEvent = () => {

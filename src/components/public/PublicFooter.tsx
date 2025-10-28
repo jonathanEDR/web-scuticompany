@@ -3,10 +3,14 @@ import { useState, useEffect } from 'react';
 import Logo from '../Logo';
 import type { PageData } from '../../types/cms';
 import { getCmsApiUrl, logApiCall, testBackendConnection } from '../../utils/apiHelper';
+import { useClerkDetection } from '../../hooks/useClerkDetection';
 
 const PublicFooter = () => {
   const navigate = useNavigate();
   const [pageData, setPageData] = useState<PageData | null>(null);
+  
+  // Hook para detectar usuario autenticado
+  const { userData, getUserInitials } = useClerkDetection();
   
   useEffect(() => {
     const fetchPageData = async () => {
@@ -261,19 +265,63 @@ const PublicFooter = () => {
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-4">Acceso</h3>
               <div className="space-y-3">
-                <button
-                  onClick={() => navigate('/login')}
-                  className="w-full px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
-                >
-                  🔐 Iniciar Sesión
-                </button>
-                
-                <button
-                  onClick={() => navigate('/signup')}
-                  className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
-                >
-                  🚀 Crear Cuenta
-                </button>
+                {userData ? (
+                  // Usuario autenticado - Mostrar botón al dashboard
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => navigate('/dashboard')}
+                      className="w-full flex items-center justify-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg transition-all text-sm"
+                      title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
+                    >
+                      {/* Avatar compacto */}
+                      {userData.imageUrl ? (
+                        <img 
+                          src={userData.imageUrl} 
+                          alt={`Avatar de ${userData.firstName || 'Usuario'}`}
+                          className="w-4 h-4 rounded-full object-cover border border-white/20"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      
+                      {/* Fallback con iniciales */}
+                      <div 
+                        className={`w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs ${
+                          userData.imageUrl ? 'hidden' : ''
+                        }`}
+                      >
+                        {getUserInitials()}
+                      </div>
+                      
+                      <span>Mi Dashboard</span>
+                    </button>
+                    
+                    {/* Información del usuario compacta */}
+                    <div className="text-center text-gray-400 text-xs">
+                      Hola, {userData.firstName || 'Usuario'} 👋
+                    </div>
+                  </div>
+                ) : (
+                  // Usuario no autenticado - Mostrar botones de acceso
+                  <>
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="w-full px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
+                    >
+                      🔐 Iniciar Sesión
+                    </button>
+                    
+                    <button
+                      onClick={() => navigate('/signup')}
+                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
+                    >
+                      🚀 Crear Cuenta
+                    </button>
+                  </>
+                )}
               </div>
             </div>
             </div>
@@ -340,19 +388,63 @@ const PublicFooter = () => {
                 <div>
                   <h3 className="text-white font-semibold mb-4">Acceso</h3>
                   <div className="space-y-3">
-                    <button
-                      onClick={() => navigate('/login')}
-                      className="w-full px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
-                    >
-                      🔐 Iniciar Sesión
-                    </button>
-                    
-                    <button
-                      onClick={() => navigate('/signup')}
-                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
-                    >
-                      🚀 Crear Cuenta
-                    </button>
+                    {userData ? (
+                      // Usuario autenticado - Mostrar botón al dashboard
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => navigate('/dashboard')}
+                          className="w-full flex items-center justify-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg transition-all text-sm"
+                          title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
+                        >
+                          {/* Avatar compacto */}
+                          {userData.imageUrl ? (
+                            <img 
+                              src={userData.imageUrl} 
+                              alt={`Avatar de ${userData.firstName || 'Usuario'}`}
+                              className="w-4 h-4 rounded-full object-cover border border-white/20"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          
+                          {/* Fallback con iniciales */}
+                          <div 
+                            className={`w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs ${
+                              userData.imageUrl ? 'hidden' : ''
+                            }`}
+                          >
+                            {getUserInitials()}
+                          </div>
+                          
+                          <span>Mi Dashboard</span>
+                        </button>
+                        
+                        {/* Información del usuario compacta */}
+                        <div className="text-center text-gray-400 text-xs">
+                          Hola, {userData.firstName || 'Usuario'} 👋
+                        </div>
+                      </div>
+                    ) : (
+                      // Usuario no autenticado - Mostrar botones de acceso
+                      <>
+                        <button
+                          onClick={() => navigate('/login')}
+                          className="w-full px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
+                        >
+                          🔐 Iniciar Sesión
+                        </button>
+                        
+                        <button
+                          onClick={() => navigate('/signup')}
+                          className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
+                        >
+                          🚀 Crear Cuenta
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

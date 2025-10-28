@@ -1,5 +1,6 @@
 ﻿import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ClerkProvider } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -11,6 +12,13 @@ import RoleBasedRoute from './components/RoleBasedRoute';
 import DashboardRouter from './components/DashboardRouter';
 import { UserRole } from './types/roles';
 import './App.css';
+
+// ⚡ Configuración de Clerk global optimizada
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_bGlnaHQtZG9scGhpbi00Mi5jbGVyay5hY2NvdW50cy5kZXYk';
+
+if (!PUBLISHABLE_KEY || PUBLISHABLE_KEY === 'YOUR_PUBLISHABLE_KEY') {
+  throw new Error('Missing or Invalid Clerk Publishable Key. Check VITE_CLERK_PUBLISHABLE_KEY in .env.local');
+}
 
 // ⚡ OPTIMIZACIÓN: Lazy loading agresivo
 // Páginas públicas - Sin dependencias de autenticación
@@ -76,11 +84,16 @@ const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
 function App() {
   return (
     <ErrorBoundary>
-      {/* ⚡ ThemeProvider es ligero, se mantiene global */}
-      <ThemeProvider>
-        {/* 🔔 Sistema de notificaciones global */}
-        <NotificationProvider>
-          <BrowserRouter>
+      {/* ⚡ ClerkProvider global optimizado - Carga lazy */}
+      <ClerkProvider 
+        publishableKey={PUBLISHABLE_KEY} 
+        afterSignOutUrl="/"
+      >
+        {/* ⚡ ThemeProvider es ligero, se mantiene global */}
+        <ThemeProvider>
+          {/* 🔔 Sistema de notificaciones global */}
+          <NotificationProvider>
+            <BrowserRouter>
             <Suspense fallback={<LoadingSpinner />}>
               <Routes>
               {/* ⚡ PÁGINAS PÚBLICAS - SIN CLERK, CARGA INSTANTÁNEA */}
@@ -90,18 +103,9 @@ function App() {
               <Route path="/servicios/:slug" element={<ServicioDetail />} />
               <Route path="/contacto" element={<Contact />} />
               
-              {/* 🔐 RUTAS DE AUTENTICACIÓN - Clerk con diseño optimizado */}
-              <Route path="/login" element={
-                <DashboardProviders>
-                  <Login />
-                </DashboardProviders>
-              } />
-              
-              <Route path="/signup" element={
-                <DashboardProviders>
-                  <Signup />
-                </DashboardProviders>
-              } />
+              {/* 🔐 RUTAS DE AUTENTICACIÓN - Clerk ya disponible globalmente */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
       
               {/* 🔒 RUTAS PROTEGIDAS CON SISTEMA DE ROLES */}
               
@@ -298,6 +302,7 @@ function App() {
         </BrowserRouter>
       </NotificationProvider>
     </ThemeProvider>
+      </ClerkProvider>
   </ErrorBoundary>
 );
 }
