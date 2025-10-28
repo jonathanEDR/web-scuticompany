@@ -16,24 +16,14 @@ export const useClerkDetection = () => {
       // 🔥 MEJORA 1: Usar función centralizada para obtener Clerk
       const clerkInstance = getClerkInstance();
 
-      console.log('🔍 [ClerkDetection] Verificando Clerk...', {
-        windowClerk: !!(window as any).Clerk,
-        clerkFrontendApi: !!(window as any).__clerk_frontend_api,
-        clerkInstance: !!clerkInstance,
-        isLoaded: clerkInstance?.loaded,
-        user: !!clerkInstance?.user,
-        env: import.meta.env.MODE,
-        url: window.location.href
-      });
+
 
       // 🔥 MEJORA 2: Si no hay instancia, intentar esperar a que cargue
       if (!clerkInstance) {
-        console.log('⏳ [ClerkDetection] Clerk no disponible, esperando...');
         try {
           const loadedClerk = await waitForClerk(3000); // Esperar máximo 3 segundos
           return checkClerkUserSync(loadedClerk);
         } catch {
-          console.log('⏰ [ClerkDetection] Timeout esperando Clerk');
           setUserData(null);
           setIsLoading(false);
           return false;
@@ -42,7 +32,6 @@ export const useClerkDetection = () => {
 
       return checkClerkUserSync(clerkInstance);
     } catch (error) {
-      console.error('❌ [ClerkDetection] Error:', error);
       setUserData(null);
       setIsLoading(false);
       return false;
@@ -65,30 +54,22 @@ export const useClerkDetection = () => {
             emailAddresses: user.emailAddresses
           };
 
-          console.log('✅ [ClerkDetection] Usuario detectado:', {
-            firstName: user.firstName,
-            hasImage: !!user.imageUrl,
-            email: user.emailAddresses?.[0]?.emailAddress,
-            environment: import.meta.env.MODE
-          });
+
 
           setUserData(newUserData);
           setIsLoading(false);
           return true;
         } else {
           // Clerk cargado pero sin usuario
-          console.log('ℹ️ [ClerkDetection] Clerk cargado, sin usuario autenticado');
           setUserData(null);
           setIsLoading(false);
           return false;
         }
       } else {
         // Clerk aún no está completamente cargado
-        console.log('⏳ [ClerkDetection] Clerk aún cargando...');
         return false;
       }
     } catch (error) {
-      console.error('❌ [ClerkDetection] Error en checkClerkUserSync:', error);
       setUserData(null);
       setIsLoading(false);
       return false;
@@ -96,7 +77,6 @@ export const useClerkDetection = () => {
   };
 
   useEffect(() => {
-    console.log('🚀 [ClerkDetection] Hook iniciado');
     
     // 🔥 MEJORA 3: Verificación inicial con delay para producción
     const initialCheck = async () => {
@@ -120,7 +100,6 @@ export const useClerkDetection = () => {
       attemptCount++;
       
       if (attemptCount >= maxAttempts) {
-        console.log('⏰ [ClerkDetection] Timeout: Dejando de verificar Clerk');
         clearInterval(smartInterval);
         setIsLoading(false);
         return;
@@ -136,15 +115,13 @@ export const useClerkDetection = () => {
     }, userData ? 30000 : 5000); // 30s si hay usuario, 5s si no hay
 
     // 🔥 MEJORA 5: Mejores event listeners
-    const handleClerkEvent = async (eventName: string) => {
-      console.log(`📡 [ClerkDetection] Evento Clerk: ${eventName}`);
+    const handleClerkEvent = async () => {
       setTimeout(async () => {
         await checkClerkUser();
       }, 200);
     };
 
     const handleSignOut = () => {
-      console.log('👋 [ClerkDetection] Usuario cerró sesión');
       setUserData(null);
       setIsLoading(false);
     };
@@ -158,20 +135,19 @@ export const useClerkDetection = () => {
     ];
 
     events.forEach(event => {
-      window.addEventListener(event as any, () => handleClerkEvent(event));
+      window.addEventListener(event as any, handleClerkEvent);
     });
 
     // Agregar evento específico para signOut
     window.addEventListener('clerk:signOut' as any, handleSignOut);
 
     // Eventos de navegación y visibilidad
-    window.addEventListener('popstate', () => handleClerkEvent('popstate'));
-    window.addEventListener('focus', () => handleClerkEvent('focus'));
+    window.addEventListener('popstate', handleClerkEvent);
+    window.addEventListener('focus', handleClerkEvent);
     
     // 🔥 MEJORA 7: Verificar cuando la página vuelve a ser visible
     const handleVisibilityChange = async () => {
       if (!document.hidden) {
-        console.log('👁️ [ClerkDetection] Página visible, verificando usuario');
         setTimeout(async () => {
           await checkClerkUser();
         }, 500);
@@ -184,11 +160,11 @@ export const useClerkDetection = () => {
       clearInterval(smartInterval);
       
       events.forEach(event => {
-        window.removeEventListener(event as any, () => handleClerkEvent(event));
+        window.removeEventListener(event as any, handleClerkEvent);
       });
       
-      window.removeEventListener('popstate', () => handleClerkEvent('popstate'));
-      window.removeEventListener('focus', () => handleClerkEvent('focus'));
+      window.removeEventListener('popstate', handleClerkEvent);
+      window.removeEventListener('focus', handleClerkEvent);
       window.removeEventListener('clerk:signOut' as any, handleSignOut);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };

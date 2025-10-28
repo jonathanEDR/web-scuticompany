@@ -315,12 +315,7 @@ const PublicFooter = () => {
                       Hola, {userData.firstName || 'Usuario'} 👋
                     </div>
                     
-                    {/* 🔥 DEBUG: Información para desarrollo */}
-                    {import.meta.env.DEV && (
-                      <div className="text-center text-gray-500 text-xs bg-gray-800/50 rounded p-2">
-                        DEBUG: Usuario detectado ✅
-                      </div>
-                    )}
+
                   </div>
                 ) : (
                   // Usuario no autenticado - Mostrar botones de acceso
@@ -339,12 +334,7 @@ const PublicFooter = () => {
                       🚀 Crear Cuenta
                     </button>
                     
-                    {/* 🔥 DEBUG: Información para desarrollo */}
-                    {import.meta.env.DEV && (
-                      <div className="text-center text-gray-500 text-xs bg-gray-800/50 rounded p-2">
-                        DEBUG: Sin usuario ❌
-                      </div>
-                    )}
+
                   </>
                 )}
               </div>

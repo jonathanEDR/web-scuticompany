@@ -65,16 +65,6 @@ export const getClerkConfig = () => {
     if (!config.publishableKey || config.publishableKey.includes('test')) {
       console.warn('⚠️ [Clerk] Usando clave de desarrollo en producción');
     }
-    
-    // Log menos verboso en producción
-    console.log('🔐 [Clerk] Configurado para producción');
-  } else {
-    // En desarrollo, más información de debug
-    console.log('🔐 [Clerk] Configurado para desarrollo', {
-      publishableKey: config.publishableKey?.substring(0, 20) + '...',
-      afterSignInUrl: config.afterSignInUrl,
-      environment: import.meta.env.MODE
-    });
   }
   
   return config;
@@ -117,13 +107,13 @@ export const waitForClerk = (timeout = 10000): Promise<any> => {
       const clerk = getClerkInstance();
       
       if (clerk && clerk.loaded !== false) {
-        console.log(`✅ [Clerk] Disponible después de ${attempts * 100}ms`);
+
         resolve(clerk);
         return;
       }
       
       if (attempts >= maxAttempts) {
-        console.warn(`⏰ [Clerk] Timeout después de ${timeout}ms`);
+
         reject(new Error('Clerk loading timeout'));
         return;
       }
