@@ -60,6 +60,15 @@ interface SolutionsSectionProps {
 const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   const { theme } = useTheme();
 
+  // 🔧 SOLUCIÓN: Función para limpiar HTML del RichTextEditor y extraer solo texto
+  const cleanHtmlToText = (htmlString: string): string => {
+    if (!htmlString) return '';
+    // Crear un div temporal para extraer solo el texto
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = DOMPurify.sanitize(htmlString);
+    return tempDiv.textContent || tempDiv.innerText || '';
+  };
+
   // ⚡ Priorizar datos del CMS sobre defaultConfig
   const solutionsData: SolutionsData = data || DEFAULT_SOLUTIONS_CONFIG;
 
@@ -289,16 +298,18 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
       {/* Section Header - Conectado con estilos del CMS */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
         <div
-          className="text-4xl sm:text-5xl font-bold mb-4 theme-transition"
+          className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 theme-transition"
           style={{
+            lineHeight: '1.2',
             color: getSafeStyle(
               solutionsData.styles?.[theme]?.titleColor,
               theme === 'light' ? '#333333' : '#FFFFFF'
             ),
             fontWeight: '700'
           }}
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.title) }}
-        />
+        >
+          {cleanHtmlToText(mappedData.title)}
+        </div>
         <div className="max-w-3xl mx-auto">
           <div
             className="theme-transition"
@@ -512,6 +523,8 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
           </button>
         </div>
       </div>
+      
+
     </section>
   );
 };

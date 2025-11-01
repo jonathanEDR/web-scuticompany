@@ -51,7 +51,10 @@ const SolutionsConfigSection: React.FC<SolutionsConfigSectionProps> = ({
                 <RichTextEditorCompact
                   label="Título de la Sección"
                   value={pageData.content.solutions.title}
-                  onChange={(html: string) => updateContent('solutions.title', html)}
+                  onChange={(html: string) => {
+                    console.log('🔍 [SolutionsConfig] Título cambiado a:', html);
+                    updateContent('solutions.title', html);
+                  }}
                   placeholder="Nuestras Soluciones"
                   themeColors={{
                     light: pageData.content.solutions.styles?.light?.titleColor || '',

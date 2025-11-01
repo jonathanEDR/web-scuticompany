@@ -86,14 +86,20 @@ const CmsManager: React.FC = () => {
   // Update text style without auto-save (manual save only)
   const handleUpdateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos', field: string, mode: 'light' | 'dark', color: string) => {
     updateTextStyle(section, field, mode, color);
-    // Marcar como cambios pendientes
+    // 🔥 Marcar como cambios pendientes GLOBALMENTE
+    if (!hasGlobalChanges) {
+      setHasGlobalChanges(true);
+    }
     setSaveStatus('idle');
   };
 
   // Update button style without auto-save (manual save only)
   const handleUpdateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: any) => {
     updateSimpleButtonStyle(mode, buttonType, style);
-    // Marcar como cambios pendientes
+    // 🔥 Marcar como cambios pendientes GLOBALMENTE
+    if (!hasGlobalChanges) {
+      setHasGlobalChanges(true);
+    }
     setSaveStatus('idle');
   };
 

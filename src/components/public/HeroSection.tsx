@@ -190,8 +190,9 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                 animationPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
               style={{
-                background: 'linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)',
-                color: '#FFFFFF',
+                background: 'var(--color-cta-bg, linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%))',
+                color: 'var(--color-cta-text, #FFFFFF)',
+                border: '2px solid var(--color-cta-border, transparent)',
                 fontWeight: '600',
                 fontSize: '0.875rem',
                 boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'

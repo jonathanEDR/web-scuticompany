@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-
-interface ButtonStyle {
-  text: string;
-  background: string;
-  textColor: string;
-  borderColor: string;
-}
+import type { ButtonStyle } from '../types/cms';
 
 interface SimpleButtonConfigProps {
   title: string;

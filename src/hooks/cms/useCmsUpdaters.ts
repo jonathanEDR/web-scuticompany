@@ -203,8 +203,6 @@ export const useCmsUpdaters = (
   const updateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: ButtonStyle) => {
     if (!pageData || !pageData.theme) return;
 
-    
-
     // Asegurar que la estructura existe
     const currentTheme = { ...pageData.theme };
     if (!currentTheme[mode].buttons) {
@@ -237,7 +235,6 @@ export const useCmsUpdaters = (
     
     // IMPORTANTE: También actualizar el ThemeContext inmediatamente
     if (setThemeConfig) {
-      
       setThemeConfig(newTheme as ThemeConfig);
     }
   };

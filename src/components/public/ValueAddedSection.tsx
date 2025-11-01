@@ -77,6 +77,15 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
   const { theme } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
 
+  // 🔧 SOLUCIÓN: Función para limpiar HTML del RichTextEditor y extraer solo texto
+  const cleanHtmlToText = (htmlString: string): string => {
+    if (!htmlString) return '';
+    // Crear un div temporal para extraer solo el texto
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = DOMPurify.sanitize(htmlString);
+    return tempDiv.textContent || tempDiv.innerText || '';
+  };
+
   // ⚡ Priorizar datos del CMS sobre defaultConfig
   const valueAddedData: ValueAddedData = data || DEFAULT_VALUE_ADDED_CONFIG;
 
@@ -208,20 +217,6 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
   // 🛡️ FUNCIÓN HELPER para CSS robusto - Evita valores undefined/null
   const getSafeStyle = (value: string | undefined, fallback: string): string => {
     return value && value !== 'undefined' && value !== 'null' ? value : fallback;
-  };
-
-  // 🎨 FUNCIÓN para remover colores inline y dejar que nuestro sistema de temas tome control
-  const cleanInlineColors = (html: string): string => {
-    if (!html) return html;
-    
-    // Remover atributos style que contengan color
-    let cleanedHtml = html
-      .replace(/style\s*=\s*["'][^"']*color[^"']*["']/gi, '') // Remover style="...color..."
-      .replace(/color\s*:\s*[^;"}]+[;}]/gi, '') // Remover color: xxx; dentro de styles
-      .replace(/style\s*=\s*["']\s*["']/gi, '') // Remover style="" vacíos
-      .replace(/style\s*=\s*["']\s*;\s*["']/gi, ''); // Remover style="; " vacíos
-    
-    return cleanedHtml;
   };
 
   // Función helper para detectar si un string es una URL de imagen
@@ -562,18 +557,20 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
       {/* Section Header - SIN SOMBRAS, colores según maqueta */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
         <div
-          className={`text-4xl sm:text-5xl font-bold mb-4 theme-transition transition-all duration-1000 ${
+          className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 theme-transition transition-all duration-1000 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{
+            lineHeight: '1.2',
             color: theme === 'light' 
               ? '#FFFFFF' // Blanco para tema claro (sobre imagen oscura)
               : '#FFFFFF', // Blanco para tema oscuro
             fontWeight: '700',
             textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6)' // Sombra fuerte para legibilidad
           }}
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.title) }}
-        />
+        >
+          {cleanHtmlToText(mappedData.title)}
+        </div>
         {mappedData.subtitle && (
           <div className="max-w-3xl mx-auto">
             <div
@@ -588,8 +585,9 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
                 lineHeight: '1.6',
                 textShadow: '1px 1px 3px rgba(0,0,0,0.7)' // Sombra para legibilidad
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.subtitle || '') }}
-            />
+            >
+              {cleanHtmlToText(mappedData.subtitle || '')}
+            </div>
           </div>
         )}
       </div>
@@ -866,11 +864,11 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
                       valueItem.styles?.[theme]?.titleColor,
                       cardStyles.titleColor
                     ),
-                    textAlign: cardStyles.iconAlignment || 'left',
-                    fontSize: 'inherit' // Permitir tamaños del RichTextEditor
+                    textAlign: cardStyles.iconAlignment || 'left'
                   }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cleanInlineColors(valueItem.title)) }}
-                />
+                >
+                  {cleanHtmlToText(valueItem.title)}
+                </h3>
 
                 {/* Descripción */}
                 <p 
@@ -881,11 +879,11 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
                       cardStyles.descriptionColor
                     ),
                     textAlign: cardStyles.iconAlignment || 'left',
-                    lineHeight: '1.6',
-                    fontSize: 'inherit' // Permitir tamaños del RichTextEditor
+                    lineHeight: '1.6'
                   }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cleanInlineColors(valueItem.description)) }}
-                />
+                >
+                  {cleanHtmlToText(valueItem.description)}
+                </p>
               </div>
             </div>
           ))}
