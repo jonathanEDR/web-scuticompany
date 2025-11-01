@@ -85,7 +85,4 @@ export const testApiConnection = async () => {
   console.groupEnd();
 };
 
-// Auto-ejecutar en desarrollo
-if (import.meta.env.DEV) {
-  debugApiConfig();
-}
+// Las funciones de debug están disponibles pero no se ejecutan automáticamente

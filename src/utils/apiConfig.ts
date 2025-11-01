@@ -17,30 +17,15 @@ function detectApiConfiguration(): ApiConfigType {
   let baseUrl: string;
   let environment: 'development' | 'production';
 
-  // Debug logging
-  const isDebug = !import.meta.env.PROD;
-  
-  if (isDebug) {
-    console.log('🔧 API Config Detection:', {
-      VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
-      VITE_API_URL: import.meta.env.VITE_API_URL,
-      MODE: import.meta.env.MODE,
-      PROD: import.meta.env.PROD,
-      hostname: typeof window !== 'undefined' ? window.location.hostname : 'SSR'
-    });
-  }
-
   // 1. PRIORIDAD MÁXIMA: Variable de entorno VITE_BACKEND_URL
   if (import.meta.env.VITE_BACKEND_URL) {
     baseUrl = import.meta.env.VITE_BACKEND_URL;
     environment = import.meta.env.PROD ? 'production' : 'development';
-    if (isDebug) console.log('✅ Using VITE_BACKEND_URL:', baseUrl);
   }
   // 2. Variable de entorno VITE_API_URL (remover /api)
   else if (import.meta.env.VITE_API_URL) {
     baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
     environment = import.meta.env.PROD ? 'production' : 'development';
-    if (isDebug) console.log('✅ Using VITE_API_URL:', baseUrl);
   }
   // 3. Detección automática por hostname
   else if (typeof window !== 'undefined') {
@@ -54,7 +39,6 @@ function detectApiConfiguration(): ApiConfigType {
       // Producción
       baseUrl = 'https://web-scuticompany-back.onrender.com';
       environment = 'production';
-      if (isDebug) console.log('✅ Auto-detected PRODUCTION:', baseUrl);
     } else if (hostname === 'localhost' || 
                hostname === '127.0.0.1' || 
                hostname.includes('127.0.0.1') ||
@@ -62,14 +46,12 @@ function detectApiConfiguration(): ApiConfigType {
       // Desarrollo local
       baseUrl = 'http://localhost:5000';
       environment = 'development';
-      if (isDebug) console.log('✅ Auto-detected DEVELOPMENT:', baseUrl);
     } else {
       // Fallback para otros dominios
       baseUrl = import.meta.env.PROD 
         ? 'https://web-scuticompany-back.onrender.com'
         : 'http://localhost:5000';
       environment = import.meta.env.PROD ? 'production' : 'development';
-      if (isDebug) console.log('⚠️ Using FALLBACK:', baseUrl);
     }
   }
   // 4. Fallback absoluto (SSR o caso extremo)
@@ -78,7 +60,6 @@ function detectApiConfiguration(): ApiConfigType {
       ? 'https://web-scuticompany-back.onrender.com'
       : 'http://localhost:5000';
     environment = import.meta.env.PROD ? 'production' : 'development';
-    if (isDebug) console.log('⚠️ Using SSR FALLBACK:', baseUrl);
   }
 
   const config: ApiConfigType = {
