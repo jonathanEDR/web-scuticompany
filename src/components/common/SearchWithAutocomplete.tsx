@@ -115,7 +115,7 @@ export const SearchWithAutocomplete = ({
         id: `servicio-${servicio._id}`,
         type: 'servicio',
         label: servicio.titulo,
-        subtitle: servicio.descripcionCorta || servicio.categoria,
+        subtitle: servicio.descripcionCorta || (typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'),
         servicio
       });
     });

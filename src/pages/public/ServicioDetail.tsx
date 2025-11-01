@@ -179,7 +179,7 @@ export const ServicioDetail: React.FC = () => {
               {/* Categoría */}
               <div className="mb-4">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  {servicio.categoria}
+                  {typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'}
                 </span>
                 {servicio.destacado && (
                   <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
@@ -668,7 +668,7 @@ export const ServicioDetail: React.FC = () => {
           descripcionCorta: servicio.descripcionCorta,
           precio: servicio.precio ? `$${servicio.precio} ${servicio.moneda}` : undefined,
           duracion: servicio.duracion ? `${servicio.duracion.valor} ${servicio.duracion.unidad}` : undefined,
-          categoria: servicio.categoria
+          categoria: typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'
         } : undefined}
         data={{
           title: servicio ? `Solicitar Cotización - ${servicio.titulo}` : 'Solicitar Cotización',

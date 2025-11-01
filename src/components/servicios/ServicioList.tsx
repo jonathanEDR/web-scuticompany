@@ -182,7 +182,9 @@ export const ServicioList: React.FC<ServicioListProps> = ({
 
                 {/* Categoría */}
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-gray-300 capitalize">{servicio.categoria}</span>
+                  <span className="text-gray-300 capitalize">
+                    {typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'}
+                  </span>
                 </td>
 
                 {/* Estado */}

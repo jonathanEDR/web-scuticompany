@@ -108,8 +108,14 @@ const ServicesPublicV2 = () => {
     }
 
     // Filtro por categoría
-    if (categoriaSeleccionada && servicio.categoria !== categoriaSeleccionada) {
-      return false;
+    if (categoriaSeleccionada) {
+      const categoriaServicio = typeof servicio.categoria === 'string' 
+        ? servicio.categoria 
+        : servicio.categoria?.nombre || servicio.categoria?._id || '';
+      
+      if (categoriaServicio !== categoriaSeleccionada) {
+        return false;
+      }
     }
 
     return true;
