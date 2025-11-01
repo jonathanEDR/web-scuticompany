@@ -3,13 +3,15 @@
  * Modal para crear un nuevo servicio usando el formulario existente
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { serviciosApi } from '../../services/serviciosApi';
-import * as uploadApi from '../../services/uploadApi';
+import { uploadImage } from '../../services/imageService';
 import { useNotification } from '../../hooks/useNotification';
+import { categoriasApi, type Categoria } from '../../services/categoriasApi';
 import { Modal } from '../common/Modal';
 import { ImageUploader } from '../common/ImageUploader';
+import { CreateCategoriaModal } from '../categorias/CreateCategoriaModal';
 
 interface CreateServicioModalProps {
   isOpen: boolean;
@@ -21,7 +23,7 @@ interface FormData {
   titulo: string;
   descripcion?: string;
   descripcionCorta?: string;
-  categoria: 'desarrollo' | 'diseño' | 'marketing' | 'consultoría' | 'mantenimiento' | 'otro';
+  categoria: string; // ID de la categoría
   precio?: number;
   tipoPrecio: 'fijo' | 'rango' | 'personalizado';
   moneda?: 'USD' | 'MXN' | 'EUR' | 'PEN';
@@ -43,6 +45,9 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
   const [uploadingMainImage, setUploadingMainImage] = useState(false);
   const [caracteristicaInput, setCaracteristicaInput] = useState('');
   const [etiquetaInput, setEtiquetaInput] = useState('');
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loadingCategorias, setLoadingCategorias] = useState(false);
+  const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
 
   // Form setup
   const {
@@ -57,7 +62,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
       titulo: '',
       descripcion: '',
       descripcionCorta: '',
-      categoria: 'desarrollo',
+      categoria: '',
       precio: 0,
       tipoPrecio: 'fijo',
       destacado: false,
@@ -109,26 +114,69 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
     setValue('etiquetas', currentEtiquetas.filter((_, i) => i !== index));
   };
 
+  // Cargar categorías desde el API
+  const loadCategorias = async () => {
+    try {
+      setLoadingCategorias(true);
+      const response = await categoriasApi.getActivas();
+      setCategorias(response);
+    } catch (err: any) {
+      console.error('Error al cargar categorías:', err);
+    } finally {
+      setLoadingCategorias(false);
+    }
+  };
+
+  // Manejar éxito al crear nueva categoría
+  const handleCategoriaCreated = (nuevaCategoria: Categoria) => {
+    setCategorias(prev => [...prev, nuevaCategoria].sort((a, b) => a.orden - b.orden));
+    setValue('categoria', nuevaCategoria._id); // Seleccionar automáticamente la nueva categoría
+    setShowCreateCategoriaModal(false);
+  };
+
+  // Cargar categorías al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      loadCategorias();
+    }
+  }, [isOpen]);
+
   // Manejar subida de imagen principal
-  const handleMainImageUpload = async (file: File | null) => {
-    if (!file) {
+  const handleMainImageUpload = async (file: File | null, previewUrl: string | null) => {
+    // Caso 1: Se seleccionó una imagen de la galería (file = null, previewUrl = URL)
+    if (!file && previewUrl) {
+      setValue('imagenPrincipal', previewUrl);
+      success('Imagen seleccionada correctamente');
+      return;
+    }
+
+    // Caso 2: Se eliminó la imagen (file = null, previewUrl = null)
+    if (!file && !previewUrl) {
       setValue('imagenPrincipal', '');
       return;
     }
-    
-    setUploadingMainImage(true);
-    try {
-      const response = await uploadApi.uploadImage(file);
-      if (response.success && response.data) {
-        setValue('imagenPrincipal', response.data.url);
+
+    // Caso 3: Se subió un archivo nuevo (file = File, previewUrl puede ser cualquier cosa)
+    if (file) {
+      setUploadingMainImage(true);
+      try {
+        const imageData = await uploadImage({
+          file,
+          category: 'servicios',
+          title: watchedFields.titulo || file.name,
+          alt: watchedFields.titulo || '',
+          description: `Imagen del servicio: ${watchedFields.titulo || file.name}`
+        });
+        
+        setValue('imagenPrincipal', imageData.url);
         success('Imagen principal subida correctamente');
-      } else {
-        error(response.error || 'Error al subir imagen principal');
+        
+      } catch (err: any) {
+        console.error('Error al subir imagen:', err);
+        error('Error al subir imagen principal', err.message || 'Error desconocido');
+      } finally {
+        setUploadingMainImage(false);
       }
-    } catch (err) {
-      error('Error al subir imagen principal');
-    } finally {
-      setUploadingMainImage(false);
     }
   };
 
@@ -159,7 +207,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
         activo: formData.activo,
         caracteristicas: formData.caracteristicas,
         etiquetas: formData.etiquetas,
-        imagenPrincipal: formData.imagenPrincipal,
+        imagen: formData.imagenPrincipal,
         imagenes: formData.imagenes,
         slug: slug, // Slug único generado
         estado: 'activo' as const,
@@ -167,8 +215,6 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
         moneda: formData.moneda || 'PEN' as const,
         icono: '🚀'
       };
-      
-      console.log('📤 Creando servicio con slug único:', slug);
       
       await serviciosApi.create(servicioData);
       success('Servicio creado exitosamente');
@@ -209,20 +255,36 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Categoría *
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Categoría *
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowCreateCategoriaModal(true)}
+                className="inline-flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              >
+                <span className="text-xs">➕</span>
+                Nueva
+              </button>
+            </div>
             <select
               {...register('categoria', { required: 'La categoría es requerida' })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              disabled={loadingCategorias}
             >
-              <option value="desarrollo">🌐 Desarrollo</option>
-              <option value="diseño">🎨 Diseño</option>
-              <option value="marketing">📈 Marketing</option>
-              <option value="consultoría">💼 Consultoría</option>
-              <option value="mantenimiento">� Mantenimiento</option>
-              <option value="otro">� Otro</option>
+              <option value="">
+                {loadingCategorias ? 'Cargando categorías...' : 'Selecciona una categoría'}
+              </option>
+              {categorias.map((categoria) => (
+                <option key={categoria._id} value={categoria._id}>
+                  {categoria.icono} {categoria.nombre}
+                </option>
+              ))}
             </select>
+            {errors.categoria && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{String(errors.categoria.message)}</p>
+            )}
           </div>
 
           <div>
@@ -446,6 +508,13 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
           </button>
         </div>
       </form>
+      
+      {/* Modal para crear nueva categoría */}
+      <CreateCategoriaModal
+        isOpen={showCreateCategoriaModal}
+        onClose={() => setShowCreateCategoriaModal(false)}
+        onSuccess={handleCategoriaCreated}
+      />
     </Modal>
   );
 };

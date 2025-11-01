@@ -15,6 +15,7 @@ import { SearchWithAutocomplete } from '../../components/common/SearchWithAutoco
 import { PaginationControls } from '../../components/common/PaginationControls';
 import { SkeletonGrid } from '../../components/common/Skeleton';
 import { CreateServicioModal } from '../../components/servicios/CreateServicioModal';
+import GestionCategoriasModal from '../../components/servicios/GestionCategoriasModal';
 import type { ServicioFilters, SortOption } from '../../types/filters';
 import { SORT_OPTIONS } from '../../types/filters';
 import type { Servicio } from '../../types/servicios';
@@ -71,6 +72,7 @@ export const ServiciosManagementOptimized = () => {
   const [showFilters, setShowFilters] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCategoriesModal, setShowCategoriesModal] = useState(false);
 
   // ============================================
   // HOOKS
@@ -268,6 +270,15 @@ export const ServiciosManagementOptimized = () => {
               </button>
               
               <button
+                onClick={() => setShowCategoriesModal(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm"
+                title="Gestionar Categorías"
+              >
+                <span>🏷️</span>
+                <span className="hidden lg:inline">Gestionar Categorías</span>
+              </button>
+              
+              <button
                 onClick={() => setShowCreateModal(true)}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-sm"
               >
@@ -443,6 +454,15 @@ export const ServiciosManagementOptimized = () => {
           setShowCreateModal(false);
           await refresh(); // Refrescar sin recargar toda la página
           success('Servicio creado', 'El servicio se agregó correctamente');
+        }}
+      />
+
+      {/* Modal de gestión de categorías */}
+      <GestionCategoriasModal
+        isOpen={showCategoriesModal}
+        onClose={() => setShowCategoriesModal(false)}
+        onCategoryChange={async () => {
+          await refresh(); // Refrescar servicios cuando cambian las categorías
         }}
       />
     </div>

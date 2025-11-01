@@ -66,6 +66,32 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     onImageChange(null, null);
   };
 
+  // Función para mostrar errores más descriptivos
+  const getErrorMessage = (error: any): string => {
+    if (typeof error === 'string') return error;
+    
+    const message = error?.message || error?.toString() || 'Error desconocido';
+    
+    // Errores específicos comunes
+    if (message.includes('401') || message.includes('Unauthorized')) {
+      return 'Error de autenticación. Por favor, recarga la página e intenta de nuevo.';
+    }
+    if (message.includes('413') || message.includes('too large') || message.includes('Payload Too Large')) {
+      return 'El archivo es demasiado grande. Tamaño máximo permitido: 5MB.';
+    }
+    if (message.includes('415') || message.includes('format') || message.includes('type')) {
+      return 'Formato de archivo no soportado. Solo se permiten: JPG, PNG, GIF, WEBP.';
+    }
+    if (message.includes('Network') || message.includes('fetch')) {
+      return 'Error de conexión. Verifica tu internet e intenta de nuevo.';
+    }
+    if (message.includes('Cloudinary') || message.includes('storage')) {
+      return 'Error en el servicio de almacenamiento. Intenta de nuevo en unos momentos.';
+    }
+    
+    return message;
+  };
+
   return (
     <div className="space-y-3">
       {/* Label */}
@@ -132,7 +158,11 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       {/* Error Message */}
       {error && (
-        <p className="text-sm text-red-400">{error}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+            ❌ {getErrorMessage(error)}
+          </p>
+        </div>
       )}
 
       {/* Botón principal para abrir galería */}
@@ -143,10 +173,26 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           e.stopPropagation();
           setShowMediaLibrary(true);
         }}
-        className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg text-lg"
+        className={`
+          w-full px-6 py-4 font-semibold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg text-lg
+          ${uploading 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-xl transform hover:scale-[1.02]'
+          }
+          text-white
+        `}
         disabled={uploading}
       >
-        �️ Seleccionar desde Galería
+        {uploading ? (
+          <>
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Subiendo...
+          </>
+        ) : (
+          <>
+            📷 Seleccionar desde Galería
+          </>
+        )}
       </button>
 
       {/* Modal de selección de imágenes */}

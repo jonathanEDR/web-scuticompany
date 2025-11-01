@@ -12,6 +12,8 @@ import { MultipleImageGallery } from '../../components/common/MultipleImageGalle
 import { ImageUploader } from '../../components/common/ImageUploader';
 import { TabNavigator, useTabNavigation, type Tab } from '../../components/common/TabNavigator';
 import { useNotification } from '../../hooks/useNotification';
+import { categoriasApi, type Categoria } from '../../services/categoriasApi';
+import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
 import * as uploadApi from '../../services/uploadApi';
 
 // ============================================
@@ -30,6 +32,10 @@ export const ServicioFormV3: React.FC = () => {
 
   const [loadingData, setLoadingData] = useState(isEditMode);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [etiquetaInput, setEtiquetaInput] = useState('');
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loadingCategorias, setLoadingCategorias] = useState(false);
+  const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
 
   // ============================================
   // REACT HOOK FORM
@@ -45,9 +51,10 @@ export const ServicioFormV3: React.FC = () => {
   } = useForm<any>({
     defaultValues: {
       titulo: '',
+      slug: '',
       descripcion: '',
       descripcionCorta: '',
-      categoria: 'desarrollo',
+      categoria: '',
       tipoPrecio: 'fijo',
       precio: 0,
       moneda: 'PEN',
@@ -72,12 +79,13 @@ export const ServicioFormV3: React.FC = () => {
       colorSecundario: '#06B6D4',
       imagen: '',
       
-      // Características (como strings para textareas)
+      // Características y Etiquetas
       caracteristicas: '',
       beneficios: '',
       incluye: '',
       noIncluye: '',
       faq: '',
+      etiquetas: [],
       
       // Configuraciones adicionales
       seo: {
@@ -159,6 +167,36 @@ export const ServicioFormV3: React.FC = () => {
   } = useTabNavigation('basic', tabs);
 
   // ============================================
+  // FUNCIONES DE CATEGORÍAS
+  // ============================================
+
+  // Cargar categorías desde el API
+  const loadCategorias = async () => {
+    try {
+      setLoadingCategorias(true);
+      const response = await categoriasApi.getActivas();
+      setCategorias(response);
+    } catch (err: any) {
+      console.error('Error al cargar categorías:', err);
+      error('Error', 'No se pudieron cargar las categorías');
+    } finally {
+      setLoadingCategorias(false);
+    }
+  };
+
+  // Manejar éxito al crear nueva categoría
+  const handleCategoriaCreated = (nuevaCategoria: Categoria) => {
+    setCategorias(prev => [...prev, nuevaCategoria].sort((a, b) => a.orden - b.orden));
+    setValue('categoria', nuevaCategoria._id); // Seleccionar automáticamente la nueva categoría
+    setShowCreateCategoriaModal(false);
+  };
+
+  // Cargar categorías al montar el componente
+  useEffect(() => {
+    loadCategorias();
+  }, []);
+
+  // ============================================
   // CARGAR DATOS EN MODO EDICIÓN
   // ============================================
 
@@ -177,9 +215,10 @@ export const ServicioFormV3: React.FC = () => {
         const servicio = response.data;
         reset({
           titulo: servicio.titulo,
+          slug: servicio.slug || '',
           descripcion: servicio.descripcion,
           descripcionCorta: servicio.descripcionCorta,
-          categoria: servicio.categoria,
+          categoria: typeof servicio.categoria === 'object' ? (servicio.categoria as any)?._id : servicio.categoria,
           tipoPrecio: servicio.tipoPrecio,
           precio: servicio.precio,
           moneda: servicio.moneda,
@@ -222,6 +261,9 @@ export const ServicioFormV3: React.FC = () => {
             ? servicio.faq.map((f: any) => `P: ${f.pregunta}\nR: ${f.respuesta}`).join('\n\n')
             : servicio.faq || '',
           
+          // Etiquetas
+          etiquetas: servicio.etiquetas || [],
+          
           // Configuraciones adicionales
           seo: servicio.seo || { titulo: '', descripcion: '', palabrasClave: '' },
           tiempoEntrega: servicio.tiempoEntrega || '',
@@ -234,6 +276,61 @@ export const ServicioFormV3: React.FC = () => {
       error('Error', 'No se pudo cargar el servicio');
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  // ============================================
+  // FUNCIONES AUXILIARES
+  // ============================================
+
+  // Generar slug desde título
+  const generateSlug = (titulo: string): string => {
+    if (!titulo) return '';
+    return titulo
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+      .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales
+      .replace(/^-+|-+$/g, ''); // Quitar guiones del inicio y final
+  };
+
+  // Actualizar slug automáticamente cuando cambie el título (solo en modo edición)
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === 'titulo' && isEditMode && value.titulo) {
+        // En modo edición, sugerir actualización del slug
+        const newSlug = generateSlug(value.titulo);
+        // Por ahora solo lo almacenamos, luego podemos agregar UI para confirmarlo
+        setValue('slug', newSlug);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setValue, isEditMode]);
+
+  // ============================================
+  // FUNCIONES DE ETIQUETAS
+  // ============================================
+
+  // Agregar etiqueta
+  const addEtiqueta = () => {
+    if (etiquetaInput.trim()) {
+      const currentEtiquetas = watch('etiquetas') || [];
+      setValue('etiquetas', [...currentEtiquetas, etiquetaInput.trim()]);
+      setEtiquetaInput('');
+    }
+  };
+
+  // Eliminar etiqueta
+  const removeEtiqueta = (index: number) => {
+    const currentEtiquetas = watch('etiquetas') || [];
+    setValue('etiquetas', currentEtiquetas.filter((_: string, i: number) => i !== index));
+  };
+
+  // Manejar Enter en input de etiquetas
+  const handleEtiquetaKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addEtiqueta();
     }
   };
 
@@ -355,20 +452,36 @@ export const ServicioFormV3: React.FC = () => {
 
           {/* Categoría y Estado */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Categoría *
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Categoría *
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowCreateCategoriaModal(true)}
+                className="inline-flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              >
+                <span className="text-xs">➕</span>
+                Nueva
+              </button>
+            </div>
             <select
-              {...register('categoria')}
+              {...register('categoria', { required: 'La categoría es obligatoria' })}
               className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              disabled={loadingCategorias}
             >
-              <option value="desarrollo">💻 Desarrollo</option>
-              <option value="diseño">🎨 Diseño</option>
-              <option value="marketing">📊 Marketing</option>
-              <option value="consultoría">💼 Consultoría</option>
-              <option value="mantenimiento">🔧 Mantenimiento</option>
-              <option value="otro">📦 Otro</option>
+              <option value="">
+                {loadingCategorias ? 'Cargando categorías...' : 'Selecciona una categoría'}
+              </option>
+              {categorias.map((categoria) => (
+                <option key={categoria._id} value={categoria._id}>
+                  {categoria.icono} {categoria.nombre}
+                </option>
+              ))}
             </select>
+            {errors.categoria && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{String(errors.categoria.message)}</p>
+            )}
           </div>
 
           <div>
@@ -442,6 +555,55 @@ export const ServicioFormV3: React.FC = () => {
             {errors.descripcion && (
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">{String(errors.descripcion.message)}</p>
             )}
+          </div>
+
+          {/* Etiquetas */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Etiquetas
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(Presiona Enter para agregar)</span>
+            </label>
+            <div className="space-y-3">
+              {/* Input para agregar etiquetas */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={etiquetaInput}
+                  onChange={(e) => setEtiquetaInput(e.target.value)}
+                  onKeyPress={handleEtiquetaKeyPress}
+                  placeholder="Ej: react, desarrollo, web..."
+                  className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <button
+                  type="button"
+                  onClick={addEtiqueta}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                >
+                  Agregar
+                </button>
+              </div>
+              
+              {/* Lista de etiquetas */}
+              {watch('etiquetas')?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {watch('etiquetas').map((etiqueta: string, index: number) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded-full border border-purple-200 dark:border-purple-700"
+                    >
+                      {etiqueta}
+                      <button
+                        type="button"
+                        onClick={() => removeEtiqueta(index)}
+                        className="ml-1 text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-200"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Opciones */}
@@ -902,6 +1064,38 @@ export const ServicioFormV3: React.FC = () => {
         </h2>
         
         <div className="space-y-8">
+          {/* URL y Slug */}
+          <div>
+            <h3 className="text-lg font-medium text-white mb-4">🔗 URL del Servicio</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Slug de la URL
+                  <span className="text-xs text-gray-400 ml-2">
+                    {isEditMode ? '(Se actualizará al cambiar el título)' : '(Se genera automáticamente)'}
+                  </span>
+                </label>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-400">
+                    /servicios/
+                  </span>
+                  <input
+                    type="text"
+                    {...register('slug')}
+                    placeholder={generateSlug(watch('titulo') || 'titulo-del-servicio')}
+                    className="flex-1 bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                <div className="mt-2 text-xs text-gray-400 bg-gray-800/50 rounded-lg p-3">
+                  <div className="font-medium text-purple-400 mb-1">URL completa:</div>
+                  <div className="font-mono text-gray-300">
+                    https://scuticompany.com/servicios/{watch('slug') || generateSlug(watch('titulo') || 'titulo-del-servicio')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Estado y Visibilidad */}
           <div>
             <h3 className="text-lg font-medium text-white mb-4">📊 Estado y Visibilidad</h3>
@@ -1149,6 +1343,13 @@ export const ServicioFormV3: React.FC = () => {
           </div>
         </div>
       </form>
+
+      {/* Modal para crear nueva categoría */}
+      <CreateCategoriaModal
+        isOpen={showCreateCategoriaModal}
+        onClose={() => setShowCreateCategoriaModal(false)}
+        onSuccess={handleCategoriaCreated}
+      />
     </div>
   );
 };

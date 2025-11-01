@@ -1,14 +1,28 @@
 /**
- * 🏷️ BADGE DE CATEGORÍA - CategoriaBadge
- * Componente para mostrar la categoría de un servicio con iconos y colores
+ * 🏷️ BADGE DE CATEGORÍA - CategoriaBadge  
+ * Componente para mostrar la categoría de un servicio con iconos y colores dinámicos
  */
 
 import React from 'react';
 
 // ============================================
-// CONFIGURACIÓN DE CATEGORÍAS
+// TIPOS
 // ============================================
 
+// Interfaz para categoría (objeto completo de la base de datos)
+interface CategoriaObject {
+  _id: string;
+  nombre: string;
+  descripcion?: string;
+  slug: string;
+  icono: string;
+  color: string;
+  orden: number;
+  activo: boolean;
+  totalServicios: number;
+}
+
+// Configuración de fallback para categorías legacy (string)
 interface CategoriaConfig {
   label: string;
   icon: string;
@@ -16,7 +30,7 @@ interface CategoriaConfig {
   bgColor: string;
 }
 
-const categoriaConfig: Record<string, CategoriaConfig> = {
+const categoriaConfigFallback: Record<string, CategoriaConfig> = {
   desarrollo: {
     label: 'Desarrollo',
     icon: '💻',
@@ -56,11 +70,11 @@ const categoriaConfig: Record<string, CategoriaConfig> = {
 };
 
 // ============================================
-// TIPOS
+// PROPS INTERFACE
 // ============================================
 
 interface CategoriaBadgeProps {
-  categoria: string;
+  categoria: CategoriaObject | string; // Puede ser objeto completo o string legacy
   showIcon?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -72,11 +86,12 @@ interface CategoriaBadgeProps {
 
 /**
  * Badge para mostrar la categoría de un servicio
+ * Soporta tanto categorías dinámicas (objetos) como legacy (strings)
  * 
  * @example
  * ```tsx
- * <CategoriaBadge categoria="desarrollo" />
- * <CategoriaBadge categoria="marketing" showIcon={false} />
+ * <CategoriaBadge categoria={categoriaObject} />
+ * <CategoriaBadge categoria="desarrollo" showIcon={false} />
  * ```
  */
 export const CategoriaBadge: React.FC<CategoriaBadgeProps> = ({
@@ -85,8 +100,59 @@ export const CategoriaBadge: React.FC<CategoriaBadgeProps> = ({
   size = 'md',
   className = ''
 }) => {
-  // Obtener configuración de la categoría
-  const config = categoriaConfig[categoria.toLowerCase()] || categoriaConfig.otro;
+  // Si no hay categoría, usar default
+  if (!categoria) {
+    categoria = 'otro';
+  }
+  
+  // Determinar si es objeto o string
+  const isObject = typeof categoria === 'object' && categoria !== null;
+  
+  let label: string;
+  let icon: string;
+  let color: string;
+  let bgColor: string;
+
+  if (isObject && (categoria as any).nombre) {
+    // Categoría dinámica (objeto de la base de datos poblado)
+    const cat = categoria as CategoriaObject;
+    label = cat.nombre;
+    icon = cat.icono;
+    
+    // Convertir color hex a clases de Tailwind
+    const hexToTailwind = (hexColor: string) => {
+      // Para simplicidad, usar el color como background con opacidad
+      return {
+        color: 'text-white',
+        bgColor: 'border-opacity-50',
+        style: {
+          backgroundColor: `${hexColor}40`, // 40 = 25% opacity
+          borderColor: `${hexColor}80`,     // 80 = 50% opacity
+        }
+      };
+    };
+    
+    const colorConfig = hexToTailwind(cat.color);
+    color = colorConfig.color;
+    bgColor = colorConfig.bgColor;
+  } else {
+    // Categoría legacy (string) o ObjectId no poblado - usar configuración de fallback
+    let categoriaStr: string;
+    
+    if (isObject) {
+      // Si es un objeto pero no tiene nombre, probablemente es un ObjectId no poblado
+      categoriaStr = 'otro'; // Default fallback
+      console.warn('CategoriaBadge: Recibido objeto sin propiedades de categoría:', categoria);
+    } else {
+      categoriaStr = categoria as string;
+    }
+    
+    const config = categoriaConfigFallback[categoriaStr.toLowerCase()] || categoriaConfigFallback.otro;
+    label = config.label;
+    icon = config.icon;
+    color = config.color;
+    bgColor = config.bgColor;
+  }
 
   // Tamaños
   const sizeClasses = {
@@ -95,20 +161,32 @@ export const CategoriaBadge: React.FC<CategoriaBadgeProps> = ({
     lg: 'text-base px-4 py-1.5'
   };
 
+  const badgeProps: React.HTMLAttributes<HTMLSpanElement> = {
+    className: `
+      inline-flex items-center gap-1.5 
+      ${sizeClasses[size]}
+      ${color}
+      ${bgColor}
+      border rounded-full font-semibold
+      ${className}
+    `.trim(),
+    title: `Categoría: ${label}`
+  };
+
+  // Si es objeto, agregar estilos inline para el color
+  if (isObject) {
+    const cat = categoria as CategoriaObject;
+    badgeProps.style = {
+      backgroundColor: `${cat.color}25`, // 25% opacity
+      borderColor: `${cat.color}60`,     // 60% opacity
+      color: 'white'
+    };
+  }
+
   return (
-    <span
-      className={`
-        inline-flex items-center gap-1.5 
-        ${sizeClasses[size]}
-        ${config.color}
-        ${config.bgColor}
-        border rounded-full font-semibold
-        ${className}
-      `}
-      title={`Categoría: ${config.label}`}
-    >
-      {showIcon && <span className="text-sm">{config.icon}</span>}
-      <span>{config.label}</span>
+    <span {...badgeProps}>
+      {showIcon && <span className="text-sm">{icon}</span>}
+      <span>{label}</span>
     </span>
   );
 };

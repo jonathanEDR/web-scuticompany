@@ -68,7 +68,15 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
     }
   };
 
-  const getCategoryColor = (categoria: string) => {
+  // Función para obtener el color de la categoría (compatible con string y objeto)
+  const getCategoryColor = (categoria: any) => {
+    // Si es un objeto categoría, usar su color
+    if (categoria && typeof categoria === 'object' && categoria.color) {
+      return `text-white`;
+    }
+    
+    // Fallback para categorías string (legacy)
+    const categoriaStr = typeof categoria === 'string' ? categoria : categoria?.nombre || 'otro';
     const colors = {
       desarrollo: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200',
       marketing: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200',
@@ -77,7 +85,24 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
       mantenimiento: 'bg-gray-100 dark:bg-gray-700/50 text-gray-800 dark:text-gray-200',
       otro: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200'
     };
-    return colors[categoria as keyof typeof colors] || colors.otro;
+    return colors[categoriaStr as keyof typeof colors] || colors.otro;
+  };
+
+  // Función para obtener el nombre de la categoría
+  const getCategoryName = (categoria: any) => {
+    if (!categoria) return 'Sin categoría';
+    
+    // Si es un objeto categoría
+    if (typeof categoria === 'object' && categoria.nombre) {
+      return categoria.nombre;
+    }
+    
+    // Si es un string (legacy)
+    if (typeof categoria === 'string') {
+      return categoria.charAt(0).toUpperCase() + categoria.slice(1);
+    }
+    
+    return 'Sin categoría';
   };
 
   // ============================================
@@ -128,11 +153,17 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
       <div className="p-6">
         {/* Categoría */}
         <div className="flex items-center justify-between mb-3">
-          <span className={`
-            inline-block px-3 py-1 rounded-full text-xs font-medium
-            ${getCategoryColor(servicio.categoria)}
-          `}>
-            {servicio.categoria.charAt(0).toUpperCase() + servicio.categoria.slice(1)}
+          <span 
+            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(servicio.categoria)}`}
+            style={{
+              backgroundColor: servicio.categoria?.color || undefined,
+              color: servicio.categoria?.color ? 'white' : undefined
+            }}
+          >
+            {servicio.categoria?.icono && (
+              <span className="mr-1">{servicio.categoria.icono}</span>
+            )}
+            {getCategoryName(servicio.categoria)}
           </span>
           
           {servicio.requiereContacto && (

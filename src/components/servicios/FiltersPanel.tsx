@@ -6,10 +6,10 @@
 import { useState, useEffect } from 'react';
 import type { ServicioFilters } from '../../types/filters';
 import { 
-  CATEGORIAS_OPTIONS, 
   TIPO_PRECIO_OPTIONS, 
   ESTADO_OPTIONS 
 } from '../../types/filters';
+import { categoriasApi, type Categoria } from '../../services/categoriasApi';
 
 // ============================================
 // TIPOS
@@ -58,6 +58,20 @@ export const FiltersPanel = ({
 }: FiltersPanelProps) => {
   const [localFilters, setLocalFilters] = useState<ServicioFilters>(filters);
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  // Cargar categorías dinámicas
+  useEffect(() => {
+    const loadCategorias = async () => {
+      try {
+        const response = await categoriasApi.getAll({ activas: true });
+        setCategorias(response.data);
+      } catch (error) {
+        console.error('Error cargando categorías:', error);
+      }
+    };
+    loadCategorias();
+  }, []);
 
   // Contar filtros activos
   useEffect(() => {
@@ -185,23 +199,28 @@ export const FiltersPanel = ({
               Categorías
             </h3>
             <div className="space-y-2">
-              {CATEGORIAS_OPTIONS.map(cat => (
+              {categorias.map(categoria => (
                 <label
-                  key={cat.value}
+                  key={categoria._id}
                   className="flex items-center gap-2 cursor-pointer group"
                 >
                   <input
                     type="checkbox"
-                    checked={localFilters.categorias?.includes(cat.value) || false}
-                    onChange={() => handleCategoryToggle(cat.value)}
+                    checked={localFilters.categorias?.includes(categoria.slug) || false}
+                    onChange={() => handleCategoryToggle(categoria.slug)}
                     className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                   />
                   <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: cat.color }}
-                  />
+                    className="w-3 h-3 rounded-full flex items-center justify-center text-xs"
+                    style={{ backgroundColor: categoria.color }}
+                  >
+                    {categoria.icono}
+                  </span>
                   <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                    {cat.label}
+                    {categoria.nombre}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-auto">
+                    ({categoria.totalServicios})
                   </span>
                 </label>
               ))}

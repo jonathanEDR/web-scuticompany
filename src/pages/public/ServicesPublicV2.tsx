@@ -115,6 +115,7 @@ const ServicesPublicV2 = () => {
     return true;
   });
 
+  // TODO: Convertir a categorías dinámicas como en FiltersPanel.tsx
   const categorias = [
     { value: '', label: 'Todas las categorías' },
     { value: 'desarrollo', label: '💻 Desarrollo' },

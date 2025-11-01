@@ -62,15 +62,7 @@ export const SORT_OPTIONS: SortOption[] = [
   { field: 'destacado', order: 'desc', label: 'Destacados primero' },
 ];
 
-export const CATEGORIAS_OPTIONS = [
-  { value: 'desarrollo', label: 'Desarrollo Web', color: '#8B5CF6' },
-  { value: 'diseno', label: 'Diseño', color: '#EC4899' },
-  { value: 'marketing', label: 'Marketing Digital', color: '#F59E0B' },
-  { value: 'seo', label: 'SEO', color: '#10B981' },
-  { value: 'hosting', label: 'Hosting', color: '#3B82F6' },
-  { value: 'consultoria', label: 'Consultoría', color: '#6366F1' },
-  { value: 'otro', label: 'Otro', color: '#6B7280' },
-];
+// CATEGORIAS_OPTIONS eliminado - ahora se cargan dinámicamente desde la API
 
 export const TIPO_PRECIO_OPTIONS = [
   { value: 'fijo', label: 'Precio Fijo', icon: '💰' },

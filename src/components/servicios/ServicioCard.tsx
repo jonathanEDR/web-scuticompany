@@ -56,6 +56,8 @@ export const ServicioCard: React.FC<ServicioCardProps> = ({
   className = ''
 }) => {
   // ============================================
+  // DEBUG LOGS PARA IMÁGENES
+  // ============================================
   // FUNCIONES AUXILIARES
   // ============================================
 
@@ -118,25 +120,31 @@ export const ServicioCard: React.FC<ServicioCardProps> = ({
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4 flex-1">
             {/* Imagen o Icono - MÁS GRANDE */}
-            {servicio.imagen ? (
-              <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-md">
-                <img
-                  src={servicio.imagen}
-                  alt={servicio.titulo}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div
-                className="flex-shrink-0 text-5xl w-24 h-24 flex items-center justify-center rounded-xl shadow-md"
-                style={{
-                  backgroundColor: `${servicio.colorIcono}${viewMode === 'admin' ? '15' : '20'}`,
-                  border: `2px solid ${servicio.colorIcono}${viewMode === 'admin' ? '30' : '40'}`
-                }}
-              >
-                {servicio.icono}
-              </div>
-            )}
+            {(() => {
+              if (servicio.imagen) {
+                return (
+                  <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-md">
+                    <img
+                      src={servicio.imagen}
+                      alt={servicio.titulo}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                );
+              }
+              
+              return (
+                <div
+                  className="flex-shrink-0 text-5xl w-24 h-24 flex items-center justify-center rounded-xl shadow-md"
+                  style={{
+                    backgroundColor: `${servicio.colorIcono}${viewMode === 'admin' ? '15' : '20'}`,
+                    border: `2px solid ${servicio.colorIcono}${viewMode === 'admin' ? '30' : '40'}`
+                  }}
+                >
+                  {servicio.icono}
+                </div>
+              );
+            })()}
 
             {/* Título y badges */}
             <div className="flex-1 min-w-0">

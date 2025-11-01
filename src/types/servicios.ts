@@ -48,7 +48,7 @@ export interface Servicio {
   
   // Estado y categoría
   estado: 'activo' | 'desarrollo' | 'pausado' | 'descontinuado' | 'agotado';
-  categoria: 'desarrollo' | 'diseño' | 'marketing' | 'consultoría' | 'mantenimiento' | 'otro';
+  categoria: any; // Puede ser string (ObjectId) o objeto poblado con categoría completa
   
   // Features
   caracteristicas: string[];
@@ -357,7 +357,7 @@ export interface CreateServicioRequest {
     unidad: 'horas' | 'días' | 'semanas' | 'meses' | 'años';
   };
   estado?: 'activo' | 'desarrollo' | 'pausado' | 'descontinuado' | 'agotado';
-  categoria: 'desarrollo' | 'diseño' | 'marketing' | 'consultoría' | 'mantenimiento' | 'otro';
+  categoria: string; // ObjectId de la categoría
   caracteristicas?: string[];
   tecnologias?: string[];
   etiquetas?: string[];
@@ -444,19 +444,7 @@ export const EstadoServicio = {
 
 export type EstadoServicioType = typeof EstadoServicio[keyof typeof EstadoServicio];
 
-/**
- * Categorías de servicios
- */
-export const CategoriaServicio = {
-  DESARROLLO: 'desarrollo' as const,
-  DISENO: 'diseño' as const,
-  MARKETING: 'marketing' as const,
-  CONSULTORIA: 'consultoría' as const,
-  MANTENIMIENTO: 'mantenimiento' as const,
-  OTRO: 'otro' as const
-};
-
-export type CategoriaServicioType = typeof CategoriaServicio[keyof typeof CategoriaServicio];
+// CategoriaServicio eliminado - ahora se gestionan dinámicamente desde la base de datos
 
 /**
  * Tipos de precio
