@@ -1,17 +1,22 @@
-import { useState } from 'react';
+/**
+ * 📝 Hook especializado para el modal de cotización de servicios
+ * Versión optimizada del useContactForm para evitar dependencias circulares
+ */
+
+import { useState, useCallback } from 'react';
 import { submitContact } from '../services/contactApi';
 import type { ContactFormData, ContactResponse } from '../services/contactApi';
 
-/**
- * 📝 Hook personalizado para gestionar el formulario de contacto
- * Maneja validación, envío, estados de loading/success/error
- */
-
-export interface ContactFormState extends ContactFormData {
+export interface QuoteFormState {
+  nombre: string;
+  celular: string;
+  correo: string;
+  mensaje: string;
+  categoria?: string;
   acceptTerms: boolean;
 }
 
-export interface ContactFormErrors {
+export interface QuoteFormErrors {
   nombre?: string;
   celular?: string;
   correo?: string;
@@ -20,20 +25,21 @@ export interface ContactFormErrors {
   general?: string;
 }
 
-export interface UseContactFormReturn {
-  formData: ContactFormState;
-  errors: ContactFormErrors;
+export interface UseQuoteFormReturn {
+  formData: QuoteFormState;
+  errors: QuoteFormErrors;
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
   successMessage: string;
   errorMessage: string;
-  handleChange: (field: keyof ContactFormState, value: string | boolean) => void;
+  handleChange: (field: keyof QuoteFormState, value: string | boolean) => void;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   resetForm: () => void;
+  initializeMessage: (message: string) => void;
 }
 
-const initialFormState: ContactFormState = {
+const initialFormState: QuoteFormState = {
   nombre: '',
   celular: '',
   correo: '',
@@ -58,14 +64,9 @@ const isValidPhone = (phone: string): boolean => {
   return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 9;
 };
 
-/**
- * Hook principal
- */
-export const useContactForm = (
-  onSuccessCallback?: () => void
-): UseContactFormReturn => {
-  const [formData, setFormData] = useState<ContactFormState>(initialFormState);
-  const [errors, setErrors] = useState<ContactFormErrors>({});
+export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn => {
+  const [formData, setFormData] = useState<QuoteFormState>(initialFormState);
+  const [errors, setErrors] = useState<QuoteFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -75,16 +76,14 @@ export const useContactForm = (
   /**
    * Validar formulario completo
    */
-  const validateForm = (): boolean => {
-    const newErrors: ContactFormErrors = {};
+  const validateForm = useCallback((): boolean => {
+    const newErrors: QuoteFormErrors = {};
 
     // Validar nombre
     if (!formData.nombre.trim()) {
       newErrors.nombre = 'El nombre es requerido';
     } else if (formData.nombre.trim().length < 2) {
       newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
-    } else if (formData.nombre.trim().length > 100) {
-      newErrors.nombre = 'El nombre no puede exceder 100 caracteres';
     }
 
     // Validar celular
@@ -106,39 +105,41 @@ export const useContactForm = (
       newErrors.mensaje = 'El mensaje es requerido';
     } else if (formData.mensaje.trim().length < 10) {
       newErrors.mensaje = 'El mensaje debe tener al menos 10 caracteres';
-    } else if (formData.mensaje.trim().length > 2000) {
-      newErrors.mensaje = 'El mensaje no puede exceder 2000 caracteres';
-    }
-
-    // Validar términos
-    if (!formData.acceptTerms) {
-      newErrors.acceptTerms = 'Debes aceptar los términos y condiciones';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData]);
 
   /**
    * Manejar cambios en los campos
    */
-  const handleChange = (field: keyof ContactFormState, value: string | boolean) => {
+  const handleChange = useCallback((field: keyof QuoteFormState, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[field as keyof ContactFormErrors]) {
+    if (errors[field as keyof QuoteFormErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
     
     // Limpiar mensajes de estado
     if (isSuccess) setIsSuccess(false);
     if (isError) setIsError(false);
-  };
+  }, [errors, isSuccess, isError]);
+
+  /**
+   * Inicializar mensaje (para pre-llenado)
+   */
+  const initializeMessage = useCallback((message: string) => {
+    if (formData.mensaje === '' && message) {
+      setFormData(prev => ({ ...prev, mensaje: message }));
+    }
+  }, [formData.mensaje]);
 
   /**
    * Manejar envío del formulario
    */
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validar formulario
@@ -154,7 +155,7 @@ export const useContactForm = (
     setErrors({});
 
     try {
-      // Preparar datos para envío (sin acceptTerms)
+      // Preparar datos para envío
       const dataToSend: ContactFormData = {
         nombre: formData.nombre.trim(),
         celular: formData.celular.trim(),
@@ -167,28 +168,22 @@ export const useContactForm = (
       const response: ContactResponse = await submitContact(dataToSend);
 
       if (response.success) {
-        // Éxito
         setIsSuccess(true);
         setSuccessMessage(response.message || '¡Gracias por contactarnos! Te responderemos pronto.');
         
-        // Resetear formulario después de 3 segundos
-        setTimeout(() => {
-          resetForm();
-        }, 3000);
-
         // Callback opcional
         if (onSuccessCallback) {
-          onSuccessCallback();
+          setTimeout(() => {
+            onSuccessCallback();
+          }, 1500);
         }
       } else {
-        // Error del servidor
         setIsError(true);
         
-        // Si hay errores de validación del backend, mostrarlos
         if (response.errors && response.errors.length > 0) {
-          const backendErrors: ContactFormErrors = {};
+          const backendErrors: QuoteFormErrors = {};
           response.errors.forEach(err => {
-            backendErrors[err.campo as keyof ContactFormErrors] = err.mensaje;
+            backendErrors[err.campo as keyof QuoteFormErrors] = err.mensaje;
           });
           setErrors(backendErrors);
           setErrorMessage('Por favor, corrige los errores indicados');
@@ -203,12 +198,12 @@ export const useContactForm = (
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [formData, validateForm, onSuccessCallback]);
 
   /**
    * Resetear formulario
    */
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData(initialFormState);
     setErrors({});
     setIsLoading(false);
@@ -216,7 +211,7 @@ export const useContactForm = (
     setIsError(false);
     setSuccessMessage('');
     setErrorMessage('');
-  };
+  }, []);
 
   return {
     formData,
@@ -229,7 +224,8 @@ export const useContactForm = (
     handleChange,
     handleSubmit,
     resetForm,
+    initializeMessage,
   };
 };
 
-export default useContactForm;
+export default useQuoteForm;

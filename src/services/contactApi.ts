@@ -10,6 +10,7 @@ export interface ContactFormData {
   celular: string;
   correo: string;
   mensaje: string;
+  categoria?: string; // Slug de la categoría seleccionada
 }
 
 export interface ContactResponse {

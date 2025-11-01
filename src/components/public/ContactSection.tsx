@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useContactForm } from '../../hooks/useContactForm';
 import SimpleGoogleMap from './SimpleGoogleMap';
+import type { Categoria } from '../../services/categoriasApi';
 
 interface ContactFormData {
   title: string;
@@ -64,6 +65,10 @@ interface ContactFormData {
     correoLabel: string;
     correoPlaceholder: string;
     correoRequired: boolean;
+    categoriaLabel?: string;
+    categoriaPlaceholder?: string;
+    categoriaRequired?: boolean;
+    categoriaEnabled?: boolean;
     mensajeLabel: string;
     mensajePlaceholder: string;
     mensajeRequired: boolean;
@@ -165,10 +170,12 @@ interface ContactFormData {
 
 interface ContactSectionProps {
   data?: ContactFormData;
+  categorias?: Categoria[];
 }
 
-const ContactSection = ({ data }: ContactSectionProps) => {
+const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [selectedCategoria, setSelectedCategoria] = useState<string>('');
   const { theme: currentTheme } = useTheme();
 
   // Obtener imagen de fondo según el tema actual
@@ -398,6 +405,55 @@ const ContactSection = ({ data }: ContactSectionProps) => {
                 </p>
               )}
             </div>
+
+            {/* Campo: Categoría de Interés (opcional) */}
+            {data?.fields?.categoriaEnabled && categorias.length > 0 && (
+              <div>
+                <label 
+                  htmlFor="categoria"
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: currentStyles?.labelColor || '#374151' }}
+                >
+                  {data?.fields?.categoriaLabel || 'Servicio de Interés'}
+                  {data?.fields?.categoriaRequired && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                <select
+                  id="categoria"
+                  value={selectedCategoria}
+                  onChange={(e) => {
+                    setSelectedCategoria(e.target.value);
+                    handleChange('categoria', e.target.value);
+                    
+                    // Actualizar el mensaje con la categoría seleccionada
+                    if (e.target.value) {
+                      const categoria = categorias.find(c => c.slug === e.target.value);
+                      if (categoria) {
+                        const mensajeBase = formData.mensaje.replace(/Estoy interesado en: .+?\.\s*/g, '');
+                        const nuevoMensaje = `Estoy interesado en: ${categoria.nombre}. ${mensajeBase}`.trim();
+                        handleChange('mensaje', nuevoMensaje);
+                      }
+                    }
+                  }}
+                  required={data?.fields?.categoriaRequired}
+                  disabled={isLoading || isSuccess}
+                  className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
+                  style={{
+                    background: currentStyles?.inputBackground || '#ffffff',
+                    border: `1px solid ${currentStyles?.inputBorder || '#e5e7eb'}`,
+                    color: currentStyles?.inputText || '#1f2937',
+                  }}
+                >
+                  <option value="">
+                    {data?.fields?.categoriaPlaceholder || 'Selecciona un tipo de servicio'}
+                  </option>
+                  {categorias.map(categoria => (
+                    <option key={categoria._id} value={categoria.slug}>
+                      {categoria.icono} {categoria.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Campo: Mensaje */}
             <div>

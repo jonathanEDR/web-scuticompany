@@ -105,6 +105,12 @@ export interface DefaultContactConfig {
       label: string;
       placeholder: string;
     };
+    categoria?: {
+      label: string;
+      placeholder: string;
+      enabled: boolean;
+      required: boolean;
+    };
     mensaje: {
       label: string;
       placeholder: string;
@@ -280,6 +286,12 @@ export const DEFAULT_CONTACT_CONFIG: DefaultContactConfig = {
     correo: {
       label: 'Correo electrónico',
       placeholder: 'Ingresa tu correo electrónico'
+    },
+    categoria: {
+      label: 'Servicio de Interés',
+      placeholder: 'Selecciona el tipo de servicio que necesitas',
+      enabled: true,
+      required: false
     },
     mensaje: {
       label: 'Mensaje',

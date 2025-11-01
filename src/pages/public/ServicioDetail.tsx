@@ -8,6 +8,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { serviciosApi } from '../../services/serviciosApi';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
+import ContactModal from '../../components/public/ContactModal';
 import { useSeo } from '../../hooks/useSeo';
 import type { Servicio } from '../../types/servicios';
 
@@ -17,6 +18,7 @@ export const ServicioDetail: React.FC = () => {
   const [servicio, setServicio] = useState<Servicio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   // SEO dinámico
   const { SeoHelmet } = useSeo({
@@ -237,12 +239,12 @@ export const ServicioDetail: React.FC = () => {
 
               {/* CTA */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  to="/contacto#formulario"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-purple-500/50"
+                <button
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-purple-500/50 transform hover:scale-105"
                 >
                   💬 Solicitar Cotización
-                </Link>
+                </button>
                 <button
                   onClick={() => navigate(-1)}
                   className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-400 dark:border-gray-600 hover:border-gray-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-lg transition-colors"
@@ -616,12 +618,12 @@ export const ServicioDetail: React.FC = () => {
             Nuestro equipo de expertos está listo para ayudarte a llevar tu idea al siguiente nivel.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/contacto#formulario"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
+            <button
+              onClick={() => setIsContactModalOpen(true)}
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
             >
               💬 Solicitar Cotización Gratuita
-            </Link>
+            </button>
             <Link
               to="/servicios"
               className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-purple-600 transition-colors"
@@ -633,6 +635,33 @@ export const ServicioDetail: React.FC = () => {
       </section>
 
       <PublicFooter />
+
+      {/* Modal de contacto */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        servicioInfo={servicio ? {
+          titulo: servicio.titulo,
+          descripcionCorta: servicio.descripcionCorta,
+          precio: servicio.precio ? `$${servicio.precio} ${servicio.moneda}` : undefined,
+          duracion: servicio.duracion ? `${servicio.duracion.valor} ${servicio.duracion.unidad}` : undefined,
+          categoria: servicio.categoria
+        } : undefined}
+        data={{
+          title: servicio ? `Solicitar Cotización - ${servicio.titulo}` : 'Solicitar Cotización',
+          subtitle: 'OBTÉN TU COTIZACIÓN',
+          description: 'Déjanos tus datos y nos pondremos en contacto contigo para brindarte la mejor asesoría.',
+          fields: {
+            mensajePlaceholder: servicio 
+              ? `Hola, estoy interesado en el servicio "${servicio.titulo}". Me gustaría recibir más información y una cotización personalizada.`
+              : 'Describe tu proyecto, necesidades o consulta...'
+          },
+          messages: {
+            success: '¡Gracias! Hemos recibido tu solicitud. Te contactaremos pronto.',
+            error: 'Error al enviar la solicitud. Por favor, intenta nuevamente.'
+          }
+        }}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { validarEmail, validarCelular } from '../../services/crmService';
+import { categoriasApi, type Categoria } from '../../services/categoriasApi';
 import type { Lead } from '../../services/crmService';
 
 interface LeadFormModalProps {
@@ -22,6 +23,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
 
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -29,7 +31,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
     celular: '',
     correo: '',
     empresa: '',
-    tipoServicio: 'web',
+    tipoServicio: '',
     descripcionProyecto: '',
     presupuestoEstimado: '',
     fechaDeseada: '',
@@ -61,7 +63,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
         celular: '',
         correo: '',
         empresa: '',
-        tipoServicio: 'web',
+        tipoServicio: '',
         descripcionProyecto: '',
         presupuestoEstimado: '',
         fechaDeseada: '',
@@ -72,6 +74,24 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
     }
     setErrors({});
   }, [mode, lead, isOpen]);
+
+  // Cargar categorías al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      loadCategorias();
+    }
+  }, [isOpen]);
+
+  const loadCategorias = async () => {
+    try {
+      const response = await categoriasApi.getAll();
+      setCategorias(response.data);
+    } catch (error) {
+      console.error('Error cargando categorías:', error);
+      // Fallback a categorías hardcodeadas en caso de error
+      setCategorias([]);
+    }
+  };
 
   // ========================================
   // 🔧 VALIDACIÓN
@@ -302,14 +322,26 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     onChange={(e) => handleChange('tipoServicio', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="web">🌐 Sitio Web</option>
-                    <option value="app">📱 App Móvil</option>
-                    <option value="ecommerce">🛒 E-commerce</option>
-                    <option value="sistemas">💻 Sistemas</option>
-                    <option value="consultoria">👨‍💼 Consultoría</option>
-                    <option value="diseño">🎨 Diseño</option>
-                    <option value="marketing">📢 Marketing</option>
-                    <option value="otro">📌 Otro</option>
+                    <option value="">Selecciona un tipo de servicio</option>
+                    {categorias.length > 0 ? (
+                      categorias.map((categoria) => (
+                        <option key={categoria._id} value={categoria.slug}>
+                          {categoria.icono} {categoria.nombre}
+                        </option>
+                      ))
+                    ) : (
+                      // Fallback con opciones básicas si no se cargan las categorías
+                      <>
+                        <option value="web">🌐 Sitio Web</option>
+                        <option value="app">📱 App Móvil</option>
+                        <option value="ecommerce">🛒 E-commerce</option>
+                        <option value="sistemas">💻 Sistemas</option>
+                        <option value="consultoria">👨‍💼 Consultoría</option>
+                        <option value="diseño">🎨 Diseño</option>
+                        <option value="marketing">📢 Marketing</option>
+                        <option value="otro">📌 Otro</option>
+                      </>
+                    )}
                   </select>
                 </div>
 

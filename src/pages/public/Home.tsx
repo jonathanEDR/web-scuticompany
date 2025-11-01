@@ -10,8 +10,10 @@ import { getPageBySlug, clearCache, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSeo } from '../../hooks/useSeo';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
+import { categoriasApi, type Categoria } from '../../services/categoriasApi';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 import type { ClientLogosContent } from '../../types/cms';
+
 
 interface ButtonTheme {
   background: string;
@@ -99,7 +101,24 @@ interface PageData {
   theme?: ExtendedThemeConfig;
 }
 
-// ⚡ Usar SOLO defaultConfig.ts como fuente única de verdad
+// Función para agregar categorías a la configuración del CMS
+const addCategoriasToConfig = (cmsConfig: any, categorias: Categoria[] = []) => {
+  const configWithCategories = {
+    ...cmsConfig,
+    fields: {
+      ...cmsConfig.fields,
+      ...(categorias.length > 0 && {
+        categoriaLabel: 'Servicio de Interés',
+        categoriaPlaceholder: 'Selecciona el tipo de servicio que necesitas',
+        categoriaRequired: false,
+        categoriaEnabled: true,
+      })
+    }
+  };
+  
+  return configWithCategories;
+};
+
 const DEFAULT_PAGE_DATA: PageData = {
   content: {
     hero: DEFAULT_HERO_CONFIG,
@@ -124,26 +143,49 @@ const DEFAULT_PAGE_DATA: PageData = {
  * - Sin dependencias de autenticación
  */
 const HomeOptimized = () => {
-  // ⚡ Estado inicial con datos por defecto - RENDERIZA INMEDIATAMENTE
   const [pageData, setPageData] = useState<PageData>(DEFAULT_PAGE_DATA);
   const [isLoadingCMS, setIsLoadingCMS] = useState(false);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const { setThemeConfig } = useTheme();
-  
-  // 🎯 Hook global de SEO - maneja meta tags automáticamente
     const { SeoHelmet } = useSeo({
       pageName: 'home',
       fallbackTitle: 'SCUTI Company - Transformamos tu empresa con tecnología inteligente',
       fallbackDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.'
     });
   
-    // ✅ SEO ahora es manejado completamente por el hook useSeo()
-
-  // ⚡ Limpiar caché al montar el componente para asegurar datos frescos
   useEffect(() => {
     clearCache('page-home');
-    
-    // 🔍 Cargar contenido (sin SEO) para el resto de la página
     loadPageData();
+    loadCategorias();
+  }, []);
+
+  // Función para cargar categorías desde el CMS
+  const loadCategorias = async () => {
+    try {
+      const response = await categoriasApi.getAll({ activas: true });
+      setCategorias(response.data);
+    } catch (error) {
+      console.error('Error cargando categorías:', error);
+      // En caso de error, usar array vacío (el selector se ocultará)
+      setCategorias([]);
+    }
+  };
+
+  // 📍 Manejo de navegación a sección de contacto
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === '#contacto') {
+      // Pequeño delay para asegurar que el contenido se haya renderizado
+      setTimeout(() => {
+        const contactoElement = document.getElementById('contacto');
+        if (contactoElement) {
+          contactoElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 500);
+    }
   }, []);
 
   // ⏰ Sistema de eventos CMS para mantener contenido sincronizado
@@ -181,16 +223,13 @@ const HomeOptimized = () => {
     try {
       if (!silent) setIsLoadingCMS(true);
       
-      // ⚡ Usar forceReload si necesitamos datos frescos, sino getPageBySlug con caché
       const data = forceRefresh 
-        ? await forceReload('home')  // Limpia caché y recarga
-        : await getPageBySlug('home', true); // Usa caché si está disponible
+        ? await forceReload('home')
+        : await getPageBySlug('home', true);
       
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
-        // Datos del CMS cargados correctamente
-        
-        // ⚠️ IMPORTANTE: Eliminar datos de SEO para evitar conflictos con useSeo hook
+        // Eliminar datos de SEO para evitar conflictos con useSeo hook
         const dataWithoutSeo = {
           ...data,
           seo: undefined // El hook useSeo() maneja esto
@@ -198,21 +237,16 @@ const HomeOptimized = () => {
         
         setPageData(dataWithoutSeo);
         
-        // ✅ Meta tags ahora se manejan automáticamente por React Helmet optimizado
-        
-        // Cargar configuración de tema si existe
         if (data.theme) {
           setThemeConfig(data.theme);
         }
         
-        // 📡 Disparar evento personalizado para notificar a componentes
         window.dispatchEvent(new CustomEvent('pageDataUpdated', { 
           detail: { valueAdded: data.content.valueAdded } 
         }));
       }
     } catch (error) {
-      console.error('❌ Error al cargar datos del CMS:', error);
-      // No hacer nada - ya tenemos datos por defecto
+      console.error('Error al cargar datos del CMS:', error);
     } finally {
       if (!silent) setIsLoadingCMS(false);
     }
@@ -220,12 +254,7 @@ const HomeOptimized = () => {
 
   return (
     <>
-      {/* 🎯 SEO Meta Tags - Manejado por Hook Global */}
       <SeoHelmet />
-      
-      {/* 🎯 SEO aplicado por hook useSeo */}
-
-      {/* ⚡ Contenido se renderiza INMEDIATAMENTE sin esperar autenticación ni CMS */}
       <div className="min-h-screen w-full overflow-x-hidden bg-transparent">
         <PublicHeader />
         <main className="w-full bg-transparent">
@@ -243,7 +272,8 @@ const HomeOptimized = () => {
           />
 
           <ContactSection 
-            data={pageData.content.contactForm}
+            data={addCategoriasToConfig(pageData.content.contactForm, categorias)}
+            categorias={categorias}
           />
         </main>
         <PublicFooter />
