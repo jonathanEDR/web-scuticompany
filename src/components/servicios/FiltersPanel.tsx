@@ -60,6 +60,16 @@ export const FiltersPanel = ({
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
+  // Prevenir scroll del body cuando el panel esté abierto en móvil
+  useEffect(() => {
+    if (isOpen && onClose && window.innerWidth < 1024) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen, onClose]);
+
   // Cargar categorías dinámicas
   useEffect(() => {
     const loadCategorias = async () => {
@@ -123,6 +133,10 @@ export const FiltersPanel = ({
     const emptyFilters: ServicioFilters = {};
     setLocalFilters(emptyFilters);
     onFiltersChange(emptyFilters);
+    // En móvil, cerrar el panel después de limpiar filtros
+    if (onClose && window.innerWidth < 1024) {
+      setTimeout(() => onClose(), 300);
+    }
   };
 
   if (!isOpen) return null;
@@ -130,22 +144,26 @@ export const FiltersPanel = ({
   return (
     <>
       {/* Overlay para móvil */}
-      {onClose && (
+      {onClose && isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
+          role="button"
+          aria-label="Cerrar panel de filtros"
         />
       )}
 
       {/* Panel lateral */}
       <div
         className={`
-          fixed lg:sticky top-0 left-0 h-screen lg:h-auto
-          w-80 bg-white dark:bg-gray-800 
-          shadow-xl lg:shadow-none
+          fixed lg:relative lg:sticky top-0 left-0 
+          h-screen lg:h-auto max-h-screen lg:max-h-none
+          w-80 max-w-[80vw] lg:max-w-none
+          bg-white dark:bg-gray-800 
+          shadow-xl lg:shadow-lg lg:border lg:border-gray-200 lg:dark:border-gray-700 lg:rounded-lg
           z-50 lg:z-0
           overflow-y-auto
-          transform transition-transform duration-300
+          transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
@@ -166,7 +184,9 @@ export const FiltersPanel = ({
             {onClose && (
               <button
                 onClick={onClose}
-                className="lg:hidden p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                title="Cerrar filtros"
+                aria-label="Cerrar panel de filtros"
               >
                 <CloseIcon />
               </button>

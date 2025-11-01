@@ -41,7 +41,13 @@ const HeroSection = ({ data }: HeroSectionProps) => {
   const { theme: currentTheme } = useTheme();
 
   // Usar datos proporcionados o configuración predeterminada como fallback
-  const heroData: HeroData = data || DEFAULT_HERO_CONFIG;
+  const rawHeroData: HeroData = data || DEFAULT_HERO_CONFIG;
+  
+  // Validar y corregir ctaLink para asegurar navegación correcta
+  const heroData: HeroData = {
+    ...rawHeroData,
+    ctaLink: rawHeroData.ctaLink?.startsWith('#') ? '/servicios' : (rawHeroData.ctaLink || '/servicios')
+  };
 
   // Obtener la imagen correcta según el tema activo
   const getCurrentBackgroundImage = () => {

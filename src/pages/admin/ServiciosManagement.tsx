@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useServicios } from '../../hooks/useServicios';
 import { useNotification } from '../../hooks/useNotification';
 import { useVirtualPagination } from '../../hooks/useVirtualPagination';
+import { useAuth } from '../../contexts/AuthContext';
 import { FiltersPanel } from '../../components/servicios/FiltersPanel';
 import { SortSelector } from '../../components/servicios/SortSelector';
 import { ServicioCard } from '../../components/servicios/ServicioCard';
@@ -54,6 +55,12 @@ const RefreshIcon = () => (
   </svg>
 );
 
+const ArrowLeftIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+  </svg>
+);
+
 // ============================================
 // COMPONENTE PRINCIPAL
 // ============================================
@@ -61,6 +68,10 @@ const RefreshIcon = () => (
 export const ServiciosManagementOptimized = () => {
   const navigate = useNavigate();
   const { success, error: showError } = useNotification();
+  const { shouldUseClientDashboard } = useAuth();
+
+  // Determinar la ruta correcta del dashboard según el tipo de usuario
+  const dashboardPath = shouldUseClientDashboard ? '/dashboard/client' : '/dashboard/admin';
 
   // ============================================
   // ESTADOS
@@ -249,41 +260,62 @@ export const ServiciosManagementOptimized = () => {
         {/* Header */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+            <div className="flex-1 min-w-0">
+              {/* Breadcrumb Navigation */}
+              <nav className="flex items-center gap-1 sm:gap-2 mb-3" aria-label="Breadcrumb">
+                <button
+                  onClick={() => navigate(dashboardPath)}
+                  className="inline-flex items-center gap-1.5 px-2 py-1.5 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+                >
+                  <ArrowLeftIcon />
+                  <span className="hidden xs:inline">
+                    {shouldUseClientDashboard ? 'Panel Cliente' : 'Dashboard Admin'}
+                  </span>
+                  <span className="xs:hidden">🏠</span>
+                </button>
+                <span className="text-gray-400 dark:text-gray-600 text-sm">/</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white px-2 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                  📋 <span className="hidden sm:inline">Gestión de </span>Servicios
+                </span>
+              </nav>
+
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                 📋 Gestión de Servicios
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 {totalItems} servicios totales
                 {activeFiltersCount > 0 && ` • ${activeFiltersCount} filtro${activeFiltersCount > 1 ? 's' : ''} activo${activeFiltersCount > 1 ? 's' : ''}`}
               </p>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className="px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 disabled:opacity-50 flex-shrink-0"
                 title="Refrescar"
               >
                 <RefreshIcon />
+                <span className="hidden sm:inline">Refrescar</span>
               </button>
               
               <button
                 onClick={() => setShowCategoriesModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm"
+                className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm flex-shrink-0"
                 title="Gestionar Categorías"
               >
                 <span>🏷️</span>
+                <span className="hidden md:inline">Categorías</span>
                 <span className="hidden lg:inline">Gestionar Categorías</span>
               </button>
               
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-sm"
+                className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-sm flex-1 sm:flex-none justify-center sm:justify-start"
               >
                 <PlusIcon />
                 <span className="hidden sm:inline">Nuevo Servicio</span>
+                <span className="sm:hidden">Nuevo</span>
               </button>
             </div>
           </div>
@@ -301,19 +333,25 @@ export const ServiciosManagementOptimized = () => {
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`
-                px-4 py-2 rounded-lg border transition-colors flex items-center gap-2
+                px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 relative
                 ${showFilters
                   ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300'
                   : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }
               `}
+              title={showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
             >
               <FilterIcon />
-              <span>Filtros</span>
+              <span className="hidden sm:inline">Filtros</span>
+              <span className="sm:hidden">{showFilters ? 'Ocultar' : 'Filtros'}</span>
               {activeFiltersCount > 0 && (
                 <span className="px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
                   {activeFiltersCount}
                 </span>
+              )}
+              {/* Indicador visual de estado en móvil */}
+              {showFilters && (
+                <span className="lg:hidden absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></span>
               )}
             </button>
 
@@ -354,21 +392,28 @@ export const ServiciosManagementOptimized = () => {
         </div>
 
         {/* Layout con Filtros y Contenido lado a lado */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 relative">
           {/* Panel de filtros - Sidebar */}
-          {showFilters && (
-            <div className="w-full lg:w-80 flex-shrink-0">
-              <div className="lg:sticky lg:top-6">
-                <FiltersPanel
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                />
-              </div>
+          <div className={`
+            ${showFilters ? 'block' : 'hidden'} lg:block
+            w-full lg:w-80 flex-shrink-0
+          `}>
+            <div className="lg:sticky lg:top-6">
+              <FiltersPanel
+                filters={filters}
+                onFiltersChange={setFilters}
+                onClose={() => setShowFilters(false)}
+                isOpen={showFilters}
+                resultCount={totalItems}
+              />
             </div>
-          )}
+          </div>
 
           {/* Contenido principal */}
-          <div className="flex-1 min-w-0">
+          <div className={`
+            flex-1 min-w-0 
+            ${showFilters ? 'lg:ml-0' : 'lg:ml-0'}
+          `}>
             {/* Contenido */}
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">

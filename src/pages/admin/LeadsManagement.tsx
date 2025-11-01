@@ -134,48 +134,52 @@ const LeadsManagement: React.FC = () => {
     <SmartDashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white truncate">
               💼 Gestión de Leads
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400 line-clamp-2">
               Administra y da seguimiento a todos tus contactos y oportunidades de negocio
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
-            {/* Toggle Vista */}
-            <div className="flex bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            {/* Toggle Vista - Responsive */}
+            <div className="flex bg-gray-200 dark:bg-gray-700 rounded-lg p-1 flex-1 sm:flex-none">
               <button
                 onClick={() => setShowStats(false)}
-                className={`px-4 py-2 rounded-lg transition-all ${
+                className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg transition-all text-sm ${
                   !showStats 
                     ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow' 
                     : 'text-gray-600 dark:text-gray-400'
                 }`}
               >
-                📋 Lista
+                <span className="hidden sm:inline">📋 Lista</span>
+                <span className="sm:hidden">📋</span>
               </button>
               <button
                 onClick={() => setShowStats(true)}
-                className={`px-4 py-2 rounded-lg transition-all ${
+                className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg transition-all text-sm ${
                   showStats 
                     ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow' 
                     : 'text-gray-600 dark:text-gray-400'
                 }`}
               >
-                📊 Estadísticas
+                <span className="hidden sm:inline">📊 Estadísticas</span>
+                <span className="sm:hidden">📊</span>
               </button>
             </div>
 
             {hasPermission('MANAGE_CONTENT') && !showStats && (
               <Button
                 onClick={handleCreateLead}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex-shrink-0"
+                size="sm"
               >
-                <span className="mr-2">➕</span>
-                Nuevo Lead
+                <span className="mr-1 sm:mr-2">➕</span>
+                <span className="hidden sm:inline">Nuevo Lead</span>
+                <span className="sm:hidden">Nuevo</span>
               </Button>
             )}
           </div>
@@ -188,106 +192,127 @@ const LeadsManagement: React.FC = () => {
         ) : (
           <>
             {/* Estadísticas rápidas */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Total Leads</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{pagination.totalRecords}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 truncate">Total Leads</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-900 dark:text-blue-100">{pagination.totalRecords}</p>
               </div>
-              <div className="text-4xl">📊</div>
+              <div className="text-2xl sm:text-4xl flex-shrink-0">📊</div>
             </div>
           </Card>
 
           <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">Nuevos</p>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-green-600 dark:text-green-400 truncate">Nuevos</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-900 dark:text-green-100">
                   {leads.filter(l => l.estado === 'nuevo').length}
                 </p>
               </div>
-              <div className="text-4xl">🆕</div>
+              <div className="text-2xl sm:text-4xl flex-shrink-0">🆕</div>
             </div>
           </Card>
 
           <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-orange-600 dark:text-orange-400">En Proceso</p>
-                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-orange-600 dark:text-orange-400 truncate">En Proceso</p>
+                <p className="text-lg sm:text-2xl font-bold text-orange-900 dark:text-orange-100">
                   {leads.filter(l => ['contactado', 'calificado', 'propuesta', 'negociacion'].includes(l.estado)).length}
                 </p>
               </div>
-              <div className="text-4xl">⚡</div>
+              <div className="text-2xl sm:text-4xl flex-shrink-0">⚡</div>
             </div>
           </Card>
 
           <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Ganados</p>
-                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-purple-600 dark:text-purple-400 truncate">Ganados</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-900 dark:text-purple-100">
                   {leads.filter(l => l.estado === 'ganado').length}
                 </p>
               </div>
-              <div className="text-4xl">🎯</div>
+              <div className="text-2xl sm:text-4xl flex-shrink-0">🎯</div>
             </div>
           </Card>
         </div>
 
         {/* Filtros y Búsqueda */}
         <Card>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {/* Búsqueda */}
-            <div className="md:col-span-2">
+          <div className="space-y-4">
+            {/* Primera fila: Búsqueda (siempre en su propia fila en móvil) */}
+            <div>
               <input
                 type="text"
                 placeholder="🔍 Buscar por nombre, email, empresa..."
                 value={filters.search || ''}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            {/* Filtro Estado */}
-            <select
-              value={filters.estado || 'all'}
-              onChange={(e) => handleFilterChange('estado', e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">Todos los estados</option>
-              <option value="nuevo">Nuevo</option>
-              <option value="contactado">Contactado</option>
-              <option value="calificado">Calificado</option>
-              <option value="propuesta">Propuesta</option>
-              <option value="negociacion">Negociación</option>
-              <option value="ganado">Ganado</option>
-              <option value="perdido">Perdido</option>
-              <option value="pausado">Pausado</option>
-            </select>
+            {/* Segunda fila: Filtros y botón refrescar */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {/* Filtro Estado */}
+              <select
+                value={filters.estado || 'all'}
+                onChange={(e) => handleFilterChange('estado', e.target.value)}
+                className="px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">📊 Todos los estados</option>
+                <option value="nuevo">🆕 Nuevo</option>
+                <option value="contactado">📞 Contactado</option>
+                <option value="calificado">✅ Calificado</option>
+                <option value="propuesta">📋 Propuesta</option>
+                <option value="negociacion">🤝 Negociación</option>
+                <option value="ganado">🎯 Ganado</option>
+                <option value="perdido">❌ Perdido</option>
+                <option value="pausado">⏸️ Pausado</option>
+              </select>
 
-            {/* Filtro Prioridad */}
-            <select
-              value={filters.prioridad || 'all'}
-              onChange={(e) => handleFilterChange('prioridad', e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">Todas las prioridades</option>
-              <option value="urgente">🔥 Urgente</option>
-              <option value="alta">⬆️ Alta</option>
-              <option value="media">➡️ Media</option>
-              <option value="baja">⬇️ Baja</option>
-            </select>
+              {/* Filtro Prioridad */}
+              <select
+                value={filters.prioridad || 'all'}
+                onChange={(e) => handleFilterChange('prioridad', e.target.value)}
+                className="px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">🎯 Todas</option>
+                <option value="urgente">🔥 Urgente</option>
+                <option value="alta">⬆️ Alta</option>
+                <option value="media">➡️ Media</option>
+                <option value="baja">⬇️ Baja</option>
+              </select>
 
-            {/* Botón Refrescar */}
-            <Button
-              onClick={refresh}
-              variant="ghost"
-              className="flex items-center justify-center gap-2"
-            >
-              🔄 Refrescar
-            </Button>
+              {/* Filtro Origen (nuevo filtro útil) */}
+              <select
+                value={filters.origen || 'all'}
+                onChange={(e) => handleFilterChange('origen', e.target.value)}
+                className="px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">🌐 Todos los orígenes</option>
+                <option value="web">🌐 Sitio Web</option>
+                <option value="facebook">📘 Facebook</option>
+                <option value="instagram">📷 Instagram</option>
+                <option value="google">🔍 Google</option>
+                <option value="referido">👥 Referido</option>
+                <option value="directo">📞 Directo</option>
+                <option value="otro">📋 Otro</option>
+              </select>
+
+              {/* Botón Refrescar */}
+              <Button
+                onClick={refresh}
+                variant="ghost"
+                className="flex items-center justify-center gap-2 text-sm sm:text-base"
+                size="sm"
+              >
+                <span>🔄</span>
+                <span className="hidden sm:inline">Refrescar</span>
+              </Button>
+            </div>
           </div>
         </Card>
 
@@ -483,9 +508,18 @@ const LeadsManagement: React.FC = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            handleViewLead(lead);
+                          }}
+                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors font-medium"
+                        >
+                          👁️ Ver
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
                             handleEditLead(lead);
                           }}
-                          className="flex-1 py-2 text-sm text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg transition-colors"
+                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg transition-colors font-medium"
                         >
                           ✏️ Editar
                         </button>
@@ -494,9 +528,9 @@ const LeadsManagement: React.FC = () => {
                             e.stopPropagation();
                             handleDeleteLead(lead);
                           }}
-                          className="flex-1 py-2 text-sm text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors"
+                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors font-medium"
                         >
-                          🗑️ Eliminar
+                          🗑️
                         </button>
                       </div>
                     )}
@@ -506,29 +540,50 @@ const LeadsManagement: React.FC = () => {
 
               {/* Paginación */}
               {pagination.total > 1 && (
-                <div className="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
-                    Mostrando {pagination.count} de {pagination.totalRecords} leads
+                <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  {/* Info en móvil centrada */}
+                  <div className="text-center sm:text-left mb-4 sm:mb-0">
+                    <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                      Mostrando {pagination.count} de {pagination.totalRecords} leads
+                    </div>
                   </div>
-                  <div className="flex gap-2">
+                  
+                  {/* Controles de paginación */}
+                  <div className="flex items-center justify-center sm:justify-end gap-1 sm:gap-2">
                     <Button
                       onClick={() => changePage(pagination.current - 1)}
                       disabled={pagination.current === 1}
                       variant="ghost"
                       size="sm"
+                      className="text-xs sm:text-sm px-2 sm:px-3"
                     >
-                      ← Anterior
+                      <span className="sm:hidden">←</span>
+                      <span className="hidden sm:inline">← Anterior</span>
                     </Button>
+                    
                     <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, pagination.total) }, (_, i) => {
-                        const page = i + 1;
+                      {Array.from({ length: Math.min(3, pagination.total) }, (_, i) => {
+                        let page;
+                        if (pagination.total <= 3) {
+                          page = i + 1;
+                        } else {
+                          // Lógica para mostrar páginas alrededor de la actual
+                          if (pagination.current <= 2) {
+                            page = i + 1;
+                          } else if (pagination.current >= pagination.total - 1) {
+                            page = pagination.total - 2 + i;
+                          } else {
+                            page = pagination.current - 1 + i;
+                          }
+                        }
+                        
                         return (
                           <button
                             key={page}
                             onClick={() => changePage(page)}
-                            className={`px-3 py-1 rounded text-sm ${
+                            className={`w-8 h-8 sm:w-10 sm:h-10 rounded text-xs sm:text-sm font-medium transition-colors ${
                               pagination.current === page
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-blue-600 text-white shadow-md'
                                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                             }`}
                           >
@@ -537,13 +592,16 @@ const LeadsManagement: React.FC = () => {
                         );
                       })}
                     </div>
+                    
                     <Button
                       onClick={() => changePage(pagination.current + 1)}
                       disabled={pagination.current === pagination.total}
                       variant="ghost"
                       size="sm"
+                      className="text-xs sm:text-sm px-2 sm:px-3"
                     >
-                      Siguiente →
+                      <span className="sm:hidden">→</span>
+                      <span className="hidden sm:inline">Siguiente →</span>
                     </Button>
                   </div>
                 </div>

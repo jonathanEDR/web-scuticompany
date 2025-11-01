@@ -212,6 +212,10 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
           
           <Link
             to={`/servicios/${servicio.slug || servicio._id}`}
+            onClick={() => {
+              // Ensure scroll to top when navigating
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }}
             className="
               bg-gradient-to-r from-purple-600 to-blue-600 
               hover:from-purple-700 hover:to-blue-700

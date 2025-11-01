@@ -10,6 +10,7 @@ import { DashboardProviders } from './components/DashboardProviders';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRoute from './components/RoleBasedRoute';
 import DashboardRouter from './components/DashboardRouter';
+import ScrollToTop from './components/common/ScrollToTop';
 import { UserRole } from './types/roles';
 import './App.css';
 
@@ -94,10 +95,11 @@ function App() {
           {/* 🔔 Sistema de notificaciones global */}
           <NotificationProvider>
             <BrowserRouter>
-            <Suspense fallback={<LoadingSpinner />}>
-              <Routes>
-              {/* ⚡ PÁGINAS PÚBLICAS - SIN CLERK, CARGA INSTANTÁNEA */}
-              <Route path="/" element={<Home />} />
+              <ScrollToTop />
+              <Suspense fallback={<LoadingSpinner />}>
+                <Routes>
+                  {/* ⚡ PÁGINAS PÚBLICAS - SIN CLERK, CARGA INSTANTÁNEA */}
+                  <Route path="/" element={<Home />} />
               <Route path="/nosotros" element={<About />} />
               <Route path="/servicios" element={<ServicesPublic />} />
               <Route path="/servicios/:slug" element={<ServicioDetail />} />

@@ -31,6 +31,35 @@ const PublicHeaderOptimized = () => {
   // Hook personalizado para detectar usuario de Clerk
   const { userData, getUserInitials } = useClerkDetection();
 
+  // Función para hacer scroll suave hacia la sección de contacto
+  const scrollToContact = () => {
+    // Buscar la sección de contacto
+    const contactElement = document.getElementById('contacto');
+    
+    if (contactElement) {
+      // Si encuentra la sección, hacer scroll suave
+      contactElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    } else if (window.location.pathname === '/') {
+      // Si está en home pero no encuentra la sección, esperar y reintentar
+      setTimeout(() => {
+        const element = document.getElementById('contacto');
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 100);
+    } else {
+      // Si está en otra página, navegar al home con hash
+      navigate('/#contacto');
+    }
+  };
+
+  // Efecto para controlar la visibilidad del navbar
   useEffect(() => {
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
@@ -49,6 +78,21 @@ const PublicHeaderOptimized = () => {
     window.addEventListener('scroll', controlNavbar);
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [lastScrollY]);
+
+  // Efecto para manejar navegación con hash (ej: /#contacto)
+  useEffect(() => {
+    if (window.location.hash === '#contacto') {
+      setTimeout(() => {
+        const contactElement = document.getElementById('contacto');
+        if (contactElement) {
+          contactElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 300);
+    }
+  }, []);
 
   return (
     <header 
@@ -159,8 +203,8 @@ const PublicHeaderOptimized = () => {
             </Link>
 
             {/* CONTÁCTANOS en navegación - Solo visible en móvil */}
-            <Link 
-              to="/contacto"
+            <button 
+              onClick={scrollToContact}
               className="sm:hidden px-4 py-1.5 rounded-full transition-all duration-300 font-medium text-xs border-2"
               style={{
                 borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
@@ -179,7 +223,7 @@ const PublicHeaderOptimized = () => {
               }}
             >
               CONTÁCTANOS
-            </Link>
+            </button>
           </nav>
 
           {/* Actions Desktop - Toggle de tema + CONTÁCTANOS + Avatar */}
@@ -202,8 +246,8 @@ const PublicHeaderOptimized = () => {
             </button>
             
             {/* CONTÁCTANOS - Color rosado en tema blanco */}
-            <Link 
-              to="/contacto"
+            <button 
+              onClick={scrollToContact}
               className="px-3 py-1.5 rounded-full transition-all duration-300 font-medium text-xs border-2"
               style={{
                 borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
@@ -222,7 +266,7 @@ const PublicHeaderOptimized = () => {
               }}
             >
               CONTÁCTANOS
-            </Link>
+            </button>
 
             {/* Avatar del usuario - Solo si está logueado */}
             {userData ? (

@@ -276,6 +276,10 @@ export const ServicioCard: React.FC<ServicioCardProps> = ({
         ) : (
           <Link
             to={`/servicios/${servicio.slug || servicio._id}`}
+            onClick={() => {
+              // Ensure scroll to top when navigating
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }}
             className="block w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-lg transition-all font-semibold shadow-lg hover:shadow-purple-500/50"
           >
             Ver detalles →

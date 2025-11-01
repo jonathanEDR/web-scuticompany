@@ -53,36 +53,30 @@ export default function SmartDashboardLayout({ children }: SmartDashboardLayoutP
               : 'ml-12'
         }`}
       >
-        {isMobile && (
-          <div className="md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-10 transition-colors duration-300">
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className={`p-2 text-white rounded-lg transition-all duration-200 shadow-lg ${
-                  useClientSidebar
-                    ? 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              <div className="flex items-center gap-2">
-                <img 
-                  src="/logos/logo-dark.svg" 
-                  alt="Web Scuti" 
-                  className="h-8 w-auto dark:invert"
-                />
-                <span className="font-bold text-slate-800 dark:text-white">
-                  {useClientSidebar ? 'Panel de Usuario' : 'Panel Administrativo'}
-                </span>
-              </div>
-            </div>
-          </div>
+        {/* Botón flotante para abrir menú en móvil */}
+        {isMobile && !sidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className={`
+              fixed top-4 left-4 z-50 p-3 text-white rounded-xl 
+              shadow-lg hover:shadow-xl transition-all duration-300 
+              hover:scale-110 active:scale-95
+              backdrop-blur-sm border border-white/20
+              ${useClientSidebar
+                ? 'bg-gradient-to-r from-green-500/95 to-blue-500/95 hover:from-green-600 hover:to-blue-600'
+                : 'bg-gradient-to-r from-blue-600/95 to-purple-600/95 hover:from-blue-700 hover:to-purple-700'
+              }
+            `}
+            aria-label="Abrir menú de navegación"
+            title="Abrir menú"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         )}
 
-        <main className="p-4 md:p-6">
+        <main className={`p-4 md:p-6 ${isMobile && !sidebarOpen ? 'pt-20' : ''}`}>
           {children}
         </main>
       </div>

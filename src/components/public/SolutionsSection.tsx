@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_SOLUTIONS_CONFIG } from '../../utils/defaultConfig';
@@ -498,8 +499,11 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
 
         {/* Botón "Ver más..." según maqueta */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center">
-          <button
-            className="group relative px-8 py-3 rounded-full overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75"
+          <Link
+            to="/servicios"
+            role="button"
+            aria-label="Ver más servicios - Ir a la página de servicios"
+            className="group relative inline-block px-8 py-3 rounded-full overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75"
             style={{
               background: viewMoreButtonStyles.background,
               color: viewMoreButtonStyles.textColor,
@@ -510,9 +514,6 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
               fontSize: '0.875rem',
               boxShadow: '0 4px 15px rgba(117, 40, 238, 0.3)'
             }}
-            onClick={() => {
-              // Aquí puedes agregar navegación o modal
-            }}
           >
             <span className="relative flex items-center space-x-2">
               <span>{viewMoreButtonStyles.text || 'Ver más...'}</span>
@@ -520,7 +521,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </span>
-          </button>
+          </Link>
         </div>
       </div>
       

@@ -27,6 +27,16 @@ export const ServicioDetail: React.FC = () => {
     fallbackDescription: servicio?.descripcionCorta || 'Servicios profesionales de desarrollo de software'
   });
 
+  // Ensure scroll to top when component mounts or slug changes
+  useEffect(() => {
+    // Scroll to top with a small delay to ensure proper rendering
+    const scrollTimeout = setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }, 150);
+
+    return () => clearTimeout(scrollTimeout);
+  }, [slug]);
+
   useEffect(() => {
     const fetchServicio = async () => {
       if (!slug) {
@@ -50,6 +60,12 @@ export const ServicioDetail: React.FC = () => {
           setError('Este servicio no está disponible actualmente');
         } else {
           setServicio(servicioEncontrado);
+          // Ensure we're at the top after content loads
+          setTimeout(() => {
+            if (window.scrollY > 100) {
+              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            }
+          }, 300);
         }
       } catch (err) {
         setError('Error al cargar el servicio');
