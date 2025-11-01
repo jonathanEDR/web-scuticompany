@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { debugApiConfig, testApiConnection } from '../../utils/debugApi';
+import { debugApiConfig } from '../../utils/debugApi';
 import { API_CONFIG, getBackendUrl, getApiUrl } from '../../utils/apiConfig';
 
 interface TestResult {
