@@ -11,6 +11,7 @@ import PublicFooter from '../../components/public/PublicFooter';
 import ContactModal from '../../components/public/ContactModal';
 import { useSeo } from '../../hooks/useSeo';
 import type { Servicio } from '../../types/servicios';
+import { debugApiConfig, testApiConnection } from '../../utils/debugApi';
 
 export const ServicioDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -37,20 +38,42 @@ export const ServicioDetail: React.FC = () => {
 
       try {
         setLoading(true);
+        
+        // DEBUG: En caso de error, mostrar información detallada
+        console.log('🔍 ServicioDetail - Debugging info:');
+        debugApiConfig();
+        
         // Intentar buscar por slug primero, luego por ID
+        console.log('📡 Fetching servicios from API...');
         const response = await serviciosApi.getAll();
+        console.log('✅ API Response:', response);
+        
         const servicioEncontrado = response.data.find(s => 
           s.slug === slug || s._id === slug
         );
 
         if (!servicioEncontrado) {
+          console.error('❌ Servicio no encontrado:', { slug, availableServices: response.data.length });
           setError('Servicio no encontrado');
         } else if (!servicioEncontrado.activo || !servicioEncontrado.visibleEnWeb) {
+          console.error('❌ Servicio no disponible:', { 
+            slug, 
+            activo: servicioEncontrado.activo, 
+            visibleEnWeb: servicioEncontrado.visibleEnWeb 
+          });
           setError('Este servicio no está disponible actualmente');
         } else {
+          console.log('✅ Servicio encontrado:', servicioEncontrado);
           setServicio(servicioEncontrado);
         }
       } catch (err) {
+        console.error('❌ Error al cargar servicio:', err);
+        
+        // Ejecutar test de conectividad en caso de error
+        testApiConnection().catch(testErr => 
+          console.error('❌ Connection test failed:', testErr)
+        );
+        
         setError('Error al cargar el servicio');
       } finally {
         setLoading(false);
