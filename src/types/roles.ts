@@ -238,6 +238,25 @@ export interface SyncUserResponse {
   user: UserWithRole;
   synced: boolean;
   message?: string;
+  leadLinking?: {
+    success: boolean;
+    message: string;
+    leadsLinked: number;
+    linkedLeads?: Array<{
+      id: string;
+      nombre: string;
+    }>;
+  };
+  onboarding?: {
+    success: boolean;
+    message: string;
+    onboarding?: {
+      leadCreated: boolean;
+      messagesSent: number;
+      leadId: string;
+      leadName: string;
+    };
+  };
 }
 
 /**

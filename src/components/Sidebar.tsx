@@ -1,9 +1,11 @@
 import { SignOutButton } from '@clerk/clerk-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole, Permission } from '../types/roles';
 import RoleBadge from './RoleBadge';
+import { messageService } from '../services/messageService';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -25,6 +27,30 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, role, hasPermission, canAccessAdmin, shouldUseClientDashboard: isClientUser } = useAuth();
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadUnread = async () => {
+      try {
+        const response = await messageService.getUnreadMessages();
+        if (!mounted) return;
+        if (response && response.success && response.data) {
+          setUnreadCount(response.data.total || (response.data.mensajes || []).length || 0);
+        }
+      } catch (error) {
+        // No bloquear la UI por errores de badge
+        // console.warn('[Sidebar] error cargando mensajes no leídos', error);
+      }
+    };
+
+    loadUnread();
+    const interval = setInterval(loadUnread, 60000); // poll cada 60s
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   // Definir items del menú con control de acceso
   const menuItems: MenuItem[] = [
@@ -68,6 +94,14 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       permission: Permission.MANAGE_CONTENT,
       adminOnly: true,
       // Solo roles administrativos - CRM para gestión de clientes potenciales
+    },
+    {
+      name: 'Mensajería',
+      icon: '💬',
+      path: '/dashboard/crm/messages',
+      description: 'Sistema de mensajería CRM',
+      permission: Permission.MANAGE_CONTENT,
+      adminOnly: true,
     },
     {
       name: 'Media Library',
@@ -260,6 +294,14 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                           {item.description}
                         </div>
                       </div>
+                      {/* Badge de no leídos para Mensajería */}
+                      {item.path === '/dashboard/crm/messages' && unreadCount > 0 && (
+                        <div className="ml-2">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-600 text-white">
+                            {unreadCount}
+                          </span>
+                        </div>
+                      )}
                       {isActive && (
                         <div className="w-1.5 h-1.5 bg-white rounded-full shadow-lg shadow-white/50 animate-pulse"></div>
                       )}
@@ -279,7 +321,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       key={item.path}
                       onClick={() => handleNavigation(item.path)}
                       className={`
-                        group w-full flex items-center justify-center p-2.5 rounded-lg transition-all duration-200
+                        relative group w-full flex items-center justify-center p-2.5 rounded-lg transition-all duration-200
                         ${isActive
                           ? 'bg-gradient-to-r from-blue-500 to-purple-500 dark:from-purple-600 dark:to-pink-600 text-white shadow-lg scale-105'
                           : 'text-slate-700 dark:text-gray-200 hover:bg-slate-100/80 dark:hover:bg-gray-800/80 hover:text-slate-900 dark:hover:text-white hover:scale-105'
@@ -290,6 +332,11 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       <span className="text-lg">
                         {item.icon}
                       </span>
+                      {item.path === '/dashboard/crm/messages' && unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-semibold bg-red-600 text-white rounded-full">
+                          {unreadCount}
+                        </span>
+                      )}
                     </button>
                   );
                 })}

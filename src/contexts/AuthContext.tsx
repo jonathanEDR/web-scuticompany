@@ -35,6 +35,11 @@ interface AuthContextType {
   canAccessAdmin: boolean;
   shouldUseClientDashboard: boolean;
   
+  // Onboarding
+  showWelcomeNotification: boolean;
+  onboardingData: any;
+  dismissWelcomeNotification: () => void;
+  
   // Métodos
   refreshUser: () => Promise<void>;
   clearError: () => void;
@@ -60,6 +65,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserWithRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showWelcomeNotification, setShowWelcomeNotification] = useState(false);
+  const [onboardingData, setOnboardingData] = useState<any>(null);
 
   /**
    * Sincroniza el usuario de Clerk con MongoDB
@@ -100,9 +107,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       };
 
       // Obtener o sincronizar usuario con backend
-      const syncedUser = await authService.getOrSyncUser(token, userData);
+      const syncResponse = await authService.getOrSyncUserWithOnboarding(token, userData);
       
-      setUser(syncedUser);
+      setUser(syncResponse.user);
+      
+      // 🎉 Verificar si hay onboarding para mostrar notificación
+      if (syncResponse.onboarding?.success && syncResponse.onboarding.onboarding) {
+        setOnboardingData(syncResponse.onboarding.onboarding);
+        setShowWelcomeNotification(true);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al sincronizar usuario';
       console.error('[AuthContext] Error:', errorMessage, err);
@@ -133,6 +146,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const clearError = () => {
     setError(null);
+  };
+
+  /**
+   * Cerrar notificación de bienvenida
+   */
+  const dismissWelcomeNotification = () => {
+    setShowWelcomeNotification(false);
+    setOnboardingData(null);
   };
 
   // ============================================
@@ -207,6 +228,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Verificaciones de acceso
     canAccessAdmin,
     shouldUseClientDashboard: shouldUseClient,
+    
+    // Onboarding
+    showWelcomeNotification,
+    onboardingData,
+    dismissWelcomeNotification,
     
     // Métodos
     refreshUser,

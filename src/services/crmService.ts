@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { messageService, templateService } from './messageService';
 
 // Declaración de tipo para Clerk en window
 declare global {
@@ -291,6 +292,20 @@ export const crmService = {
   },
 
   /**
+   * 🏠 Obtener leads del cliente autenticado
+   * GET /api/crm/cliente/mis-leads
+   */
+  getClientLeads: async (): Promise<ApiResponse<{ leads: Lead[] }>> => {
+    try {
+      const response = await api.get('/cliente/mis-leads');
+      return response.data;
+    } catch (error: any) {
+      console.error('Error obteniendo leads del cliente:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
    * 📅 Obtener leads pendientes de seguimiento
    */
   getPendingLeads: async (): Promise<ApiResponse<Lead[]>> => {
@@ -384,6 +399,37 @@ export const validarEmail = (email: string): boolean => {
 export const validarCelular = (celular: string): boolean => {
   const regex = /^\+?[\d\s-]{8,}$/;
   return regex.test(celular);
+};
+
+// ========================================
+// 💬 INTEGRACIÓN CON SISTEMA DE MENSAJERÍA
+// ========================================
+
+/**
+ * Métodos de mensajería integrados con CRM
+ */
+export const crmMessaging = {
+  // Mensajes
+  getMessages: messageService.getLeadMessages,
+  sendInternal: messageService.sendInternalMessage,
+  sendClient: messageService.sendClientMessage,
+  reply: messageService.replyMessage,
+  markRead: messageService.markAsRead,
+  deleteMessage: messageService.deleteMessage,
+  getUnread: messageService.getUnreadMessages,
+  search: messageService.searchMessages,
+
+  // Plantillas
+  templates: {
+    getAll: templateService.getTemplates,
+    getOne: templateService.getTemplate,
+    create: templateService.createTemplate,
+    update: templateService.updateTemplate,
+    delete: templateService.deleteTemplate,
+    use: templateService.useTemplate,
+    toggleFavorite: templateService.toggleFavorite,
+    getStats: templateService.getTemplateStats,
+  },
 };
 
 export default crmService;

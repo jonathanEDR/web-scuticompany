@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActivityTimeline } from './ActivityTimeline';
 import { StatusBadge, PriorityBadge, OrigenBadge } from './Badges';
+import { MessageTimeline } from './messages/MessageTimeline';
+import { MessageComposer } from './messages/MessageComposer';
 import type { Lead } from '../../services/crmService';
+import type { LeadMessage, MessageTemplate } from '../../types/message.types';
+import { messageService, templateService } from '../../services/messageService';
 
 interface LeadDetailModalProps {
   isOpen: boolean;
@@ -12,7 +16,7 @@ interface LeadDetailModalProps {
   onAddActivity?: (leadId: string, tipo: string, descripcion: string) => Promise<void>;
 }
 
-type TabType = 'general' | 'activities' | 'history';
+type TabType = 'general' | 'activities' | 'messages' | 'history';
 
 /**
  * 🔍 Modal de vista detallada del Lead
@@ -29,7 +33,161 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   const [newActivity, setNewActivity] = useState({ tipo: 'nota', descripcion: '' });
   const [isAddingActivity, setIsAddingActivity] = useState(false);
 
+  // ========================================
+  // 📩 MENSAJERÍA STATE
+  // ========================================
+  const [messages, setMessages] = useState<LeadMessage[]>([]);
+  const [templates, setTemplates] = useState<MessageTemplate[]>([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showComposer, setShowComposer] = useState(false);
+  const [composerType, setComposerType] = useState<'internal' | 'client'>('internal');
+
+  // ========================================
+  // 🔄 EFFECTS - Cargar mensajes cuando se abre el modal
+  // ========================================
+  useEffect(() => {
+    if (isOpen && lead) {
+      loadMessages();
+      loadTemplates();
+    }
+  }, [isOpen, lead]);
+
   if (!isOpen || !lead) return null;
+
+  // ========================================
+  // 📩 MENSAJERÍA FUNCTIONS
+  // ========================================
+
+  /**
+   * Cargar mensajes del lead
+   */
+  const loadMessages = async () => {
+    if (!lead) return;
+    
+    setIsLoadingMessages(true);
+    try {
+      const response = await messageService.getLeadMessages(lead._id);
+      if (response.success && response.data) {
+        setMessages(response.data.mensajes || []);
+        // Contar no leídos
+        const unread = (response.data.mensajes || []).filter(
+          (msg: LeadMessage) => !msg.leido && msg.tipo !== 'nota_interna'
+        ).length;
+        setUnreadCount(unread);
+      }
+    } catch (error) {
+      console.error('Error al cargar mensajes:', error);
+    } finally {
+      setIsLoadingMessages(false);
+    }
+  };
+
+  /**
+   * Cargar plantillas disponibles
+   */
+  const loadTemplates = async () => {
+    try {
+      const response = await templateService.getTemplates();
+      if (response.success && response.data) {
+        setTemplates(response.data.plantillas || []);
+      }
+    } catch (error) {
+      console.error('Error al cargar plantillas:', error);
+    }
+  };
+
+  /**
+   * Enviar mensaje
+   */
+  const handleSendMessage = async (data: {
+    contenido: string;
+    prioridad?: string;
+    etiquetas?: string[];
+  }) => {
+    if (!lead) return;
+
+    try {
+      let response;
+      
+      if (composerType === 'internal') {
+        response = await messageService.sendInternalMessage({
+          leadId: lead._id,
+          contenido: data.contenido,
+          prioridad: (data.prioridad as any) || 'normal',
+          etiquetas: data.etiquetas || [],
+        });
+      } else {
+        response = await messageService.sendClientMessage({
+          leadId: lead._id,
+          contenido: data.contenido,
+          prioridad: (data.prioridad as any) || 'normal',
+        });
+      }
+
+      if (response.success) {
+        setShowComposer(false);
+        await loadMessages(); // Recargar mensajes
+      } else {
+        alert(response.message || 'Error al enviar el mensaje');
+      }
+    } catch (error) {
+      console.error('Error al enviar mensaje:', error);
+      alert('Error al enviar el mensaje');
+    }
+  };
+
+
+
+  /**
+   * Iniciar respuesta a un mensaje (solo para el timeline)
+   */
+  const handleInitReply = (messageId: string) => {
+    // El MessageTimeline manejará internamente el formulario de respuesta
+    console.log('Iniciar respuesta a mensaje:', messageId);
+  };
+
+  /**
+   * Marcar mensaje como leído
+   */
+  const handleMarkAsRead = async (messageId: string) => {
+    try {
+      const response = await messageService.markAsRead(messageId);
+      if (response.success) {
+        await loadMessages();
+      }
+    } catch (error) {
+      console.error('Error al marcar como leído:', error);
+    }
+  };
+
+  /**
+   * Eliminar mensaje
+   */
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!window.confirm('¿Estás seguro de eliminar este mensaje?')) {
+      return;
+    }
+
+    try {
+      const response = await messageService.deleteMessage(messageId);
+      if (response.success) {
+        await loadMessages();
+      } else {
+        alert(response.message || 'Error al eliminar el mensaje');
+      }
+    } catch (error) {
+      console.error('Error al eliminar mensaje:', error);
+      alert('Error al eliminar el mensaje');
+    }
+  };
+
+  /**
+   * Refrescar mensajes
+   */
+  const handleRefreshMessages = async () => {
+    await loadMessages();
+  };
 
   // ========================================
   // 🔄 HANDLERS
@@ -136,6 +294,21 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
               }`}
             >
               📋 Información General
+            </button>
+            <button
+              onClick={() => setActiveTab('messages')}
+              className={`py-3 px-4 font-medium transition-colors border-b-2 relative ${
+                activeTab === 'messages'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+              }`}
+            >
+              💬 Mensajes
+              {unreadCount > 0 && (
+                <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('activities')}
@@ -356,6 +529,80 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   <InfoField label="ID del Lead" value={lead._id} icon="🆔" />
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB: Mensajes */}
+          {activeTab === 'messages' && (
+            <div className="space-y-6">
+              {/* Botones de acción */}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => {
+                    setComposerType('internal');
+                    setShowComposer(!showComposer);
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                >
+                  📝 {showComposer && composerType === 'internal' ? 'Cancelar' : 'Nueva Nota Interna'}
+                </button>
+                <button
+                  onClick={() => {
+                    setComposerType('client');
+                    setShowComposer(!showComposer);
+                  }}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                >
+                  💬 {showComposer && composerType === 'client' ? 'Cancelar' : 'Mensaje a Cliente'}
+                </button>
+                <button
+                  onClick={handleRefreshMessages}
+                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                >
+                  🔄 Actualizar
+                </button>
+              </div>
+
+              {/* Compositor de mensajes */}
+              {showComposer && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <MessageComposer
+                    leadId={lead._id}
+                    messageType={composerType}
+                    onSend={handleSendMessage}
+                    templates={templates}
+                    onCancel={() => setShowComposer(false)}
+                  />
+                </div>
+              )}
+
+              {/* Timeline de mensajes */}
+              {isLoadingMessages ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="animate-spin text-4xl mb-2">⏳</div>
+                    <p className="text-gray-600 dark:text-gray-400">Cargando mensajes...</p>
+                  </div>
+                </div>
+              ) : messages.length > 0 ? (
+                <MessageTimeline
+                  leadId={lead._id}
+                  messages={messages}
+                  onRefresh={handleRefreshMessages}
+                  onReply={handleInitReply}
+                  onMarkAsRead={handleMarkAsRead}
+                  onDelete={handleDeleteMessage}
+                  canReply={true}
+                  canDelete={true}
+                  canViewPrivate={true}
+                />
+              ) : (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  <p className="text-4xl mb-2">💬</p>
+                  <p className="text-lg font-medium mb-2">No hay mensajes aún</p>
+                  <p className="text-sm">Crea el primer mensaje para este lead</p>
+                </div>
+              )}
             </div>
           )}
 

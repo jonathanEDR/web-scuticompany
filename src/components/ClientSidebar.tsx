@@ -35,6 +35,24 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
       description: 'Panel principal'
     },
     {
+      name: 'Mis Proyectos',
+      icon: '📊',
+      path: '/dashboard/client/leads',
+      description: 'Ver mis proyectos'
+    },
+    {
+      name: 'Mensajes',
+      icon: '💬',
+      path: '/dashboard/client/messages',
+      description: 'Comunicación con el equipo'
+    },
+    {
+      name: 'Perfil',
+      icon: '👤',
+      path: '/dashboard/profile',
+      description: 'Tu información'
+    },
+    {
       name: 'Ayuda',
       icon: '❓',
       path: '/dashboard/help',

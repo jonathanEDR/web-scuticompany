@@ -26,6 +26,7 @@ const LeadsManagement: React.FC = () => {
     selectedLead,
     createLead,
     updateLead,
+    deleteLead,
     changeStatus,
     addActivity,
     refresh
@@ -66,11 +67,22 @@ const LeadsManagement: React.FC = () => {
   };
 
   const handleDeleteLead = async (lead: Lead) => {
-    if (!window.confirm(`¿Estás seguro de eliminar el lead "${lead.nombre}"?`)) {
+    if (!window.confirm(`¿Estás seguro de eliminar el lead "${lead.nombre}"?\n\nEsta acción no se puede deshacer.`)) {
       return;
     }
-    // La eliminación se implementará con el hook
-    console.log('Eliminar lead:', lead);
+    
+    try {
+      const result = await deleteLead(lead._id);
+      if (result.success) {
+        console.log('Lead eliminado exitosamente');
+        // El hook ya actualiza automáticamente la lista local removiendo el lead
+      } else {
+        alert(result.error || 'Error al eliminar el lead');
+      }
+    } catch (error) {
+      console.error('Error eliminando lead:', error);
+      alert('Error inesperado al eliminar el lead');
+    }
   };
 
   // ========================================

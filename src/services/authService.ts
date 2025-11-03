@@ -141,7 +141,7 @@ export const authService = {
     }
   ): Promise<UserWithRole> {
     // El backend solo tiene /sync, así que usamos ese endpoint
-    return this.syncUser(token, userData);
+    return this.getUserOnly(token, userData);
   },
 
   /**
@@ -175,7 +175,7 @@ export const authService = {
       username?: string | null;
       profileImage?: string | null;
     }
-  ): Promise<UserWithRole> {
+  ): Promise<SyncUserResponse> {
     try {
       if (!token) {
         throw new Error('Token de autenticación requerido');
@@ -206,7 +206,7 @@ export const authService = {
         throw new Error(response.data.message || 'No se pudo sincronizar el usuario');
       }
 
-      return response.data.user;
+      return response.data;
     } catch (error) {
       const apiError = handleApiError(error);
       console.error('[authService.syncUser] Error:', apiError);
@@ -235,6 +235,21 @@ export const authService = {
    * });
    * ```
    */
+  async getOrSyncUserWithOnboarding(
+    token: string,
+    userData: {
+      clerkId: string;
+      email: string;
+      firstName?: string | null;
+      lastName?: string | null;
+      username?: string | null;
+      profileImage?: string | null;
+    }
+  ): Promise<SyncUserResponse> {
+    // syncUser es idempotente, así que podemos llamarlo directamente
+    return this.syncUser(token, userData);
+  },
+
   async getOrSyncUser(
     token: string,
     userData: {
@@ -246,8 +261,27 @@ export const authService = {
       profileImage?: string | null;
     }
   ): Promise<UserWithRole> {
-    // syncUser es idempotente, así que podemos llamarlo directamente
-    return this.syncUser(token, userData);
+    // Para compatibilidad, devolvemos solo el usuario
+    return this.getUserOnly(token, userData);
+  },
+
+  /**
+   * Obtiene solo el usuario (sin información de onboarding)
+   * Para compatibilidad con código existente
+   */
+  async getUserOnly(
+    token: string,
+    userData: {
+      clerkId: string;
+      email: string;
+      firstName?: string | null;
+      lastName?: string | null;
+      username?: string | null;
+      profileImage?: string | null;
+    }
+  ): Promise<UserWithRole> {
+    const response = await this.syncUser(token, userData);
+    return response.user;
   },
 
   /**

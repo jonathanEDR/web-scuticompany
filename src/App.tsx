@@ -11,7 +11,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRoute from './components/RoleBasedRoute';
 import DashboardRouter from './components/DashboardRouter';
 import ScrollToTop from './components/common/ScrollToTop';
+import WelcomeNotification from './components/WelcomeNotification';
 import { UserRole } from './types/roles';
+import { useAuth } from './contexts/AuthContext';
 import './App.css';
 
 // ⚡ Configuración de Clerk global optimizada
@@ -42,6 +44,8 @@ const Profile = lazy(() => import('./pages/Profile'));
 const Services = lazy(() => import('./pages/Services'));
 const Settings = lazy(() => import('./pages/Settings'));
 const LeadsManagement = lazy(() => import('./pages/admin/LeadsManagement'));
+// Página de mensajería CRM (admin)
+const CrmMessages = lazy(() => import('./pages/admin/CrmMessages'));
 const Help = lazy(() => import('./pages/Help'));
 const CmsManager = lazy(() => import('./pages/CmsManager'));
 const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
@@ -57,6 +61,11 @@ const PerformanceDemo = lazy(() => import('./pages/demo/PerformanceDemo'));
 const ServicioDashboard = lazy(() => import('./pages/admin/ServicioDashboard'));
 const ServiciosManagement = lazy(() => import('./pages/admin/ServiciosManagement'));
 const ServicioForm = lazy(() => import('./pages/admin/ServicioFormV3'));
+
+// Páginas del Portal Cliente
+const ClientPortal = lazy(() => import('./pages/client/ClientPortal'));
+const MyLeads = lazy(() => import('./pages/client/MyLeads'));
+const MyMessages = lazy(() => import('./pages/client/MyMessages'));
 
 // Componente de loading minimalista
 const LoadingSpinner = () => (
@@ -74,30 +83,29 @@ const LoadingSpinner = () => (
  */
 const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
   <DashboardProviders>
-    <AuthProvider>
-      <ProtectedRoute>
-        {children}
-      </ProtectedRoute>
-    </AuthProvider>
+    <ProtectedRoute>
+      {children}
+    </ProtectedRoute>
   </DashboardProviders>
 );
 
-function App() {
+function AppContent() {
+  const { showWelcomeNotification, onboardingData, dismissWelcomeNotification } = useAuth();
+
   return (
-    <ErrorBoundary>
-      {/* ⚡ ClerkProvider global optimizado - Carga lazy */}
-      <ClerkProvider 
-        publishableKey={PUBLISHABLE_KEY} 
-        afterSignOutUrl="/"
-      >
-        {/* ⚡ ThemeProvider es ligero, se mantiene global */}
-        <ThemeProvider>
-          {/* 🔔 Sistema de notificaciones global */}
-          <NotificationProvider>
-            <BrowserRouter>
-              <ScrollToTop />
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
+    <BrowserRouter>
+      <ScrollToTop />
+      
+      {/* 🎉 Notificación de bienvenida para nuevos clientes */}
+      {showWelcomeNotification && onboardingData && (
+        <WelcomeNotification 
+          onboarding={onboardingData}
+          onClose={dismissWelcomeNotification}
+        />
+      )}
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
                   {/* ⚡ PÁGINAS PÚBLICAS - SIN CLERK, CARGA INSTANTÁNEA */}
                   <Route path="/" element={<Home />} />
               <Route path="/nosotros" element={<About />} />
@@ -123,6 +131,33 @@ function App() {
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
                     <ClientDashboard />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 🏠 Portal Cliente - Dashboard Principal */}
+              <Route path="/dashboard/client/portal" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
+                    <ClientPortal />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 📊 Mis Proyectos/Leads */}
+              <Route path="/dashboard/client/leads" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
+                    <MyLeads />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 💬 Mis Mensajes */}
+              <Route path="/dashboard/client/messages" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
+                    <MyMessages />
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -230,6 +265,15 @@ function App() {
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
+
+              {/* 💬 Mensajería CRM - Página administrativa de mensajes */}
+              <Route path="/dashboard/crm/messages" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CrmMessages />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
               
               {/* 🚀 MÓDULO DE SERVICIOS - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
               
@@ -302,11 +346,30 @@ function App() {
           {/* 🔔 Contenedor de notificaciones Toast */}
           <ToastContainer position="top-right" />
         </BrowserRouter>
-      </NotificationProvider>
-    </ThemeProvider>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      {/* ⚡ ClerkProvider global optimizado - Carga lazy */}
+      <ClerkProvider 
+        publishableKey={PUBLISHABLE_KEY} 
+        afterSignOutUrl="/"
+      >
+        {/* ⚡ ThemeProvider es ligero, se mantiene global */}
+        <ThemeProvider>
+          {/* 🔔 Sistema de notificaciones global */}
+          <NotificationProvider>
+            {/* 🔐 AuthProvider con notificación de bienvenida */}
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </NotificationProvider>
+        </ThemeProvider>
       </ClerkProvider>
-  </ErrorBoundary>
-);
+    </ErrorBoundary>
+  );
 }
 
 export default App;
