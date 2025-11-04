@@ -224,10 +224,27 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
 
   // Filtrar plantillas por tipo
   const filteredTemplates = templates.filter((t) => {
+    // Verificar que esté activa
+    if (!t.esActiva) return false;
+    
     if (messageType === 'internal') {
+      // Solo notas internas
       return t.tipo === 'nota_interna';
     } else {
-      return t.tipo === 'mensaje_cliente' || t.tipo === 'email';
+      // Todos los tipos de mensajes a clientes
+      const clientMessageTypes = [
+        'bienvenida',
+        'seguimiento',
+        'cotizacion',
+        'propuesta',
+        'cierre',
+        'agradecimiento',
+        'recordatorio',
+        'rechazo',
+        'mensaje_cliente',
+        'email'
+      ];
+      return clientMessageTypes.includes(t.tipo);
     }
   });
 

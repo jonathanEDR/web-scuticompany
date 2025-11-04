@@ -113,6 +113,15 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       // Solo roles administrativos con MANAGE_UPLOADS
     },
     {
+      name: 'Blog',
+      icon: '📝',
+      path: '/dashboard/blog',
+      description: 'Gestión del blog',
+      permission: Permission.MANAGE_CONTENT,
+      adminOnly: true,
+      // Solo roles administrativos - Módulo de blog
+    },
+    {
       name: 'Gestión de Usuarios',
       icon: '👥',
       path: '/dashboard/admin/users',

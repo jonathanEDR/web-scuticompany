@@ -8,6 +8,7 @@ import { MessageFiltersComponent } from '../../components/crm/messages/MessageFi
 import { TemplateEditor } from '../../components/crm/templates/TemplateEditor';
 import { MessageComposer } from '../../components/crm/messages/MessageComposer';
 import { Modal } from '../../components/common/Modal';
+import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import type { 
   LeadMessage, 
   MessageTemplate, 
@@ -364,100 +365,104 @@ export const CrmMessages: React.FC = () => {
   // ========================================
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
+    <SmartDashboardLayout>
+      <div className="w-full">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 dark:from-purple-700 dark:via-pink-700 dark:to-red-700 rounded-2xl p-6 md:p-8 mb-8 text-white shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                <span>💬</span>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
+                <span className="text-4xl">💬</span>
                 Gestión de Mensajería CRM
               </h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-purple-100 dark:text-pink-100 text-lg">
                 Administra todos los mensajes y plantillas del sistema
               </p>
             </div>
 
             {/* Toggle View Mode + Nuevo Mensaje */}
-            <div className="flex gap-2">
-              {/* Botón Nuevo Mensaje - solo visible en modo mensajes */}
+            <div className="flex flex-col gap-3 w-full sm:w-auto">
+              {/* Botones de Vista - Siempre visibles */}
+              <div className="flex gap-2 w-full">
+                <button
+                  onClick={() => setViewMode('messages')}
+                  className={`flex-1 px-3 py-2 rounded-lg font-medium transition-colors text-sm ${
+                    viewMode === 'messages'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  <span className="sm:hidden">💬</span>
+                  <span className="hidden sm:inline">💬 Mensajes</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('templates')}
+                  className={`flex-1 px-3 py-2 rounded-lg font-medium transition-colors text-sm ${
+                    viewMode === 'templates'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  <span className="sm:hidden">📋</span>
+                  <span className="hidden sm:inline">📋 Plantillas</span>
+                </button>
+              </div>
+
+              {/* Botones de Acción - solo visible en modo mensajes */}
               {viewMode === 'messages' && (
-                <div className="flex gap-2 mr-4">
+                <div className="flex flex-col sm:flex-row gap-2 w-full">
                   <button
                     onClick={() => handleOpenComposer('client')}
-                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <span>✉️</span>
-                    Mensaje a Cliente
+                    <span>Mensaje a Cliente</span>
                   </button>
                   <button
                     onClick={() => handleOpenComposer('internal')}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <span>📝</span>
-                    Nota Interna
+                    <span>Nota Interna</span>
                   </button>
                 </div>
               )}
-
-              <button
-                onClick={() => setViewMode('messages')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  viewMode === 'messages'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-              >
-                💬 Mensajes
-              </button>
-              <button
-                onClick={() => setViewMode('templates')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  viewMode === 'templates'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-              >
-                📋 Plantillas
-              </button>
             </div>
           </div>
 
           {/* Stats */}
           {stats && viewMode === 'messages' && (
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <div className="mt-4 sm:mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-2 sm:p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {stats.total}
                 </div>
-                <div className="text-sm text-blue-700 dark:text-blue-300">Total Mensajes</div>
+                <div className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">Total Mensajes</div>
               </div>
-              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+              <div className="bg-red-50 dark:bg-red-900/20 p-2 sm:p-4 rounded-lg border border-red-200 dark:border-red-800">
+                <div className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">
                   {stats.noLeidos}
                 </div>
-                <div className="text-sm text-red-700 dark:text-red-300">No Leídos</div>
+                <div className="text-xs sm:text-sm text-red-700 dark:text-red-300">No Leídos</div>
               </div>
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <div className="bg-green-50 dark:bg-green-900/20 p-2 sm:p-4 rounded-lg border border-green-200 dark:border-green-800">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
                   {stats.enviados}
                 </div>
-                <div className="text-sm text-green-700 dark:text-green-300">Enviados</div>
+                <div className="text-xs sm:text-sm text-green-700 dark:text-green-300">Enviados</div>
               </div>
-              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-2 sm:p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+                <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {stats.respondidos}
                 </div>
-                <div className="text-sm text-purple-700 dark:text-purple-300">Respondidos</div>
+                <div className="text-xs sm:text-sm text-purple-700 dark:text-purple-300">Respondidos</div>
               </div>
             </div>
           )}
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Content */}
+        <div className="mb-8">
         {/* VISTA: MENSAJES */}
         {viewMode === 'messages' && (
           <div className="space-y-6">
@@ -804,7 +809,8 @@ export const CrmMessages: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </SmartDashboardLayout>
   );
 };
 

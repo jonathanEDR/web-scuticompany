@@ -1,0 +1,92 @@
+/**
+ * 🏷️ TagList Component
+ * Lista de tags con estilo y límite configurable
+ */
+
+import { Link } from 'react-router-dom';
+import { Tag } from 'lucide-react';
+import type { BlogTag } from '../../../types/blog';
+
+interface TagListProps {
+  tags: (string | BlogTag)[];
+  limit?: number;
+  size?: 'sm' | 'md';
+  clickable?: boolean;
+  className?: string;
+}
+
+export default function TagList({
+  tags,
+  limit,
+  size = 'md',
+  clickable = true,
+  className = ''
+}: TagListProps) {
+  
+  // Aplicar límite si existe
+  const displayTags = limit ? tags.slice(0, limit) : tags;
+  const remainingCount = limit && tags.length > limit ? tags.length - limit : 0;
+
+  // Estilos por tamaño
+  const sizeClasses = {
+    sm: 'text-xs px-2 py-1',
+    md: 'text-sm px-2.5 py-1.5'
+  };
+
+  const iconSizes = {
+    sm: 'w-3 h-3',
+    md: 'w-3.5 h-3.5'
+  };
+
+  if (tags.length === 0) return null;
+
+  return (
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
+      {displayTags.map((tag, index) => {
+        // Extraer nombre y slug del tag (puede ser string u objeto)
+        const tagName = typeof tag === 'string' ? tag : tag.name;
+        const tagSlug = typeof tag === 'string' ? tag : tag.slug;
+        
+        const tagClass = `
+          inline-flex items-center gap-1
+          ${sizeClasses[size]}
+          bg-gray-100 text-gray-700
+          rounded-md font-medium
+          transition-all duration-200
+          ${clickable ? 'hover:bg-blue-100 hover:text-blue-700 cursor-pointer' : ''}
+        `;
+
+        const content = (
+          <>
+            <Tag className={iconSizes[size]} />
+            <span>{tagName}</span>
+          </>
+        );
+
+        if (clickable) {
+          return (
+            <Link
+              key={`${tagSlug}-${index}`}
+              to={`/blog/tag/${encodeURIComponent(tagSlug)}`}
+              className={tagClass}
+            >
+              {content}
+            </Link>
+          );
+        }
+
+        return (
+          <span key={`${tagSlug}-${index}`} className={tagClass}>
+            {content}
+          </span>
+        );
+      })}
+      
+      {remainingCount > 0 && (
+        <span className={`${sizeClasses[size]} text-gray-500 font-medium`}>
+          +{remainingCount} más
+        </span>
+      )}
+    </div>
+  );
+}

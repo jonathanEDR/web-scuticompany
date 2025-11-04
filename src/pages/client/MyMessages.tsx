@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
+import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import type { LeadMessage } from '../../types/message.types';
 import type { Lead } from '../../services/crmService';
 import { messageService } from '../../services/messageService';
@@ -267,27 +268,29 @@ export default function MyMessages() {
   const unreadCount = messages.filter((m) => !m.leido).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
+    <SmartDashboardLayout>
+      <div className="w-full">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 dark:from-green-700 dark:via-blue-700 dark:to-purple-700 rounded-2xl p-6 md:p-8 mb-8 text-white shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                💬 Mis Mensajes
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
+                <span className="text-4xl">💬</span>
+                Mis Mensajes
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-green-100 dark:text-blue-100 text-lg">
                 {filteredMessages.length} {filteredMessages.length === 1 ? 'mensaje' : 'mensajes'}
                 {unreadCount > 0 && ` • ${unreadCount} sin leer`}
               </p>
             </div>
             <button
               onClick={() => navigate('/dashboard/client')}
-              className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:shadow-md transition-all text-gray-700 dark:text-gray-300"
+              className="px-4 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg transition-all text-white border border-white/30"
             >
               ← Volver al Portal
             </button>
           </div>
+        </div>
 
           {/* Filtro por Lead */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
@@ -430,10 +433,9 @@ export default function MyMessages() {
             ))}
           </div>
         )}
-      </div>
 
-      {/* Modal de Respuesta */}
-      {selectedMessage && (
+        {/* Modal de Respuesta */}
+        {selectedMessage && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
@@ -529,7 +531,7 @@ export default function MyMessages() {
             </div>
           </div>
         </div>
-      )}
-    </div>
+        )}
+    </SmartDashboardLayout>
   );
 }

@@ -4,6 +4,7 @@ import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import ValueAddedSection from '../../components/public/ValueAddedSection';
 import ClientLogosSection from '../../components/public/ClientLogosSection';
+import BlogSection from '../../components/public/BlogSection';
 import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import { getPageBySlug, clearCache, forceReload } from '../../services/cmsApi';
@@ -270,6 +271,8 @@ const HomeOptimized = () => {
           <ClientLogosSection 
             data={pageData.content.clientLogos}
           />
+
+          <BlogSection />
 
           <ContactSection 
             data={addCategoriasToConfig(pageData.content.contactForm, categorias)}

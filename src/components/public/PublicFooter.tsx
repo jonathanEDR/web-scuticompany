@@ -135,11 +135,11 @@ const PublicFooter = () => {
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-4">Recursos</h3>
               <ul className="space-y-2">
-                <li><Link to="/recursos/webinars" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Blog de Tecnología</Link></li>
-                <li><Link to="/recursos/blogs" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Casos de Éxito</Link></li>
-                <li><Link to="/recursos/podcast" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Guías y Tutoriales</Link></li>
-                <li><Link to="/recursos/eventos" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Webinars</Link></li>
-                <li><Link to="/recursos/ebooks" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Sobre Nosotros</Link></li>
+                <li><Link to="/blog" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Blog de Tecnología</Link></li>
+                <li><Link to="/recursos/casos-exito" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Casos de Éxito</Link></li>
+                <li><Link to="/recursos/guias" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Guías y Tutoriales</Link></li>
+                <li><Link to="/recursos/webinars" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Webinars</Link></li>
+                <li><Link to="/nosotros" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Sobre Nosotros</Link></li>
               </ul>
             </div>
 
@@ -392,11 +392,11 @@ const PublicFooter = () => {
                 <div>
                   <h3 className="text-white font-semibold mb-4">Recursos</h3>
                   <ul className="space-y-2">
-                    <li><Link to="/recursos/webinars" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Blog de Tecnología</Link></li>
-                    <li><Link to="/recursos/blogs" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Casos de Éxito</Link></li>
-                    <li><Link to="/recursos/podcast" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Guías y Tutoriales</Link></li>
-                    <li><Link to="/recursos/eventos" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Webinars</Link></li>
-                    <li><Link to="/recursos/ebooks" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Sobre Nosotros</Link></li>
+                    <li><Link to="/blog" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Blog de Tecnología</Link></li>
+                    <li><Link to="/recursos/casos-exito" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Casos de Éxito</Link></li>
+                    <li><Link to="/recursos/guias" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Guías y Tutoriales</Link></li>
+                    <li><Link to="/recursos/webinars" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Webinars</Link></li>
+                    <li><Link to="/nosotros" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Sobre Nosotros</Link></li>
                   </ul>
                 </div>
                                 {/* Acceso */}

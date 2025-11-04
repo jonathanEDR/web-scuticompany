@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import type { Lead } from '../../services/crmService';
 import type { LeadMessage } from '../../types/message.types';
 import { crmService } from '../../services/crmService';
@@ -134,22 +135,27 @@ export default function ClientPortal() {
   const secureMessages = useFilterPrivateMessages(recentMessages);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
+    <SmartDashboardLayout>
+      <div className="w-full">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            👋 ¡Bienvenido de vuelta, {user?.firstName || 'Cliente'}!
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Aquí está el resumen de tus proyectos y actualizaciones
-          </p>
+        <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 dark:from-green-700 dark:via-blue-700 dark:to-purple-700 rounded-2xl p-6 md:p-8 mb-8 text-white shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
+                <span className="text-4xl">👋</span>
+                ¡Bienvenido de vuelta, {user?.firstName || 'Cliente'}!
+              </h1>
+              <p className="text-green-100 dark:text-blue-100 text-lg">
+                Aquí está el resumen de tus proyectos y actualizaciones
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
           {/* Total Proyectos */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-blue-500">
             <div className="flex items-center justify-between mb-2">
               <div className="text-3xl">📊</div>
               <div className="text-right">
@@ -168,7 +174,7 @@ export default function ClientPortal() {
           </div>
 
           {/* Proyectos Activos */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between mb-2">
               <div className="text-3xl">⚡</div>
               <div className="text-right">
@@ -184,7 +190,7 @@ export default function ClientPortal() {
           </div>
 
           {/* Mensajes Sin Leer */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-purple-500">
             <div className="flex items-center justify-between mb-2">
               <div className="text-3xl">💬</div>
               <div className="text-right">
@@ -377,6 +383,6 @@ export default function ClientPortal() {
           </div>
         </div>
       </div>
-    </div>
+    </SmartDashboardLayout>
   );
 }

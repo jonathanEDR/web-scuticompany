@@ -67,6 +67,17 @@ const ClientPortal = lazy(() => import('./pages/client/ClientPortal'));
 const MyLeads = lazy(() => import('./pages/client/MyLeads'));
 const MyMessages = lazy(() => import('./pages/client/MyMessages'));
 
+// Módulo de Blog - Páginas Públicas
+const BlogHome = lazy(() => import('./pages/public/blog/BlogHome'));
+const BlogPost = lazy(() => import('./pages/public/blog/BlogPost'));
+const BlogSearch = lazy(() => import('./pages/public/blog/BlogSearch'));
+const BlogCategory = lazy(() => import('./pages/public/blog/BlogCategory'));
+
+// Módulo de Blog - Páginas Administrativas
+const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
+const PostEditor = lazy(() => import('./pages/admin/blog/PostEditor'));
+const CategoriesManager = lazy(() => import('./pages/admin/blog/CategoriesManager'));
+
 // Componente de loading minimalista
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -113,7 +124,13 @@ function AppContent() {
               <Route path="/servicios/:slug" element={<ServicioDetail />} />
               <Route path="/contacto" element={<Contact />} />
               
-              {/* 🔐 RUTAS DE AUTENTICACIÓN - Clerk ya disponible globalmente */}
+              {/* � BLOG - Páginas Públicas */}
+              <Route path="/blog" element={<BlogHome />} />
+              <Route path="/blog/search" element={<BlogSearch />} />
+              <Route path="/blog/categoria/:slug" element={<BlogCategory />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              
+              {/* �🔐 RUTAS DE AUTENTICACIÓN - Clerk ya disponible globalmente */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
       
@@ -313,7 +330,45 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
+              {/* � MÓDULO DE BLOG - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
+              
+              {/* Dashboard Principal de Blog - Estadísticas y resumen */}
+              <Route path="/dashboard/blog" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <BlogDashboard />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Crear Nuevo Post */}
+              <Route path="/dashboard/blog/posts/new" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <PostEditor />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Editar Post Existente */}
+              <Route path="/dashboard/blog/posts/:id/edit" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <PostEditor />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Gestión de Categorías */}
+              <Route path="/dashboard/blog/categories" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CategoriesManager />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* �👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
               <Route path="/dashboard/admin/users" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>

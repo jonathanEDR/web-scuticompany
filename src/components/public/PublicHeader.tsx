@@ -201,6 +201,15 @@ const PublicHeaderOptimized = () => {
             >
               Proyectos destacados
             </Link>
+            <Link 
+              to="/blog" 
+              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+              onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
+              onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
+              aria-label="Blog de tecnología"
+            >
+              Blog
+            </Link>
 
             {/* CONTÁCTANOS en navegación - Solo visible en móvil */}
             <button 
