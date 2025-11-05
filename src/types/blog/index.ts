@@ -35,7 +35,7 @@ export interface BlogPost {
   allowComments: boolean;
   isPinned: boolean;
   category: BlogCategory;
-  author: BlogAuthor;
+  author: BlogAuthor | null; // Puede ser null si no tiene autor asignado
   tags: (string | BlogTag)[];
   stats: PostStats;
   seo: SEOMetadata;

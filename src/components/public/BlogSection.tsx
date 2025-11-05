@@ -10,7 +10,7 @@ interface BlogPost {
   featuredImage?: string;
   author: {
     name: string;
-  };
+  } | null;
   category: {
     name: string;
     slug: string;
@@ -120,7 +120,9 @@ const BlogSection = () => {
                   </div>
                   <div className="flex items-center space-x-1">
                     <User className="w-3 h-3" />
-                    <span>{post.author.name}</span>
+                    <span>
+                      {post.author?.name || 'Autor Desconocido'}
+                    </span>
                   </div>
                 </div>
 

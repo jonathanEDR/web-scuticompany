@@ -6,12 +6,13 @@
 import { useEffect, useState } from 'react';
 import { 
   FileText, MessageCircle, Eye, TrendingUp, 
-  Users, Calendar, BarChart3, Clock 
+  Users, Calendar, BarChart3, Clock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCategories, useAdminPosts } from '../../../hooks/blog';
 import { useModerationStats } from '../../../hooks/blog/useModerationQueue';
 import DashboardLayout from '../../../components/DashboardLayout';
+import { BlogAnalyticsDashboard } from '../../../components/blog/analytics/BlogAnalyticsDashboard';
 
 interface DashboardStats {
   totalPosts: number;
@@ -25,6 +26,9 @@ interface DashboardStats {
 }
 
 export default function BlogDashboard() {
+  
+  // Estado para las pestañas
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics'>('dashboard');
   
   // Usar useAdminPosts para obtener TODOS los posts (incluye borradores)
   const { posts, loading: postsLoading, error: postsError } = useAdminPosts({ 
@@ -77,7 +81,7 @@ export default function BlogDashboard() {
         draftPosts: draft,
         totalViews,
         totalComments,
-        totalAuthors: new Set(posts.map(p => p.author._id)).size,
+        totalAuthors: new Set(posts.filter(p => p.author).map(p => p.author!._id)).size,
         postsThisMonth: thisMonth,
         avgReadingTime: Math.round(avgReading)
       });
@@ -172,6 +176,35 @@ export default function BlogDashboard() {
         </div>
       </div>
 
+      {/* Pestañas de Navegación */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="flex space-x-8">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'dashboard'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            📊 Dashboard General
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'analytics'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            🤖 Analytics con IA
+          </button>
+        </div>
+      </div>
+
+      {/* Contenido Condicional */}
+      {activeTab === 'dashboard' ? (
+        <>
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat, index) => {
@@ -394,6 +427,11 @@ export default function BlogDashboard() {
           </div>
         </div>
       </div>
+        </>
+      ) : (
+        /* Analytics con IA */
+        <BlogAnalyticsDashboard />
+      )}
     </div>
     </DashboardLayout>
   );

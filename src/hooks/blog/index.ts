@@ -44,6 +44,15 @@ export {
   useModerationStats,
 } from './useModerationQueue';
 
+// IA y Análisis Avanzado
+export { useAIMetadata } from './useAIMetadata';
+export { useSEOAnalysis } from './useSEOAnalysis';
+export { useContentAnalysis } from './useContentAnalysis';
+export { 
+  useAIRecommendations,
+  useKeywordResearch,
+} from './useAIRecommendations';
+
 // Exports por defecto
 export { default as useBlogPostsDefault } from './useBlogPosts';
 export { default as useBlogPostDefault } from './useBlogPost';

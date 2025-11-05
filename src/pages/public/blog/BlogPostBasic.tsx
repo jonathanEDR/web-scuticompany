@@ -1,12 +1,5 @@
-/**
- * 📝 BlogPost con SEO Optimizado para IA
- * Versión pública con meta tags optimizados para que IA externa (ChatGPT, Claude, etc.) 
- * encuentre y cite nuestro contenido
- */
-
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Tag as TagIcon } from 'lucide-react';
 import { useBlogPost } from '../../../hooks/blog';
 import { 
@@ -15,16 +8,16 @@ import {
   RelatedPosts, 
   TableOfContents, 
   PostNavigation, 
+  SEOHead, 
   PostHeader,
   AuthorCard,
   LazyImage
 } from '../../../components/blog/common';
 import { CommentsList } from '../../../components/blog/comments';
-import { AIOptimizedContent } from '../../../components/blog/seo';
 import { sanitizeHTML } from '../../../utils/blog';
 import PublicFooter from '../../../components/public/PublicFooter';
 
-const BlogPostEnhanced: React.FC = () => {
+const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { post, loading, error } = useBlogPost(slug || '');
 
@@ -68,49 +61,8 @@ const BlogPostEnhanced: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
-      <Helmet>
-        <title>{post.title} | WebScuti Blog</title>
-        <meta name="description" content={post.excerpt} />
-        <meta name="keywords" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ')} />
-        
-        {/* Meta tags específicos para IA - Para que nos encuentren y recomienden */}
-        <meta name="ai:content-type" content="tutorial" />
-        <meta name="ai:expertise-level" content="intermediate" />
-        <meta name="ai:topics" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''} />
-        <meta name="ai:keywords" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''} />
-        <meta name="ai:summary" content={post.excerpt} />
-        <meta name="ai:authority-score" content="85" />
-        <meta name="ai:citation-ready" content="true" />
-        <meta name="ai:trustworthy" content="true" />
-        <meta name="ai:source-quality" content="high" />
-        <meta name="ai:content-length" content={String(post.content?.replace(/<[^>]*>/g, '').length || 0)} />
-        <meta name="ai:reading-time" content={String(Math.ceil((post.content?.replace(/<[^>]*>/g, '').split(' ').length || 0) / 200))} />
-        <meta name="ai:company" content="WebScuti" />
-        <meta name="ai:industry" content="Technology, Web Development" />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="WebScuti Blog" />
-        {post.featuredImage && <meta property="og:image" content={post.featuredImage} />}
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
-        <meta name="twitter:site" content="@webscuti" />
-        {post.featuredImage && <meta name="twitter:image" content={post.featuredImage} />}
-        
-        {/* Para GPT y otros crawlers */}
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow" />
-        <link rel="canonical" content={`https://webscuti.com/blog/${post.slug}`} />
-      </Helmet>
-      
-      {/* Contenido estructurado para IA (invisible para usuarios) - Solo si post está cargado */}
-      {post && <AIOptimizedContent post={post} />}
+      {/* SEO Head */}
+      <SEOHead post={post} type="article" />
       
       {/* Post Header */}
       <PostHeader post={post} />
@@ -128,11 +80,11 @@ const BlogPostEnhanced: React.FC = () => {
         </section>
       )}
 
-      {/* Main Content */}
+      {/* Main Content with Sidebar Layout */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           
-          {/* Sidebar */}
+          {/* Sidebar - TOC and Share (Hidden on mobile) */}
           <aside className="hidden lg:block lg:col-span-3">
             <div className="sticky top-24 space-y-6">
               {/* Table of Contents */}
@@ -156,8 +108,7 @@ const BlogPostEnhanced: React.FC = () => {
           </aside>
 
           {/* Main Article */}
-          <article className="lg:col-span-9 space-y-8">
-            {/* Contenido Principal */}
+          <article className="lg:col-span-9">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8 lg:p-12">
               {/* Content */}
               <div 
@@ -201,29 +152,50 @@ const BlogPostEnhanced: React.FC = () => {
                   <AuthorCard author={post.author} />
                 </div>
               )}
+              
+              {/* Share on Mobile */}
+              <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 lg:hidden">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                  Compartir artículo
+                </h3>
+                <ShareButtons 
+                  url={window.location.href} 
+                  title={post.title} 
+                  variant="default" 
+                />
+              </div>
             </div>
 
             {/* Comments Section */}
             {post.allowComments && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
-                <CommentsList postSlug={slug!} />
+              <div className="mt-8">
+                <CommentsList 
+                  postSlug={post.slug}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8"
+                />
               </div>
             )}
-
-            {/* Related Posts */}
-            <RelatedPosts 
-              currentPost={post}
-            />
-
-            {/* Navigation */}
-            <PostNavigation currentPost={post} />
           </article>
         </div>
       </section>
 
+      {/* Post Navigation */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8">
+        <PostNavigation currentPost={post} />
+      </section>
+
+      {/* Related Posts */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
+        <RelatedPosts 
+          currentPost={post} 
+          maxPosts={4}
+        />
+      </section>
+
+      {/* Footer */}
       <PublicFooter />
     </div>
   );
 };
 
-export default BlogPostEnhanced;
+export default BlogPost;

@@ -7,10 +7,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Save, Eye, Send, ArrowLeft, Image as ImageIcon,
-  Tag, Folder, Settings, Upload
+  Tag, Folder, Settings, Upload, Sparkles
 } from 'lucide-react';
 import { RichTextEditor, ContentPreview } from '../../../components/blog/editor';
 import { CategoryBadge } from '../../../components/blog/common';
+import { EditorAISidebar } from '../../../components/blog/editor/EditorAISidebar';
 import { useCategories } from '../../../hooks/blog';
 import { generateSlug } from '../../../utils/blog';
 import { blogPostApi } from '../../../services/blog';
@@ -55,6 +56,7 @@ export default function PostEditor() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [showAISidebar, setShowAISidebar] = useState(false);
 
   // Cargar post si está editando
   useEffect(() => {
@@ -331,6 +333,18 @@ export default function PostEditor() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAISidebar(!showAISidebar)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                showAISidebar
+                  ? 'bg-purple-600 text-white hover:bg-purple-700'
+                  : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Asistente IA</span>
+            </button>
+
             <button
               onClick={() => setShowPreview(!showPreview)}
               className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -612,6 +626,15 @@ export default function PostEditor() {
           </div>
         </div>
       </div>
+
+      {/* AI Sidebar */}
+      <EditorAISidebar
+        title={formData.title}
+        content={formData.content}
+        excerpt={formData.excerpt}
+        isOpen={showAISidebar}
+        onClose={() => setShowAISidebar(false)}
+      />
     </div>
     </DashboardLayout>
   );

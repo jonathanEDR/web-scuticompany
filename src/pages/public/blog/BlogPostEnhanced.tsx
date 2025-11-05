@@ -1,39 +1,59 @@
 /**
- * 📝 BlogPost con SEO Optimizado para IA
- * Versión pública con meta tags optimizados para que IA externa (ChatGPT, Claude, etc.) 
- * encuentre y cite nuestro contenido
+ * 📝 BlogPost Mejorado con IA
+ * Versión avanzada del componente BlogPost con funcionalidades de IA integradas
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Tag as TagIcon } from 'lucide-react';
-import { useBlogPost } from '../../../hooks/blog';
+import { ArrowLeft, Tag as TagIcon, Sparkles, Bot, BarChart3 } from 'lucide-react';
+import { useBlogPost, useAIMetadata, useContentAnalysis, useAIRecommendations } from '../../../hooks/blog';
 import { 
   ShareButtons, 
   TagList, 
   RelatedPosts, 
   TableOfContents, 
   PostNavigation, 
+  SEOHead, 
   PostHeader,
   AuthorCard,
   LazyImage
 } from '../../../components/blog/common';
 import { CommentsList } from '../../../components/blog/comments';
-import { AIOptimizedContent } from '../../../components/blog/seo';
+import { AIMetadataComponent, QAComponent, AIRecommendations } from '../../../components/blog/ai';
 import { sanitizeHTML } from '../../../utils/blog';
 import PublicFooter from '../../../components/public/PublicFooter';
 
 const BlogPostEnhanced: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { post, loading, error } = useBlogPost(slug || '');
+  
+  // Hooks de IA
+  const { metadata: aiMetadata, loading: aiLoading, error: aiError } = useAIMetadata(slug || '');
+  const { 
+    qaGeneration, 
+    loading: qaLoading, 
+    generateQA 
+  } = useContentAnalysis(slug || '');
+  const { 
+    recommendations, 
+    loading: recLoading 
+  } = useAIRecommendations(slug || '', { limit: 4 });
+
+  // Estado para pestañas de funcionalidades avanzadas
+  const [activeAITab, setActiveAITab] = useState<'metadata' | 'qa' | 'recommendations'>('metadata');
+  const [showAIFeatures, setShowAIFeatures] = useState(false);
 
   useEffect(() => {
     if (post) {
       document.title = `${post.title} | Blog Web Scuti`;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Generar Q&A automáticamente después de cargar el post
+      setTimeout(() => {
+        generateQA();
+      }, 1000);
     }
-  }, [post]);
+  }, [post, generateQA]);
 
   if (loading) {
     return (
@@ -66,51 +86,53 @@ const BlogPostEnhanced: React.FC = () => {
     );
   }
 
+  const renderAIContent = () => {
+    switch (activeAITab) {
+      case 'metadata':
+        return aiMetadata ? (
+          <AIMetadataComponent metadata={aiMetadata} />
+        ) : aiLoading ? (
+          <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-64 rounded-lg"></div>
+        ) : aiError ? (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <Bot className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>No se pudo cargar el análisis IA</p>
+          </div>
+        ) : null;
+
+      case 'qa':
+        return qaGeneration ? (
+          <QAComponent qaData={qaGeneration} />
+        ) : qaLoading ? (
+          <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-64 rounded-lg"></div>
+        ) : (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <Bot className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>Generando preguntas y respuestas...</p>
+          </div>
+        );
+
+      case 'recommendations':
+        return recommendations.length > 0 ? (
+          <AIRecommendations recommendations={recommendations} loading={recLoading} />
+        ) : recLoading ? (
+          <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-64 rounded-lg"></div>
+        ) : (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>No hay recomendaciones disponibles</p>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
-      <Helmet>
-        <title>{post.title} | WebScuti Blog</title>
-        <meta name="description" content={post.excerpt} />
-        <meta name="keywords" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ')} />
-        
-        {/* Meta tags específicos para IA - Para que nos encuentren y recomienden */}
-        <meta name="ai:content-type" content="tutorial" />
-        <meta name="ai:expertise-level" content="intermediate" />
-        <meta name="ai:topics" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''} />
-        <meta name="ai:keywords" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''} />
-        <meta name="ai:summary" content={post.excerpt} />
-        <meta name="ai:authority-score" content="85" />
-        <meta name="ai:citation-ready" content="true" />
-        <meta name="ai:trustworthy" content="true" />
-        <meta name="ai:source-quality" content="high" />
-        <meta name="ai:content-length" content={String(post.content?.replace(/<[^>]*>/g, '').length || 0)} />
-        <meta name="ai:reading-time" content={String(Math.ceil((post.content?.replace(/<[^>]*>/g, '').split(' ').length || 0) / 200))} />
-        <meta name="ai:company" content="WebScuti" />
-        <meta name="ai:industry" content="Technology, Web Development" />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="WebScuti Blog" />
-        {post.featuredImage && <meta property="og:image" content={post.featuredImage} />}
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
-        <meta name="twitter:site" content="@webscuti" />
-        {post.featuredImage && <meta name="twitter:image" content={post.featuredImage} />}
-        
-        {/* Para GPT y otros crawlers */}
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow" />
-        <link rel="canonical" content={`https://webscuti.com/blog/${post.slug}`} />
-      </Helmet>
-      
-      {/* Contenido estructurado para IA (invisible para usuarios) - Solo si post está cargado */}
-      {post && <AIOptimizedContent post={post} />}
+      {/* SEO Head */}
+      <SEOHead post={post} type="article" />
       
       {/* Post Header */}
       <PostHeader post={post} />
@@ -128,6 +150,17 @@ const BlogPostEnhanced: React.FC = () => {
         </section>
       )}
 
+      {/* Botón flotante para funcionalidades IA */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setShowAIFeatures(!showAIFeatures)}
+          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+          title="Funcionalidades IA"
+        >
+          <Sparkles className="w-6 h-6" />
+        </button>
+      </div>
+
       {/* Main Content */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
@@ -135,6 +168,11 @@ const BlogPostEnhanced: React.FC = () => {
           {/* Sidebar */}
           <aside className="hidden lg:block lg:col-span-3">
             <div className="sticky top-24 space-y-6">
+              {/* Análisis IA Compacto */}
+              {aiMetadata && (
+                <AIMetadataComponent metadata={aiMetadata} compact />
+              )}
+              
               {/* Table of Contents */}
               <TableOfContents 
                 content={post.content}
@@ -202,6 +240,55 @@ const BlogPostEnhanced: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Funcionalidades IA Expandidas */}
+            {showAIFeatures && (
+              <div className="space-y-6">
+                {/* Pestañas IA */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="border-b border-gray-200 dark:border-gray-700">
+                    <nav className="-mb-px flex space-x-8 px-6">
+                      <button
+                        onClick={() => setActiveAITab('metadata')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeAITab === 'metadata'
+                            ? 'border-purple-500 text-purple-600 dark:text-purple-400'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                        }`}
+                      >
+                        <BarChart3 className="w-4 h-4 inline mr-2" />
+                        Análisis IA
+                      </button>
+                      <button
+                        onClick={() => setActiveAITab('qa')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeAITab === 'qa'
+                            ? 'border-purple-500 text-purple-600 dark:text-purple-400'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                        }`}
+                      >
+                        <Bot className="w-4 h-4 inline mr-2" />
+                        Q&A Automático
+                      </button>
+                      <button
+                        onClick={() => setActiveAITab('recommendations')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeAITab === 'recommendations'
+                            ? 'border-purple-500 text-purple-600 dark:text-purple-400'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                        }`}
+                      >
+                        <Sparkles className="w-4 h-4 inline mr-2" />
+                        Recomendaciones
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+
+                {/* Contenido de las pestañas IA */}
+                {renderAIContent()}
+              </div>
+            )}
 
             {/* Comments Section */}
             {post.allowComments && (
