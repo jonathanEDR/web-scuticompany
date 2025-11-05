@@ -13,6 +13,9 @@ export {
 // Posts Admin
 export { useAdminPosts } from './useAdminPosts';
 
+// Favorites
+export { useFavorites } from './useFavorites';
+
 // Post individual
 export {
   useBlogPost,

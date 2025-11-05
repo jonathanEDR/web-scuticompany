@@ -108,7 +108,9 @@ export const executeWelcomeOnboarding = async (userInfo: {
 
     const result = await response.json();
     
-    console.log('🎉 Onboarding ejecutado exitosamente:', result);
+    if (import.meta.env.DEV) {
+      console.log('🎉 Onboarding ejecutado exitosamente:', result);
+    }
     
     return {
       success: true,

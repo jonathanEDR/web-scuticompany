@@ -5,6 +5,7 @@
 
 import axios, { AxiosError } from 'axios';
 import { getApiUrl } from '../../utils/apiConfig';
+import { setupAuthInterceptor } from './blogApiClientSetup';
 import type {
   BlogPost,
   CreatePostDto,
@@ -30,25 +31,8 @@ const blogApiClient = axios.create({
 // INTERCEPTORES
 // ============================================
 
-// Interceptor para agregar token de autenticación
-blogApiClient.interceptors.request.use(
-  async (config) => {
-    try {
-      // Obtener token de Clerk
-      const token = await window.Clerk?.session?.getToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (error) {
-      console.error('[BlogAPI] Error obteniendo token:', error);
-    }
-    return config;
-  },
-  (error) => {
-    console.error('[BlogAPI] Error en request:', error);
-    return Promise.reject(error);
-  }
-);
+// Configurar interceptor de autenticación
+setupAuthInterceptor(blogApiClient);
 
 // Interceptor para manejo de respuestas y errores
 blogApiClient.interceptors.response.use(
@@ -219,7 +203,9 @@ const duplicatePost = async (id: string): Promise<ApiResponse<BlogPost>> => {
  * Marca/desmarca like en un post
  */
 const toggleLike = async (postId: string): Promise<ApiResponse<void>> => {
+  console.log('🔍 [BlogAPI] Toggle like iniciado para postId:', postId);
   const response = await blogApiClient.post(`/posts/${postId}/like`);
+  console.log('✅ [BlogAPI] Toggle like respuesta:', response.data);
   return response.data;
 };
 
@@ -227,7 +213,9 @@ const toggleLike = async (postId: string): Promise<ApiResponse<void>> => {
  * Marca/desmarca bookmark en un post
  */
 const toggleBookmark = async (postId: string): Promise<ApiResponse<void>> => {
+  console.log('🔍 [BlogAPI] Toggle bookmark iniciado para postId:', postId);
   const response = await blogApiClient.post(`/posts/${postId}/bookmark`);
+  console.log('✅ [BlogAPI] Toggle bookmark respuesta:', response.data);
   return response.data;
 };
 

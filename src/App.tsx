@@ -1,6 +1,6 @@
-﻿import { lazy, Suspense } from 'react';
+﻿import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -14,6 +14,7 @@ import ScrollToTop from './components/common/ScrollToTop';
 import WelcomeNotification from './components/WelcomeNotification';
 import { UserRole } from './types/roles';
 import { useAuth } from './contexts/AuthContext';
+import { setTokenGetter } from './services/blog/blogApiClientSetup';
 import './App.css';
 
 // ⚡ Configuración de Clerk global optimizada
@@ -30,6 +31,8 @@ const About = lazy(() => import('./pages/public/About'));
 const ServicesPublic = lazy(() => import('./pages/public/ServicesPublicV2'));
 const ServicioDetail = lazy(() => import('./pages/public/ServicioDetail'));
 const Contact = lazy(() => import('./pages/public/Contact'));
+const PublicProfilePage = lazy(() => import('./pages/public/PublicProfilePage'));
+const ProfileListPage = lazy(() => import('./pages/public/ProfileListPage'));
 
 // Páginas de autenticación - CON Clerk optimizado
 const Login = lazy(() => import('./pages/auth/Login'));
@@ -40,7 +43,7 @@ const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 // Páginas del dashboard - Con autenticación
-const Profile = lazy(() => import('./pages/Profile'));
+const Profile = lazy(() => import('./pages/dashboard/Profile'));
 const Services = lazy(() => import('./pages/Services'));
 const Settings = lazy(() => import('./pages/Settings'));
 const LeadsManagement = lazy(() => import('./pages/admin/LeadsManagement'));
@@ -77,6 +80,10 @@ const BlogCategory = lazy(() => import('./pages/public/blog/BlogCategory'));
 const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
 const PostEditor = lazy(() => import('./pages/admin/blog/PostEditor'));
 const CategoriesManager = lazy(() => import('./pages/admin/blog/CategoriesManager'));
+const CommentModeration = lazy(() => import('./pages/admin/blog/CommentModeration'));
+
+// Módulo de Blog - Páginas del Cliente
+const MyBlogHub = lazy(() => import('./components/blog/MyBlogHub'));
 
 // Componente de loading minimalista
 const LoadingSpinner = () => (
@@ -102,6 +109,13 @@ const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
 
 function AppContent() {
   const { showWelcomeNotification, onboardingData, dismissWelcomeNotification } = useAuth();
+  const { getToken } = useClerkAuth();
+
+  // Configurar el token getter para el blog API
+  useEffect(() => {
+    setTokenGetter(getToken);
+    console.log('🔧 [App] Token getter configurado para Blog API');
+  }, [getToken]);
 
   return (
     <BrowserRouter>
@@ -123,6 +137,8 @@ function AppContent() {
               <Route path="/servicios" element={<ServicesPublic />} />
               <Route path="/servicios/:slug" element={<ServicioDetail />} />
               <Route path="/contacto" element={<Contact />} />
+              <Route path="/perfiles" element={<ProfileListPage />} />
+              <Route path="/perfil/:username" element={<PublicProfilePage />} />
               
               {/* � BLOG - Páginas Públicas */}
               <Route path="/blog" element={<BlogHome />} />
@@ -214,6 +230,13 @@ function AppContent() {
                 <DashboardRoute>
                   <Help />
                 </DashboardRoute>
+              } />
+              
+              {/* 📚 Mi Actividad en el Blog - Accesible para todos los usuarios autenticados */}
+              <Route path="/dashboard/mi-blog" element={
+                <ProtectedRoute>
+                  <MyBlogHub />
+                </ProtectedRoute>
               } />
               
               {/* 📝 CMS - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
@@ -368,7 +391,16 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* �👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
+              {/* Moderación de Comentarios */}
+              <Route path="/dashboard/blog/moderation" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <CommentModeration />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
               <Route path="/dashboard/admin/users" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>

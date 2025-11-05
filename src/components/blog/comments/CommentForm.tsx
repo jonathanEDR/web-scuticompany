@@ -4,22 +4,23 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Send, X, AlertCircle } from 'lucide-react';
+import { Send, X, AlertCircle, User, Mail } from 'lucide-react';
+import { useAuth } from '../../../contexts/AuthContext';
+import type { CommentFormData } from '../../../types/blog';
 
 interface CommentFormProps {
-  postId: string;
+  postId?: string; // Opcional, solo para compatibilidad
   parentId?: string;
   initialContent?: string;
   isEditing?: boolean;
   isReply?: boolean;
-  onSubmit: (content: string, postId: string, parentId?: string) => Promise<void>;
+  onSubmit: (data: CommentFormData) => Promise<void>;
   onCancel?: () => void;
   placeholder?: string;
   className?: string;
 }
 
 export default function CommentForm({
-  postId,
   parentId,
   initialContent = '',
   isEditing = false,
@@ -30,7 +31,13 @@ export default function CommentForm({
   className = ''
 }: CommentFormProps) {
   
+  // Obtener usuario autenticado del contexto
+  const { user } = useAuth();
+  const isSignedIn = !!user;
+  
   const [content, setContent] = useState(initialContent);
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [charCount, setCharCount] = useState(initialContent.length);
@@ -55,6 +62,24 @@ export default function CommentForm({
       return false;
     }
 
+    // Si no está autenticado, validar nombre y email
+    if (!isSignedIn) {
+      if (!guestName.trim()) {
+        setError('Por favor ingresa tu nombre');
+        return false;
+      }
+      if (!guestEmail.trim()) {
+        setError('Por favor ingresa tu email');
+        return false;
+      }
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(guestEmail)) {
+        setError('Por favor ingresa un email válido');
+        return false;
+      }
+    }
+
     setError('');
     return true;
   };
@@ -69,11 +94,24 @@ export default function CommentForm({
     setError('');
 
     try {
-      await onSubmit(content.trim(), postId, parentId);
+      const commentData: CommentFormData = {
+        content: content.trim(),
+        parentComment: parentId
+      };
+
+      // Si no está autenticado, agregar datos de invitado
+      if (!isSignedIn) {
+        commentData.name = guestName.trim();
+        commentData.email = guestEmail.trim();
+      }
+
+      await onSubmit(commentData);
       
       // Limpiar formulario si no es edición
       if (!isEditing) {
         setContent('');
+        setGuestName('');
+        setGuestEmail('');
         setCharCount(0);
       }
       
@@ -104,30 +142,73 @@ export default function CommentForm({
   // Determinar si puede enviar
   const canSubmit = content.trim().length >= MIN_LENGTH && 
                     content.length <= MAX_LENGTH &&
-                    !isSubmitting;
+                    !isSubmitting &&
+                    (isSignedIn || (guestName.trim() && guestEmail.trim()));
 
   return (
     <form onSubmit={handleSubmit} className={`comment-form ${className}`}>
       <div className={`
-        bg-white rounded-lg border-2 transition-colors
-        ${error ? 'border-red-300' : 'border-gray-200 focus-within:border-blue-500'}
+        bg-white dark:bg-gray-800 rounded-lg border-2 transition-colors
+        ${error ? 'border-red-300 dark:border-red-600' : 'border-gray-200 dark:border-gray-600 focus-within:border-blue-500 dark:focus-within:border-blue-400'}
         ${isReply ? 'shadow-sm' : 'shadow-md'}
       `}>
         {/* Header (si es respuesta o edición) */}
         {(isReply || isEditing) && (
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
-            <span className="text-sm font-medium text-gray-700">
+          <div className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {isEditing ? '✏️ Editando comentario' : '↩️ Respondiendo'}
             </span>
             {onCancel && (
               <button
                 type="button"
                 onClick={handleCancel}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
+          </div>
+        )}
+
+        {/* Campos de invitado (solo si no está autenticado) */}
+        {!isSignedIn && !isEditing && (
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
+            <p className="text-sm text-blue-800 dark:text-blue-300 mb-3">
+              Comentando como invitado
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <User size={14} />
+                  Nombre *
+                </label>
+                <input
+                  type="text"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder="Tu nombre"
+                  required={!isSignedIn}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+              </div>
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <Mail size={14} />
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                  placeholder="tu@email.com"
+                  required={!isSignedIn}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+              Tu email no será publicado
+            </p>
           </div>
         )}
 
@@ -139,26 +220,26 @@ export default function CommentForm({
             placeholder={placeholder}
             rows={isReply ? 3 : 4}
             maxLength={MAX_LENGTH}
-            className="w-full resize-none border-0 focus:ring-0 text-gray-900 placeholder-gray-400"
+            className="w-full resize-none border-0 focus:ring-0 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             disabled={isSubmitting}
           />
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
           {/* Contador de caracteres */}
           <div className="text-sm">
             <span className={`
               font-medium
-              ${charCount < MIN_LENGTH ? 'text-gray-400' :
-                charCount > MAX_LENGTH * 0.9 ? 'text-orange-600' :
-                'text-gray-600'}
+              ${charCount < MIN_LENGTH ? 'text-gray-400 dark:text-gray-500' :
+                charCount > MAX_LENGTH * 0.9 ? 'text-orange-600 dark:text-orange-400' :
+                'text-gray-600 dark:text-gray-300'}
             `}>
               {charCount}
             </span>
-            <span className="text-gray-400"> / {MAX_LENGTH}</span>
+            <span className="text-gray-400 dark:text-gray-500"> / {MAX_LENGTH}</span>
             {charCount < MIN_LENGTH && (
-              <span className="ml-2 text-xs text-gray-400">
+              <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
                 (mínimo {MIN_LENGTH})
               </span>
             )}
@@ -171,7 +252,7 @@ export default function CommentForm({
                 type="button"
                 onClick={handleCancel}
                 disabled={isSubmitting}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
@@ -206,7 +287,7 @@ export default function CommentForm({
 
         {/* Mensaje de error */}
         {error && (
-          <div className="flex items-start gap-2 px-4 py-3 bg-red-50 border-t border-red-200 text-red-700 text-sm">
+          <div className="flex items-start gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border-t border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
             <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -215,9 +296,9 @@ export default function CommentForm({
 
       {/* Nota de políticas (solo en formulario principal) */}
       {!isReply && !isEditing && (
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
           Al comentar, aceptas nuestras{' '}
-          <a href="/politicas" className="text-blue-600 hover:underline">
+          <a href="/politicas" className="text-blue-600 dark:text-blue-400 hover:underline">
             políticas de comunidad
           </a>
           . Los comentarios están sujetos a moderación.

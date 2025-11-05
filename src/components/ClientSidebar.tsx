@@ -47,6 +47,12 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
       description: 'Comunicación con el equipo'
     },
     {
+      name: 'Mi Actividad',
+      icon: '📚',
+      path: '/dashboard/mi-blog',
+      description: 'Actividad en el blog'
+    },
+    {
       name: 'Perfil',
       icon: '👤',
       path: '/dashboard/profile',

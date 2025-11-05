@@ -3,6 +3,8 @@
  * Compatible con el backend Web Scuti API
  */
 
+import type { SocialLinks } from '../profile';
+
 // ============================================
 // INTERFACES PRINCIPALES
 // ============================================
@@ -66,14 +68,21 @@ export interface BlogCategory {
 export interface BlogAuthor {
   _id: string;
   clerkId: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
+  // Datos del perfil público del blog
+  displayName?: string;
   avatar?: string;
   bio?: string;
   website?: string;
+  location?: string;
+  expertise?: string[];
   social?: SocialLinks;
   role: string;
+  // Datos adicionales para el contexto del blog
+  profileCompleteness?: number;
+  publicUsername?: string;
 }
 
 export interface BlogComment {
@@ -125,13 +134,6 @@ export interface PostImage {
   url: string;
   alt?: string;
   caption?: string;
-}
-
-export interface SocialLinks {
-  twitter?: string;
-  linkedin?: string;
-  github?: string;
-  website?: string;
 }
 
 export interface CommentAuthor {

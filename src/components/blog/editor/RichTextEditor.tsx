@@ -95,7 +95,6 @@ export default function RichTextEditor({
     // 1. El editor está vacío y hay contenido nuevo (carga inicial)
     // 2. El contenido es diferente y no está siendo editado activamente
     if (hasNewContent && (isEditorEmpty || !editor.isFocused)) {
-      console.log('📝 [RichTextEditor] Actualizando contenido del editor');
       editor.commands.setContent(content);
     }
   }, [content, editor]);

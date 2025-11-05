@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Reply, Flag, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import type { BlogComment } from '../../../types/blog';
 
@@ -53,8 +54,10 @@ export default function CommentItem({
   });
 
   // Nombre del autor
-  const authorName = comment.author.userId 
-    ? `${comment.author.firstName} ${comment.author.lastName}`.trim()
+  // Si author.userId está poblado, puede ser un objeto con firstName/lastName/username
+  const isPopulatedUser = comment.author.userId && typeof comment.author.userId !== 'string';
+  const authorName = isPopulatedUser && (comment.author.userId as any).firstName
+    ? `${(comment.author.userId as any).firstName} ${(comment.author.userId as any).lastName || ''}`.trim()
     : comment.author.name || 'Usuario invitado';
 
   // Manejar votación
@@ -102,22 +105,45 @@ export default function CommentItem({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          {comment.author.avatar ? (
-            <img
-              src={comment.author.avatar}
-              alt={authorName}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">
-                {authorName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
+          {(() => {
+            const profileUsername = isPopulatedUser ? (comment.author.userId as any).username : undefined;
+            const profileImg = isPopulatedUser ? (comment.author.userId as any).profileImage : (comment.author.avatar || undefined);
+            const profileUrl = profileUsername ? `/perfil/${profileUsername}` : (comment.author.website || null);
+
+            const avatarNode = profileImg ? (
+              <img src={profileImg} alt={authorName} className="w-10 h-10 rounded-full object-cover" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">{authorName.charAt(0).toUpperCase()}</span>
+              </div>
+            );
+
+            if (profileUrl) {
+              // Si es ruta interna (username), usar Link; si es website, abrir en nueva pestaña
+              if (profileUsername) {
+                return (
+                  <Link to={profileUrl} aria-label={`Ver perfil de ${authorName}`} className="block">
+                    {avatarNode}
+                  </Link>
+                );
+              }
+              return (
+                <a href={profileUrl} target="_blank" rel="noopener noreferrer" aria-label={`Ver sitio de ${authorName}`}>{avatarNode}</a>
+              );
+            }
+
+            return avatarNode;
+          })()}
 
           <div>
-            <p className="font-semibold text-gray-900">{authorName}</p>
+            {/* Nombre del autor - si existe username, enlazar al perfil público */}
+            {isPopulatedUser && (comment.author.userId as any).username ? (
+              <Link to={`/perfil/${(comment.author.userId as any).username}`} className="font-semibold text-gray-900 hover:underline">
+                {authorName}
+              </Link>
+            ) : (
+              <p className="font-semibold text-gray-900">{authorName}</p>
+            )}
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <span>{formattedDate}</span>
               {comment.editedAt && (

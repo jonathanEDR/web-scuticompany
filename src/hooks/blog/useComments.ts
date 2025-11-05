@@ -57,8 +57,13 @@ export function useComments(
       });
       
       if (response.success && response.data) {
-        setComments(response.data.data);
-        setPagination(response.data.pagination);
+        // La respuesta directamente contiene el array de comentarios
+        const commentsData = Array.isArray(response.data) ? response.data : [];
+        setComments(commentsData);
+        // La paginación está en response.data si es PaginatedResponse, o en response si no
+        setPagination((response as any).pagination || null);
+      } else {
+        setComments([]);
       }
     } catch (err: any) {
       console.error('[useComments] Error:', err);

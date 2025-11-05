@@ -32,11 +32,11 @@ const authApiClient = axios.create({
   },
 });
 
-// Interceptor para logging en desarrollo
+// Interceptor para logging optimizado - solo en desarrollo
 if (import.meta.env.DEV) {
   authApiClient.interceptors.request.use(
     (config: any) => {
-      console.log(`[AuthService] ${config.method?.toUpperCase()} ${config.url}`);
+      console.debug(`[AuthService] ${config.method?.toUpperCase()} ${config.url}`);
       return config;
     },
     (error: any) => {
@@ -47,7 +47,7 @@ if (import.meta.env.DEV) {
 
   authApiClient.interceptors.response.use(
     (response: any) => {
-      console.log(`[AuthService] Response:`, response.data);
+      console.debug(`[AuthService] Response:`, response.data);
       return response;
     },
     (error: any) => {

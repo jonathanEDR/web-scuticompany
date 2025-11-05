@@ -20,6 +20,7 @@ interface UseModerationQueueReturn {
   stats: any | null;
   moderateComment: (commentId: string, action: ModerationAction, reason?: string) => Promise<void>;
   moderateBatch: (commentIds: string[], action: 'approve' | 'reject') => Promise<void>;
+  moderateMultiple: (commentIds: string[], action: 'approve' | 'reject' | 'spam') => Promise<void>;
   refetch: () => Promise<void>;
 }
 
@@ -59,7 +60,9 @@ export function useModerationQueue(
     try {
       const response = await blogModerationApi.getModerationStats();
       if (response.success && response.data) {
-        setStats(response.data);
+        // El backend devuelve { comments: { pending, approved, spam, ... }, reports, ... }
+        // Solo necesitamos la parte de comments
+        setStats(response.data.comments || response.data);
       }
     } catch (err: any) {
       console.error('[useModerationQueue] Error stats:', err);
@@ -114,6 +117,31 @@ export function useModerationQueue(
     }
   };
 
+  const moderateMultiple = async (
+    commentIds: string[],
+    action: 'approve' | 'reject' | 'spam'
+  ) => {
+    try {
+      // Moderar cada comentario individualmente
+      const promises = commentIds.map(id => 
+        blogModerationApi.moderateComment(id, {
+          action: action as ModerationAction,
+          notifyUser: action !== 'spam'
+        })
+      );
+      
+      await Promise.all(promises);
+      
+      // Recargar cola y stats
+      await fetchQueue();
+      await fetchStats();
+    } catch (err: any) {
+      console.error('[useModerationQueue] Error moderateMultiple:', err);
+      setError(err.message || 'Error al moderar múltiples comentarios');
+      throw err;
+    }
+  };
+
   return {
     comments,
     loading,
@@ -122,6 +150,7 @@ export function useModerationQueue(
     stats,
     moderateComment,
     moderateBatch,
+    moderateMultiple,
     refetch: fetchQueue,
   };
 }
@@ -224,7 +253,9 @@ export function useModerationStats() {
       const response = await blogModerationApi.getModerationStats();
       
       if (response.success && response.data) {
-        setStats(response.data);
+        // El backend devuelve { comments: { pending, approved, spam, ... }, reports, ... }
+        // Solo necesitamos la parte de comments
+        setStats(response.data.comments || response.data);
       }
     } catch (err: any) {
       console.error('[useModerationStats] Error:', err);

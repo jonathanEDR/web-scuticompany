@@ -69,23 +69,23 @@ apiClient.interceptors.request.use(
 );
 
 /**
- * Interceptor para logging en desarrollo
+ * Interceptor para logging optimizado - solo en desarrollo
  */
 if (import.meta.env.DEV) {
   apiClient.interceptors.request.use(
     (config) => {
-      console.log(`[ServiciosAPI] ${config.method?.toUpperCase()} ${config.url}`, config.params);
+      console.debug(`[ServiciosAPI] ${config.method?.toUpperCase()} ${config.url}`, config.params);
       return config;
     }
   );
 
   apiClient.interceptors.response.use(
     (response) => {
-      console.log(`[ServiciosAPI] Response:`, response.data);
+      console.debug(`[ServiciosAPI] Response:`, response.data);
       return response;
     },
     (error) => {
-      console.error('[ServiciosAPI] Response Error:', error.response?.data || error.message);
+      console.error('[ServiciosAPI] Error:', error.response?.data || error.message);
       return Promise.reject(error);
     }
   );

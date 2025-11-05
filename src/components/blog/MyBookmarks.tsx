@@ -1,0 +1,226 @@
+/**
+ * 🔖 MyBookmarks Component
+ * Artículos guardados por el usuario
+ */
+
+import { useState } from 'react';
+import { useUserBookmarks } from '../../hooks/useUserBookmarks';
+import { Bookmark, BookmarkX, Calendar, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+export default function MyBookmarks() {
+  const [page, setPage] = useState(1);
+  const [categoryFilter, setCategoryFilter] = useState<string | undefined>(undefined);
+  
+  const { bookmarks, pagination, loading, error, toggleBookmark, refetch } = useUserBookmarks({
+    page,
+    limit: 12,
+    category: categoryFilter
+  });
+
+  const handleRemoveBookmark = async (postId: string) => {
+    try {
+      await toggleBookmark(postId);
+      refetch();
+    } catch (err) {
+      alert('Error al quitar de guardados');
+    }
+  };
+
+  // Extraer categorías únicas para el filtro
+  const categories = Array.from(
+    new Set(bookmarks.map(b => b.category.slug))
+  ).map(slug => {
+    const bookmark = bookmarks.find(b => b.category.slug === slug);
+    return bookmark ? bookmark.category : null;
+  }).filter(Boolean);
+
+  if (loading && page === 1) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
+            <div className="h-48 bg-gray-200"></div>
+            <div className="p-4 space-y-3">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <p className="text-red-800 font-medium">Error al cargar guardados</p>
+        <p className="text-red-600 text-sm mt-1">{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Filters */}
+      {categories.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium text-gray-700">Categorías:</span>
+              <button
+                onClick={() => {
+                  setCategoryFilter(undefined);
+                  setPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  !categoryFilter
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Todas
+              </button>
+              {categories.map((category) => category && (
+                <button
+                  key={category.slug}
+                  onClick={() => {
+                    setCategoryFilter(category.slug);
+                    setPage(1);
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    categoryFilter === category.slug
+                      ? 'text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                  style={{
+                    backgroundColor: categoryFilter === category.slug ? category.color : undefined
+                  }}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+            
+            {pagination && (
+              <span className="text-sm text-gray-600">
+                {pagination.total} guardado{pagination.total !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Bookmarks Grid */}
+      {bookmarks.length === 0 ? (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
+          <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 font-medium">No tienes artículos guardados</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Guarda artículos para leerlos más tarde
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {bookmarks.map((bookmark) => (
+            <article 
+              key={bookmark._id}
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group"
+            >
+              {/* Featured Image */}
+              {bookmark.featuredImage && (
+                <Link to={`/blog/${bookmark.slug}`} className="block relative overflow-hidden">
+                  <img
+                    src={bookmark.featuredImage}
+                    alt={bookmark.title}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-3 right-3">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleRemoveBookmark(bookmark._id);
+                      }}
+                      className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors"
+                      title="Quitar de guardados"
+                    >
+                      <BookmarkX className="w-5 h-5 text-red-500" />
+                    </button>
+                  </div>
+                </Link>
+              )}
+
+              {/* Content */}
+              <div className="p-4">
+                {/* Category */}
+                <span 
+                  className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-3"
+                  style={{
+                    backgroundColor: `${bookmark.category.color}20`,
+                    color: bookmark.category.color
+                  }}
+                >
+                  {bookmark.category.name}
+                </span>
+
+                {/* Title */}
+                <Link to={`/blog/${bookmark.slug}`}>
+                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                    {bookmark.title}
+                  </h3>
+                </Link>
+
+                {/* Excerpt */}
+                {bookmark.excerpt && (
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                    {bookmark.excerpt}
+                  </p>
+                )}
+
+                {/* Meta */}
+                <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
+                  <div className="flex items-center gap-1">
+                    <User className="w-4 h-4" />
+                    <span>{bookmark.author?.name || 'Anónimo'}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      {new Date(bookmark.publishedAt).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'short'
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {pagination && pagination.pages > 1 && (
+        <div className="flex justify-center gap-2">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+          >
+            Anterior
+          </button>
+          <span className="px-4 py-2 text-gray-700">
+            Página {page} de {pagination.pages}
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+            disabled={page === pagination.pages}
+            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

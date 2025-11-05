@@ -92,7 +92,9 @@ export function usePostInteractions(postId: string) {
       setLoading(true);
       setError(null);
       
-      await blogPostApi.toggleLike(postId);
+      console.log('🔍 [FRONTEND] Intentando toggle like, postId:', postId);
+      const response = await blogPostApi.toggleLike(postId);
+      console.log('✅ [FRONTEND] Respuesta toggle like:', response);
       
       // Actualizar estado local
       const likedPosts = JSON.parse(localStorage.getItem('blog_liked_posts') || '[]');
@@ -120,7 +122,9 @@ export function usePostInteractions(postId: string) {
       setLoading(true);
       setError(null);
       
-      await blogPostApi.toggleBookmark(postId);
+      console.log('🔍 [FRONTEND] Intentando toggle bookmark, postId:', postId);
+      const response = await blogPostApi.toggleBookmark(postId);
+      console.log('✅ [FRONTEND] Respuesta toggle bookmark:', response);
       
       // Actualizar estado local
       const bookmarkedPosts = JSON.parse(localStorage.getItem('blog_bookmarked_posts') || '[]');

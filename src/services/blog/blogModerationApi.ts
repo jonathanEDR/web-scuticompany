@@ -78,10 +78,21 @@ const moderateComment = async (
   commentId: string,
   moderationData: ModerateCommentDto
 ): Promise<ApiResponse<BlogComment>> => {
-  const response = await moderationApiClient.put(
-    `/${commentId}/moderate`,
-    moderationData
-  );
+  // Mapear la acción a la ruta correcta del backend
+  const actionRoutes: Record<string, string> = {
+    'approve': `/${commentId}/approve`,
+    'reject': `/${commentId}/reject`,
+    'spam': `/${commentId}/spam`,
+    'hide': `/${commentId}/hide`
+  };
+
+  const route = actionRoutes[moderationData.action] || `/${commentId}/approve`;
+  
+  const response = await moderationApiClient.post(route, {
+    reason: moderationData.reason,
+    notifyUser: moderationData.notifyUser
+  });
+  
   return response.data;
 };
 

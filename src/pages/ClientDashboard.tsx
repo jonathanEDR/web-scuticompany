@@ -122,6 +122,32 @@ export default function ClientDashboard() {
               Centro de Ayuda
             </a>
           </div>
+
+          {/* Card de Mi Actividad en el Blog */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-200">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-2xl">
+                📚
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Mi Actividad en el Blog
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Comentarios y guardados
+                </p>
+              </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+              Gestiona tus comentarios, artículos guardados y tu historial de lectura.
+            </p>
+            <a
+              href="/dashboard/mi-blog"
+              className="inline-block w-full text-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold rounded-lg transition-all duration-200"
+            >
+              Ver Mi Actividad
+            </a>
+          </div>
         </div>
 
         {/* Información del Usuario */}

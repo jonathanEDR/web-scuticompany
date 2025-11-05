@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCategories, useAdminPosts } from '../../../hooks/blog';
+import { useModerationStats } from '../../../hooks/blog/useModerationQueue';
 import DashboardLayout from '../../../components/DashboardLayout';
 
 interface DashboardStats {
@@ -29,6 +30,9 @@ export default function BlogDashboard() {
   const { posts, loading: postsLoading, error: postsError } = useAdminPosts({ 
     limit: 100 // Cargar más posts para estadísticas precisas
   });
+  
+  // Cargar estadísticas de moderación para comentarios pendientes
+  const { stats: moderationStats } = useModerationStats();
   
   // Debug logs
   useEffect(() => {
@@ -105,10 +109,10 @@ export default function BlogDashboard() {
     },
     {
       label: 'Comentarios',
-      value: stats.totalComments,
+      value: moderationStats?.pending || 0,
       icon: MessageCircle,
       color: 'orange',
-      trend: 'Pendientes de moderar'
+      trend: `${moderationStats?.pending || 0} pendientes de moderar`
     },
     {
       label: 'Autores Activos',
@@ -172,10 +176,13 @@ export default function BlogDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
-          return (
+          const isCommentsCard = stat.label === 'Comentarios';
+          
+          const cardContent = (
             <div
-              key={index}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
+              className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-shadow ${
+                isCommentsCard ? 'hover:shadow-lg hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer' : 'hover:shadow-md'
+              }`}
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -191,6 +198,16 @@ export default function BlogDashboard() {
                   <Icon className="w-6 h-6" />
                 </div>
               </div>
+            </div>
+          );
+          
+          return isCommentsCard ? (
+            <Link key={index} to="/dashboard/blog/moderation">
+              {cardContent}
+            </Link>
+          ) : (
+            <div key={index}>
+              {cardContent}
             </div>
           );
         })}

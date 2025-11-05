@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useBlogPosts } from '../../../hooks/blog';
 import { useCategories } from '../../../hooks/blog';
-import { BlogCard } from '../../../components/blog/common';
+import { BlogCard, SEOHead } from '../../../components/blog/common';
 import PublicFooter from '../../../components/public/PublicFooter';
 
 const BlogHome: React.FC = () => {
@@ -61,6 +61,12 @@ const BlogHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* SEO Head */}
+      <SEOHead 
+        title="Blog Web Scuti - Desarrollo Web y Tecnología"
+        description="Descubre las últimas tendencias en desarrollo web, diseño y tecnología. Artículos, tutoriales y consejos para desarrolladores y empresarios."
+        type="website"
+      />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-white py-20">
         <div className="container mx-auto px-4">

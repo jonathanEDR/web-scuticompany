@@ -1,8 +1,19 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, Clock, User, ArrowLeft, Tag as TagIcon, Eye, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Tag as TagIcon } from 'lucide-react';
 import { useBlogPost } from '../../../hooks/blog';
-import { ShareButtons, ReadingTimeIndicator, CategoryBadge, TagList } from '../../../components/blog/common';
+import { 
+  ShareButtons, 
+  TagList, 
+  RelatedPosts, 
+  TableOfContents, 
+  PostNavigation, 
+  SEOHead, 
+  PostHeader,
+  AuthorCard,
+  LazyImage
+} from '../../../components/blog/common';
+import { CommentsList } from '../../../components/blog/comments';
 import { sanitizeHTML } from '../../../utils/blog';
 import PublicFooter from '../../../components/public/PublicFooter';
 
@@ -50,136 +61,135 @@ const BlogPost: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <section className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <Link to="/blog" className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium mb-6">
-            <ArrowLeft size={20} />
-            Volver al blog
-          </Link>
-          {post.category && <div className="mb-4"><CategoryBadge category={post.category} /></div>}
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">{post.title}</h1>
-          {post.excerpt && <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">{post.excerpt}</p>}
-          <div className="flex flex-wrap items-center gap-6 text-gray-600 dark:text-gray-400">
-            {post.author && (
-              <div className="flex items-center gap-2">
-                <User size={18} />
-                <span className="font-medium">{post.author.firstName} {post.author.lastName}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <Calendar size={18} />
-              <span>{new Date(post.publishedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock size={18} />
-              <ReadingTimeIndicator minutes={post.readingTime} variant="minimal" />
-            </div>
-            {post.stats?.views && (
-              <div className="flex items-center gap-2">
-                <Eye size={18} />
-                <span>{post.stats.views.toLocaleString()} vistas</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      {/* SEO Head */}
+      <SEOHead post={post} type="article" />
+      
+      {/* Post Header */}
+      <PostHeader post={post} />
+
+      {/* Featured Image */}
       {post.featuredImage && (
-        <section className="bg-gray-900 dark:bg-gray-950">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <img 
-              src={post.featuredImage} 
-              alt={post.title} 
-              className="w-full h-96 object-cover" 
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-6">
+          <div className="w-full rounded-xl overflow-hidden shadow-lg">
+            <LazyImage
+              src={post.featuredImage}
+              alt={post.title}
+              className="w-full h-[300px] sm:h-[400px] lg:h-[500px] object-cover"
             />
           </div>
         </section>
       )}
-      <section className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <aside className="hidden lg:block lg:col-span-1">
-            <div className="sticky top-24">
-              <ShareButtons url={window.location.href} title={post.title} variant="default" />
+
+      {/* Main Content with Sidebar Layout */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+          
+          {/* Sidebar - TOC and Share (Hidden on mobile) */}
+          <aside className="hidden lg:block lg:col-span-3">
+            <div className="sticky top-24 space-y-6">
+              {/* Table of Contents */}
+              <TableOfContents 
+                content={post.content}
+                maxLevel={3}
+              />
+              
+              {/* Share Buttons */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                  Compartir
+                </h3>
+                <ShareButtons 
+                  url={window.location.href} 
+                  title={post.title} 
+                  variant="default" 
+                />
+              </div>
             </div>
           </aside>
-          <article className="lg:col-span-11">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 md:p-12">
+
+          {/* Main Article */}
+          <article className="lg:col-span-9">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8 lg:p-12">
+              {/* Content */}
               <div 
-                className="prose prose-lg max-w-none 
-                  prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
+                className="prose prose-lg lg:prose-xl max-w-none
+                  prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-headings:scroll-mt-24
                   prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed 
-                  prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline 
-                  prose-strong:text-gray-900 dark:prose-strong:text-white
-                  prose-ul:list-disc prose-ol:list-decimal 
+                  prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium
+                  prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-semibold
+                  prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-blue-600
                   prose-li:text-gray-700 dark:prose-li:text-gray-300
                   prose-blockquote:border-l-4 prose-blockquote:border-blue-600 dark:prose-blockquote:border-blue-400 
-                  prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
+                  prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
+                  prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:py-2
                   prose-code:bg-gray-100 dark:prose-code:bg-gray-700 prose-code:text-gray-800 dark:prose-code:text-gray-200
-                  prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm 
-                  prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 
-                  prose-img:rounded-lg prose-img:shadow-md"
+                  prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono
+                  prose-code:before:content-[''] prose-code:after:content-['']
+                  prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:rounded-lg
+                  prose-pre:shadow-lg prose-pre:border prose-pre:border-gray-700
+                  prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto
+                  prose-hr:border-gray-200 dark:prose-hr:border-gray-700"
                 dangerouslySetInnerHTML={{ __html: sanitizeHTML(post.content) }} 
               />
+
+              {/* Tags Section */}
               {post.tags && post.tags.length > 0 && (
                 <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-3 mb-3">
-                    <TagIcon className="text-gray-400 dark:text-gray-500" size={20} />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Etiquetas</h3>
+                  <div className="flex items-center gap-3 mb-4">
+                    <TagIcon className="text-blue-600 dark:text-blue-400" size={20} />
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Etiquetas</h3>
                   </div>
                   <TagList tags={post.tags} />
                 </div>
               )}
               
-              {/* Sección del autor */}
+              {/* Author Card */}
               {post.author && (
                 <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-start gap-4">
-                    {post.author.avatar ? (
-                      <img 
-                        src={post.author.avatar} 
-                        alt={`${post.author.firstName} ${post.author.lastName}`} 
-                        className="w-16 h-16 rounded-full object-cover" 
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                        <User className="text-blue-600 dark:text-blue-400" size={32} />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                        {post.author.firstName} {post.author.lastName}
-                      </h3>
-                      {post.author.bio && <p className="text-gray-600 dark:text-gray-300">{post.author.bio}</p>}
-                    </div>
-                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                    Sobre el autor
+                  </h3>
+                  <AuthorCard author={post.author} />
                 </div>
               )}
               
-              <div className="mt-8 lg:hidden">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Compartir</h3>
-                <ShareButtons url={window.location.href} title={post.title} variant="default" />
+              {/* Share on Mobile */}
+              <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 lg:hidden">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                  Compartir artículo
+                </h3>
+                <ShareButtons 
+                  url={window.location.href} 
+                  title={post.title} 
+                  variant="default" 
+                />
               </div>
             </div>
+
+            {/* Comments Section */}
             {post.allowComments && (
-              <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <MessageCircle className="text-blue-600 dark:text-blue-400" size={24} />
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Comentarios ({post.stats?.commentsCount || 0})
-                  </h2>
-                </div>
-                <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
-                  <MessageCircle className="mx-auto text-gray-400 dark:text-gray-500 mb-3" size={48} />
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
-                    La sección de comentarios estará disponible próximamente
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500">
-                    Podrás compartir tus opiniones y conectar con otros lectores
-                  </p>
-                </div>
+              <div className="mt-8">
+                <CommentsList 
+                  postSlug={post.slug}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8"
+                />
               </div>
             )}
           </article>
         </div>
+      </section>
+
+      {/* Post Navigation */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8">
+        <PostNavigation currentPost={post} />
+      </section>
+
+      {/* Related Posts */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
+        <RelatedPosts 
+          currentPost={post} 
+          maxPosts={4}
+        />
       </section>
 
       {/* Footer */}
