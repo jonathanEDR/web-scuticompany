@@ -74,10 +74,10 @@ export default function ModerationCard({ comment, selected, onSelect, onModerate
   };
 
   const getAuthorName = () => {
-    if (comment.author.firstName && comment.author.lastName) {
+    if (comment.author?.firstName && comment.author?.lastName) {
       return `${comment.author.firstName} ${comment.author.lastName}`;
     }
-    return comment.author.name || 'Usuario Anónimo';
+    return comment.author?.name || 'Usuario Anónimo';
   };
 
   return (

@@ -1,10 +1,9 @@
 /**
  * 📋 ProfileDirectory - Directorio Avanzado de Perfiles
- * Lista completa con filtros avanzados, búsqueda y ordenamiento
+ * Lista completa con filtros avanzados, búsqueda y vista de perfil en panel lateral
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Search,
   Filter,
@@ -19,11 +18,19 @@ import {
   List,
   ArrowUpDown,
   User,
-  ExternalLink,
-  Award
+  Award,
+  Eye,
+  Calendar,
+  Globe,
+  Mail,
+  Twitter,
+  Github,
+  Linkedin,
+  Share2
 } from 'lucide-react';
 import {
-  listPublicProfiles
+  listPublicProfiles,
+  getPublicProfile
 } from '../../services/profileService';
 import type { PublicUserProfile } from '../../types/profile';
 
@@ -49,6 +56,11 @@ const ProfileDirectory: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  
+  // Estados para el panel de perfil
+  const [selectedProfile, setSelectedProfile] = useState<PublicUserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [showProfilePanel, setShowProfilePanel] = useState(false);
 
   // Estados de filtros
   const [filters, setFilters] = useState<FilterState>({
@@ -175,6 +187,37 @@ const ProfileDirectory: React.FC = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
+  // Handler para mostrar perfil en panel lateral
+  const handleViewProfile = async (profile: PublicUserProfile) => {
+    setProfileLoading(true);
+    setShowProfilePanel(true);
+    
+    try {
+      // Intentar obtener el perfil completo desde la API
+      // Primero intentar con username, luego con ID
+      let identifier = profile.username;
+      if (!identifier) {
+        identifier = profile._id;
+      }
+      
+      console.log('🔍 Cargando perfil para:', identifier);
+      const fullProfile = await getPublicProfile(identifier);
+      setSelectedProfile(fullProfile);
+      console.log('✅ Perfil cargado:', fullProfile);
+    } catch (error) {
+      console.error('❌ Error loading full profile:', error);
+      // Usar el perfil básico como fallback
+      setSelectedProfile(profile);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const closeProfilePanel = () => {
+    setShowProfilePanel(false);
+    setSelectedProfile(null);
+  };
+
   const getCompletenessColor = (score: number): string => {
     if (score >= 80) return 'text-green-600 bg-green-100';
     if (score >= 60) return 'text-yellow-600 bg-yellow-100';
@@ -248,13 +291,13 @@ const ProfileDirectory: React.FC = () => {
                   )}
                 </div>
 
-                <Link
-                  to={`/perfil/${profile._id}`}
+                <button
+                  onClick={() => handleViewProfile(profile)}
                   className="inline-flex items-center px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
                 >
                   Ver Perfil
-                  <ExternalLink className="w-3 h-3 ml-1" />
-                </Link>
+                  <Eye className="w-3 h-3 ml-1" />
+                </button>
               </div>
             </div>
           </div>
@@ -327,13 +370,13 @@ const ProfileDirectory: React.FC = () => {
           </div>
 
           {/* Botón */}
-          <Link
-            to={`/perfil/${profile._id}`}
+          <button
+            onClick={() => handleViewProfile(profile)}
             className="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
             Ver Perfil
-            <ExternalLink className="w-4 h-4 ml-2" />
-          </Link>
+            <Eye className="w-4 h-4 ml-2" />
+          </button>
         </div>
       </div>
     );
@@ -579,6 +622,250 @@ const ProfileDirectory: React.FC = () => {
             )}
           </>
         )}
+      </div>
+
+      {/* Panel lateral de perfil */}
+      {showProfilePanel && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={closeProfilePanel}
+          />
+          
+          {/* Panel lateral */}
+          <div className="absolute right-0 top-0 h-full w-full max-w-md sm:max-w-lg lg:max-w-xl bg-white shadow-xl">
+            <div className="flex flex-col h-full">
+              {/* Header del panel */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 className="text-xl font-semibold text-gray-900">Perfil de Usuario</h2>
+                <button
+                  onClick={closeProfilePanel}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Contenido del panel */}
+              <div className="flex-1 overflow-y-auto">
+                {profileLoading ? (
+                  <div className="flex items-center justify-center h-64">
+                    <Loader className="w-8 h-8 animate-spin text-indigo-600" />
+                  </div>
+                ) : selectedProfile ? (
+                  <ProfilePanelContent profile={selectedProfile} />
+                ) : (
+                  <div className="flex items-center justify-center h-64">
+                    <AlertCircle className="w-8 h-8 text-gray-400" />
+                    <p className="ml-2 text-gray-500">Error al cargar el perfil</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Componente para el contenido del panel de perfil
+const ProfilePanelContent: React.FC<{ profile: PublicUserProfile }> = ({ profile }) => {
+  const getMemberSince = (createdAt: string): string => {
+    const date = new Date(createdAt);
+    return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long' });
+  };
+
+  const getCompletenessLevel = (score: number): { level: string; color: string; badge: string } => {
+    if (score >= 90) return { level: 'Experto', color: 'text-purple-600 bg-purple-100', badge: '🏆' };
+    if (score >= 80) return { level: 'Avanzado', color: 'text-green-600 bg-green-100', badge: '⭐' };
+    if (score >= 60) return { level: 'Intermedio', color: 'text-yellow-600 bg-yellow-100', badge: '🥉' };
+    if (score >= 40) return { level: 'Básico', color: 'text-blue-600 bg-blue-100', badge: '📝' };
+    return { level: 'Nuevo', color: 'text-gray-600 bg-gray-100', badge: '🌱' };
+  };
+
+  const completeness = getCompletenessLevel(profile.profileCompleteness || 0);
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header del perfil */}
+      <div className="text-center">
+        <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 mx-auto mb-4">
+          {profile.avatar ? (
+            <img 
+              src={profile.avatar} 
+              alt={profile.displayName}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <User className="w-12 h-12 text-gray-400" />
+            </div>
+          )}
+        </div>
+        
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          {profile.displayName || 'Usuario'}
+        </h3>
+        
+        {profile.bio ? (
+          <p className="text-gray-600 mb-4">
+            {profile.bio}
+          </p>
+        ) : (
+          <p className="text-gray-400 italic mb-4">
+            Este usuario aún no ha agregado una biografía
+          </p>
+        )}
+
+        {/* Badge de completeness */}
+        <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${completeness.color}`}>
+          <span className="mr-1">{completeness.badge}</span>
+          {completeness.level} - {profile.profileCompleteness || 0}%
+        </div>
+      </div>
+
+      {/* Información básica */}
+      <div className="bg-gray-50 rounded-lg p-4">
+        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+          <User className="w-4 h-4 mr-2" />
+          Información básica
+        </h4>
+        
+        <div className="space-y-2 text-sm">
+          {profile.username && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Username</span>
+              <span className="font-medium">@{profile.username}</span>
+            </div>
+          )}
+          
+          {profile.location && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Ubicación</span>
+              <span className="font-medium flex items-center">
+                <MapPin className="w-3 h-3 mr-1" />
+                {profile.location}
+              </span>
+            </div>
+          )}
+          
+          {profile.joinDate && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Miembro desde</span>
+              <span className="font-medium flex items-center">
+                <Calendar className="w-3 h-3 mr-1" />
+                {getMemberSince(profile.joinDate)}
+              </span>
+            </div>
+          )}
+          
+          {profile.website && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Sitio web</span>
+              <a 
+                href={profile.website} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="font-medium text-indigo-600 hover:text-indigo-700 flex items-center"
+              >
+                <Globe className="w-3 h-3 mr-1" />
+                Visitar
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Especialidades */}
+      {profile.expertise && profile.expertise.length > 0 && (
+        <div>
+          <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+            <Star className="w-4 h-4 mr-2" />
+            Especialidades
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {profile.expertise.map((skill, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Redes sociales */}
+      {profile.social && Object.values(profile.social).some(v => v) && (
+        <div>
+          <h4 className="font-semibold text-gray-900 mb-3">Redes sociales</h4>
+          <div className="space-y-2">
+            {profile.social.twitter && (
+              <a
+                href={`https://twitter.com/${profile.social.twitter}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Twitter className="w-4 h-4 mr-3 text-blue-500" />
+                <span>@{profile.social.twitter}</span>
+              </a>
+            )}
+            
+            {profile.social.github && (
+              <a
+                href={`https://github.com/${profile.social.github}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Github className="w-4 h-4 mr-3 text-gray-900" />
+                <span>@{profile.social.github}</span>
+              </a>
+            )}
+            
+            {profile.social.linkedin && (
+              <a
+                href={`https://linkedin.com/in/${profile.social.linkedin}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Linkedin className="w-4 h-4 mr-3 text-blue-700" />
+                <span>@{profile.social.linkedin}</span>
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Acciones */}
+      <div className="border-t border-gray-200 pt-6">
+        <div className="space-y-3">
+          {profile.email && (
+            <a
+              href={`mailto:${profile.email}`}
+              className="w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Enviar mensaje
+            </a>
+          )}
+          
+          <button
+            onClick={() => {
+              const url = window.location.origin + `/perfil/${profile.username || profile._id}`;
+              navigator.share?.({ url }) || navigator.clipboard?.writeText(url);
+            }}
+            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            Compartir perfil
+          </button>
+        </div>
       </div>
     </div>
   );

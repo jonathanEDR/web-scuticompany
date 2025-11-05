@@ -19,7 +19,17 @@ import type {
 // CONFIGURACIÓN DE AXIOS
 // ============================================
 
+// Cliente para peticiones autenticadas
 const blogApiClient = axios.create({
+  baseURL: `${getApiUrl()}/blog`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 15000,
+});
+
+// Cliente para peticiones públicas (sin autenticación)
+const publicBlogApiClient = axios.create({
   baseURL: `${getApiUrl()}/blog`,
   headers: {
     'Content-Type': 'application/json',
@@ -31,7 +41,7 @@ const blogApiClient = axios.create({
 // INTERCEPTORES
 // ============================================
 
-// Configurar interceptor de autenticación
+// Configurar interceptor de autenticación solo para cliente autenticado
 setupAuthInterceptor(blogApiClient);
 
 // Interceptor para manejo de respuestas y errores
@@ -77,7 +87,7 @@ blogApiClient.interceptors.response.use(
 const getAllPosts = async (
   filters?: BlogFilters
 ): Promise<ApiResponse<PaginatedResponse<BlogPost>>> => {
-  const response = await blogApiClient.get('/posts', { params: filters });
+  const response = await publicBlogApiClient.get('/posts', { params: filters });
   return response.data;
 };
 
@@ -85,7 +95,7 @@ const getAllPosts = async (
  * Obtiene un post por su slug
  */
 const getPostBySlug = async (slug: string): Promise<ApiResponse<BlogPost>> => {
-  const response = await blogApiClient.get(`/posts/${slug}`);
+  const response = await publicBlogApiClient.get(`/posts/${slug}`);
   return response.data;
 };
 
@@ -93,7 +103,7 @@ const getPostBySlug = async (slug: string): Promise<ApiResponse<BlogPost>> => {
  * Obtiene posts destacados
  */
 const getFeaturedPosts = async (): Promise<ApiResponse<BlogPost[]>> => {
-  const response = await blogApiClient.get('/posts/featured');
+  const response = await publicBlogApiClient.get('/posts/featured');
   return response.data;
 };
 
@@ -101,7 +111,7 @@ const getFeaturedPosts = async (): Promise<ApiResponse<BlogPost[]>> => {
  * Obtiene posts populares
  */
 const getPopularPosts = async (limit: number = 5): Promise<ApiResponse<BlogPost[]>> => {
-  const response = await blogApiClient.get('/posts/popular', {
+  const response = await publicBlogApiClient.get('/posts/popular', {
     params: { limit }
   });
   return response.data;
@@ -114,7 +124,7 @@ const searchPosts = async (
   query: string,
   filters?: Partial<BlogFilters>
 ): Promise<ApiResponse<PaginatedResponse<BlogPost>>> => {
-  const response = await blogApiClient.get('/posts/search', {
+  const response = await publicBlogApiClient.get('/posts/search', {
     params: { q: query, ...filters }
   });
   return response.data;

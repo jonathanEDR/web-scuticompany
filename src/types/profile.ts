@@ -32,6 +32,7 @@ export interface BlogProfile {
 
 export interface PublicUserProfile {
   _id: string;
+  username?: string;
   displayName?: string;
   bio?: string;
   avatar?: string;

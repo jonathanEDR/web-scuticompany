@@ -157,33 +157,47 @@ const ProfileEditor: React.FC = () => {
         return;
       }
       
+      console.log('🔍 Cargando perfil del usuario...');
       const profile = await getMyProfile(token);
+      console.log('📦 Perfil recibido:', profile);
+      
       if (profile && profile.blogProfile) {
         const bp = profile.blogProfile;
-        setFormData({
-          displayName: bp.displayName || '',
-          bio: bp.bio || '',
-          location: bp.location || '',
-          website: bp.website || '',
-          expertise: Array.isArray(bp.expertise) ? bp.expertise : [],
-          avatar: bp.avatar || '',
+        console.log('✅ blogProfile encontrado:', bp);
+        
+        // 🛡️ ASEGURAR QUE TODOS LOS VALORES SEAN STRINGS (NO UNDEFINED)
+        const newFormData = {
+          displayName: String(bp.displayName || profile.firstName || (profile.email?.split('@')[0]) || ''),
+          bio: String(bp.bio || ''),
+          location: String(bp.location || ''),
+          website: String(bp.website || ''),
+          expertise: Array.isArray(bp.expertise) 
+            ? bp.expertise 
+            : (typeof bp.expertise === 'string' && bp.expertise 
+               ? (bp.expertise as string).split(', ').filter((e: string) => e.trim()) // Convertir string a array
+               : []),
+          avatar: String(bp.avatar || ''),
           social: {
-            twitter: bp.social?.twitter || '',
-            github: bp.social?.github || '',
-            linkedin: bp.social?.linkedin || '',
-            instagram: bp.social?.instagram || ''
+            twitter: String(bp.social?.twitter || ''),
+            github: String(bp.social?.github || ''),
+            linkedin: String(bp.social?.linkedin || ''),
+            instagram: String(bp.social?.instagram || '')
           },
           privacy: {
-            showEmail: bp.showEmail || false,
-            showLocation: true, // Default
+            showEmail: Boolean(bp.showEmail),
+            showLocation: true,
             isPublicProfile: bp.isPublicProfile !== false,
             allowComments: bp.allowComments !== false
           }
-        });
+        };
+        
+        console.log('📝 FormData a establecer:', newFormData);
+        setFormData(newFormData);
       } else {
+        console.warn('⚠️ No se encontró blogProfile, inicializando con valores por defecto');
         // Inicializar con valores por defecto si no hay perfil
-        setFormData({
-          displayName: user?.firstName || '',
+        const defaultFormData = {
+          displayName: String(user?.firstName || (user?.primaryEmailAddress?.emailAddress?.split('@')[0]) || ''),
           bio: '',
           location: '',
           website: '',
@@ -201,10 +215,13 @@ const ProfileEditor: React.FC = () => {
             isPublicProfile: true,
             allowComments: true
           }
-        });
+        };
+        
+        console.log('📝 FormData por defecto:', defaultFormData);
+        setFormData(defaultFormData);
       }
     } catch (err: any) {
-      console.error('Error loading profile:', err);
+      console.error('❌ Error loading profile:', err);
       setErrors([{ field: 'general', message: err.message || 'Error al cargar el perfil' }]);
       // Inicializar con valores por defecto en caso de error
       setFormData({
@@ -324,7 +341,14 @@ const ProfileEditor: React.FC = () => {
   // ============================================
 
   const handleBasicChange = (field: keyof Pick<FormData, 'displayName' | 'bio' | 'location' | 'website'>, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    console.log(`✏️ handleBasicChange - Campo: ${field}, Valor: ${value}`);
+    
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      console.log('📝 FormData actualizado:', updated);
+      return updated;
+    });
+    
     setHasChanges(true);
     
     // Validación en tiempo real
@@ -392,17 +416,23 @@ const ProfileEditor: React.FC = () => {
       const token = await getToken();
       if (!token) throw new Error('No estás autenticado');
 
-      const profileData: Partial<BlogProfile> = {
+      // 🔧 FIX: Ajustar formato de datos para que coincida con el validador del backend
+      const profileData: any = {
         displayName: formData.displayName,
         bio: formData.bio,
         location: formData.location,
         website: formData.website,
-        expertise: formData.expertise,
+        expertise: Array.isArray(formData.expertise) 
+          ? formData.expertise.join(', ') // Convertir array a string separado por comas
+          : (formData.expertise || ''),
         social: formData.social,
+        // Campos de privacidad al nivel raíz (no anidado en 'privacy')
         showEmail: formData.privacy.showEmail,
         isPublicProfile: formData.privacy.isPublicProfile,
         allowComments: formData.privacy.allowComments
       };
+      
+      console.log('📤 Datos a enviar al backend:', profileData);
 
       if (formData.avatar) {
         profileData.avatar = formData.avatar;

@@ -49,11 +49,17 @@ export default function SEOHead({
       // Actualizar meta tags del post
       updateMetaTag('description', seoDescription);
       updateMetaTag('keywords', keywords);
-      updateMetaTag('author', `${post.author.firstName} ${post.author.lastName}`);
-      updateMetaTag('article:author', `${post.author.firstName} ${post.author.lastName}`);
+      
+      // Autor con validación de null
+      const authorName = post.author 
+        ? `${post.author.firstName || ''} ${post.author.lastName || ''}`.trim()
+        : 'Autor Desconocido';
+      
+      updateMetaTag('author', authorName);
+      updateMetaTag('article:author', authorName);
       updateMetaTag('article:published_time', post.publishedAt);
       updateMetaTag('article:modified_time', post.updatedAt);
-      updateMetaTag('article:section', post.category.name);
+      updateMetaTag('article:section', post.category?.name || '');
       updateMetaTag('article:tag', keywords);
     }
 
@@ -100,8 +106,10 @@ export default function SEOHead({
         image: post.featuredImage,
         author: {
           '@type': 'Person',
-          name: `${post.author.firstName} ${post.author.lastName}`,
-          url: post.author.website
+          name: post.author 
+            ? `${post.author.firstName || ''} ${post.author.lastName || ''}`.trim() || 'Autor Desconocido'
+            : 'Autor Desconocido',
+          url: post.author?.website || ''
         },
         publisher: {
           '@type': 'Organization',

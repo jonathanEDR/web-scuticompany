@@ -2,8 +2,12 @@ import React from 'react';
 import DashboardSeo from '../../components/DashboardSeo';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import ProfileEditor from '../../components/profile/ProfileEditorComplete';
+// import ProfileEditorTest from '../../components/profile/ProfileEditorTest'; // 🧪 Componente de prueba
 
 const Profile: React.FC = () => {
+  // 🔧 Para debugging: Descomentar la línea abajo y comentar <ProfileEditor />
+  // const UseTestComponent = true;
+  
   return (
     <SmartDashboardLayout>
       <DashboardSeo
@@ -21,6 +25,7 @@ const Profile: React.FC = () => {
           </div>
           
           {/* Componente del editor */}
+          {/* {UseTestComponent ? <ProfileEditorTest /> : <ProfileEditor />} */}
           <ProfileEditor />
         </div>
       </DashboardSeo>

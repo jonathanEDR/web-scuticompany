@@ -47,8 +47,10 @@ export default function BlogCard({
   // Tiempo de lectura
   const readingTime = formatReadingTime(post.readingTime);
   
-  // Nombre completo del autor
-  const authorName = `${post.author.firstName} ${post.author.lastName}`.trim();
+  // Nombre completo del autor (con validación de nulos)
+  const authorName = post.author 
+    ? `${post.author.firstName || ''} ${post.author.lastName || ''}`.trim()
+    : 'Autor Desconocido';
 
   // Variantes de diseño
   const variants = {
@@ -122,7 +124,7 @@ export default function BlogCard({
           <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
             {showAuthor && (
               <div className="flex items-center gap-3">
-                {post.author.avatar && (
+                {post.author?.avatar && (
                   <img
                     src={post.author.avatar}
                     alt={authorName}
@@ -313,7 +315,7 @@ export default function BlogCard({
         <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700 mt-auto">
           {showAuthor && (
             <div className="flex items-center gap-2">
-              {post.author.avatar && (
+              {post.author?.avatar && (
                 <img
                   src={post.author.avatar}
                   alt={authorName}

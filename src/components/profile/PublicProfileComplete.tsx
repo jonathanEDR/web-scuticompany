@@ -64,9 +64,12 @@ const PublicProfileComplete: React.FC = () => {
 
   const loadProfile = async (username: string) => {
     try {
+      console.log('🔍 Cargando perfil público para username:', username);
       const profileData = await getPublicProfile(username);
+      console.log('✅ Perfil público cargado:', profileData);
       setProfile(profileData);
     } catch (err: any) {
+      console.error('❌ Error cargando perfil público:', err);
       setError(err.message || 'Perfil no encontrado');
     }
   };
@@ -286,10 +289,28 @@ const PublicProfileComplete: React.FC = () => {
                 {profile.displayName || username}
               </h1>
               
-              {profile.bio && (
+              {profile.bio ? (
                 <p className="text-xl text-indigo-100 mb-4 max-w-2xl">
                   {profile.bio}
                 </p>
+              ) : (
+                <p className="text-lg text-indigo-200/80 mb-4 max-w-2xl italic">
+                  Este usuario aún no ha agregado una biografía
+                </p>
+              )}
+
+              {/* Expertise tags */}
+              {profile.expertise && profile.expertise.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {profile.expertise.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-white/20 text-white rounded-full text-sm font-medium backdrop-blur-sm"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               )}
 
               {/* Metadatos */}
@@ -447,9 +468,17 @@ const PublicProfileComplete: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">Aún no ha publicado artículos</p>
+                <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                  <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Aún no hay artículos</h3>
+                  <p className="text-gray-500 mb-4">
+                    {profile.displayName || username} aún no ha publicado artículos en el blog
+                  </p>
+                  <div className="bg-gray-50 rounded-lg p-4 max-w-sm mx-auto">
+                    <p className="text-sm text-gray-600">
+                      💡 Los artículos aparecerán aquí cuando {profile.displayName || 'este usuario'} publique contenido
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -507,9 +536,78 @@ const PublicProfileComplete: React.FC = () => {
                 </div>
               )}
 
+              {/* Estado cuando no hay información de contacto */}
               {!profile.email && (!profile.social || Object.values(profile.social).every(v => !v)) && (
-                <p className="text-gray-500 text-sm">No hay información de contacto pública</p>
+                <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-lg">
+                  <Mail className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm font-medium">No hay información de contacto pública</p>
+                  <p className="text-gray-400 text-xs mt-1">Este usuario prefiere mantener privados sus datos de contacto</p>
+                </div>
               )}
+            </div>
+
+            {/* Nueva sección: Sobre el usuario */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <User className="w-5 h-5 mr-2 text-indigo-600" />
+                Sobre {profile.displayName || username}
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Completitud del perfil visual */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Perfil completado</span>
+                    <span className="text-sm font-bold text-indigo-600">
+                      {profile.profileCompleteness || 0}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${profile.profileCompleteness || 0}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Información básica del usuario */}
+                <div className="grid grid-cols-1 gap-3 text-sm">
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Username</span>
+                    <span className="font-medium text-gray-900">@{profile.username || username}</span>
+                  </div>
+                  
+                  {profile.joinDate && (
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Se unió</span>
+                      <span className="font-medium text-gray-900">{getMemberSince(profile.joinDate)}</span>
+                    </div>
+                  )}
+                  
+                  {profile.expertise && profile.expertise.length > 0 && (
+                    <div className="py-2 border-b border-gray-100">
+                      <span className="text-gray-600 block mb-2">Especialidades</span>
+                      <div className="flex flex-wrap gap-1">
+                        {profile.expertise.map((skill, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(!profile.expertise || profile.expertise.length === 0) && (
+                    <div className="py-2 border-b border-gray-100">
+                      <span className="text-gray-600 block mb-1">Especialidades</span>
+                      <span className="text-gray-400 text-xs">No ha especificado áreas de experticia</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Acciones rápidas */}

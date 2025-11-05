@@ -56,7 +56,7 @@ export default function PostHeader({ post, className = '' }: PostHeaderProps) {
                   {post.author.avatar ? (
                     <img
                       src={post.author.avatar}
-                      alt={`${post.author.firstName} ${post.author.lastName}`}
+                      alt={`${post.author.firstName || ''} ${post.author.lastName || ''}`}
                       className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
                     />
                   ) : (
@@ -65,7 +65,7 @@ export default function PostHeader({ post, className = '' }: PostHeaderProps) {
                     </div>
                   )}
                   <span className="font-medium text-gray-900 dark:text-white">
-                    {post.author.firstName} {post.author.lastName}
+                    {post.author.firstName || ''} {post.author.lastName || ''}
                   </span>
                 </div>
               )}
