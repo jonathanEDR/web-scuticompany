@@ -122,6 +122,15 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       // Solo roles administrativos - Módulo de blog
     },
     {
+      name: 'Agentes IA',
+      icon: '🤖',
+      path: '/dashboard/ai-agents',
+      description: 'Sistema de agentes inteligentes',
+      permission: Permission.MANAGE_SYSTEM,
+      roles: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+      // Solo ADMIN y SUPER_ADMIN - Sistema de IA
+    },
+    {
       name: 'Gestión de Usuarios',
       icon: '👥',
       path: '/dashboard/admin/users',

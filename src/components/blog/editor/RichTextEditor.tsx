@@ -29,6 +29,9 @@ interface RichTextEditorProps {
   showToolbar?: boolean;
   showWordCount?: boolean;
   className?: string;
+  // Props para detección de cursor
+  onCursorChange?: (position: any) => void;
+  registerEditor?: (element: HTMLElement) => void;
 }
 
 export default function RichTextEditor({
@@ -40,7 +43,9 @@ export default function RichTextEditor({
   maxHeight = '600px',
   showToolbar = true,
   showWordCount = true,
-  className = ''
+  className = '',
+  onCursorChange,
+  registerEditor
 }: RichTextEditorProps) {
   
   const [showLinkInput, setShowLinkInput] = useState(false);
@@ -73,6 +78,13 @@ export default function RichTextEditor({
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    onSelectionUpdate: ({ editor }) => {
+      // Detectar cambios de cursor y posición
+      if (onCursorChange) {
+        const { from, to } = editor.state.selection;
+        onCursorChange({ from, to, isCursor: from === to });
+      }
+    },
     editorProps: {
       attributes: {
         class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none focus:outline-none px-4 py-3',
@@ -98,6 +110,14 @@ export default function RichTextEditor({
       editor.commands.setContent(content);
     }
   }, [content, editor]);
+
+  // Registrar el editor DOM para detección de cursor
+  useEffect(() => {
+    if (editor && registerEditor) {
+      const editorElement = editor.view.dom;
+      registerEditor(editorElement);
+    }
+  }, [editor, registerEditor]);
 
   if (!editor) {
     return null;

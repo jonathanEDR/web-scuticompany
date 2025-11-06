@@ -78,12 +78,22 @@ const BlogCategory = lazy(() => import('./pages/public/blog/BlogCategory'));
 
 // Módulo de Blog - Páginas Administrativas
 const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
+
+// Componente de Testing IA (temporal) - Comentado hasta implementar
+// const AISystemTestWithAuth = lazy(() => import('./components/testing/AISystemTestWithAuth'));
 const PostEditor = lazy(() => import('./pages/admin/blog/PostEditor'));
 const CategoriesManager = lazy(() => import('./pages/admin/blog/CategoriesManager'));
 const CommentModeration = lazy(() => import('./pages/admin/blog/CommentModeration'));
 
 // Módulo de Blog - Páginas del Cliente
 const MyBlogHub = lazy(() => import('./components/blog/MyBlogHub'));
+
+// Panel Central de IA
+const AIAgentsDashboard = lazy(() => import('./pages/admin/AIAgentsDashboard'));
+const BlogAgentConfig = lazy(() => import('./pages/admin/BlogAgentConfig'));
+const BlogAgentTraining = lazy(() => import('./pages/admin/BlogAgentTraining'));
+const SEOAgentTraining = lazy(() => import('./pages/admin/SEOAgentTraining'));
+const AIAnalytics = lazy(() => import('./pages/admin/AIAnalytics'));
 
 // Componente de loading minimalista
 const LoadingSpinner = () => (
@@ -400,6 +410,53 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
+              {/* 🤖 MÓDULO DE AGENTES IA - Solo ADMIN y SUPER_ADMIN */}
+              
+              {/* Dashboard Central de Agentes IA - Configuración y monitoreo */}
+              <Route path="/dashboard/ai-agents" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <AIAgentsDashboard />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* Configuración detallada del BlogAgent */}
+              <Route path="/dashboard/agents/blog/config" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <BlogAgentConfig />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* Entrenamiento avanzado del BlogAgent */}
+              <Route path="/dashboard/agents/blog/training" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <BlogAgentTraining />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* Entrenamiento avanzado del SEOAgent */}
+              <Route path="/dashboard/agents/seo/training" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <SEOAgentTraining />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* Analytics de AI - Estadísticas de uso */}
+              <Route path="/dashboard/ai-analytics" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <AIAnalytics />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
               {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
               <Route path="/dashboard/admin/users" element={
                 <DashboardRoute>
@@ -428,6 +485,17 @@ function AppContent() {
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
+
+              {/* 🤖 Sistema de IA - Testing (Temporal) */}
+              {/* Route temporalmente comentada - componente no implementado
+              <Route path="/admin/ai-test" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <AISystemTestWithAuth />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              */}
             </Routes>
           </Suspense>
           {/* 🔔 Contenedor de notificaciones Toast */}
