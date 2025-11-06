@@ -18,6 +18,7 @@ import { useCursorAwareAutoComplete } from '../../../hooks/ai/useCursorAwareAuto
 import { useAITracking } from '../../../hooks/ai/useAITracking';
 import { useCategories } from '../../../hooks/blog';
 import { generateSlug } from '../../../utils/blog';
+import { getApiUrl } from '../../../utils/apiConfig';
 import { blogPostApi } from '../../../services/blog';
 import { uploadImage } from '../../../services/imageService';
 import type { CreatePostDto, UpdatePostDto } from '../../../types/blog';
@@ -644,8 +645,7 @@ export default function PostEditor() {
                   onClick={async () => {
                     try {
                       const token = await getToken();
-                      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                      const result = await fetch(`${API_URL}/agents/blog/generate-content`, {
+                      const result = await fetch(`${getApiUrl()}/agents/blog/generate-content`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -677,8 +677,7 @@ export default function PostEditor() {
                   onClick={async () => {
                     try {
                       const token = await getToken();
-                      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                      const result = await fetch(`${API_URL}/agents/blog/generate-content`, {
+                      const result = await fetch(`${getApiUrl()}/agents/blog/generate-content`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -710,8 +709,7 @@ export default function PostEditor() {
                   onClick={async () => {
                     try {
                       const token = await getToken();
-                      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                      const result = await fetch(`${API_URL}/agents/blog/generate-content`, {
+                      const result = await fetch(`${getApiUrl()}/agents/blog/generate-content`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -743,8 +741,7 @@ export default function PostEditor() {
                   onClick={async () => {
                     try {
                       const token = await getToken();
-                      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                      const result = await fetch(`${API_URL}/agents/blog/chat`, {
+                      const result = await fetch(`${getApiUrl()}/agents/blog/chat`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
