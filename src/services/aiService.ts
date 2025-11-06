@@ -1,4 +1,5 @@
 import axios, { type AxiosResponse } from 'axios';
+import { getApiUrl } from '../utils/apiConfig';
 
 // Extender Window para incluir Clerk
 declare global {
@@ -13,7 +14,7 @@ declare global {
 
 // Configuración base del cliente AI
 const aiApiClient = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/agents`,
+  baseURL: `${getApiUrl()}/agents`,
   timeout: parseInt(import.meta.env.VITE_AI_TIMEOUT) || 30000,
   headers: {
     'Content-Type': 'application/json',

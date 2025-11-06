@@ -3,7 +3,7 @@
  * Gestiona las llamadas al backend para configuración de agentes AI
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { getApiUrl } from '../utils/apiConfig';
 
 export interface AgentConfigData {
   agentName: string;
@@ -131,7 +131,7 @@ class AgentConfigService {
       ...options.headers,
     };
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${getApiUrl()}${endpoint}`, {
       ...options,
       headers,
     });

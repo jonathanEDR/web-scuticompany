@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import agentConfigService, { type AgentConfigData } from '../../services/agentConfigService';
+import { getApiUrl } from '../../utils/apiConfig';
 import { 
   Settings, 
   Activity, 
@@ -186,12 +187,12 @@ const AIAgentsDashboard = () => {
       };
 
       // Obtener health status
-      const healthResponse = await fetch('/api/agents/health', { headers });
+      const healthResponse = await fetch(`${getApiUrl()}/agents/health`, { headers });
       const healthData = await healthResponse.json();
       setSystemHealth(healthData);
 
       // Obtener métricas del sistema
-      const metricsResponse = await fetch('/api/agents/testing/system-metrics', { headers });
+      const metricsResponse = await fetch(`${getApiUrl()}/agents/testing/system-metrics`, { headers });
       const metricsData = await metricsResponse.json();
       setSystemMetrics(metricsData);
 
