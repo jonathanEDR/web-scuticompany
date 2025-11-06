@@ -6,8 +6,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { getApiUrl } from '../../utils/apiConfig';
 
 export interface ChatMessage {
   id: string;
@@ -90,9 +89,9 @@ export const useAIChat = () => {
       console.log('[useAIChat] ✅ Token obtenido');
 
       // Enviar al backend
-      console.log('[useAIChat] Enviando solicitud a:', `${API_URL}/agents/blog/chat`);
+      console.log('[useAIChat] Enviando solicitud a:', `${getApiUrl()}/agents/blog/chat`);
       const response = await axios.post<{ success: boolean; data: ChatResponse }>(
-        `${API_URL}/agents/blog/chat`,
+        `${getApiUrl()}/agents/blog/chat`,
         {
           message,
           context: {
@@ -143,7 +142,7 @@ export const useAIChat = () => {
       } else if (err.response?.status === 400) {
         errorMessage = err.response?.data?.error || 'Solicitud inválida';
       } else if (err.message === 'Network Error') {
-        errorMessage = 'Error de conexión. Verifica que el servidor backend esté corriendo en http://localhost:5000';
+        errorMessage = 'Error de conexión. Verifica que el servidor backend esté disponible.';
       } else {
         errorMessage = err.response?.data?.error || err.message || 'Error enviando mensaje';
       }

@@ -5,6 +5,7 @@
 
 import { useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/clerk-react';
+import { getApiUrl } from '../../utils/apiConfig';
 
 interface TrackingSession {
   sessionId: string;
@@ -15,14 +16,13 @@ interface TrackingSession {
 export const useAITracking = () => {
   const { getToken, userId } = useAuth();
   const sessionRef = useRef<TrackingSession | null>(null);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   // Crear sesión de tracking
   const createSession = useCallback(async (postId?: string, metadata = {}) => {
     try {
       const token = await getToken();
       
-      const response = await fetch(`${API_URL}/ai/session/create`, {
+      const response = await fetch(`${getApiUrl()}/ai/session/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const useAITracking = () => {
     }
     
     return null;
-  }, [getToken, API_URL]);
+  }, [getToken]);
 
   // Trackear nueva sugerencia (alias para compatibilidad)
   const trackSuggestion = useCallback(async (_data: {
@@ -71,7 +71,7 @@ export const useAITracking = () => {
     try {
       const token = await getToken();
       
-      const response = await fetch(`${API_URL}/ai/track/accept`, {
+      const response = await fetch(`${getApiUrl()}/ai/track/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,14 +92,14 @@ export const useAITracking = () => {
     }
     
     return false;
-  }, [getToken, API_URL]);
+  }, [getToken]);
 
   // Marcar sugerencia como rechazada
   const markAsRejected = useCallback(async (trackingId: string) => {
     try {
       const token = await getToken();
       
-      const response = await fetch(`${API_URL}/ai/track/reject`, {
+      const response = await fetch(`${getApiUrl()}/ai/track/reject`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,14 +119,14 @@ export const useAITracking = () => {
     }
     
     return false;
-  }, [getToken, API_URL]);
+  }, [getToken]);
 
   // Agregar rating
   const addRating = useCallback(async (trackingId: string, rating: number, feedback?: string) => {
     try {
       const token = await getToken();
       
-      const response = await fetch(`${API_URL}/ai/track/rating`, {
+      const response = await fetch(`${getApiUrl()}/ai/track/rating`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,14 +148,14 @@ export const useAITracking = () => {
     }
     
     return false;
-  }, [getToken, API_URL]);
+  }, [getToken]);
 
   // Obtener estadísticas del usuario
   const getUserStats = useCallback(async (days = 30) => {
     try {
       const token = await getToken();
       
-      const response = await fetch(`${API_URL}/ai/stats/user?days=${days}`, {
+      const response = await fetch(`${getApiUrl()}/ai/stats/user?days=${days}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -171,7 +171,7 @@ export const useAITracking = () => {
     }
     
     return null;
-  }, [getToken, API_URL]);
+  }, [getToken]);
 
   // Obtener sesión actual
   const getCurrentSession = useCallback(() => {

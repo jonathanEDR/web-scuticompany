@@ -6,8 +6,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { getApiUrl } from '../../utils/apiConfig';
 
 export type GenerationType = 'full' | 'section' | 'extend' | 'improve' | 'autocomplete';
 
@@ -55,7 +54,7 @@ export const useContentGeneration = () => {
 
       // Enviar solicitud al backend
       const response = await axios.post<{ success: boolean; data: GeneratedContent }>(
-        `${API_URL}/agents/blog/generate-content`,
+        `${getApiUrl()}/agents/blog/generate-content`,
         request,
         {
           headers: {
