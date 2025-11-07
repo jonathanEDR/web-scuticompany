@@ -7,7 +7,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Eye } from 'lucide-react';
 import { LazyImage } from '../common';
-import { getImageUrl } from '../../../utils/imageUtils';
 import type { BlogPost } from '../../../types/blog';
 
 interface SimpleBlogCardProps {

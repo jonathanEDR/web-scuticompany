@@ -40,7 +40,7 @@ export default function BlogDashboard() {
   const { role } = useAuth();
   
   // Usar useAdminPosts para obtener TODOS los posts (incluye borradores)
-  const { posts, loading: postsLoading, error: postsError } = useAdminPosts({ 
+  const { posts, loading: postsLoading } = useAdminPosts({ 
     limit: 100 // Cargar más posts para estadísticas precisas
   });
   
