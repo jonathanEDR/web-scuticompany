@@ -6,12 +6,14 @@
 import { useEffect, useState } from 'react';
 import { 
   FileText, MessageCircle, Eye, TrendingUp, 
-  Users, Calendar, BarChart3, Clock
+  Users, Calendar, BarChart3, Clock, Target
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCategories, useAdminPosts } from '../../../hooks/blog';
 import { useModerationStats } from '../../../hooks/blog/useModerationQueue';
 import { BlogAnalyticsDashboard } from '../../../components/blog/analytics/BlogAnalyticsDashboard';
+import { SEOCanvasModal } from '../../../components/admin/seo';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface DashboardStats {
   totalPosts: number;
@@ -28,6 +30,14 @@ export default function BlogDashboard() {
   
   // Estado para las pestañas
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics'>('dashboard');
+  
+  // Estado para SEO Canvas
+  const [isSEOCanvasOpen, setIsSEOCanvasOpen] = useState(false);
+  const [selectedPostForSEO, setSelectedPostForSEO] = useState<any>(null);
+  const [seoCanvasInitialMode, setSeoCanvasInitialMode] = useState<'chat' | 'analysis' | 'structure' | 'review'>('chat');
+  
+  // Hook de autenticación para verificar permisos
+  const { role } = useAuth();
   
   // Usar useAdminPosts para obtener TODOS los posts (incluye borradores)
   const { posts, loading: postsLoading, error: postsError } = useAdminPosts({ 
@@ -154,6 +164,21 @@ export default function BlogDashboard() {
         </div>
 
         <div className="flex gap-3">
+          {/* Botón SEO Canvas - Solo para ADMIN/SUPER_ADMIN */}
+          {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
+            <button
+              onClick={() => {
+                setSelectedPostForSEO(null);
+                setSeoCanvasInitialMode('chat');
+                setIsSEOCanvasOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors font-medium shadow-sm border-2 border-green-300 dark:border-green-600"
+            >
+              <Target className="w-5 h-5" />
+              <span>SEO Canvas</span>
+            </button>
+          )}
+          
           <Link
             to="/blog"
             target="_blank"
@@ -288,7 +313,7 @@ export default function BlogDashboard() {
                 {posts.slice(0, 5).map((post) => (
                   <div
                     key={post._id}
-                    className="flex items-start gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    className="flex items-start gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-100 dark:border-gray-600"
                   >
                     {post.featuredImage && (
                       <img
@@ -329,6 +354,31 @@ export default function BlogDashboard() {
                           </span>
                         )}
                       </div>
+                      
+                      {/* Acciones del post - Solo para ADMIN/SUPER_ADMIN */}
+                      {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
+                        <div className="flex items-center gap-2 mt-3">
+                          <button
+                            onClick={() => {
+                              setSelectedPostForSEO(post);
+                              setSeoCanvasInitialMode('analysis');
+                              setIsSEOCanvasOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors text-xs font-medium"
+                          >
+                            <Target className="w-3 h-3" />
+                            <span>SEO Canvas</span>
+                          </button>
+                          
+                          <Link
+                            to={`/dashboard/blog/posts/${post._id}/edit`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors text-xs font-medium"
+                          >
+                            <FileText className="w-3 h-3" />
+                            <span>Editar</span>
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -430,6 +480,24 @@ export default function BlogDashboard() {
         /* Analytics con IA */
         <BlogAnalyticsDashboard />
       )}
+
+      {/* SEO Canvas Modal */}
+      <SEOCanvasModal
+        isOpen={isSEOCanvasOpen}
+        onClose={() => {
+          setIsSEOCanvasOpen(false);
+          setSelectedPostForSEO(null);
+          setSeoCanvasInitialMode('chat');
+        }}
+        initialMode={seoCanvasInitialMode}
+        postContext={selectedPostForSEO ? {
+          postId: selectedPostForSEO._id,
+          title: selectedPostForSEO.title,
+          content: selectedPostForSEO.content,
+          description: selectedPostForSEO.metaDescription,
+          keywords: selectedPostForSEO.keywords
+        } : undefined}
+      />
     </div>
   );
 }

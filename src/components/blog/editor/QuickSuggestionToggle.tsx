@@ -69,10 +69,6 @@ export const QuickSuggestionToggle: React.FC<QuickSuggestionToggleProps> = ({
     try {
       setIsAnimating(true);
       await toggleLocal();
-      
-      if (import.meta.env.DEV) {
-        console.log('🎛️ [QuickSuggestionToggle] Toggle completed, new state:', getEffectiveState());
-      }
     } catch (error) {
       console.error('Error toggling suggestions:', error);
     } finally {

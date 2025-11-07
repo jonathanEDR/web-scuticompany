@@ -4,7 +4,7 @@
  * para control directo de sugerencias desde el editor
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAutoSuggestionSettings } from './useAgentSettings';
 
 interface QuickSuggestionState {
@@ -161,7 +161,7 @@ export const useQuickSuggestionControl = () => {
     }
   }, [saveLocalState, refetch]);
 
-  // Obtener estado efectivo (combinando local + global)
+  // Obtener estado efectivo (combinando local + global) - REACTIVO
   const getEffectiveState = useCallback((): EffectiveState => {
     // Si hay override local, usar ese
     if (localState.localEnabled !== null) {
@@ -179,6 +179,9 @@ export const useQuickSuggestionControl = () => {
       canToggle: true // Siempre se puede hacer toggle local
     };
   }, [localState]);
+
+  // Estado efectivo calculado reactivamente
+  const effectiveState = useMemo(() => getEffectiveState(), [getEffectiveState]);
 
   // Limpiar override expirado automáticamente
   useEffect(() => {
@@ -222,9 +225,9 @@ export const useQuickSuggestionControl = () => {
     syncWithGlobal,
     
     // Utilidades
-    canToggle: getEffectiveState().canToggle,
-    effectiveEnabled: getEffectiveState().enabled,
-    source: getEffectiveState().source
+    canToggle: effectiveState.canToggle,
+    effectiveEnabled: effectiveState.enabled,
+    source: effectiveState.source
   };
 };
 

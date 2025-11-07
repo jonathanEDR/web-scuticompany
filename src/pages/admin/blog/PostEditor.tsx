@@ -88,23 +88,16 @@ export default function PostEditor() {
   const { settings: suggestionSettings } = useAutoSuggestionSettings('blog');
   
   // Hook para control directo de sugerencias
-  const { effectiveEnabled } = useQuickSuggestionControl();
-
-  // Función para navegar al panel de configuración
-  const handleOpenSettings = () => {
-    navigate('/dashboard/ai-agents/blog/config');
-  };
+  const { effectiveEnabled, isOverridden } = useQuickSuggestionControl();
 
   // Hook de autocompletado contextual (como Copilot) - ahora usa estado efectivo
   const {
     suggestion,
     isVisible: showAutoComplete,
-    isGenerating: isAutoCompleting,
     currentPosition,
     handleContentChange,
     acceptSuggestion,
-    rejectSuggestion,
-    getPerformanceStats
+    rejectSuggestion
   } = useCursorAwareAutoComplete({
     enabled: effectiveEnabled, // Usar estado efectivo del toggle
     debounceMs: suggestionSettings.debounceMs,
@@ -123,7 +116,6 @@ export default function PostEditor() {
     patternSuggestions,
     isTypingPattern,
     activePattern,
-    hasPatterns,
     handleContentChange: handlePatternContentChange,
     insertPatternSuggestion
   } = useContextAwareAutoComplete({
@@ -132,10 +124,15 @@ export default function PostEditor() {
 
   // Crear sesión de tracking al montar el componente
   React.useEffect(() => {
-    createSession(id || 'new-post', {
-      postTitle: formData.title,
-      postCategory: formData.category
-    });
+    try {
+      createSession(id || 'new-post', {
+        postTitle: formData.title,
+        postCategory: formData.category
+      });
+    } catch (error) {
+      // Silenciar errores de tracking para no interrumpir la funcionalidad
+      console.warn('⚠️ [PostEditor] Error creando sesión de tracking:', error);
+    }
   }, [createSession, id, formData.title, formData.category]);
 
   // Cargar post si está editando
@@ -178,16 +175,16 @@ export default function PostEditor() {
           : [];
         
         setFormData({
-          title: post.title,
-          slug: post.slug,
-          content: post.content,
-          excerpt: post.excerpt,
+          title: post.title || '',
+          slug: post.slug || '',
+          content: post.content || '',
+          excerpt: post.excerpt || '',
           featuredImage: post.featuredImage || '',
-          category: typeof post.category === 'string' ? post.category : post.category._id,
+          category: typeof post.category === 'string' ? post.category : (post.category?._id || ''),
           tags: tagsAsStrings,
-          isPublished: post.isPublished,
-          allowComments: post.allowComments,
-          isPinned: post.isPinned
+          isPublished: post.isPublished || false,
+          allowComments: post.allowComments !== undefined ? post.allowComments : true,
+          isPinned: post.isPinned || false
         });
       }
     } catch (error) {
@@ -574,8 +571,6 @@ export default function PostEditor() {
             <QuickSuggestionToggle
               size="md"
               showLabel={true}
-              showSettings={true}
-              onSettingsClick={handleOpenSettings}
             />
 
             {/* Botón Asistente IA - Más visible al final */}
@@ -1153,26 +1148,19 @@ export default function PostEditor() {
         }}
       />
 
-      {/* Debug info - mantener para desarrollo */}
+      {/* Debug info simplificado - solo en desarrollo */}
       {import.meta.env.DEV && (
-        <div className="fixed bottom-4 left-4 bg-black/90 text-white p-3 rounded-lg text-xs z-50 max-w-xs">
-          <div className="font-bold mb-2">🔧 AI Performance</div>
-          <div className="space-y-1">
-            <div>AutoComplete: {showAutoComplete ? '🟢' : '🔴'}</div>
-            <div>Generating: {isAutoCompleting ? '⏳' : '✅'}</div>
-            <div>Suggestion: {suggestion ? `📝 ${Math.round(suggestion.confidence * 100)}%` : '∅'}</div>
-            <div>Content: {formData.content.length} chars</div>
-            {(() => {
-              const stats = getPerformanceStats();
-              return (
-                <>
-                  <div className="border-t border-gray-600 pt-1 mt-1">
-                    <div>Rate: {stats.rateLimiter.requestsInWindow}/{stats.rateLimiter.maxRequests}</div>
-                    <div>Cache: {stats.cache.active}/{stats.cache.maxSize} ({Math.round(stats.cache.usage)}%)</div>
-                  </div>
-                </>
-              );
-            })()}
+        <div className="fixed bottom-4 left-4 bg-black/85 text-white px-3 py-2 rounded-lg text-xs z-50 font-mono">
+          <div className="flex items-center gap-2">
+            <span>AI:</span>
+            <span className={effectiveEnabled ? 'text-green-400' : 'text-red-400'}>
+              {effectiveEnabled ? '🟢 ON' : '🔴 OFF'}
+            </span>
+            {isOverridden && <span className="text-orange-400">⚠️</span>}
+            <span className="text-gray-400">|</span>
+            <span>Sugg: {suggestion ? '📝' : '∅'}</span>
+            <span className="text-gray-400">|</span>
+            <span>{formData.content.length}ch</span>
           </div>
         </div>
       )}
@@ -1207,23 +1195,6 @@ export default function PostEditor() {
             <div className="animate-spin w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full"></div>
             <span className="text-gray-700 dark:text-gray-300">Procesando con IA...</span>
           </div>
-        </div>
-      )}
-
-      {/* Debug info simplificado - esquina inferior derecha */}
-      {import.meta.env.DEV && (
-        <div className="fixed bottom-4 right-4 bg-black/80 text-white p-2 rounded text-xs z-50 font-mono">
-          <div>AutoComplete: {showAutoComplete ? '🟢 ON' : '🔴 OFF'} | Generating: {isAutoCompleting ? '⏳' : '✅'}</div>
-          <div>Suggestion: {suggestion ? '📝' : '∅'} | Chars: {formData.content.length}</div>
-          <div className="border-t border-gray-600 pt-1 mt-1">
-            Pattern: {isTypingPattern ? '⌨️ TYPING' : hasPatterns ? '🧠 DETECTED' : '∅'} |
-            Active: {activePattern ? `✓ ${activePattern.type}` : '✗'}
-          </div>
-          {activePattern && (
-            <div className="text-purple-300 mt-1">
-              "{activePattern.contextText.substring(0, 20)}..."
-            </div>
-          )}
         </div>
       )}
 
