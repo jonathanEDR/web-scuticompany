@@ -21,7 +21,6 @@ import {
   Gauge
 } from 'lucide-react';
 import { agentConfigService } from '../../services/agentConfigService';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 
 interface TrainingExample {
   id: string;
@@ -336,22 +335,21 @@ const SEOAgentTraining: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
-        <div className="text-center bg-white rounded-2xl shadow-xl p-8">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-700 text-lg font-medium">Cargando configuración de entrenamiento SEO...</p>
-          <p className="text-gray-500 text-sm mt-2">Esto puede tomar unos segundos</p>
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20">
+        <div className="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 dark:border-red-400 mx-auto mb-4"></div>
+          <p className="text-gray-700 dark:text-gray-200 text-lg font-medium">Cargando configuración de entrenamiento SEO...</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">Esto puede tomar unos segundos</p>
         </div>
       </div>
     );
   }
 
   return (
-    <SmartDashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
           <button
             onClick={() => navigate('/dashboard/ai-agents')}
             className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white mb-4 transition-colors"
@@ -367,15 +365,15 @@ const SEOAgentTraining: React.FC = () => {
                   <Search className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Entrenamiento del SEO Agent</h1>
-                  <p className="text-gray-600 mt-2">Personaliza el comportamiento y respuestas del agente SEO con ejemplos y configuración avanzada</p>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Entrenamiento del SEO Agent</h1>
+                  <p className="text-gray-600 dark:text-gray-300 mt-2">Personaliza el comportamiento y respuestas del agente SEO con ejemplos y configuración avanzada</p>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => loadTrainingConfig()}
-                  className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   <RotateCcw className="w-5 h-5 mr-2" />
                   Resetear
@@ -421,14 +419,14 @@ const SEOAgentTraining: React.FC = () => {
         {/* Main Content Container */}
         <div className="max-w-6xl mx-auto">
           {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="flex border-b border-gray-200 bg-gray-50">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+          <div className="flex border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
             <button
               onClick={() => setActiveTab('examples')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'examples'
-                  ? 'bg-white text-red-600 border-b-2 border-red-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <BookOpen className="w-5 h-5 mr-2" />
@@ -438,8 +436,8 @@ const SEOAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('prompts')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'prompts'
-                  ? 'bg-white text-red-600 border-b-2 border-red-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Sparkles className="w-5 h-5 mr-2" />
@@ -449,8 +447,8 @@ const SEOAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('behavior')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'behavior'
-                  ? 'bg-white text-red-600 border-b-2 border-red-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Target className="w-5 h-5 mr-2" />
@@ -460,8 +458,8 @@ const SEOAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('testing')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'testing'
-                  ? 'bg-white text-red-600 border-b-2 border-red-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Zap className="w-5 h-5 mr-2" />
@@ -480,17 +478,17 @@ const SEOAgentTraining: React.FC = () => {
                   </p>
 
                   {/* Formulario para nuevo ejemplo */}
-                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                    <h4 className="font-medium text-gray-900 mb-4">Agregar Nuevo Ejemplo</h4>
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Agregar Nuevo Ejemplo</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Categoría
                         </label>
                         <select
                           value={newExample.category}
                           onChange={(e) => setNewExample(prev => ({ ...prev, category: e.target.value as any }))}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         >
                           <option value="general">General</option>
                           <option value="technical_audit">Auditoría Técnica</option>
@@ -502,31 +500,31 @@ const SEOAgentTraining: React.FC = () => {
                     </div>
 
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Entrada (Input del Usuario)
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Entrada del Usuario (Input)
                       </label>
                       <textarea
                         value={newExample.input}
                         onChange={(e) => setNewExample(prev => ({ ...prev, input: e.target.value }))}
                         placeholder="Ej: Analiza el SEO técnico de https://ejemplo.com y proporciona recomendaciones..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[100px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[100px]"
                       />
                     </div>
 
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Salida Esperada (Respuesta Ideal)
                       </label>
                       <textarea
                         value={newExample.expectedOutput}
                         onChange={(e) => setNewExample(prev => ({ ...prev, expectedOutput: e.target.value }))}
                         placeholder="Ej: Análisis SEO Técnico: 1. Core Web Vitals: LCP 2.1s (Bueno), 2. Meta tags: Falta meta description..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[120px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[120px]"
                       />
                     </div>
 
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Notas (Opcional)
                       </label>
                       <input
@@ -534,7 +532,7 @@ const SEOAgentTraining: React.FC = () => {
                         value={newExample.notes}
                         onChange={(e) => setNewExample(prev => ({ ...prev, notes: e.target.value }))}
                         placeholder="Contexto adicional o consideraciones especiales..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
 
@@ -549,7 +547,7 @@ const SEOAgentTraining: React.FC = () => {
 
                   {/* Lista de ejemplos existentes */}
                   {trainingConfig.examples.length === 0 ? (
-                    <div className="text-center py-8 bg-gray-50 rounded-lg">
+                    <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                       <p className="text-gray-600">No hay ejemplos de entrenamiento</p>
                       <p className="text-sm text-gray-500">Agrega ejemplos específicos de SEO para mejorar el aprendizaje</p>
@@ -578,17 +576,17 @@ const SEOAgentTraining: React.FC = () => {
                           
                           <div className="space-y-3">
                             <div>
-                              <p className="text-sm font-medium text-gray-700 mb-1">Entrada:</p>
-                              <p className="text-gray-600 bg-gray-50 p-2 rounded text-sm">{example.input}</p>
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Entrada:</p>
+                              <p className="text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-2 rounded text-sm">{example.input}</p>
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-gray-700 mb-1">Salida Esperada:</p>
-                              <p className="text-gray-600 bg-gray-50 p-2 rounded text-sm">{example.expectedOutput}</p>
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Salida Esperada:</p>
+                              <p className="text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-2 rounded text-sm">{example.expectedOutput}</p>
                             </div>
                             {example.notes && (
                               <div>
-                                <p className="text-sm font-medium text-gray-700 mb-1">Notas:</p>
-                                <p className="text-gray-500 text-sm italic">{example.notes}</p>
+                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notas:</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm italic">{example.notes}</p>
                               </div>
                             )}
                           </div>
@@ -644,10 +642,10 @@ const SEOAgentTraining: React.FC = () => {
 
                           {/* Contenido expandible */}
                           {isExpanded && (
-                            <div className="p-6 bg-white border-t">
+                            <div className="p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                               <div className="space-y-4">
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     System Prompt
                                   </label>
                                   <textarea
@@ -660,13 +658,13 @@ const SEOAgentTraining: React.FC = () => {
                                       );
                                       setTrainingConfig(prev => ({ ...prev, taskPrompts: updatedPrompts }));
                                     }}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[200px] font-mono text-sm"
+                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[200px] font-mono text-sm"
                                   />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                       User Prompt Template
                                     </label>
                                     <textarea
@@ -730,24 +728,24 @@ const SEOAgentTraining: React.FC = () => {
 
                   {/* Formulario para agregar nuevo task prompt */}
                   {trainingConfig.taskPrompts.length === 0 ? (
-                    <div className="text-center py-8 bg-gray-50 rounded-lg">
-                      <Sparkles className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600">No hay task prompts configurados</p>
-                      <p className="text-sm text-gray-500">El sistema creará prompts por defecto automáticamente</p>
+                    <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <Sparkles className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+                      <p className="text-gray-600 dark:text-gray-300">No hay task prompts configurados</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">El sistema creará prompts por defecto automáticamente</p>
                     </div>
                   ) : (
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <h4 className="font-medium text-gray-900 mb-4">Agregar Nuevo Task Prompt</h4>
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Agregar Nuevo Task Prompt</h4>
                       
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Tipo de Tarea
                           </label>
                           <select
                             value={newTaskPrompt.taskType}
                             onChange={(e) => setNewTaskPrompt(prev => ({ ...prev, taskType: e.target.value }))}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           >
                             <option value="">Seleccionar tipo de tarea...</option>
                             <option value="technical_audit">Auditoría Técnica</option>
@@ -760,27 +758,27 @@ const SEOAgentTraining: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             System Prompt
                           </label>
                           <textarea
                             value={newTaskPrompt.systemPrompt}
                             onChange={(e) => setNewTaskPrompt(prev => ({ ...prev, systemPrompt: e.target.value }))}
                             placeholder="Eres un experto en [tipo de tarea SEO]. Tu especialidad es..."
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[150px]"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[150px]"
                           />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               User Prompt Template
                             </label>
                             <textarea
                               value={newTaskPrompt.userPromptTemplate}
                               onChange={(e) => setNewTaskPrompt(prev => ({ ...prev, userPromptTemplate: e.target.value }))}
                               placeholder="Realiza un análisis de {tipo} para {objetivo}..."
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[100px]"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[100px]"
                             />
                           </div>
 
@@ -827,15 +825,15 @@ const SEOAgentTraining: React.FC = () => {
                   </p>
 
                   {/* Formulario para nueva regla */}
-                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                    <h4 className="font-medium text-gray-900 mb-4">Agregar Nueva Regla</h4>
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Agregar Nueva Regla</h4>
                     <div className="flex space-x-3">
                       <input
                         type="text"
                         value={newBehaviorRule}
                         onChange={(e) => setNewBehaviorRule(e.target.value)}
                         placeholder="Ej: Siempre incluir métricas de Core Web Vitals en análisis de rendimiento..."
-                        className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="flex-1 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         onKeyPress={(e) => e.key === 'Enter' && addBehaviorRule()}
                       />
                       <button
@@ -850,18 +848,18 @@ const SEOAgentTraining: React.FC = () => {
 
                   {/* Lista de reglas */}
                   {trainingConfig.behaviorRules.length === 0 ? (
-                    <div className="text-center py-8 bg-gray-50 rounded-lg">
-                      <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600">No hay reglas de comportamiento definidas</p>
+                    <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <Target className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+                      <p className="text-gray-600 dark:text-gray-300">No hay reglas de comportamiento definidas</p>
                     </div>
                   ) : (
                     <ul className="space-y-2">
                       {trainingConfig.behaviorRules.map((rule, index) => (
-                        <li key={index} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
-                          <span className="text-gray-700 flex-1">{rule}</span>
+                        <li key={index} className="flex items-start justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                          <span className="text-gray-700 dark:text-gray-300 flex-1">{rule}</span>
                           <button
                             onClick={() => removeBehaviorRule(index)}
-                            className="ml-4 text-red-500 hover:text-red-700 transition-colors"
+                            className="ml-4 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -872,7 +870,7 @@ const SEOAgentTraining: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Instrucciones Especiales
                   </label>
                   <textarea
@@ -909,9 +907,9 @@ const SEOAgentTraining: React.FC = () => {
             {/* Tab: Testing */}
             {activeTab === 'testing' && (
               <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">💡 Prueba tu SEO Agent entrenado</h3>
-                  <p className="text-blue-800 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 Prueba tu SEO Agent entrenado</h3>
+                  <p className="text-blue-800 dark:text-blue-200 text-sm">
                     Prueba cómo responde el SEO Agent con la configuración de entrenamiento actual.
                     Esto te ayuda a validar si los ejemplos y reglas funcionan como esperas para consultas SEO.
                   </p>
@@ -919,7 +917,7 @@ const SEOAgentTraining: React.FC = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Input de Prueba SEO
                     </label>
                     <textarea
@@ -927,7 +925,7 @@ const SEOAgentTraining: React.FC = () => {
                       onChange={(e) => setTestInput(e.target.value)}
                       placeholder="Escribe una consulta SEO para probar el agente...
 Ej: Analiza el SEO técnico de mi sitio web y proporciona recomendaciones específicas para mejorar Core Web Vitals y el ranking en Google"
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[200px]"
+                      className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[200px]"
                     />
                     <button
                       onClick={testAgent}
@@ -949,14 +947,14 @@ Ej: Analiza el SEO técnico de mi sitio web y proporciona recomendaciones espec�
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Respuesta del SEO Agent
                     </label>
-                    <div className="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 min-h-[200px] overflow-auto">
+                    <div className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 min-h-[200px] overflow-auto">
                       {testOutput ? (
-                        <p className="text-gray-700 whitespace-pre-wrap">{testOutput}</p>
+                        <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{testOutput}</p>
                       ) : (
-                        <p className="text-gray-400 italic">La respuesta del SEO Agent aparecerá aquí...</p>
+                        <p className="text-gray-400 dark:text-gray-500 italic">La respuesta del SEO Agent aparecerá aquí...</p>
                       )}
                     </div>
                   </div>
@@ -968,7 +966,6 @@ Ej: Analiza el SEO técnico de mi sitio web y proporciona recomendaciones espec�
         </div>
       </div>
     </div>
-    </SmartDashboardLayout>
   );
 };
 

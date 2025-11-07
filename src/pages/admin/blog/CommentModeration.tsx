@@ -9,7 +9,6 @@ import { useModerationQueue } from '../../../hooks/blog';
 import ModerationQueue from '../../../components/blog/admin/ModerationQueue';
 import ModerationStats from '../../../components/blog/admin/ModerationStats';
 import type { CommentStatus } from '../../../types/blog';
-import DashboardLayout from '../../../components/DashboardLayout';
 
 type TabType = 'all' | 'pending' | 'reported' | 'spam' | 'approved';
 
@@ -115,134 +114,132 @@ export default function CommentModeration() {
   ];
 
   return (
-    <DashboardLayout>
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Moderación de Comentarios
-            </h1>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400">
-            Revisa y gestiona los comentarios del blog
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        <ModerationStats stats={stats} loading={loading} />
-
-        {/* Tabs */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
-          <div className="flex overflow-x-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    setSelectedComments(new Set());
-                  }}
-                  className={`
-                    flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap
-                    ${isActive
-                      ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }
-                  `}
-                >
-                  <Icon size={18} className={isActive ? tab.color : ''} />
-                  <span className="font-medium">{tab.label}</span>
-                  <span className={`
-                    px-2 py-0.5 rounded-full text-xs font-semibold
-                    ${isActive
-                      ? 'bg-blue-600 dark:bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                    }
-                  `}>
-                    {tab.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Bulk Actions */}
-        {selectedComments.size > 0 && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <span className="text-blue-900 dark:text-blue-300 font-medium">
-                {selectedComments.size} comentario(s) seleccionado(s)
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleBulkAction('approve')}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  <Check size={16} />
-                  Aprobar todos
-                </button>
-                <button
-                  onClick={() => handleBulkAction('reject')}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  <X size={16} />
-                  Rechazar todos
-                </button>
-                <button
-                  onClick={() => handleBulkAction('spam')}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  <Ban size={16} />
-                  Marcar spam
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Moderation Queue */}
-        <ModerationQueue
-          comments={comments}
-          loading={loading}
-          error={error}
-          selectedComments={selectedComments}
-          onSelectComment={handleSelectComment}
-          onSelectAll={handleSelectAll}
-          onModerate={moderateComment}
-          onRefetch={refetch}
-        />
-
-        {/* Pagination */}
-        {pagination && pagination.pages > 1 && (
-          <div className="mt-6 flex justify-center items-center gap-2">
-            <button
-              onClick={() => {/* TODO: Implement pagination */}}
-              disabled={pagination.page === 1}
-              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Anterior
-            </button>
-            
-            <span className="text-gray-600 dark:text-gray-400">
-              Página {pagination.page} de {pagination.pages}
-            </span>
-
-            <button
-              onClick={() => {/* TODO: Implement pagination */}}
-              disabled={pagination.page === pagination.pages}
-              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Siguiente
-            </button>
-          </div>
-        )}
+    <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Moderación de Comentarios
+        </h1>
       </div>
-    </DashboardLayout>
+      <p className="text-gray-600 dark:text-gray-400">
+        Revisa y gestiona los comentarios del blog
+      </p>
+    </div>
+
+    {/* Stats Cards */}
+    <ModerationStats stats={stats} loading={loading} />
+
+    {/* Tabs */}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+      <div className="flex overflow-x-auto">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setSelectedComments(new Set());
+              }}
+              className={`
+                flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap
+                ${isActive
+                  ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }
+              `}
+            >
+              <Icon size={18} className={isActive ? tab.color : ''} />
+              <span className="font-medium">{tab.label}</span>
+              <span className={`
+                px-2 py-0.5 rounded-full text-xs font-semibold
+                ${isActive
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }
+              `}>
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+
+    {/* Bulk Actions */}
+    {selectedComments.size > 0 && (
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <div className="flex items-center justify-between">
+          <span className="text-blue-900 dark:text-blue-300 font-medium">
+            {selectedComments.size} comentario(s) seleccionado(s)
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleBulkAction('approve')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+            >
+              <Check size={16} />
+              Aprobar todos
+            </button>
+            <button
+              onClick={() => handleBulkAction('reject')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+            >
+              <X size={16} />
+              Rechazar todos
+            </button>
+            <button
+              onClick={() => handleBulkAction('spam')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+            >
+              <Ban size={16} />
+              Marcar spam
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Moderation Queue */}
+    <ModerationQueue
+      comments={comments}
+      loading={loading}
+      error={error}
+      selectedComments={selectedComments}
+      onSelectComment={handleSelectComment}
+      onSelectAll={handleSelectAll}
+      onModerate={moderateComment}
+      onRefetch={refetch}
+    />
+
+    {/* Pagination */}
+    {pagination && pagination.pages > 1 && (
+      <div className="mt-6 flex justify-center items-center gap-2">
+        <button
+          onClick={() => {/* TODO: Implement pagination */}}
+          disabled={pagination.page === 1}
+          className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Anterior
+        </button>
+        
+        <span className="text-gray-600 dark:text-gray-400">
+          Página {pagination.page} de {pagination.pages}
+        </span>
+
+        <button
+          onClick={() => {/* TODO: Implement pagination */}}
+          disabled={pagination.page === pagination.pages}
+          className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Siguiente
+        </button>
+      </div>
+    )}
+  </div>
   );
 }

@@ -26,7 +26,7 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
     <div className="space-y-6">
       {/* Timeout Configuration */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Timeout (segundos)
         </label>
         <div className="flex items-center gap-4">
@@ -36,21 +36,21 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
             max="120"
             value={config.config.timeout}
             onChange={(e) => onConfigChange('config', 'timeout', parseInt(e.target.value))}
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
             disabled={!config.enabled}
           />
-          <span className="text-sm font-medium text-gray-900 w-16 text-right">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 w-16 text-right">
             {config.config.timeout}s
           </span>
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Tiempo máximo de espera para operaciones del agente
         </p>
       </div>
 
       {/* Max Tokens */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Tokens Máximos
         </label>
         <input
@@ -60,17 +60,17 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
           step="100"
           value={config.config.maxTokens}
           onChange={(e) => onConfigChange('config', 'maxTokens', parseInt(e.target.value))}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           disabled={!config.enabled}
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Número máximo de tokens para la respuesta del modelo (500-4000)
         </p>
       </div>
 
       {/* Temperature */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Temperatura
         </label>
         <div className="flex items-center gap-4">
@@ -81,25 +81,25 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
             step="0.1"
             value={config.config.temperature}
             onChange={(e) => onConfigChange('config', 'temperature', parseFloat(e.target.value))}
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
             disabled={!config.enabled}
           />
-          <span className="text-sm font-medium text-gray-900 w-12 text-right">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 w-12 text-right">
             {config.config.temperature}
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
           <span>Preciso (0.0)</span>
           <span>Creativo (1.0)</span>
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Controla la creatividad vs precisión de las respuestas
         </p>
       </div>
 
       {/* Max Tags Per Post */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Etiquetas Máximas por Post
         </label>
         <input
@@ -108,17 +108,17 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
           max="20"
           value={config.config.maxTagsPerPost}
           onChange={(e) => onConfigChange('config', 'maxTagsPerPost', parseInt(e.target.value))}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           disabled={!config.enabled}
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Número máximo de etiquetas a generar por publicación (3-20)
         </p>
       </div>
 
       {/* SEO Score Threshold */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Umbral de Score SEO
         </label>
         <div className="flex items-center gap-4">
@@ -128,30 +128,30 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
             max="100"
             value={config.config.seoScoreThreshold}
             onChange={(e) => onConfigChange('config', 'seoScoreThreshold', parseInt(e.target.value))}
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
             disabled={!config.enabled}
           />
-          <span className="text-sm font-medium text-gray-900 w-12 text-right">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 w-12 text-right">
             {config.config.seoScoreThreshold}
           </span>
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Score mínimo para considerar el contenido optimizado para SEO
         </p>
       </div>
 
       {/* Auto Optimization Toggle */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div>
-          <h4 className="text-sm font-medium text-gray-900">Auto-optimización SEO</h4>
-          <p className="text-xs text-gray-500 mt-1">
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Auto-optimización SEO</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Permite al agente optimizar automáticamente el contenido para SEO
           </p>
         </div>
         <button
           onClick={() => onConfigChange('config', 'autoOptimization', !config.config.autoOptimization)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            config.config.autoOptimization ? 'bg-blue-600' : 'bg-gray-300'
+            config.config.autoOptimization ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
           }`}
           disabled={!config.enabled}
         >

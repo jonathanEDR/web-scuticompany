@@ -23,7 +23,6 @@ import BasicConfigPanel from '../../components/admin/agent-config/BasicConfigPan
 import PersonalityConfigPanel from '../../components/admin/agent-config/PersonalityConfigPanel';
 import ContextConfigPanel from '../../components/admin/agent-config/ContextConfigPanel';
 import ResponseConfigPanel from '../../components/admin/agent-config/ResponseConfigPanel';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 
 // Tipos para el dashboard
 interface SystemHealth {
@@ -378,27 +377,26 @@ const AIAgentsDashboard = () => {
   }
 
   return (
-    <SmartDashboardLayout>
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <Brain className="text-purple-600" />
-              Panel Central IA
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
-              Configuración y monitoreo del sistema de agentes inteligentes
-            </p>
-          </div>
-        
-        <button
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-        >
-          <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-          {isRefreshing ? 'Actualizando...' : 'Actualizar'}
+    <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            <Brain className="text-purple-600" />
+            Panel Central IA
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
+            Configuración y monitoreo del sistema de agentes inteligentes
+          </p>
+        </div>
+      
+      <button
+        onClick={handleRefresh}
+        disabled={isRefreshing}
+        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+      >
+        <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+        {isRefreshing ? 'Actualizando...' : 'Actualizar'}
         </button>
       </div>
 
@@ -450,17 +448,17 @@ const AIAgentsDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Estado General */}
-            <div className="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Activity className="text-blue-600" />
+            <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Activity className="text-blue-600 dark:text-blue-400" />
                 Estado General del Sistema
               </h2>
               
               {systemHealth && (
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 border rounded-lg">
+                  <div className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">Estado Global</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Estado Global</span>
                       {getStatusIcon(systemHealth.status)}
                     </div>
                     <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(systemHealth.status)}`}>
@@ -469,9 +467,9 @@ const AIAgentsDashboard = () => {
                   </div>
                   
                   {systemHealth.components && Object.entries(systemHealth.components).map(([component, status]) => (
-                    <div key={component} className="p-4 border rounded-lg">
+                    <div key={component} className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700 capitalize">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
                           {component.replace('_', ' ')}
                         </span>
                         {getStatusIcon(status)}
@@ -486,9 +484,9 @@ const AIAgentsDashboard = () => {
             </div>
 
             {/* Métricas Rápidas */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <BarChart3 className="text-green-600" />
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <BarChart3 className="text-green-600 dark:text-green-400" />
                 Métricas Rápidas
               </h3>
               
@@ -524,17 +522,17 @@ const AIAgentsDashboard = () => {
 
             {/* Agentes Activos */}
             {agentsConfig && (
-              <div className="lg:col-span-3 bg-white rounded-lg shadow-lg p-6">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <Brain className="text-purple-600" />
+              <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Brain className="text-purple-600 dark:text-purple-400" />
                   Estado de Agentes
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {Object.entries(agentsConfig).map(([agentName, config]) => (
-                    <div key={agentName} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div key={agentName} className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium">{agentName}</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-white">{agentName}</h4>
                         {getStatusIcon(config.status)}
                       </div>
                       
@@ -542,7 +540,7 @@ const AIAgentsDashboard = () => {
                         {config.enabled ? 'Habilitado' : 'Deshabilitado'}
                       </div>
                       
-                      <p className="text-sm text-gray-600 mb-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                         Requests: {config.requests}
                       </p>
 
@@ -589,10 +587,10 @@ const AIAgentsDashboard = () => {
 
         {/* Agents Configuration Tab */}
         {activeTab === 'agents' && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Settings className="text-blue-600" />
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Settings className="text-blue-600 dark:text-blue-400" />
                 Configuración de Agentes
               </h2>
               
@@ -615,21 +613,21 @@ const AIAgentsDashboard = () => {
 
             {!agentConfig ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-gray-600">Cargando configuración...</span>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
+                <span className="ml-3 text-gray-600 dark:text-gray-400">Cargando configuración...</span>
               </div>
             ) : (
               <>
                 {/* Blog Agent Header */}
-                <div className="border rounded-lg overflow-hidden mb-6">
-                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 px-6 py-4 border-b">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-6">
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                          <Brain className="text-purple-600" />
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                          <Brain className="text-purple-600 dark:text-purple-400" />
                           Blog Agent
                         </h3>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                           Agente especializado en optimización de contenido de blog
                         </p>
                       </div>
@@ -652,14 +650,14 @@ const AIAgentsDashboard = () => {
                 </div>
 
                 {/* Sub-tabs Navigation */}
-                <div className="border-b border-gray-200 mb-6">
+                <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
                   <nav className="-mb-px flex space-x-8">
                     <button
                       onClick={() => setActiveConfigTab('basic')}
                       className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                         activeConfigTab === 'basic'
-                          ? 'border-blue-600 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       Configuración Básica
@@ -668,8 +666,8 @@ const AIAgentsDashboard = () => {
                       onClick={() => setActiveConfigTab('personality')}
                       className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                         activeConfigTab === 'personality'
-                          ? 'border-purple-600 text-purple-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          ? 'border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400'
+                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       Personalidad
@@ -678,8 +676,8 @@ const AIAgentsDashboard = () => {
                       onClick={() => setActiveConfigTab('context')}
                       className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                         activeConfigTab === 'context'
-                          ? 'border-indigo-600 text-indigo-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
+                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       Contexto
@@ -762,18 +760,18 @@ const AIAgentsDashboard = () => {
         {/* Health Tab */}
         {activeTab === 'health' && systemHealth && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Activity className="text-green-600" />
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Activity className="text-green-600 dark:text-green-400" />
                 Estado de Componentes
               </h2>
               
               <div className="space-y-4">
                 {systemHealth.components && Object.entries(systemHealth.components).map(([component, status]) => (
-                  <div key={component} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={component} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <div className="flex items-center gap-3">
                       {getStatusIcon(status)}
-                      <span className="font-medium capitalize">{component.replace('_', ' ')}</span>
+                      <span className="font-medium text-gray-900 dark:text-white capitalize">{component.replace('_', ' ')}</span>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
                       {status}
@@ -783,22 +781,22 @@ const AIAgentsDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Database className="text-blue-600" />
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Database className="text-blue-600 dark:text-blue-400" />
                 Información del Sistema
               </h3>
               
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Timestamp:</span>
-                  <span className="font-medium">
+                  <span className="text-gray-600 dark:text-gray-400">Timestamp:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
                     {systemHealth.timestamp ? new Date(systemHealth.timestamp).toLocaleString() : 'N/A'}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Estado Global:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Estado Global:</span>
                   <span className={`font-medium ${
                     systemHealth.status === 'healthy' ? 'text-green-600' : 
                     systemHealth.status === 'degraded' ? 'text-yellow-600' : 'text-red-600'
@@ -831,9 +829,9 @@ const AIAgentsDashboard = () => {
 
         {/* Metrics Tab */}
         {activeTab === 'metrics' && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Cpu className="text-purple-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <Cpu className="text-purple-600 dark:text-purple-400" />
               Métricas Avanzadas del Sistema
             </h2>
             
@@ -842,20 +840,20 @@ const AIAgentsDashboard = () => {
                 
                 {/* Prompt System */}
                 {systemMetrics.data?.promptSystem && (
-                  <div className="p-4 border rounded-lg">
-                    <h3 className="font-bold mb-3 text-blue-600">Sistema de Prompts</h3>
+                  <div className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                    <h3 className="font-bold mb-3 text-blue-600 dark:text-blue-400">Sistema de Prompts</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span>Templates:</span>
-                        <span className="font-medium">{systemMetrics.data.promptSystem.templates}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Templates:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.promptSystem.templates}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Total Usage:</span>
-                        <span className="font-medium">{systemMetrics.data.promptSystem.totalUsage}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Total Usage:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.promptSystem.totalUsage}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Success Rate:</span>
-                        <span className="font-medium text-green-600">
+                        <span className="text-gray-600 dark:text-gray-400">Success Rate:</span>
+                        <span className="font-medium text-green-600 dark:text-green-400">
                           {(systemMetrics.data.promptSystem.avgSuccessRate * 100).toFixed(1)}%
                         </span>
                       </div>
@@ -865,11 +863,11 @@ const AIAgentsDashboard = () => {
 
                 {/* Memory System */}
                 {systemMetrics.data?.memorySystem && (
-                  <div className="p-4 border rounded-lg">
-                    <h3 className="font-bold mb-3 text-green-600">Sistema de Memoria</h3>
+                  <div className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                    <h3 className="font-bold mb-3 text-green-600 dark:text-green-400">Sistema de Memoria</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span>Cached Patterns:</span>
+                        <span className="text-gray-600 dark:text-gray-400">Cached Patterns:</span>
                         <span className="font-medium">{systemMetrics.data.memorySystem.cachedPatterns}</span>
                       </div>
                       <div className="flex justify-between">
@@ -886,26 +884,26 @@ const AIAgentsDashboard = () => {
 
                 {/* OpenAI Service */}
                 {systemMetrics.data?.openaiService && (
-                  <div className="p-4 border rounded-lg">
-                    <h3 className="font-bold mb-3 text-purple-600">Servicio OpenAI</h3>
+                  <div className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                    <h3 className="font-bold mb-3 text-purple-600 dark:text-purple-400">Servicio OpenAI</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span>Total Requests:</span>
-                        <span className="font-medium">{systemMetrics.data.openaiService.totalRequests}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Total Requests:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.openaiService.totalRequests}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Cached:</span>
-                        <span className="font-medium">{systemMetrics.data.openaiService.cachedResponses}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Cached:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.openaiService.cachedResponses}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Error Rate:</span>
-                        <span className="font-medium text-red-600">
+                        <span className="text-gray-600 dark:text-gray-400">Error Rate:</span>
+                        <span className="font-medium text-red-600 dark:text-red-400">
                           {(systemMetrics.data.openaiService.errorRate * 100).toFixed(2)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Avg Response:</span>
-                        <span className="font-medium">{systemMetrics.data.openaiService.avgResponseTime}ms</span>
+                        <span className="text-gray-600 dark:text-gray-400">Avg Response:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.openaiService.avgResponseTime}ms</span>
                       </div>
                     </div>
                   </div>
@@ -926,8 +924,7 @@ const AIAgentsDashboard = () => {
           <AgentSystemTester />
         )}
       </div>
-      </div>
-    </SmartDashboardLayout>
+    </div>
   );
 };
 

@@ -11,7 +11,6 @@ import BasicConfigPanel from '../../components/admin/agent-config/BasicConfigPan
 import PersonalityConfigPanel from '../../components/admin/agent-config/PersonalityConfigPanel';
 import ContextConfigPanel from '../../components/admin/agent-config/ContextConfigPanel';
 import ResponseConfigPanel from '../../components/admin/agent-config/ResponseConfigPanel';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 
 export const BlogAgentConfig: React.FC = () => {
   const navigate = useNavigate();
@@ -213,22 +212,21 @@ export const BlogAgentConfig: React.FC = () => {
   }
 
   return (
-    <SmartDashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/dashboard/ai-agents')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-              </button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                  🤖 Configuración del BlogAgent
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/dashboard/ai-agents')}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                🤖 Configuración del BlogAgent
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
                   Personaliza el comportamiento, personalidad y capacidades del agente de blog
@@ -372,7 +370,6 @@ export const BlogAgentConfig: React.FC = () => {
         )}
       </div>
     </div>
-    </SmartDashboardLayout>
   );
 };
 

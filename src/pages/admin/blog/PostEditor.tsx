@@ -22,7 +22,6 @@ import { getApiUrl } from '../../../utils/apiConfig';
 import { blogPostApi } from '../../../services/blog';
 import { uploadImage } from '../../../services/imageService';
 import type { CreatePostDto, UpdatePostDto } from '../../../types/blog';
-import DashboardLayout from '../../../components/DashboardLayout';
 
 interface PostFormData {
   title: string;
@@ -393,8 +392,7 @@ export default function PostEditor() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="post-editor max-w-7xl mx-auto">
+    <div className="post-editor max-w-7xl mx-auto">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm mb-6">
         <div className="flex items-center justify-between p-4">
@@ -1042,6 +1040,5 @@ export default function PostEditor() {
         </div>
       )}
     </div>
-    </DashboardLayout>
   );
 }

@@ -10,6 +10,7 @@ import { DashboardProviders } from './components/DashboardProviders';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRoute from './components/RoleBasedRoute';
 import DashboardRouter from './components/DashboardRouter';
+import DashboardLayout from './components/DashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import WelcomeNotification from './components/WelcomeNotification';
 import { UserRole } from './types/roles';
@@ -107,12 +108,14 @@ const LoadingSpinner = () => (
 
 /**
  * Wrapper para rutas del dashboard con providers de autenticación y roles
- * Clerk + AuthContext se cargan aquí
+ * Clerk + AuthContext se cargan aquí + DashboardLayout
  */
 const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
   <DashboardProviders>
     <ProtectedRoute>
-      {children}
+      <DashboardLayout>
+        {children}
+      </DashboardLayout>
     </ProtectedRoute>
   </DashboardProviders>
 );

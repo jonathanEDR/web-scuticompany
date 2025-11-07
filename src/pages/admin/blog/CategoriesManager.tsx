@@ -8,7 +8,6 @@ import { Plus, Edit2, Trash2, Save, X, Folder } from 'lucide-react';
 import { useCategories } from '../../../hooks/blog';
 import { blogCategoryApi } from '../../../services/blog';
 import type { CreateCategoryDto, UpdateCategoryDto } from '../../../types/blog';
-import DashboardLayout from '../../../components/DashboardLayout';
 
 interface CategoryFormData {
   name: string;
@@ -163,10 +162,9 @@ export default function CategoriesManager() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="categories-manager max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="categories-manager max-w-6xl mx-auto space-y-6">
+    {/* Header */}
+    <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Categorías</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -419,6 +417,5 @@ export default function CategoriesManager() {
         </div>
       </div>
     </div>
-    </DashboardLayout>
   );
 }

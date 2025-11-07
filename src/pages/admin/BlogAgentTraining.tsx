@@ -17,7 +17,6 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { agentConfigService } from '../../services/agentConfigService';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 
 interface TrainingExample {
   id: string;
@@ -279,22 +278,21 @@ const BlogAgentTraining: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
-        <div className="text-center bg-white rounded-2xl shadow-xl p-8">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-700 text-lg font-medium">Cargando configuración de entrenamiento...</p>
-          <p className="text-gray-500 text-sm mt-2">Esto puede tomar unos segundos</p>
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900/20 dark:via-blue-900/20 dark:to-indigo-900/20">
+        <div className="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
+          <p className="text-gray-700 dark:text-gray-200 text-lg font-medium">Cargando configuración de entrenamiento...</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">Esto puede tomar unos segundos</p>
         </div>
       </div>
     );
   }
 
   return (
-    <SmartDashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
           <button
             onClick={() => navigate('/dashboard/ai-agents')}
             className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white mb-4 transition-colors"
@@ -310,15 +308,15 @@ const BlogAgentTraining: React.FC = () => {
                   <Brain className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Entrenamiento del BlogAgent</h1>
-                  <p className="text-gray-600 mt-2">Personaliza el comportamiento y respuestas del agente con ejemplos y configuración avanzada</p>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Entrenamiento del BlogAgent</h1>
+                  <p className="text-gray-600 dark:text-gray-300 mt-2">Personaliza el comportamiento y respuestas del agente con ejemplos y configuración avanzada</p>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => loadTrainingConfig()}
-                  className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   <RotateCcw className="w-5 h-5 mr-2" />
                   Resetear
@@ -360,14 +358,14 @@ const BlogAgentTraining: React.FC = () => {
         )}
 
         {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="flex border-b border-gray-200 bg-gray-50">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+          <div className="flex border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
             <button
               onClick={() => setActiveTab('examples')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'examples'
-                  ? 'bg-white text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <BookOpen className="w-5 h-5 mr-2" />
@@ -377,8 +375,8 @@ const BlogAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('prompts')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'prompts'
-                  ? 'bg-white text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Sparkles className="w-5 h-5 mr-2" />
@@ -388,8 +386,8 @@ const BlogAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('behavior')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'behavior'
-                  ? 'bg-white text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Target className="w-5 h-5 mr-2" />
@@ -399,8 +397,8 @@ const BlogAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('testing')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'testing'
-                  ? 'bg-white text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <Zap className="w-5 h-5 mr-2" />
@@ -412,24 +410,24 @@ const BlogAgentTraining: React.FC = () => {
             {/* Tab: Ejemplos de Entrenamiento */}
             {activeTab === 'examples' && (
               <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">💡 ¿Qué son los ejemplos de entrenamiento?</h3>
-                  <p className="text-blue-800 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 ¿Qué son los ejemplos de entrenamiento?</h3>
+                  <p className="text-blue-800 dark:text-blue-200 text-sm">
                     Los ejemplos de entrenamiento enseñan al agente cómo responder en situaciones específicas.
                     Usa "few-shot learning" para mejorar la calidad y consistencia de las respuestas.
                   </p>
                 </div>
 
                 {/* Formulario para nuevo ejemplo */}
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Plus className="w-5 h-5 mr-2 text-purple-600" />
+                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                    <Plus className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" />
                     Agregar Nuevo Ejemplo
                   </h3>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Categoría
                       </label>
                       <select
@@ -449,14 +447,14 @@ const BlogAgentTraining: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Entrada del Usuario (Input)
                       </label>
                       <textarea
                         value={newExample.input}
                         onChange={(e) => setNewExample(prev => ({ ...prev, input: e.target.value }))}
                         placeholder="Ej: Analiza este post sobre React y sugiere mejoras SEO..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[100px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[100px]"
                       />
                     </div>
 
@@ -525,14 +523,14 @@ const BlogAgentTraining: React.FC = () => {
                   ) : (
                     <div className="space-y-4">
                       {trainingConfig.examples.map((example) => (
-                        <div key={example.id} className="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
+                        <div key={example.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:shadow-md transition-shadow">
                           <div className="flex items-start justify-between mb-3">
-                            <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                            <span className="inline-block px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">
                               {example.category}
                             </span>
                             <button
                               onClick={() => removeExample(example.id)}
-                              className="text-red-500 hover:text-red-700 transition-colors"
+                              className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
@@ -571,25 +569,25 @@ const BlogAgentTraining: React.FC = () => {
             {/* Tab: Prompts por Tarea */}
             {activeTab === 'prompts' && (
               <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">💡 ¿Qué son los prompts por tarea?</h3>
-                  <p className="text-blue-800 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 ¿Qué son los prompts por tarea?</h3>
+                  <p className="text-blue-800 dark:text-blue-200 text-sm">
                     Define system prompts personalizados para diferentes tipos de tareas (SEO, análisis, tags, etc.).
                     Esto permite que el agente use instrucciones específicas según lo que necesites.
                   </p>
                 </div>
 
                 {/* Formulario para nuevo prompt de tarea */}
-                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Plus className="w-5 h-5 mr-2 text-indigo-600" />
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-800">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                    <Plus className="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" />
                     Agregar Prompt por Tarea
                   </h3>
 
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Tipo de Tarea
                         </label>
                         <select
@@ -710,10 +708,10 @@ Proporciona: {deliverables}"
                   {trainingConfig.taskPrompts.length === 0 ? (
                     <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
                       <Sparkles className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Sistema Preparado</h4>
-                      <p className="text-gray-600 mb-4">Los prompts profesionales se inicializarán automáticamente cuando sea necesario</p>
-                      <div className="bg-white rounded-lg p-4 max-w-md mx-auto border border-blue-100">
-                        <div className="flex items-center justify-center space-x-4 text-sm text-blue-700">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Sistema Preparado</h4>
+                      <p className="text-gray-600 dark:text-gray-400 mb-4">Los prompts profesionales se inicializarán automáticamente cuando sea necesario</p>
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 max-w-md mx-auto border border-blue-100 dark:border-blue-900">
+                        <div className="flex items-center justify-center space-x-4 text-sm text-blue-700 dark:text-blue-300">
                           <span className="flex items-center">
                             <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
                             SEO Analysis
@@ -821,8 +819,8 @@ Proporciona: {deliverables}"
                                         ({taskPrompt.systemPrompt.length} chars)
                                       </span>
                                     </h5>
-                                    <div className="bg-white p-4 rounded-lg border border-gray-200 max-h-64 overflow-y-auto">
-                                      <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
+                                      <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono">
                                         {taskPrompt.systemPrompt}
                                       </pre>
                                     </div>
@@ -837,8 +835,8 @@ Proporciona: {deliverables}"
                                           ({taskPrompt.userPromptTemplate.length} chars)
                                         </span>
                                       </h5>
-                                      <div className="bg-white p-4 rounded-lg border border-gray-200 max-h-64 overflow-y-auto">
-                                        <pre className="text-sm text-gray-600 whitespace-pre-wrap">
+                                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
+                                        <pre className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                                           {taskPrompt.userPromptTemplate}
                                         </pre>
                                       </div>
@@ -867,9 +865,9 @@ Proporciona: {deliverables}"
                 </div>
 
                 {/* Prompts predefinidos recomendados */}
-                <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6 border border-green-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                    <Sparkles className="w-5 h-5 mr-2 text-green-600" />
+                <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                    <Sparkles className="w-5 h-5 mr-2 text-green-600 dark:text-green-400" />
                     Prompts Predefinidos Recomendados
                   </h3>
                   
@@ -937,16 +935,16 @@ Proporciona: {deliverables}"
             {/* Tab: Reglas de Comportamiento */}
             {activeTab === 'behavior' && (
               <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">💡 ¿Qué son las reglas de comportamiento?</h3>
-                  <p className="text-blue-800 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 ¿Qué son las reglas de comportamiento?</h3>
+                  <p className="text-blue-800 dark:text-blue-200 text-sm">
                     Define reglas que el agente SIEMPRE debe seguir. Estas reglas tienen prioridad sobre otras instrucciones.
                   </p>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       Reglas Activas ({trainingConfig.behaviorRules.length})
                     </h3>
                     <button
@@ -1023,9 +1021,9 @@ Proporciona: {deliverables}"
             {/* Tab: Testing */}
             {activeTab === 'testing' && (
               <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">💡 Prueba tu agente entrenado</h3>
-                  <p className="text-blue-800 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 Prueba tu agente entrenado</h3>
+                  <p className="text-blue-800 dark:text-blue-200 text-sm">
                     Prueba cómo responde el agente con la configuración de entrenamiento actual.
                     Esto te ayuda a validar si los ejemplos y reglas funcionan como esperas.
                   </p>
@@ -1033,14 +1031,14 @@ Proporciona: {deliverables}"
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Input de Prueba
                     </label>
                     <textarea
                       value={testInput}
                       onChange={(e) => setTestInput(e.target.value)}
                       placeholder="Escribe una consulta para probar el agente..."
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[200px]"
+                      className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[200px]"
                     />
                     <button
                       onClick={testAgent}
@@ -1062,14 +1060,14 @@ Proporciona: {deliverables}"
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Respuesta del Agente
                     </label>
-                    <div className="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 min-h-[200px] overflow-auto">
+                    <div className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 min-h-[200px] overflow-auto">
                       {testOutput ? (
-                        <p className="text-gray-700 whitespace-pre-wrap">{testOutput}</p>
+                        <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{testOutput}</p>
                       ) : (
-                        <p className="text-gray-400 italic">La respuesta aparecerá aquí...</p>
+                        <p className="text-gray-400 dark:text-gray-500 italic">La respuesta aparecerá aquí...</p>
                       )}
                     </div>
                   </div>
@@ -1080,7 +1078,6 @@ Proporciona: {deliverables}"
         </div>
       </div>
     </div>
-    </SmartDashboardLayout>
   );
 };
 

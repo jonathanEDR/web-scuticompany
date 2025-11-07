@@ -11,7 +11,6 @@ import {
 import { Link } from 'react-router-dom';
 import { useCategories, useAdminPosts } from '../../../hooks/blog';
 import { useModerationStats } from '../../../hooks/blog/useModerationQueue';
-import DashboardLayout from '../../../components/DashboardLayout';
 import { BlogAnalyticsDashboard } from '../../../components/blog/analytics/BlogAnalyticsDashboard';
 
 interface DashboardStats {
@@ -144,8 +143,7 @@ export default function BlogDashboard() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="blog-dashboard space-y-6">
+    <div className="blog-dashboard space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -433,6 +431,5 @@ export default function BlogDashboard() {
         <BlogAnalyticsDashboard />
       )}
     </div>
-    </DashboardLayout>
   );
 }
