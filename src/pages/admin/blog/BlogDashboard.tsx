@@ -47,13 +47,6 @@ export default function BlogDashboard() {
   // Cargar estadísticas de moderación para comentarios pendientes
   const { stats: moderationStats } = useModerationStats();
   
-  // Debug logs
-  useEffect(() => {
-    console.log('📊 [BlogDashboard] Posts:', posts);
-    console.log('📊 [BlogDashboard] Loading:', postsLoading);
-    console.log('📊 [BlogDashboard] Error:', postsError);
-  }, [posts, postsLoading, postsError]);
-  
   const { categories, loading: categoriesLoading } = useCategories();
 
   const [stats, setStats] = useState<DashboardStats>({

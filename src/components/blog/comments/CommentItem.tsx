@@ -6,6 +6,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Reply, Flag, Edit2, Trash2, MoreVertical } from 'lucide-react';
+import { getImageUrl } from '../../../utils/imageUtils';
+import LazyImage from '../common/LazyImage';
 import type { BlogComment } from '../../../types/blog';
 
 interface CommentItemProps {
@@ -111,7 +113,13 @@ export default function CommentItem({
             const profileUrl = profileUsername ? `/perfil/${profileUsername}` : (comment.author.website || null);
 
             const avatarNode = profileImg ? (
-              <img src={profileImg} alt={authorName} className="w-10 h-10 rounded-full object-cover" />
+              <LazyImage 
+                src={getImageUrl(profileImg)} 
+                alt={authorName} 
+                className="w-10 h-10 rounded-full object-cover"
+                width={40}
+                height={40}
+              />
             ) : (
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                 <span className="text-white font-semibold text-sm">{authorName.charAt(0).toUpperCase()}</span>

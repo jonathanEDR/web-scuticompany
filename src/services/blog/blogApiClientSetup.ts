@@ -53,7 +53,6 @@ export function setupAuthInterceptor(client: AxiosInstance) {
       
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('🔑 [BlogAPI] Token agregado a la petición:', config.url);
       } else {
         console.warn('⚠️ [BlogAPI] No hay token disponible para:', config.url);
       }

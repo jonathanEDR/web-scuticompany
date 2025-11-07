@@ -6,6 +6,8 @@
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, User, Eye, ArrowLeft } from 'lucide-react';
 import { CategoryBadge, ReadingTimeIndicator, LikeButton, FavoriteButton } from './';
+import { getImageUrl } from '../../../utils/imageUtils';
+import LazyImage from './LazyImage';
 import type { BlogPost } from '../../../types/blog';
 
 interface PostHeaderProps {
@@ -54,10 +56,12 @@ export default function PostHeader({ post, className = '' }: PostHeaderProps) {
               {post.author && (
                 <div className="flex items-center gap-2">
                   {post.author.avatar ? (
-                    <img
-                      src={post.author.avatar}
+                    <LazyImage
+                      src={getImageUrl(post.author.avatar)}
                       alt={`${post.author.firstName || ''} ${post.author.lastName || ''}`}
                       className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                      width={32}
+                      height={32}
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">

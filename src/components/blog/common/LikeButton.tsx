@@ -44,21 +44,17 @@ export default function LikeButton({
     if (isSignedIn && userId) {
       try {
         setLoading(true);
-        console.log('🔍 [FRONTEND] Intentando toggle like, postId:', postId);
         
         // Obtener token fresco
         const token = await getToken();
-        console.log('🔑 [FRONTEND] Token obtenido:', token ? 'SI' : 'NO');
         
         if (!token) {
-          console.error('❌ [FRONTEND] No se pudo obtener token de Clerk');
           return;
         }
         
         await blogPostApi.toggleLike(postId);
-        console.log('✅ [FRONTEND] Like toggled exitosamente');
       } catch (err) {
-        console.error('❌ [FRONTEND] Error al dar like:', err);
+        console.error('Error al dar like:', err);
         return;
       } finally {
         setLoading(false);

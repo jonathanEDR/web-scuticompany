@@ -9,6 +9,7 @@ import { formatReadingTime, generateExcerpt, extractFirstImage } from '../../../
 import { Eye, Heart, MessageCircle, Calendar, User } from 'lucide-react';
 import CategoryBadge from './CategoryBadge';
 import TagList from './TagList';
+import LazyImage from './LazyImage';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -30,7 +31,7 @@ export default function BlogCard({
   className = ''
 }: BlogCardProps) {
   
-  // Extraer imagen destacada
+  // Extraer imagen destacada (ahora es string simple como Media Library)
   const featuredImage = post.featuredImage || extractFirstImage(post.content);
   
   // Generar excerpt si no existe
@@ -82,10 +83,12 @@ export default function BlogCard({
             to={`/blog/${post.slug}`}
             className="relative flex-1 overflow-hidden group"
           >
-            <img
+            <LazyImage
               src={featuredImage}
               alt={post.title}
               className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+              width={600}
+              height={400}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </Link>
@@ -125,10 +128,12 @@ export default function BlogCard({
             {showAuthor && (
               <div className="flex items-center gap-3">
                 {post.author?.avatar && (
-                  <img
+                  <LazyImage
                     src={post.author.avatar}
                     alt={authorName}
                     className="w-10 h-10 rounded-full object-cover"
+                    width={40}
+                    height={40}
                   />
                 )}
                 <div>
@@ -174,10 +179,12 @@ export default function BlogCard({
             to={`/blog/${post.slug}`}
             className="flex-shrink-0 w-24 h-24 overflow-hidden rounded-lg"
           >
-            <img
+            <LazyImage
               src={featuredImage}
               alt={post.title}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              width={96}
+              height={96}
             />
           </Link>
         )}
@@ -241,10 +248,12 @@ export default function BlogCard({
               to={`/blog/${post.slug}`}
               className="flex-shrink-0 w-16 h-16 overflow-hidden rounded"
             >
-              <img
+              <LazyImage
                 src={featuredImage}
                 alt={post.title}
                 className="w-full h-full object-cover"
+                width={64}
+                height={64}
               />
             </Link>
           )}
@@ -264,10 +273,12 @@ export default function BlogCard({
           to={`/blog/${post.slug}`}
           className="relative h-48 md:h-56 overflow-hidden group"
         >
-          <img
+          <LazyImage
             src={featuredImage}
             alt={post.title}
             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+            width={400}
+            height={224}
           />
           
           {/* Badge de categoría sobre la imagen (NO clickeable para evitar <a> anidados) */}
@@ -316,10 +327,12 @@ export default function BlogCard({
           {showAuthor && (
             <div className="flex items-center gap-2">
               {post.author?.avatar && (
-                <img
+                <LazyImage
                   src={post.author.avatar}
                   alt={authorName}
                   className="w-8 h-8 rounded-full object-cover"
+                  width={32}
+                  height={32}
                 />
               )}
               <div>

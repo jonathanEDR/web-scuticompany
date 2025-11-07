@@ -30,15 +30,11 @@ export function useAdminPosts(filters?: BlogFilters): UseAdminPostsReturn {
       setLoading(true);
       setError(null);
       
-      console.log('[useAdminPosts] Fetching posts...');
       const response = await blogPostApi.admin.getAllPosts(filters);
-      console.log('[useAdminPosts] Response:', response);
       
       if (response.success && response.data) {
         setPosts(response.data.data);
         setPagination(response.data.pagination);
-        
-        console.log('[useAdminPosts] Posts loaded:', response.data.data.length);
       } else {
         throw new Error('Error al cargar posts');
       }

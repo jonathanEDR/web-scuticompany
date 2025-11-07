@@ -6,7 +6,9 @@
 import { useState } from 'react';
 import { useUserLikes } from '../../hooks/useUserLikes';
 import { Heart, HeartOff, Calendar, User, Eye } from 'lucide-react';
+import { getImageUrl } from '../../utils/imageUtils';
 import { Link } from 'react-router-dom';
+import LazyImage from '../blog/common/LazyImage';
 
 export default function MyLikes() {
   const [page, setPage] = useState(1);
@@ -95,10 +97,12 @@ export default function MyLikes() {
                     to={`/blog/${like.slug}`}
                     className="flex-shrink-0 relative overflow-hidden rounded-lg"
                   >
-                    <img
-                      src={like.featuredImage}
+                    <LazyImage
+                      src={getImageUrl(like.featuredImage)}
                       alt={like.title}
                       className="w-48 h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                      width={192}
+                      height={128}
                     />
                   </Link>
                 )}

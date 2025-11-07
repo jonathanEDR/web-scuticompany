@@ -6,7 +6,9 @@
 import { useState } from 'react';
 import { useUserBookmarks } from '../../hooks/useUserBookmarks';
 import { Bookmark, BookmarkX, Calendar, User } from 'lucide-react';
+import { getImageUrl } from '../../utils/imageUtils';
 import { Link } from 'react-router-dom';
+import LazyImage from '../blog/common/LazyImage';
 
 export default function MyBookmarks() {
   const [page, setPage] = useState(1);
@@ -130,10 +132,12 @@ export default function MyBookmarks() {
               {/* Featured Image */}
               {bookmark.featuredImage && (
                 <Link to={`/blog/${bookmark.slug}`} className="block relative overflow-hidden">
-                  <img
-                    src={bookmark.featuredImage}
+                  <LazyImage
+                    src={getImageUrl(bookmark.featuredImage)}
                     alt={bookmark.title}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    width={400}
+                    height={192}
                   />
                   <div className="absolute top-3 right-3">
                     <button

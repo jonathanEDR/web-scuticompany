@@ -6,7 +6,9 @@
 import { useState } from 'react';
 import { useReadingHistory } from '../../hooks/useReadingHistory';
 import { Clock, Calendar, User, TrendingUp, Book } from 'lucide-react';
+import { getImageUrl } from '../../utils/imageUtils';
 import { Link } from 'react-router-dom';
+import LazyImage from '../blog/common/LazyImage';
 
 type PeriodFilter = 'today' | 'week' | 'month' | 'all';
 
@@ -161,10 +163,12 @@ export default function ReadingHistory() {
                     to={`/blog/${item.post.slug}`}
                     className="flex-shrink-0 relative overflow-hidden rounded-lg"
                   >
-                    <img
-                      src={item.post.featuredImage}
+                    <LazyImage
+                      src={getImageUrl(item.post.featuredImage)}
                       alt={item.post.title}
                       className="w-32 h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                      width={128}
+                      height={96}
                     />
                   </Link>
                 )}

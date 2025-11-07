@@ -193,24 +193,27 @@ export default function PostEditor() {
     }
   };
 
-  // Subir imagen
+  // Subir imagen - MEJORADO
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Validar tamaño (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('La imagen no debe superar 5MB');
+      const errorMsg = `La imagen es demasiado grande (${(file.size / 1024 / 1024).toFixed(2)}MB). Máximo permitido: 5MB`;
+      alert(errorMsg);
       return;
     }
 
     // Validar tipo
     if (!file.type.startsWith('image/')) {
-      alert('Solo se permiten archivos de imagen');
+      const errorMsg = `Tipo de archivo no válido: ${file.type}. Solo se permiten imágenes.`;
+      alert(errorMsg);
       return;
     }
 
     setIsUploading(true);
+    
     try {
       const imageData = await uploadImage({
         file,
@@ -221,11 +224,40 @@ export default function PostEditor() {
 
       handleChange('featuredImage', imageData.url);
       alert('✅ Imagen subida exitosamente');
+      
     } catch (error: any) {
-      console.error('Error al subir imagen:', error);
-      alert(`❌ Error al subir la imagen: ${error.message || 'Error desconocido'}`);
+      console.error('❌ [PostEditor] Error detallado al subir imagen:', {
+        error: error.message,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        formTitle: formData.title,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Mostrar error más específico al usuario
+      let userMessage = '❌ Error al subir la imagen';
+      
+      if (error.message.includes('permisos')) {
+        userMessage = '❌ No tienes permisos para subir imágenes. Verifica tu sesión.';
+      } else if (error.message.includes('demasiado grande')) {
+        userMessage = '❌ El archivo es demasiado grande. Máximo 5MB.';
+      } else if (error.message.includes('tipo') || error.message.includes('formato')) {
+        userMessage = '❌ Formato de imagen no válido. Usa JPG, PNG, GIF o WEBP.';
+      } else if (error.message.includes('conexión') || error.message.includes('red')) {
+        userMessage = '❌ Error de conexión. Verifica tu internet e intenta de nuevo.';
+      } else if (error.message.includes('servidor')) {
+        userMessage = '❌ Error del servidor. Intenta más tarde.';
+      } else {
+        userMessage = `❌ ${error.message}`;
+      }
+      
+      alert(userMessage);
+      
     } finally {
       setIsUploading(false);
+      // Limpiar el input para permitir resubir el mismo archivo
+      e.target.value = '';
     }
   };
 
@@ -310,8 +342,6 @@ export default function PostEditor() {
       alert('⚠️ Escribe primero algo en el extracto');
       return;
     }
-
-    console.log('🎯 [PostEditor] Acción en extracto:', actionType, formData.excerpt.length, 'caracteres');
     
     try {
       setIsProcessingAI(true);

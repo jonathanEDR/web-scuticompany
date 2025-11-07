@@ -37,15 +37,6 @@ const publicBlogApiClient = axios.create({
   timeout: parseInt(import.meta.env.VITE_BLOG_API_TIMEOUT || '15000'),
 });
 
-// Debug logging en desarrollo
-if (import.meta.env.DEV || import.meta.env.VITE_DEBUG_API === 'true') {
-  console.log('🔧 [BlogAPI] Configuración:', {
-    baseURL: `${getApiUrl()}/blog`,
-    timeout: parseInt(import.meta.env.VITE_BLOG_API_TIMEOUT || '15000'),
-    environment: import.meta.env.PROD ? 'production' : 'development'
-  });
-}
-
 // ============================================
 // INTERCEPTORES
 // ============================================
@@ -246,9 +237,7 @@ const duplicatePost = async (id: string): Promise<ApiResponse<BlogPost>> => {
  * Marca/desmarca like en un post
  */
 const toggleLike = async (postId: string): Promise<ApiResponse<void>> => {
-  console.log('🔍 [BlogAPI] Toggle like iniciado para postId:', postId);
   const response = await blogApiClient.post(`/posts/${postId}/like`);
-  console.log('✅ [BlogAPI] Toggle like respuesta:', response.data);
   return response.data;
 };
 
@@ -256,9 +245,7 @@ const toggleLike = async (postId: string): Promise<ApiResponse<void>> => {
  * Marca/desmarca bookmark en un post
  */
 const toggleBookmark = async (postId: string): Promise<ApiResponse<void>> => {
-  console.log('🔍 [BlogAPI] Toggle bookmark iniciado para postId:', postId);
   const response = await blogApiClient.post(`/posts/${postId}/bookmark`);
-  console.log('✅ [BlogAPI] Toggle bookmark respuesta:', response.data);
   return response.data;
 };
 

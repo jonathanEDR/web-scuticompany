@@ -22,6 +22,7 @@ import {
 import { CommentsList } from '../../../components/blog/comments';
 import { AIOptimizedContent } from '../../../components/blog/seo';
 import { sanitizeHTML } from '../../../utils/blog';
+import { getImageUrl } from '../../../utils/imageUtils';
 import PublicFooter from '../../../components/public/PublicFooter';
 
 const BlogPostEnhanced: React.FC = () => {
@@ -94,14 +95,14 @@ const BlogPostEnhanced: React.FC = () => {
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:site_name" content="WebScuti Blog" />
-        {post.featuredImage && <meta property="og:image" content={post.featuredImage} />}
+        {post.featuredImage && <meta property="og:image" content={getImageUrl(post.featuredImage)} />}
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.excerpt} />
         <meta name="twitter:site" content="@webscuti" />
-        {post.featuredImage && <meta name="twitter:image" content={post.featuredImage} />}
+        {post.featuredImage && <meta name="twitter:image" content={getImageUrl(post.featuredImage)} />}
         
         {/* Para GPT y otros crawlers */}
         <meta name="robots" content="index, follow" />

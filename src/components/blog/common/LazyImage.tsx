@@ -1,10 +1,10 @@
 /**
  * 🖼️ LazyImage Component
- * Carga diferida de imágenes con placeholder
+ * Carga diferida de imágenes con placeholder mejorado
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { ImageIcon } from 'lucide-react';
+import { getImageUrl, getPlaceholderImage, getErrorImage, isValidImageUrl } from '../../../utils/imageUtils';
 
 interface LazyImageProps {
   src: string;
@@ -12,6 +12,8 @@ interface LazyImageProps {
   className?: string;
   placeholderClassName?: string;
   fallbackSrc?: string;
+  width?: number;
+  height?: number;
   onLoad?: () => void;
   onError?: () => void;
 }
@@ -21,7 +23,9 @@ export default function LazyImage({
   alt,
   className = '',
   placeholderClassName = '',
-  fallbackSrc = '/images/blog-placeholder.jpg',
+  fallbackSrc,
+  width = 400,
+  height = 300,
   onLoad,
   onError
 }: LazyImageProps) {
@@ -31,6 +35,12 @@ export default function LazyImage({
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const placeholderRef = useRef<HTMLDivElement>(null);
+
+  // Generar URLs de respaldo
+  const placeholderUrl = getPlaceholderImage(width, height);
+  const errorUrl = getErrorImage(width, height);
+  const processedSrc = isValidImageUrl(src) ? getImageUrl(src) : errorUrl;
+  const finalFallbackSrc = fallbackSrc ? getImageUrl(fallbackSrc) : errorUrl;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -79,7 +89,11 @@ export default function LazyImage({
           ${placeholderClassName}
           ${isLoaded ? 'opacity-0' : 'opacity-100'}
         `}>
-          <ImageIcon className="text-gray-400 dark:text-gray-600" size={48} />
+          <img 
+            src={placeholderUrl}
+            alt="Cargando..."
+            className="max-w-full max-h-full object-contain"
+          />
         </div>
       )}
 
@@ -87,7 +101,7 @@ export default function LazyImage({
       {isInView && (
         <img
           ref={imgRef}
-          src={hasError ? fallbackSrc : src}
+          src={hasError ? finalFallbackSrc : processedSrc}
           alt={alt}
           onLoad={handleLoad}
           onError={handleError}

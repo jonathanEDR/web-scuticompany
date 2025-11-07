@@ -170,7 +170,6 @@ export const useContextAwareAutoComplete = (options: UseContextAwareAutoComplete
       const token = await window.Clerk?.session?.getToken();
       
       if (!token) {
-        console.warn('⚠️ No hay token de autenticación, usando template');
         return createTemplateSuggestion(pattern);
       }
 
@@ -220,8 +219,6 @@ export const useContextAwareAutoComplete = (options: UseContextAwareAutoComplete
       return aiSuggestion;
 
     } catch (error) {
-      console.error('❌ [ContextAware] Error generando sugerencia:', error);
-      
       // Fallback a template si falla
       return createTemplateSuggestion(pattern);
     }

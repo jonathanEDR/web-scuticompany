@@ -36,7 +36,7 @@ export interface ImageData {
   size: number;
   width?: number;
   height?: number;
-  category: 'hero' | 'logo' | 'service' | 'gallery' | 'icon' | 'banner' | 'avatar' | 'thumbnail' | 'other';
+  category: 'hero' | 'logo' | 'service' | 'gallery' | 'icon' | 'banner' | 'avatar' | 'thumbnail' | 'blog' | 'other';
   tags: string[];
   title?: string;
   description?: string;
@@ -128,6 +128,17 @@ export const uploadImage = async (options: UploadImageOptions): Promise<ImageDat
   const headerObj = headers as Record<string, string>;
   delete headerObj['Content-Type']; // Dejar que el navegador establezca el boundary
 
+  // Log de debug en desarrollo
+  if (import.meta.env.DEV) {
+    console.log('📤 [ImageService] Iniciando upload:', {
+      fileName: options.file.name,
+      fileSize: `${(options.file.size / 1024 / 1024).toFixed(2)}MB`,
+      category: options.category,
+      apiUrl: `${API_URL}/upload/image`,
+      hasAuth: !!headerObj['Authorization']
+    });
+  }
+
   const response = await fetch(`${API_URL}/upload/image`, {
     method: 'POST',
     headers: headerObj,
@@ -140,24 +151,57 @@ export const uploadImage = async (options: UploadImageOptions): Promise<ImageDat
     try {
       const errorData = await response.json();
       errorMessage = errorData.message || errorData.error || errorMessage;
-      console.error('🔍 Upload Error Details:', {
+      
+      console.error('🔍 [ImageService] Upload Error Details:', {
         status: response.status,
         statusText: response.statusText,
         errorData,
-        url: `${API_URL}/upload/image`
+        url: `${API_URL}/upload/image`,
+        fileName: options.file.name,
+        fileSize: options.file.size,
+        requestHeaders: Object.keys(headerObj)
       });
-    } catch (parseError) {
-      console.error('🔍 Upload Error (failed to parse):', {
+    } catch (parseError: any) {
+      console.error('🔍 [ImageService] Upload Error (failed to parse response):', {
         status: response.status,
         statusText: response.statusText,
-        url: `${API_URL}/upload/image`
+        url: `${API_URL}/upload/image`,
+        parseError: parseError?.message || String(parseError)
       });
+    }
+    
+    // Crear mensaje de error más específico según el status
+    if (response.status === 401) {
+      errorMessage = 'No tienes permisos para subir imágenes. Verifica tu sesión.';
+    } else if (response.status === 403) {
+      errorMessage = 'Acceso denegado. Tu rol no permite subir archivos.';
+    } else if (response.status === 413) {
+      errorMessage = 'El archivo es demasiado grande. Máximo 5MB permitido.';
+    } else if (response.status === 415) {
+      errorMessage = 'Tipo de archivo no soportado. Solo se permiten imágenes JPG, PNG, GIF, WEBP.';
+    } else if (response.status === 503) {
+      errorMessage = 'Servicio de almacenamiento temporalmente no disponible. Intenta más tarde.';
+    } else if (response.status === 504) {
+      errorMessage = 'Tiempo de espera agotado. El archivo puede ser muy grande o la conexión lenta.';
+    } else if (response.status >= 500) {
+      errorMessage = 'Error del servidor. Contacta al administrador si persiste.';
     }
     
     throw new Error(errorMessage);
   }
 
   const data = await response.json();
+  
+  // Log de éxito en desarrollo
+  if (import.meta.env.DEV) {
+    console.log('✅ [ImageService] Upload exitoso:', {
+      imageId: data.data._id,
+      url: data.data.url,
+      fileName: data.data.originalName,
+      size: `${(data.data.size / 1024 / 1024).toFixed(2)}MB`
+    });
+  }
+  
   return data.data;
 };
 

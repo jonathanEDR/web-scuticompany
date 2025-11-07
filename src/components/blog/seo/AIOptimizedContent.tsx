@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { getImageUrl } from '../../../utils/imageUtils';
 import type { BlogPost } from '../../../types/blog';
 
 interface AIOptimizedContentProps {
@@ -66,7 +67,7 @@ export const AIOptimizedContent: React.FC<AIOptimizedContentProps> = ({ post }) 
           dateModified: post.updatedAt,
           
           // Imagen principal
-          image: post.featuredImage || 'https://webscuti.com/default-image.jpg',
+          image: post.featuredImage ? getImageUrl(post.featuredImage) : 'https://webscuti.com/default-image.jpg',
           
           // Palabras clave
           keywords: post.tags.map(tag => typeof tag === 'string' ? tag : tag.name).join(', '),

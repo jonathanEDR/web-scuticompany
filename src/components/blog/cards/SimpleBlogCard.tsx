@@ -6,6 +6,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Eye } from 'lucide-react';
+import { LazyImage } from '../common';
+import { getImageUrl } from '../../../utils/imageUtils';
 import type { BlogPost } from '../../../types/blog';
 
 interface SimpleBlogCardProps {
@@ -32,13 +34,14 @@ export const SimpleBlogCard: React.FC<SimpleBlogCardProps> = ({
       {/* Imagen */}
       {post.featuredImage && (
         <div className="relative">
-          <img
+          <LazyImage
             src={post.featuredImage}
             alt={post.title}
             className={`w-full object-cover rounded-t-lg ${
               variant === 'featured' ? 'h-48 md:h-64' : 'h-40'
             }`}
-            loading="lazy"
+            width={variant === 'featured' ? 600 : 400}
+            height={variant === 'featured' ? 256 : 160}
           />
           
           {/* Categoría badge */}
