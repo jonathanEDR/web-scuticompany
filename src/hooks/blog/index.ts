@@ -53,6 +53,12 @@ export {
   useKeywordResearch,
 } from './useAIRecommendations';
 
+// Debug y Troubleshooting
+export { 
+  useBlogDebug,
+  useBlogDebugConsole,
+} from './useBlogDebug';
+
 // Exports por defecto
 export { default as useBlogPostsDefault } from './useBlogPosts';
 export { default as useBlogPostDefault } from './useBlogPost';

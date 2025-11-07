@@ -25,7 +25,7 @@ const blogApiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: parseInt(import.meta.env.VITE_BLOG_API_TIMEOUT || '15000'),
 });
 
 // Cliente para peticiones públicas (sin autenticación)
@@ -34,8 +34,17 @@ const publicBlogApiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: parseInt(import.meta.env.VITE_BLOG_API_TIMEOUT || '15000'),
 });
+
+// Debug logging en desarrollo
+if (import.meta.env.DEV || import.meta.env.VITE_DEBUG_API === 'true') {
+  console.log('🔧 [BlogAPI] Configuración:', {
+    baseURL: `${getApiUrl()}/blog`,
+    timeout: parseInt(import.meta.env.VITE_BLOG_API_TIMEOUT || '15000'),
+    environment: import.meta.env.PROD ? 'production' : 'development'
+  });
+}
 
 // ============================================
 // INTERCEPTORES
@@ -44,38 +53,62 @@ const publicBlogApiClient = axios.create({
 // Configurar interceptor de autenticación solo para cliente autenticado
 setupAuthInterceptor(blogApiClient);
 
-// Interceptor para manejo de respuestas y errores
-blogApiClient.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError) => {
-    if (error.response) {
-      // Error del servidor con respuesta
-      const status = error.response.status;
-      const data = error.response.data as any;
+// Interceptor para manejo de respuestas y errores (MEJORADO)
+[blogApiClient, publicBlogApiClient].forEach(client => {
+  client.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+      const config = error.config;
+      const url = config?.url || 'unknown';
+      
+      if (error.response) {
+        // Error del servidor con respuesta
+        const status = error.response.status;
+        const data = error.response.data as any;
 
-      if (status === 401) {
-        console.error('[BlogAPI] No autorizado - Token inválido o expirado');
-        // Opcional: Redirigir a login
-      } else if (status === 403) {
-        console.error('[BlogAPI] Acceso denegado - Permisos insuficientes');
-      } else if (status === 404) {
-        console.error('[BlogAPI] Recurso no encontrado');
-      } else if (status === 429) {
-        console.error('[BlogAPI] Demasiadas peticiones - Rate limit excedido');
+        // Log específico según el tipo de error
+        if (status === 401) {
+          console.error(`[BlogAPI] 401 No autorizado en ${url} - Token inválido o expirado`);
+        } else if (status === 403) {
+          console.error(`[BlogAPI] 403 Acceso denegado en ${url} - Permisos insuficientes`);
+        } else if (status === 404) {
+          console.error(`[BlogAPI] 404 Recurso no encontrado: ${url}`);
+        } else if (status === 429) {
+          console.error(`[BlogAPI] 429 Rate limit excedido en ${url} - Demasiadas peticiones`);
+        } else if (status >= 500) {
+          console.error(`[BlogAPI] ${status} Error del servidor en ${url}:`, data?.message || 'Error interno');
+        }
+
+        // Mensaje de error más específico
+        const errorMessage = data?.message || 
+                           (status === 429 ? 'Demasiadas peticiones, intenta más tarde' :
+                            status === 404 ? 'Recurso no encontrado' :
+                            status === 403 ? 'Acceso denegado' :
+                            status === 401 ? 'No autorizado' :
+                            'Error en la petición');
+
+        return Promise.reject(new Error(errorMessage));
+      } else if (error.request) {
+        // Petición enviada pero sin respuesta
+        console.error(`[BlogAPI] Sin respuesta del servidor para ${url}:`, {
+          timeout: error.code === 'ECONNABORTED',
+          network: error.message.includes('Network Error'),
+          code: error.code
+        });
+        
+        const errorMessage = error.code === 'ECONNABORTED' 
+          ? 'Tiempo de espera agotado - El servidor tardó demasiado en responder'
+          : 'No se pudo conectar con el servidor - Verifica tu conexión';
+          
+        return Promise.reject(new Error(errorMessage));
+      } else {
+        // Error al configurar la petición
+        console.error('[BlogAPI] Error de configuración:', error.message);
+        return Promise.reject(error);
       }
-
-      return Promise.reject(new Error(data?.message || 'Error en la petición'));
-    } else if (error.request) {
-      // Petición enviada pero sin respuesta
-      console.error('[BlogAPI] Sin respuesta del servidor');
-      return Promise.reject(new Error('No se pudo conectar con el servidor'));
-    } else {
-      // Error al configurar la petición
-      console.error('[BlogAPI] Error:', error.message);
-      return Promise.reject(error);
     }
-  }
-);
+  );
+});
 
 // ============================================
 // API DE POSTS PÚBLICOS

@@ -12,46 +12,66 @@ interface ApiConfigType {
 
 /**
  * Detecta el entorno y configura las URLs correctas
+ * VERSIÓN MEJORADA - Más robusta para producción
  */
 function detectApiConfiguration(): ApiConfigType {
   let baseUrl: string;
   let environment: 'development' | 'production';
 
+  // Determinar el entorno de forma más robusta
+  environment = import.meta.env.PROD ? 'production' : 'development';
+  
+  // DEBUG: Logging para troubleshooting
+  if (environment === 'development') {
+    console.log('🔧 [API Config] Variables disponibles:', {
+      VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
+      VITE_API_URL: import.meta.env.VITE_API_URL,
+      PROD: import.meta.env.PROD,
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'SSR'
+    });
+  }
+
   // 1. PRIORIDAD MÁXIMA: Variable de entorno VITE_BACKEND_URL
   if (import.meta.env.VITE_BACKEND_URL) {
     baseUrl = import.meta.env.VITE_BACKEND_URL;
-    environment = import.meta.env.PROD ? 'production' : 'development';
+    console.log(`🎯 [API Config] Usando VITE_BACKEND_URL: ${baseUrl}`);
   }
   // 2. Variable de entorno VITE_API_URL (remover /api)
   else if (import.meta.env.VITE_API_URL) {
     baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
-    environment = import.meta.env.PROD ? 'production' : 'development';
+    console.log(`🎯 [API Config] Usando VITE_API_URL (processed): ${baseUrl}`);
   }
-  // 3. Detección automática por hostname
+  // 3. Detección automática por hostname (MEJORADA)
   else if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || 
+                       hostname === '127.0.0.1' || 
+                       hostname.includes('127.0.0.1') ||
+                       hostname.includes('192.168.');
+                       
+    const isProduction = hostname.includes('vercel.app') || 
+                        hostname.includes('web-scuti') ||
+                        hostname.includes('scuticompany') ||
+                        hostname.includes('netlify.app') ||
+                        hostname.includes('render.com') ||
+                        import.meta.env.PROD;
     
-    if (hostname.includes('vercel.app') || 
-        hostname.includes('web-scuti') ||
-        hostname.includes('scuticompany') ||
-        hostname.includes('netlify.app') ||
-        import.meta.env.PROD) {
+    if (isProduction) {
       // Producción
       baseUrl = 'https://web-scuticompany-back.onrender.com';
       environment = 'production';
-    } else if (hostname === 'localhost' || 
-               hostname === '127.0.0.1' || 
-               hostname.includes('127.0.0.1') ||
-               hostname.includes('192.168.')) {
+      console.log(`🌐 [API Config] Detectado entorno PRODUCCIÓN para: ${hostname}`);
+    } else if (isLocalhost) {
       // Desarrollo local
       baseUrl = 'http://localhost:5000';
       environment = 'development';
+      console.log(`🏠 [API Config] Detectado entorno DESARROLLO para: ${hostname}`);
     } else {
-      // Fallback para otros dominios
+      // Fallback basado en import.meta.env.PROD
       baseUrl = import.meta.env.PROD 
         ? 'https://web-scuticompany-back.onrender.com'
         : 'http://localhost:5000';
-      environment = import.meta.env.PROD ? 'production' : 'development';
+      console.warn(`⚠️ [API Config] Dominio no reconocido: ${hostname}, usando fallback: ${baseUrl}`);
     }
   }
   // 4. Fallback absoluto (SSR o caso extremo)
@@ -59,7 +79,7 @@ function detectApiConfiguration(): ApiConfigType {
     baseUrl = import.meta.env.PROD 
       ? 'https://web-scuticompany-back.onrender.com'
       : 'http://localhost:5000';
-    environment = import.meta.env.PROD ? 'production' : 'development';
+    console.warn(`⚠️ [API Config] Modo SSR detectado, usando fallback: ${baseUrl}`);
   }
 
   const config: ApiConfigType = {

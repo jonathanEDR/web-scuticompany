@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:prod": "tsc -b && vite build --mode production",
-    "build:debug": "tsc -b && vite build --mode development",
+    "build:debug": "tsc -b && VITE_DEBUG_API=true vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:api": "echo 'Testing API connection...' && node -e \"import('./src/utils/debugApi.js').then(m => m.testApiConnection())\""
+    "test:api": "echo 'Testing API connection...' && node -e \"import('./src/utils/debugApi.js').then(m => m.testApiConnection())\"",
+    "debug:blog": "echo 'Debugging Blog Module...' && node -e \"console.log('Environment vars:'); console.log('VITE_API_URL:', process.env.VITE_API_URL); console.log('VITE_BACKEND_URL:', process.env.VITE_BACKEND_URL);\""
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.52.0",

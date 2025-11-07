@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useBlogPosts } from '../../../hooks/blog';
 import { useCategories } from '../../../hooks/blog';
+import { useBlogDebugConsole } from '../../../hooks/blog';
 import { SimpleHeroSection } from '../../../components/blog/hero/SimpleHeroSection';
 import { SimpleBlogCard } from '../../../components/blog/cards/SimpleBlogCard';
 import { SimpleSidebar } from '../../../components/blog/sidebar/SimpleSidebar';
@@ -14,6 +15,9 @@ const BlogHome: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const postsPerPage = 9;
+
+  // Debug info (solo en desarrollo)
+  useBlogDebugConsole();
 
   // Fetch posts with filters
   const { 
