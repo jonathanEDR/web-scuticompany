@@ -163,6 +163,109 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
         </button>
       </div>
 
+      {/* Auto Suggestions Toggle */}
+      <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            🎯 Sugerencias Automáticas
+          </h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Activa las sugerencias automáticas de contenido en el editor (como GitHub Copilot)
+          </p>
+        </div>
+        <button
+          onClick={() => onConfigChange('config', 'autoSuggestions', !config.config.autoSuggestions)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            config.config.autoSuggestions ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+          }`}
+          disabled={!config.enabled}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              config.config.autoSuggestions ? 'translate-x-6' : 'translate-x-1'
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* Configuraciones avanzadas de sugerencias (solo si están habilitadas) */}
+      {config.config.autoSuggestions && (
+        <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800">
+          <h5 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            ⚙️ Configuración Avanzada de Sugerencias
+          </h5>
+
+          {/* Debounce Time */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Tiempo de Respuesta (ms)
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min="300"
+                max="3000"
+                step="100"
+                value={config.config.suggestionDebounceMs}
+                onChange={(e) => onConfigChange('config', 'suggestionDebounceMs', parseInt(e.target.value))}
+                className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                disabled={!config.enabled}
+              />
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100 w-16 text-right">
+                {config.config.suggestionDebounceMs}ms
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Tiempo de espera antes de generar sugerencias (más bajo = más rápido)
+            </p>
+          </div>
+
+          {/* Min Length */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Longitud Mínima para Sugerencias
+            </label>
+            <input
+              type="number"
+              min="5"
+              max="50"
+              value={config.config.suggestionMinLength}
+              onChange={(e) => onConfigChange('config', 'suggestionMinLength', parseInt(e.target.value))}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={!config.enabled}
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Número mínimo de caracteres escritos antes de activar sugerencias
+            </p>
+          </div>
+
+          {/* Context Length */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Longitud de Contexto
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min="100"
+                max="500"
+                step="50"
+                value={config.config.suggestionContextLength}
+                onChange={(e) => onConfigChange('config', 'suggestionContextLength', parseInt(e.target.value))}
+                className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                disabled={!config.enabled}
+              />
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100 w-16 text-right">
+                {config.config.suggestionContextLength}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Cantidad de contexto enviado al modelo para generar mejores sugerencias
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4 border-t">
         <button

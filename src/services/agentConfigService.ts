@@ -18,6 +18,11 @@ export interface AgentConfigData {
     minContentLength: number;
     seoScoreThreshold: number;
     autoOptimization: boolean;
+    // Control de sugerencias automáticas
+    autoSuggestions: boolean;
+    suggestionDebounceMs: number;
+    suggestionMinLength: number;
+    suggestionContextLength: number;
   };
   
   // Configuración de personalidad

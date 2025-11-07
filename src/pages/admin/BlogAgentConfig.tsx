@@ -58,6 +58,11 @@ export const BlogAgentConfig: React.FC = () => {
         minContentLength: 300,
         seoScoreThreshold: 70,
         autoOptimization: true,
+        // Configuración de sugerencias automáticas
+        autoSuggestions: true,
+        suggestionDebounceMs: 800,
+        suggestionMinLength: 10,
+        suggestionContextLength: 200,
       },
       personality: {
         archetype: 'expert',

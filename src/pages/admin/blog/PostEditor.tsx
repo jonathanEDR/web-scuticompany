@@ -10,13 +10,20 @@ import {
   Save, Eye, Send, ArrowLeft, Image as ImageIcon,
   Tag, Folder, Settings, Upload, Sparkles
 } from 'lucide-react';
-import { RichTextEditor, ContentPreview, EnhancedEditorAISidebar } from '../../../components/blog/editor';
+import { RichTextEditor, ContentPreview, EnhancedEditorAISidebar, QuickSuggestionToggle } from '../../../components/blog/editor';
 import { CategoryBadge } from '../../../components/blog/common';
 import { SuggestionRating } from '../../../components/ai/SuggestionRating';
+import { SelectionContextMenu } from '../../../components/blog/components/SelectionContextMenu';
+import { ContextPatternHelper } from '../../../components/blog/components/ContextPatternHelper';
+import AIPreviewModal from '../../../components/blog/editor/AIPreviewModal';
+import { selectionAIService, type AIActionRequest } from '../../../components/blog/services/selectionAIService';
+import { useContextAwareAutoComplete } from '../../../components/blog/hooks/useContextAwareAutoComplete';
 
 import { useCursorAwareAutoComplete } from '../../../hooks/ai/useCursorAwareAutoComplete';
 import { useAITracking } from '../../../hooks/ai/useAITracking';
 import { useCategories } from '../../../hooks/blog';
+import { useAutoSuggestionSettings } from '../../../hooks/useAgentSettings';
+import { useQuickSuggestionControl } from '../../../hooks/useQuickSuggestionControl';
 import { generateSlug } from '../../../utils/blog';
 import { getApiUrl } from '../../../utils/apiConfig';
 import { blogPostApi } from '../../../services/blog';
@@ -62,8 +69,33 @@ export default function PostEditor() {
   const [isUploading, setIsUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [showAISidebar, setShowAISidebar] = useState(false);
+  const [isProcessingAI, setIsProcessingAI] = useState(false);
+  
+  // Estado para el modal de preview de IA
+  const [previewState, setPreviewState] = useState<{
+    isOpen: boolean;
+    originalText: string;
+    expandedText: string;
+    actionLabel: string;
+  }>({
+    isOpen: false,
+    originalText: '',
+    expandedText: '', 
+    actionLabel: ''
+  });
 
-  // Hook de autocompletado contextual (como Copilot)
+  // Hook para obtener configuraciones de sugerencias automáticas
+  const { settings: suggestionSettings } = useAutoSuggestionSettings('blog');
+  
+  // Hook para control directo de sugerencias
+  const { effectiveEnabled } = useQuickSuggestionControl();
+
+  // Función para navegar al panel de configuración
+  const handleOpenSettings = () => {
+    navigate('/dashboard/ai-agents/blog/config');
+  };
+
+  // Hook de autocompletado contextual (como Copilot) - ahora usa estado efectivo
   const {
     suggestion,
     isVisible: showAutoComplete,
@@ -72,13 +104,12 @@ export default function PostEditor() {
     handleContentChange,
     acceptSuggestion,
     rejectSuggestion,
-    registerEditor,
     getPerformanceStats
   } = useCursorAwareAutoComplete({
-    enabled: true,
-    debounceMs: 800, // Más rápido para debugging
-    minLength: 10, // Más bajo para que funcione rápido
-    contextLength: 200 // Contexto más amplio
+    enabled: effectiveEnabled, // Usar estado efectivo del toggle
+    debounceMs: suggestionSettings.debounceMs,
+    minLength: suggestionSettings.minLength,
+    contextLength: suggestionSettings.contextLength
   });
 
   // Hook de tracking para persistencia
@@ -87,6 +118,18 @@ export default function PostEditor() {
     addRating
   } = useAITracking();
 
+  // Hook de context-aware para patrones #...#
+  const {
+    patternSuggestions,
+    isTypingPattern,
+    activePattern,
+    hasPatterns,
+    handleContentChange: handlePatternContentChange,
+    insertPatternSuggestion
+  } = useContextAwareAutoComplete({
+    enabled: effectiveEnabled
+  });
+
   // Crear sesión de tracking al montar el componente
   React.useEffect(() => {
     createSession(id || 'new-post', {
@@ -94,19 +137,6 @@ export default function PostEditor() {
       postCategory: formData.category
     });
   }, [createSession, id, formData.title, formData.category]);
-
-  // Simple debugging y performance
-  React.useEffect(() => {
-    if (suggestion) {
-      console.log('🎯 Sugerencia disponible:', suggestion.text.slice(0, 50));
-      
-      // Mostrar estadísticas de performance en desarrollo
-      if (import.meta.env.DEV) {
-        const stats = getPerformanceStats();
-        console.log('📊 Performance Stats:', stats);
-      }
-    }
-  }, [suggestion, getPerformanceStats]);
 
   // Cargar post si está editando
   useEffect(() => {
@@ -121,9 +151,7 @@ export default function PostEditor() {
       if (showAutoComplete && suggestion) {
         if (e.key === 'Tab') {
           e.preventDefault();
-          const accepted = acceptSuggestion();
-          console.log('🎯 Tab presionado - Texto insertado:', accepted);
-          // NO concatenar - acceptSuggestion() ya inserta en la posición correcta
+          acceptSuggestion();
         } else if (e.key === 'Escape') {
           e.preventDefault();
           rejectSuggestion();
@@ -137,16 +165,12 @@ export default function PostEditor() {
 
   const loadPost = async (postId: string) => {
     try {
-      console.log('📝 [PostEditor] Cargando post con ID:', postId);
-      
-      // ✅ FIXED: Usar endpoint admin que busca por _id en lugar de slug
       const response = await blogPostApi.admin.getPostById(postId);
       
       if (response.success && response.data) {
         const post = response.data;
-        console.log('✅ [PostEditor] Post cargado:', post.title);
         
-        // ✅ Convertir tags de objetos a strings para el formulario
+        // Convertir tags de objetos a strings para el formulario
         const tagsAsStrings = Array.isArray(post.tags)
           ? post.tags.map((tag: any) => 
               typeof tag === 'string' ? tag : tag.name || tag._id
@@ -211,14 +235,131 @@ export default function PostEditor() {
   // Función para manejar el rating de sugerencias
   const handleSuggestionRating = async (rating: number) => {
     try {
-      // Como no tenemos el trackingId aquí, lo dejamos como "current"
-      // El backend usa el sessionId para encontrar la última interacción
       await addRating('current', rating);
-      console.log('✅ Rating enviado:', rating);
     } catch (error) {
       console.error('❌ Error al enviar rating:', error);
     }
   };
+
+  // Función para manejar acciones del menú contextual
+  const handleSelectionAction = async (action: any, selectedText: string) => {
+    if (!selectedText.trim()) return;
+
+    setIsProcessingAI(true);
+    
+    try {
+      const request: AIActionRequest = {
+        action: action.id,
+        selectedText,
+        context: {
+          wordCount: selectedText.split(/\s+/).length,
+          isCode: /```/.test(selectedText) || /`.*`/.test(selectedText)
+        }
+      };
+
+      const response = await selectionAIService.processAIAction(request);
+      
+      if (response.success) {
+        setPreviewState({
+          isOpen: true,
+          originalText: selectedText,
+          expandedText: response.result,
+          actionLabel: action.label
+        });
+      } else {
+        console.error('❌ Error procesando acción:', response.result);
+        alert(`❌ Error: ${response.result}`);
+      }
+    } catch (error) {
+      console.error('❌ Error en acción de selección:', error);
+      alert('❌ Error procesando la acción. Intenta de nuevo.');
+    } finally {
+      setIsProcessingAI(false);
+    }
+  };
+
+  // Funciones para manejar el modal de preview
+  const handleAcceptPreview = async () => {
+    try {
+      // Copiar al portapapeles
+      await navigator.clipboard.writeText(previewState.expandedText);
+      
+      // Cerrar modal
+      setPreviewState({ ...previewState, isOpen: false });
+      
+      // Mostrar notificación de éxito
+      const notification = document.createElement('div');
+      notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#22c55e;color:white;padding:12px 20px;border-radius:8px;z-index:9999;font-family:system-ui;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
+      notification.textContent = '📋 Contenido copiado al portapapeles - Pega con Ctrl+V';
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 4000);
+    } catch (error) {
+      console.error('❌ Error copiando al portapapeles:', error);
+      alert('❌ Error copiando al portapapeles. Selecciona y copia manualmente el texto del modal.');
+    }
+  };
+
+  const handleCancelPreview = () => {
+    setPreviewState({ ...previewState, isOpen: false });
+  };
+
+  // Función para manejar acciones de IA en el extracto
+  const handleExcerptAIAction = async (actionType: 'expand' | 'improve') => {
+    if (!formData.excerpt.trim()) {
+      alert('⚠️ Escribe primero algo en el extracto');
+      return;
+    }
+
+    console.log('🎯 [PostEditor] Acción en extracto:', actionType, formData.excerpt.length, 'caracteres');
+    
+    try {
+      setIsProcessingAI(true);
+      
+      const request: AIActionRequest = {
+        action: actionType === 'expand' ? 'expand' : 'rewrite',
+        selectedText: formData.excerpt,
+        context: {
+          wordCount: formData.excerpt.split(/\s+/).length,
+          isCode: false,
+          surroundingText: `Título: ${formData.title}\nCategoría: ${formData.category}\nInstrucción: ${
+            actionType === 'expand' 
+              ? 'Expandir este extracto manteniendo la esencia pero añadiendo más detalles atractivos' 
+              : 'Mejorar este extracto haciéndolo más atractivo y profesional'
+          }`
+        }
+      };
+
+      const response = await selectionAIService.processAIAction(request);
+
+      if (response.success && response.result) {
+        setPreviewState({
+          isOpen: true,
+          originalText: formData.excerpt,
+          expandedText: response.result,
+          actionLabel: actionType === 'expand' ? 'Expandir Extracto' : 'Mejorar Extracto'
+        });
+      } else {
+        console.error('❌ Error procesando acción:', response.result);
+        alert(`❌ Error: ${response.result}`);
+      }
+    } catch (error) {
+      console.error('❌ Error en acción de IA del extracto:', error);
+      alert('❌ Error procesando la acción. Intenta de nuevo.');
+    } finally {
+      setIsProcessingAI(false);
+    }
+  };
+
+  // Función para insertar sugerencia de patrón
+  const handlePatternSuggestionInsert = (suggestion: string) => {
+    const newContent = insertPatternSuggestion(suggestion);
+    handleChange('content', newContent);
+  };
+
 
   // Auto-generar slug desde el título
   useEffect(() => {
@@ -236,6 +377,12 @@ export default function PostEditor() {
       ...prev,
       [field]: value
     }));
+
+    // Si el campo es 'content', notificar al sistema de patrones
+    if (field === 'content' && typeof value === 'string') {
+      handlePatternContentChange(value);
+      handleContentChange(value); // También notificar al autocompletado normal
+    }
   };
 
   // Agregar tag
@@ -258,14 +405,7 @@ export default function PostEditor() {
   };
 
   // Guardar como borrador
-  const handleSaveDraft = async () => {
-    // Logs para depuración
-    console.log('📝 Validando datos del formulario (borrador):');
-    console.log('Título:', formData.title);
-    console.log('Contenido length:', formData.content?.length);
-    console.log('Categoría:', formData.category);
-    
-    // Validar que el contenido no esté vacío (sin contar etiquetas HTML)
+  const handleSaveDraft = async () => {    
     const textContent = formData.content.replace(/<[^>]*>/g, '').trim();
     
     if (!formData.title || !formData.title.trim()) {
@@ -283,7 +423,6 @@ export default function PostEditor() {
       return;
     }
 
-    console.log('✅ Validación pasada, guardando borrador...');
     setIsSaving(true);
     try {
       // Generar excerpt automáticamente si está vacío
@@ -321,15 +460,6 @@ export default function PostEditor() {
 
   // Publicar post
   const handlePublish = async () => {
-    // Logs para depuración
-    console.log('📝 Validando datos del formulario:');
-    console.log('Título:', formData.title);
-    console.log('Contenido length:', formData.content?.length);
-    console.log('Contenido:', formData.content?.substring(0, 100));
-    console.log('Categoría:', formData.category);
-    console.log('Tags:', formData.tags);
-    console.log('isPublished será:', true);
-    
     // Validar que el contenido no esté vacío (sin contar etiquetas HTML)
     const textContent = formData.content.replace(/<[^>]*>/g, '').trim();
     
@@ -440,6 +570,14 @@ export default function PostEditor() {
               <span>{isEditing ? 'Actualizar' : 'Publicar'}</span>
             </button>
 
+            {/* Control de Sugerencias Automáticas */}
+            <QuickSuggestionToggle
+              size="md"
+              showLabel={true}
+              showSettings={true}
+              onSettingsClick={handleOpenSettings}
+            />
+
             {/* Botón Asistente IA - Más visible al final */}
             <button
               onClick={() => setShowAISidebar(!showAISidebar)}
@@ -499,32 +637,21 @@ export default function PostEditor() {
                   onChange={(html) => {
                     try {
                       handleChange('content', html);
-                      // Activar autocompletado contextual con detección de cursor
-                      handleContentChange(html, {
-                        title: formData.title,
-                        category: formData.category,
-                        postId: id || 'new'
-                      });
+                      
+                      // Solo activar autocompletado si está habilitado
+                      if (effectiveEnabled) {
+                        handleContentChange(html, {
+                          title: formData.title,
+                          category: formData.category,
+                          postId: id || 'new'
+                        });
+                      }
                     } catch (error) {
                       console.error('Error en onChange del editor:', error);
                     }
                   }}
                   minHeight="400px"
                   maxHeight="800px"
-                  registerEditor={(element: HTMLElement) => {
-                    try {
-                      registerEditor(element);
-                    } catch (error) {
-                      console.error('Error registrando editor:', error);
-                    }
-                  }}
-                  onCursorChange={(position: any) => {
-                    try {
-                      console.log('🎯 Cursor position changed:', position);
-                    } catch (error) {
-                      console.error('Error en onCursorChange:', error);
-                    }
-                  }}
                 />
 
                 {/* Sugerencia AI Contextual */}
@@ -774,11 +901,31 @@ export default function PostEditor() {
             </div>
           )}
 
-          {/* Excerpt */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-              Extracto (Resumen)
-            </label>
+          {/* Excerpt con IA - Enfoque Simplificado */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 relative">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                Extracto (Resumen)
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleExcerptAIAction('expand')}
+                  disabled={!formData.excerpt.trim() || isProcessingAI}
+                  className="px-3 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Expandir extracto con IA"
+                >
+                  🚀 Expandir
+                </button>
+                <button
+                  onClick={() => handleExcerptAIAction('improve')}
+                  disabled={!formData.excerpt.trim() || isProcessingAI}
+                  className="px-3 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Mejorar extracto con IA"
+                >
+                  ✨ Mejorar
+                </button>
+              </div>
+            </div>
             <textarea
               value={formData.excerpt}
               onChange={(e) => handleChange('excerpt', e.target.value)}
@@ -1030,15 +1177,65 @@ export default function PostEditor() {
         </div>
       )}
 
-      {/* Debug info simplificado - esquina inferior derecha */}
-      {import.meta.env.DEV && (
-        <div className="fixed bottom-4 right-4 bg-black/80 text-white p-2 rounded text-xs z-50">
-          AutoComplete: {showAutoComplete ? '🟢 ON' : '🔴 OFF'} | 
-          Generating: {isAutoCompleting ? '⏳' : '✅'} |
-          Suggestion: {suggestion ? '📝' : '∅'} |
-          Chars: {formData.content.length}
+      {/* Menú contextual para selección de texto */}
+      <SelectionContextMenu
+        onActionSelect={handleSelectionAction}
+        onClose={() => {
+          // Limpiar selección al cerrar menú
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+          }
+        }}
+      />
+
+      {/* Helper de patrones #...# */}
+      {(isTypingPattern || activePattern) && (
+        <ContextPatternHelper
+          isTypingPattern={isTypingPattern}
+          suggestions={patternSuggestions}
+          activePattern={activePattern}
+          onSuggestionClick={handlePatternSuggestionInsert}
+          className="max-w-md"
+        />
+      )}
+
+      {/* Indicador de procesamiento AI */}
+      {isProcessingAI && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl flex items-center gap-3">
+            <div className="animate-spin w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full"></div>
+            <span className="text-gray-700 dark:text-gray-300">Procesando con IA...</span>
+          </div>
         </div>
       )}
+
+      {/* Debug info simplificado - esquina inferior derecha */}
+      {import.meta.env.DEV && (
+        <div className="fixed bottom-4 right-4 bg-black/80 text-white p-2 rounded text-xs z-50 font-mono">
+          <div>AutoComplete: {showAutoComplete ? '🟢 ON' : '🔴 OFF'} | Generating: {isAutoCompleting ? '⏳' : '✅'}</div>
+          <div>Suggestion: {suggestion ? '📝' : '∅'} | Chars: {formData.content.length}</div>
+          <div className="border-t border-gray-600 pt-1 mt-1">
+            Pattern: {isTypingPattern ? '⌨️ TYPING' : hasPatterns ? '🧠 DETECTED' : '∅'} |
+            Active: {activePattern ? `✓ ${activePattern.type}` : '✗'}
+          </div>
+          {activePattern && (
+            <div className="text-purple-300 mt-1">
+              "{activePattern.contextText.substring(0, 20)}..."
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Modal de Preview de IA */}
+      <AIPreviewModal
+        isOpen={previewState.isOpen}
+        originalText={previewState.originalText}
+        expandedText={previewState.expandedText}
+        actionLabel={previewState.actionLabel}
+        onAccept={handleAcceptPreview}
+        onCancel={handleCancelPreview}
+      />
     </div>
   );
 }
