@@ -1,6 +1,10 @@
 /**
  * 🎴 CARD DE SERVICIO - ServicioCard
  * Componente para mostrar un servicio en formato tarjeta
+ * 
+ * 🎯 Simplicidad:
+ * - Enfoque en visualización y acciones básicas
+ * - Services Canvas manejado a nivel global desde toolbar
  */
 
 import React from 'react';

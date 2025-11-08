@@ -15,6 +15,8 @@ import { useNotification } from '../../hooks/useNotification';
 import { categoriasApi, type Categoria } from '../../services/categoriasApi';
 import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
 import * as uploadApi from '../../services/uploadApi';
+import ServicesCanvasModal from '../../components/admin/services/ServicesCanvasModal';
+import { Sparkles } from 'lucide-react';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -36,6 +38,7 @@ export const ServicioFormV3: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loadingCategorias, setLoadingCategorias] = useState(false);
   const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
+  const [showServicesCanvas, setShowServicesCanvas] = useState(false);
 
   // ============================================
   // REACT HOOK FORM
@@ -1275,6 +1278,17 @@ export const ServicioFormV3: React.FC = () => {
               {isEditMode ? '✏️ Editar Servicio' : '+ Crear Servicio'}
             </h1>
           </div>
+          
+          {/* Botón AI Assistant */}
+          <button
+            type="button"
+            onClick={() => setShowServicesCanvas(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            title="Abrir Asistente IA"
+          >
+            <Sparkles size={18} className="animate-pulse" />
+            <span className="font-medium">AI Assistant</span>
+          </button>
         </div>
       </div>
 
@@ -1349,6 +1363,25 @@ export const ServicioFormV3: React.FC = () => {
         isOpen={showCreateCategoriaModal}
         onClose={() => setShowCreateCategoriaModal(false)}
         onSuccess={handleCategoriaCreated}
+      />
+
+      {/* Services Canvas Modal */}
+      <ServicesCanvasModal
+        isOpen={showServicesCanvas}
+        onClose={() => setShowServicesCanvas(false)}
+        initialMode="chat"
+        serviceContext={{
+          serviceId: id,
+          serviceTitle: watch('titulo') || 'Nuevo Servicio',
+          currentDescription: watch('descripcion') || '',
+          currentPrice: watch('precio') || 0,
+          currency: watch('moneda') || 'PEN',
+          category: watch('categoria') || '',
+          descriptionCorta: watch('descripcionCorta'),
+          caracteristicas: watch('caracteristicas'),
+          beneficios: watch('beneficios'),
+          etiquetas: watch('etiquetas') || []
+        }}
       />
     </div>
   );

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import agentConfigService, { type AgentConfigData } from '../../services/agentConfigService';
+import servicesAgentService from '../../services/servicesAgentService';
 import { getApiUrl } from '../../utils/apiConfig';
 import { 
   Settings, 
@@ -92,6 +93,10 @@ const AIAgentsDashboard = () => {
   
   // Configuración detallada de BlogAgent (se cargará del backend)
   const [agentConfig, setAgentConfig] = useState<AgentConfigData | null>(null);
+
+  // Estados para ServicesAgent metrics
+  const [servicesAgentStatus, setServicesAgentStatus] = useState<any>(null);
+  const [servicesAgentMetrics, setServicesAgentMetrics] = useState<any>(null);
 
   // Cargar configuración del agente al montar
   useEffect(() => {
@@ -200,11 +205,28 @@ const AIAgentsDashboard = () => {
       const metricsData = await metricsResponse.json();
       setSystemMetrics(metricsData);
 
-      // Obtener configuración de agentes (simulado por ahora)
+      // Obtener estado y métricas del ServicesAgent
+      try {
+        const servicesStatusResponse = await servicesAgentService.getStatus();
+        setServicesAgentStatus(servicesStatusResponse);
+
+        const servicesMetricsResponse = await servicesAgentService.getMetrics();
+        setServicesAgentMetrics(servicesMetricsResponse);
+      } catch (servicesErr) {
+        console.warn('⚠️ ServicesAgent not available:', servicesErr);
+        // No es un error crítico, solo significa que el agente no está disponible aún
+      }
+
+      // Obtener configuración de agentes
       setAgentsConfig({
         BlogAgent: { enabled: true, status: 'active', requests: 1234 },
-        SEOAgent: { enabled: true, status: 'active', requests: 0 }, // Ahora activo
-        AnalyticsAgent: { enabled: false, status: 'inactive', requests: 0 }
+        SEOAgent: { enabled: true, status: 'active', requests: 0 },
+        AnalyticsAgent: { enabled: false, status: 'inactive', requests: 0 },
+        ServicesAgent: { 
+          enabled: servicesAgentStatus?.data?.enabled || false, 
+          status: servicesAgentStatus?.data?.status || 'unknown', 
+          requests: servicesAgentMetrics?.data?.totalRequests || 0 
+        }
       });
 
     } catch (err) {
@@ -576,6 +598,27 @@ const AIAgentsDashboard = () => {
                           <button
                             onClick={() => navigate('/dashboard/agents/seo/training')}
                             className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white rounded-lg transition-colors text-sm font-medium"
+                          >
+                            <Brain size={16} />
+                            Entrenar Agente
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Botones para ServicesAgent */}
+                      {agentName === 'ServicesAgent' && (
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={() => navigate('/dashboard/agents/services/config')}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                          >
+                            <Settings size={16} />
+                            Configurar Agente
+                            <ChevronRight size={16} />
+                          </button>
+                          <button
+                            onClick={() => navigate('/dashboard/agents/services/training')}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-colors text-sm font-medium"
                           >
                             <Brain size={16} />
                             Entrenar Agente

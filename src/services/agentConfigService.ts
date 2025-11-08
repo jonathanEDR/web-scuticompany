@@ -6,23 +6,43 @@
 import { getApiUrl } from '../utils/apiConfig';
 
 export interface AgentConfigData {
-  agentName: string;
+  agentName: 'blog' | 'seo' | 'services';
   enabled: boolean;
   
-  // Configuración básica
+  // Configuración básica (compartida entre agentes)
   config: {
     timeout: number;
     maxTokens: number;
     temperature: number;
-    maxTagsPerPost: number;
-    minContentLength: number;
-    seoScoreThreshold: number;
-    autoOptimization: boolean;
+    
+    // BlogAgent específicas
+    maxTagsPerPost?: number;
+    minContentLength?: number;
+    seoScoreThreshold?: number;
+    autoOptimization?: boolean;
     // Control de sugerencias automáticas
-    autoSuggestions: boolean;
-    suggestionDebounceMs: number;
-    suggestionMinLength: number;
-    suggestionContextLength: number;
+    autoSuggestions?: boolean;
+    suggestionDebounceMs?: number;
+    suggestionMinLength?: number;
+    suggestionContextLength?: number;
+    
+    // ServicesAgent específicas
+    minDescriptionLength?: number;
+    optimalDescriptionLength?: number;
+    maxDescriptionLength?: number;
+    qualityScoreThreshold?: number;
+    completenessThreshold?: number;
+    creativityLevel?: 'low' | 'balanced' | 'high' | 'very_high';
+    considerMarketRates?: boolean;
+    includeValueAnalysis?: boolean;
+    suggestDiscounts?: boolean;
+    autoSuggestImprovements?: boolean;
+    includeSEORecommendations?: boolean;
+    includeConversionTips?: boolean;
+    canCreateServices?: boolean;
+    canEditServices?: boolean;
+    canDeleteServices?: boolean;
+    canManagePricing?: boolean;
   };
   
   // Configuración de personalidad
@@ -105,6 +125,139 @@ export interface AgentConfigData {
   updatedBy?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+// ============================================
+// INTERFACES ESPECÍFICAS PARA SERVICESAGENT
+// ============================================
+
+/**
+ * Configuración de Análisis para ServicesAgent
+ */
+export interface ServicesAgentAnalysisConfig {
+  minDescriptionLength: number;
+  optimalDescriptionLength: number;
+  maxDescriptionLength: number;
+  seoScoreThreshold: number;
+  qualityScoreThreshold: number;
+  completenessThreshold: number;
+  includeCompetitorAnalysis: boolean;
+  includeSEOAnalysis: boolean;
+  includePricingAnalysis: boolean;
+  includeGapAnalysis: boolean;
+  analysisDepth: 'quick' | 'standard' | 'thorough' | 'exhaustive';
+}
+
+/**
+ * Configuración de Generación para ServicesAgent
+ */
+export interface ServicesAgentGenerationConfig {
+  temperature: number;
+  maxTokens: number;
+  topP: number;
+  frequencyPenalty: number;
+  presencePenalty: number;
+  creativityLevel: 'low' | 'balanced' | 'high' | 'very_high';
+  includeExamples: boolean;
+  includeSEOTags: boolean;
+  includeMetadata: boolean;
+  generateMultipleVariations: boolean;
+  variationsCount: number;
+  validateBeforeCreate: boolean;
+  autoOptimizeSEO: boolean;
+  suggestImprovements: boolean;
+}
+
+/**
+ * Configuración de Pricing para ServicesAgent
+ */
+export interface ServicesAgentPricingConfig {
+  defaultStrategy: 'competitive' | 'premium' | 'penetration' | 'value-based';
+  considerMarketRates: boolean;
+  includeCompetitorPricing: boolean;
+  includeValueAnalysis: boolean;
+  minimumMargin: number;
+  optimalMargin: number;
+  premiumMargin: number;
+  suggestDiscounts: boolean;
+  maxDiscountPercentage: number;
+  bundleDiscount: number;
+  analyzeBundleOpportunities: boolean;
+  defaultCurrency: string;
+  supportedCurrencies: string[];
+  pricingTypes: string[];
+}
+
+/**
+ * Configuración de Optimización para ServicesAgent
+ */
+export interface ServicesAgentOptimizationConfig {
+  types: Array<'seo' | 'description' | 'structure' | 'conversion' | 'complete'>;
+  autoSuggestImprovements: boolean;
+  autoApplyMinorFixes: boolean;
+  includeSEORecommendations: boolean;
+  optimizeMetaTags: boolean;
+  optimizeHeadings: boolean;
+  optimizeKeywords: boolean;
+  includeConversionTips: boolean;
+  includeCTAOptimization: boolean;
+  includeValuePropositionTips: boolean;
+  improveReadability: boolean;
+  improveClarity: boolean;
+  enhanceBenefits: boolean;
+  suggestABTests: boolean;
+  generateVariations: boolean;
+}
+
+/**
+ * Configuración de Permisos para ServicesAgent
+ */
+export interface ServicesAgentPermissionsConfig {
+  canCreateServices: boolean;
+  canCreatePackages: boolean;
+  canEditServices: boolean;
+  canEditPackages: boolean;
+  canEditPricing: boolean;
+  canEditSEO: boolean;
+  canDeleteServices: boolean;
+  canDeletePackages: boolean;
+  canPublishServices: boolean;
+  canUnpublishServices: boolean;
+  canManagePricing: boolean;
+  canSuggestDiscounts: boolean;
+  canAccessAnalytics: boolean;
+  canViewCompetitors: boolean;
+}
+
+/**
+ * Configuración de Chat para ServicesAgent
+ */
+export interface ServicesAgentChatConfig {
+  maxContextLength: number;
+  includeServiceContext: boolean;
+  includePortfolioContext: boolean;
+  maxResponseLength: number;
+  includeRecommendations: boolean;
+  includeExamples: boolean;
+  includeNextSteps: boolean;
+  adaptToUserExpertise: boolean;
+  rememberPreferences: boolean;
+  suggestActions: boolean;
+  suggestQuestions: boolean;
+}
+
+/**
+ * Configuración completa específica de ServicesAgent
+ */
+export interface ServicesAgentFullConfig extends AgentConfigData {
+  servicesConfig?: {
+    analysis?: ServicesAgentAnalysisConfig;
+    generation?: ServicesAgentGenerationConfig;
+    pricing?: ServicesAgentPricingConfig;
+    optimization?: ServicesAgentOptimizationConfig;
+    permissions?: ServicesAgentPermissionsConfig;
+    chat?: ServicesAgentChatConfig;
+  };
 }
 
 export interface ApiResponse<T> {

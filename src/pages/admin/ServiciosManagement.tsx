@@ -1,9 +1,13 @@
 /**
  * 📋 GESTIÓN DE SERVICIOS OPTIMIZADA
  * Versión mejorada con lazy loading, paginación virtual y caché
+ * 
+ * 🎯 Integraciones:
+ * - Services Canvas para análisis y optimización con IA
+ * - Acciones rápidas desde las tarjetas de servicio
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServicios } from '../../hooks/useServicios';
 import { useNotification } from '../../hooks/useNotification';
@@ -17,9 +21,12 @@ import { PaginationControls } from '../../components/common/PaginationControls';
 import { SkeletonGrid } from '../../components/common/Skeleton';
 import { CreateServicioModal } from '../../components/servicios/CreateServicioModal';
 import GestionCategoriasModal from '../../components/servicios/GestionCategoriasModal';
+import ServicesCanvasModal from '../../components/admin/services/ServicesCanvasModal';
+import useServicesCanvas, { servicioToServiceContext } from '../../hooks/useServicesCanvas'; // 🆕 Importar convertidor
 import type { ServicioFilters, SortOption } from '../../types/filters';
 import { SORT_OPTIONS } from '../../types/filters';
 import type { Servicio } from '../../types/servicios';
+import { Sparkles } from 'lucide-react';
 
 // ============================================
 // ICONOS
@@ -69,6 +76,14 @@ export const ServiciosManagementOptimized = () => {
   const navigate = useNavigate();
   const { success, error: showError } = useNotification();
   const { shouldUseClientDashboard } = useAuth();
+  
+  // Services Canvas hook
+  const { 
+    isOpen: isCanvasOpen, 
+    openCanvas,
+    closeCanvas,
+    updateAllServices // 🆕 Función para actualizar contexto global
+  } = useServicesCanvas();
 
   // Determinar la ruta correcta del dashboard según el tipo de usuario
   const dashboardPath = shouldUseClientDashboard ? '/dashboard/client' : '/dashboard/admin';
@@ -97,6 +112,18 @@ export const ServiciosManagementOptimized = () => {
     duplicateServicio: duplicateServicioHook,
     refresh
   } = useServicios({ autoFetch: true });
+
+  // ============================================
+  // SINCRONIZACIÓN CON SERVICES CANVAS
+  // ============================================
+
+  // Actualizar contexto global cuando cambien los servicios
+  useEffect(() => {
+    if (servicios.length > 0) {
+      const servicesContext = servicios.map(servicioToServiceContext);
+      updateAllServices(servicesContext);
+    }
+  }, [servicios, updateAllServices]);
 
   // ============================================
   // FILTRADO Y ORDENAMIENTO CON MEMOIZATION
@@ -250,6 +277,10 @@ export const ServiciosManagementOptimized = () => {
     window.location.reload();
   };
 
+  const handleOpenGlobalServicesCanvas = () => {
+    openCanvas('portfolio'); // 🆕 Abrir en modo portafolio por defecto para análisis global
+  };
+
   // ============================================
   // RENDER
   // ============================================
@@ -307,6 +338,16 @@ export const ServiciosManagementOptimized = () => {
                 <span>🏷️</span>
                 <span className="hidden md:inline">Categorías</span>
                 <span className="hidden lg:inline">Gestionar Categorías</span>
+              </button>
+
+              <button
+                onClick={handleOpenGlobalServicesCanvas}
+                className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 flex-shrink-0"
+                title="🤖 Services Canvas IA - Análisis de portafolio, pricing inteligente y generación de contenido"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span className="hidden sm:inline">Services Canvas</span>
+                <span className="sm:hidden">🤖 IA</span>
               </button>
               
               <button
@@ -509,6 +550,12 @@ export const ServiciosManagementOptimized = () => {
         onCategoryChange={async () => {
           await refresh(); // Refrescar servicios cuando cambian las categorías
         }}
+      />
+
+      {/* Services Canvas Modal */}
+      <ServicesCanvasModal
+        isOpen={isCanvasOpen}
+        onClose={closeCanvas}
       />
     </div>
   );

@@ -94,6 +94,8 @@ const AIAgentsDashboard = lazy(() => import('./pages/admin/AIAgentsDashboard'));
 const BlogAgentConfig = lazy(() => import('./pages/admin/BlogAgentConfig'));
 const BlogAgentTraining = lazy(() => import('./pages/admin/BlogAgentTraining'));
 const SEOAgentTraining = lazy(() => import('./pages/admin/SEOAgentTraining'));
+const ServicesAgentConfig = lazy(() => import('./pages/admin/ServicesAgentConfig'));
+const ServicesAgentTraining = lazy(() => import('./pages/admin/ServicesAgentTraining'));
 const AIAnalytics = lazy(() => import('./pages/admin/AIAnalytics'));
 
 // Componente de loading minimalista
@@ -447,6 +449,24 @@ function AppContent() {
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
                     <SEOAgentTraining />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* Configuración detallada del ServicesAgent */}
+              <Route path="/dashboard/agents/services/config" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <ServicesAgentConfig />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* Entrenamiento avanzado del ServicesAgent */}
+              <Route path="/dashboard/agents/services/training" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <ServicesAgentTraining />
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />

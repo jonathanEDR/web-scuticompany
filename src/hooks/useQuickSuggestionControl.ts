@@ -83,7 +83,7 @@ export const useQuickSuggestionControl = () => {
     if (!globalLoading && globalSettings) {
       setLocalState(prev => ({
         ...prev,
-        globalEnabled: globalSettings.enabled,
+        globalEnabled: globalSettings.enabled ?? false,
         isLoading: false,
         lastSync: Date.now()
       }));
