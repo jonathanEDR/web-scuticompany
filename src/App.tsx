@@ -10,7 +10,6 @@ import { DashboardProviders } from './components/DashboardProviders';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRoute from './components/RoleBasedRoute';
 import DashboardRouter from './components/DashboardRouter';
-import DashboardLayout from './components/DashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import WelcomeNotification from './components/WelcomeNotification';
 import { UserRole } from './types/roles';
@@ -110,14 +109,13 @@ const LoadingSpinner = () => (
 
 /**
  * Wrapper para rutas del dashboard con providers de autenticación y roles
- * Clerk + AuthContext se cargan aquí + DashboardLayout
+ * Clerk + AuthContext se cargan aquí
+ * NOTA: Las páginas manejan su propio layout (SmartDashboardLayout o DashboardLayout)
  */
 const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
   <DashboardProviders>
     <ProtectedRoute>
-      <DashboardLayout>
-        {children}
-      </DashboardLayout>
+      {children}
     </ProtectedRoute>
   </DashboardProviders>
 );
@@ -255,47 +253,8 @@ function AppContent() {
               } />
               
               {/* 📝 CMS - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
-              <Route path="/dashboard/cms" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <CmsManager />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-              
-              <Route path="/dashboard/cms/content" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <CmsManager />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-              
-              <Route path="/dashboard/cms/seo" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <CmsManager />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-              
-              <Route path="/dashboard/cms/theme" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <CmsManager />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-              
-              <Route path="/dashboard/cms/cards" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <CmsManager />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-              
-              <Route path="/dashboard/cms/contact" element={
+              {/* Ruta consolidada para CMS - maneja todas las sub-rutas internamente */}
+              <Route path="/dashboard/cms/*" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
                     <CmsManager />

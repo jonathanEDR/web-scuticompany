@@ -19,6 +19,9 @@
 import React, { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
 import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { useServicesCanvasContext } from '../../../contexts/ServicesCanvasContext';
+import QuickActionButton from './QuickActionButton';
+import FormCollectionProgress from './FormCollectionProgress';
+import CategoryButtons from './CategoryButtons';
 
 const ServicesChatInterface: React.FC = memo(() => {
   const {
@@ -28,6 +31,7 @@ const ServicesChatInterface: React.FC = memo(() => {
     allServices, // 🆕 Acceso a servicios globales
     sendChatMessage,
     clearChatHistory,
+    executeQuickAction, // 🆕 Para ejecutar acciones
     // activeMode
   } = useServicesCanvasContext();
 
@@ -114,16 +118,16 @@ const ServicesChatInterface: React.FC = memo(() => {
   // ============================================
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
       {/* Header del chat */}
-      <div className="p-4 border-b border-gray-200 bg-white">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Sparkles className="h-4 w-4 text-purple-600" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <span className="font-medium text-gray-900">Services Assistant</span>
+              <span className="font-medium text-gray-900 dark:text-white">Services Assistant</span>
               <p className="text-xs text-gray-500">
                 {currentService?.serviceId 
                   ? `Trabajando en: ${currentService.serviceTitle}`
@@ -163,7 +167,7 @@ const ServicesChatInterface: React.FC = memo(() => {
             
             {/* Comandos sugeridos */}
             <div className="max-w-md mx-auto">
-              <p className="text-sm text-gray-500 mb-3 font-medium">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 font-medium">
                 💡 Prueba estos comandos:
               </p>
               <div className="space-y-2">
@@ -171,9 +175,9 @@ const ServicesChatInterface: React.FC = memo(() => {
                   <button
                     key={index}
                     onClick={() => handleSuggestedCommand(command)}
-                    className="block w-full text-left p-3 text-sm bg-white hover:bg-purple-50 border border-gray-200 hover:border-purple-300 rounded-lg transition-all shadow-sm hover:shadow-md group"
+                    className="block w-full text-left p-3 text-sm bg-white dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500/50 rounded-lg transition-all shadow-sm hover:shadow-md group"
                   >
-                    <span className="text-gray-700 group-hover:text-purple-700">
+                    <span className="text-gray-700 dark:text-gray-300 group-hover:text-purple-700 dark:group-hover:text-purple-400">
                       {command}
                     </span>
                   </button>
@@ -193,14 +197,14 @@ const ServicesChatInterface: React.FC = memo(() => {
                 max-w-[80%] rounded-lg px-4 py-3 shadow-sm
                 ${chat.role === 'user'
                   ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                  : 'bg-white text-gray-900 border border-gray-200'
+                  : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'
                 }
               `}
             >
               <div className="flex items-start space-x-2">
                 {chat.role === 'assistant' && (
                   <div className="flex-shrink-0 mt-1">
-                    <Bot className="h-4 w-4 text-purple-600" />
+                    <Bot className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   </div>
                 )}
                 {chat.role === 'user' && (
@@ -209,9 +213,62 @@ const ServicesChatInterface: React.FC = memo(() => {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
+                  {/* 🆕 Renderizar Form Collection Progress */}
+                  {chat.role === 'assistant' && chat.formState && (
+                    <FormCollectionProgress
+                      progress={chat.formState.progress || '0/0'}
+                      currentQuestion={chat.formState.currentQuestion}
+                      completedFields={[]} // Se puede mejorar para mostrar campos completados
+                      isCollecting={chat.formState.isCollecting}
+                    />
+                  )}
+
+                  {/* 🆕 Renderizar Category Buttons si el campo actual es 'categoria' y tipo 'select' */}
+                  {chat.role === 'assistant' && 
+                   chat.formState && 
+                   chat.formState.isCollecting &&
+                   chat.formState.currentField === 'categoria' &&
+                   chat.formState.fieldType === 'select' &&
+                   chat.formState.options && 
+                   chat.formState.options.length > 0 && (
+                    <CategoryButtons
+                      options={chat.formState.options}
+                      onSelect={(category) => {
+                        setMessage(category);
+                        handleSendMessage({ preventDefault: () => {} } as React.FormEvent);
+                      }}
+                      disabled={isLoading}
+                    />
+                  )}
+                  
                   <p className="text-sm whitespace-pre-wrap break-words">
                     {chat.content}
                   </p>
+                  
+                  {/* 🆕 Renderizar Quick Actions */}
+                  {chat.role === 'assistant' && chat.quickActions && chat.quickActions.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-xs font-semibold text-purple-600 mb-2">
+                        💡 Acciones sugeridas:
+                      </p>
+                      {chat.quickActions.map((qa, idx) => (
+                        <QuickActionButton
+                          key={`${chat.id}_qa_${idx}`}
+                          quickAction={{
+                            action: qa.action,
+                            label: qa.label,
+                            description: qa.description,
+                            data: qa.data,
+                            variant: 'primary',
+                            requiresConfirmation: qa.action === 'create_service' || qa.action === 'edit_service'
+                          }}
+                          onExecute={executeQuickAction}
+                          disabled={isLoading}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  
                   <p className={`text-xs mt-1 ${
                     chat.role === 'user' ? 'text-purple-200' : 'text-gray-500'
                   }`}>
@@ -246,7 +303,7 @@ const ServicesChatInterface: React.FC = memo(() => {
       </div>
 
       {/* Input del chat */}
-      <div className="p-4 border-t border-gray-200 bg-white">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <form onSubmit={handleSendMessage} className="flex space-x-2">
           <div className="flex-1">
             <textarea
@@ -255,7 +312,7 @@ const ServicesChatInterface: React.FC = memo(() => {
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Escribe tu mensaje... (Enter para enviar, Shift+Enter para nueva línea)"
-              className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               rows={1}
               style={{ minHeight: '44px', maxHeight: '120px' }}
               disabled={isLoading}

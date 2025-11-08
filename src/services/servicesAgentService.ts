@@ -37,6 +37,13 @@ export interface ServicesAgentChatResponse {
     suggestions?: string[];
     quickActions?: Array<{ action: string; label: string }>;
     relatedServices?: any[];
+    formState?: { // 🆕 Estado del formulario
+      isCollecting: boolean;
+      progress?: string;
+      currentQuestion?: string;
+      completed?: boolean;
+      collectedData?: any;
+    };
   };
   metadata?: {
     sessionId: string;
@@ -401,6 +408,34 @@ class ServicesAgentService {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Error al analizar servicio',
+      };
+    }
+  }
+
+  /**
+   * 🆕 6.5. Generar contenido específico para servicio
+   * POST /api/servicios/:id/agent/generate-content
+   */
+  async generateContent(
+    serviceId: string,
+    contentType: 'full_description' | 'short_description' | 'features' | 'benefits' | 'faq',
+    style: 'formal' | 'casual' | 'technical' = 'formal'
+  ): Promise<any> {
+    try {
+      const response = await this.fetchWithAuth(
+        `${getApiUrl()}/servicios/${serviceId}/agent/generate-content`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ contentType, style }),
+        }
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error generating content:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error al generar contenido',
       };
     }
   }

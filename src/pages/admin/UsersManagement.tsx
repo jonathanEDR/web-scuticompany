@@ -270,7 +270,7 @@ export default function UsersManagement() {
 
   return (
     <SmartDashboardLayout>
-      <div className="space-y-6">
+      <div className="w-full space-y-6">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-purple-600 dark:via-blue-600 dark:to-indigo-600 rounded-xl p-6 text-white shadow-xl">
           <div className="flex items-center gap-3 mb-2">
@@ -286,7 +286,7 @@ export default function UsersManagement() {
 
         {/* Estadísticas */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-2xl">
@@ -346,8 +346,8 @@ export default function UsersManagement() {
         )}
 
         {/* Filtros y Búsqueda */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 shadow-lg border border-slate-200 dark:border-gray-700 w-full overflow-hidden">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:items-end">
             {/* Búsqueda */}
             <div className="flex-1">
               <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
@@ -358,12 +358,12 @@ export default function UsersManagement() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nombre o email..."
-                className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 sm:px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent transition-all text-sm"
               />
             </div>
 
             {/* Filtro por Rol */}
-            <div>
+            <div className="lg:flex-shrink-0 lg:w-40">
               <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
                 🎭 Rol
               </label>
@@ -373,7 +373,7 @@ export default function UsersManagement() {
                   setFilterRole(e.target.value as UserRole | '');
                   setCurrentPage(1);
                 }}
-                className="px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 sm:px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent transition-all text-sm"
               >
                 <option value="">Todos los roles</option>
                 {Object.values(UserRole).map((role) => (
@@ -385,7 +385,7 @@ export default function UsersManagement() {
             </div>
 
             {/* Filtro por Estado */}
-            <div>
+            <div className="lg:flex-shrink-0 lg:w-40">
               <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
                 📊 Estado
               </label>
@@ -395,7 +395,7 @@ export default function UsersManagement() {
                   setFilterStatus(e.target.value as 'active' | 'inactive' | '');
                   setCurrentPage(1);
                 }}
-                className="px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 sm:px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent transition-all text-sm"
               >
                 <option value="">Todos</option>
                 <option value="active">✅ Activos</option>
@@ -405,10 +405,10 @@ export default function UsersManagement() {
 
             {/* Botón Limpiar */}
             {(searchTerm || filterRole || filterStatus) && (
-              <div className="flex items-end">
+              <div className="flex items-end w-full sm:w-auto">
                 <button
                   onClick={handleClearFilters}
-                  className="px-4 py-2 bg-slate-200 dark:bg-gray-700 text-slate-700 dark:text-gray-300 rounded-lg hover:bg-slate-300 dark:hover:bg-gray-600 transition-colors"
+                  className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-slate-200 dark:bg-gray-700 text-slate-700 dark:text-gray-300 rounded-lg hover:bg-slate-300 dark:hover:bg-gray-600 transition-colors text-sm"
                 >
                   🔄 Limpiar
                 </button>
@@ -418,7 +418,7 @@ export default function UsersManagement() {
         </div>
 
         {/* Tabla de Usuarios */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden w-full">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
@@ -441,7 +441,7 @@ export default function UsersManagement() {
           ) : (
             <>
               {/* Tabla Desktop */}
-              <div className="hidden md:block overflow-x-auto">
+              <div className="hidden md:block overflow-x-auto w-full">
                 <table className="w-full">
                   <thead className="bg-slate-100 dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700">
                     <tr>
@@ -583,7 +583,7 @@ export default function UsersManagement() {
               </div>
 
               {/* Cards Mobile */}
-              <div className="md:hidden space-y-4 p-4">
+              <div className="md:hidden space-y-3 p-3 sm:p-4">
                 {users.map((user) => {
                   const isCurrentUser = user._id === currentUser?._id;
                   const assignableRoles = currentRole ? getAssignableRoles(currentRole) : [];
@@ -592,7 +592,7 @@ export default function UsersManagement() {
                   return (
                     <div
                       key={user._id}
-                      className={`p-4 border rounded-lg ${
+                      className={`p-3 sm:p-4 border rounded-lg text-sm ${
                         isCurrentUser
                           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                           : 'border-slate-200 dark:border-gray-700'
@@ -639,16 +639,16 @@ export default function UsersManagement() {
                       </div>
 
                       {canEditThisUser && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-col sm:flex-row">
                           <button
                             onClick={() => handleOpenRoleModal(user)}
-                            className="flex-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-colors"
+                            className="flex-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm rounded-lg transition-colors"
                           >
                             🎭 Cambiar Rol
                           </button>
                           <button
                             onClick={() => handleToggleUserStatus(user)}
-                            className={`flex-1 px-3 py-2 text-white text-sm rounded-lg transition-colors ${
+                            className={`flex-1 px-3 py-2 text-white text-xs sm:text-sm rounded-lg transition-colors ${
                               user.isActive
                                 ? 'bg-orange-500 hover:bg-orange-600'
                                 : 'bg-green-500 hover:bg-green-600'
@@ -665,22 +665,22 @@ export default function UsersManagement() {
 
               {/* Paginación */}
               {totalPages > 1 && (
-                <div className="px-6 py-4 bg-slate-50 dark:bg-gray-900 border-t border-slate-200 dark:border-gray-700 flex items-center justify-between">
-                  <p className="text-sm text-slate-600 dark:text-gray-400">
+                <div className="px-3 sm:px-6 py-3 sm:py-4 bg-slate-50 dark:bg-gray-900 border-t border-slate-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 text-sm">
+                  <p className="text-slate-600 dark:text-gray-400">
                     Página {currentPage} de {totalPages}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 w-full sm:w-auto">
                     <button
                       onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                       disabled={currentPage === 1}
-                      className="px-4 py-2 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-300 border border-slate-300 dark:border-gray-600 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-300 border border-slate-300 dark:border-gray-600 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
                     >
                       ← Anterior
                     </button>
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages}
-                      className="px-4 py-2 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-300 border border-slate-300 dark:border-gray-600 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-300 border border-slate-300 dark:border-gray-600 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
                     >
                       Siguiente →
                     </button>
@@ -694,8 +694,8 @@ export default function UsersManagement() {
 
       {/* Modal de Asignación de Rol */}
       {isRoleModalOpen && selectedUser && currentRole && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 dark:border-gray-700">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full my-8 p-4 sm:p-6 border border-slate-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-slate-800 dark:text-white">
                 🎭 Cambiar Rol

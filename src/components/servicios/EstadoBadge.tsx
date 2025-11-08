@@ -19,31 +19,31 @@ interface EstadoConfig {
 const estadoConfig: Record<string, EstadoConfig> = {
   activo: {
     label: 'Activo',
-    color: 'text-green-300',
+    color: 'text-green-700 dark:text-green-300',
     bgColor: 'bg-green-500/20 border-green-500/50',
     icon: '✓'
   },
   desarrollo: {
     label: 'En desarrollo',
-    color: 'text-blue-300',
+    color: 'text-blue-700 dark:text-blue-300',
     bgColor: 'bg-blue-500/20 border-blue-500/50',
     icon: '⚙️'
   },
   pausado: {
     label: 'Pausado',
-    color: 'text-yellow-300',
+    color: 'text-yellow-700 dark:text-yellow-300',
     bgColor: 'bg-yellow-500/20 border-yellow-500/50',
     icon: '⏸️'
   },
   descontinuado: {
     label: 'Descontinuado',
-    color: 'text-red-300',
+    color: 'text-red-700 dark:text-red-300',
     bgColor: 'bg-red-500/20 border-red-500/50',
     icon: '❌'
   },
   agotado: {
     label: 'Agotado',
-    color: 'text-gray-300',
+    color: 'text-gray-700 dark:text-gray-300',
     bgColor: 'bg-gray-500/20 border-gray-500/50',
     icon: '🚫'
   }

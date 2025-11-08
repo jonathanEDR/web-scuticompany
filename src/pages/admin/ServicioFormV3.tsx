@@ -7,15 +7,20 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { serviciosApi } from '../../services/serviciosApi';
+import { servicesAgentService } from '../../services/servicesAgentService';
 import { RichTextEditor } from '../../components/common/RichTextEditor';
 import { MultipleImageGallery } from '../../components/common/MultipleImageGallery';
 import { ImageUploader } from '../../components/common/ImageUploader';
-import { TabNavigator, useTabNavigation, type Tab } from '../../components/common/TabNavigator';
+import { useTabNavigation, type Tab } from '../../components/common/TabNavigator';
 import { useNotification } from '../../hooks/useNotification';
 import { categoriasApi, type Categoria } from '../../services/categoriasApi';
 import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
 import * as uploadApi from '../../services/uploadApi';
 import ServicesCanvasModal from '../../components/admin/services/ServicesCanvasModal';
+import AIFieldButton from '../../components/ai-assistant/AIFieldButton';
+import BlockEditor from '../../components/ai-assistant/BlockEditor/BlockEditor';
+import { useBlocksConverter } from '../../components/ai-assistant/hooks/useBlocksConverter';
+import type { Block } from '../../components/ai-assistant/BlockEditor/types';
 import { Sparkles } from 'lucide-react';
 
 // ============================================
@@ -39,6 +44,15 @@ export const ServicioFormV3: React.FC = () => {
   const [loadingCategorias, setLoadingCategorias] = useState(false);
   const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
   const [showServicesCanvas, setShowServicesCanvas] = useState(false);
+
+  // 🆕 Estados para Block Editors
+  const [caracteristicasBlocks, setCaracteristicasBlocks] = useState<Block[]>([]);
+  const [beneficiosBlocks, setBeneficiosBlocks] = useState<Block[]>([]);
+  const [faqBlocks, setFaqBlocks] = useState<Block[]>([]);
+  const [generatingBlocks, setGeneratingBlocks] = useState(false);
+
+  // Hook para convertir bloques ↔ texto
+  const { textToBlocks, blocksToText } = useBlocksConverter();
 
   // ============================================
   // REACT HOOK FORM
@@ -273,6 +287,21 @@ export const ServicioFormV3: React.FC = () => {
           garantia: servicio.garantia || '',
           soporte: servicio.soporte || 'basico',
         });
+
+        // 🆕 Convertir texto cargado a bloques
+        const caracteristicasText = Array.isArray(servicio.caracteristicas) 
+          ? servicio.caracteristicas.map(c => `• ${c}`).join('\n')
+          : servicio.caracteristicas || '';
+        const beneficiosText = Array.isArray(servicio.beneficios)
+          ? servicio.beneficios.map(b => `• ${b}`).join('\n')
+          : servicio.beneficios || '';
+        const faqText = Array.isArray(servicio.faq) && servicio.faq.length > 0 && typeof servicio.faq[0] === 'object'
+          ? servicio.faq.map((f: any) => `**Pregunta:** ${f.pregunta}\n${f.respuesta}`).join('\n\n')
+          : typeof servicio.faq === 'string' ? servicio.faq : '';
+
+        setCaracteristicasBlocks(textToBlocks(caracteristicasText, 'list'));
+        setBeneficiosBlocks(textToBlocks(beneficiosText, 'list'));
+        setFaqBlocks(textToBlocks(faqText, 'faq'));
       }
     } catch (err: any) {
       console.error('Error al cargar servicio:', err);
@@ -338,6 +367,55 @@ export const ServicioFormV3: React.FC = () => {
   };
 
   // ============================================
+  // GENERAR BLOQUES CON IA
+  // ============================================
+
+  const handleGenerateBlocks = async (
+    blockType: 'features' | 'benefits' | 'faq',
+    setBlocks: React.Dispatch<React.SetStateAction<Block[]>>
+  ) => {
+    if (!id) {
+      error('Error', 'Debes guardar el servicio primero antes de generar contenido');
+      return;
+    }
+
+    try {
+      setGeneratingBlocks(true);
+
+      // Mapear tipo de bloque a contentType del backend
+      const contentTypeMap = {
+        features: 'features' as const,
+        benefits: 'benefits' as const,
+        faq: 'faq' as const
+      };
+
+      const contentType = contentTypeMap[blockType];
+
+      // Llamar a la API para generar contenido
+      const response = await servicesAgentService.generateContent(id, contentType, 'formal');
+
+      if (response.success && response.data?.content) {
+        const generatedText = response.data.content;
+        
+        // Convertir el texto generado a bloques
+        const newBlocks = textToBlocks(generatedText, blockType === 'faq' ? 'faq' : 'list');
+        
+        // Reemplazar bloques existentes con los nuevos
+        setBlocks(newBlocks);
+        
+        success('Éxito', `Se generaron ${newBlocks.length} bloques con IA`);
+      } else {
+        error('Error', response.error || 'No se pudo generar el contenido');
+      }
+    } catch (err: any) {
+      console.error('Error generating blocks:', err);
+      error('Error', err.message || 'Error al generar bloques con IA');
+    } finally {
+      setGeneratingBlocks(false);
+    }
+  };
+
+  // ============================================
   // SUBMIT
   // ============================================
 
@@ -394,17 +472,25 @@ export const ServicioFormV3: React.FC = () => {
       };
 
       // Preparar datos procesados
+      // 🆕 Convertir bloques a texto antes de procesar
+      const caracteristicasText = caracteristicasBlocks.length > 0 
+        ? blocksToText(caracteristicasBlocks)
+        : data.caracteristicas;
+      const beneficiosText = beneficiosBlocks.length > 0
+        ? blocksToText(beneficiosBlocks)
+        : data.beneficios;
+      const faqText = faqBlocks.length > 0
+        ? blocksToText(faqBlocks)
+        : data.faq;
+
       const processedData = {
         ...data,
-        caracteristicas: processTextToArray(data.caracteristicas),
-        beneficios: processTextToArray(data.beneficios),
+        caracteristicas: processTextToArray(caracteristicasText),
+        beneficios: processTextToArray(beneficiosText),
         incluye: processTextToArray(data.incluye),
         noIncluye: processTextToArray(data.noIncluye),
-        faq: processFaqText(data.faq),
+        faq: processFaqText(faqText),
       };
-
-      console.log('📤 Datos a enviar:', processedData);
-      console.log('🖼️ Imagen en datos:', processedData.imagen);
 
       if (isEditMode && id) {
         await serviciosApi.update(id, processedData);
@@ -429,25 +515,43 @@ export const ServicioFormV3: React.FC = () => {
   // ============================================
 
   const renderBasicTab = () => (
-    <div className="max-w-4xl mx-auto py-8">
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+    <div className="max-w-5xl mx-auto py-4 lg:py-8 px-4 lg:px-6">
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-4 lg:p-6">
+        <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-4 lg:mb-6 flex items-center gap-2">
           📋 Información Básica
-          <span className="text-sm font-normal text-gray-600 dark:text-gray-400">(Obligatorio)</span>
+          <span className="text-xs lg:text-sm font-normal text-gray-600 dark:text-gray-400">(Obligatorio)</span>
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Título */}
-          <div className="md:col-span-2">
+          <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Título *
             </label>
-            <input
-              type="text"
-              {...register('titulo', { required: 'El título es obligatorio' })}
-              placeholder="Ej: Desarrollo Web Profesional"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                {...register('titulo', { required: 'El título es obligatorio' })}
+                placeholder="Ej: Desarrollo Web Profesional"
+                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              {isEditMode && id && (
+                <AIFieldButton
+                  key={`btn-titulo-${id}`}
+                  fieldName="titulo"
+                  fieldLabel="Título del Servicio"
+                  fieldType="title"
+                  currentValue={watch('titulo')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+                  size="md"
+                />
+              )}
+            </div>
             {errors.titulo && (
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">{String(errors.titulo.message)}</p>
             )}
@@ -531,23 +635,57 @@ export const ServicioFormV3: React.FC = () => {
           </div>
 
           {/* Descripción corta */}
-          <div className="md:col-span-2">
+          <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Descripción Corta
             </label>
-            <input
-              type="text"
-              {...register('descripcionCorta')}
-              placeholder="Resumen breve del servicio (máx. 200 caracteres)"
-              maxLength={200}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                {...register('descripcionCorta')}
+                placeholder="Resumen breve del servicio (máx. 200 caracteres)"
+                maxLength={200}
+                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              {isEditMode && id && (
+                <AIFieldButton
+                  key={`btn-descripcionCorta-${id}`}
+                  fieldName="descripcionCorta"
+                  fieldLabel="Descripción Corta"
+                  fieldType="short_text"
+                  currentValue={watch('descripcionCorta')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+                  size="md"
+                />
+              )}
+            </div>
           </div>
 
           {/* Descripción completa */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Descripción Completa *
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
+              <span>Descripción Completa *</span>
+              {isEditMode && id && (
+                <AIFieldButton
+                  key={`btn-descripcion-${id}`}
+                  fieldName="descripcion"
+                  fieldLabel="Descripción Completa"
+                  fieldType="long_text"
+                  currentValue={watch('descripcion')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+                  size="sm"
+                />
+              )}
             </label>
             <textarea
               {...register('descripcion', { required: 'La descripción es obligatoria' })}
@@ -644,7 +782,7 @@ export const ServicioFormV3: React.FC = () => {
   );
 
   const renderAdvancedTab = () => (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8 px-6">
       <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           ✨ Contenido Avanzado
@@ -715,14 +853,14 @@ export const ServicioFormV3: React.FC = () => {
   );
 
   const renderPricingTab = () => (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8 px-6">
       <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           💰 Precios y Comercial
           <span className="text-sm font-normal text-gray-600 dark:text-gray-400">(Configuración comercial)</span>
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Precio Base */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -791,13 +929,32 @@ export const ServicioFormV3: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Etiqueta Promocional
             </label>
-            <input
-              type="text"
-              {...register('etiquetaPromocion')}
-              placeholder="Ej: ¡OFERTA ESPECIAL!, NUEVO, POPULAR"
-              maxLength={50}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                {...register('etiquetaPromocion')}
+                placeholder="Ej: ¡OFERTA ESPECIAL!, NUEVO, POPULAR"
+                maxLength={50}
+                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              {isEditMode && id && (
+                <AIFieldButton
+                  key={`btn-etiquetaPromocion-${id}`}
+                  fieldName="etiquetaPromocion"
+                  fieldLabel="Etiqueta Promocional"
+                  fieldType="promotional"
+                  currentValue={watch('etiquetaPromocion')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+
+                  size="md"
+                />
+              )}
+            </div>
           </div>
 
           {/* Tiempo de Entrega */}
@@ -805,12 +962,31 @@ export const ServicioFormV3: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Tiempo de Entrega
             </label>
-            <input
-              type="text"
-              {...register('tiempoEntrega')}
-              placeholder="Ej: 7-10 días, 2 semanas, Inmediato"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                {...register('tiempoEntrega')}
+                placeholder="Ej: 7-10 días, 2 semanas, Inmediato"
+                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              {isEditMode && id && (
+                <AIFieldButton
+                  key={`btn-tiempoEntrega-${id}`}
+                  fieldName="tiempoEntrega"
+                  fieldLabel="Tiempo de Entrega"
+                  fieldType="short_text"
+                  currentValue={watch('tiempoEntrega')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+
+                  size="sm"
+                />
+              )}
+            </div>
           </div>
 
           {/* Garantía */}
@@ -818,12 +994,31 @@ export const ServicioFormV3: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Garantía
             </label>
-            <input
-              type="text"
-              {...register('garantia')}
-              placeholder="Ej: 30 días, 6 meses, 1 año"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                {...register('garantia')}
+                placeholder="Ej: 30 días, 6 meses, 1 año"
+                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              {isEditMode && id && (
+                <AIFieldButton
+                  key={`btn-garantia-${id}`}
+                  fieldName="garantia"
+                  fieldLabel="Garantía"
+                  fieldType="short_text"
+                  currentValue={watch('garantia')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+
+                  size="sm"
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -831,35 +1026,36 @@ export const ServicioFormV3: React.FC = () => {
   );
 
   const renderVisualTab = () => (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8 px-6">
       <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           🎨 Diseño Visual
           <span className="text-sm font-normal text-purple-600 dark:text-purple-400">(Opcional)</span>
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Icono */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Icono del Servicio
             </label>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <input
                 type="text"
                 {...register('icono')}
                 placeholder="🚀"
                 maxLength={4}
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white text-center text-2xl placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-16 h-16 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-center text-xl placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
-              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-3xl">
-                {watch('icono') || '🚀'}
+              <div className="flex-1 text-sm text-gray-600 dark:text-gray-400">
+                <p>Emoji o símbolo para representar el servicio</p>
+                <p className="text-xs mt-1">Ejemplos: 🚀 💻 🎨 📱 �️</p>
               </div>
             </div>
           </div>
 
           {/* Imagen Principal */}
-          <div className="md:col-span-2">
+          <div className="lg:col-span-2">
             <ImageUploader
               label="Imagen Principal del Servicio"
               currentImage={watch('imagen')}
@@ -949,7 +1145,7 @@ export const ServicioFormV3: React.FC = () => {
           </div>
 
           {/* Preview */}
-          <div className="md:col-span-2 mt-4 p-4 bg-gray-100/50 dark:bg-gray-700/30 rounded-lg border border-gray-300 dark:border-gray-600">
+          <div className="lg:col-span-2 mt-4 p-4 bg-gray-100/50 dark:bg-gray-700/30 rounded-lg border border-gray-300 dark:border-gray-600">
             <h3 className="text-gray-900 dark:text-white font-medium mb-3">Vista Previa</h3>
             <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
               <div 
@@ -970,7 +1166,7 @@ export const ServicioFormV3: React.FC = () => {
   );
 
   const renderFeaturesTab = () => (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8 px-6">
       <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           ⚡ Características y Beneficios
@@ -978,43 +1174,70 @@ export const ServicioFormV3: React.FC = () => {
         </h2>
         
         <div className="space-y-8">
-          {/* Características Principales (Lista simple por ahora) */}
+          {/* Características Principales - BLOCK EDITOR */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Características Principales
-            </label>
-            <textarea
-              {...register('caracteristicas')}
-              placeholder="• Característica 1&#10;• Característica 2&#10;• Característica 3"
-              rows={4}
-              className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            <BlockEditor
+              blocks={caracteristicasBlocks}
+              onChange={setCaracteristicasBlocks}
+              config={{
+                title: '⚡ Características Principales',
+                allowedTypes: ['list-item'],
+                placeholder: 'Agrega características principales del servicio',
+                maxBlocks: 10
+              }}
+              serviceContext={{
+                serviceId: id,
+                titulo: watch('titulo'),
+                descripcionCorta: watch('descripcionCorta'),
+                categoria: watch('categoria')
+              }}
+              onGenerateWithAI={() => handleGenerateBlocks('features', setCaracteristicasBlocks)}
+              isGenerating={generatingBlocks}
             />
-            <p className="text-gray-500 text-sm mt-1">
-              Lista las características principales (una por línea con •)
-            </p>
           </div>
 
-          {/* Beneficios */}
+          {/* Beneficios - BLOCK EDITOR */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Beneficios Clave
-            </label>
-            <textarea
-              {...register('beneficios')}
-              placeholder="• Beneficio 1&#10;• Beneficio 2&#10;• Beneficio 3"
-              rows={4}
-              className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            <BlockEditor
+              blocks={beneficiosBlocks}
+              onChange={setBeneficiosBlocks}
+              config={{
+                title: '💎 Beneficios Clave',
+                allowedTypes: ['list-item'],
+                placeholder: '¿Qué beneficios obtiene el cliente?',
+                maxBlocks: 10
+              }}
+              serviceContext={{
+                serviceId: id,
+                titulo: watch('titulo'),
+                descripcionCorta: watch('descripcionCorta'),
+                categoria: watch('categoria')
+              }}
+              onGenerateWithAI={() => handleGenerateBlocks('benefits', setBeneficiosBlocks)}
+              isGenerating={generatingBlocks}
             />
-            <p className="text-gray-500 text-sm mt-1">
-              ¿Qué beneficios obtiene el cliente?
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             {/* Qué Incluye */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                ✅ Qué Incluye
+              <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                <span>✅ Qué Incluye</span>
+                <AIFieldButton
+                  key={`btn-incluye-${id}`}
+                  fieldName="incluye"
+                  fieldLabel="Qué Incluye"
+                  fieldType="list"
+                  currentValue={watch('incluye')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+
+                  size="sm"
+                />
               </label>
               <textarea
                 {...register('incluye')}
@@ -1026,8 +1249,23 @@ export const ServicioFormV3: React.FC = () => {
 
             {/* Qué NO Incluye */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                ❌ Qué NO Incluye
+              <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                <span>❌ Qué NO Incluye</span>
+                <AIFieldButton
+                  key={`btn-noIncluye-${id}`}
+                  fieldName="noIncluye"
+                  fieldLabel="Qué NO Incluye"
+                  fieldType="list"
+                  currentValue={watch('noIncluye')}
+                  serviceContext={{
+                    serviceId: id,
+                    titulo: watch('titulo'),
+                    descripcionCorta: watch('descripcionCorta'),
+                    categoria: watch('categoria')
+                  }}
+
+                  size="sm"
+                />
               </label>
               <textarea
                 {...register('noIncluye')}
@@ -1038,20 +1276,26 @@ export const ServicioFormV3: React.FC = () => {
             </div>
           </div>
 
-          {/* FAQ Básico */}
+          {/* FAQ - BLOCK EDITOR */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Preguntas Frecuentes (FAQ)
-            </label>
-            <textarea
-              {...register('faq')}
-              placeholder="P: ¿Pregunta frecuente 1?&#10;R: Respuesta detallada...&#10;&#10;P: ¿Pregunta frecuente 2?&#10;R: Respuesta detallada..."
-              rows={6}
-              className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            <BlockEditor
+              blocks={faqBlocks}
+              onChange={setFaqBlocks}
+              config={{
+                title: '❓ Preguntas Frecuentes (FAQ)',
+                allowedTypes: ['faq-item'],
+                placeholder: 'Agrega preguntas frecuentes sobre el servicio',
+                maxBlocks: 15
+              }}
+              serviceContext={{
+                serviceId: id,
+                titulo: watch('titulo'),
+                descripcionCorta: watch('descripcionCorta'),
+                categoria: watch('categoria')
+              }}
+              onGenerateWithAI={() => handleGenerateBlocks('faq', setFaqBlocks)}
+              isGenerating={generatingBlocks}
             />
-            <p className="text-gray-500 text-sm mt-1">
-              Formato: "P: Pregunta?" seguido de "R: Respuesta"
-            </p>
           </div>
         </div>
       </div>
@@ -1059,7 +1303,7 @@ export const ServicioFormV3: React.FC = () => {
   );
 
   const renderSettingsTab = () => (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8 px-6">
       <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           ⚙️ Configuraciones Avanzadas
@@ -1102,7 +1346,7 @@ export const ServicioFormV3: React.FC = () => {
           {/* Estado y Visibilidad */}
           <div>
             <h3 className="text-lg font-medium text-white mb-4">📊 Estado y Visibilidad</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Estado del Servicio
@@ -1263,88 +1507,208 @@ export const ServicioFormV3: React.FC = () => {
   // ============================================
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header Global Sticky */}
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/dashboard/servicios/management')}
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2"
-            >
-              ← Volver
-            </button>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {isEditMode ? '✏️ Editar Servicio' : '+ Crear Servicio'}
-            </h1>
-          </div>
-          
-          {/* Botón AI Assistant */}
-          <button
-            type="button"
-            onClick={() => setShowServicesCanvas(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-            title="Abrir Asistente IA"
-          >
-            <Sparkles size={18} className="animate-pulse" />
-            <span className="font-medium">AI Assistant</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <TabNavigator
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-
-      {/* Contenido del Formulario */}
-      <form onSubmit={handleSubmit(onSubmit)} className="pb-24">
-        {/* Render del tab activo */}
-        {renderTabContent()}
-
-        {/* Footer Navigation Fijo */}
-        <div className="sticky bottom-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+      {/* Contenido Principal */}
+      <div className="flex-1 flex flex-col">
+        {/* Header Global Sticky */}
+        <div className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
-              <span className="text-gray-600 dark:text-gray-400 text-sm">
-                {tabs.findIndex(t => t.id === activeTab) + 1} de {tabs.length}
-              </span>
-              <div className="w-32 bg-gray-300 dark:bg-gray-700 rounded-full h-1">
-                <div 
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 h-1 rounded-full transition-all duration-300"
-                  style={{ width: `${((tabs.findIndex(t => t.id === activeTab) + 1) / tabs.length) * 100}%` }}
-                />
-              </div>
+              <button
+                onClick={() => navigate('/dashboard/servicios/management')}
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2"
+              >
+                ← Volver
+              </button>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {isEditMode ? '✏️ Editar Servicio' : '+ Crear Servicio'}
+              </h1>
             </div>
             
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={previousTab}
-                disabled={isFirstTab}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 text-gray-900 dark:text-white rounded-lg transition-colors"
-              >
-                ← Anterior
-              </button>
+            {/* Botón AI Assistant */}
+            <button
+              type="button"
+              onClick={() => setShowServicesCanvas(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              title="Abrir Asistente IA"
+            >
+              <Sparkles size={18} className="animate-pulse" />
+              <span className="font-medium">AI Assistant</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Contenido del Formulario */}
+        <div className="flex-1 flex">
+          <div className="flex-1 overflow-y-auto">
+            {/* Navegador Flotante Móvil */}
+            <div className="lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {tabs.find(t => t.id === activeTab)?.title}
+                </h3>
+                <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                  {tabs.findIndex(t => t.id === activeTab) + 1}/{tabs.length}
+                </span>
+              </div>
               
-              {!isLastTab ? (
+              {/* Barra de progreso móvil */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                  <div 
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 h-1.5 rounded-full transition-all duration-300"
+                    style={{ width: `${((tabs.findIndex(t => t.id === activeTab) + 1) / tabs.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Navegación compacta */}
+              <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  onClick={nextTab}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
+                  onClick={previousTab}
+                  disabled={isFirstTab}
+                  className="flex-1 px-3 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 text-gray-900 dark:text-white rounded-lg transition-colors text-sm font-medium"
                 >
-                  Siguiente →
+                  ← Anterior
                 </button>
-              ) : (
+                
+                {/* Selector de tabs móvil */}
+                <select
+                  value={activeTab}
+                  onChange={(e) => setActiveTab(e.target.value)}
+                  className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  {tabs.map((tab) => (
+                    <option key={tab.id} value={tab.id}>
+                      {tab.icon} {tab.title}
+                    </option>
+                  ))}
+                </select>
+                
+                {!isLastTab ? (
+                  <button
+                    type="button"
+                    onClick={nextTab}
+                    className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm"
+                  >
+                    Siguiente →
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    form="servicio-form"
+                    disabled={isSubmitting}
+                    className="flex-1 px-3 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg transition-all font-medium text-sm"
+                  >
+                    {isSubmitting ? '⏳' : '💾'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <form id="servicio-form" onSubmit={handleSubmit(onSubmit)} className="pb-6">
+              {/* Render del tab activo */}
+              {renderTabContent()}
+            </form>
+          </div>
+
+          {/* Barra Lateral Derecha - Solo Desktop */}
+          <div className="hidden lg:flex w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex-col">
+            {/* Header de la Barra Lateral */}
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Configuración del Servicio
+              </h2>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${((tabs.findIndex(t => t.id === activeTab) + 1) / tabs.length) * 100}%` }}
+                  />
+                </div>
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                  {tabs.findIndex(t => t.id === activeTab) + 1}/{tabs.length}
+                </span>
+              </div>
+            </div>
+
+            {/* Lista de Tabs */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    w-full text-left p-4 rounded-xl transition-all duration-200
+                    ${activeTab === tab.id 
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg scale-105' 
+                      : 'bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-102'
+                    }
+                  `}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl">{tab.icon}</span>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-sm">{tab.title}</h3>
+                      {tab.isOptional && (
+                        <span className={`text-xs ${activeTab === tab.id ? 'text-purple-100' : 'text-purple-600 dark:text-purple-400'}`}>
+                          (Opcional)
+                        </span>
+                      )}
+                    </div>
+                    {/* Indicador de estado */}
+                    <div className="flex items-center">
+                      {tab.isValid ? (
+                        <div className={`w-2 h-2 rounded-full ${activeTab === tab.id ? 'bg-green-300' : 'bg-green-500'}`} />
+                      ) : tab.isCompleted ? (
+                        <div className={`w-2 h-2 rounded-full ${activeTab === tab.id ? 'bg-yellow-300' : 'bg-yellow-500'}`} />
+                      ) : (
+                        <div className={`w-2 h-2 rounded-full ${activeTab === tab.id ? 'bg-gray-300' : 'bg-gray-400'}`} />
+                      )}
+                    </div>
+                  </div>
+                  <p className={`text-xs ${activeTab === tab.id ? 'text-purple-100' : 'text-gray-600 dark:text-gray-400'}`}>
+                    {tab.description}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            {/* Footer de la Barra Lateral */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+              {/* Navegación */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={previousTab}
+                  disabled={isFirstTab}
+                  className="flex-1 px-3 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 text-gray-900 dark:text-white rounded-lg transition-colors text-sm font-medium"
+                >
+                  ← Anterior
+                </button>
+                
+                {!isLastTab ? (
+                  <button
+                    type="button"
+                    onClick={nextTab}
+                    className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm"
+                  >
+                    Siguiente →
+                  </button>
+                ) : null}
+              </div>
+              
+              {/* Botón de Guardar */}
+              {isLastTab && (
                 <button
                   type="submit"
+                  form="servicio-form"
                   disabled={isSubmitting}
-                  className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 dark:disabled:from-gray-600 dark:disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-all font-semibold shadow-lg hover:shadow-purple-500/50"
+                  className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 dark:disabled:from-gray-600 dark:disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-all font-semibold shadow-lg hover:shadow-purple-500/50"
                 >
                   {isSubmitting ? (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center gap-2">
                       <span className="animate-spin">⏳</span>
                       {isEditMode ? 'Actualizando...' : 'Creando...'}
                     </span>
@@ -1356,7 +1720,7 @@ export const ServicioFormV3: React.FC = () => {
             </div>
           </div>
         </div>
-      </form>
+      </div>
 
       {/* Modal para crear nueva categoría */}
       <CreateCategoriaModal

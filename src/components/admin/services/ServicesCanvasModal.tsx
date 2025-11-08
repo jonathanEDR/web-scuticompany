@@ -173,23 +173,23 @@ const ServicesCanvasModalContent: React.FC<{
   if (!hasAdminAccess) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-red-600">Acceso Denegado</h3>
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Acceso Denegado</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
               <X size={20} />
             </button>
           </div>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
             El Services Canvas solo está disponible para administradores.
           </p>
           <div className="flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Cerrar
             </button>
@@ -296,18 +296,18 @@ const ServicesCanvasModalContent: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <ModeIcon className="h-6 w-6 text-purple-600" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <ModeIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {getModeTitle(activeMode)}
               </h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {getModeDescription(activeMode)}
               </p>
             </div>
@@ -317,7 +317,7 @@ const ServicesCanvasModalContent: React.FC<{
               clearError();
               onClose();
             }}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
             title="Cerrar"
           >
             <X size={24} />
@@ -325,8 +325,8 @@ const ServicesCanvasModalContent: React.FC<{
         </div>
 
         {/* Toolbar con Modos */}
-        <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
-          <div className="flex items-center space-x-2">
+        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-2 overflow-x-auto">
+          <div className="flex items-center space-x-2 min-w-max md:min-w-0">
             <Tooltip 
               content="Chat interactivo con IA para consultas y recomendaciones personalizadas"
               variant="purple"
@@ -334,15 +334,15 @@ const ServicesCanvasModalContent: React.FC<{
             >
               <button
                 onClick={() => setActiveMode('chat')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
                   activeMode === 'chat'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'text-gray-600 hover:bg-gray-200'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
                 title="Chat Interactivo"
               >
                 <MessageSquare size={18} />
-                <span className="text-sm font-medium">Chat</span>
+                <span className="hidden sm:inline text-sm font-medium">Chat</span>
               </button>
             </Tooltip>
 
@@ -354,17 +354,17 @@ const ServicesCanvasModalContent: React.FC<{
               <button
                 onClick={() => setActiveMode('analysis')}
                 disabled={!serviceContext}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
                   activeMode === 'analysis'
-                    ? 'bg-purple-100 text-purple-700'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                     : !serviceContext
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-600 hover:bg-gray-200'
+                      ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
                 title="Análisis de Servicio"
               >
                 <BarChart3 size={18} />
-                <span className="text-sm font-medium">Análisis</span>
+                <span className="hidden sm:inline text-sm font-medium">Análisis</span>
               </button>
             </Tooltip>
 
@@ -376,17 +376,17 @@ const ServicesCanvasModalContent: React.FC<{
               <button
                 onClick={() => setActiveMode('pricing')}
                 disabled={!serviceContext}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
                   activeMode === 'pricing'
-                    ? 'bg-purple-100 text-purple-700'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                     : !serviceContext
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-600 hover:bg-gray-200'
+                    ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
                 title="Estrategias de Pricing"
               >
                 <DollarSign size={18} />
-                <span className="text-sm font-medium">Pricing</span>
+                <span className="hidden sm:inline text-sm font-medium">Pricing</span>
               </button>
             </Tooltip>
 
@@ -397,15 +397,15 @@ const ServicesCanvasModalContent: React.FC<{
             >
               <button
                 onClick={() => setActiveMode('generation')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
                   activeMode === 'generation'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'text-gray-600 hover:bg-gray-200'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
                 title="Generación de Contenido"
               >
                 <FileText size={18} />
-                <span className="text-sm font-medium">Generar</span>
+                <span className="hidden sm:inline text-sm font-medium">Generar</span>
               </button>
             </Tooltip>
 
@@ -416,15 +416,15 @@ const ServicesCanvasModalContent: React.FC<{
             >
               <button
                 onClick={() => setActiveMode('portfolio')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
                   activeMode === 'portfolio'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'text-gray-600 hover:bg-gray-200'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
                 title="Análisis de Portafolio"
               >
                 <Briefcase size={18} />
-                <span className="text-sm font-medium">Portafolio</span>
+                <span className="hidden sm:inline text-sm font-medium">Portafolio</span>
               </button>
             </Tooltip>
           </div>
@@ -432,13 +432,13 @@ const ServicesCanvasModalContent: React.FC<{
 
         {/* Error Display */}
         {error && (
-          <div className="mx-4 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start justify-between">
+          <div className="mx-4 mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
             </div>
             <button
               onClick={clearError}
-              className="text-red-400 hover:text-red-600 ml-2"
+              className="text-red-400 dark:text-red-600 hover:text-red-600 dark:hover:text-red-400 ml-2"
             >
               <X size={16} />
             </button>
@@ -446,21 +446,21 @@ const ServicesCanvasModalContent: React.FC<{
         )}
 
         {/* Content Area */}
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden relative bg-gray-50 dark:bg-gray-900">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
             </div>
           ) : (
             renderActivePanel()
           )}
           
           {/* Shortcuts Indicator */}
-          <div className="absolute bottom-4 right-4 bg-black bg-opacity-70 text-white text-xs px-3 py-2 rounded-lg">
+          <div className="absolute bottom-4 right-4 bg-black dark:bg-gray-950 bg-opacity-70 text-white text-xs px-3 py-2 rounded-lg">
             <div className="flex items-center space-x-3">
-              <span><kbd className="bg-gray-700 px-1.5 py-0.5 rounded">1-5</kbd> Paneles</span>
-              <span><kbd className="bg-gray-700 px-1.5 py-0.5 rounded">Esc</kbd> Cerrar</span>
-              <span><kbd className="bg-gray-700 px-1.5 py-0.5 rounded">⌘K</kbd> Chat</span>
+              <span><kbd className="bg-gray-700 dark:bg-gray-800 px-1.5 py-0.5 rounded">1-5</kbd> Paneles</span>
+              <span><kbd className="bg-gray-700 dark:bg-gray-800 px-1.5 py-0.5 rounded">Esc</kbd> Cerrar</span>
+              <span><kbd className="bg-gray-700 dark:bg-gray-800 px-1.5 py-0.5 rounded">⌘K</kbd> Chat</span>
             </div>
           </div>
         </div>

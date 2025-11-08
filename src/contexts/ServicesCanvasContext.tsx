@@ -36,6 +36,25 @@ export interface ServicesChatMessage {
   content: string;
   timestamp: Date;
   mode?: 'chat' | 'analysis' | 'pricing' | 'generation' | 'portfolio';
+  quickActions?: Array<{ // 🆕 Acciones rápidas sugeridas
+    action: string;
+    label: string;
+    description?: string;
+    data?: any;
+  }>;
+  formState?: { // 🆕 Estado del formulario conversacional
+    isCollecting: boolean;
+    progress?: string;
+    currentQuestion?: string;
+    currentField?: string;
+    fieldType?: 'text' | 'select' | 'number';
+    options?: Array<{
+      nombre: string;
+      slug: string;
+    }>;
+    completed?: boolean;
+    collectedData?: any;
+  };
 }
 
 export interface ServicesAnalysisResult {
@@ -140,6 +159,11 @@ interface ServicesCanvasContextType {
   
   // Acciones de Portafolio
   analyzePortfolio: (services?: ServiceContext[]) => Promise<PortfolioAnalysis | null>;
+  
+  // 🆕 Acciones CRUD con IA
+  createServiceWithAI: (serviceData: any, options?: any) => Promise<{ success: boolean; data?: any; error?: string }>;
+  editServiceWithAI: (serviceId: string, instructions: string, options?: any) => Promise<{ success: boolean; data?: any; error?: string }>;
+  executeQuickAction: (action: string, data?: any) => Promise<void>;
   
   // Utilidades
   checkUserPermissions: () => Promise<any>;

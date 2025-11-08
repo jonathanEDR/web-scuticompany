@@ -34,37 +34,37 @@ const categoriaConfigFallback: Record<string, CategoriaConfig> = {
   desarrollo: {
     label: 'Desarrollo',
     icon: '💻',
-    color: 'text-blue-300',
+    color: 'text-blue-700 dark:text-blue-300',
     bgColor: 'bg-blue-600/20 border-blue-500/50'
   },
   diseño: {
     label: 'Diseño',
     icon: '🎨',
-    color: 'text-pink-300',
+    color: 'text-pink-700 dark:text-pink-300',
     bgColor: 'bg-pink-600/20 border-pink-500/50'
   },
   marketing: {
     label: 'Marketing',
     icon: '📊',
-    color: 'text-green-300',
+    color: 'text-green-700 dark:text-green-300',
     bgColor: 'bg-green-600/20 border-green-500/50'
   },
   consultoría: {
     label: 'Consultoría',
     icon: '💼',
-    color: 'text-purple-300',
+    color: 'text-purple-700 dark:text-purple-300',
     bgColor: 'bg-purple-600/20 border-purple-500/50'
   },
   mantenimiento: {
     label: 'Mantenimiento',
     icon: '🔧',
-    color: 'text-orange-300',
+    color: 'text-orange-700 dark:text-orange-300',
     bgColor: 'bg-orange-600/20 border-orange-500/50'
   },
   otro: {
     label: 'Otro',
     icon: '📦',
-    color: 'text-gray-300',
+    color: 'text-gray-700 dark:text-gray-300',
     bgColor: 'bg-gray-600/20 border-gray-500/50'
   }
 };
@@ -179,8 +179,14 @@ export const CategoriaBadge: React.FC<CategoriaBadgeProps> = ({
     badgeProps.style = {
       backgroundColor: `${cat.color}25`, // 25% opacity
       borderColor: `${cat.color}60`,     // 60% opacity
-      color: 'white'
     };
+    badgeProps.className = `
+      inline-flex items-center gap-1.5 
+      ${sizeClasses[size]}
+      text-gray-800 dark:text-white
+      border rounded-full font-semibold
+      ${className}
+    `.trim();
   }
 
   return (

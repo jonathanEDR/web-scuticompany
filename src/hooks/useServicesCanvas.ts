@@ -200,6 +200,12 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
     }));
 
     try {
+      console.log('📤 [FRONTEND] Sending chat message:', {
+        message: message.substring(0, 50) + (message.length > 50 ? '...' : ''),
+        sessionId: state.sessionId,
+        hasSessionId: !!state.sessionId
+      });
+
       const response = await servicesAgentService.chat({
         message,
         context: {
@@ -211,17 +217,44 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
         }
       });
 
+      // 🆕 GUARDAR SESSION ID SI VIENE EN LA RESPUESTA
+      const sessionIdFromBackend = response.metadata?.sessionId;
+      if (sessionIdFromBackend) {
+        console.log('💾 [FRONTEND] Session ID received from backend:', sessionIdFromBackend);
+      }
+
+      console.log('🤖 [FRONTEND] Chat response received:', {
+        success: response.success,
+        hasQuickActions: !!response.data?.quickActions?.length,
+        quickActionsCount: response.data?.quickActions?.length || 0,
+        hasFormState: !!response.data?.formState,
+        formState: response.data?.formState,
+        intent: response.metadata?.intent,
+        sessionId: sessionIdFromBackend
+      });
+
       const assistantMessage: ServicesChatMessage = {
         id: `msg_${Date.now()}_assistant`,
         role: 'assistant',
         content: response.data?.message || 'Lo siento, no pude procesar tu solicitud.',
         timestamp: new Date(),
-        mode: state.activeMode
+        mode: state.activeMode,
+        quickActions: response.data?.quickActions || [], // 🆕 Capturar quickActions
+        formState: response.data?.formState || undefined // 🆕 Capturar formState
       };
+
+      if (response.data?.formState) {
+        console.log('📋 [FRONTEND] Form state detected:', response.data.formState);
+      }
+
+      if (response.data?.quickActions && response.data.quickActions.length > 0) {
+        console.log('⚡ [FRONTEND] Quick actions available:', response.data.quickActions);
+      }
 
       setState(prev => ({
         ...prev,
         chatHistory: [...prev.chatHistory, assistantMessage],
+        sessionId: sessionIdFromBackend || prev.sessionId, // 🆕 Guardar sessionId
         isLoading: false
       }));
 
@@ -397,24 +430,30 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const response = await servicesAgentService.createService({
-        prompt: `Generar ${type} para servicio: ${serviceData.serviceTitle}`,
-        serviceData: {
-          titulo: serviceData.serviceTitle,
-          descripcion: serviceData.currentDescription,
-          categoria: serviceData.category
-        },
-        options: {
-          autoOptimize: true,
-          generateSEO: true,
-          includeSuggestions: true
-        }
-      });
+      console.log('📝 [GENERATE_CONTENT] Calling service:', { type, style, serviceId: serviceData.serviceId });
+
+      // Validar que hay serviceId
+      if (!serviceData.serviceId) {
+        throw new Error('Se requiere un servicio guardado para generar contenido');
+      }
+
+      // Llamar al endpoint correcto de generación de contenido
+      const response = await servicesAgentService.generateContent(
+        serviceData.serviceId,
+        type,
+        style
+      );
+
+      console.log('📝 [GENERATE_CONTENT] Response:', response);
+
+      if (!response.success) {
+        throw new Error(response.error || 'Error al generar contenido');
+      }
 
       const content: GeneratedContent = {
         type,
-        content: response.data?.service?.descripcion || '',
-        variations: response.data?.suggestions,
+        content: response.data?.content || '',
+        variations: [], // TODO: Agregar variaciones si el backend las proporciona
         style
       };
 
@@ -423,6 +462,8 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
         generatedContent: [...(prev.generatedContent || []), content],
         isLoading: false
       }));
+
+      console.log('✅ [GENERATE_CONTENT] Content generated successfully');
 
       return content;
     } catch (error: any) {
@@ -509,6 +550,218 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
   }, []);
 
   // ============================================
+  // 🆕 ACCIONES CRUD CON IA
+  // ============================================
+
+  /**
+   * Crear servicio con IA
+   */
+  const createServiceWithAI = useCallback(async (
+    serviceData: any,
+    options?: any
+  ): Promise<{ success: boolean; data?: any; error?: string }> => {
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const response = await servicesAgentService.createService({
+        prompt: serviceData.prompt,
+        serviceData: serviceData.serviceData,
+        options: {
+          autoOptimize: true,
+          generateSEO: true,
+          includeSuggestions: true,
+          ...options
+        }
+      });
+
+      if (response.success) {
+        // Agregar mensaje de éxito al chat
+        const successMessage: ServicesChatMessage = {
+          id: `msg_${Date.now()}_system`,
+          role: 'assistant',
+          content: `✅ ¡Servicio creado exitosamente! "${response.data?.service?.titulo || 'Nuevo servicio'}" ha sido guardado en la base de datos.`,
+          timestamp: new Date(),
+          mode: state.activeMode
+        };
+
+        setState(prev => ({
+          ...prev,
+          chatHistory: [...prev.chatHistory, successMessage],
+          isLoading: false,
+          error: null
+        }));
+
+        return {
+          success: true,
+          data: response.data
+        };
+      } else {
+        throw new Error(response.error || 'Error al crear servicio');
+      }
+    } catch (error: any) {
+      console.error('Error in createServiceWithAI:', error);
+      
+      const errorMessage: ServicesChatMessage = {
+        id: `msg_${Date.now()}_error`,
+        role: 'assistant',
+        content: `❌ Error al crear servicio: ${error.message || 'Error desconocido'}`,
+        timestamp: new Date(),
+        mode: state.activeMode
+      };
+
+      setState(prev => ({
+        ...prev,
+        chatHistory: [...prev.chatHistory, errorMessage],
+        isLoading: false,
+        error: error.message || 'Error al crear servicio'
+      }));
+
+      return {
+        success: false,
+        error: error.message || 'Error al crear servicio'
+      };
+    }
+  }, [state.activeMode, state.chatHistory]);
+
+  /**
+   * Editar servicio con IA
+   */
+  const editServiceWithAI = useCallback(async (
+    serviceId: string,
+    instructions: string,
+    options?: any
+  ): Promise<{ success: boolean; data?: any; error?: string }> => {
+    if (!serviceId) {
+      return {
+        success: false,
+        error: 'ID de servicio requerido'
+      };
+    }
+
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const response = await servicesAgentService.editService(serviceId, {
+        instructions,
+        autoApply: true,
+        ...options
+      });
+
+      if (response.success) {
+        // Agregar mensaje de éxito al chat
+        const successMessage: ServicesChatMessage = {
+          id: `msg_${Date.now()}_system`,
+          role: 'assistant',
+          content: `✅ ¡Servicio actualizado exitosamente! Los cambios han sido guardados en "${response.data?.service?.titulo || 'el servicio'}".`,
+          timestamp: new Date(),
+          mode: state.activeMode
+        };
+
+        setState(prev => ({
+          ...prev,
+          chatHistory: [...prev.chatHistory, successMessage],
+          currentService: response.data?.service ? {
+            ...prev.currentService,
+            serviceTitle: response.data.service.titulo,
+            currentDescription: response.data.service.descripcion,
+            currentPrice: response.data.service.precio
+          } as ServiceContext : prev.currentService,
+          isLoading: false,
+          error: null
+        }));
+
+        return {
+          success: true,
+          data: response.data
+        };
+      } else {
+        throw new Error(response.error || 'Error al editar servicio');
+      }
+    } catch (error: any) {
+      console.error('Error in editServiceWithAI:', error);
+      
+      const errorMessage: ServicesChatMessage = {
+        id: `msg_${Date.now()}_error`,
+        role: 'assistant',
+        content: `❌ Error al editar servicio: ${error.message || 'Error desconocido'}`,
+        timestamp: new Date(),
+        mode: state.activeMode
+      };
+
+      setState(prev => ({
+        ...prev,
+        chatHistory: [...prev.chatHistory, errorMessage],
+        isLoading: false,
+        error: error.message || 'Error al editar servicio'
+      }));
+
+      return {
+        success: false,
+        error: error.message || 'Error al editar servicio'
+      };
+    }
+  }, [state.activeMode, state.chatHistory, state.currentService]);
+
+  /**
+   * Ejecutar acción rápida sugerida por el agente
+   */
+  const executeQuickAction = useCallback(async (
+    action: string,
+    data?: any
+  ): Promise<void> => {
+    console.log('🚀 [FRONTEND] Executing quick action:', action);
+    console.log('📦 [FRONTEND] Action data:', data);
+
+    switch (action) {
+      case 'create_service':
+        console.log('✨ [FRONTEND] CREATE SERVICE action triggered');
+        // Si los datos vienen del formulario conversacional, usarlos
+        if (data?.serviceData) {
+          console.log('📋 [FRONTEND] Using collected form data:', data.serviceData);
+          await createServiceWithAI({
+            serviceData: data.serviceData,
+            autoComplete: data.autoComplete || true
+          });
+        } else {
+          console.log('⚠️ [FRONTEND] No form data provided, using empty data');
+          await createServiceWithAI(data || {});
+        }
+        break;
+
+      case 'edit_service':
+        console.log('✏️ [FRONTEND] EDIT SERVICE action triggered');
+        if (data?.serviceId && data?.instructions) {
+          await editServiceWithAI(data.serviceId, data.instructions);
+        } else if (state.currentService?.serviceId && data?.instructions) {
+          await editServiceWithAI(state.currentService.serviceId, data.instructions);
+        }
+        break;
+
+      case 'analyze_service':
+        console.log('📊 [FRONTEND] ANALYZE SERVICE action triggered');
+        if (state.currentService) {
+          await analyzeService(state.currentService);
+        }
+        break;
+
+      case 'suggest_pricing':
+        console.log('💰 [FRONTEND] SUGGEST PRICING action triggered');
+        if (state.currentService) {
+          await suggestPricing(state.currentService);
+        }
+        break;
+
+      case 'analyze_portfolio':
+        console.log('🔍 [FRONTEND] ANALYZE PORTFOLIO action triggered');
+        await analyzePortfolio();
+        break;
+
+      default:
+        console.warn('⚠️ [FRONTEND] Unknown quick action:', action);
+    }
+  }, [state.currentService, createServiceWithAI, editServiceWithAI, analyzeService, suggestPricing, analyzePortfolio]);
+
+  // ============================================
   // RETURN
   // ============================================
 
@@ -553,6 +806,11 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
 
     // Acciones de Portafolio
     analyzePortfolio,
+
+    // 🆕 Acciones CRUD con IA
+    createServiceWithAI,
+    editServiceWithAI,
+    executeQuickAction,
 
     // Utilidades
     checkUserPermissions,

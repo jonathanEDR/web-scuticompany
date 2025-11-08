@@ -130,14 +130,38 @@ const ServicesGenerationPanel: React.FC = memo(() => {
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
           Generación de Contenido
         </h3>
-        <p className="text-center text-sm text-gray-600 max-w-md mb-6">
-          Necesitas proporcionar información básica del servicio para poder 
-          generar contenido con IA.
+        <p className="text-center text-sm text-gray-600 max-w-md mb-4">
+          Selecciona un servicio existente para generar contenido con IA.
         </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md">
-          <p className="text-xs text-blue-800">
-            💡 <strong>Tip:</strong> Completa al menos el título y una descripción 
-            básica del servicio para obtener mejores resultados.
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md space-y-3">
+          <div className="flex items-start">
+            <span className="text-blue-600 mr-2">1️⃣</span>
+            <p className="text-xs text-blue-800">
+              Ve a la lista de servicios en el panel de gestión
+            </p>
+          </div>
+          <div className="flex items-start">
+            <span className="text-blue-600 mr-2">2️⃣</span>
+            <p className="text-xs text-blue-800">
+              Haz clic en "Editar" en cualquier servicio
+            </p>
+          </div>
+          <div className="flex items-start">
+            <span className="text-blue-600 mr-2">3️⃣</span>
+            <p className="text-xs text-blue-800">
+              Busca el botón <strong>"🤖 Generar con IA"</strong> o abre el Services Canvas
+            </p>
+          </div>
+          <div className="flex items-start">
+            <span className="text-blue-600 mr-2">4️⃣</span>
+            <p className="text-xs text-blue-800">
+              Selecciona la pestaña <strong>"Generar"</strong> en el canvas
+            </p>
+          </div>
+        </div>
+        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-md">
+          <p className="text-xs text-amber-800">
+            💡 <strong>Nota:</strong> Este panel requiere un servicio <strong>guardado en la base de datos</strong> (con ID) para poder generar contenido.
           </p>
         </div>
       </div>
@@ -167,13 +191,13 @@ const ServicesGenerationPanel: React.FC = memo(() => {
   // ============================================
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-gray-50">
+    <div className="flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Sparkles className="h-5 w-5 text-purple-600 mr-2" />
-            <h3 className="font-semibold text-gray-900">Generador de Contenido</h3>
+            <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400 mr-2" />
+            <h3 className="font-semibold text-gray-900 dark:text-white">Generador de Contenido</h3>
           </div>
         </div>
       </div>
@@ -182,7 +206,7 @@ const ServicesGenerationPanel: React.FC = memo(() => {
         <div className="p-6 space-y-6">
           {/* Selector de Tipo de Contenido */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Tipo de Contenido
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -192,15 +216,15 @@ const ServicesGenerationPanel: React.FC = memo(() => {
                   onClick={() => setSelectedType(type.id)}
                   className={`p-4 rounded-lg border-2 text-left transition-all ${
                     selectedType === type.id
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <div className="text-2xl mb-2">{type.icon}</div>
-                  <div className="font-medium text-gray-900 text-sm mb-1">
+                  <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">
                     {type.label}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {type.description}
                   </div>
                 </button>
@@ -220,14 +244,14 @@ const ServicesGenerationPanel: React.FC = memo(() => {
                   onClick={() => setSelectedStyle(style.id)}
                   className={`p-3 rounded-lg border-2 text-center transition-all ${
                     selectedStyle === style.id
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
-                  <div className="font-medium text-gray-900 text-sm mb-1">
+                  <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">
                     {style.label}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {style.description}
                   </div>
                 </button>
@@ -262,7 +286,7 @@ const ServicesGenerationPanel: React.FC = memo(() => {
 
           {/* Preview del Contenido Generado */}
           {previewContent && (
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
               <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center text-white">
                   <Eye className="h-4 w-4 mr-2" />
@@ -295,8 +319,8 @@ const ServicesGenerationPanel: React.FC = memo(() => {
                 </div>
               </div>
               <div className="p-6">
-                <div className="prose prose-sm max-w-none">
-                  <div className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <div className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
                     {previewContent}
                   </div>
                 </div>
@@ -307,28 +331,28 @@ const ServicesGenerationPanel: React.FC = memo(() => {
           {/* Historial de Contenido Generado */}
           {generatedContent && generatedContent.length > 0 && (
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                <FileText className="h-4 w-4 mr-2 text-purple-600" />
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                <FileText className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
                 Contenido Generado Anteriormente ({generatedContent.length})
               </h4>
               <div className="space-y-3">
                 {generatedContent.slice().reverse().map((item, index) => (
                   <div
                     key={index}
-                    className="bg-white border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors"
+                    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-purple-300 dark:hover:border-purple-500/50 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
                           {contentTypes.find(t => t.id === item.type)?.label || item.type}
                         </span>
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                        <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
                           {item.style}
                         </span>
                       </div>
                       <button
                         onClick={() => handleCopy(item.content, index)}
-                        className="text-sm text-purple-600 hover:text-purple-700 flex items-center"
+                        className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center"
                       >
                         {copiedIndex === index ? (
                           <>

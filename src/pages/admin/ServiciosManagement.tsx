@@ -287,7 +287,7 @@ export const ServiciosManagementOptimized = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
@@ -433,11 +433,11 @@ export const ServiciosManagementOptimized = () => {
         </div>
 
         {/* Layout con Filtros y Contenido lado a lado */}
-        <div className="flex flex-col lg:flex-row gap-6 relative">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 relative">
           {/* Panel de filtros - Sidebar */}
           <div className={`
-            ${showFilters ? 'block' : 'hidden'} lg:block
-            w-full lg:w-80 flex-shrink-0
+            ${showFilters ? 'block' : 'hidden'}
+            w-full lg:w-72 xl:w-80 flex-shrink-0
           `}>
             <div className="lg:sticky lg:top-6">
               <FiltersPanel
@@ -451,10 +451,7 @@ export const ServiciosManagementOptimized = () => {
           </div>
 
           {/* Contenido principal */}
-          <div className={`
-            flex-1 min-w-0 
-            ${showFilters ? 'lg:ml-0' : 'lg:ml-0'}
-          `}>
+          <div className="flex-1 min-w-0">
             {/* Contenido */}
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
@@ -490,13 +487,17 @@ export const ServiciosManagementOptimized = () => {
                 {/* Grid/List de servicios - LAYOUT MEJORADO */}
                 <div className={`
                   ${viewMode === 'grid'
-                    ? showFilters 
-                      ? 'grid grid-cols-1 xl:grid-cols-2 gap-6'
-                      : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
-                    : 'space-y-4'
+                    ? 'grid gap-4 lg:gap-6 mb-6'
+                    : 'space-y-4 mb-6'
                   }
-                  mb-6
-                `}>
+                `}
+                style={{
+                  gridTemplateColumns: viewMode === 'grid' 
+                    ? showFilters 
+                      ? 'repeat(auto-fill, minmax(260px, 1fr))'
+                      : 'repeat(auto-fit, minmax(300px, 1fr))'
+                    : undefined
+                }}>
                   {pageData.map((servicio) => (
                     <ServicioCard
                       key={servicio._id}
