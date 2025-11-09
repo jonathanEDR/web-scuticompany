@@ -1,10 +1,12 @@
 /**
  * 🎣 Hook para obtener un Post Individual
  * Maneja la carga de un post específico por slug
+ * ✅ Optimizado con cache para evitar recargas innecesarias
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { blogPostApi } from '../../services/blog';
+import blogCache from '../../utils/blogCache';
 import type { BlogPost } from '../../types/blog';
 
 interface UseBlogPostReturn {
@@ -34,12 +36,25 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
       setLoading(true);
       setError(null);
       
+      // ✅ Intentar obtener del cache primero
+      const cached = blogCache.get<{ post: BlogPost; relatedPosts: BlogPost[] }>('POST_DETAIL', slug);
+      
+      if (cached) {
+        setPost(cached.post);
+        setLoading(false);
+        return;
+      }
+      
+      // Si no está en cache, hacer petición al servidor
       const response = await blogPostApi.getPostBySlug(slug);
       
       if (response.success && response.data) {
         // El backend devuelve { success: true, data: { post, relatedPosts } }
         const responseData = response.data as any;
         setPost(responseData.post);
+        
+        // ✅ Guardar en cache
+        blogCache.set('POST_DETAIL', slug, responseData);
       } else {
         throw new Error('Post no encontrado');
       }

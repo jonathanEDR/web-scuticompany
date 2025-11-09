@@ -1,10 +1,12 @@
 /**
  * 🎣 Hook para gestión de Posts del Blog
  * Maneja la obtención y estado de posts
+ * ✅ Optimizado con cache para evitar recargas innecesarias
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { blogPostApi } from '../../services/blog';
+import blogCache from '../../utils/blogCache';
 import type { BlogPost, BlogFilters, PaginationInfo } from '../../types/blog';
 
 interface UseBlogPostsReturn {
@@ -30,11 +32,29 @@ export function useBlogPosts(filters?: BlogFilters): UseBlogPostsReturn {
       setLoading(true);
       setError(null);
       
+      // ✅ Intentar obtener del cache primero
+      const cacheKey = filters || {};
+      const cached = blogCache.get<{ data: BlogPost[]; pagination: PaginationInfo }>('POST_LIST', cacheKey);
+      
+      if (cached) {
+        setPosts(cached.data);
+        setPagination(cached.pagination);
+        setLoading(false);
+        return;
+      }
+      
+      // Si no está en cache, hacer petición al servidor
       const response = await blogPostApi.getAllPosts(filters);
       
       if (response.success && response.data) {
         setPosts(response.data.data);
         setPagination(response.data.pagination);
+        
+        // ✅ Guardar en cache
+        blogCache.set('POST_LIST', cacheKey, {
+          data: response.data.data,
+          pagination: response.data.pagination,
+        });
       } else {
         throw new Error('Error al cargar posts');
       }
@@ -79,10 +99,24 @@ export function useFeaturedPosts() {
       try {
         setLoading(true);
         setError(null);
+        
+        // ✅ Intentar obtener del cache primero
+        const cached = blogCache.get<BlogPost[]>('FEATURED', 'featured-posts');
+        
+        if (cached) {
+          setPosts(cached);
+          setLoading(false);
+          return;
+        }
+        
+        // Si no está en cache, hacer petición al servidor
         const response = await blogPostApi.getFeaturedPosts();
         
         if (response.success && response.data) {
           setPosts(response.data);
+          
+          // ✅ Guardar en cache
+          blogCache.set('FEATURED', 'featured-posts', response.data);
         }
       } catch (err: any) {
         console.error('[useFeaturedPosts] Error:', err);
@@ -111,10 +145,25 @@ export function usePopularPosts(limit: number = 5) {
       try {
         setLoading(true);
         setError(null);
+        
+        // ✅ Intentar obtener del cache primero
+        const cacheKey = `popular-${limit}`;
+        const cached = blogCache.get<BlogPost[]>('POPULAR', cacheKey);
+        
+        if (cached) {
+          setPosts(cached);
+          setLoading(false);
+          return;
+        }
+        
+        // Si no está en cache, hacer petición al servidor
         const response = await blogPostApi.getPopularPosts(limit);
         
         if (response.success && response.data) {
           setPosts(response.data);
+          
+          // ✅ Guardar en cache
+          blogCache.set('POPULAR', cacheKey, response.data);
         }
       } catch (err: any) {
         console.error('[usePopularPosts] Error:', err);
