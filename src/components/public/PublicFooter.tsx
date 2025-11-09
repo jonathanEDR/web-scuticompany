@@ -13,16 +13,34 @@ const PublicFooter = () => {
   const { userData, getUserInitials, isLoading } = useClerkDetection();
   
   useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval> | null = null;
     let isMounted = true;
+    
+    // ✅ Usar caché en localStorage para evitar consultas innecesarias
+    const CACHE_KEY = 'publicFooter_pageData';
+    const CACHE_DURATION = 10 * 60 * 1000; // 10 minutos
 
     const fetchPageData = async () => {
       if (!isMounted) return;
 
       try {
-        // 🔥 SOLUCIÓN 1: Agregar timestamp para evitar caché del navegador
+        // ✅ PRIMERO: Verificar si hay datos en localStorage
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        if (cachedData) {
+          try {
+            const { data, timestamp } = JSON.parse(cachedData);
+            const isExpired = Date.now() - timestamp > CACHE_DURATION;
+            
+            if (!isExpired && isMounted) {
+              setPageData(data);
+              return; // ✅ Usar caché - NO hacer request
+            }
+          } catch (e) {
+            // Si hay error parseando, continuar con fetch
+          }
+        }
+
+        // ✅ SEGUNDO: Si no hay caché válido, hacer request
         const timestamp = new Date().getTime();
-        // 🔥 SOLUCIÓN NUEVA: URL correcta para desarrollo y producción
         const apiUrl = `${getCmsApiUrl('/pages/home')}?t=${timestamp}`;
         
         logApiCall(apiUrl, 'Obteniendo datos de página home');
@@ -32,8 +50,15 @@ const PublicFooter = () => {
         if (response.ok) {
           const result = await response.json();
           const data = result.data || result;
+          
           if (isMounted) {
             setPageData(data);
+            
+            // ✅ Guardar en localStorage para próximas visitas
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+              data,
+              timestamp: Date.now()
+            }));
           }
         } else {
           console.error('❌ [PublicFooter] Error en respuesta:', {
@@ -52,14 +77,10 @@ const PublicFooter = () => {
     
     fetchPageData();
     
-    // ✅ SOLUCIÓN: Recargar datos cada 5 minutos (reducido de 30s para menos carga)
-    intervalId = setInterval(fetchPageData, 5 * 60 * 1000); // 5 minutos
+    // ✅ ELIMINADO: setInterval que recargaba cada 5 minutos innecesariamente
     
     return () => {
       isMounted = false;
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
     };
   }, []);
 

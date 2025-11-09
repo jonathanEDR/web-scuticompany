@@ -151,15 +151,17 @@ const HomeOptimized = () => {
   
   // ✅ SOLUCIÓN: Usar SEO de pageData en lugar de hook separado (evita consulta duplicada)
   
-  // ✅ Efecto inicial con cleanup
+  // ✅ Efecto inicial con cleanup - SIN limpiar caché automáticamente
   useEffect(() => {
     const controller = new AbortController();
     let isMounted = true;
 
     const init = async () => {
-      clearCache('page-home');
+      // ✅ NO limpiar caché - dejar que el sistema de caché decida si está expirado
+      // clearCache('page-home'); // ❌ REMOVIDO - causaba recargas innecesarias
+      
       if (isMounted) {
-        await loadPageData();
+        await loadPageData(); // Esto usará caché si está disponible
         await loadCategorias();
       }
     };
@@ -210,19 +212,14 @@ const HomeOptimized = () => {
     };
   }, []);
 
-  // ⏰ Sistema de eventos CMS con cleanup completo
+  // ⏰ Sistema de eventos CMS - SOLO recargar cuando haya actualización real
   useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval> | null = null;
+    // ✅ ELIMINADO: setInterval que recargaba cada 5 minutos innecesariamente
     
-    // ✅ Refrescar contenido cada 5 minutos (reducido de 60s para menos carga)
-    intervalId = setInterval(() => {
-      loadPageData(true); // Recarga silenciosa
-    }, 5 * 60 * 1000); // 5 minutos
-
     // Escuchar eventos de actualización del CMS
     const handleCMSUpdate = () => {
       clearCache('page-home');
-      loadPageData(true, true);
+      loadPageData(true, true); // Forzar recarga cuando el CMS se actualiza
     };
 
     const handleClearCache = () => {
@@ -235,9 +232,6 @@ const HomeOptimized = () => {
 
     // ✅ Cleanup completo
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
       window.removeEventListener('cmsUpdate', handleCMSUpdate);
       window.removeEventListener('clearCache', handleClearCache);
     };
