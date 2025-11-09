@@ -25,6 +25,88 @@ import { getBackendUrl } from '../utils/apiConfig';
 const API_BASE_URL = getBackendUrl();
 
 // ============================================
+// CACHE CONFIGURATION
+// ============================================
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+class AdminCache {
+  private cache = new Map<string, CacheEntry<any>>();
+  // Dashboard admin: Cache largo (datos estadísticos raramente cambian)
+  private readonly CACHE_DURATION = 8 * 60 * 60 * 1000; // 8 horas
+
+  get<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    const age = Date.now() - entry.timestamp;
+    if (age > this.CACHE_DURATION) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.data;
+  }
+
+  set<T>(key: string, data: T): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+    });
+  }
+
+  clear(pattern?: string): void {
+    if (!pattern) {
+      this.cache.clear();
+      return;
+    }
+
+    const keys = Array.from(this.cache.keys());
+    keys.forEach(key => {
+      if (key.includes(pattern)) {
+        this.cache.delete(key);
+      }
+    });
+  }
+}
+
+const adminCache = new AdminCache();
+
+// ============================================
+// FUNCIONES UTILITARIAS
+// ============================================
+
+/**
+ * Limpia el cache de datos administrativos
+ * @param pattern - Patrón opcional para limpiar entradas específicas
+ */
+export const clearAdminCache = (pattern?: string) => {
+  adminCache.clear(pattern);
+  
+  // También limpiar localStorage de admin
+  if (pattern) {
+    // Limpiar entradas específicas
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && key.includes('adminDashboard') && key.includes(pattern)) {
+        localStorage.removeItem(key);
+      }
+    }
+  } else {
+    // Limpiar todas las entradas de admin
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('adminDashboard_')) {
+        localStorage.removeItem(key);
+      }
+    }
+  }
+};
+
+// ============================================
 // CONFIGURACIÓN DE AXIOS
 // ============================================
 
@@ -134,6 +216,30 @@ export const adminService = {
         throw new Error('Token de autenticación requerido');
       }
 
+      // ⚡ Verificar cache localStorage primero (persiste entre recargas)
+      const localStorageKey = 'adminDashboard_stats';
+      const CACHE_DURATION = 8 * 60 * 60 * 1000; // 8 horas
+
+      try {
+        const localData = localStorage.getItem(localStorageKey);
+        if (localData) {
+          const { data, timestamp } = JSON.parse(localData);
+          const age = Date.now() - timestamp;
+          
+          if (age < CACHE_DURATION) {
+            // También guardar en memoria para acceso rápido
+            adminCache.set('stats', data);
+            return data;
+          }
+        }
+      } catch (e) {
+        console.error('Error parseando localStorage de stats:', e);
+      }
+
+      // ⚡ Verificar cache en memoria
+      const cached = adminCache.get<StatsResponse['data']>('stats');
+      if (cached) return cached;
+
       const response = await adminApiClient.get<StatsResponse>(
         '/api/admin/stats',
         {
@@ -147,7 +253,22 @@ export const adminService = {
         throw new Error(response.data.message || 'No se pudieron obtener las estadísticas');
       }
 
-      return response.data.data;
+      const statsData = response.data.data;
+
+      // Guardar en cache memoria
+      adminCache.set('stats', statsData);
+
+      // Guardar en localStorage (persiste entre recargas)
+      try {
+        localStorage.setItem(localStorageKey, JSON.stringify({
+          data: statsData,
+          timestamp: Date.now()
+        }));
+      } catch (e) {
+        console.error('Error guardando stats en localStorage:', e);
+      }
+
+      return statsData;
     } catch (error) {
       const apiError = handleApiError(error);
       console.error('[adminService.getStats] Error:', apiError);

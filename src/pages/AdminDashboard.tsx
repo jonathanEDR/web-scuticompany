@@ -4,13 +4,12 @@
  * Incluye estadísticas, gestión y accesos administrativos
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { useAuth } from '../contexts/AuthContext';
 import { adminService } from '../services/adminService';
 import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import RoleBadge from '../components/RoleBadge';
-import { PermissionGuard } from '../components/PermissionGuard';
 import { Permission, type UserStats, formatUserName } from '../types/roles';
 import { LoadingSpinner } from '../components/UI';
 
@@ -21,45 +20,67 @@ export default function AdminDashboard() {
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
 
-  // Cargar estadísticas
-  useEffect(() => {
-    const loadStats = async () => {
-      if (!user) return;
+  // ⚡ Optimización: Memoizar valores que no cambian
+  const userName = useMemo(() => {
+    return user ? formatUserName(user) : '';
+  }, [user]);
 
-      try {
-        setIsLoadingStats(true);
-        setStatsError(null);
+  const canViewAnalytics = useMemo(() => {
+    return hasPermission(Permission.VIEW_ANALYTICS);
+  }, [hasPermission]);
 
-        // Verificar si tiene permisos para ver estadísticas
-        if (!hasPermission(Permission.VIEW_ANALYTICS)) {
-          setStats(null);
-          return;
-        }
+  const canManageUsers = useMemo(() => {
+    return hasPermission(Permission.MANAGE_USERS);
+  }, [hasPermission]);
 
-        const token = await getToken();
-        
-        if (token) {
-          const statsData = await adminService.getStats(token);
-          setStats(statsData);
-        }
-      } catch (error) {
-        console.error('[AdminDashboard] Error cargando estadísticas:', error);
-        setStatsError('No se pudieron cargar las estadísticas');
-      } finally {
-        setIsLoadingStats(false);
+  const canManageContent = useMemo(() => {
+    return hasPermission(Permission.MANAGE_CONTENT);
+  }, [hasPermission]);
+
+  const canManageUploads = useMemo(() => {
+    return hasPermission(Permission.MANAGE_UPLOADS);
+  }, [hasPermission]);
+
+  const canManageSystem = useMemo(() => {
+    return hasPermission(Permission.MANAGE_SYSTEM);
+  }, [hasPermission]);
+
+  // ⚡ Optimización: useCallback para evitar recreación de función
+  const loadStats = useCallback(async () => {
+    if (!user || !canViewAnalytics) {
+      setStats(null);
+      setIsLoadingStats(false);
+      return;
+    }
+
+    try {
+      setIsLoadingStats(true);
+      setStatsError(null);
+
+      const token = await getToken();
+      
+      if (token) {
+        // ✅ Ahora usa cache de 8 horas
+        const statsData = await adminService.getStats(token);
+        setStats(statsData);
       }
-    };
+    } catch (error) {
+      console.error('[AdminDashboard] Error cargando estadísticas:', error);
+      setStatsError('No se pudieron cargar las estadísticas');
+    } finally {
+      setIsLoadingStats(false);
+    }
+  }, [user, canViewAnalytics, getToken]);
 
+  // ⚡ useEffect simplificado
+  useEffect(() => {
     loadStats();
     document.title = 'Panel Administrativo | Web Scuti';
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, hasPermission, getToken]);
+  }, [loadStats]);
 
   if (!user || !role) {
     return null;
   }
-
-  const userName = formatUserName(user);
 
   return (
     <SmartDashboardLayout>
@@ -83,7 +104,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Estadísticas Generales */}
-        <PermissionGuard permission={Permission.VIEW_ANALYTICS}>
+        {canViewAnalytics && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">📊</span>
@@ -170,7 +191,7 @@ export default function AdminDashboard() {
               </div>
             ) : null}
           </div>
-        </PermissionGuard>
+        )}
 
         {/* Accesos Rápidos Administrativos */}
         <div className="mb-8">
@@ -181,7 +202,7 @@ export default function AdminDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Gestión de Usuarios */}
-            <PermissionGuard permission={Permission.MANAGE_USERS}>
+            {canManageUsers && (
               <a
                 href="/dashboard/admin/users"
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
@@ -203,10 +224,10 @@ export default function AdminDashboard() {
                   Visualiza, edita y asigna roles a los usuarios del sistema.
                 </p>
               </a>
-            </PermissionGuard>
+            )}
 
             {/* CMS */}
-            <PermissionGuard permission={Permission.MANAGE_CONTENT}>
+            {canManageContent && (
               <a
                 href="/dashboard/cms"
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
@@ -228,10 +249,10 @@ export default function AdminDashboard() {
                   Edita el contenido, SEO, temas y tarjetas del sitio.
                 </p>
               </a>
-            </PermissionGuard>
+            )}
 
             {/* Media Library */}
-            <PermissionGuard permission={Permission.MANAGE_UPLOADS}>
+            {canManageUploads && (
               <a
                 href="/dashboard/media"
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
@@ -253,10 +274,10 @@ export default function AdminDashboard() {
                   Sube, organiza y gestiona imágenes del sistema.
                 </p>
               </a>
-            </PermissionGuard>
+            )}
 
             {/* Sistema de Agentes IA */}
-            <PermissionGuard permission={Permission.MANAGE_SYSTEM}>
+            {canManageSystem && (
               <a
                 href="/dashboard/ai-agents"
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group border-2 border-purple-300 dark:border-purple-600"
@@ -278,7 +299,7 @@ export default function AdminDashboard() {
                   Configura y monitorea el sistema de análisis AI, métricas y recomendaciones inteligentes.
                 </p>
               </a>
-            </PermissionGuard>
+            )}
 
             {/* Servicios */}
             <a
