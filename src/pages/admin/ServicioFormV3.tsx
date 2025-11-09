@@ -16,6 +16,7 @@ import { useNotification } from '../../hooks/useNotification';
 import { type Categoria } from '../../services/categoriasApi';
 import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
 import * as uploadApi from '../../services/uploadApi';
+import { SEOPreview } from '../../components/admin/services/SEOPreview';
 // ✅ Optimización Fase 3: Lazy loading - cargar modal solo cuando se abre
 const ServicesCanvasModal = lazy(() => import('../../components/admin/services/ServicesCanvasModal'));
 import AIFieldButton from '../../components/ai-assistant/AIFieldButton';
@@ -313,8 +314,12 @@ export const ServicioFormV3: React.FC = () => {
           // Etiquetas
           etiquetas: servicio.etiquetas || [],
           
-          // Configuraciones adicionales
-          seo: servicio.seo || { titulo: '', descripcion: '', palabrasClave: '' },
+          // Configuraciones adicionales - ✅ Priorizar campo 'seo', fallback a metaTitle/metaDescription
+          seo: {
+            titulo: servicio.seo?.titulo || servicio.metaTitle || '',
+            descripcion: servicio.seo?.descripcion || servicio.metaDescription || '',
+            palabrasClave: servicio.seo?.palabrasClave || ''
+          },
           tiempoEntrega: servicio.tiempoEntrega || '',
           garantia: servicio.garantia || '',
           soporte: servicio.soporte || 'basico',
@@ -607,6 +612,20 @@ export const ServicioFormV3: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
+      // ✅ Validación de campos SEO antes de enviar
+      if (data.seo?.titulo && data.seo.titulo.length > 60) {
+        error('Validación', 'El título SEO no puede exceder 60 caracteres');
+        return;
+      }
+      if (data.seo?.descripcion && data.seo.descripcion.length > 160) {
+        error('Validación', 'La descripción SEO no puede exceder 160 caracteres');
+        return;
+      }
+      if (data.seo?.palabrasClave && data.seo.palabrasClave.length > 500) {
+        error('Validación', 'Las palabras clave no pueden exceder 500 caracteres');
+        return;
+      }
+
       // Procesar campos de texto a arrays (eliminar viñetas y líneas vacías)
       const processTextToArray = (text: string | string[]): string[] => {
         if (Array.isArray(text)) return text;
@@ -676,6 +695,12 @@ export const ServicioFormV3: React.FC = () => {
         incluye: processTextToArray(data.incluye),
         noIncluye: processTextToArray(data.noIncluye),
         faq: processFaqText(faqText),
+        // ✅ Asegurar que el objeto seo se preserve correctamente
+        seo: {
+          titulo: data.seo?.titulo || '',
+          descripcion: data.seo?.descripcion || '',
+          palabrasClave: data.seo?.palabrasClave || ''
+        }
       };
 
       if (isEditMode && id) {
@@ -1682,6 +1707,16 @@ export const ServicioFormV3: React.FC = () => {
             <p className="text-gray-400 text-sm mb-4">
               💡 El botón genera automáticamente: Título SEO + Descripción + Palabras Clave
             </p>
+
+            {/* Vista Previa SEO en Tiempo Real */}
+            <div className="mb-6">
+              <SEOPreview
+                titulo={watch('seo.titulo') || ''}
+                descripcion={watch('seo.descripcion') || ''}
+                url={watch('slug') ? `www.tuempresa.com/servicios/${watch('slug')}` : undefined}
+              />
+            </div>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1692,10 +1727,22 @@ export const ServicioFormV3: React.FC = () => {
                   {...register('seo.titulo')}
                   placeholder="Título optimizado para motores de búsqueda"
                   maxLength={60}
-                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className={`w-full bg-gray-700/50 border rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                    (watch('seo.titulo')?.length || 0) > 60 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : (watch('seo.titulo')?.length || 0) > 50
+                      ? 'border-yellow-500 focus:ring-yellow-500'
+                      : 'border-gray-600 focus:ring-purple-500'
+                  }`}
                 />
-                <p className="text-gray-500 text-sm mt-1">
+                <p className={`text-sm mt-1 ${
+                  (watch('seo.titulo')?.length || 0) > 60 ? 'text-red-400' :
+                  (watch('seo.titulo')?.length || 0) > 50 ? 'text-yellow-400' :
+                  'text-gray-500'
+                }`}>
                   {watch('seo.titulo')?.length || 0}/60 caracteres
+                  {(watch('seo.titulo')?.length || 0) > 60 && ' - Demasiado largo'}
+                  {(watch('seo.titulo')?.length || 0) > 50 && (watch('seo.titulo')?.length || 0) <= 60 && ' - Casi al límite'}
                 </p>
               </div>
 
@@ -1708,10 +1755,22 @@ export const ServicioFormV3: React.FC = () => {
                   placeholder="Descripción para motores de búsqueda"
                   maxLength={160}
                   rows={3}
-                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className={`w-full bg-gray-700/50 border rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 resize-none ${
+                    (watch('seo.descripcion')?.length || 0) > 160 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : (watch('seo.descripcion')?.length || 0) > 150
+                      ? 'border-yellow-500 focus:ring-yellow-500'
+                      : 'border-gray-600 focus:ring-purple-500'
+                  }`}
                 />
-                <p className="text-gray-500 text-sm mt-1">
+                <p className={`text-sm mt-1 ${
+                  (watch('seo.descripcion')?.length || 0) > 160 ? 'text-red-400' :
+                  (watch('seo.descripcion')?.length || 0) > 150 ? 'text-yellow-400' :
+                  'text-gray-500'
+                }`}>
                   {watch('seo.descripcion')?.length || 0}/160 caracteres
+                  {(watch('seo.descripcion')?.length || 0) > 160 && ' - Demasiado largo'}
+                  {(watch('seo.descripcion')?.length || 0) > 150 && (watch('seo.descripcion')?.length || 0) <= 160 && ' - Casi al límite'}
                 </p>
               </div>
 
