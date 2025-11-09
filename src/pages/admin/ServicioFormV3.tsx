@@ -3,7 +3,7 @@
  * Versión limpia con tabs funcionales para crear y editar servicios
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { serviciosApi } from '../../services/serviciosApi';
@@ -16,7 +16,8 @@ import { useNotification } from '../../hooks/useNotification';
 import { type Categoria } from '../../services/categoriasApi';
 import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
 import * as uploadApi from '../../services/uploadApi';
-import ServicesCanvasModal from '../../components/admin/services/ServicesCanvasModal';
+// ✅ Optimización Fase 3: Lazy loading - cargar modal solo cuando se abre
+const ServicesCanvasModal = lazy(() => import('../../components/admin/services/ServicesCanvasModal'));
 import AIFieldButton from '../../components/ai-assistant/AIFieldButton';
 import BlockEditor from '../../components/ai-assistant/BlockEditor/BlockEditor';
 import { useBlocksConverter } from '../../components/ai-assistant/hooks/useBlocksConverter';
@@ -202,6 +203,35 @@ export const ServicioFormV3: React.FC = () => {
     isFirstTab,
     isLastTab
   } = useTabNavigation('basic', tabs);
+
+  // ============================================
+  // ✅ OPTIMIZACIÓN FASE 3: MEMOIZACIÓN
+  // ============================================
+  
+  // Memoizar serviceContext para evitar re-renders del modal
+  const serviceContext = useMemo(() => ({
+    serviceId: id,
+    serviceTitle: watch('titulo') || 'Nuevo Servicio',
+    currentDescription: watch('descripcion') || '',
+    currentPrice: watch('precio') || 0,
+    currency: watch('moneda') || 'PEN',
+    category: watch('categoria') || '',
+    descriptionCorta: watch('descripcionCorta'),
+    caracteristicas: watch('caracteristicas'),
+    beneficios: watch('beneficios'),
+    etiquetas: watch('etiquetas') || []
+  }), [
+    id,
+    watch('titulo'),
+    watch('descripcion'),
+    watch('precio'),
+    watch('moneda'),
+    watch('categoria'),
+    watch('descripcionCorta'),
+    watch('caracteristicas'),
+    watch('beneficios'),
+    watch('etiquetas')
+  ]);
 
   // ============================================
   // FUNCIONES DE CATEGORÍAS
@@ -1967,24 +1997,24 @@ export const ServicioFormV3: React.FC = () => {
         onSuccess={handleCategoriaCreated}
       />
 
-      {/* Services Canvas Modal */}
-      <ServicesCanvasModal
-        isOpen={showServicesCanvas}
-        onClose={() => setShowServicesCanvas(false)}
-        initialMode="chat"
-        serviceContext={{
-          serviceId: id,
-          serviceTitle: watch('titulo') || 'Nuevo Servicio',
-          currentDescription: watch('descripcion') || '',
-          currentPrice: watch('precio') || 0,
-          currency: watch('moneda') || 'PEN',
-          category: watch('categoria') || '',
-          descriptionCorta: watch('descripcionCorta'),
-          caracteristicas: watch('caracteristicas'),
-          beneficios: watch('beneficios'),
-          etiquetas: watch('etiquetas') || []
-        }}
-      />
+      {/* ✅ Services Canvas Modal con Lazy Loading y Suspense */}
+      {showServicesCanvas && (
+        <Suspense fallback={
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+              <span className="text-gray-700">Cargando asistente IA...</span>
+            </div>
+          </div>
+        }>
+          <ServicesCanvasModal
+            isOpen={showServicesCanvas}
+            onClose={() => setShowServicesCanvas(false)}
+            initialMode="chat"
+            serviceContext={serviceContext}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };
