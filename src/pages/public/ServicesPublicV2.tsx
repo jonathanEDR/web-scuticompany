@@ -10,6 +10,7 @@ import { ServicioPublicCard } from '../../components/public/ServicioPublicCard';
 import { SearchBar } from '../../components/common/SearchBar';
 import { useSeo } from '../../hooks/useSeo';
 import { serviciosApi } from '../../services/serviciosApi';
+import serviciosCache from '../../utils/serviciosCache'; // ✅ Importar cache
 import type { Servicio, ServicioFilters } from '../../types/servicios';
 
 // ============================================
@@ -58,6 +59,22 @@ const ServicesPublicV2 = () => {
     try {
       setLoading(true);
       setError(null);
+
+      // ✅ Generar clave de cache
+      const cacheKey = {
+        filters: filtros,
+        sort: getSort(),
+        page: 1,
+        limit: 50
+      };
+
+      // ✅ Verificar cache primero
+      const cached = serviciosCache.get<Servicio[]>('SERVICE_LIST', cacheKey);
+      if (cached) {
+        setServicios(cached);
+        setLoading(false);
+        return;
+      }
       
       const response = await serviciosApi.getAll(filtros, {
         page: 1,
@@ -67,6 +84,9 @@ const ServicesPublicV2 = () => {
 
       if (response.success && response.data) {
         setServicios(response.data);
+        
+        // ✅ Guardar en cache
+        serviciosCache.set('SERVICE_LIST', cacheKey, response.data);
       }
     } catch (err: any) {
       setError(err.message || 'Error al cargar servicios');

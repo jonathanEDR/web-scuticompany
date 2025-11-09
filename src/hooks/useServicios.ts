@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { serviciosApi } from '../services/serviciosApi';
+import serviciosCache from '../utils/serviciosCache'; // ✅ Importar cache
 import type {
   Servicio,
   ServicioFilters,
@@ -110,6 +111,23 @@ export const useServicios = (options: UseServiciosOptions = {}): UseServiciosRet
     try {
       setLoading(true);
       setError(null);
+
+      // ✅ Generar clave de cache incluyendo filtros y paginación
+      const cacheKey = {
+        filters,
+        page: pagination.page,
+        limit: pagination.limit,
+        sort: initialPagination.sort
+      };
+
+      // ✅ Verificar cache primero
+      const cached = serviciosCache.get<{ data: Servicio[]; pagination: any }>('SERVICE_LIST', cacheKey);
+      if (cached) {
+        setServicios(cached.data);
+        setPagination(cached.pagination);
+        setLoading(false);
+        return;
+      }
       
       const response = await serviciosApi.getAll(filters, {
         page: pagination.page,
@@ -121,24 +139,34 @@ export const useServicios = (options: UseServiciosOptions = {}): UseServiciosRet
       
       // Asegurar que pagination siempre tenga valores válidos
       // El backend puede devolver pagination como objeto anidado o propiedades en el root
+      let paginationData;
       if (response.pagination) {
-        setPagination(response.pagination);
+        paginationData = response.pagination;
       } else if (response.page !== undefined) {
         // Si viene en el formato antiguo (page, pages, total en root)
-        setPagination({
+        paginationData = {
           page: response.page || 1,
           pages: response.pages || 1,
           total: response.total || 0,
           limit: pagination.limit
-        });
+        };
       } else {
         // Si no hay paginación en la respuesta, mantener los valores actuales
-        setPagination(prev => ({
-          ...prev,
+        paginationData = {
+          ...pagination,
           total: response.data?.length || 0,
           pages: 1
-        }));
+        };
       }
+
+      setPagination(paginationData);
+
+      // ✅ Guardar en cache
+      serviciosCache.set('SERVICE_LIST', cacheKey, {
+        data: response.data || [],
+        pagination: paginationData
+      });
+
     } catch (err: any) {
       const errorMessage = err.message || 'Error al cargar servicios';
       setError(errorMessage);
