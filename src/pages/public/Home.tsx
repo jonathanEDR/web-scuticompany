@@ -154,10 +154,25 @@ const HomeOptimized = () => {
       fallbackDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.'
     });
   
+  // ✅ Efecto inicial con cleanup
   useEffect(() => {
-    clearCache('page-home');
-    loadPageData();
-    loadCategorias();
+    const controller = new AbortController();
+    let isMounted = true;
+
+    const init = async () => {
+      clearCache('page-home');
+      if (isMounted) {
+        await loadPageData();
+        await loadCategorias();
+      }
+    };
+
+    init();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   // Función para cargar categorías desde el CMS
@@ -172,12 +187,14 @@ const HomeOptimized = () => {
     }
   };
 
-  // 📍 Manejo de navegación a sección de contacto
+  // 📍 Manejo de navegación a sección de contacto con cleanup
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     const hash = window.location.hash;
     if (hash === '#contacto') {
       // Pequeño delay para asegurar que el contenido se haya renderizado
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         const contactoElement = document.getElementById('contacto');
         if (contactoElement) {
           contactoElement.scrollIntoView({ 
@@ -187,24 +204,30 @@ const HomeOptimized = () => {
         }
       }, 500);
     }
+
+    // ✅ Cleanup del timeout
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
-  // ⏰ Sistema de eventos CMS para mantener contenido sincronizado
+  // ⏰ Sistema de eventos CMS con cleanup completo
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | null = null;
     
-    // Refrescar contenido cada 60 segundos (sin SEO)
-    const interval = setInterval(() => {
+    // ✅ Refrescar contenido cada 5 minutos (reducido de 60s para menos carga)
+    intervalId = setInterval(() => {
       loadPageData(true); // Recarga silenciosa
-    }, 60000); // 60 segundos
+    }, 5 * 60 * 1000); // 5 minutos
 
     // Escuchar eventos de actualización del CMS
     const handleCMSUpdate = () => {
-      // Limpiar caché y forzar refresh cuando viene del CMS
       clearCache('page-home');
-      loadPageData(true, true); // silent=true, forceRefresh=true
+      loadPageData(true, true);
     };
 
-    // Escuchar eventos de limpieza de caché
     const handleClearCache = () => {
       clearCache('page-home');
       loadPageData(true, true);
@@ -213,8 +236,11 @@ const HomeOptimized = () => {
     window.addEventListener('cmsUpdate', handleCMSUpdate);
     window.addEventListener('clearCache', handleClearCache);
 
+    // ✅ Cleanup completo
     return () => {
-      clearInterval(interval);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
       window.removeEventListener('cmsUpdate', handleCMSUpdate);
       window.removeEventListener('clearCache', handleClearCache);
     };

@@ -44,6 +44,7 @@ const PublicHeaderOptimized = () => {
       });
     } else if (window.location.pathname === '/') {
       // Si está en home pero no encuentra la sección, esperar y reintentar
+      // ✅ Este setTimeout es OK porque es dentro de un handler de click, no un effect
       setTimeout(() => {
         const element = document.getElementById('contacto');
         if (element) {
@@ -79,10 +80,12 @@ const PublicHeaderOptimized = () => {
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [lastScrollY]);
 
-  // Efecto para manejar navegación con hash (ej: /#contacto)
+  // ✅ Efecto para manejar navegación con hash (ej: /#contacto) CON CLEANUP
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     if (window.location.hash === '#contacto') {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         const contactElement = document.getElementById('contacto');
         if (contactElement) {
           contactElement.scrollIntoView({ 
@@ -92,6 +95,12 @@ const PublicHeaderOptimized = () => {
         }
       }, 300);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   return (

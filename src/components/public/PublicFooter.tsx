@@ -13,7 +13,12 @@ const PublicFooter = () => {
   const { userData, getUserInitials, isLoading } = useClerkDetection();
   
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    let isMounted = true;
+
     const fetchPageData = async () => {
+      if (!isMounted) return;
+
       try {
         // 🔥 SOLUCIÓN 1: Agregar timestamp para evitar caché del navegador
         const timestamp = new Date().getTime();
@@ -27,7 +32,9 @@ const PublicFooter = () => {
         if (response.ok) {
           const result = await response.json();
           const data = result.data || result;
-          setPageData(data);
+          if (isMounted) {
+            setPageData(data);
+          }
         } else {
           console.error('❌ [PublicFooter] Error en respuesta:', {
             status: response.status,
@@ -45,10 +52,15 @@ const PublicFooter = () => {
     
     fetchPageData();
     
-    // 🔥 SOLUCIÓN 3: Recargar datos cada 30 segundos para mantener sincronizado
-    const intervalId = setInterval(fetchPageData, 30000);
+    // ✅ SOLUCIÓN: Recargar datos cada 5 minutos (reducido de 30s para menos carga)
+    intervalId = setInterval(fetchPageData, 5 * 60 * 1000); // 5 minutos
     
-    return () => clearInterval(intervalId);
+    return () => {
+      isMounted = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, []);
 
   const contactData = pageData?.content?.contact;
