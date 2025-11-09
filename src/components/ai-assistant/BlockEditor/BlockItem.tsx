@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { GripVertical, Trash2, Edit2, Check, X } from 'lucide-react';
+import { GripVertical, Trash2, Edit2, Check, X, Save } from 'lucide-react';
 import type { Block } from './types';
 
 interface BlockItemProps {
@@ -39,6 +39,10 @@ const BlockItem: React.FC<BlockItemProps> = ({
   };
 
   const handleSaveEdit = () => {
+    onUpdate(block.id, editValue);
+  };
+
+  const handleSaveAndClose = () => {
     onUpdate(block.id, editValue);
     setIsEditing(false);
   };
@@ -127,20 +131,32 @@ const BlockItem: React.FC<BlockItemProps> = ({
       </div>
 
       {/* Acciones */}
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className={`absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 transition-opacity ${
+        isEditing ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+      }`}>
         {isEditing ? (
           <>
             <button
+              type="button"
               onClick={handleSaveEdit}
               className="p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors"
-              title="Guardar"
+              title="Guardar (mantener editando)"
             >
               <Check className="h-4 w-4" />
             </button>
             <button
+              type="button"
+              onClick={handleSaveAndClose}
+              className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+              title="Guardar y cerrar editor"
+            >
+              <Save className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
               onClick={handleCancelEdit}
               className="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-              title="Cancelar"
+              title="Cancelar cambios"
             >
               <X className="h-4 w-4" />
             </button>
@@ -148,6 +164,7 @@ const BlockItem: React.FC<BlockItemProps> = ({
         ) : (
           <>
             <button
+              type="button"
               onClick={handleStartEdit}
               className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
               title="Editar"
@@ -155,6 +172,7 @@ const BlockItem: React.FC<BlockItemProps> = ({
               <Edit2 className="h-4 w-4" />
             </button>
             <button
+              type="button"
               onClick={() => onDelete(block.id)}
               className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
               title="Eliminar"

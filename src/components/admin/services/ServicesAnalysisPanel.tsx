@@ -9,7 +9,7 @@
  */
 
 import React, { useState, memo, useCallback } from 'react';
-import { BarChart3, Target, TrendingUp, AlertCircle, CheckCircle, Loader2, Lightbulb, Play } from 'lucide-react';
+import { BarChart3, Target, TrendingUp, AlertCircle, CheckCircle, Loader2, Lightbulb, Play, Search, DollarSign, FileText, Image, Zap } from 'lucide-react';
 import { useServicesCanvasContext } from '../../../contexts/ServicesCanvasContext';
 
 const ServicesAnalysisPanel: React.FC = memo(() => {
@@ -68,6 +68,30 @@ const ServicesAnalysisPanel: React.FC = memo(() => {
       case 'medium': return 'Media';
       case 'low': return 'Baja';
       default: return priority;
+    }
+  };
+
+  // Obtener icono según el tipo de recomendación
+  const getTypeIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'seo': return <Search className="h-4 w-4" />;
+      case 'pricing': return <DollarSign className="h-4 w-4" />;
+      case 'contenido': return <FileText className="h-4 w-4" />;
+      case 'visual': return <Image className="h-4 w-4" />;
+      case 'conversión': return <Zap className="h-4 w-4" />;
+      default: return <Target className="h-4 w-4" />;
+    }
+  };
+
+  // Obtener color según el tipo
+  const getTypeColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'seo': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'pricing': return 'bg-green-100 text-green-700 border-green-200';
+      case 'contenido': return 'bg-purple-100 text-purple-700 border-purple-200';
+      case 'visual': return 'bg-pink-100 text-pink-700 border-pink-200';
+      case 'conversión': return 'bg-orange-100 text-orange-700 border-orange-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
@@ -292,29 +316,83 @@ const ServicesAnalysisPanel: React.FC = memo(() => {
         {/* Recomendaciones */}
         {currentAnalysis.recommendations && currentAnalysis.recommendations.length > 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
-              <Lightbulb className="h-5 w-5 text-purple-600 mr-2" />
-              Recomendaciones ({currentAnalysis.recommendations.length})
-            </h4>
-            <div className="space-y-3">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="font-semibold text-gray-900 flex items-center">
+                <Lightbulb className="h-5 w-5 text-purple-600 mr-2" />
+                Recomendaciones de Mejora
+              </h4>
+              <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                {currentAnalysis.recommendations.length} sugerencias
+              </span>
+            </div>
+            
+            <div className="space-y-4">
               {currentAnalysis.recommendations.map((rec, index) => (
                 <div 
                   key={index} 
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="group relative border-l-4 border-transparent hover:border-purple-500 bg-gray-50 rounded-r-lg p-5 hover:bg-white hover:shadow-md transition-all duration-200"
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900">{rec.type}</span>
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${getPriorityColor(rec.priority)}`}>
-                      {getPriorityLabel(rec.priority)}
+                  {/* Header con Tipo y Prioridad */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 rounded-lg border ${getTypeColor(rec.type)}`}>
+                        {getTypeIcon(rec.type)}
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-900 block">{rec.type}</span>
+                        <span className="text-xs text-gray-500">Recomendación #{index + 1}</span>
+                      </div>
+                    </div>
+                    <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getPriorityColor(rec.priority)}`}>
+                      Prioridad {getPriorityLabel(rec.priority)}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 mb-2">{rec.description}</p>
-                  <div className="flex items-center text-xs text-gray-500">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    <span>Impacto: {rec.impact}</span>
+
+                  {/* Descripción */}
+                  <p className="text-sm text-gray-700 leading-relaxed mb-4 pl-12">
+                    {rec.description}
+                  </p>
+
+                  {/* Footer con Impacto */}
+                  <div className="flex items-center justify-between pl-12 pt-3 border-t border-gray-200">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center text-xs text-gray-600">
+                        <TrendingUp className="h-3.5 w-3.5 mr-1.5 text-green-600" />
+                        <span className="font-medium">Impacto:</span>
+                        <span className="ml-1 text-green-700 font-semibold">{rec.impact}</span>
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Target className="h-3.5 w-3.5 mr-1.5 text-blue-600" />
+                        <span className="font-medium">Beneficio esperado</span>
+                      </div>
+                    </div>
+                    
+                    {/* Indicador de acción recomendada */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-xs text-purple-600 font-medium flex items-center">
+                        <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                        Implementar
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Nota informativa */}
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+              <div className="flex items-start">
+                <AlertCircle className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-blue-900 font-medium mb-1">
+                    💡 Consejo profesional
+                  </p>
+                  <p className="text-xs text-blue-700 leading-relaxed">
+                    Implementa las recomendaciones de <span className="font-semibold">alta prioridad</span> primero para obtener los mejores resultados. 
+                    Cada mejora incrementará significativamente la calidad y conversión de tu servicio.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

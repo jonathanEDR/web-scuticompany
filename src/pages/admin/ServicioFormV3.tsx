@@ -45,7 +45,7 @@ export const ServicioFormV3: React.FC = () => {
   const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
   const [showServicesCanvas, setShowServicesCanvas] = useState(false);
 
-  // 🆕 Estados para Block Editors
+  // Estados para Block Editors
   const [caracteristicasBlocks, setCaracteristicasBlocks] = useState<Block[]>([]);
   const [beneficiosBlocks, setBeneficiosBlocks] = useState<Block[]>([]);
   const [faqBlocks, setFaqBlocks] = useState<Block[]>([]);
@@ -288,7 +288,7 @@ export const ServicioFormV3: React.FC = () => {
           soporte: servicio.soporte || 'basico',
         });
 
-        // 🆕 Convertir texto cargado a bloques
+        // Convertir texto cargado a bloques
         const caracteristicasText = Array.isArray(servicio.caracteristicas) 
           ? servicio.caracteristicas.map(c => `• ${c}`).join('\n')
           : servicio.caracteristicas || '';
@@ -296,7 +296,7 @@ export const ServicioFormV3: React.FC = () => {
           ? servicio.beneficios.map(b => `• ${b}`).join('\n')
           : servicio.beneficios || '';
         const faqText = Array.isArray(servicio.faq) && servicio.faq.length > 0 && typeof servicio.faq[0] === 'object'
-          ? servicio.faq.map((f: any) => `**Pregunta:** ${f.pregunta}\n${f.respuesta}`).join('\n\n')
+          ? servicio.faq.map((f: any) => `P: ${f.pregunta}\nR: ${f.respuesta}`).join('\n\n')
           : typeof servicio.faq === 'string' ? servicio.faq : '';
 
         setCaracteristicasBlocks(textToBlocks(caracteristicasText, 'list'));
@@ -415,6 +415,143 @@ export const ServicioFormV3: React.FC = () => {
     }
   };
 
+  // Generar contenido de texto simple con IA (autocompletado directo)
+  const handleGenerateText = async (
+    contentType: 'full_description' | 'short_description',
+    fieldName: string,
+    style: 'formal' | 'casual' | 'technical' = 'formal'
+  ) => {
+    if (!id) {
+      error('Error', 'Debes guardar el servicio primero antes de generar contenido');
+      return;
+    }
+
+    try {
+      setGeneratingBlocks(true);
+
+      const response = await servicesAgentService.generateContent(id, contentType, style);
+
+      if (response.success && response.data?.content) {
+        let generatedText = response.data.content;
+        
+        // Limpiar contenido: remover secciones de recomendaciones y análisis
+        // Estas secciones son útiles para el agente pero no para el usuario final
+        generatedText = generatedText
+          .replace(/💡\s*RECOMENDACIÓN:[\s\S]*?(?=\n\n|$)/gi, '') // Remover sección de recomendación
+          .replace(/🔍\s*ANÁLISIS:[\s\S]*?(?=\n\n|$)/gi, '') // Remover sección de análisis
+          .replace(/📊\s*SUGERENCIA:[\s\S]*?(?=\n\n|$)/gi, '') // Remover sugerencias
+          .replace(/⚠️\s*NOTA:[\s\S]*?(?=\n\n|$)/gi, '') // Remover notas
+          .replace(/\n{3,}/g, '\n\n') // Limpiar múltiples saltos de línea
+          .trim();
+        
+        // Aplicar límites de caracteres según el campo para evitar errores de validación
+        const fieldLimits: Record<string, number> = {
+          'descripcionRica': 3000,      // RichTextEditor permite 3000
+          'contenidoAdicional': 1950    // Backend valida 2000, dejamos margen de seguridad
+        };
+        
+        const maxLength = fieldLimits[fieldName];
+        
+        if (maxLength && generatedText.length > maxLength) {
+          // Truncar el texto de forma inteligente (en el último punto antes del límite)
+          let truncatedText = generatedText.substring(0, maxLength);
+          const lastPeriod = truncatedText.lastIndexOf('.');
+          
+          if (lastPeriod > maxLength * 0.8) { // Si el último punto está en el último 20%
+            truncatedText = truncatedText.substring(0, lastPeriod + 1);
+          } else {
+            // Si no hay punto cercano, truncar en el último espacio
+            const lastSpace = truncatedText.lastIndexOf(' ');
+            truncatedText = truncatedText.substring(0, lastSpace) + '...';
+          }
+          
+          generatedText = truncatedText;
+          console.warn(`⚠️ Contenido truncado de ${response.data.content.length} a ${generatedText.length} caracteres`);
+        }
+        
+        setValue(fieldName, generatedText);
+        
+        // Mensajes personalizados según el campo
+        const fieldMessages: Record<string, string> = {
+          'descripcionRica': '✨ Descripción rica generada y aplicada automáticamente',
+          'contenidoAdicional': '✨ Contenido adicional generado y aplicado automáticamente'
+        };
+        
+        const message = fieldMessages[fieldName] || '✨ Contenido generado y aplicado exitosamente';
+        success('Éxito', message);
+      } else {
+        error('Error', response.error || 'No se pudo generar el contenido');
+      }
+    } catch (err: any) {
+      console.error('Error generating text:', err);
+      error('Error', err.message || 'Error al generar contenido con IA');
+    } finally {
+      setGeneratingBlocks(false);
+    }
+  };
+
+  // Generar contenido SEO con IA (autocompletado directo de los 3 campos)
+  const handleGenerateSEO = async () => {
+    if (!id) {
+      error('Error', 'Debes guardar el servicio primero antes de generar SEO');
+      return;
+    }
+
+    try {
+      setGeneratingBlocks(true);
+
+      // Generar título SEO optimizado
+      const titleResponse = await servicesAgentService.generateContent(id, 'short_description', 'formal');
+      
+      if (titleResponse.success && titleResponse.data?.content) {
+        // Crear un título SEO más atractivo y optimizado
+        const baseTitle = titleResponse.data.content;
+        const seoTitle = baseTitle.length > 60 
+          ? baseTitle.substring(0, 57) + '...' 
+          : baseTitle;
+        setValue('seo.titulo', seoTitle);
+      }
+
+      // Generar descripción SEO
+      const descResponse = await servicesAgentService.generateContent(id, 'full_description', 'formal');
+      
+      if (descResponse.success && descResponse.data?.content) {
+        // Crear descripción SEO dentro del límite de 160 caracteres
+        const fullDesc = descResponse.data.content;
+        const seoDesc = fullDesc.length > 160 
+          ? fullDesc.substring(0, 157) + '...' 
+          : fullDesc;
+        setValue('seo.descripcion', seoDesc);
+      }
+
+      // Generar palabras clave inteligentes basadas en el servicio
+      const currentTitle = watch('titulo') || '';
+      const currentDesc = watch('descripcionCorta') || '';
+      const currentCategory = categorias.find(cat => cat._id === watch('categoria'))?.nombre || '';
+      
+      // Extraer palabras clave del título y descripción
+      const titleWords = currentTitle.toLowerCase().split(' ').filter((w: string) => w.length > 3);
+      const descWords = currentDesc.toLowerCase().split(' ').filter((w: string) => w.length > 4);
+      
+      const keywords = [
+        ...titleWords.slice(0, 2),
+        currentCategory.toLowerCase(),
+        ...descWords.slice(0, 2),
+        'servicio profesional',
+        'solución empresarial'
+      ].filter(Boolean).slice(0, 8).join(', ');
+      
+      setValue('seo.palabrasClave', keywords);
+
+      success('Éxito', '✨ Contenido SEO optimizado y aplicado automáticamente');
+    } catch (err: any) {
+      console.error('Error generating SEO:', err);
+      error('Error', err.message || 'Error al generar SEO con IA');
+    } finally {
+      setGeneratingBlocks(false);
+    }
+  };
+
   // ============================================
   // SUBMIT
   // ============================================
@@ -472,7 +609,7 @@ export const ServicioFormV3: React.FC = () => {
       };
 
       // Preparar datos procesados
-      // 🆕 Convertir bloques a texto antes de procesar
+      // Convertir bloques a texto antes de procesar
       const caracteristicasText = caracteristicasBlocks.length > 0 
         ? blocksToText(caracteristicasBlocks)
         : data.caracteristicas;
@@ -795,6 +932,31 @@ export const ServicioFormV3: React.FC = () => {
         <div className="space-y-8">
           {/* Descripción Rica */}
           <div>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Descripción Rica
+              </label>
+              <button
+                type="button"
+                onClick={() => handleGenerateText('full_description', 'descripcionRica', 'formal')}
+                disabled={generatingBlocks || !id}
+                className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg text-sm"
+              >
+                {generatingBlocks ? (
+                  <>
+                    <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+                    <span>Generando...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Generar con IA</span>
+                  </>
+                )}
+              </button>
+            </div>
             <RichTextEditor
               label="Descripción Rica"
               value={watch('descripcionRica') || ''}
@@ -834,18 +996,50 @@ export const ServicioFormV3: React.FC = () => {
 
           {/* Contenido Adicional */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Contenido Adicional
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Contenido Adicional
+              </label>
+              <button
+                type="button"
+                onClick={() => handleGenerateText('full_description', 'contenidoAdicional', 'technical')}
+                disabled={generatingBlocks || !id}
+                className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg text-sm"
+              >
+                {generatingBlocks ? (
+                  <>
+                    <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+                    <span>Generando...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Generar con IA</span>
+                  </>
+                )}
+              </button>
+            </div>
             <textarea
               {...register('contenidoAdicional')}
               placeholder="Información extra, proceso de trabajo, garantías, etc."
               rows={4}
+              maxLength={2000}
               className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
             />
-            <p className="text-gray-600 dark:text-gray-500 text-sm mt-1">
-              Información adicional que aparecerá al final de la página de detalles
-            </p>
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-gray-600 dark:text-gray-500 text-sm">
+                Información adicional que aparecerá al final de la página de detalles
+              </p>
+              <p className={`text-sm font-medium ${
+                (watch('contenidoAdicional')?.length || 0) > 1900 
+                  ? 'text-red-600 dark:text-red-400' 
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}>
+                {watch('contenidoAdicional')?.length || 0}/2000
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -1413,7 +1607,32 @@ export const ServicioFormV3: React.FC = () => {
 
           {/* SEO */}
           <div>
-            <h3 className="text-lg font-medium text-white mb-4">🔍 Optimización SEO</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-white">🔍 Optimización SEO</h3>
+              <button
+                type="button"
+                onClick={handleGenerateSEO}
+                disabled={generatingBlocks || !id}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                {generatingBlocks ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <span className="text-sm font-medium">Generando SEO...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span className="text-sm font-medium">Generar SEO Completo con IA</span>
+                  </>
+                )}
+              </button>
+            </div>
+            <p className="text-gray-400 text-sm mb-4">
+              💡 El botón genera automáticamente: Título SEO + Descripción + Palabras Clave
+            </p>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
