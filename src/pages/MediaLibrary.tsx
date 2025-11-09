@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useImageLibrary } from '../hooks/cms/useImageLibrary';
 import { uploadImage, getImageStatistics, getOrphanImages, cleanupOrphanImages, updateImageMetadata } from '../services/imageService';
+import { media } from '../utils/contentManagementCache';
 import imageCompression from 'browser-image-compression';
 import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import ImageMetadataEditor from '../components/ImageMetadataEditor';
@@ -98,6 +99,12 @@ const MediaLibrary = () => {
       });
 
       setShowUploadModal(false);
+      
+      // 🗑️ Invalidar cache de esta categoría para forzar refresh
+      const category = filters.category || 'root';
+      console.log(`🗑️ [Media] Invalidando cache de categoría después de upload: ${category}`);
+      media.invalidateFolder(category);
+      
       await refreshImages();
     } catch (err) {
       console.error('Error al subir imagen:', err);
@@ -135,6 +142,11 @@ const MediaLibrary = () => {
 
     try {
       await updateImageMetadata(editingImage._id, metadata);
+      
+      // 🗑️ Invalidar metadata cache para esta imagen
+      console.log(`🗑️ [Media] Invalidando metadata cache: ${editingImage._id}`);
+      media.invalidateMetadata(editingImage._id);
+      
       await refreshImages(); // Refrescar la lista
       setShowMetadataEditor(false);
       setEditingImage(null);

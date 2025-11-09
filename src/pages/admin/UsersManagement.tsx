@@ -12,10 +12,11 @@
  * Permisos requeridos: MANAGE_USERS (solo ADMIN y SUPER_ADMIN)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminService } from '../../services/adminService';
+import { useUsersCache } from '../../hooks/useDashboardCache';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import RoleBadge from '../../components/RoleBadge';
 import {
@@ -29,23 +30,81 @@ import {
   formatUserName
 } from '../../types/roles';
 
+interface UsersManagementData {
+  users: UserWithRole[];
+  stats: UserStats | null;
+  pagination: {
+    pages: number;
+    total: number;
+  };
+}
+
 export default function UsersManagement() {
   const { user: currentUser, role: currentRole, hasPermission } = useAuth();
   const { getToken } = useClerkAuth();
-  
-  // Estados
-  const [users, setUsers] = useState<UserWithRole[]>([]);
-  const [stats, setStats] = useState<UserStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   
   // Filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<UserRole | ''>('');
   const [filterStatus, setFilterStatus] = useState<'active' | 'inactive' | ''>('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const usersPerPage = 10;
+  
+  // Cache key basado en filtros
+  const cacheKey = useMemo(() => {
+    const params = new URLSearchParams({
+      page: currentPage.toString(),
+      limit: usersPerPage.toString(),
+      ...(searchTerm.trim() && { search: searchTerm.trim() }),
+      ...(filterRole && { role: filterRole }),
+      ...(filterStatus && { status: filterStatus })
+    });
+    return `users-${params.toString()}`;
+  }, [currentPage, searchTerm, filterRole, filterStatus]);
+
+  // Hook de cache para usuarios
+  const {
+    data: usersData,
+    loading: isLoading,
+    error: cacheError,
+    refetch: refreshUsers
+  } = useUsersCache(
+    useCallback(async (): Promise<UsersManagementData> => {
+      const token = await getToken();
+      if (!token) throw new Error('Token no disponible');
+
+      const filters: UserFilters = {
+        page: currentPage,
+        limit: usersPerPage,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      };
+
+      if (searchTerm.trim()) filters.search = searchTerm.trim();
+      if (filterRole) filters.role = filterRole;
+      if (filterStatus === 'active') filters.isActive = true;
+      else if (filterStatus === 'inactive') filters.isActive = false;
+
+      // Cargar usuarios y estadísticas en paralelo
+      const [usersResponse, statsData] = await Promise.all([
+        adminService.getUsers(token, filters),
+        adminService.getStats(token).catch(() => null) // No es crítico si falla
+      ]);
+
+      return {
+        users: usersResponse.users,
+        stats: statsData,
+        pagination: usersResponse.pagination
+      };
+    }, [getToken, currentPage, searchTerm, filterRole, filterStatus]),
+    cacheKey
+  );
+
+  // Estados derivados del cache
+  const users = usersData?.users || [];
+  const stats = usersData?.stats || null;
+  const totalPages = usersData?.pagination?.pages || 1;
+  const error = cacheError;
   
   // Modal de asignación de rol
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
@@ -57,97 +116,17 @@ export default function UsersManagement() {
   const canManageUsers = hasPermission(Permission.MANAGE_USERS);
 
   /**
-   * Cargar estadísticas de usuarios
-   */
-  const loadStats = async () => {
-    try {
-      const token = await getToken();
-      if (!token) {
-        console.warn('Token no disponible, saltando carga de estadísticas');
-        return;
-      }
-      
-      const statsData = await adminService.getStats(token);
-      setStats(statsData);
-    } catch (err) {
-      console.error('Error cargando estadísticas:', err);
-    }
-  };
-
-  /**
-   * Cargar lista de usuarios con filtros
-   */
-  const loadUsers = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const token = await getToken();
-      if (!token) {
-        throw new Error('Token no disponible');
-      }
-
-      const filters: UserFilters = {
-        page: currentPage,
-        limit: usersPerPage,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
-      };
-
-      // Aplicar búsqueda
-      if (searchTerm.trim()) {
-        filters.search = searchTerm.trim();
-      }
-
-      // Aplicar filtro de rol
-      if (filterRole) {
-        filters.role = filterRole;
-      }
-
-      // Aplicar filtro de estado
-      if (filterStatus === 'active') {
-        filters.isActive = true;
-      } else if (filterStatus === 'inactive') {
-        filters.isActive = false;
-      }
-
-      const response = await adminService.getUsers(token, filters);
-      setUsers(response.users);
-      setTotalPages(response.pagination.pages);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al cargar usuarios';
-      setError(errorMessage);
-      console.error('Error cargando usuarios:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Cargar datos iniciales
-   */
-  useEffect(() => {
-    if (canManageUsers) {
-      loadStats();
-      loadUsers();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, filterRole, filterStatus, canManageUsers]);
-
-  /**
    * Buscar con debounce
    */
   useEffect(() => {
     if (!canManageUsers) return;
 
     const timeoutId = setTimeout(() => {
-      setCurrentPage(1); // Resetear a primera página
-      loadUsers();
+      setCurrentPage(1); // Resetear a primera página cuando cambie la búsqueda
     }, 500);
 
     return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]);
+  }, [searchTerm, canManageUsers]);
 
   /**
    * Abrir modal de asignación de rol
@@ -189,9 +168,8 @@ export default function UsersManagement() {
       
       await adminService.assignRole(token, selectedUser._id, newRole);
       
-      // Recargar lista de usuarios
-      await loadUsers();
-      await loadStats();
+      // Invalidar cache y recargar datos
+      await refreshUsers();
       
       handleCloseRoleModal();
       alert(`Rol actualizado exitosamente a ${ROLE_INFO[newRole].label}`);
@@ -227,9 +205,8 @@ export default function UsersManagement() {
       
       await adminService.toggleUserStatus(token, user._id, newStatus);
       
-      // Recargar lista
-      await loadUsers();
-      await loadStats();
+      // Invalidar cache y recargar datos
+      await refreshUsers();
       
       alert(`Usuario ${action === 'activar' ? 'activado' : 'desactivado'} exitosamente`);
     } catch (err) {
@@ -427,7 +404,7 @@ export default function UsersManagement() {
             <div className="p-6 text-center">
               <p className="text-red-500 dark:text-red-400">❌ {error}</p>
               <button
-                onClick={loadUsers}
+                onClick={refreshUsers}
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 🔄 Reintentar
@@ -466,7 +443,7 @@ export default function UsersManagement() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
-                    {users.map((user) => {
+                    {users.map((user: UserWithRole) => {
                       const isCurrentUser = user._id === currentUser?._id;
                       const assignableRoles = currentRole ? getAssignableRoles(currentRole) : [];
                       const canEditThisUser = !isCurrentUser && assignableRoles.length > 0;
@@ -584,7 +561,7 @@ export default function UsersManagement() {
 
               {/* Cards Mobile */}
               <div className="md:hidden space-y-3 p-3 sm:p-4">
-                {users.map((user) => {
+                {users.map((user: UserWithRole) => {
                   const isCurrentUser = user._id === currentUser?._id;
                   const assignableRoles = currentRole ? getAssignableRoles(currentRole) : [];
                   const canEditThisUser = !isCurrentUser && assignableRoles.length > 0;

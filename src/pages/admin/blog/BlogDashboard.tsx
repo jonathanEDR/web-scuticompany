@@ -11,20 +11,10 @@ import {
 import { Link } from 'react-router-dom';
 import { useCategories, useAdminPosts } from '../../../hooks/blog';
 import { useModerationStats } from '../../../hooks/blog/useModerationQueue';
+import { useBlogDashboardCache } from '../../../hooks/blog/useBlogDashboardCache';
 import { BlogAnalyticsDashboard } from '../../../components/blog/analytics/BlogAnalyticsDashboard';
 import { SEOCanvasModal } from '../../../components/admin/seo';
 import { useAuth } from '../../../contexts/AuthContext';
-
-interface DashboardStats {
-  totalPosts: number;
-  publishedPosts: number;
-  draftPosts: number;
-  totalViews: number;
-  totalComments: number;
-  totalAuthors: number;
-  postsThisMonth: number;
-  avgReadingTime: number;
-}
 
 export default function BlogDashboard() {
   
@@ -49,46 +39,16 @@ export default function BlogDashboard() {
   
   const { categories, loading: categoriesLoading } = useCategories();
 
-  const [stats, setStats] = useState<DashboardStats>({
-    totalPosts: 0,
-    publishedPosts: 0,
-    draftPosts: 0,
-    totalViews: 0,
-    totalComments: 0,
-    totalAuthors: 0,
-    postsThisMonth: 0,
-    avgReadingTime: 0
-  });
+  // 🎨 Usar cache para estadísticas del blog
+  const { stats, loadStats } = useBlogDashboardCache();
 
-  // Calcular estadísticas
+  // Calcular estadísticas con cache
   useEffect(() => {
     if (posts && posts.length > 0) {
-      const published = posts.filter(p => p.isPublished).length;
-      const draft = posts.filter(p => !p.isPublished).length;
-      const totalViews = posts.reduce((sum, p) => sum + (p.stats?.views || 0), 0);
-      const totalComments = posts.reduce((sum, p) => sum + (p.stats?.commentsCount || 0), 0);
-      const avgReading = posts.reduce((sum, p) => sum + p.readingTime, 0) / posts.length;
-      
-      // Posts este mes
-      const now = new Date();
-      const thisMonth = posts.filter(p => {
-        const postDate = new Date(p.createdAt);
-        return postDate.getMonth() === now.getMonth() && 
-               postDate.getFullYear() === now.getFullYear();
-      }).length;
-
-      setStats({
-        totalPosts: posts.length,
-        publishedPosts: published,
-        draftPosts: draft,
-        totalViews,
-        totalComments,
-        totalAuthors: new Set(posts.filter(p => p.author).map(p => p.author!._id)).size,
-        postsThisMonth: thisMonth,
-        avgReadingTime: Math.round(avgReading)
-      });
+      console.log('📊 [Blog] Actualizando estadísticas desde posts');
+      loadStats(posts);
     }
-  }, [posts]);
+  }, [posts, loadStats]);
 
   // Tarjetas de estadísticas
   const statCards = [
@@ -146,7 +106,7 @@ export default function BlogDashboard() {
   };
 
   return (
-    <div className="blog-dashboard space-y-6">
+    <div className="blog-dashboard w-full space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

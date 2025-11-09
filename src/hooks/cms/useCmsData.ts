@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getPageBySlug, updatePage, clearCache } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_PAGE_CONFIG } from '../../utils/defaultConfig';
+import { cms } from '../../utils/contentManagementCache';
 import type { PageData, MessageState } from '../../types/cms';
 
 export const useCmsData = () => {
@@ -31,9 +32,23 @@ export const useCmsData = () => {
       
       let data: PageData;
       
-      // Intentar cargar datos desde la API
+      // 1️⃣ Intentar cargar del cache primero
+      const cachedData = cms.getPages<PageData>('home');
+      if (cachedData) {
+        console.log('✅ [CMS] Datos cargados desde cache');
+        data = cachedData;
+        setPageData(data);
+        setLoading(false);
+        return;
+      }
+      
+      // 2️⃣ Si no hay cache, obtener de la API
       try {
+        console.log('🌐 [CMS] Obteniendo datos de la API');
         data = await getPageBySlug('home');
+        
+        // 3️⃣ Guardar en cache
+        cms.setPages<PageData>(data, 'home');
       } catch (apiError) {
         console.warn('⚠️ No se pudo conectar con la base de datos, usando configuración predeterminada');
         
@@ -324,7 +339,11 @@ export const useCmsData = () => {
         isPublished: pageData.isPublished
       });
       
-      // 🔧 CORRECCIÓN: Limpiar caché para forzar que la página pública use datos frescos
+      // �️ ACTUALIZADO: Invalidar cache para forzar refresh en próxima carga
+      cms.invalidatePages('home');
+      console.log('✅ [CMS] Cache invalidado after save');
+      
+      // 🔧 MANTENER: Limpiar caché para forzar que la página pública use datos frescos
       clearCache('page-home');
       
       setMessage({ type: 'success', text: '✅ Cambios guardados correctamente' });

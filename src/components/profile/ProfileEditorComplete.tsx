@@ -33,6 +33,7 @@ import {
   updateMyProfile,
   validateProfileCompleteness
 } from '../../services/profileService';
+import { useProfileCache } from '../../hooks/useDashboardCache';
 import type { BlogProfile } from '../../types/profile';
 import AvatarUpload from './AvatarUpload';
 
@@ -83,6 +84,18 @@ const ProfileEditor: React.FC = () => {
   const { user } = useUser();
   const navigate = useNavigate();
 
+  // ⚡ CACHE OPTIMIZADO: Hook personalizado para cache de perfil
+  const {
+    data: profileData,
+    loading: profileLoading
+  } = useProfileCache(
+    useCallback(async () => {
+      const token = await getToken();
+      if (!token) throw new Error('Token no disponible');
+      return await getMyProfile(token);
+    }, [getToken])
+  );
+
   // Estado del formulario
   const [formData, setFormData] = useState<FormData>({
     displayName: '',
@@ -106,7 +119,6 @@ const ProfileEditor: React.FC = () => {
 
   // Estados de UI
   const [activeTab, setActiveTab] = useState<TabType>('basic');
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
@@ -124,108 +136,43 @@ const ProfileEditor: React.FC = () => {
   // EFECTOS Y CARGA DE DATOS
   // ============================================
 
+  // Efecto para cargar datos del perfil cuando están disponibles  
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  useEffect(() => {
-    // Calcular completeness cuando cambian los datos
-    if (!loading) {
-      const profileForValidation: BlogProfile = {
-        displayName: formData.displayName,
-        bio: formData.bio,
-        location: formData.location,
-        website: formData.website,
-        avatar: formData.avatar,
-        expertise: formData.expertise,
-        social: formData.social,
-        isPublicProfile: formData.privacy.isPublicProfile,
-        allowComments: formData.privacy.allowComments,
-        showEmail: formData.privacy.showEmail
+    if (profileData && profileData.blogProfile) {
+      const bp = profileData.blogProfile;
+      console.log('✅ [ProfileEditor] Cargando datos de cache/API:', bp);
+      
+      const newFormData = {
+        displayName: String(bp.displayName || profileData.firstName || (profileData.email?.split('@')[0]) || ''),
+        bio: String(bp.bio || ''),
+        location: String(bp.location || ''),
+        website: String(bp.website || ''),
+        expertise: Array.isArray(bp.expertise) 
+          ? bp.expertise 
+          : (typeof bp.expertise === 'string' && bp.expertise 
+             ? (bp.expertise as string).split(', ').filter((e: string) => e.trim())
+             : []),
+        avatar: String(bp.avatar || ''),
+        social: {
+          twitter: String(bp.social?.twitter || ''),
+          github: String(bp.social?.github || ''),
+          linkedin: String(bp.social?.linkedin || ''),
+          instagram: String(bp.social?.instagram || '')
+        },
+        privacy: {
+          showEmail: Boolean(bp.showEmail),
+          showLocation: true,
+          isPublicProfile: bp.isPublicProfile !== false,
+          allowComments: bp.allowComments !== false
+        }
       };
       
-      const completenessResult = validateProfileCompleteness(profileForValidation);
-      setCompleteness(completenessResult);
-    }
-  }, [formData, loading]);
-
-  const loadProfile = async () => {
-    try {
-      const token = await getToken();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      
-      console.log('🔍 Cargando perfil del usuario...');
-      const profile = await getMyProfile(token);
-      console.log('📦 Perfil recibido:', profile);
-      
-      if (profile && profile.blogProfile) {
-        const bp = profile.blogProfile;
-        console.log('✅ blogProfile encontrado:', bp);
-        
-        // 🛡️ ASEGURAR QUE TODOS LOS VALORES SEAN STRINGS (NO UNDEFINED)
-        const newFormData = {
-          displayName: String(bp.displayName || profile.firstName || (profile.email?.split('@')[0]) || ''),
-          bio: String(bp.bio || ''),
-          location: String(bp.location || ''),
-          website: String(bp.website || ''),
-          expertise: Array.isArray(bp.expertise) 
-            ? bp.expertise 
-            : (typeof bp.expertise === 'string' && bp.expertise 
-               ? (bp.expertise as string).split(', ').filter((e: string) => e.trim()) // Convertir string a array
-               : []),
-          avatar: String(bp.avatar || ''),
-          social: {
-            twitter: String(bp.social?.twitter || ''),
-            github: String(bp.social?.github || ''),
-            linkedin: String(bp.social?.linkedin || ''),
-            instagram: String(bp.social?.instagram || '')
-          },
-          privacy: {
-            showEmail: Boolean(bp.showEmail),
-            showLocation: true,
-            isPublicProfile: bp.isPublicProfile !== false,
-            allowComments: bp.allowComments !== false
-          }
-        };
-        
-        console.log('📝 FormData a establecer:', newFormData);
-        setFormData(newFormData);
-      } else {
-        console.warn('⚠️ No se encontró blogProfile, inicializando con valores por defecto');
-        // Inicializar con valores por defecto si no hay perfil
-        const defaultFormData = {
-          displayName: String(user?.firstName || (user?.primaryEmailAddress?.emailAddress?.split('@')[0]) || ''),
-          bio: '',
-          location: '',
-          website: '',
-          expertise: [],
-          avatar: '',
-          social: {
-            twitter: '',
-            github: '',
-            linkedin: '',
-            instagram: ''
-          },
-          privacy: {
-            showEmail: false,
-            showLocation: true,
-            isPublicProfile: true,
-            allowComments: true
-          }
-        };
-        
-        console.log('📝 FormData por defecto:', defaultFormData);
-        setFormData(defaultFormData);
-      }
-    } catch (err: any) {
-      console.error('❌ Error loading profile:', err);
-      setErrors([{ field: 'general', message: err.message || 'Error al cargar el perfil' }]);
-      // Inicializar con valores por defecto en caso de error
-      setFormData({
-        displayName: user?.firstName || '',
+      setFormData(newFormData);
+    } else if (profileData && !profileData.blogProfile) {
+      console.log('⚠️ [ProfileEditor] No hay blogProfile, usando valores por defecto');
+      // Usar valores por defecto del usuario
+      const defaultFormData = {
+        displayName: String(user?.firstName || (user?.primaryEmailAddress?.emailAddress?.split('@')[0]) || ''),
         bio: '',
         location: '',
         website: '',
@@ -243,11 +190,31 @@ const ProfileEditor: React.FC = () => {
           isPublicProfile: true,
           allowComments: true
         }
-      });
-    } finally {
-      setLoading(false);
+      };
+      setFormData(defaultFormData);
     }
-  };
+  }, [profileData, user]);
+
+  useEffect(() => {
+    // Calcular completeness cuando cambian los datos
+    if (!profileLoading && formData.displayName) {
+      const profileForValidation: BlogProfile = {
+        displayName: formData.displayName,
+        bio: formData.bio,
+        location: formData.location,
+        website: formData.website,
+        avatar: formData.avatar,
+        expertise: formData.expertise,
+        social: formData.social,
+        isPublicProfile: formData.privacy.isPublicProfile,
+        allowComments: formData.privacy.allowComments,
+        showEmail: formData.privacy.showEmail
+      };
+      
+      const completenessResult = validateProfileCompleteness(profileForValidation);
+      setCompleteness(completenessResult);
+    }
+  }, [formData, profileLoading]);
 
   // ============================================
   // VALIDACIONES
@@ -483,7 +450,7 @@ const ProfileEditor: React.FC = () => {
   // COMPONENTE DE CARGA
   // ============================================
 
-  if (loading) {
+  if (profileLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">

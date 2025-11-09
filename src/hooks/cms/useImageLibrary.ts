@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as imageService from '../../services/imageService';
+import { media } from '../../utils/contentManagementCache';
 import type { ImageData, ListImagesOptions, PaginationInfo } from '../../services/imageService';
 
 interface UseImageLibraryReturn {
@@ -42,14 +43,50 @@ export const useImageLibrary = (initialFilters: Partial<ListImagesOptions> = {})
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   /**
-   * Fetch images from API
+   * Fetch images from API or Cache
    */
   const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
+      // Generar clave de cache basada en filtros
+      const category = filters.category || 'root';
+      const page = filters.page || 1;
+      const limit = filters.limit || 20;
+      const cacheKey = `${category}_p${page}_l${limit}`;
+      
+      console.log(`📦 [ImageLibrary Cache] Buscando en cache: ${cacheKey}`);
+      
+      // 1. Intentar obtener del cache
+      const cached = media.getFolderList<{
+        images: ImageData[];
+        pagination: PaginationInfo;
+      }>(cacheKey);
+
+      if (cached) {
+        console.log(`✅ [ImageLibrary Cache] Datos desde cache: ${cacheKey}`);
+        setImages(cached.images);
+        setPagination(cached.pagination);
+        setLoading(false);
+        return;
+      }
+
+      // 2. Si no hay cache, obtener de la API
+      console.log(`🌐 [ImageLibrary Cache] Obteniendo de API: ${cacheKey}`);
       const response = await imageService.listImages(filters);
+      
+      // 3. Guardar en cache
+      media.setFolderList<{
+        images: ImageData[];
+        pagination: PaginationInfo;
+      }>(
+        {
+          images: response.images,
+          pagination: response.pagination,
+        },
+        cacheKey
+      );
       
       setImages(response.images);
       setPagination(response.pagination);
@@ -63,11 +100,18 @@ export const useImageLibrary = (initialFilters: Partial<ListImagesOptions> = {})
   }, [filters]);
 
   /**
-   * Refresh images
+   * Refresh images - invalidate cache and refetch
    */
   const refreshImages = useCallback(async () => {
+    const category = filters.category || 'root';
+    console.log(`🔄 [ImageLibrary Cache] Refrescando cache: ${category}`);
+    
+    // Invalidar el cache de esta carpeta
+    media.invalidateFolder(category);
+    
+    // Refetch images
     await fetchImages();
-  }, [fetchImages]);
+  }, [fetchImages, filters.category]);
 
   /**
    * Update filters
@@ -141,6 +185,11 @@ export const useImageLibrary = (initialFilters: Partial<ListImagesOptions> = {})
 
       await Promise.all(deletePromises);
 
+      // Invalidate cache for this category after deletion
+      const category = filters.category || 'root';
+      console.log(`🗑️ [ImageLibrary Cache] Invalidando categoría después de eliminar: ${category}`);
+      media.invalidateFolder(category);
+
       // Clear selection and refresh
       setSelectedImages(new Set());
       await fetchImages();
@@ -153,7 +202,7 @@ export const useImageLibrary = (initialFilters: Partial<ListImagesOptions> = {})
     } finally {
       setLoading(false);
     }
-  }, [selectedImages, fetchImages]);
+  }, [selectedImages, fetchImages, filters.category]);
 
   /**
    * Fetch images when filters change

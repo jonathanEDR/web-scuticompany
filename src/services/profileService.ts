@@ -7,6 +7,7 @@ import axios from 'axios';
 import type { BlogProfile, PublicUserProfile, ProfileStats } from '../types/profile';
 import type { BlogPost } from '../types/blog';
 import { getBackendUrl } from '../utils/apiConfig';
+import { dashboardCache, DASHBOARD_CACHE_DURATIONS } from '../utils/dashboardCache';
 
 // ============================================
 // CONFIGURACIÓN DE API
@@ -91,12 +92,29 @@ interface AvatarUploadResponse {
  */
 export const getMyProfile = async (token?: string): Promise<ProfileResponse['data']> => {
   try {
+    // ⚡ Verificar cache primero (4 horas para datos personales)
+    const cacheKey = 'user-profile';
+    const cachedProfile = dashboardCache.get<ProfileResponse['data']>(
+      cacheKey, 
+      DASHBOARD_CACHE_DURATIONS.PROFILE
+    );
+    
+    if (cachedProfile) {
+      console.log('✅ [Profile Service] Cache hit - usando datos cacheados');
+      return cachedProfile;
+    }
+
+    console.log('🌐 [Profile Service] Cache miss - haciendo request');
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await profileApiClient.get<ProfileResponse>('/profile', { headers });
     
     if (!response.data.success) {
       throw new Error(response.data.message || 'Error al obtener perfil');
     }
+
+    // ⚡ Guardar en cache después del request exitoso
+    dashboardCache.set(cacheKey, response.data.data);
+    console.log('💾 [Profile Service] Datos guardados en cache');
     
     return response.data.data;
   } catch (error: any) {
@@ -116,6 +134,15 @@ export const updateMyProfile = async (profileData: Partial<BlogProfile>, token?:
     if (!response.data.success) {
       throw new Error(response.data.message || 'Error al actualizar perfil');
     }
+
+    // ⚡ Invalidar cache después de actualización exitosa
+    const cacheKey = 'user-profile';
+    dashboardCache.clear(cacheKey);
+    console.log('🗑️ [Profile Service] Cache invalidado después de actualización');
+
+    // ⚡ Guardar nuevo perfil en cache
+    dashboardCache.set(cacheKey, response.data.data);
+    console.log('💾 [Profile Service] Nuevo perfil guardado en cache');
     
     return response.data.data;
   } catch (error: any) {

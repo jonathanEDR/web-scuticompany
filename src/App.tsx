@@ -10,6 +10,7 @@ import { DashboardProviders } from './components/DashboardProviders';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRoute from './components/RoleBasedRoute';
 import DashboardRouter from './components/DashboardRouter';
+import SmartDashboardLayout from './components/SmartDashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import WelcomeNotification from './components/WelcomeNotification';
 import { UserRole } from './types/roles';
@@ -302,7 +303,9 @@ function AppContent() {
               <Route path="/dashboard/servicios/management" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <ServiciosManagement />
+                    <SmartDashboardLayout>
+                      <ServiciosManagement />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -320,7 +323,9 @@ function AppContent() {
               <Route path="/dashboard/servicios/:id/edit" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <ServicioForm />
+                    <SmartDashboardLayout>
+                      <ServicioForm />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -331,7 +336,9 @@ function AppContent() {
               <Route path="/dashboard/blog" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <BlogDashboard />
+                    <SmartDashboardLayout>
+                      <BlogDashboard />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -340,7 +347,9 @@ function AppContent() {
               <Route path="/dashboard/blog/posts/new" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <PostEditor />
+                    <SmartDashboardLayout>
+                      <PostEditor />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -349,7 +358,9 @@ function AppContent() {
               <Route path="/dashboard/blog/posts/:id/edit" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <PostEditor />
+                    <SmartDashboardLayout>
+                      <PostEditor />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -378,7 +389,9 @@ function AppContent() {
               <Route path="/dashboard/ai-agents" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                    <AIAgentsDashboard />
+                    <SmartDashboardLayout>
+                      <AIAgentsDashboard />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />

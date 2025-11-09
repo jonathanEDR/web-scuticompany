@@ -13,6 +13,7 @@ import { useServicios } from '../../hooks/useServicios';
 import { useNotification } from '../../hooks/useNotification';
 import { useVirtualPagination } from '../../hooks/useVirtualPagination';
 import { useAuth } from '../../contexts/AuthContext';
+import { useServicesManagementCache } from '../../hooks/useServicesManagementCache';
 import { FiltersPanel } from '../../components/servicios/FiltersPanel';
 import { SortSelector } from '../../components/servicios/SortSelector';
 import { ServicioCard } from '../../components/servicios/ServicioCard';
@@ -112,6 +113,9 @@ export const ServiciosManagementOptimized = () => {
     duplicateServicio: duplicateServicioHook,
     refresh
   } = useServicios({ autoFetch: true });
+
+  // 🎨 Hook para cache de servicios
+  const { invalidateAllCache } = useServicesManagementCache();
 
   // ============================================
   // SINCRONIZACIÓN CON SERVICES CANVAS
@@ -251,6 +255,11 @@ export const ServiciosManagementOptimized = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
       try {
         await deleteServicioHook(id);
+        
+        // 🗑️ Invalidar cache después de eliminar
+        console.log(`🗑️ [Services] Invalidando cache después de eliminar: ${id}`);
+        invalidateAllCache();
+        
         success('Servicio eliminado exitosamente');
       } catch (err) {
         showError('Error al eliminar el servicio');
@@ -261,6 +270,11 @@ export const ServiciosManagementOptimized = () => {
   const handleDuplicate = async (id: string) => {
     try {
       await duplicateServicioHook(id);
+      
+      // 🗑️ Invalidar cache después de duplicar
+      console.log(`🗑️ [Services] Invalidando cache después de duplicar: ${id}`);
+      invalidateAllCache();
+      
       success('Servicio duplicado exitosamente');
     } catch (err) {
       showError('Error al duplicar el servicio');
@@ -286,7 +300,7 @@ export const ServiciosManagementOptimized = () => {
   // ============================================
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="w-full bg-gray-50 dark:bg-gray-900">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="mb-6">

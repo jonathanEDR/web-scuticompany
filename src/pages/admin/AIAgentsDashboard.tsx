@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import agentConfigService, { type AgentConfigData } from '../../services/agentConfigService';
 import servicesAgentService from '../../services/servicesAgentService';
 import { getApiUrl } from '../../utils/apiConfig';
+import { useAIAgentsCache } from '../../hooks/useDashboardCache';
 import { 
   Settings, 
   Activity, 
@@ -68,6 +69,15 @@ interface AgentsConfiguration {
   [key: string]: AgentConfig;
 }
 
+interface AIAgentsDashboardData {
+  systemHealth: SystemHealth | null;
+  systemMetrics: SystemMetrics | null;
+  agentsConfig: AgentsConfiguration | null;
+  agentConfig: AgentConfigData | null;
+  servicesAgentStatus: any;
+  servicesAgentMetrics: any;
+}
+
 // ===================================================
 // PANEL CENTRAL DASHBOARD ADMINISTRATIVO - IA AGENTS
 // ===================================================
@@ -76,149 +86,112 @@ const AIAgentsDashboard = () => {
   const { getToken } = useAuth();
   const navigate = useNavigate();
   
-  // Estados principales
-  const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null);
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null);
-  const [agentsConfig, setAgentsConfig] = useState<AgentsConfiguration | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [activeConfigTab, setActiveConfigTab] = useState('basic'); // Sub-tabs de configuración
-
-  // Estados de configuración
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [configSaved, setConfigSaved] = useState(false);
-  const [configError, setConfigError] = useState<string | null>(null);
-  
-  // Configuración detallada de BlogAgent (se cargará del backend)
-  const [agentConfig, setAgentConfig] = useState<AgentConfigData | null>(null);
-
-  // Estados para ServicesAgent metrics
-  const [servicesAgentStatus, setServicesAgentStatus] = useState<any>(null);
-  const [servicesAgentMetrics, setServicesAgentMetrics] = useState<any>(null);
-
-  // Cargar configuración del agente al montar
-  useEffect(() => {
-    loadAgentConfig();
-  }, []);
-
-  const loadAgentConfig = async () => {
-    try {
-      console.log('🔄 Loading agent configuration...');
-      const response = await agentConfigService.getConfig('blog');
-      
-      console.log('📡 API Response:', response);
-      
-      if (response.success && response.data) {
-        console.log('✅ Agent config loaded successfully:', response.data);
-        console.log('🎭 Personality archetype:', response.data.personality?.archetype);
-        console.log('🌡️ Temperature:', response.data.config?.temperature);
-        setAgentConfig(response.data);
-      } else {
-        console.error('❌ Failed to load config:', response);
-        console.warn('⚠️ No agent config found, will use defaults');
-        // Crear configuración por defecto para el frontend
-        const defaultConfig: AgentConfigData = {
-          agentName: 'blog',
-          enabled: true,
-          config: {
-            timeout: 30,
-            maxTokens: 2000,
-            temperature: 0.7,
-            maxTagsPerPost: 10,
-            minContentLength: 300,
-            seoScoreThreshold: 70,
-            autoOptimization: true,
-            // Configuración de sugerencias automáticas
-            autoSuggestions: true,
-            suggestionDebounceMs: 800,
-            suggestionMinLength: 10,
-            suggestionContextLength: 200,
-          },
-          personality: {
-            archetype: 'expert',
-            traits: [
-              { trait: 'analytical', intensity: 8 },
-              { trait: 'professional', intensity: 7 },
-              { trait: 'creative', intensity: 6 }
-            ],
-            communicationStyle: {
-              tone: 'professional',
-              verbosity: 'moderate',
-              formality: 7,
-              enthusiasm: 6,
-              technicality: 7
-            }
-          },
-          contextConfig: {
-            projectInfo: {
-              name: 'Web Scuti',
-              type: 'tech_blog',
-              domain: 'technology',
-              language: 'es-ES',
-              tone: 'professional_friendly'
-            },
-            userExpertise: 'intermediate'
-          },
-          responseConfig: {
-            defaultLanguage: 'es-ES',
-            supportedLanguages: ['es-ES', 'en-US'],
-            includeExamples: true,
-            includeSteps: true,
-            includeMetrics: true,
-            includeRecommendations: true,
-            responseFormat: 'structured'
-          },
-          promptConfig: {
-            useCustomPrompts: false,
-            customSystemPrompt: '',
-            promptVariables: {},
-            contextWindow: 10
-          }
-        };
-        setAgentConfig(defaultConfig);
-      }
-    } catch (error) {
-      console.error('❌ Error loading agent config:', error);
-    }
-  };
-
-  // Función para obtener datos del sistema
-  const fetchSystemData = async () => {
-    try {
-      setLoading(true);
+  // Hook de cache para AI Agents
+  const {
+    data: aiAgentsData,
+    loading,
+    error: cacheError,
+    refetch: refreshAIAgents
+  } = useAIAgentsCache(
+    useCallback(async (): Promise<AIAgentsDashboardData> => {
       const token = await getToken();
+      if (!token) throw new Error('Token no disponible');
       
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       };
 
-      // Obtener health status
-      const healthResponse = await fetch(`${getApiUrl()}/agents/health`, { headers });
-      const healthData = await healthResponse.json();
-      setSystemHealth(healthData);
-
-      // Obtener métricas del sistema
-      const metricsResponse = await fetch(`${getApiUrl()}/agents/testing/system-metrics`, { headers });
-      const metricsData = await metricsResponse.json();
-      setSystemMetrics(metricsData);
-
-      // Obtener estado y métricas del ServicesAgent
+      // Configuración del agente
+      let agentConfig: AgentConfigData | null = null;
       try {
-        const servicesStatusResponse = await servicesAgentService.getStatus();
-        setServicesAgentStatus(servicesStatusResponse);
-
-        const servicesMetricsResponse = await servicesAgentService.getMetrics();
-        setServicesAgentMetrics(servicesMetricsResponse);
-      } catch (servicesErr) {
-        console.warn('⚠️ ServicesAgent not available:', servicesErr);
-        // No es un error crítico, solo significa que el agente no está disponible aún
+        const configResponse = await agentConfigService.getConfig('blog');
+        if (configResponse.success && configResponse.data) {
+          agentConfig = configResponse.data;
+        } else {
+          // Configuración por defecto
+          agentConfig = {
+            agentName: 'blog',
+            enabled: true,
+            config: {
+              timeout: 30,
+              maxTokens: 2000,
+              temperature: 0.7,
+              maxTagsPerPost: 10,
+              minContentLength: 300,
+              seoScoreThreshold: 70,
+              autoOptimization: true,
+              autoSuggestions: true,
+              suggestionDebounceMs: 800,
+              suggestionMinLength: 10,
+              suggestionContextLength: 200,
+            },
+            personality: {
+              archetype: 'expert',
+              traits: [
+                { trait: 'analytical', intensity: 8 },
+                { trait: 'professional', intensity: 7 },
+                { trait: 'creative', intensity: 6 }
+              ],
+              communicationStyle: {
+                tone: 'professional',
+                verbosity: 'moderate',
+                formality: 7,
+                enthusiasm: 6,
+                technicality: 7
+              }
+            },
+            contextConfig: {
+              projectInfo: {
+                name: 'Web Scuti',
+                type: 'tech_blog',
+                domain: 'technology',
+                language: 'es-ES',
+                tone: 'professional_friendly'
+              },
+              userExpertise: 'intermediate'
+            },
+            responseConfig: {
+              defaultLanguage: 'es-ES',
+              supportedLanguages: ['es-ES', 'en-US'],
+              includeExamples: true,
+              includeSteps: true,
+              includeMetrics: true,
+              includeRecommendations: true,
+              responseFormat: 'structured'
+            },
+            promptConfig: {
+              useCustomPrompts: false,
+              customSystemPrompt: '',
+              promptVariables: {},
+              contextWindow: 10
+            }
+          };
+        }
+      } catch (error) {
+        console.error('❌ Error loading agent config:', error);
       }
 
-      // Obtener configuración de agentes
-      setAgentsConfig({
+      // Health status
+      const healthResponse = await fetch(`${getApiUrl()}/agents/health`, { headers });
+      const systemHealth = await healthResponse.json();
+
+      // Métricas del sistema
+      const metricsResponse = await fetch(`${getApiUrl()}/agents/testing/system-metrics`, { headers });
+      const systemMetrics = await metricsResponse.json();
+
+      // Estado y métricas del ServicesAgent
+      let servicesAgentStatus = null;
+      let servicesAgentMetrics = null;
+      try {
+        servicesAgentStatus = await servicesAgentService.getStatus();
+        servicesAgentMetrics = await servicesAgentService.getMetrics();
+      } catch (servicesErr) {
+        console.warn('⚠️ ServicesAgent not available:', servicesErr);
+      }
+
+      // Configuración de agentes
+      const agentsConfig = {
         BlogAgent: { enabled: true, status: 'active', requests: 1234 },
         SEOAgent: { enabled: true, status: 'active', requests: 0 },
         AnalyticsAgent: { enabled: false, status: 'inactive', requests: 0 },
@@ -227,31 +200,53 @@ const AIAgentsDashboard = () => {
           status: servicesAgentStatus?.data?.status || 'unknown', 
           requests: servicesAgentMetrics?.data?.totalRequests || 0 
         }
-      });
+      };
 
-    } catch (err) {
-      console.error('Error fetching system data:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
+      return {
+        systemHealth,
+        systemMetrics,
+        agentsConfig,
+        agentConfig,
+        servicesAgentStatus,
+        servicesAgentMetrics
+      };
+    }, [getToken])
+  );
+  
+  // Estados locales (no cacheados)
+  const [activeTab, setActiveTab] = useState('overview');
+  const [activeConfigTab, setActiveConfigTab] = useState('basic');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [configSaved, setConfigSaved] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
+  
+  // Estado local para ediciones de configuración (temporal hasta guardar)
+  const [editingConfig, setEditingConfig] = useState<AgentConfigData | null>(null);
+
+  // Estados derivados del cache
+  const systemHealth = aiAgentsData?.systemHealth || null;
+  const systemMetrics = aiAgentsData?.systemMetrics || null;
+  const agentsConfig = aiAgentsData?.agentsConfig || null;
+  const agentConfig = aiAgentsData?.agentConfig || null;
+  const error = cacheError;
+
+  // Configuración actual (editando si existe, sino del cache)
+  const currentConfig = editingConfig || agentConfig;
+
+  // Inicializar configuración de edición cuando cambie el cache
+  useEffect(() => {
+    if (agentConfig && !editingConfig) {
+      setEditingConfig({ ...agentConfig });
     }
-  };
+  }, [agentConfig, editingConfig]);
 
   // Función de refresh manual
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchSystemData();
+    await refreshAIAgents();
     setIsRefreshing(false);
   };
-
-  // Cargar datos al montar
-  useEffect(() => {
-    fetchSystemData();
-    
-    // Auto-refresh cada 30 segundos
-    const interval = setInterval(fetchSystemData, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Función para obtener color de estado
   const getStatusColor = (status: string) => {
@@ -291,28 +286,37 @@ const AIAgentsDashboard = () => {
 
   // Handlers para configuración de agentes
   const handleToggleAgent = async (agentId: string) => {
-    if (agentId === 'blog' && agentConfig) {
-      const newEnabled = !agentConfig.enabled;
-      setAgentConfig(prev => prev ? { ...prev, enabled: newEnabled } : null);
+    if (agentId === 'blog' && currentConfig) {
+      const newEnabled = !currentConfig.enabled;
+      
+      // Actualizar estado local inmediatamente para UI responsiva
+      setEditingConfig(prev => prev ? { ...prev, enabled: newEnabled } : null);
       
       // Guardar automáticamente
       try {
         await agentConfigService.updateConfig('blog', {
           enabled: newEnabled
         });
+        
+        // Invalidar cache y refrescar datos
+        await refreshAIAgents();
+        
+        // Limpiar estado de edición después de guardar exitosamente
+        setEditingConfig(null);
       } catch (error) {
         console.error('Error toggling agent:', error);
         // Revertir en caso de error
-        setAgentConfig(prev => prev ? { ...prev, enabled: !newEnabled } : null);
+        setEditingConfig(prev => prev ? { ...prev, enabled: !newEnabled } : null);
+        setConfigError('Error al cambiar estado del agente');
       }
     }
   };
 
   // Handler genérico para cambios de configuración en cualquier sección
   const handleConfigChange = (section: string, key: string, value: any) => {
-    if (!agentConfig) return;
+    if (!currentConfig) return;
     
-    setAgentConfig(prev => {
+    setEditingConfig(prev => {
       if (!prev) return null;
       
       // Actualizar la sección correspondiente
@@ -329,30 +333,25 @@ const AIAgentsDashboard = () => {
   };
 
   const handleSaveConfig = async () => {
-    if (!agentConfig) return;
+    if (!editingConfig) return;
     
     setIsSaving(true);
     setConfigSaved(false);
     setConfigError(null);
     
     try {
-      const response = await agentConfigService.updateConfig('blog', {
-        enabled: agentConfig.enabled,
-        config: agentConfig.config,
-        personality: agentConfig.personality,
-        contextConfig: agentConfig.contextConfig,
-        responseConfig: agentConfig.responseConfig,
-        promptConfig: agentConfig.promptConfig
-      });
+      const response = await agentConfigService.updateConfig('blog', editingConfig);
       
       if (response.success) {
         setConfigSaved(true);
-        setTimeout(() => setConfigSaved(false), 3000);
         
-        // Actualizar con la respuesta del servidor
-        if (response.data) {
-          setAgentConfig(response.data);
-        }
+        // Invalidar cache y refrescar datos
+        await refreshAIAgents();
+        
+        // Limpiar estado de edición después de guardar exitosamente
+        setEditingConfig(null);
+        
+        setTimeout(() => setConfigSaved(false), 3000);
       } else {
         setConfigError(response.error || 'Error al guardar configuración');
         setTimeout(() => setConfigError(null), 5000);
@@ -378,8 +377,14 @@ const AIAgentsDashboard = () => {
       const response = await agentConfigService.resetConfig('blog');
       
       if (response.success && response.data) {
-        setAgentConfig(response.data);
         setConfigSaved(true);
+        
+        // Invalidar cache y refrescar datos
+        await refreshAIAgents();
+        
+        // Limpiar estado de edición después de resetear exitosamente
+        setEditingConfig(null);
+        
         setTimeout(() => setConfigSaved(false), 3000);
       } else {
         setConfigError(response.error || 'Error al resetear configuración');
@@ -404,7 +409,7 @@ const AIAgentsDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="w-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -499,10 +504,10 @@ const AIAgentsDashboard = () => {
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
                           {component.replace('_', ' ')}
                         </span>
-                        {getStatusIcon(status)}
+                        {getStatusIcon(status as string)}
                       </div>
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
-                        {status}
+                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status as string)}`}>
+                        {status as string}
                       </div>
                     </div>
                   ))}
@@ -556,14 +561,14 @@ const AIAgentsDashboard = () => {
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {Object.entries(agentsConfig).map(([agentName, config]) => (
+                  {Object.entries(agentsConfig || {}).map(([agentName, config]: [string, any]) => (
                     <div key={agentName} className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="font-medium text-gray-900 dark:text-white">{agentName}</h4>
-                        {getStatusIcon(config.status)}
+                        {getStatusIcon(config.status as string)}
                       </div>
                       
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium mb-2 ${getStatusColor(config.status)}`}>
+                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium mb-2 ${getStatusColor(config.status as string)}`}>
                         {config.enabled ? 'Habilitado' : 'Deshabilitado'}
                       </div>
                       
@@ -684,12 +689,12 @@ const AIAgentsDashboard = () => {
                       <button
                         onClick={() => handleToggleAgent('blog')}
                         className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                          agentConfig.enabled ? 'bg-green-600' : 'bg-gray-300'
+                          currentConfig?.enabled ? 'bg-green-600' : 'bg-gray-300'
                         }`}
                       >
                         <span
                           className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                            agentConfig.enabled ? 'translate-x-7' : 'translate-x-1'
+                            currentConfig?.enabled ? 'translate-x-7' : 'translate-x-1'
                           }`}
                         />
                       </button>
@@ -747,7 +752,7 @@ const AIAgentsDashboard = () => {
                 <div className="mt-6">
                   {activeConfigTab === 'basic' && (
                     <BasicConfigPanel
-                      config={agentConfig}
+                      config={currentConfig}
                       onConfigChange={handleConfigChange}
                       onSave={handleSaveConfig}
                       onReset={handleResetConfig}
@@ -757,7 +762,7 @@ const AIAgentsDashboard = () => {
 
                   {activeConfigTab === 'personality' && (
                     <PersonalityConfigPanel
-                      config={agentConfig}
+                      config={currentConfig}
                       onConfigChange={handleConfigChange}
                       onSave={handleSaveConfig}
                       onReset={handleResetConfig}
@@ -767,7 +772,7 @@ const AIAgentsDashboard = () => {
 
                   {activeConfigTab === 'context' && (
                     <ContextConfigPanel
-                      config={agentConfig}
+                      config={currentConfig}
                       onConfigChange={handleConfigChange}
                       onSave={handleSaveConfig}
                       onReset={handleResetConfig}
@@ -777,7 +782,7 @@ const AIAgentsDashboard = () => {
 
                   {activeConfigTab === 'response' && (
                     <ResponseConfigPanel
-                      config={agentConfig}
+                      config={currentConfig}
                       onConfigChange={handleConfigChange}
                       onSave={handleSaveConfig}
                       onReset={handleResetConfig}
@@ -818,11 +823,11 @@ const AIAgentsDashboard = () => {
                 {systemHealth.components && Object.entries(systemHealth.components).map(([component, status]) => (
                   <div key={component} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <div className="flex items-center gap-3">
-                      {getStatusIcon(status)}
+                      {getStatusIcon(status as string)}
                       <span className="font-medium text-gray-900 dark:text-white capitalize">{component.replace('_', ' ')}</span>
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
-                      {status}
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(status as string)}`}>
+                      {status as string}
                     </div>
                   </div>
                 ))}
