@@ -13,7 +13,7 @@ import { MultipleImageGallery } from '../../components/common/MultipleImageGalle
 import { ImageUploader } from '../../components/common/ImageUploader';
 import { useTabNavigation, type Tab } from '../../components/common/TabNavigator';
 import { useNotification } from '../../hooks/useNotification';
-import { categoriasApi, type Categoria } from '../../services/categoriasApi';
+import { type Categoria } from '../../services/categoriasApi';
 import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
 import * as uploadApi from '../../services/uploadApi';
 import ServicesCanvasModal from '../../components/admin/services/ServicesCanvasModal';
@@ -22,6 +22,8 @@ import BlockEditor from '../../components/ai-assistant/BlockEditor/BlockEditor';
 import { useBlocksConverter } from '../../components/ai-assistant/hooks/useBlocksConverter';
 import type { Block } from '../../components/ai-assistant/BlockEditor/types';
 import { Sparkles } from 'lucide-react';
+import useCategoriasCacheadas from '../../hooks/useCategoriasCacheadas';
+// import useServicesAgentOptimized from '../../hooks/useServicesAgentOptimized';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -41,7 +43,6 @@ export const ServicioFormV3: React.FC = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [etiquetaInput, setEtiquetaInput] = useState('');
   const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [loadingCategorias, setLoadingCategorias] = useState(false);
   const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
   const [showServicesCanvas, setShowServicesCanvas] = useState(false);
 
@@ -53,6 +54,26 @@ export const ServicioFormV3: React.FC = () => {
 
   // Hook para convertir bloques ↔ texto
   const { textToBlocks, blocksToText } = useBlocksConverter();
+
+  // ✅ Optimización Fase 3: Categorías cacheadas
+  const { 
+    categorias: categoriasCache, 
+    loading: loadingCategorias, 
+    invalidateAfterCreate: invalidateCategorias 
+  } = useCategoriasCacheadas({ autoLoad: true });
+
+  // Sincronizar categorías del cache
+  useEffect(() => {
+    setCategorias(categoriasCache);
+  }, [categoriasCache]);
+
+  // ✅ Optimización Fase 3: ServicesAgent optimizado
+  // TODO: Implementar en handlers de generateContent
+  // const _agentService = useServicesAgentOptimized({
+  //   debounceMs: 500,      // Esperar 500ms antes de ejecutar
+  //   maxConcurrent: 1,     // Solo 1 request a la vez
+  //   cacheResults: true    // Cachear resultados
+  // });
 
   // ============================================
   // REACT HOOK FORM
@@ -187,31 +208,13 @@ export const ServicioFormV3: React.FC = () => {
   // FUNCIONES DE CATEGORÍAS
   // ============================================
 
-  // Cargar categorías desde el API
-  const loadCategorias = async () => {
-    try {
-      setLoadingCategorias(true);
-      const response = await categoriasApi.getActivas();
-      setCategorias(response);
-    } catch (err: any) {
-      console.error('Error al cargar categorías:', err);
-      error('Error', 'No se pudieron cargar las categorías');
-    } finally {
-      setLoadingCategorias(false);
-    }
-  };
-
   // Manejar éxito al crear nueva categoría
   const handleCategoriaCreated = (nuevaCategoria: Categoria) => {
     setCategorias(prev => [...prev, nuevaCategoria].sort((a, b) => a.orden - b.orden));
     setValue('categoria', nuevaCategoria._id); // Seleccionar automáticamente la nueva categoría
     setShowCreateCategoriaModal(false);
+    invalidateCategorias(); // ✅ Invalidar cache después de crear
   };
-
-  // Cargar categorías al montar el componente
-  useEffect(() => {
-    loadCategorias();
-  }, []);
 
   // ============================================
   // CARGAR DATOS EN MODO EDICIÓN
