@@ -7,7 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { serviciosApi } from '../../services/serviciosApi';
-import { servicesAgentService } from '../../services/servicesAgentService';
+// import { servicesAgentService } from '../../services/servicesAgentService'; // ✅ Reemplazado por useServicesAgentOptimized
 import { RichTextEditor } from '../../components/common/RichTextEditor';
 import { MultipleImageGallery } from '../../components/common/MultipleImageGallery';
 import { ImageUploader } from '../../components/common/ImageUploader';
@@ -23,7 +23,7 @@ import { useBlocksConverter } from '../../components/ai-assistant/hooks/useBlock
 import type { Block } from '../../components/ai-assistant/BlockEditor/types';
 import { Sparkles } from 'lucide-react';
 import useCategoriasCacheadas from '../../hooks/useCategoriasCacheadas';
-// import useServicesAgentOptimized from '../../hooks/useServicesAgentOptimized';
+import useServicesAgentOptimized from '../../hooks/useServicesAgentOptimized';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -67,13 +67,12 @@ export const ServicioFormV3: React.FC = () => {
     setCategorias(categoriasCache);
   }, [categoriasCache]);
 
-  // ✅ Optimización Fase 3: ServicesAgent optimizado
-  // TODO: Implementar en handlers de generateContent
-  // const _agentService = useServicesAgentOptimized({
-  //   debounceMs: 500,      // Esperar 500ms antes de ejecutar
-  //   maxConcurrent: 1,     // Solo 1 request a la vez
-  //   cacheResults: true    // Cachear resultados
-  // });
+  // ✅ Optimización Fase 3: ServicesAgent con debouncing y caché
+  const agentService = useServicesAgentOptimized({
+    debounceMs: 500,      // Esperar 500ms antes de ejecutar
+    maxConcurrent: 1,     // Solo 1 request a la vez
+    cacheResults: true    // Cachear resultados
+  });
 
   // ============================================
   // REACT HOOK FORM
@@ -394,8 +393,12 @@ export const ServicioFormV3: React.FC = () => {
 
       const contentType = contentTypeMap[blockType];
 
-      // Llamar a la API para generar contenido
-      const response = await servicesAgentService.generateContent(id, contentType, 'formal');
+      // ✅ Llamar con debouncing y caché
+      const response = await agentService.generateContent({
+        serviceId: id,
+        contentType,
+        style: 'formal'
+      });
 
       if (response.success && response.data?.content) {
         const generatedText = response.data.content;
@@ -432,7 +435,12 @@ export const ServicioFormV3: React.FC = () => {
     try {
       setGeneratingBlocks(true);
 
-      const response = await servicesAgentService.generateContent(id, contentType, style);
+      // ✅ Llamar con debouncing y caché
+      const response = await agentService.generateContent({
+        serviceId: id,
+        contentType,
+        style
+      });
 
       if (response.success && response.data?.content) {
         let generatedText = response.data.content;
@@ -503,8 +511,12 @@ export const ServicioFormV3: React.FC = () => {
     try {
       setGeneratingBlocks(true);
 
-      // Generar título SEO optimizado
-      const titleResponse = await servicesAgentService.generateContent(id, 'short_description', 'formal');
+      // ✅ Generar título SEO con debouncing
+      const titleResponse = await agentService.generateContent({
+        serviceId: id,
+        contentType: 'short_description',
+        style: 'formal'
+      });
       
       if (titleResponse.success && titleResponse.data?.content) {
         // Crear un título SEO más atractivo y optimizado
@@ -515,8 +527,12 @@ export const ServicioFormV3: React.FC = () => {
         setValue('seo.titulo', seoTitle);
       }
 
-      // Generar descripción SEO
-      const descResponse = await servicesAgentService.generateContent(id, 'full_description', 'formal');
+      // ✅ Generar descripción SEO con debouncing
+      const descResponse = await agentService.generateContent({
+        serviceId: id,
+        contentType: 'full_description',
+        style: 'formal'
+      });
       
       if (descResponse.success && descResponse.data?.content) {
         // Crear descripción SEO dentro del límite de 160 caracteres

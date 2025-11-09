@@ -23,6 +23,13 @@ interface ContentGenerationParams {
   style?: 'formal' | 'casual' | 'technical';
 }
 
+interface ServicesAgentResponse {
+  success: boolean;
+  data?: any;
+  error?: string;
+  [key: string]: any;
+}
+
 export const useServicesAgentOptimized = (
   options: UseServicesAgentOptions = {}
 ) => {
@@ -46,7 +53,7 @@ export const useServicesAgentOptimized = (
    * Generar contenido con debounce
    */
   const generateContent = useCallback(
-    async (params: ContentGenerationParams) => {
+    async (params: ContentGenerationParams): Promise<ServicesAgentResponse> => {
       return new Promise((resolve, reject) => {
         // Cancelar request anterior si existe
         if (debounceTimerRef.current) {
@@ -124,7 +131,7 @@ export const useServicesAgentOptimized = (
    * Analizar servicio con debounce
    */
   const analyzeService = useCallback(
-    async (serviceId: string) => {
+    async (serviceId: string): Promise<ServicesAgentResponse> => {
       return new Promise((resolve, reject) => {
         if (debounceTimerRef.current) {
           clearTimeout(debounceTimerRef.current);
