@@ -24,23 +24,38 @@ const BlogSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isMounted = true;
+
     const fetchRecentPosts = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${apiUrl}/api/blog/posts?limit=3&status=published&sort=-publishedAt`);
+        const response = await fetch(
+          `${apiUrl}/api/blog/posts?limit=3&status=published&sort=-publishedAt`,
+          { signal: controller.signal }
+        );
         
-        if (response.ok) {
+        if (response.ok && isMounted) {
           const data = await response.json();
           setPosts(data.posts || []);
         }
       } catch (error) {
-        console.error('Error fetching blog posts:', error);
+        if ((error as any).name !== 'AbortError') {
+          console.error('Error fetching blog posts:', error);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchRecentPosts();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   if (loading) {

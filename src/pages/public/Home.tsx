@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import PublicHeader from '../../components/public/PublicHeader';
 import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
@@ -9,7 +10,6 @@ import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import { getPageBySlug, clearCache, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useSeo } from '../../hooks/useSeo';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
 import { categoriasApi, type Categoria } from '../../services/categoriasApi';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
@@ -148,11 +148,8 @@ const HomeOptimized = () => {
   const [isLoadingCMS, setIsLoadingCMS] = useState(false);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const { setThemeConfig } = useTheme();
-    const { SeoHelmet } = useSeo({
-      pageName: 'home',
-      fallbackTitle: 'SCUTI Company - Transformamos tu empresa con tecnología inteligente',
-      fallbackDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.'
-    });
+  
+  // ✅ SOLUCIÓN: Usar SEO de pageData en lugar de hook separado (evita consulta duplicada)
   
   // ✅ Efecto inicial con cleanup
   useEffect(() => {
@@ -256,16 +253,16 @@ const HomeOptimized = () => {
       
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
-        // Eliminar datos de SEO para evitar conflictos con useSeo hook
-        const dataWithoutSeo = {
-          ...data,
-          seo: undefined // El hook useSeo() maneja esto
-        };
-        
-        setPageData(dataWithoutSeo);
+        // ✅ Mantener datos SEO para usarlos directamente
+        setPageData(data);
         
         if (data.theme) {
           setThemeConfig(data.theme);
+        }
+
+        // ✅ Actualizar título del documento
+        if (data.seo?.metaTitle) {
+          document.title = data.seo.metaTitle;
         }
         
         window.dispatchEvent(new CustomEvent('pageDataUpdated', { 
@@ -281,7 +278,25 @@ const HomeOptimized = () => {
 
   return (
     <>
-      <SeoHelmet />
+      {/* ✅ SEO Manual desde pageData (sin hook duplicado) */}
+      <Helmet>
+        <title>{pageData.seo?.metaTitle || 'SCUTI Company - Transformamos tu empresa con tecnología inteligente'}</title>
+        <meta name="description" content={pageData.seo?.metaDescription || 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.'} />
+        <meta name="keywords" content={(pageData.seo?.keywords || []).join(', ')} />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || 'SCUTI Company'} />
+        <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || 'Transformamos empresas con tecnología'} />
+        {pageData.seo?.ogImage && <meta property="og:image" content={pageData.seo.ogImage} />}
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || 'SCUTI Company'} />
+        <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || 'Transformamos empresas'} />
+        {pageData.seo?.ogImage && <meta name="twitter:image" content={pageData.seo.ogImage} />}
+      </Helmet>
+
       <div className="min-h-screen w-full overflow-x-hidden bg-transparent">
         <PublicHeader />
         <main className="w-full bg-transparent">

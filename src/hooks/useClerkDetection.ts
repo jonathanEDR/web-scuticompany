@@ -78,43 +78,24 @@ export const useClerkDetection = () => {
 
   useEffect(() => {
     
-    // 🔥 MEJORA 3: Verificación inicial con delay para producción
+    // ✅ SOLUCIÓN: Verificación ÚNICA al montar, sin intervalo continuo
     const initialCheck = async () => {
       const result = await checkClerkUser();
       if (!result) {
-        // Si no está listo, reintentar en 1 segundo
+        // Si no está listo, reintentar SOLO UNA VEZ después de 2 segundos
         setTimeout(async () => {
           await checkClerkUser();
-        }, 1000);
+        }, 2000);
       }
     };
 
     // Delay inicial pequeño para que Clerk termine de cargar
     setTimeout(initialCheck, 100);
 
-    // 🔥 MEJORA 4: Verificar periódicamente pero de forma inteligente
-    let attemptCount = 0;
-    const maxAttempts = 30; // 30 intentos = 3 minutos máximo
-    
-    const smartInterval = setInterval(async () => {
-      attemptCount++;
-      
-      if (attemptCount >= maxAttempts) {
-        clearInterval(smartInterval);
-        setIsLoading(false);
-        return;
-      }
+    // ✅ ELIMINADO: smartInterval que consultaba cada 5-30 segundos
+    // ✅ NUEVO: Solo escuchar eventos de Clerk, sin polling activo
 
-      // Si ya tenemos datos de usuario, verificar menos frecuentemente
-      if (userData) {
-        await checkClerkUser();
-      } else {
-        // Si no tenemos usuario, verificar más activamente
-        await checkClerkUser();
-      }
-    }, userData ? 30000 : 5000); // 30s si hay usuario, 5s si no hay
-
-    // 🔥 MEJORA 5: Mejores event listeners
+    // ✅ MEJORA 5: Mejores event listeners
     const handleClerkEvent = async () => {
       setTimeout(async () => {
         await checkClerkUser();
@@ -126,7 +107,7 @@ export const useClerkDetection = () => {
       setIsLoading(false);
     };
 
-    // 🔥 MEJORA 6: Más eventos de Clerk para capturar cambios
+    // ✅ MEJORA 6: Más eventos de Clerk para capturar cambios
     const events = [
       'clerk:loaded',
       'clerk:signIn', 
@@ -141,13 +122,12 @@ export const useClerkDetection = () => {
     // Agregar evento específico para signOut
     window.addEventListener('clerk:signOut' as any, handleSignOut);
 
-    // Eventos de navegación y visibilidad
-    window.addEventListener('popstate', handleClerkEvent);
-    window.addEventListener('focus', handleClerkEvent);
+    // ✅ ELIMINADO: eventos 'popstate' y 'focus' que causaban consultas excesivas
     
-    // 🔥 MEJORA 7: Verificar cuando la página vuelve a ser visible
+    // ✅ MEJORA 7: Verificar cuando la página vuelve a ser visible (SOLO SI ES NECESARIO)
     const handleVisibilityChange = async () => {
-      if (!document.hidden) {
+      if (!document.hidden && !userData) {
+        // Solo verificar si NO hay usuario activo
         setTimeout(async () => {
           await checkClerkUser();
         }, 500);
@@ -157,18 +137,16 @@ export const useClerkDetection = () => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      clearInterval(smartInterval);
+      // ✅ Cleanup sin smartInterval
       
       events.forEach(event => {
         window.removeEventListener(event as any, handleClerkEvent);
       });
       
-      window.removeEventListener('popstate', handleClerkEvent);
-      window.removeEventListener('focus', handleClerkEvent);
       window.removeEventListener('clerk:signOut' as any, handleSignOut);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [userData]); // 🔥 MEJORA 8: Dependencia de userData para optimizar
+  }, []); // ✅ CRÍTICO: Sin dependencias para evitar re-ejecución
 
   // Función para obtener iniciales del usuario
   const getUserInitials = (userData: UserData): string => {
