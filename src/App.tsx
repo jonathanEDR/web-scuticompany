@@ -32,7 +32,6 @@ const ServicesPublic = lazy(() => import('./pages/public/ServicesPublicV2'));
 const ServicioDetail = lazy(() => import('./pages/public/ServicioDetail'));
 const Contact = lazy(() => import('./pages/public/Contact'));
 const PublicProfilePage = lazy(() => import('./pages/public/PublicProfilePage'));
-const ProfileListPage = lazy(() => import('./pages/public/ProfileListPage'));
 
 // Páginas de autenticación - CON Clerk optimizado
 const Login = lazy(() => import('./pages/auth/Login'));
@@ -150,7 +149,6 @@ function AppContent() {
               <Route path="/servicios" element={<ServicesPublic />} />
               <Route path="/servicios/:slug" element={<ServicioDetail />} />
               <Route path="/contacto" element={<Contact />} />
-              <Route path="/perfiles" element={<ProfileListPage />} />
               <Route path="/perfil/:username" element={<PublicProfilePage />} />
               
               {/* � BLOG - Páginas Públicas */}

@@ -138,7 +138,16 @@ export interface PostImage {
 
 export interface CommentAuthor {
   // Usuario autenticado
-  userId?: string;
+  userId?: string | {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+    profileImage?: string;
+    blogProfile?: {
+      isPublicProfile?: boolean;
+    };
+  };
   firstName?: string;
   lastName?: string;
   avatar?: string;

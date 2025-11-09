@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Reply, Flag, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import { getImageUrl } from '../../../utils/imageUtils';
-import LazyImage from '../common/LazyImage';
 import type { BlogComment } from '../../../types/blog';
 
 interface CommentItemProps {
@@ -61,6 +60,11 @@ export default function CommentItem({
   const authorName = isPopulatedUser && (comment.author.userId as any).firstName
     ? `${(comment.author.userId as any).firstName} ${(comment.author.userId as any).lastName || ''}`.trim()
     : comment.author.name || 'Usuario invitado';
+  
+  // Verificar si el perfil es público
+  const isPublicProfile = isPopulatedUser && 
+    (comment.author.userId as any).username && 
+    (comment.author.userId as any).blogProfile?.isPublicProfile !== false;
 
   // Manejar votación
   const handleVote = async (voteType: 'like' | 'dislike') => {
@@ -108,44 +112,67 @@ export default function CommentItem({
         <div className="flex items-center gap-3">
           {/* Avatar */}
           {(() => {
-            const profileUsername = isPopulatedUser ? (comment.author.userId as any).username : undefined;
-            const profileImg = isPopulatedUser ? (comment.author.userId as any).profileImage : (comment.author.avatar || undefined);
-            const profileUrl = profileUsername ? `/perfil/${profileUsername}` : (comment.author.website || null);
+            const profileUsername = isPublicProfile ? (comment.author.userId as any).username : undefined;
+            // Intentar obtener la imagen del perfil, priorizando profileImage de Clerk, luego avatar del blog
+            const profileImg = isPopulatedUser 
+              ? ((comment.author.userId as any).profileImage || (comment.author.userId as any).blogProfile?.avatar)
+              : (comment.author.avatar || undefined);
+            const profileUrl = isPublicProfile && profileUsername ? `/perfil/${profileUsername}` : (comment.author.website || null);
 
             const avatarNode = profileImg ? (
-              <LazyImage 
+              <img 
                 src={getImageUrl(profileImg)} 
                 alt={authorName} 
                 className="w-10 h-10 rounded-full object-cover"
-                width={40}
-                height={40}
+                onError={(e) => {
+                  // Si la imagen falla, mostrar iniciales
+                  e.currentTarget.style.display = 'none';
+                  const fallback = e.currentTarget.nextElementSibling;
+                  if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                }}
               />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            ) : null;
+            
+            const fallbackAvatar = (
+              <div 
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+                style={{ display: profileImg ? 'none' : 'flex' }}
+              >
                 <span className="text-white font-semibold text-sm">{authorName.charAt(0).toUpperCase()}</span>
               </div>
             );
 
-            if (profileUrl) {
-              // Si es ruta interna (username), usar Link; si es website, abrir en nueva pestaña
-              if (profileUsername) {
-                return (
-                  <Link to={profileUrl} aria-label={`Ver perfil de ${authorName}`} className="block">
-                    {avatarNode}
-                  </Link>
-                );
-              }
+            const avatarContent = (
+              <>
+                {avatarNode}
+                {fallbackAvatar}
+              </>
+            );
+
+            // Solo enlazar si el perfil es público
+            if (profileUrl && profileUsername && isPublicProfile) {
               return (
-                <a href={profileUrl} target="_blank" rel="noopener noreferrer" aria-label={`Ver sitio de ${authorName}`}>{avatarNode}</a>
+                <Link to={profileUrl} aria-label={`Ver perfil de ${authorName}`} className="block">
+                  {avatarContent}
+                </Link>
+              );
+            }
+            
+            // Enlace externo para website (usuarios invitados)
+            if (profileUrl && !profileUsername && comment.author.website) {
+              return (
+                <a href={profileUrl} target="_blank" rel="noopener noreferrer" aria-label={`Ver sitio de ${authorName}`}>
+                  {avatarContent}
+                </a>
               );
             }
 
-            return avatarNode;
+            return <div className="block">{avatarContent}</div>;
           })()}
 
           <div>
-            {/* Nombre del autor - si existe username, enlazar al perfil público */}
-            {isPopulatedUser && (comment.author.userId as any).username ? (
+            {/* Nombre del autor - solo enlazar si el perfil es público */}
+            {isPublicProfile ? (
               <Link to={`/perfil/${(comment.author.userId as any).username}`} className="font-semibold text-gray-900 hover:underline">
                 {authorName}
               </Link>
