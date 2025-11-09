@@ -41,14 +41,27 @@ class BlogCacheManager {
   private cache: Map<string, CacheEntry<any>>;
   private stats: { hits: number; misses: number };
   private maxSize: number;
+  private cleanupTimer: ReturnType<typeof setInterval> | null = null; // ✅ Timer reference
 
   constructor(maxSize = 100) {
     this.cache = new Map();
     this.stats = { hits: 0, misses: 0 };
     this.maxSize = maxSize;
     
-    // Limpiar cache expirado cada minuto
-    setInterval(() => this.cleanExpired(), 60 * 1000);
+    // ✅ Guardar referencia del timer para cleanup
+    this.cleanupTimer = setInterval(() => this.cleanExpired(), 60 * 1000);
+  }
+
+  /**
+   * ✅ Método para limpiar recursos y evitar memory leaks
+   */
+  destroy(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+    this.cache.clear();
+    this.stats = { hits: 0, misses: 0 };
   }
 
   /**

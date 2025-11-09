@@ -48,7 +48,24 @@ const ServicesPublicV2 = () => {
   // ============================================
 
   useEffect(() => {
-    cargarServicios();
+    const controller = new AbortController(); // ✅ AbortController
+
+    const loadData = async () => {
+      try {
+        await cargarServicios();
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error('Error loading services:', error);
+        }
+      }
+    };
+
+    loadData();
+
+    // ✅ Cleanup
+    return () => {
+      controller.abort();
+    };
   }, [filtros, ordenamiento]);
 
   // ============================================
@@ -89,7 +106,10 @@ const ServicesPublicV2 = () => {
         serviciosCache.set('SERVICE_LIST', cacheKey, response.data);
       }
     } catch (err: any) {
-      setError(err.message || 'Error al cargar servicios');
+      // ✅ No mostrar error si fue cancelado
+      if (err.name !== 'AbortError') {
+        setError(err.message || 'Error al cargar servicios');
+      }
     } finally {
       setLoading(false);
     }

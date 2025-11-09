@@ -20,7 +20,6 @@ import {
   LazyImage
 } from '../../../components/blog/common';
 import { CommentsList } from '../../../components/blog/comments';
-import { AIOptimizedContent } from '../../../components/blog/seo';
 import { sanitizeHTML } from '../../../utils/blog';
 import { getImageUrl } from '../../../utils/imageUtils';
 import PublicFooter from '../../../components/public/PublicFooter';
@@ -109,9 +108,6 @@ const BlogPostEnhanced: React.FC = () => {
         <meta name="googlebot" content="index, follow" />
         <link rel="canonical" content={`https://webscuti.com/blog/${post.slug}`} />
       </Helmet>
-      
-      {/* Contenido estructurado para IA (invisible para usuarios) - Solo si post está cargado */}
-      {post && <AIOptimizedContent post={post} />}
       
       {/* Post Header */}
       <PostHeader post={post} />

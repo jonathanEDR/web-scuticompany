@@ -39,6 +39,9 @@ export const ServicioDetail: React.FC = () => {
   }, [slug]);
 
   useEffect(() => {
+    const controller = new AbortController(); // ✅ AbortController para cancelar requests
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     const fetchServicio = async () => {
       if (!slug) {
         setError('Servicio no encontrado');
@@ -51,10 +54,10 @@ export const ServicioDetail: React.FC = () => {
 
         // ✅ Verificar cache primero
         const cached = serviciosCache.get<Servicio>('SERVICE_DETAIL', slug);
-        if (cached) {
+        if (cached && !controller.signal.aborted) {
           setServicio(cached);
           setLoading(false);
-          setTimeout(() => {
+          timeoutId = setTimeout(() => {
             if (window.scrollY > 100) {
               window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }
@@ -64,6 +67,10 @@ export const ServicioDetail: React.FC = () => {
         
         // Intentar buscar por slug primero, luego por ID
         const response = await serviciosApi.getAll();
+        
+        // ✅ Verificar si el request fue cancelado
+        if (controller.signal.aborted) return;
+
         const servicioEncontrado = response.data.find(s => 
           s.slug === slug || s._id === slug
         );
@@ -79,20 +86,33 @@ export const ServicioDetail: React.FC = () => {
           serviciosCache.set('SERVICE_DETAIL', slug, servicioEncontrado);
           
           // Ensure we're at the top after content loads
-          setTimeout(() => {
+          timeoutId = setTimeout(() => {
             if (window.scrollY > 100) {
               window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }
           }, 300);
         }
-      } catch (err) {
-        setError('Error al cargar el servicio');
+      } catch (err: any) {
+        // ✅ No mostrar error si fue cancelado
+        if (err.name !== 'AbortError') {
+          setError('Error al cargar el servicio');
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchServicio();
+
+    // ✅ Cleanup function
+    return () => {
+      controller.abort();
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [slug]);
 
   const formatPrice = (servicio: Servicio) => {
