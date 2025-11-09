@@ -1,5 +1,23 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// ========== CACHE CONFIGURATION ==========
+// Diferentes duraciones según el tipo de contenido
+const CACHE_DURATIONS = {
+  // 🌐 Páginas públicas - Contenido estático (raramente cambia)
+  PUBLIC_PAGES: 8 * 60 * 60 * 1000,      // 8 horas
+  PUBLIC_FOOTER: 8 * 60 * 60 * 1000,     // 8 horas
+  
+  // 📝 Contenido semi-estático
+  BLOG_POSTS: 2 * 60 * 60 * 1000,        // 2 horas
+  SERVICES: 4 * 60 * 60 * 1000,          // 4 horas
+  
+  // 🔐 Datos administrativos - Contenido dinámico (cambia frecuentemente)
+  ADMIN_DATA: 2 * 60 * 1000,             // 2 minutos
+  
+  // 🔄 Datos en tiempo real
+  REALTIME: 0,                            // Sin cache
+};
+
 // ========== CACHE IMPLEMENTATION ==========
 interface CacheEntry<T> {
   data: T;
@@ -8,14 +26,16 @@ interface CacheEntry<T> {
 
 class RequestCache {
   private cache = new Map<string, CacheEntry<any>>();
-  private readonly CACHE_DURATION = 10 * 60 * 1000; // ⚡ 10 minutos (aumentado de 5)
+  private readonly DEFAULT_DURATION = CACHE_DURATIONS.PUBLIC_PAGES;
 
-  get<T>(key: string): T | null {
+  get<T>(key: string, customDuration?: number): T | null {
     const entry = this.cache.get(key);
     if (!entry) return null;
 
-    const isExpired = Date.now() - entry.timestamp > this.CACHE_DURATION;
-    if (isExpired) {
+    const duration = customDuration ?? this.DEFAULT_DURATION;
+    const age = Date.now() - entry.timestamp;
+    
+    if (age > duration) {
       this.cache.delete(key);
       return null;
     }
@@ -36,7 +56,6 @@ class RequestCache {
       return;
     }
 
-    // Limpiar entradas que coincidan con el patrón
     const keys = Array.from(this.cache.keys());
     keys.forEach(key => {
       if (key.includes(pattern)) {
@@ -48,6 +67,12 @@ class RequestCache {
   // ⚡ Nuevo: Obtener datos aunque estén expirados (para fallback)
   getStale<T>(key: string): T | null {
     const entry = this.cache.get(key);
+    if (entry) {
+      console.log('⚠️ [RequestCache.getStale] Retornando datos EXPIRADOS:', {
+        key,
+        age: Math.floor((Date.now() - entry.timestamp) / 1000) + 's'
+      });
+    }
     return entry ? entry.data : null;
   }
 }
@@ -161,20 +186,41 @@ export const getAllPages = async (useCache = true) => {
 // Obtener una página por slug (con caché y retry)
 export const getPageBySlug = async (slug: string, useCache = true) => {
   const cacheKey = `page-${slug}`;
+  const localStorageKey = `cmsCache_${cacheKey}`;
+  
+  // ⚡ Duración de caché según tipo de página
+  // Páginas públicas: 8 horas (contenido estático)
+  const CACHE_DURATION = CACHE_DURATIONS.PUBLIC_PAGES;
 
-  // ⚡ Intentar obtener del caché
+  // ⚡ PRIMERO: Verificar localStorage (persiste entre recargas)
+  if (useCache) {
+    try {
+      const localData = localStorage.getItem(localStorageKey);
+      if (localData) {
+        const { data, timestamp } = JSON.parse(localData);
+        const age = Date.now() - timestamp;
+        
+        if (age < CACHE_DURATION) {
+          cache.set(cacheKey, data);
+          return data;
+        }
+      }
+    } catch (e) {
+      console.error('Error parseando localStorage:', e);
+    }
+  }
+
+  // ⚡ SEGUNDO: Intentar obtener del caché en memoria
   if (useCache) {
     const cached = cache.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
+    if (cached) return cached;
   }
 
   try {
     const response = await fetchWithRetry(
       `${API_URL}/cms/pages/${slug}`,
       {},
-      { maxRetries: 2, delay: 500 } // ⚡ Menos reintentos y delay más corto para páginas públicas
+      { maxRetries: 2, delay: 500 }
     );
     const data = await response.json();
 
@@ -182,18 +228,40 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
       throw new Error(data.message || 'Error al obtener página');
     }
 
-    // Guardar en caché
+    // Guardar en RequestCache (memoria)
     cache.set(cacheKey, data.data);
+
+    // ✅ También guardar en localStorage (persiste entre recargas)
+    try {
+      localStorage.setItem(localStorageKey, JSON.stringify({
+        data: data.data,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      console.error('Error guardando en localStorage:', e);
+    }
 
     return data.data;
   } catch (error) {
-    console.error(`Error en getPageBySlug (${slug}):`, error);
+    console.error('Error obteniendo página:', error);
     
-    // ⚡ Intentar usar datos en caché aunque estén expirados (stale-while-revalidate)
+    // ⚡ Intentar usar datos en caché aunque estén expirados
     const staleData = cache.getStale(cacheKey);
     if (staleData) {
-      console.warn(`⚠️ Usando datos expirados del caché para ${slug}`);
+      console.warn('Usando datos expirados del RequestCache como fallback');
       return staleData;
+    }
+
+    // ⚡ Último recurso: localStorage aunque esté expirado
+    try {
+      const localData = localStorage.getItem(localStorageKey);
+      if (localData) {
+        const { data } = JSON.parse(localData);
+        console.warn('Usando datos expirados del localStorage como fallback');
+        return data;
+      }
+    } catch (e) {
+      // Ignore
     }
     
     throw error;
@@ -291,7 +359,31 @@ export const initHomePage = async () => {
 
 // ⚡ Exportar función para limpiar caché manualmente
 export const clearCache = (pattern?: string) => {
+  console.log('🗑️ [clearCache] Limpiando caché:', { pattern: pattern || 'TODO' });
+  
+  // Limpiar RequestCache en memoria
   cache.clear(pattern);
+
+  // ✅ NUEVO: También limpiar localStorage
+  if (!pattern) {
+    // Limpiar todo el localStorage que empiece con 'cmsCache_'
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('cmsCache_')) {
+        localStorage.removeItem(key);
+        console.log('🗑️ [clearCache] Eliminado de localStorage:', key);
+      }
+    });
+  } else {
+    // Limpiar solo las keys que coincidan con el patrón
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('cmsCache_') && key.includes(pattern)) {
+        localStorage.removeItem(key);
+        console.log('🗑️ [clearCache] Eliminado de localStorage:', key);
+      }
+    });
+  }
 };
 
 // ⚡ Exportar función para forzar recarga sin caché

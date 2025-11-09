@@ -23,16 +23,17 @@ interface CacheStats {
 
 /**
  * Configuración de TTL por tipo de contenido de servicios
+ * Servicios públicos: Contenido estático (actualiza raramente)
  */
 const CACHE_TTL = {
-  SERVICE_DETAIL: 5 * 60 * 1000,      // 5 minutos - Servicios individuales
-  SERVICE_LIST: 3 * 60 * 1000,        // 3 minutos - Listados de servicios
-  FEATURED: 10 * 60 * 1000,           // 10 minutos - Servicios destacados
-  POPULAR: 5 * 60 * 1000,             // 5 minutos - Servicios populares
-  CATEGORIES: 15 * 60 * 1000,         // 15 minutos - Categorías
-  SEARCH: 2 * 60 * 1000,              // 2 minutos - Resultados de búsqueda
-  PACKAGES: 5 * 60 * 1000,            // 5 minutos - Paquetes de servicio
-  STATS: 10 * 60 * 1000,              // 10 minutos - Estadísticas
+  SERVICE_DETAIL: 4 * 60 * 60 * 1000,   // 4 horas - Servicios individuales
+  SERVICE_LIST: 4 * 60 * 60 * 1000,     // 4 horas - Listados de servicios
+  FEATURED: 6 * 60 * 60 * 1000,         // 6 horas - Servicios destacados
+  POPULAR: 4 * 60 * 60 * 1000,          // 4 horas - Servicios populares
+  CATEGORIES: 8 * 60 * 60 * 1000,       // 8 horas - Categorías
+  SEARCH: 1 * 60 * 60 * 1000,           // 1 hora - Búsqueda
+  PACKAGES: 6 * 60 * 60 * 1000,         // 6 horas - Paquetes
+  STATS: 2 * 60 * 60 * 1000,            // 2 horas - Estadísticas
 } as const;
 
 /**

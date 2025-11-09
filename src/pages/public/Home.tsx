@@ -157,11 +157,8 @@ const HomeOptimized = () => {
     let isMounted = true;
 
     const init = async () => {
-      // ✅ NO limpiar caché - dejar que el sistema de caché decida si está expirado
-      // clearCache('page-home'); // ❌ REMOVIDO - causaba recargas innecesarias
-      
       if (isMounted) {
-        await loadPageData(); // Esto usará caché si está disponible
+        await loadPageData();
         await loadCategorias();
       }
     };
@@ -244,17 +241,15 @@ const HomeOptimized = () => {
       const data = forceRefresh 
         ? await forceReload('home')
         : await getPageBySlug('home', true);
-      
+
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
-        // ✅ Mantener datos SEO para usarlos directamente
         setPageData(data);
         
         if (data.theme) {
           setThemeConfig(data.theme);
         }
 
-        // ✅ Actualizar título del documento
         if (data.seo?.metaTitle) {
           document.title = data.seo.metaTitle;
         }
@@ -264,7 +259,7 @@ const HomeOptimized = () => {
         }));
       }
     } catch (error) {
-      console.error('Error al cargar datos del CMS:', error);
+      console.error('Error cargando datos de página:', error);
     } finally {
       if (!silent) setIsLoadingCMS(false);
     }

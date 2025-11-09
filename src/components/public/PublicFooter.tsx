@@ -15,9 +15,9 @@ const PublicFooter = () => {
   useEffect(() => {
     let isMounted = true;
     
-    // ✅ Usar caché en localStorage para evitar consultas innecesarias
     const CACHE_KEY = 'publicFooter_pageData';
-    const CACHE_DURATION = 10 * 60 * 1000; // 10 minutos
+    // ⚡ 8 horas - Páginas públicas (contenido estático)
+    const CACHE_DURATION = 8 * 60 * 60 * 1000;
 
     const fetchPageData = async () => {
       if (!isMounted) return;
@@ -28,14 +28,14 @@ const PublicFooter = () => {
         if (cachedData) {
           try {
             const { data, timestamp } = JSON.parse(cachedData);
-            const isExpired = Date.now() - timestamp > CACHE_DURATION;
+            const age = Date.now() - timestamp;
             
-            if (!isExpired && isMounted) {
+            if (age < CACHE_DURATION && isMounted) {
               setPageData(data);
               return; // ✅ Usar caché - NO hacer request
             }
           } catch (e) {
-            // Si hay error parseando, continuar con fetch
+            console.error('Error parseando localStorage:', e);
           }
         }
 
@@ -61,23 +61,15 @@ const PublicFooter = () => {
             }));
           }
         } else {
-          console.error('❌ [PublicFooter] Error en respuesta:', {
-            status: response.status,
-            statusText: response.statusText,
-            url: apiUrl
-          });
+          console.error('Error obteniendo datos del footer:', response.status);
         }
       } catch (error) {
-        console.error('❌ [PublicFooter] Error fetching page data:', error);
+        console.error('Error fetching page data:', error);
       }
     };
 
-    // 🔥 NUEVO: Probar conexión con backend al inicio
     testBackendConnection();
-    
     fetchPageData();
-    
-    // ✅ ELIMINADO: setInterval que recargaba cada 5 minutos innecesariamente
     
     return () => {
       isMounted = false;

@@ -23,15 +23,16 @@ interface CacheStats {
 
 /**
  * Configuración de TTL por tipo de contenido
+ * Blog público: Contenido semi-estático (actualiza ocasionalmente)
  */
 const CACHE_TTL = {
-  POST_DETAIL: 5 * 60 * 1000,      // 5 minutos - Posts individuales
-  POST_LIST: 3 * 60 * 1000,        // 3 minutos - Listados de posts
-  FEATURED: 10 * 60 * 1000,        // 10 minutos - Posts destacados
-  POPULAR: 5 * 60 * 1000,          // 5 minutos - Posts populares
-  CATEGORIES: 15 * 60 * 1000,      // 15 minutos - Categorías
-  SEARCH: 2 * 60 * 1000,           // 2 minutos - Resultados de búsqueda
-  COMMENTS: 1 * 60 * 1000,         // 1 minuto - Comentarios
+  POST_DETAIL: 2 * 60 * 60 * 1000,      // 2 horas - Posts individuales
+  POST_LIST: 1 * 60 * 60 * 1000,        // 1 hora - Listados de posts
+  FEATURED: 4 * 60 * 60 * 1000,         // 4 horas - Posts destacados
+  POPULAR: 2 * 60 * 60 * 1000,          // 2 horas - Posts populares
+  CATEGORIES: 6 * 60 * 60 * 1000,       // 6 horas - Categorías
+  SEARCH: 30 * 60 * 1000,               // 30 minutos - Búsqueda
+  COMMENTS: 5 * 60 * 1000,              // 5 minutos - Comentarios (dinámicos)
 } as const;
 
 /**
