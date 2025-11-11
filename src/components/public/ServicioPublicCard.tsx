@@ -1,9 +1,10 @@
 /**
  * 🌟 TARJETA PÚBLICA DE SERVICIO
  * Componente optimizado para mostrar servicios al público
+ * ⚡ Optimizado con React.memo para prevenir re-renders innecesarios
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Servicio } from '../../types/servicios';
 
@@ -249,4 +250,5 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
   );
 };
 
-export default ServicioPublicCard;
+// ⚡ Optimización: Memo para prevenir re-renders innecesarios
+export default memo(ServicioPublicCard);

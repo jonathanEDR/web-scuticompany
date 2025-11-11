@@ -1,13 +1,15 @@
 /**
  * 🌟 PÁGINA PÚBLICA DE SERVICIOS MEJORADA
  * Vista optimizada para mostrar servicios al público con filtros y búsqueda
+ * ⚡ Optimizada con lazy loading y React.memo
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import { ServicioPublicCard } from '../../components/public/ServicioPublicCard';
 import { SearchBar } from '../../components/common/SearchBar';
+import CacheDebug from '../../components/debug/CacheDebug';
 import { useSeo } from '../../hooks/useSeo';
 import { serviciosApi } from '../../services/serviciosApi';
 import type { Servicio, ServicioFilters } from '../../types/servicios';
@@ -68,10 +70,11 @@ const ServicesPublicV2 = () => {
   }, [filtros, ordenamiento]);
 
   // ============================================
-  // FUNCIONES
+  // FUNCIONES OPTIMIZADAS CON MEMOIZATION
   // ============================================
 
-  const cargarServicios = async () => {
+  // ⚡ Memoizar función de carga de servicios
+  const cargarServicios = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -93,9 +96,9 @@ const ServicesPublicV2 = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filtros, ordenamiento]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const getSort = () => {
+  const getSort = useCallback(() => {
     switch (ordenamiento) {
       case 'destacado':
         return '-destacado,-orden,-createdAt';
@@ -110,9 +113,11 @@ const ServicesPublicV2 = () => {
       default:
         return '-destacado,-orden';
     }
-  };
+  }, [ordenamiento]);
 
-  const serviciosFiltrados = servicios.filter(servicio => {
+  // ⚡ Memoizar lista filtrada para evitar recalcular en cada render
+  const serviciosFiltrados = useMemo(() => {
+    return servicios.filter(servicio => {
     // Filtro por búsqueda
     if (busqueda) {
       const busquedaLower = busqueda.toLowerCase();
@@ -139,7 +144,8 @@ const ServicesPublicV2 = () => {
     }
 
     return true;
-  });
+    });
+  }, [servicios, busqueda, categoriaSeleccionada]);
 
   // TODO: Convertir a categorías dinámicas como en FiltersPanel.tsx
   const categorias = [
@@ -152,8 +158,8 @@ const ServicesPublicV2 = () => {
     { value: 'otro', label: '📦 Otros' }
   ];
 
-  const serviciosDestacados = serviciosFiltrados.filter(s => s.destacado);
-  const serviciosRegulares = serviciosFiltrados.filter(s => !s.destacado);
+  const serviciosDestacados = serviciosFiltrados.filter((s: Servicio) => s.destacado);
+  const serviciosRegulares = serviciosFiltrados.filter((s: Servicio) => !s.destacado);
 
   // ============================================
   // RENDER
@@ -346,6 +352,9 @@ const ServicesPublicV2 = () => {
         </main>
         
         <PublicFooter />
+        
+        {/* 🔍 Componente de debug para cache */}
+        <CacheDebug />
       </div>
     </>
   );

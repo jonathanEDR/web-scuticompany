@@ -9,6 +9,7 @@ import { serviciosApi } from '../../services/serviciosApi';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import ContactModal from '../../components/public/ContactModal';
+import CacheDebug from '../../components/debug/CacheDebug';
 import { useSeo } from '../../hooks/useSeo';
 import type { Servicio } from '../../types/servicios';
 
@@ -697,6 +698,9 @@ export const ServicioDetail: React.FC = () => {
           }
         }}
       />
+      
+      {/* 🔍 Componente de debug para cache */}
+      <CacheDebug />
     </div>
   );
 };
