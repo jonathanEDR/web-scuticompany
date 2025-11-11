@@ -413,29 +413,96 @@ class ServicesAgentService {
   }
 
   /**
-   * 🆕 6.5. Generar contenido específico para servicio
-   * POST /api/servicios/:id/agent/generate-content
+   * ❌ DEPRECADO: Usar generateCompleteContent() en su lugar
+   * 🔄 REDIRIGIDO: Este método ahora usa el endpoint optimizado
    */
   async generateContent(
     serviceId: string,
-    contentType: 'full_description' | 'short_description' | 'features' | 'benefits' | 'faq',
+    contentType: 'full_description' | 'short_description' | 'features' | 'benefits' | 'faq' | 'incluye' | 'noIncluye' | 'seo',
     style: 'formal' | 'casual' | 'technical' = 'formal'
   ): Promise<any> {
+    console.warn(`⚠️ [DEPRECATED] generateContent() is deprecated. Redirecting to generateCompleteContent()`);
+    
     try {
-      const response = await this.fetchWithAuth(
-        `${getApiUrl()}/servicios/${serviceId}/agent/generate-content`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ contentType, style }),
-        }
-      );
+      // 🔄 REDIRIGIR al método optimizado
+      const result = await this.generateCompleteContent(serviceId, style, true);
+      
+      if (result.success && result.data.generatedContent && result.data.generatedContent[contentType]) {
+        // Simular la estructura del método viejo para compatibilidad
+        return {
+          success: true,
+          data: {
+            type: contentType,
+            content: result.data.generatedContent[contentType],
+            service: result.data.service,
+            redirectedFromDeprecated: true
+          }
+        };
+      }
+      
+      throw new Error(`Content type ${contentType} not generated in complete content`);
+      
+    } catch (error) {
+      console.error(`❌ [DEPRECATED_REDIRECT] Error redirecting to optimized method:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 🚀 6.6. Generar TODAS las características de una sola vez (OPTIMIZADO)
+   * POST /api/servicios/:id/agent/generate-complete
+   * 
+   * Este endpoint unificado genera:
+   * - Características (5 items)
+   * - Beneficios (5 items)
+   * - Qué Incluye (5 items)
+   * - Qué NO Incluye (5 items)
+   * - FAQ (5 preguntas)
+   * 
+   * TODO EN UNA SOLA LLAMADA A LA API (~90s vs 30-45s separadas)
+   */
+  async generateCompleteContent(
+    serviceId: string,
+    style: 'formal' | 'casual' | 'technical' = 'formal',
+    forceRegenerate: boolean = false
+  ): Promise<any> {
+    try {
+      const url = `${getApiUrl()}/servicios/${serviceId}/agent/generate-complete`;
+      
+      // Timeout extendido a 120 segundos para generación completa
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
+      
+      const response = await this.fetchWithAuth(url, {
+        method: 'POST',
+        body: JSON.stringify({ style, forceRegenerate }),
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ [servicesAgentService] Error response:`, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       const data = await response.json();
+      
       return data;
     } catch (error) {
-      console.error('Error generating content:', error);
+      console.error(`❌ [servicesAgentService] Exception en generateCompleteContent:`, error);
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        return {
+          success: false,
+          error: 'Timeout: La generación completa tomó demasiado tiempo (>120s). Esto puede deberse a problemas de red o servidor ocupado.',
+        };
+      }
+      
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Error al generar contenido',
+        error: error instanceof Error ? error.message : 'Error desconocido al generar contenido completo',
       };
     }
   }

@@ -6,7 +6,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { serviciosApi } from '../../services/serviciosApi';
-import serviciosCache from '../../utils/serviciosCache'; // ✅ Importar cache
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import ContactModal from '../../components/public/ContactModal';
@@ -52,23 +51,8 @@ export const ServicioDetail: React.FC = () => {
       try {
         setLoading(true);
 
-        // ✅ Verificar cache primero
-        const cached = serviciosCache.get<Servicio>('SERVICE_DETAIL', slug);
-        if (cached && !controller.signal.aborted) {
-          setServicio(cached);
-          setLoading(false);
-          timeoutId = setTimeout(() => {
-            if (window.scrollY > 100) {
-              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            }
-          }, 300);
-          return;
-        }
-        
-        // Intentar buscar por slug primero, luego por ID
         const response = await serviciosApi.getAll();
         
-        // ✅ Verificar si el request fue cancelado
         if (controller.signal.aborted) return;
 
         const servicioEncontrado = response.data.find(s => 
@@ -82,10 +66,6 @@ export const ServicioDetail: React.FC = () => {
         } else {
           setServicio(servicioEncontrado);
           
-          // ✅ Guardar en cache
-          serviciosCache.set('SERVICE_DETAIL', slug, servicioEncontrado);
-          
-          // Ensure we're at the top after content loads
           timeoutId = setTimeout(() => {
             if (window.scrollY > 100) {
               window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });

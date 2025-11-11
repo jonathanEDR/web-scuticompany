@@ -12,13 +12,41 @@ export const useBlocksConverter = () => {
    * - Lista: "- Item 1\n- Item 2"
    * - FAQ: "**Pregunta:** Texto\nRespuesta\n\n**Pregunta:** Texto\nRespuesta"
    */
-  const textToBlocks = (text: string, type: 'list' | 'faq'): Block[] => {
-    if (!text || !text.trim()) return [];
+  const textToBlocks = (text: any, type: 'list' | 'faq'): Block[] => {
+    // ✅ VALIDACIÓN ROBUSTA: Convertir cualquier input a string seguro
+    let safeText = '';
+    try {
+      if (text === null || text === undefined) {
+        safeText = '';
+      } else if (typeof text === 'string') {
+        safeText = text;
+      } else if (typeof text === 'number' || typeof text === 'boolean') {
+        safeText = String(text);
+      } else if (Array.isArray(text)) {
+        safeText = text.filter(Boolean).map(String).join('\n');
+      } else if (typeof text === 'object') {
+        safeText = JSON.stringify(text);
+      } else {
+        safeText = String(text);
+      }
+    } catch (error) {
+      console.error('🚫 [textToBlocks] Error convirtiendo input a string:', error);
+      safeText = '';
+    }
+
+    if (!safeText || typeof safeText !== 'string') {
+      return [];
+    }
+
+    const cleanText = safeText.trim();
+    if (!cleanText) {
+      return [];
+    }
 
     const blocks: Block[] = [];
 
     if (type === 'list') {
-      const lines = text.split('\n');
+      const lines = cleanText.split('\n');
       lines.forEach((line, index) => {
         const trimmed = line.trim();
         if (trimmed) {
@@ -37,7 +65,7 @@ export const useBlocksConverter = () => {
       });
     } else if (type === 'faq') {
       // Intentar formato P:/R: (usado por backend)
-      const lines = text.split('\n');
+      const lines = cleanText.split('\n');
       let currentQuestion = '';
       let currentAnswer = '';
       let index = 0;
@@ -64,6 +92,9 @@ export const useBlocksConverter = () => {
         } else if (currentAnswer && line.trim()) {
           // Continuación de respuesta
           currentAnswer += ' ' + line.trim();
+        } else if (currentQuestion && line.trim()) {
+          // Continuación de pregunta
+          currentQuestion += ' ' + line.trim();
         }
       });
 
@@ -80,8 +111,8 @@ export const useBlocksConverter = () => {
 
       // Si no hay matches con P:/R:, intentar formato **Pregunta:**
       if (blocks.length === 0) {
-        const faqPattern = /\ \ Pregunta:\ \ \s (. ?)\n(. ?)(?=\n\ \ Pregunta:\ \ |\n*$)/gs;
-        const matches = [...text.matchAll(faqPattern)];
+        const faqPattern = /\*\*Pregunta:\*\*\s*(.*?)\n(.*?)(?=\n\*\*Pregunta:\*\*|\n*$)/gs;
+        const matches = [...cleanText.matchAll(faqPattern)];
         
         matches.forEach((match, idx) => {
           const question = match[1]?.trim();
@@ -100,7 +131,7 @@ export const useBlocksConverter = () => {
 
       // Si aún no hay matches, intentar formato simple
       if (blocks.length === 0) {
-        const paragraphs = text.split('\n\n');
+        const paragraphs = cleanText.split('\n\n');
         paragraphs.forEach((paragraph, idx) => {
           const parts = paragraph.split('\n');
           if (parts.length >= 2) {
@@ -149,6 +180,12 @@ export const useBlocksConverter = () => {
    * Parsear respuesta de IA a bloques
    */
   const aiResponseToBlocks = (response: string, targetType: 'list' | 'faq'): Block[] => {
+    // ✅ VALIDACIÓN: Verificar que response es string
+    if (!response || typeof response !== 'string') {
+      console.warn('⚠️ [aiResponseToBlocks] Response no es string válido:', typeof response, response);
+      return [];
+    }
+    
     // La IA puede devolver formato markdown, limpiar y convertir
     return textToBlocks(response, targetType);
   };

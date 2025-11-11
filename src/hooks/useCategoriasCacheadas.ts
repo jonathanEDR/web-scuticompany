@@ -1,13 +1,12 @@
 /**
  * 🪝 useCategoriasCacheadas Hook
  * 
- * Obtiene categorías con cacheing automático
- * Reducción: 80% en queries repetidas
+ * Obtiene categorías SIN CACHE (temporalmente desactivado)
+ * Versión simplificada para evitar problemas de cache en admin
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { categoriasApi, type Categoria } from '../services/categoriasApi';
-import { categoryCache } from '../services/categoryCache';
 
 interface UseCategoriasCacheadasOptions {
   autoLoad?: boolean;
@@ -21,54 +20,49 @@ export const useCategoriasCacheadas = (
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const loadedRef = useRef(false); // Prevenir carga duplicada
 
-  // Cargar categorías con cache
-  const loadCategorias = async () => {
+  // Cargar categorías SIN cache - memoizado para estabilidad
+  const loadCategorias = useCallback(async () => {
+    if (loadedRef.current) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const data = await categoryCache.getCategories(
-        () => categoriasApi.getActivas(),
-        'all-categories'
-      );
+      loadedRef.current = true;
+      const data = await categoriasApi.getActivas();
       setCategorias(data);
     } catch (err: any) {
       const errorMsg = err.message || 'Error cargando categorías';
       setError(errorMsg);
-      console.error('❌ [useCategoriasCacheadas]', errorMsg);
+      loadedRef.current = false;
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Auto-cargar si está habilitado
   useEffect(() => {
     if (autoLoad) {
       loadCategorias();
     }
-  }, [autoLoad]);
+  }, [autoLoad, loadCategorias]);
 
-  // Invalidar cache después de crear
-  const invalidateAfterCreate = () => {
-    categoryCache.invalidateAfterCreate();
-    console.log('🔄 [useCategoriasCacheadas] Cache invalidado después de crear');
-  };
-
-  // Refrescar manualmente
-  const refresh = async () => {
-    categoryCache.invalidate('all-categories');
+  // Refrescar manualmente - resetea el flag
+  const refresh = useCallback(async () => {
+    loadedRef.current = false;
     await loadCategorias();
-  };
+  }, [loadCategorias]);
 
   return {
     categorias,
     loading,
     error,
     loadCategorias,
-    invalidateAfterCreate,
-    refresh,
-    cacheStats: categoryCache.getStats()
+    refresh
   };
 };
 

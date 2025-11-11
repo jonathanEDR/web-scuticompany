@@ -255,9 +255,6 @@ export const ServiciosManagementOptimized = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
       try {
         await deleteServicioHook(id);
-        
-        // 🗑️ Invalidar cache después de eliminar
-        console.log(`🗑️ [Services] Invalidando cache después de eliminar: ${id}`);
         invalidateAllCache();
         
         success('Servicio eliminado exitosamente');
@@ -270,9 +267,6 @@ export const ServiciosManagementOptimized = () => {
   const handleDuplicate = async (id: string) => {
     try {
       await duplicateServicioHook(id);
-      
-      // 🗑️ Invalidar cache después de duplicar
-      console.log(`🗑️ [Services] Invalidando cache después de duplicar: ${id}`);
       invalidateAllCache();
       
       success('Servicio duplicado exitosamente');
@@ -552,6 +546,8 @@ export const ServiciosManagementOptimized = () => {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={async () => {
+          invalidateAllCache();
+          
           setShowCreateModal(false);
           await refresh(); // Refrescar sin recargar toda la página
           success('Servicio creado', 'El servicio se agregó correctamente');

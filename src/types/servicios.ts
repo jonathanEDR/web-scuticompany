@@ -359,6 +359,12 @@ export interface CreateServicioRequest {
   estado?: 'activo' | 'desarrollo' | 'pausado' | 'descontinuado' | 'agotado';
   categoria: string; // ObjectId de la categoría
   caracteristicas?: string[];
+  incluye?: string[];
+  noIncluye?: string[];
+  faq?: {
+    pregunta: string;
+    respuesta: string;
+  }[];
   tecnologias?: string[];
   etiquetas?: string[];
   destacado?: boolean;

@@ -5,7 +5,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { serviciosApi } from '../services/serviciosApi';
-import serviciosCache from '../utils/serviciosCache'; // ✅ Importar cache
 import type {
   Servicio,
   ServicioFilters,
@@ -112,23 +111,6 @@ export const useServicios = (options: UseServiciosOptions = {}): UseServiciosRet
       setLoading(true);
       setError(null);
 
-      // ✅ Generar clave de cache incluyendo filtros y paginación
-      const cacheKey = {
-        filters,
-        page: pagination.page,
-        limit: pagination.limit,
-        sort: initialPagination.sort
-      };
-
-      // ✅ Verificar cache primero
-      const cached = serviciosCache.get<{ data: Servicio[]; pagination: any }>('SERVICE_LIST', cacheKey);
-      if (cached) {
-        setServicios(cached.data);
-        setPagination(cached.pagination);
-        setLoading(false);
-        return;
-      }
-      
       const response = await serviciosApi.getAll(filters, {
         page: pagination.page,
         limit: pagination.limit,
@@ -160,12 +142,6 @@ export const useServicios = (options: UseServiciosOptions = {}): UseServiciosRet
       }
 
       setPagination(paginationData);
-
-      // ✅ Guardar en cache
-      serviciosCache.set('SERVICE_LIST', cacheKey, {
-        data: response.data || [],
-        pagination: paginationData
-      });
 
     } catch (err: any) {
       const errorMessage = err.message || 'Error al cargar servicios';

@@ -19,8 +19,14 @@ interface UseServicesAgentOptions {
 
 interface ContentGenerationParams {
   serviceId: string;
-  contentType: 'full_description' | 'short_description' | 'features' | 'benefits' | 'faq';
+  contentType: 'full_description' | 'short_description' | 'features' | 'benefits' | 'faq' | 'incluye' | 'noIncluye';
   style?: 'formal' | 'casual' | 'technical';
+}
+
+interface CompleteContentParams {
+  serviceId: string;
+  style?: 'formal' | 'casual' | 'technical';
+  forceRegenerate?: boolean;
 }
 
 interface ServicesAgentResponse {
@@ -64,9 +70,7 @@ export const useServicesAgentOptimized = (
         // Crear key para caché
         const cacheKey = `${params.serviceId}-${params.contentType}-${params.style || 'formal'}`;
 
-        // Verificar cache
         if (cacheResults && resultsCache.current.has(cacheKey)) {
-          console.log(`💾 [useServicesAgent] ✅ Resultado en cache: ${cacheKey}`);
           resolve(resultsCache.current.get(cacheKey));
           return;
         }
@@ -103,10 +107,13 @@ export const useServicesAgentOptimized = (
               params.style
             );
 
-            // Guardar en cache
+            console.log(`📦 [useServicesAgent] Respuesta completa:`, response);
+            console.log(`🔍 [useServicesAgent] Response.success:`, response?.success);
+            console.log(`🔍 [useServicesAgent] Response.data:`, response?.data);
+            console.log(`🔍 [useServicesAgent] Response.data.content:`, response?.data?.content);
+
             if (cacheResults) {
               resultsCache.current.set(cacheKey, response);
-              console.log(`💾 [useServicesAgent] Resultado cacheado`);
             }
 
             console.log(`✅ [useServicesAgent] Éxito - ${params.contentType}`);
@@ -140,7 +147,6 @@ export const useServicesAgentOptimized = (
         const cacheKey = `analyze-${serviceId}`;
 
         if (cacheResults && resultsCache.current.has(cacheKey)) {
-          console.log(`💾 [useServicesAgent] Análisis en cache`);
           resolve(resultsCache.current.get(cacheKey));
           return;
         }
@@ -175,11 +181,60 @@ export const useServicesAgentOptimized = (
   );
 
   /**
+   * 🚀 Generar contenido COMPLETO con endpoint unificado (SIN debounce)
+   * Este método NO usa debounce porque es una operación deliberada del usuario
+   */
+  const generateCompleteContent = useCallback(
+    async (params: CompleteContentParams): Promise<ServicesAgentResponse> => {
+      const cacheKey = `complete-${params.serviceId}-${params.style || 'formal'}`;
+
+      // En este caso NO queremos caché si forceRegenerate es true
+      if (cacheResults && !params.forceRegenerate && resultsCache.current.has(cacheKey)) {
+        console.log(`💾 [useServicesAgent] Usando caché para contenido completo`);
+        return resultsCache.current.get(cacheKey);
+      }
+
+      // Verificar límite de requests concurrentes
+      if (pendingRequestsRef.current >= maxConcurrent) {
+        const errorMsg = 'Ya hay una operación en curso. Por favor espera.';
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+
+      pendingRequestsRef.current++;
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await servicesAgentService.generateCompleteContent(
+          params.serviceId,
+          params.style || 'formal',
+          params.forceRegenerate || false
+        );
+
+        if (cacheResults && response.success) {
+          resultsCache.current.set(cacheKey, response);
+        }
+
+        return response;
+      } catch (err: any) {
+        const errorMsg = err.message || 'Error generando contenido completo';
+        console.error(`❌ [useServicesAgent] Error:`, errorMsg);
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
+      } finally {
+        pendingRequestsRef.current--;
+        setIsLoading(pendingRequestsRef.current > 0);
+      }
+    },
+    [maxConcurrent, cacheResults]
+  );
+
+  /**
    * Limpiar cache
    */
   const clearCache = useCallback(() => {
     resultsCache.current.clear();
-    console.log(`🧹 [useServicesAgent] Cache limpiado`);
   }, []);
 
   /**
@@ -204,13 +259,14 @@ export const useServicesAgentOptimized = (
     console.log('Cargando:', isLoading);
     console.log('Error:', error);
     console.log('Requests activos:', pendingRequestsRef.current);
-    console.log('Cache entries:', resultsCache.current.size);
+    console.log('Entradas en memoria:', resultsCache.current.size);
     console.log('Configuración:', { debounceMs, maxConcurrent, cacheResults });
     console.groupEnd();
   }, [isLoading, error, debounceMs, maxConcurrent, cacheResults]);
 
   return {
     generateContent,
+    generateCompleteContent,
     analyzeService,
     clearCache,
     cancel,

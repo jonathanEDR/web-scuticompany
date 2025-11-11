@@ -3,29 +3,27 @@
  * Versión limpia con tabs funcionales para crear y editar servicios
  */
 
-import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { serviciosApi } from '../../services/serviciosApi';
-// import { servicesAgentService } from '../../services/servicesAgentService'; // ✅ Reemplazado por useServicesAgentOptimized
-import { RichTextEditor } from '../../components/common/RichTextEditor';
-import { MultipleImageGallery } from '../../components/common/MultipleImageGallery';
-import { ImageUploader } from '../../components/common/ImageUploader';
 import { useTabNavigation, type Tab } from '../../components/common/TabNavigator';
 import { useNotification } from '../../hooks/useNotification';
 import { type Categoria } from '../../services/categoriasApi';
 import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
-import * as uploadApi from '../../services/uploadApi';
-import { SEOPreview } from '../../components/admin/services/SEOPreview';
-// ✅ Optimización Fase 3: Lazy loading - cargar modal solo cuando se abre
 const ServicesCanvasModal = lazy(() => import('../../components/admin/services/ServicesCanvasModal'));
-import AIFieldButton from '../../components/ai-assistant/AIFieldButton';
-import BlockEditor from '../../components/ai-assistant/BlockEditor/BlockEditor';
-import { useBlocksConverter } from '../../components/ai-assistant/hooks/useBlocksConverter';
-import type { Block } from '../../components/ai-assistant/BlockEditor/types';
 import { Sparkles } from 'lucide-react';
-import useCategoriasCacheadas from '../../hooks/useCategoriasCacheadas';
+import useCategorias from '../../hooks/useCategoriasCacheadas';
 import useServicesAgentOptimized from '../../hooks/useServicesAgentOptimized';
+import useDebugBlocks from '../../hooks/useDebugBlocks';
+import useServiceBlocks from '../../hooks/useServiceBlocks';
+import AdvancedContentForm from '../../components/forms/AdvancedContentForm';
+import FeaturesForm from '../../components/forms/FeaturesForm';
+import BasicInfoForm from '../../components/forms/BasicInfoForm';
+import PricingForm from '../../components/forms/PricingForm';
+import VisualForm from '../../components/forms/VisualForm';
+import SettingsForm from '../../components/forms/SettingsForm';
+import { intelligentTruncate, cleanAIContent, prepareSEOContent } from '../../utils/textUtils';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -44,37 +42,52 @@ export const ServicioFormV3: React.FC = () => {
   const [loadingData, setLoadingData] = useState(isEditMode);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [etiquetaInput, setEtiquetaInput] = useState('');
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
   const [showServicesCanvas, setShowServicesCanvas] = useState(false);
+  const loadingRef = useRef(false); // Prevenir doble carga
 
-  // Estados para Block Editors
-  const [caracteristicasBlocks, setCaracteristicasBlocks] = useState<Block[]>([]);
-  const [beneficiosBlocks, setBeneficiosBlocks] = useState<Block[]>([]);
-  const [faqBlocks, setFaqBlocks] = useState<Block[]>([]);
+  // ✅ Hook centralizado para manejar todos los bloques
+  const {
+    caracteristicasBlocks,
+    beneficiosBlocks,
+    incluyeBlocks,
+    noIncluyeBlocks,
+    faqBlocks,
+    setCaracteristicasBlocks,
+    setBeneficiosBlocks,
+    setIncluyeBlocks,
+    setNoIncluyeBlocks,
+    setFaqBlocks,
+    textToBlocks,
+    loadBlocksFromService,
+    getBlocksAsArrays
+  } = useServiceBlocks();
+  
   const [generatingBlocks, setGeneratingBlocks] = useState(false);
 
-  // Hook para convertir bloques ↔ texto
-  const { textToBlocks, blocksToText } = useBlocksConverter();
+  // 🔍 Debug hook - Solo en desarrollo
+  useDebugBlocks(
+    caracteristicasBlocks,
+    beneficiosBlocks,
+    incluyeBlocks,
+    noIncluyeBlocks,
+    faqBlocks
+  );
 
-  // ✅ Optimización Fase 3: Categorías cacheadas
-  const { 
-    categorias: categoriasCache, 
-    loading: loadingCategorias, 
-    invalidateAfterCreate: invalidateCategorias 
-  } = useCategoriasCacheadas({ autoLoad: true });
+  // ✅ Categorías (usando hook existente pero sin invalidación)
+  const {
+    categorias, 
+    loading: loadingCategorias
+  } = useCategorias({ autoLoad: true });
 
-  // Sincronizar categorías del cache
-  useEffect(() => {
-    setCategorias(categoriasCache);
-  }, [categoriasCache]);
-
-  // ✅ Optimización Fase 3: ServicesAgent con debouncing y caché
   const agentService = useServicesAgentOptimized({
-    debounceMs: 500,      // Esperar 500ms antes de ejecutar
-    maxConcurrent: 1,     // Solo 1 request a la vez
-    cacheResults: true    // Cachear resultados
+    debounceMs: 500,
+    maxConcurrent: 1,
+    cacheResults: false
   });
+
+  // ✅ AutoComplete automático cuando se detectan campos incompletos
+  const [autoCompleteTriggered, setAutoCompleteTriggered] = useState(false);
 
   // ============================================
   // REACT HOOK FORM
@@ -87,6 +100,7 @@ export const ServicioFormV3: React.FC = () => {
     setValue,
     watch,
     reset,
+    control,
   } = useForm<any>({
     defaultValues: {
       titulo: '',
@@ -118,12 +132,7 @@ export const ServicioFormV3: React.FC = () => {
       colorSecundario: '#06B6D4',
       imagen: '',
       
-      // Características y Etiquetas
-      caracteristicas: '',
-      beneficios: '',
-      incluye: '',
-      noIncluye: '',
-      faq: '',
+      // Etiquetas
       etiquetas: [],
       
       // Configuraciones adicionales
@@ -138,11 +147,8 @@ export const ServicioFormV3: React.FC = () => {
     },
   });
 
-  // Observar campos
+  // Observar solo campos necesarios para la UI
   const galeriaImagenes = watch('galeriaImagenes') || [];
-  const caracteristicas = watch('caracteristicas') || '';
-  const beneficios = watch('beneficios') || '';
-  const faq = watch('faq') || '';
 
   // ============================================
   // SISTEMA DE TABS COMPLETO
@@ -185,7 +191,13 @@ export const ServicioFormV3: React.FC = () => {
       icon: '⚡',
       description: 'Beneficios, incluye/excluye, FAQ',
       isOptional: true,
-      isCompleted: Boolean(caracteristicas?.length || beneficios?.length || faq?.length)
+      isCompleted: Boolean(
+        caracteristicasBlocks.length || 
+        beneficiosBlocks.length || 
+        incluyeBlocks.length || 
+        noIncluyeBlocks.length || 
+        faqBlocks.length
+      )
     },
     {
       id: 'settings',
@@ -194,7 +206,15 @@ export const ServicioFormV3: React.FC = () => {
       description: 'Estado, visibilidad y opciones avanzadas',
       isValid: true
     }
-  ], [watch, galeriaImagenes]);
+  ], [
+    watch, 
+    galeriaImagenes, 
+    caracteristicasBlocks.length, 
+    beneficiosBlocks.length, 
+    incluyeBlocks.length, 
+    noIncluyeBlocks.length, 
+    faqBlocks.length
+  ]);
 
   const {
     activeTab,
@@ -240,29 +260,33 @@ export const ServicioFormV3: React.FC = () => {
 
   // Manejar éxito al crear nueva categoría
   const handleCategoriaCreated = (nuevaCategoria: Categoria) => {
-    setCategorias(prev => [...prev, nuevaCategoria].sort((a, b) => a.orden - b.orden));
     setValue('categoria', nuevaCategoria._id); // Seleccionar automáticamente la nueva categoría
     setShowCreateCategoriaModal(false);
-    invalidateCategorias(); // ✅ Invalidar cache después de crear
+    // Las categorías se recargarán automáticamente por el hook
   };
 
   // ============================================
   // CARGAR DATOS EN MODO EDICIÓN
   // ============================================
 
-  useEffect(() => {
-    if (isEditMode && id) {
-      loadServicio(id);
-    }
-  }, [id, isEditMode]);
+  const loadServicio = useCallback(async (servicioId: string) => {
+    // ✅ Prevenir doble carga
+    if (loadingRef.current) {
 
-  const loadServicio = async (servicioId: string) => {
+      return;
+    }
+
     try {
+      loadingRef.current = true;
       setLoadingData(true);
-      const response = await serviciosApi.getById(servicioId, false);
+      
+      // ✅ Intentar primero sin bypass de cache
+      const response = await serviciosApi.getById(servicioId, true, true);            
       
       if (response.success && response.data) {
         const servicio = response.data;
+        
+        // ✅ Cargar datos del servicio en el formulario
         reset({
           titulo: servicio.titulo,
           slug: servicio.slug || '',
@@ -294,66 +318,54 @@ export const ServicioFormV3: React.FC = () => {
           colorSecundario: servicio.colorSecundario || '#06B6D4',
           imagen: servicio.imagen || '',
           
-          // Características - Convertir arrays a texto para textareas
-          caracteristicas: Array.isArray(servicio.caracteristicas) 
-            ? servicio.caracteristicas.map(c => `• ${c}`).join('\n')
-            : servicio.caracteristicas || '',
-          beneficios: Array.isArray(servicio.beneficios)
-            ? servicio.beneficios.map(b => `• ${b}`).join('\n')
-            : servicio.beneficios || '',
-          incluye: Array.isArray(servicio.incluye)
-            ? servicio.incluye.map(i => `• ${i}`).join('\n')
-            : servicio.incluye || '',
-          noIncluye: Array.isArray(servicio.noIncluye)
-            ? servicio.noIncluye.map(n => `• ${n}`).join('\n')
-            : servicio.noIncluye || '',
-          faq: Array.isArray(servicio.faq) && servicio.faq.length > 0 && typeof servicio.faq[0] === 'object'
-            ? servicio.faq.map((f: any) => `P: ${f.pregunta}\nR: ${f.respuesta}`).join('\n\n')
-            : servicio.faq || '',
-          
           // Etiquetas
           etiquetas: servicio.etiquetas || [],
           
-          // Configuraciones adicionales - ✅ Priorizar campo 'seo', fallback a metaTitle/metaDescription
+          // Configuraciones adicionales - ✅ Verificar que los campos tengan contenido real
           seo: {
-            titulo: servicio.seo?.titulo || servicio.metaTitle || '',
-            descripcion: servicio.seo?.descripcion || servicio.metaDescription || '',
-            palabrasClave: servicio.seo?.palabrasClave || ''
+            titulo: (servicio.seo?.titulo && servicio.seo.titulo.trim()) || servicio.metaTitle || '',
+            descripcion: (servicio.seo?.descripcion && servicio.seo.descripcion.trim()) || servicio.metaDescription || '',
+            palabrasClave: (servicio.seo?.palabrasClave && servicio.seo.palabrasClave.trim()) || ''
           },
           tiempoEntrega: servicio.tiempoEntrega || '',
           garantia: servicio.garantia || '',
           soporte: servicio.soporte || 'basico',
         });
-
-        // Convertir texto cargado a bloques
-        const caracteristicasText = Array.isArray(servicio.caracteristicas) 
-          ? servicio.caracteristicas.map(c => `• ${c}`).join('\n')
-          : servicio.caracteristicas || '';
-        const beneficiosText = Array.isArray(servicio.beneficios)
-          ? servicio.beneficios.map(b => `• ${b}`).join('\n')
-          : servicio.beneficios || '';
-        const faqText = Array.isArray(servicio.faq) && servicio.faq.length > 0 && typeof servicio.faq[0] === 'object'
-          ? servicio.faq.map((f: any) => `P: ${f.pregunta}\nR: ${f.respuesta}`).join('\n\n')
-          : typeof servicio.faq === 'string' ? servicio.faq : '';
-
-        setCaracteristicasBlocks(textToBlocks(caracteristicasText, 'list'));
-        setBeneficiosBlocks(textToBlocks(beneficiosText, 'list'));
-        setFaqBlocks(textToBlocks(faqText, 'faq'));
+      
+        // ✅ CARGAR BLOQUES usando el hook centralizado
+        loadBlocksFromService(servicio);
+      } else {
+        error('Error', 'No se pudieron cargar los datos del servicio');
       }
     } catch (err: any) {
-      console.error('Error al cargar servicio:', err);
-      error('Error', 'No se pudo cargar el servicio');
+      
+      if (err.response?.status === 404) {
+        error('Error', 'Servicio no encontrado');
+        navigate('/admin/servicios');
+      } else if (err.response?.status >= 500) {
+        error('Error', 'Error del servidor. Intenta de nuevo en un momento.');
+      } else {
+        error('Error', `No se pudo cargar el servicio: ${err.message || 'Error desconocido'}`);
+      }
     } finally {
       setLoadingData(false);
+      loadingRef.current = false; // ✅ Resetear flag de carga
     }
-  };
+  }, []); // useCallback dependencies
+
+  // Efecto para cargar servicio en modo edición
+  useEffect(() => {
+    if (isEditMode && id) {
+      loadServicio(id);
+    }
+  }, [id, isEditMode, loadServicio]);
 
   // ============================================
-  // FUNCIONES AUXILIARES
+  // FUNCIONES AUXILIARES OPTIMIZADAS
   // ============================================
 
-  // Generar slug desde título
-  const generateSlug = (titulo: string): string => {
+  // Generar slug - Memoizado para evitar recálculos innecesarios
+  const generateSlug = useCallback((titulo: string): string => {
     if (!titulo) return '';
     return titulo
       .toLowerCase()
@@ -361,20 +373,52 @@ export const ServicioFormV3: React.FC = () => {
       .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
       .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales
       .replace(/^-+|-+$/g, ''); // Quitar guiones del inicio y final
-  };
+  }, []);
 
-  // Actualizar slug automáticamente cuando cambie el título (solo en modo edición)
+  // Auto-actualizar slug cuando cambie el título - Optimizado con debounce implícito
+  const currentTitulo = watch('titulo');
+  
   useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      if (name === 'titulo' && isEditMode && value.titulo) {
-        // En modo edición, sugerir actualización del slug
-        const newSlug = generateSlug(value.titulo);
-        // Por ahora solo lo almacenamos, luego podemos agregar UI para confirmarlo
-        setValue('slug', newSlug);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, setValue, isEditMode]);
+    // Solo auto-generar slug en modo creación O si el slug actual está vacío
+    const currentSlug = watch('slug');
+    
+    if (currentTitulo && (!currentSlug || (!isEditMode && currentTitulo))) {
+      const newSlug = generateSlug(currentTitulo);
+      setValue('slug', newSlug);
+    }
+  }, [currentTitulo, isEditMode, generateSlug, setValue, watch]);
+
+  // ✅ AUTOCOMPLETADO AUTOMÁTICO - Cuando se carga un servicio con campos incompletos
+  useEffect(() => {
+    // Solo en modo edición y cuando hay datos cargados
+    if (!isEditMode || loadingData || autoCompleteTriggered) return;
+
+    const titulo = watch('titulo');
+    const descripcion = watch('descripcion');
+    const descripcionCorta = watch('descripcionCorta');
+
+    // Detectar si los campos necesitan autocompletado automático
+    const shouldAutoComplete = 
+      titulo && 
+      (
+        !descripcion || descripcion.length < 50 ||
+        !descripcionCorta || descripcionCorta.length < 20
+      ) &&
+      !generatingBlocks; // No si ya está generando
+
+    if (shouldAutoComplete && id) {
+      setAutoCompleteTriggered(true);
+      
+      // Pequeño delay para que el usuario lo vea
+      const timer = setTimeout(() => {
+        success('ℹ️ Sugerencia', 'Detectamos campos incompletos. Autocompletando con IA...');
+        // La función handleAutoCompleteBasicInfo se ejecutará cuando se defina
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isEditMode, loadingData, id, watch, generatingBlocks, success, autoCompleteTriggered]);
+  // TODO: Agregar handleAutoCompleteBasicInfo a dependencias cuando se pueda refactorizar
 
   // ============================================
   // FUNCIONES DE ETIQUETAS
@@ -404,13 +448,10 @@ export const ServicioFormV3: React.FC = () => {
   };
 
   // ============================================
-  // GENERAR BLOQUES CON IA
+  // AUTOCOMPLETAR INFORMACIÓN BÁSICA CON IA - VERSIÓN MEJORADA
   // ============================================
 
-  const handleGenerateBlocks = async (
-    blockType: 'features' | 'benefits' | 'faq',
-    setBlocks: React.Dispatch<React.SetStateAction<Block[]>>
-  ) => {
+  const handleAutoCompleteBasicInfo = async () => {
     if (!id) {
       error('Error', 'Debes guardar el servicio primero antes de generar contenido');
       return;
@@ -419,49 +460,174 @@ export const ServicioFormV3: React.FC = () => {
     try {
       setGeneratingBlocks(true);
 
-      // Mapear tipo de bloque a contentType del backend
-      const contentTypeMap = {
-        features: 'features' as const,
-        benefits: 'benefits' as const,
-        faq: 'faq' as const
-      };
-
-      const contentType = contentTypeMap[blockType];
-
-      // ✅ Llamar con debouncing y caché
       const response = await agentService.generateContent({
         serviceId: id,
-        contentType,
+        contentType: 'full_description',
         style: 'formal'
       });
 
       if (response.success && response.data?.content) {
-        const generatedText = response.data.content;
+        const generatedContent = response.data.content;
         
-        // Convertir el texto generado a bloques
-        const newBlocks = textToBlocks(generatedText, blockType === 'faq' ? 'faq' : 'list');
-        
-        // Reemplazar bloques existentes con los nuevos
-        setBlocks(newBlocks);
-        
-        success('Éxito', `Se generaron ${newBlocks.length} bloques con IA`);
+        // Limpiar contenido
+        const cleanContent = cleanAIContent(generatedContent);
+
+        if (cleanContent && cleanContent.length > 50) {
+          // ⚡ SOLUCIÓN: Aplicar límite de 1000 caracteres para descripción
+          let finalDescription = cleanContent;
+          if (finalDescription.length > 1000) {
+            finalDescription = intelligentTruncate(finalDescription, {
+              maxLength: 1000,
+              respectWordBoundaries: true,
+              addEllipsis: false,
+              preferSentenceEnd: true
+            });
+          }
+          
+          setValue('descripcion', finalDescription);
+          
+          // También podemos generar una descripción corta a partir del contenido largo
+          const shortDescription = intelligentTruncate(cleanContent, {
+            maxLength: 200,
+            respectWordBoundaries: true,
+            addEllipsis: false,
+            preferSentenceEnd: true
+          });
+          
+          if (shortDescription && shortDescription.length > 20) {
+            setValue('descripcionCorta', shortDescription);
+          }
+
+          success('🎉 ¡Contenido Generado!', 'Se ha actualizado la descripción del servicio con contenido profesional generado por IA');
+        } else {
+          error('Error', 'El contenido generado es demasiado corto. Intenta nuevamente.');
+        }
       } else {
-        error('Error', response.error || 'No se pudo generar el contenido');
+        error('Error', 'No se pudo generar contenido. Verifica que el servicio tenga información básica.');
       }
+
     } catch (err: any) {
-      console.error('Error generating blocks:', err);
-      error('Error', err.message || 'Error al generar bloques con IA');
+      error('Error', err.message || 'Error al autocompletar la información básica');
     } finally {
       setGeneratingBlocks(false);
     }
   };
 
-  // Generar contenido de texto simple con IA (autocompletado directo)
-  const handleGenerateText = async (
-    contentType: 'full_description' | 'short_description',
-    fieldName: string,
-    style: 'formal' | 'casual' | 'technical' = 'formal'
-  ) => {
+  // ============================================
+  // AUTOCOMPLETAR INFORMACIÓN COMERCIAL CON IA
+  // ============================================
+
+  const handleAutoCompletePricing = async () => {
+    if (!id) {
+      error('Error', 'Debes guardar el servicio primero antes de generar contenido comercial');
+      return;
+    }
+
+    try {
+      setGeneratingBlocks(true);
+
+      // Obtener información actual del servicio para contexto
+      const serviceInfo = {
+        titulo: watch('titulo') || '',
+        categoria: watch('categoria') || '',
+        descripcion: watch('descripcion') || ''
+      };
+
+      // Generar contenido comercial usando el agente
+      const response = await agentService.generateContent({
+        serviceId: id,
+        contentType: 'full_description',
+        style: 'formal'
+      });
+
+      if (response.success && response.data?.content) {
+        // Generar etiqueta promocional inteligente basada en el contenido
+        const etiquetasComunes = [
+          '¡NUEVO!', '🔥 POPULAR', '⭐ RECOMENDADO', '🚀 INNOVADOR', 
+          '💡 ESPECIALISTA', '✨ PREMIUM', '🎯 PERSONALIZADO', '🏆 EXPERTO'
+        ];
+        
+        let etiqueta = '';
+        if (serviceInfo.categoria?.toLowerCase().includes('consultor')) {
+          etiqueta = '💡 ESPECIALISTA';
+        } else if (serviceInfo.titulo?.toLowerCase().includes('desarrollo') || 
+                   serviceInfo.titulo?.toLowerCase().includes('diseño')) {
+          etiqueta = '🚀 INNOVADOR';
+        } else if (serviceInfo.categoria?.toLowerCase().includes('marketing')) {
+          etiqueta = '🔥 POPULAR';
+        } else {
+          etiqueta = etiquetasComunes[Math.floor(Math.random() * etiquetasComunes.length)];
+        }
+
+        // Generar tiempo de entrega inteligente
+        let tiempoEntrega = '';
+        if (serviceInfo.categoria?.toLowerCase().includes('consultor')) {
+          tiempoEntrega = '3-5 días laborales';
+        } else if (serviceInfo.titulo?.toLowerCase().includes('desarrollo')) {
+          tiempoEntrega = '7-14 días laborales';
+        } else if (serviceInfo.titulo?.toLowerCase().includes('diseño')) {
+          tiempoEntrega = '5-10 días laborales';
+        } else {
+          tiempoEntrega = '2-7 días laborales';
+        }
+
+        // Generar garantía inteligente
+        let garantia = '';
+        if (serviceInfo.categoria?.toLowerCase().includes('consultor')) {
+          garantia = '100% satisfacción garantizada';
+        } else if (serviceInfo.titulo?.toLowerCase().includes('desarrollo')) {
+          garantia = '6 meses de soporte incluido';
+        } else if (serviceInfo.titulo?.toLowerCase().includes('diseño')) {
+          garantia = '3 revisiones gratuitas';
+        } else {
+          garantia = '30 días de garantía total';
+        }
+
+        // Aplicar los valores solo si los campos están vacíos o necesitan mejora
+        let updatedFields = 0;
+        
+        if (!watch('etiquetaPromocion') || watch('etiquetaPromocion').length < 5) {
+          setValue('etiquetaPromocion', etiqueta);
+          updatedFields++;
+        }
+
+        if (!watch('tiempoEntrega') || watch('tiempoEntrega').length < 5) {
+          setValue('tiempoEntrega', tiempoEntrega);
+          updatedFields++;
+        }
+
+        if (!watch('garantia') || watch('garantia').length < 5) {
+          setValue('garantia', garantia);
+          updatedFields++;
+        }
+
+        if (updatedFields > 0) {
+          success(
+            '🎉 ¡Información Comercial Generada!', 
+            `Se actualizaron ${updatedFields} campos comerciales con información inteligente`
+          );
+        } else {
+          success(
+            'ℹ️ Información Completa', 
+            'Todos los campos comerciales ya tienen contenido. No se requieren cambios.'
+          );
+        }
+      } else {
+        error('Error', 'No se pudo generar información comercial. Verifica que el servicio tenga información básica.');
+      }
+
+    } catch (err: any) {
+      error('Error', err.message || 'Error al autocompletar información comercial');
+    } finally {
+      setGeneratingBlocks(false);
+    }
+  };
+
+  // ============================================
+  // AUTOCOMPLETAR CONTENIDO AVANZADO CON IA (OPTIMIZADO - ENDPOINT UNIFICADO)
+  // ============================================
+
+  const handleAutoCompleteAdvanced = async () => {
     if (!id) {
       error('Error', 'Debes guardar el servicio primero antes de generar contenido');
       return;
@@ -470,71 +636,252 @@ export const ServicioFormV3: React.FC = () => {
     try {
       setGeneratingBlocks(true);
 
-      // ✅ Llamar con debouncing y caché
-      const response = await agentService.generateContent({
+      // Usar endpoint unificado para generar contenido avanzado
+      const response = await agentService.generateCompleteContent({
         serviceId: id,
-        contentType,
-        style
+        style: 'formal',
+        forceRegenerate: false
       });
 
-      if (response.success && response.data?.content) {
-        let generatedText = response.data.content;
-        
-        // Limpiar contenido: remover secciones de recomendaciones y análisis
-        // Estas secciones son útiles para el agente pero no para el usuario final
-        generatedText = generatedText
-          .replace(/💡\s*RECOMENDACIÓN:[\s\S]*?(?=\n\n|$)/gi, '') // Remover sección de recomendación
-          .replace(/🔍\s*ANÁLISIS:[\s\S]*?(?=\n\n|$)/gi, '') // Remover sección de análisis
-          .replace(/📊\s*SUGERENCIA:[\s\S]*?(?=\n\n|$)/gi, '') // Remover sugerencias
-          .replace(/⚠️\s*NOTA:[\s\S]*?(?=\n\n|$)/gi, '') // Remover notas
-          .replace(/\n{3,}/g, '\n\n') // Limpiar múltiples saltos de línea
-          .trim();
-        
-        // Aplicar límites de caracteres según el campo para evitar errores de validación
-        const fieldLimits: Record<string, number> = {
-          'descripcionRica': 3000,      // RichTextEditor permite 3000
-          'contenidoAdicional': 1950    // Backend valida 2000, dejamos margen de seguridad
-        };
-        
-        const maxLength = fieldLimits[fieldName];
-        
-        if (maxLength && generatedText.length > maxLength) {
-          // Truncar el texto de forma inteligente (en el último punto antes del límite)
-          let truncatedText = generatedText.substring(0, maxLength);
-          const lastPeriod = truncatedText.lastIndexOf('.');
+      if (!response.success || !response.data?.generatedContent) {
+        throw new Error(response.error || 'No se pudo generar contenido avanzado');
+      }
+
+      const generatedContent = response.data.generatedContent;
+      let updatedFields = 0;
+
+      // ✅ Procesar descripción completa (full_description) → descripcionRica
+      if (generatedContent.full_description && typeof generatedContent.full_description === 'string') {
+        const cleanContent = cleanAIContent(generatedContent.full_description);
+
+        if (cleanContent && cleanContent.length > 100) {
+          // Descripción rica: usar contenido completo
+          let descripcionRica = cleanContent;
           
-          if (lastPeriod > maxLength * 0.8) { // Si el último punto está en el último 20%
-            truncatedText = truncatedText.substring(0, lastPeriod + 1);
-          } else {
-            // Si no hay punto cercano, truncar en el último espacio
-            const lastSpace = truncatedText.lastIndexOf(' ');
-            truncatedText = truncatedText.substring(0, lastSpace) + '...';
+          // Truncar si excede el límite (3000 caracteres)
+          if (descripcionRica.length > 3000) {
+            descripcionRica = intelligentTruncate(descripcionRica, {
+              maxLength: 3000,
+              respectWordBoundaries: true,
+              addEllipsis: false,
+              preferSentenceEnd: true
+            });
+          }
+
+          // Solo actualizar si está vacío o muy corto
+          if (!watch('descripcionRica') || watch('descripcionRica').length < 50) {
+            setValue('descripcionRica', descripcionRica);
+            updatedFields++;
+          }
+        }
+      }
+
+      // ✅ Procesar descripción corta (short_description) → contenidoAdicional
+      // Usar short_description en lugar de duplicar full_description
+      if (generatedContent.short_description && typeof generatedContent.short_description === 'string') {
+        const shortDesc = cleanAIContent(generatedContent.short_description);
+        
+        // Contenido adicional: usar descripción corta (diferente a la rica)
+        if (shortDesc && shortDesc.length > 50 && (!watch('contenidoAdicional') || watch('contenidoAdicional').length < 50)) {
+          let contenidoAdicional = shortDesc;
+          
+          // Asegurar que no exceda el límite (2000 caracteres)
+          if (contenidoAdicional.length > 2000) {
+            contenidoAdicional = intelligentTruncate(contenidoAdicional, {
+              maxLength: 2000,
+              respectWordBoundaries: true,
+              addEllipsis: false,
+              preferSentenceEnd: true
+            });
           }
           
-          generatedText = truncatedText;
-          console.warn(`⚠️ Contenido truncado de ${response.data.content.length} a ${generatedText.length} caracteres`);
+          setValue('contenidoAdicional', contenidoAdicional);
+          updatedFields++;
         }
-        
-        setValue(fieldName, generatedText);
-        
-        // Mensajes personalizados según el campo
-        const fieldMessages: Record<string, string> = {
-          'descripcionRica': '✨ Descripción rica generada y aplicada automáticamente',
-          'contenidoAdicional': '✨ Contenido adicional generado y aplicado automáticamente'
-        };
-        
-        const message = fieldMessages[fieldName] || '✨ Contenido generado y aplicado exitosamente';
-        success('Éxito', message);
-      } else {
-        error('Error', response.error || 'No se pudo generar el contenido');
       }
+
+      // ✅ También actualizar descripcionCorta si está vacía
+      if (generatedContent.short_description && typeof generatedContent.short_description === 'string') {
+        const shortDesc = cleanAIContent(generatedContent.short_description);
+        
+        if (shortDesc && shortDesc.length > 20 && (!watch('descripcionCorta') || watch('descripcionCorta').length < 20)) {
+          // Asegurar que no exceda el límite de descripción corta
+          const finalShortDesc = shortDesc.length > 200 
+            ? intelligentTruncate(shortDesc, { maxLength: 200, respectWordBoundaries: true, addEllipsis: false })
+            : shortDesc;
+          
+          setValue('descripcionCorta', finalShortDesc);
+          updatedFields++;
+        }
+      }
+
+      if (updatedFields > 0) {
+        const processingTime = response.metadata?.processingTime 
+          ? ` en ${Math.round(response.metadata.processingTime / 1000)}s`
+          : '';
+
+        success(
+          '🎉 ¡Contenido Avanzado Generado!', 
+          `Se actualizaron ${updatedFields} campos con contenido profesional${processingTime}. Optimizado con endpoint unificado 🎯`
+        );
+      } else {
+        success(
+          'ℹ️ Contenido Completo', 
+          'Todos los campos de contenido avanzado ya tienen información. No se requieren cambios.'
+        );
+      }
+
     } catch (err: any) {
-      console.error('Error generating text:', err);
-      error('Error', err.message || 'Error al generar contenido con IA');
+      console.error('❌ Error en handleAutoCompleteAdvanced:', err);
+      error('Error', err.message || 'Error al autocompletar contenido avanzado');
     } finally {
       setGeneratingBlocks(false);
     }
   };
+
+  // ============================================
+  // AUTOCOMPLETAR CARACTERÍSTICAS CON IA (OPTIMIZADO - ENDPOINT UNIFICADO)
+  // ============================================
+
+  const handleAutoCompleteFeatures = async () => {
+    if (!id) {
+      error('Error', 'Debes guardar el servicio primero antes de generar características');
+      return;
+    }
+
+    try {
+      setGeneratingBlocks(true);
+
+      // Analizar qué secciones están vacías
+      const sectionsEmpty = {
+        caracteristicas: caracteristicasBlocks.length === 0,
+        beneficios: beneficiosBlocks.length === 0,
+        incluye: incluyeBlocks.length === 0,
+        noIncluye: noIncluyeBlocks.length === 0,
+        faq: faqBlocks.length === 0
+      };
+
+      // Contar secciones vacías
+      const emptySectionsCount = Object.values(sectionsEmpty).filter(Boolean).length;
+
+      if (emptySectionsCount === 0) {
+        success(
+          'ℹ️ Características Completas',
+          'Todas las secciones ya tienen contenido. Para regenerar, elimina primero el contenido existente.'
+        );
+        return;
+      }
+
+      // Usar endpoint unificado para generar características completas
+      const response = await agentService.generateCompleteContent({
+        serviceId: id,
+        style: 'formal',
+        forceRegenerate: false
+      });
+
+      if (!response.success || !response.data?.generatedContent) {
+        throw new Error(response.error || 'No se pudo generar contenido completo');
+      }
+
+      const generatedContent = response.data.generatedContent;
+      let successCount = 0;
+
+      // ✅ Procesar características
+      if (sectionsEmpty.caracteristicas && generatedContent.caracteristicas && Array.isArray(generatedContent.caracteristicas)) {
+        const textForBlocks = generatedContent.caracteristicas.join('\n');
+        if (textForBlocks && textForBlocks.trim()) {
+          const newBlocks = textToBlocks(textForBlocks, 'list');
+          if (newBlocks.length > 0) {
+            setCaracteristicasBlocks(newBlocks);
+            successCount++;
+          }
+        }
+      }
+
+      // ✅ Procesar beneficios
+      if (sectionsEmpty.beneficios && generatedContent.beneficios && Array.isArray(generatedContent.beneficios)) {
+        const textForBlocks = generatedContent.beneficios.join('\n');
+        if (textForBlocks && textForBlocks.trim()) {
+          const newBlocks = textToBlocks(textForBlocks, 'list');
+          if (newBlocks.length > 0) {
+            setBeneficiosBlocks(newBlocks);
+            successCount++;
+          }
+        }
+      }
+
+      // ✅ Procesar qué incluye
+      if (sectionsEmpty.incluye && generatedContent.incluye && Array.isArray(generatedContent.incluye)) {
+        const textForBlocks = generatedContent.incluye.join('\n');
+        if (textForBlocks && textForBlocks.trim()) {
+          const newBlocks = textToBlocks(textForBlocks, 'list');
+          if (newBlocks.length > 0) {
+            setIncluyeBlocks(newBlocks);
+            successCount++;
+          }
+        }
+      }
+
+      // ✅ Procesar qué NO incluye
+      if (sectionsEmpty.noIncluye && generatedContent.noIncluye && Array.isArray(generatedContent.noIncluye)) {
+        const textForBlocks = generatedContent.noIncluye.join('\n');
+        if (textForBlocks && textForBlocks.trim()) {
+          const newBlocks = textToBlocks(textForBlocks, 'list');
+          if (newBlocks.length > 0) {
+            setNoIncluyeBlocks(newBlocks);
+            successCount++;
+          }
+        }
+      }
+
+      // ✅ Procesar FAQ (caso especial - objetos con pregunta/respuesta)
+      if (sectionsEmpty.faq && generatedContent.faq && Array.isArray(generatedContent.faq)) {
+        let textForBlocks = '';
+        
+        // El backend devuelve array de objetos FAQ
+        if (generatedContent.faq.length > 0 && typeof generatedContent.faq[0] === 'object') {
+          textForBlocks = generatedContent.faq
+            .map((faq: any) => `P: ${faq.pregunta || faq.question || ''}\nR: ${faq.respuesta || faq.answer || ''}`)
+            .join('\n\n');
+        } else {
+          // Fallback: array de strings
+          textForBlocks = generatedContent.faq.join('\n\n');
+        }
+        
+        if (textForBlocks && textForBlocks.trim()) {
+          const newBlocks = textToBlocks(textForBlocks, 'faq');
+          if (newBlocks.length > 0) {
+            setFaqBlocks(newBlocks);
+            successCount++;
+          }
+        }
+      }
+
+      // Mostrar resultado
+      if (successCount > 0) {
+        const processingTime = response.metadata?.processingTime 
+          ? ` en ${Math.round(response.metadata.processingTime / 1000)}s`
+          : '';
+        
+        success(
+          '🚀 ¡Contenido Generado con IA!',
+          `Se completaron ${successCount} de ${emptySectionsCount} secciones vacías${processingTime}. Optimizado con endpoint unificado 🎯`
+        );
+      } else {
+        error('Error', 'No se pudo aplicar el contenido generado. Intenta nuevamente.');
+      }
+
+    } catch (err: any) {
+      console.error('❌ Error en handleAutoCompleteFeatures:', err);
+      error('Error', err.message || 'Error al autocompletar características');
+    } finally {
+      setGeneratingBlocks(false);
+    }
+  };
+
+  // ============================================
+  // GENERAR CONTENIDO SEO CON IA
+  // ============================================
 
   // Generar contenido SEO con IA (autocompletado directo de los 3 campos)
   const handleGenerateSEO = async () => {
@@ -546,60 +893,55 @@ export const ServicioFormV3: React.FC = () => {
     try {
       setGeneratingBlocks(true);
 
-      // ✅ Generar título SEO con debouncing
-      const titleResponse = await agentService.generateContent({
+      // ✅ Generar contenido SEO estructurado con el agente
+      const response = await agentService.generateContent({
         serviceId: id,
-        contentType: 'short_description',
+        contentType: 'seo' as any, // Nuevo tipo específico para SEO
         style: 'formal'
       });
-      
-      if (titleResponse.success && titleResponse.data?.content) {
-        // Crear un título SEO más atractivo y optimizado
-        const baseTitle = titleResponse.data.content;
-        const seoTitle = baseTitle.length > 60 
-          ? baseTitle.substring(0, 57) + '...' 
-          : baseTitle;
-        setValue('seo.titulo', seoTitle);
+
+      if (response.success && response.data?.content) {
+        let seoContent;
+        
+        // Verificar si la respuesta es un objeto JSON estructurado
+        if (typeof response.data.content === 'object' && response.data.content.titulo) {
+          seoContent = response.data.content;
+        } else {
+          // Intentar parsear como JSON si llega como string
+          try {
+            seoContent = JSON.parse(response.data.content);
+          } catch (parseError) {
+            console.warn('⚠️ No se pudo parsear contenido SEO como JSON, generando fallback');
+            
+            // Fallback: usar el contenido como descripción
+            const fallbackContent = response.data.content;
+            seoContent = {
+              titulo: prepareSEOContent(watch('titulo') || '', 'title'),
+              descripcion: prepareSEOContent(fallbackContent, 'description'),
+              palabrasClave: ['consultoría', 'servicios', 'profesional']
+            };
+          }
+        }
+
+        // Aplicar contenido SEO a los campos
+        if (seoContent.titulo) {
+          setValue('seo.titulo', prepareSEOContent(seoContent.titulo, 'title'));
+        }
+        if (seoContent.descripcion) {
+          setValue('seo.descripcion', prepareSEOContent(seoContent.descripcion, 'description'));
+        }
+        if (seoContent.palabrasClave) {
+          const keywords = Array.isArray(seoContent.palabrasClave) 
+            ? seoContent.palabrasClave.join(', ')
+            : seoContent.palabrasClave;
+          setValue('seo.palabrasClave', keywords);
+        }
+
+        success('Éxito', '✨ Contenido SEO profesional generado y aplicado automáticamente');
+      } else {
+        error('Error', response.error || 'No se pudo generar el contenido SEO');
       }
-
-      // ✅ Generar descripción SEO con debouncing
-      const descResponse = await agentService.generateContent({
-        serviceId: id,
-        contentType: 'full_description',
-        style: 'formal'
-      });
-      
-      if (descResponse.success && descResponse.data?.content) {
-        // Crear descripción SEO dentro del límite de 160 caracteres
-        const fullDesc = descResponse.data.content;
-        const seoDesc = fullDesc.length > 160 
-          ? fullDesc.substring(0, 157) + '...' 
-          : fullDesc;
-        setValue('seo.descripcion', seoDesc);
-      }
-
-      // Generar palabras clave inteligentes basadas en el servicio
-      const currentTitle = watch('titulo') || '';
-      const currentDesc = watch('descripcionCorta') || '';
-      const currentCategory = categorias.find(cat => cat._id === watch('categoria'))?.nombre || '';
-      
-      // Extraer palabras clave del título y descripción
-      const titleWords = currentTitle.toLowerCase().split(' ').filter((w: string) => w.length > 3);
-      const descWords = currentDesc.toLowerCase().split(' ').filter((w: string) => w.length > 4);
-      
-      const keywords = [
-        ...titleWords.slice(0, 2),
-        currentCategory.toLowerCase(),
-        ...descWords.slice(0, 2),
-        'servicio profesional',
-        'solución empresarial'
-      ].filter(Boolean).slice(0, 8).join(', ');
-      
-      setValue('seo.palabrasClave', keywords);
-
-      success('Éxito', '✨ Contenido SEO optimizado y aplicado automáticamente');
     } catch (err: any) {
-      console.error('Error generating SEO:', err);
       error('Error', err.message || 'Error al generar SEO con IA');
     } finally {
       setGeneratingBlocks(false);
@@ -612,7 +954,6 @@ export const ServicioFormV3: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      // ✅ Validación de campos SEO antes de enviar
       if (data.seo?.titulo && data.seo.titulo.length > 60) {
         error('Validación', 'El título SEO no puede exceder 60 caracteres');
         return;
@@ -626,86 +967,29 @@ export const ServicioFormV3: React.FC = () => {
         return;
       }
 
-      // Procesar campos de texto a arrays (eliminar viñetas y líneas vacías)
-      const processTextToArray = (text: string | string[]): string[] => {
-        if (Array.isArray(text)) return text;
-        if (!text) return [];
-        return text
-          .split('\n')
-          .map(line => line.trim().replace(/^[•\-\*]\s*/, ''))
-          .filter(line => line.length > 0);
-      };
-
-      // Procesar FAQ de texto a array de objetos {pregunta, respuesta}
-      const processFaqText = (text: string | any[]): Array<{pregunta: string, respuesta: string}> => {
-        if (Array.isArray(text) && text.length > 0 && typeof text[0] === 'object') {
-          return text; // Ya está en formato correcto
-        }
-        if (!text || typeof text !== 'string') return [];
-        
-        const faqs: Array<{pregunta: string, respuesta: string}> = [];
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-        
-        let currentPregunta = '';
-        let currentRespuesta = '';
-        
-        for (const line of lines) {
-          if (line.match(/^P:/i)) {
-            // Si hay una pregunta previa, guardarla
-            if (currentPregunta && currentRespuesta) {
-              faqs.push({ pregunta: currentPregunta, respuesta: currentRespuesta });
-            }
-            currentPregunta = line.replace(/^P:\s*/i, '').trim();
-            currentRespuesta = '';
-          } else if (line.match(/^R:/i)) {
-            currentRespuesta = line.replace(/^R:\s*/i, '').trim();
-          } else if (currentRespuesta) {
-            // Continuar respuesta en múltiples líneas
-            currentRespuesta += ' ' + line;
-          } else if (currentPregunta) {
-            // Continuar pregunta en múltiples líneas
-            currentPregunta += ' ' + line;
-          }
-        }
-        
-        // Agregar el último par P/R
-        if (currentPregunta && currentRespuesta) {
-          faqs.push({ pregunta: currentPregunta, respuesta: currentRespuesta });
-        }
-        
-        return faqs;
-      };
-
-      // Preparar datos procesados
-      // Convertir bloques a texto antes de procesar
-      const caracteristicasText = caracteristicasBlocks.length > 0 
-        ? blocksToText(caracteristicasBlocks)
-        : data.caracteristicas;
-      const beneficiosText = beneficiosBlocks.length > 0
-        ? blocksToText(beneficiosBlocks)
-        : data.beneficios;
-      const faqText = faqBlocks.length > 0
-        ? blocksToText(faqBlocks)
-        : data.faq;
-
+      const formData = watch();
+      const blocksData = getBlocksAsArrays();
+      
+      const { caracteristicas, beneficios, incluye, noIncluye, faq, ...formDataSinArrays } = formData;
+      
       const processedData = {
-        ...data,
-        caracteristicas: processTextToArray(caracteristicasText),
-        beneficios: processTextToArray(beneficiosText),
-        incluye: processTextToArray(data.incluye),
-        noIncluye: processTextToArray(data.noIncluye),
-        faq: processFaqText(faqText),
-        // ✅ Asegurar que el objeto seo se preserve correctamente
+        ...formDataSinArrays,
+        ...blocksData,
+        descripcionRica: formData.descripcionRica || '',
+        videoUrl: formData.videoUrl || '',
+        galeriaImagenes: formData.galeriaImagenes || [],
+        contenidoAdicional: formData.contenidoAdicional || '',
         seo: {
-          titulo: data.seo?.titulo || '',
-          descripcion: data.seo?.descripcion || '',
-          palabrasClave: data.seo?.palabrasClave || ''
+          titulo: formData.seo?.titulo || '',
+          descripcion: formData.seo?.descripcion || '',
+          palabrasClave: formData.seo?.palabrasClave || ''
         }
       };
 
       if (isEditMode && id) {
         await serviciosApi.update(id, processedData);
         success('Servicio actualizado', 'Los cambios se guardaron correctamente');
+        navigate('/dashboard/servicios/management');
       } else {
         const response = await serviciosApi.create(processedData);
         success('Servicio creado', 'El servicio se creó correctamente');
@@ -713,10 +997,9 @@ export const ServicioFormV3: React.FC = () => {
           navigate(`/dashboard/servicios/${response.data._id}/edit`);
           return;
         }
+        navigate('/dashboard/servicios/management');
       }
-      navigate('/dashboard/servicios/management');
     } catch (err: any) {
-      console.error('Error al guardar:', err);
       error('Error al guardar', String(err.message || 'No se pudo guardar el servicio'));
     }
   };
@@ -726,1073 +1009,111 @@ export const ServicioFormV3: React.FC = () => {
   // ============================================
 
   const renderBasicTab = () => (
-    <div className="max-w-5xl mx-auto py-4 lg:py-8 px-4 lg:px-6">
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-4 lg:p-6">
-        <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-4 lg:mb-6 flex items-center gap-2">
-          📋 Información Básica
-          <span className="text-xs lg:text-sm font-normal text-gray-600 dark:text-gray-400">(Obligatorio)</span>
-        </h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          {/* Título */}
-          <div className="lg:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Título *
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                {...register('titulo', { required: 'El título es obligatorio' })}
-                placeholder="Ej: Desarrollo Web Profesional"
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              {isEditMode && id && (
-                <AIFieldButton
-                  key={`btn-titulo-${id}`}
-                  fieldName="titulo"
-                  fieldLabel="Título del Servicio"
-                  fieldType="title"
-                  currentValue={watch('titulo')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-                  size="md"
-                />
-              )}
-            </div>
-            {errors.titulo && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{String(errors.titulo.message)}</p>
-            )}
-          </div>
-
-          {/* Categoría y Estado */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Categoría *
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowCreateCategoriaModal(true)}
-                className="inline-flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
-              >
-                <span className="text-xs">➕</span>
-                Nueva
-              </button>
-            </div>
-            <select
-              {...register('categoria', { required: 'La categoría es obligatoria' })}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              disabled={loadingCategorias}
-            >
-              <option value="">
-                {loadingCategorias ? 'Cargando categorías...' : 'Selecciona una categoría'}
-              </option>
-              {categorias.map((categoria) => (
-                <option key={categoria._id} value={categoria._id}>
-                  {categoria.icono} {categoria.nombre}
-                </option>
-              ))}
-            </select>
-            {errors.categoria && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{String(errors.categoria.message)}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Estado
-            </label>
-            <select
-              {...register('estado')}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="activo">✓ Activo</option>
-              <option value="desarrollo">⚙️ En desarrollo</option>
-              <option value="pausado">⏸️ Pausado</option>
-              <option value="descontinuado">❌ Descontinuado</option>
-            </select>
-          </div>
-
-          {/* Precio */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Precio (USD)
-            </label>
-            <input
-              type="number"
-              {...register('precio', { valueAsNumber: true })}
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Icono
-            </label>
-            <input
-              type="text"
-              {...register('icono')}
-              placeholder="🚀"
-              maxLength={4}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white text-center text-2xl placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* Descripción corta */}
-          <div className="lg:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Descripción Corta
-            </label>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                {...register('descripcionCorta')}
-                placeholder="Resumen breve del servicio (máx. 200 caracteres)"
-                maxLength={200}
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              {isEditMode && id && (
-                <AIFieldButton
-                  key={`btn-descripcionCorta-${id}`}
-                  fieldName="descripcionCorta"
-                  fieldLabel="Descripción Corta"
-                  fieldType="short_text"
-                  currentValue={watch('descripcionCorta')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-                  size="md"
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Descripción completa */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
-              <span>Descripción Completa *</span>
-              {isEditMode && id && (
-                <AIFieldButton
-                  key={`btn-descripcion-${id}`}
-                  fieldName="descripcion"
-                  fieldLabel="Descripción Completa"
-                  fieldType="long_text"
-                  currentValue={watch('descripcion')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-                  size="sm"
-                />
-              )}
-            </label>
-            <textarea
-              {...register('descripcion', { required: 'La descripción es obligatoria' })}
-              rows={5}
-              placeholder="Describe el servicio en detalle..."
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-            />
-            {errors.descripcion && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{String(errors.descripcion.message)}</p>
-            )}
-          </div>
-
-          {/* Etiquetas */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Etiquetas
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(Presiona Enter para agregar)</span>
-            </label>
-            <div className="space-y-3">
-              {/* Input para agregar etiquetas */}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={etiquetaInput}
-                  onChange={(e) => setEtiquetaInput(e.target.value)}
-                  onKeyPress={handleEtiquetaKeyPress}
-                  placeholder="Ej: react, desarrollo, web..."
-                  className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <button
-                  type="button"
-                  onClick={addEtiqueta}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
-                >
-                  Agregar
-                </button>
-              </div>
-              
-              {/* Lista de etiquetas */}
-              {watch('etiquetas')?.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {watch('etiquetas').map((etiqueta: string, index: number) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded-full border border-purple-200 dark:border-purple-700"
-                    >
-                      {etiqueta}
-                      <button
-                        type="button"
-                        onClick={() => removeEtiqueta(index)}
-                        className="ml-1 text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-200"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Opciones */}
-          <div className="md:col-span-2 space-y-3 pt-4 border-t border-gray-300 dark:border-gray-700">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                {...register('destacado')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500"
-              />
-              <span className="text-gray-900 dark:text-white">⭐ Servicio Destacado</span>
-            </label>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                {...register('activo')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500"
-              />
-              <span className="text-gray-900 dark:text-white">✓ Servicio Activo</span>
-            </label>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                {...register('visibleEnWeb')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500"
-              />
-              <span className="text-gray-900 dark:text-white">👁️ Visible en Web</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
+    <BasicInfoForm
+      register={register}
+      watch={watch}
+      setValue={setValue}
+      errors={errors}
+      isEditMode={isEditMode}
+      categorias={categorias}
+      loadingCategorias={loadingCategorias}
+      etiquetaInput={etiquetaInput}
+      onEtiquetaInputChange={setEtiquetaInput}
+      onAddEtiqueta={addEtiqueta}
+      onRemoveEtiqueta={removeEtiqueta}
+      onEtiquetaKeyPress={handleEtiquetaKeyPress}
+      onShowCreateCategoriaModal={() => setShowCreateCategoriaModal(true)}
+      generateSlug={generateSlug}
+      serviceContext={{
+        serviceId: id,
+        titulo: watch('titulo') || '',
+        descripcionCorta: watch('descripcionCorta'),
+        categoria: watch('categoria')
+      }}
+      isLoading={loadingData}
+      // ✅ NUEVAS PROPS PARA AUTOCOMPLETADO
+      onAutoCompleteBasicInfo={handleAutoCompleteBasicInfo}
+      isGenerating={generatingBlocks}
+    />
   );
 
   const renderAdvancedTab = () => (
-    <div className="max-w-5xl mx-auto py-8 px-6">
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          ✨ Contenido Avanzado
-          <span className="text-sm font-normal text-purple-600 dark:text-purple-400">(Opcional)</span>
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Personaliza la página de detalles del servicio con contenido rico y multimedia
-        </p>
-        
-        <div className="space-y-8">
-          {/* Descripción Rica */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Descripción Rica
-              </label>
-              <button
-                type="button"
-                onClick={() => handleGenerateText('full_description', 'descripcionRica', 'formal')}
-                disabled={generatingBlocks || !id}
-                className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg text-sm"
-              >
-                {generatingBlocks ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
-                    <span>Generando...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span>Generar con IA</span>
-                  </>
-                )}
-              </button>
-            </div>
-            <RichTextEditor
-              label="Descripción Rica"
-              value={watch('descripcionRica') || ''}
-              onChange={(value) => setValue('descripcionRica', value)}
-              placeholder="Descripción detallada con formato..."
-              helpText="Usa markdown para dar formato: **negrita**, *cursiva*, # títulos, - listas"
-              maxLength={3000}
-            />
-          </div>
-
-          {/* Video URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Video Promocional
-            </label>
-            <input
-              type="url"
-              {...register('videoUrl')}
-              placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <p className="text-gray-600 dark:text-gray-500 text-sm mt-1">
-              URL de YouTube, Vimeo u otro servicio de video
-            </p>
-          </div>
-
-          {/* Galería de Imágenes */}
-          <div>
-            <MultipleImageGallery
-              label="Galería de Imágenes"
-              images={galeriaImagenes}
-              onImagesChange={(images) => setValue('galeriaImagenes', images)}
-              maxImages={8}
-              helpText="Imágenes adicionales para mostrar en la página de detalles"
-            />
-          </div>
-
-          {/* Contenido Adicional */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Contenido Adicional
-              </label>
-              <button
-                type="button"
-                onClick={() => handleGenerateText('full_description', 'contenidoAdicional', 'technical')}
-                disabled={generatingBlocks || !id}
-                className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg text-sm"
-              >
-                {generatingBlocks ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
-                    <span>Generando...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span>Generar con IA</span>
-                  </>
-                )}
-              </button>
-            </div>
-            <textarea
-              {...register('contenidoAdicional')}
-              placeholder="Información extra, proceso de trabajo, garantías, etc."
-              rows={4}
-              maxLength={2000}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-            />
-            <div className="flex items-center justify-between mt-1">
-              <p className="text-gray-600 dark:text-gray-500 text-sm">
-                Información adicional que aparecerá al final de la página de detalles
-              </p>
-              <p className={`text-sm font-medium ${
-                (watch('contenidoAdicional')?.length || 0) > 1900 
-                  ? 'text-red-600 dark:text-red-400' 
-                  : 'text-gray-500 dark:text-gray-400'
-              }`}>
-                {watch('contenidoAdicional')?.length || 0}/2000
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AdvancedContentForm
+      register={register}
+      watch={watch}
+      setValue={setValue}
+      control={control}
+      isLoading={loadingData}
+      onAutoCompleteAdvanced={handleAutoCompleteAdvanced}
+      isGeneratingAdvanced={generatingBlocks}
+    />
   );
 
   const renderPricingTab = () => (
-    <div className="max-w-5xl mx-auto py-8 px-6">
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          💰 Precios y Comercial
-          <span className="text-sm font-normal text-gray-600 dark:text-gray-400">(Configuración comercial)</span>
-        </h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          {/* Precio Base */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Precio Base (USD) *
-            </label>
-            <input
-              type="number"
-              {...register('precio', { valueAsNumber: true, required: 'El precio es obligatorio' })}
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* Tipo de Precio */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Tipo de Precio
-            </label>
-            <select
-              {...register('tipoPrecio')}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="fijo">🏷️ Precio Fijo</option>
-              <option value="desde">📈 Desde (mínimo)</option>
-              <option value="consultar">💬 Consultar</option>
-              <option value="personalizado">🎯 Personalizado</option>
-            </select>
-          </div>
-
-          {/* Descuento */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Descuento (%)
-            </label>
-            <input
-              type="number"
-              {...register('descuento', { valueAsNumber: true })}
-              min="0"
-              max="100"
-              step="1"
-              placeholder="0"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* Moneda */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Moneda
-            </label>
-            <select
-              {...register('moneda')}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="PEN">🇵🇪 PEN (Soles)</option>
-              <option value="USD">� USD (Dólares)</option>
-              <option value="EUR">� EUR (Euros)</option>
-              <option value="MXN">💸 MXN (Pesos Mexicanos)</option>
-            </select>
-          </div>
-
-          {/* Etiqueta de Promoción */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Etiqueta Promocional
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                {...register('etiquetaPromocion')}
-                placeholder="Ej: ¡OFERTA ESPECIAL!, NUEVO, POPULAR"
-                maxLength={50}
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              {isEditMode && id && (
-                <AIFieldButton
-                  key={`btn-etiquetaPromocion-${id}`}
-                  fieldName="etiquetaPromocion"
-                  fieldLabel="Etiqueta Promocional"
-                  fieldType="promotional"
-                  currentValue={watch('etiquetaPromocion')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-
-                  size="md"
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Tiempo de Entrega */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Tiempo de Entrega
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                {...register('tiempoEntrega')}
-                placeholder="Ej: 7-10 días, 2 semanas, Inmediato"
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              {isEditMode && id && (
-                <AIFieldButton
-                  key={`btn-tiempoEntrega-${id}`}
-                  fieldName="tiempoEntrega"
-                  fieldLabel="Tiempo de Entrega"
-                  fieldType="short_text"
-                  currentValue={watch('tiempoEntrega')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-
-                  size="sm"
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Garantía */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Garantía
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                {...register('garantia')}
-                placeholder="Ej: 30 días, 6 meses, 1 año"
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              {isEditMode && id && (
-                <AIFieldButton
-                  key={`btn-garantia-${id}`}
-                  fieldName="garantia"
-                  fieldLabel="Garantía"
-                  fieldType="short_text"
-                  currentValue={watch('garantia')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-
-                  size="sm"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <PricingForm
+      register={register}
+      errors={errors}
+      isEditMode={isEditMode}
+      serviceContext={{
+        serviceId: id || '',
+        titulo: watch('titulo'),
+        descripcionCorta: watch('descripcionCorta'),
+        categoria: watch('categoria')
+      }}
+      isLoading={loadingData}
+      onAutoCompletePricing={handleAutoCompletePricing}
+      isGeneratingPricing={generatingBlocks}
+    />
   );
 
   const renderVisualTab = () => (
-    <div className="max-w-5xl mx-auto py-8 px-6">
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          🎨 Diseño Visual
-          <span className="text-sm font-normal text-purple-600 dark:text-purple-400">(Opcional)</span>
-        </h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          {/* Icono */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Icono del Servicio
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                {...register('icono')}
-                placeholder="🚀"
-                maxLength={4}
-                className="w-16 h-16 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-center text-xl placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <div className="flex-1 text-sm text-gray-600 dark:text-gray-400">
-                <p>Emoji o símbolo para representar el servicio</p>
-                <p className="text-xs mt-1">Ejemplos: 🚀 💻 🎨 📱 �️</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Imagen Principal */}
-          <div className="lg:col-span-2">
-            <ImageUploader
-              label="Imagen Principal del Servicio"
-              currentImage={watch('imagen')}
-              onImageChange={async (file, previewUrl) => {
-                // Si es un archivo (subida desde PC)
-                if (file) {
-                  setUploadingImage(true);
-                  try {
-                    const response = await uploadApi.uploadImage(file);
-                    if (response.success && response.data) {
-                      setValue('imagen', response.data.url);
-                      success('Imagen subida correctamente');
-                    } else {
-                      error('Error al subir imagen', response.error || 'Intenta nuevamente');
-                    }
-                  } catch (err) {
-                    error('Error al subir imagen');
-                  } finally {
-                    setUploadingImage(false);
-                  }
-                } 
-                // Si es una URL (selección desde galería)
-                else if (previewUrl) {
-                  setValue('imagen', previewUrl);
-                  success('Imagen seleccionada de la galería');
-                } 
-                // Si es null (eliminar imagen)
-                else {
-                  setValue('imagen', '');
-                }
-              }}
-              helpText="Selecciona desde la galería o pega una URL. Tamaño recomendado: 1200x630px"
-              uploading={uploadingImage}
-              aspectRatio="16:9"
-            />
-            {watch('imagen') && (
-              <div className="mt-3">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">URL de la imagen:</p>
-                <input
-                  type="url"
-                  {...register('imagen')}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Color Primario */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Color Primario
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                {...register('colorPrimario')}
-                className="w-12 h-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
-              />
-              <input
-                type="text"
-                {...register('colorPrimario')}
-                placeholder="#8B5CF6"
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-          </div>
-
-          {/* Color Secundario */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Color Secundario
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                {...register('colorSecundario')}
-                className="w-12 h-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
-              />
-              <input
-                type="text"
-                {...register('colorSecundario')}
-                placeholder="#06B6D4"
-                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-          </div>
-
-          {/* Preview */}
-          <div className="lg:col-span-2 mt-4 p-4 bg-gray-100/50 dark:bg-gray-700/30 rounded-lg border border-gray-300 dark:border-gray-600">
-            <h3 className="text-gray-900 dark:text-white font-medium mb-3">Vista Previa</h3>
-            <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
-                style={{ backgroundColor: watch('colorPrimario') + '20', color: watch('colorPrimario') }}
-              >
-                {watch('icono') || '🚀'}
-              </div>
-              <div>
-                <h4 className="text-gray-900 dark:text-white font-medium">{watch('titulo') || 'Título del Servicio'}</h4>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">{watch('descripcionCorta') || 'Descripción corta del servicio'}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <VisualForm
+      register={register}
+      watch={watch}
+      setValue={setValue}
+      onSuccess={success}
+      onError={error}
+      isLoading={loadingData}
+      uploadingImage={uploadingImage}
+      setUploadingImage={setUploadingImage}
+    />
   );
 
   const renderFeaturesTab = () => (
-    <div className="max-w-5xl mx-auto py-8 px-6">
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          ⚡ Características y Beneficios
-          <span className="text-sm font-normal text-purple-600 dark:text-purple-400">(Opcional)</span>
-        </h2>
-        
-        <div className="space-y-8">
-          {/* Características Principales - BLOCK EDITOR */}
-          <div>
-            <BlockEditor
-              blocks={caracteristicasBlocks}
-              onChange={setCaracteristicasBlocks}
-              config={{
-                title: '⚡ Características Principales',
-                allowedTypes: ['list-item'],
-                placeholder: 'Agrega características principales del servicio',
-                maxBlocks: 10
-              }}
-              serviceContext={{
-                serviceId: id,
-                titulo: watch('titulo'),
-                descripcionCorta: watch('descripcionCorta'),
-                categoria: watch('categoria')
-              }}
-              onGenerateWithAI={() => handleGenerateBlocks('features', setCaracteristicasBlocks)}
-              isGenerating={generatingBlocks}
-            />
-          </div>
-
-          {/* Beneficios - BLOCK EDITOR */}
-          <div>
-            <BlockEditor
-              blocks={beneficiosBlocks}
-              onChange={setBeneficiosBlocks}
-              config={{
-                title: '💎 Beneficios Clave',
-                allowedTypes: ['list-item'],
-                placeholder: '¿Qué beneficios obtiene el cliente?',
-                maxBlocks: 10
-              }}
-              serviceContext={{
-                serviceId: id,
-                titulo: watch('titulo'),
-                descripcionCorta: watch('descripcionCorta'),
-                categoria: watch('categoria')
-              }}
-              onGenerateWithAI={() => handleGenerateBlocks('benefits', setBeneficiosBlocks)}
-              isGenerating={generatingBlocks}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-            {/* Qué Incluye */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
-                <span>✅ Qué Incluye</span>
-                <AIFieldButton
-                  key={`btn-incluye-${id}`}
-                  fieldName="incluye"
-                  fieldLabel="Qué Incluye"
-                  fieldType="list"
-                  currentValue={watch('incluye')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-
-                  size="sm"
-                />
-              </label>
-              <textarea
-                {...register('incluye')}
-                placeholder="• Servicio incluido 1&#10;• Servicio incluido 2"
-                rows={5}
-                className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-              />
-            </div>
-
-            {/* Qué NO Incluye */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
-                <span>❌ Qué NO Incluye</span>
-                <AIFieldButton
-                  key={`btn-noIncluye-${id}`}
-                  fieldName="noIncluye"
-                  fieldLabel="Qué NO Incluye"
-                  fieldType="list"
-                  currentValue={watch('noIncluye')}
-                  serviceContext={{
-                    serviceId: id,
-                    titulo: watch('titulo'),
-                    descripcionCorta: watch('descripcionCorta'),
-                    categoria: watch('categoria')
-                  }}
-
-                  size="sm"
-                />
-              </label>
-              <textarea
-                {...register('noIncluye')}
-                placeholder="• Servicio no incluido 1&#10;• Servicio no incluido 2"
-                rows={5}
-                className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-              />
-            </div>
-          </div>
-
-          {/* FAQ - BLOCK EDITOR */}
-          <div>
-            <BlockEditor
-              blocks={faqBlocks}
-              onChange={setFaqBlocks}
-              config={{
-                title: '❓ Preguntas Frecuentes (FAQ)',
-                allowedTypes: ['faq-item'],
-                placeholder: 'Agrega preguntas frecuentes sobre el servicio',
-                maxBlocks: 15
-              }}
-              serviceContext={{
-                serviceId: id,
-                titulo: watch('titulo'),
-                descripcionCorta: watch('descripcionCorta'),
-                categoria: watch('categoria')
-              }}
-              onGenerateWithAI={() => handleGenerateBlocks('faq', setFaqBlocks)}
-              isGenerating={generatingBlocks}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <FeaturesForm
+      caracteristicasBlocks={caracteristicasBlocks}
+      beneficiosBlocks={beneficiosBlocks}
+      incluyeBlocks={incluyeBlocks}
+      noIncluyeBlocks={noIncluyeBlocks}
+      faqBlocks={faqBlocks}
+      onCaracteristicasChange={setCaracteristicasBlocks}
+      onBeneficiosChange={setBeneficiosBlocks}
+      onIncluyeChange={setIncluyeBlocks}
+      onNoIncluyeChange={setNoIncluyeBlocks}
+      onFaqChange={setFaqBlocks}
+      serviceContext={{
+        serviceId: id,
+        titulo: watch('titulo') || '',
+        descripcionCorta: watch('descripcionCorta'),
+        categoria: watch('categoria')
+      }}
+      onAutoCompleteFeatures={handleAutoCompleteFeatures}
+      isGeneratingFeatures={generatingBlocks}
+      isLoading={loadingData}
+    />
   );
 
   const renderSettingsTab = () => (
-    <div className="max-w-5xl mx-auto py-8 px-6">
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          ⚙️ Configuraciones Avanzadas
-          <span className="text-sm font-normal text-gray-600 dark:text-gray-400">(Estado y visibilidad)</span>
-        </h2>
-        
-        <div className="space-y-8">
-          {/* URL y Slug */}
-          <div>
-            <h3 className="text-lg font-medium text-white mb-4">🔗 URL del Servicio</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Slug de la URL
-                  <span className="text-xs text-gray-400 ml-2">
-                    {isEditMode ? '(Se actualizará al cambiar el título)' : '(Se genera automáticamente)'}
-                  </span>
-                </label>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-400">
-                    /servicios/
-                  </span>
-                  <input
-                    type="text"
-                    {...register('slug')}
-                    placeholder={generateSlug(watch('titulo') || 'titulo-del-servicio')}
-                    className="flex-1 bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-                <div className="mt-2 text-xs text-gray-400 bg-gray-800/50 rounded-lg p-3">
-                  <div className="font-medium text-purple-400 mb-1">URL completa:</div>
-                  <div className="font-mono text-gray-300">
-                    https://scuticompany.com/servicios/{watch('slug') || generateSlug(watch('titulo') || 'titulo-del-servicio')}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Estado y Visibilidad */}
-          <div>
-            <h3 className="text-lg font-medium text-white mb-4">📊 Estado y Visibilidad</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Estado del Servicio
-                </label>
-                <select
-                  {...register('estado')}
-                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="activo">✓ Activo</option>
-                  <option value="desarrollo">⚙️ En desarrollo</option>
-                  <option value="pausado">⏸️ Pausado</option>
-                  <option value="descontinuado">❌ Descontinuado</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Tipo de Soporte
-                </label>
-                <select
-                  {...register('soporte')}
-                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="basico">📧 Básico (Email)</option>
-                  <option value="premium">💬 Premium (Chat + Email)</option>
-                  <option value="dedicado">👨‍💼 Dedicado (Manager)</option>
-                  <option value="24x7">🕐 24/7 (Soporte completo)</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-3 pt-4 mt-6 border-t border-gray-700">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('destacado')}
-                  className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500"
-                />
-                <span className="text-white">⭐ Servicio Destacado</span>
-                <span className="text-gray-400 text-sm">(Aparece primero en listados)</span>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('activo')}
-                  className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500"
-                />
-                <span className="text-white">✓ Servicio Activo</span>
-                <span className="text-gray-400 text-sm">(Disponible para nuevos clientes)</span>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('visibleEnWeb')}
-                  className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500"
-                />
-                <span className="text-white">👁️ Visible en Web</span>
-                <span className="text-gray-400 text-sm">(Mostrar en sitio web público)</span>
-              </label>
-            </div>
-          </div>
-
-          {/* SEO */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">🔍 Optimización SEO</h3>
-              <button
-                type="button"
-                onClick={handleGenerateSEO}
-                disabled={generatingBlocks || !id}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                {generatingBlocks ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span className="text-sm font-medium">Generando SEO...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span className="text-sm font-medium">Generar SEO Completo con IA</span>
-                  </>
-                )}
-              </button>
-            </div>
-            <p className="text-gray-400 text-sm mb-4">
-              💡 El botón genera automáticamente: Título SEO + Descripción + Palabras Clave
-            </p>
-
-            {/* Vista Previa SEO en Tiempo Real */}
-            <div className="mb-6">
-              <SEOPreview
-                titulo={watch('seo.titulo') || ''}
-                descripcion={watch('seo.descripcion') || ''}
-                url={watch('slug') ? `www.tuempresa.com/servicios/${watch('slug')}` : undefined}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Título SEO
-                </label>
-                <input
-                  type="text"
-                  {...register('seo.titulo')}
-                  placeholder="Título optimizado para motores de búsqueda"
-                  maxLength={60}
-                  className={`w-full bg-gray-700/50 border rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 ${
-                    (watch('seo.titulo')?.length || 0) > 60 
-                      ? 'border-red-500 focus:ring-red-500' 
-                      : (watch('seo.titulo')?.length || 0) > 50
-                      ? 'border-yellow-500 focus:ring-yellow-500'
-                      : 'border-gray-600 focus:ring-purple-500'
-                  }`}
-                />
-                <p className={`text-sm mt-1 ${
-                  (watch('seo.titulo')?.length || 0) > 60 ? 'text-red-400' :
-                  (watch('seo.titulo')?.length || 0) > 50 ? 'text-yellow-400' :
-                  'text-gray-500'
-                }`}>
-                  {watch('seo.titulo')?.length || 0}/60 caracteres
-                  {(watch('seo.titulo')?.length || 0) > 60 && ' - Demasiado largo'}
-                  {(watch('seo.titulo')?.length || 0) > 50 && (watch('seo.titulo')?.length || 0) <= 60 && ' - Casi al límite'}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Descripción SEO
-                </label>
-                <textarea
-                  {...register('seo.descripcion')}
-                  placeholder="Descripción para motores de búsqueda"
-                  maxLength={160}
-                  rows={3}
-                  className={`w-full bg-gray-700/50 border rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 resize-none ${
-                    (watch('seo.descripcion')?.length || 0) > 160 
-                      ? 'border-red-500 focus:ring-red-500' 
-                      : (watch('seo.descripcion')?.length || 0) > 150
-                      ? 'border-yellow-500 focus:ring-yellow-500'
-                      : 'border-gray-600 focus:ring-purple-500'
-                  }`}
-                />
-                <p className={`text-sm mt-1 ${
-                  (watch('seo.descripcion')?.length || 0) > 160 ? 'text-red-400' :
-                  (watch('seo.descripcion')?.length || 0) > 150 ? 'text-yellow-400' :
-                  'text-gray-500'
-                }`}>
-                  {watch('seo.descripcion')?.length || 0}/160 caracteres
-                  {(watch('seo.descripcion')?.length || 0) > 160 && ' - Demasiado largo'}
-                  {(watch('seo.descripcion')?.length || 0) > 150 && (watch('seo.descripcion')?.length || 0) <= 160 && ' - Casi al límite'}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Palabras Clave
-                </label>
-                <input
-                  type="text"
-                  {...register('seo.palabrasClave')}
-                  placeholder="desarrollo web, diseño, programación"
-                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <p className="text-gray-500 text-sm mt-1">
-                  Separar con comas
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <SettingsForm
+      register={register}
+      watch={watch}
+      isEditMode={isEditMode}
+      generateSlug={generateSlug}
+      onGenerateSEO={handleGenerateSEO}
+      isGenerating={generatingBlocks}
+      isLoading={loadingData}
+      hasServiceId={Boolean(id)}
+    />
   );
 
   const renderTabContent = () => {
@@ -2026,24 +1347,22 @@ export const ServicioFormV3: React.FC = () => {
                 ) : null}
               </div>
               
-              {/* Botón de Guardar */}
-              {isLastTab && (
-                <button
-                  type="submit"
-                  form="servicio-form"
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 dark:disabled:from-gray-600 dark:disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-all font-semibold shadow-lg hover:shadow-purple-500/50"
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="animate-spin">⏳</span>
-                      {isEditMode ? 'Actualizando...' : 'Creando...'}
-                    </span>
-                  ) : (
-                    isEditMode ? '💾 Guardar Cambios' : '+ Crear Servicio'
-                  )}
-                </button>
-              )}
+              {/* Botón de Guardar - Disponible en todos los tabs */}
+              <button
+                type="submit"
+                form="servicio-form"
+                disabled={isSubmitting}
+                className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 dark:disabled:from-gray-600 dark:disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-all font-semibold shadow-lg hover:shadow-purple-500/50"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">⏳</span>
+                    {isEditMode ? 'Actualizando...' : 'Creando...'}
+                  </span>
+                ) : (
+                  isEditMode ? '💾 Guardar Cambios' : '+ Crear Servicio'
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -2079,3 +1398,4 @@ export const ServicioFormV3: React.FC = () => {
 };
 
 export default ServicioFormV3;
+

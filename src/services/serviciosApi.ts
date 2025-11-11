@@ -143,15 +143,34 @@ function handleApiError(error: unknown): ApiErrorResponse {
 
 export const serviciosApi = {
   /**
-   * Obtener todos los servicios con filtros y paginación
+   * Obtener todos los servicios con filtros y paginación (detecta contexto automáticamente)
    */
   getAll: async (
     filters?: ServicioFilters,
     pagination?: PaginationParams
   ): Promise<ServiciosResponse> => {
     try {
+      const isAdminContext = window.location.pathname.includes('/dashboard');
+      const endpoint = isAdminContext ? '/admin/list' : '/';
+      
       const params = { ...filters, ...pagination };
-      const { data } = await apiClient.get<ServiciosResponse>('/', { params });
+      const { data } = await apiClient.get<ServiciosResponse>(endpoint, { params });
+      return data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  /**
+   * Obtener todos los servicios para admin
+   */
+  getAllAdmin: async (
+    filters?: ServicioFilters,
+    pagination?: PaginationParams
+  ): Promise<ServiciosResponse> => {
+    try {
+      const params = { ...filters, ...pagination };
+      const { data } = await apiClient.get<ServiciosResponse>('/admin/list', { params });
       return data;
     } catch (error) {
       throw handleApiError(error);
@@ -161,13 +180,16 @@ export const serviciosApi = {
   /**
    * Obtener un servicio por ID o slug
    */
-  getById: async (id: string, includePaquetes = true): Promise<ServicioResponse> => {
+  getById: async (id: string, includePaquetes = true, admin = true): Promise<ServicioResponse> => {
     try {
-      const { data } = await apiClient.get<ServicioResponse>(`/${id}`, {
-        params: { includePaquetes }
-      });
+      const config: any = {
+        params: { includePaquetes, admin }
+      };
+      
+      const { data } = await apiClient.get<ServicioResponse>(`/${id}`, config);
       return data;
     } catch (error) {
+      console.error('❌ [ServiciosAPI.getById] Error:', error);
       throw handleApiError(error);
     }
   },

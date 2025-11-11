@@ -563,16 +563,55 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const response = await servicesAgentService.createService({
-        prompt: serviceData.prompt,
-        serviceData: serviceData.serviceData,
-        options: {
-          autoOptimize: true,
-          generateSEO: true,
-          includeSuggestions: true,
-          ...options
-        }
+      // 🔧 FIX: Normalizar datos según de dónde vengan
+      let requestPayload: any;
+
+      if (serviceData.serviceData) {
+        // 📋 Caso 1: Viene del formulario conversacional (quickAction)
+        console.log('📋 [CREATE] Using form data from chat', serviceData.serviceData);
+        requestPayload = {
+          serviceData: serviceData.serviceData, // Datos recopilados
+          options: {
+            autoOptimize: true,
+            generateSEO: true,
+            includeSuggestions: true,
+            autoComplete: serviceData.autoComplete || true, // Flag importante
+            ...options
+          }
+        };
+      } else if (serviceData.prompt) {
+        // 💬 Caso 2: Viene de un prompt directo (texto libre)
+        console.log('💬 [CREATE] Using prompt', serviceData.prompt);
+        requestPayload = {
+          prompt: serviceData.prompt,
+          options: {
+            autoOptimize: true,
+            generateSEO: true,
+            includeSuggestions: true,
+            ...options
+          }
+        };
+      } else {
+        // 🎯 Caso 3: Datos directos (desde modal u otra fuente)
+        console.log('🎯 [CREATE] Using direct service data');
+        requestPayload = {
+          serviceData: serviceData,
+          options: {
+            autoOptimize: true,
+            generateSEO: true,
+            includeSuggestions: true,
+            ...options
+          }
+        };
+      }
+
+      console.log('🚀 [CREATE] Sending to backend:', {
+        hasPrompt: !!requestPayload.prompt,
+        hasServiceData: !!requestPayload.serviceData,
+        autoComplete: requestPayload.options?.autoComplete
       });
+
+      const response = await servicesAgentService.createService(requestPayload);
 
       if (response.success) {
         // Agregar mensaje de éxito al chat
