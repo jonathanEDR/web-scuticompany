@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@clerk/clerk-react';
+import { getApiUrl } from '../utils/apiConfig';
 
 // ============================================
 // TIPOS
@@ -89,7 +90,9 @@ export const useCacheControl = (): UseCacheControlReturn => {
       ...options.headers
     };
 
-    const response = await fetch(`/api/servicios/cache${endpoint}`, {
+    // Usar configuración de API para obtener la URL correcta
+    const apiUrl = getApiUrl();
+    const response = await fetch(`${apiUrl}/servicios/cache${endpoint}`, {
       ...options,
       headers
     });
