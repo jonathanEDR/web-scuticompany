@@ -193,19 +193,41 @@ export function useServicioDetail(
 ) {
   const fetchFn = useCallback(async () => {
     const { serviciosApi } = await import('../services/serviciosApi');
-    const response = await serviciosApi.getAll();
     
-    const servicio = response.data.find(s => s.slug === slug || s._id === slug);
-    
-    if (!servicio) {
-      throw new Error('Servicio no encontrado');
+    // Primero intentar obtener por slug específico si es posible
+    try {
+      // Intentar búsqueda eficiente - buscar solo en servicios activos/visibles
+      const response = await serviciosApi.getAll({ 
+        visibleEnWeb: true, 
+        activo: true 
+      });
+      
+      const servicio = response.data.find(s => s.slug === slug || s._id === slug);
+      
+      if (!servicio) {
+        throw new Error('Servicio no encontrado');
+      }
+      
+      if (!servicio.activo || !servicio.visibleEnWeb) {
+        throw new Error('Este servicio no está disponible actualmente');
+      }
+      
+      return servicio;
+    } catch (error) {
+      // Si falla, hacer fallback a búsqueda sin filtros
+      const response = await serviciosApi.getAll();
+      const servicio = response.data.find(s => s.slug === slug || s._id === slug);
+      
+      if (!servicio) {
+        throw new Error('Servicio no encontrado');
+      }
+      
+      if (!servicio.activo || !servicio.visibleEnWeb) {
+        throw new Error('Este servicio no está disponible actualmente');
+      }
+      
+      return servicio;
     }
-    
-    if (!servicio.activo || !servicio.visibleEnWeb) {
-      throw new Error('Este servicio no está disponible actualmente');
-    }
-    
-    return servicio;
   }, [slug]);
 
   return useServiciosCache<Servicio>(

@@ -28,8 +28,9 @@ export const ServicioDetail: React.FC = () => {
     isFromCache
   } = useServicioDetail(slug || '', {
     enabled: !!slug,
-    onSuccess: (data) => {
-      console.log(`✅ Servicio cargado: ${data.titulo} ${isFromCache ? '(desde cache)' : '(desde API)'}`);
+    onSuccess: (data, fromCache) => {
+      const source = fromCache ? '(desde cache)' : '(desde API)';
+      console.log(`✅ Servicio cargado: ${data.titulo} ${source}`);
     },
     onError: (err) => {
       console.error('❌ Error cargando servicio:', err);
