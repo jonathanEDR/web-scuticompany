@@ -46,13 +46,13 @@ class ServiciosCacheManager {
   private readonly STORAGE_PREFIX = 'serviciosCache_';
   private readonly STATS_KEY = 'serviciosCache_stats';
 
-  constructor(maxSize = 50) {
+  constructor(maxSize = 30) {
     this.memoryCache = new Map();
     this.stats = this.loadStats();
     this.maxSize = maxSize;
     
-    // Limpiar entradas expiradas cada 5 minutos
-    this.cleanupTimer = setInterval(() => this.cleanExpired(), 5 * 60 * 1000);
+    // ⚡ Limpiar más agresivamente: cada 1 minuto en lugar de 5
+    this.cleanupTimer = setInterval(() => this.cleanExpired(), 1 * 60 * 1000);
     
     // Cargar datos de localStorage a memoria al iniciar
     this.loadFromLocalStorage();
@@ -80,7 +80,7 @@ class ServiciosCacheManager {
         return JSON.parse(stored);
       }
     } catch (e) {
-      console.warn('[ServiciosCache] Error loading stats:', e);
+      // Silenciar errores de localStorage
     }
     return { hits: 0, misses: 0 };
   }
@@ -92,7 +92,7 @@ class ServiciosCacheManager {
     try {
       localStorage.setItem(this.STATS_KEY, JSON.stringify(this.stats));
     } catch (e) {
-      console.warn('[ServiciosCache] Error saving stats:', e);
+      // Silenciar errores de localStorage
     }
   }
 
@@ -154,7 +154,7 @@ class ServiciosCacheManager {
           }
         }
       } catch (e) {
-        console.warn('[ServiciosCache] Error reading from localStorage:', e);
+        // Silenciar errores de localStorage
       }
     }
 
@@ -174,11 +174,10 @@ class ServiciosCacheManager {
       try {
         localStorage.removeItem(this.STORAGE_PREFIX + key);
       } catch (e) {
-        console.warn('[ServiciosCache] Error removing expired entry:', e);
+        // Silenciar errores de localStorage
       }
       this.stats.misses++;
       this.saveStats();
-      console.log(`[ServiciosCache] ⏰ EXPIRED - ${key} (age: ${Math.round(age / 1000)}s)`);
       return null;
     }
 
@@ -186,11 +185,6 @@ class ServiciosCacheManager {
     entry.hits++;
     this.stats.hits++;
     this.saveStats();
-    
-    const remaining = ttl - age;
-    console.log(
-      `[ServiciosCache] ✅ HIT - ${key} (hits: ${entry.hits}, remaining: ${Math.round(remaining / 1000)}s)`
-    );
     
     return entry.data;
   }
@@ -201,17 +195,22 @@ class ServiciosCacheManager {
   set<T>(type: keyof typeof SERVICIOS_CACHE_TTL, identifier: string | Record<string, any>, data: T): void {
     const key = this.generateKey(type, identifier);
     
-    // Si el cache está lleno, eliminar la entrada más antigua
-    if (this.memoryCache.size >= this.maxSize) {
-      const oldestKey = this.memoryCache.keys().next().value;
-      if (oldestKey) {
-        this.memoryCache.delete(oldestKey);
+    // Si el cache está lleno, eliminar las entradas más antiguas
+    // Cuando llega al límite, eliminar 20% de las más antiguas
+    if (this.memoryCache.size >= this.maxSize * 0.9) {
+      const entriesToRemove = Math.ceil(this.maxSize * 0.2);
+      const entries = Array.from(this.memoryCache.entries())
+        .sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0))
+        .slice(0, entriesToRemove);
+      
+      entries.forEach(([key]) => {
+        this.memoryCache.delete(key);
         try {
-          localStorage.removeItem(this.STORAGE_PREFIX + oldestKey);
+          localStorage.removeItem(this.STORAGE_PREFIX + key);
         } catch (e) {
-          console.warn('[ServiciosCache] Error removing oldest entry:', e);
+          // Silenciar errores
         }
-      }
+      });
     }
 
     const entry: CacheEntry<T> = {
@@ -226,17 +225,15 @@ class ServiciosCacheManager {
     // Guardar en localStorage
     try {
       localStorage.setItem(this.STORAGE_PREFIX + key, JSON.stringify(entry));
-      console.log(`[ServiciosCache] 💾 STORED - ${key}`);
     } catch (e) {
       // Si localStorage está lleno, limpiar cache antiguo
-      console.warn('[ServiciosCache] localStorage full, cleaning old entries...');
       this.cleanOldEntries();
       
       // Reintentar
       try {
         localStorage.setItem(this.STORAGE_PREFIX + key, JSON.stringify(entry));
       } catch (e2) {
-        console.error('[ServiciosCache] Error storing in localStorage:', e2);
+        // Silenciar errores de localStorage lleno
       }
     }
   }
@@ -249,37 +246,53 @@ class ServiciosCacheManager {
     this.memoryCache.delete(key);
     try {
       localStorage.removeItem(this.STORAGE_PREFIX + key);
-      console.log(`[ServiciosCache] 🗑️ REMOVED - ${key}`);
     } catch (e) {
-      console.warn('[ServiciosCache] Error removing entry:', e);
+      // Silenciar errores de localStorage
     }
   }
 
   /**
-   * Limpiar entradas expiradas
+   * Limpiar entradas expiradas - Ejecutarse más frecuentemente
    */
   private cleanExpired(): void {
-    let cleaned = 0;
     const now = Date.now();
+    const keysToDelete: string[] = [];
 
+    // Primera pasada: eliminar expirados
     this.memoryCache.forEach((entry, key) => {
       const type = key.split(':')[0] as keyof typeof SERVICIOS_CACHE_TTL;
       const ttl = SERVICIOS_CACHE_TTL[type] || SERVICIOS_CACHE_TTL.SERVICIOS_LIST;
       const age = now - entry.timestamp;
 
       if (age > ttl) {
-        this.memoryCache.delete(key);
-        try {
-          localStorage.removeItem(this.STORAGE_PREFIX + key);
-          cleaned++;
-        } catch (e) {
-          console.warn('[ServiciosCache] Error removing expired entry:', e);
-        }
+        keysToDelete.push(key);
       }
     });
 
-    if (cleaned > 0) {
-      console.log(`[ServiciosCache] 🧹 Cleaned ${cleaned} expired entries`);
+    // Eliminar keys expiradas
+    keysToDelete.forEach(key => {
+      this.memoryCache.delete(key);
+      try {
+        localStorage.removeItem(this.STORAGE_PREFIX + key);
+      } catch (e) {
+        // Silenciar errores
+      }
+    });
+
+    // Segunda pasada: si aún está muy lleno, eliminar los menos usados
+    if (this.memoryCache.size > this.maxSize * 0.85) {
+      const entries = Array.from(this.memoryCache.entries())
+        .sort((a, b) => (a[1].hits || 0) - (b[1].hits || 0))
+        .slice(0, Math.ceil(this.maxSize * 0.15));
+      
+      entries.forEach(([key]) => {
+        this.memoryCache.delete(key);
+        try {
+          localStorage.removeItem(this.STORAGE_PREFIX + key);
+        } catch (e) {
+          // Silenciar errores
+        }
+      });
     }
   }
 
@@ -301,7 +314,6 @@ class ServiciosCacheManager {
         console.warn('[ServiciosCache] Error removing old entry:', e);
       }
     }
-    console.log(`[ServiciosCache] 🧹 Cleaned ${toRemove} old entries`);
   }
 
   /**
@@ -319,7 +331,6 @@ class ServiciosCacheManager {
             localStorage.removeItem(key);
           }
         }
-        console.log('[ServiciosCache] 🗑️ Cache cleared completely');
       } catch (e) {
         console.warn('[ServiciosCache] Error clearing localStorage:', e);
       }
@@ -328,23 +339,17 @@ class ServiciosCacheManager {
 
     // Limpiar por patrón
     const keys = Array.from(this.memoryCache.keys());
-    let cleared = 0;
     
     keys.forEach(key => {
       if (key.includes(pattern)) {
         this.memoryCache.delete(key);
         try {
           localStorage.removeItem(this.STORAGE_PREFIX + key);
-          cleared++;
         } catch (e) {
-          console.warn('[ServiciosCache] Error removing entry:', e);
+          // Silenciar errores de localStorage
         }
       }
     });
-    
-    if (cleared > 0) {
-      console.log(`[ServiciosCache] 🗑️ Cleared ${cleared} entries matching "${pattern}"`);
-    }
   }
 
   /**
@@ -397,7 +402,6 @@ class ServiciosCacheManager {
   resetStats(): void {
     this.stats = { hits: 0, misses: 0 };
     this.saveStats();
-    console.log('[ServiciosCache] 📊 Stats reset');
   }
 
   /**

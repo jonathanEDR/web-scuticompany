@@ -27,12 +27,11 @@ export const ServicioDetail: React.FC = () => {
     error: errorServicio
   } = useServicioDetail(slug || '', {
     enabled: !!slug,
-    onSuccess: (data, fromCache) => {
-      const source = fromCache ? '(desde cache)' : '(desde API)';
-      console.log(`✅ Servicio cargado: ${data.titulo} ${source}`);
+    onSuccess: () => {
+      // Silenciar logs en producción
     },
-    onError: (err) => {
-      console.error('❌ Error cargando servicio:', err);
+    onError: () => {
+      // Silenciar logs en producción
     }
   });
 

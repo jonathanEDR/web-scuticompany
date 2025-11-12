@@ -43,14 +43,24 @@ export function useServiciosCache<T>(
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
   const fetchIdRef = useRef(0);
+  const isLoadingRef = useRef(false); // ⚡ Prevenir múltiples requests simultáneos
 
   // Función para cargar datos (con cache o fetch)
   const loadData = useCallback(async (force = false) => {
     if (!enabled) return;
+    
+    // ⚡ Si ya hay una carga pendiente y no es forzada, saltarse
+    if (isLoadingRef.current && !force) {
+      return;
+    }
 
     // Cancelar request anterior si existe
     if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+      try {
+        abortControllerRef.current.abort();
+      } catch (e) {
+        // Silenciar errores
+      }
     }
 
     // Incrementar ID de fetch para detectar requests obsoletos
@@ -58,6 +68,7 @@ export function useServiciosCache<T>(
 
     try {
       setLoading(true);
+      isLoadingRef.current = true;
       setError(null);
 
       // 1. Intentar obtener del cache si no es forzado
@@ -68,6 +79,7 @@ export function useServiciosCache<T>(
             setData(cachedData);
             setIsFromCache(true);
             setLoading(false);
+            isLoadingRef.current = false;
             onSuccess?.(cachedData, true); // Pasar true para indicar que es del cache
           }
           return;
@@ -102,7 +114,6 @@ export function useServiciosCache<T>(
     } catch (err: any) {
       // Ignorar errores de requests cancelados
       if (err.name === 'AbortError' || err.name === 'CanceledError') {
-        console.log('[useServiciosCache] Request cancelado');
         return;
       }
 
@@ -115,11 +126,11 @@ export function useServiciosCache<T>(
         const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
         setError(errorMessage);
         onError?.(err instanceof Error ? err : new Error(errorMessage));
-        console.error(`[useServiciosCache] Error loading data:`, err);
       }
     } finally {
       if (isMountedRef.current && currentFetchId === fetchIdRef.current) {
         setLoading(false);
+        isLoadingRef.current = false; // ⚡ Resetear flag de carga
       }
     }
   }, [cacheKey, identifier, fetchFn, enabled, onSuccess, onError]);
@@ -147,9 +158,19 @@ export function useServiciosCache<T>(
   useEffect(() => {
     return () => {
       isMountedRef.current = false;
+      
+      // ⚡ Cancelar cualquier request en vuelo
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+        try {
+          abortControllerRef.current.abort();
+        } catch (e) {
+          // Silenciar errores de abort
+        }
+        abortControllerRef.current = null;
       }
+      
+      // ⚡ Limpiar referencias
+      fetchIdRef.current = 0;
     };
   }, []);
 
