@@ -10,7 +10,7 @@ import type { Servicio, ServicioFilters } from '../types/servicios';
 
 interface UseServiciosCacheOptions {
   enabled?: boolean;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: any, fromCache?: boolean) => void;
   onError?: (error: Error) => void;
 }
 
@@ -68,7 +68,7 @@ export function useServiciosCache<T>(
             setData(cachedData);
             setIsFromCache(true);
             setLoading(false);
-            onSuccess?.(cachedData);
+            onSuccess?.(cachedData, true); // Pasar true para indicar que es del cache
           }
           return;
         }
@@ -97,7 +97,7 @@ export function useServiciosCache<T>(
       // 7. Actualizar estado
       setData(fetchedData);
       setIsFromCache(false);
-      onSuccess?.(fetchedData);
+      onSuccess?.(fetchedData, false); // Pasar false para indicar que es de API
 
     } catch (err: any) {
       // Ignorar errores de requests cancelados

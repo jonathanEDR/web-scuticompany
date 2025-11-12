@@ -53,8 +53,9 @@ const ServicesPublicV2 = () => {
     isFromCache
   } = useServiciosList(filtros, {
     enabled: true,
-    onSuccess: (data) => {
-      console.log(`✅ Servicios cargados: ${data.length} servicios ${isFromCache ? '(desde cache)' : '(desde API)'}`);
+    onSuccess: (data, fromCache) => {
+      const source = fromCache ? '(desde cache)' : '(desde API)';
+      console.log(`✅ Servicios cargados: ${data.length} servicios ${source}`);
     },
     onError: (err) => {
       console.error('❌ Error cargando servicios:', err);
