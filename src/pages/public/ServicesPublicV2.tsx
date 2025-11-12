@@ -11,6 +11,8 @@ import { ServicioPublicCard } from '../../components/public/ServicioPublicCard';
 import { SearchBar } from '../../components/common/SearchBar';
 import { useSeo } from '../../hooks/useSeo';
 import { useServiciosList } from '../../hooks/useServiciosCache';
+import { categoriasApi, type Categoria } from '../../services/categoriasApi';
+import { invalidateServiciosCache } from '../../utils/serviciosCache';
 import type { Servicio, ServicioFilters } from '../../types/servicios';
 
 // ============================================
@@ -26,11 +28,36 @@ const ServicesPublicV2 = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [ordenamiento, setOrdenamiento] = useState<string>('destacado');
   const [filterKey, setFilterKey] = useState(0); // Key para forzar re-animación
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  
+  // ✨ NUEVO: Estados de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // 10 servicios por página
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
-  // Detectar cambios en filtros para trigger animación
+  // Detectar cambios en filtros para trigger animación y resetear paginación
   useEffect(() => {
     setFilterKey(prev => prev + 1);
+    // Resetear a la primera página cuando cambien los filtros
+    setCurrentPage(1);
   }, [busqueda, categoriaSeleccionada, ordenamiento]);
+
+  // 🔄 Cargar categorías dinámicamente desde la API
+  useEffect(() => {
+    const loadCategorias = async () => {
+      try {
+        const response = await categoriasApi.getAll({ activas: true });
+        setCategorias(response.data);
+      } catch (error) {
+        console.error('Error cargando categorías:', error);
+        // Fallback a categorías por defecto en caso de error
+        setCategorias([]);
+      }
+    };
+
+    loadCategorias();
+  }, []);
 
   // ============================================
   // FILTROS PARA EL CACHE
@@ -41,25 +68,70 @@ const ServicesPublicV2 = () => {
     activo: true
   }), []);
 
+  // ✨ NUEVO: Filtros con paginación incluida
+  const filtrosConPaginacion = useMemo(() => ({
+    ...filtros,
+    page: currentPage,
+    limit: itemsPerPage,
+    sort: ordenamiento === 'destacado' ? '-destacado,-createdAt' : ordenamiento
+  }), [filtros, currentPage, itemsPerPage, ordenamiento]);
+
   // ============================================
   // HOOK DE CACHE - REEMPLAZA USEEFFECT + API CALL
   // ============================================
 
   const {
-    data: servicios = [],
+    data: serviciosResponse = null,
     loading,
     error,
     refetch: recargarServicios,
     isFromCache
-  } = useServiciosList(filtros, {
+  } = useServiciosList(filtrosConPaginacion, {
     enabled: true,
-    onSuccess: () => {
-      // Silenciar logs en producción
+    onSuccess: (data) => {
+      console.log('\n════════════════════════════════════════════════════════════════');
+      console.log('📡 [FRONTEND] Servicios cargados exitosamente');
+      console.log('════════════════════════════════════════════════════════════════');
+      console.log('📦 Total servicios:', data?.total || 0);
+      console.log('📄 Página actual:', data?.page || 1);
+      console.log('📄 Total páginas:', data?.pages || 1);
+      console.log('📦 Servicios en esta página:', data?.data?.length || 0);
+      console.log('💾 Desde cache:', isFromCache ? 'SÍ ✅' : 'NO ❌ (Fresco desde backend)');
+      console.log('⏰ Timestamp:', new Date().toISOString());
+      console.log('════════════════════════════════════════════════════════════════\n');
+      
+      // ✨ NUEVO: Actualizar información de paginación
+      if (data && typeof data === 'object' && 'total' in data) {
+        setTotalItems(data.total || 0);
+        setTotalPages(data.pages || 1);
+      }
     },
     onError: () => {
-      // Silenciar logs en producción
+      console.error('\n════════════════════════════════════════════════════════════════');
+      console.error('❌ [FRONTEND] Error cargando servicios');
+      console.error('════════════════════════════════════════════════════════════════\n');
     }
   });
+
+  // Extraer servicios del response
+  const servicios = serviciosResponse?.data || [];
+
+  // 🔄 Función para invalidar cache y recargar
+  const recargarConInvalidacion = async () => {
+    try {
+      console.log('🗑️ [FRONTEND] Invalidando cache y recargando servicios...');
+      
+      // 1. Invalidar cache local
+      invalidateServiciosCache();
+      
+      // 2. Recargar servicios
+      await recargarServicios();
+      
+      console.log('✅ [FRONTEND] Cache invalidado y servicios recargados');
+    } catch (error) {
+      console.error('❌ [FRONTEND] Error al invalidar cache y recargar:', error);
+    }
+  };
 
   // ============================================
   // SEO
@@ -80,13 +152,13 @@ const ServicesPublicV2 = () => {
     // Verificar que servicios no sea null
     if (!servicios) return [];
     
-    return servicios.filter(servicio => {
+    return servicios.filter((servicio: Servicio) => {
     // Filtro por búsqueda
     if (busqueda) {
       const busquedaLower = busqueda.toLowerCase();
       const matchTitulo = servicio.titulo.toLowerCase().includes(busquedaLower);
       const matchDescripcion = servicio.descripcion.toLowerCase().includes(busquedaLower);
-      const matchEtiquetas = servicio.etiquetas?.some(etiqueta => 
+      const matchEtiquetas = servicio.etiquetas?.some((etiqueta: string) => 
         etiqueta.toLowerCase().includes(busquedaLower)
       );
       
@@ -141,17 +213,6 @@ const ServicesPublicV2 = () => {
   const serviciosDestacados = serviciosOrdenados.filter((s: Servicio) => s.destacado);
   const serviciosRegulares = serviciosOrdenados.filter((s: Servicio) => !s.destacado);
 
-  // TODO: Convertir a categorías dinámicas como en FiltersPanel.tsx
-  const categorias = [
-    { value: '', label: 'Todas las categorías' },
-    { value: 'desarrollo', label: '💻 Desarrollo' },
-    { value: 'diseño', label: '🎨 Diseño' },
-    { value: 'marketing', label: '📈 Marketing' },
-    { value: 'consultoría', label: '🤝 Consultoría' },
-    { value: 'mantenimiento', label: '🔧 Mantenimiento' },
-    { value: 'otro', label: '📦 Otros' }
-  ];
-
   // ============================================
   // RENDER
   // ============================================
@@ -194,9 +255,22 @@ const ServicesPublicV2 = () => {
                     
                     {/* Búsqueda */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
-                        Buscar
-                      </label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                          Buscar
+                        </label>
+                        <button
+                          onClick={recargarConInvalidacion}
+                          disabled={loading}
+                          className="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors disabled:opacity-50 flex items-center gap-1"
+                          title="Actualizar servicios"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Actualizar
+                        </button>
+                      </div>
                       <SearchBar
                         value={busqueda}
                         onChange={setBusqueda}
@@ -215,17 +289,31 @@ const ServicesPublicV2 = () => {
                         Categoría
                       </label>
                       <div className="space-y-1">
+                        {/* Opción "Todas las categorías" */}
+                        <button
+                          key=""
+                          onClick={() => setCategoriaSeleccionada('')}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            categoriaSeleccionada === ''
+                              ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                          }`}
+                        >
+                          Todas las categorías
+                        </button>
+
+                        {/* Categorías dinámicas */}
                         {categorias.map(categoria => (
                           <button
-                            key={categoria.value}
-                            onClick={() => setCategoriaSeleccionada(categoria.value)}
+                            key={categoria.slug}
+                            onClick={() => setCategoriaSeleccionada(categoria.slug)}
                             className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                              categoriaSeleccionada === categoria.value
+                              categoriaSeleccionada === categoria.slug
                                 ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700'
                                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
                             }`}
                           >
-                            {categoria.label}
+                            {categoria.icono} {categoria.nombre}
                           </button>
                         ))}
                       </div>
@@ -319,10 +407,10 @@ const ServicesPublicV2 = () => {
                     <div className="text-4xl mb-2 animate-bounce">❌</div>
                     <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
                     <button
-                      onClick={() => recargarServicios()}
+                      onClick={() => recargarConInvalidacion()}
                       className="mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105"
                     >
-                      Reintentar
+                      🔄 Recargar servicios
                     </button>
                   </div>
                 )}
@@ -404,6 +492,73 @@ const ServicesPublicV2 = () => {
                       </div>
                     )}
                   </>
+                )}
+
+                {/* ✨ NUEVO: Controles de Paginación */}
+                {!loading && !error && totalPages > 1 && (
+                  <div className="flex flex-col sm:flex-row justify-between items-center mt-12 mb-8 gap-4 animate-fade-in-up">
+                    {/* Información de paginación */}
+                    <div className="text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
+                      Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} - {Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} servicios
+                    </div>
+                    
+                    {/* Controles de navegación */}
+                    <div className="flex items-center gap-2 order-1 sm:order-2">
+                      {/* Botón Anterior */}
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Anterior
+                      </button>
+
+                      {/* Números de página */}
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNumber;
+                          if (totalPages <= 5) {
+                            pageNumber = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNumber = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNumber = totalPages - 4 + i;
+                          } else {
+                            pageNumber = currentPage - 2 + i;
+                          }
+
+                          return (
+                            <button
+                              key={pageNumber}
+                              onClick={() => setCurrentPage(pageNumber)}
+                              className={`w-10 h-10 text-sm font-medium rounded-lg transition-all duration-300 ${
+                                currentPage === pageNumber
+                                  ? 'bg-purple-600 text-white shadow-lg'
+                                  : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              {pageNumber}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Botón Siguiente */}
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                      >
+                        Siguiente
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 )}
 
                 {/* Call to Action con animación */}

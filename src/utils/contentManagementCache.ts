@@ -25,10 +25,10 @@ export const CONTENT_CACHE_DURATIONS = {
   BLOG_CATEGORIES: 1 * 60 * 60 * 1000, // 1 hora - categorías del blog
   BLOG_TAGS: 1 * 60 * 60 * 1000,       // 1 hora - tags del blog
 
-  // Services
-  SERVICES_LIST: 2 * 60 * 60 * 1000,   // 2 horas - lista completa
-  SERVICES_BY_CATEGORY: 2 * 60 * 60 * 1000, // 2 horas - por categoría
-  SERVICES_PORTFOLIO: 2 * 60 * 60 * 1000,   // 2 horas - portfolio
+  // Services - ⚠️ SIN CACHE para respetar CacheConfig del backend
+  SERVICES_LIST: 0,                    // ⚠️ SIN CACHE - Respeta backend
+  SERVICES_BY_CATEGORY: 0,             // ⚠️ SIN CACHE - Respeta backend
+  SERVICES_PORTFOLIO: 0,               // ⚠️ SIN CACHE - Respeta backend
 } as const;
 
 // ============================================

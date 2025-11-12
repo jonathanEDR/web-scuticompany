@@ -17,7 +17,7 @@ export const DASHBOARD_CACHE_DURATIONS = {
   CMS_CONTENT: 1 * 60 * 60 * 1000,    // 1 hora (contenido web)
   MEDIA_LIBRARY: 2 * 60 * 60 * 1000,  // 2 horas (archivos estáticos)
   BLOG_STATS: 1 * 60 * 60 * 1000,     // 1 hora (estadísticas blog)
-  SERVICES: 2 * 60 * 60 * 1000,       // 2 horas (catálogo servicios)
+  SERVICES: 0,                        // ⚠️ SIN CACHE - Respeta CacheConfig del backend
   
   // BLOQUE 3 - Business Operations
   CRM_DATA: 5 * 60 * 1000,            // 5 minutos (datos negocio)

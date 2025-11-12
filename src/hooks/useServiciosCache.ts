@@ -193,11 +193,43 @@ export function useServiciosList(
 ) {
   const fetchFn = useCallback(async () => {
     const { serviciosApi } = await import('../services/serviciosApi');
-    const response = await serviciosApi.getAll(filters);
-    return response.data || [];
+    
+    try {
+      const response = await serviciosApi.getAll(filters);
+      
+      // 🔍 Guardar timestamp de la última actualización para detectar cambios
+      const lastUpdateKey = 'lastServiciosUpdate';
+      const currentTime = Date.now();
+      
+      if (response.data && Array.isArray(response.data)) {
+        // Verificar si hay servicios recién creados (últimos 2 minutos)
+        const recentServices = response.data.filter((servicio: any) => {
+          const createdAt = new Date(servicio.createdAt).getTime();
+          const updatedAt = new Date(servicio.updatedAt).getTime();
+          const recentThreshold = currentTime - (2 * 60 * 1000); // 2 minutos
+          
+          return createdAt > recentThreshold || updatedAt > recentThreshold;
+        });
+        
+        if (recentServices.length > 0) {
+          console.log(`� [FRONTEND] Detectados ${recentServices.length} servicios recientes, invalidando cache...`);
+          const { invalidateServiciosCache } = await import('../utils/serviciosCache');
+          invalidateServiciosCache('SERVICIOS_');
+        }
+        
+        // Actualizar timestamp
+        localStorage.setItem(lastUpdateKey, currentTime.toString());
+      }
+      
+      // Retornar respuesta completa para acceder a datos de paginación
+      return response;
+    } catch (error) {
+      console.error('❌ [FRONTEND] Error fetching servicios:', error);
+      throw error;
+    }
   }, [filters]);
 
-  return useServiciosCache<Servicio[]>(
+  return useServiciosCache<any>(
     'SERVICIOS_LIST',
     filters,
     fetchFn,

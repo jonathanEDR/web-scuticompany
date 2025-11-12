@@ -18,7 +18,6 @@ import { FiltersPanel } from '../../components/servicios/FiltersPanel';
 import { SortSelector } from '../../components/servicios/SortSelector';
 import { ServicioCard } from '../../components/servicios/ServicioCard';
 import { SearchWithAutocomplete } from '../../components/common/SearchWithAutocomplete';
-import { CacheControl } from '../../components/servicios/CacheControl';
 import { PaginationControls } from '../../components/common/PaginationControls';
 import { SkeletonGrid } from '../../components/common/Skeleton';
 import { CreateServicioModal } from '../../components/servicios/CreateServicioModal';
@@ -339,11 +338,7 @@ export const ServiciosManagementOptimized = () => {
                 <span className="hidden sm:inline">Refrescar</span>
               </button>
               
-              {/* Control de Cache */}
-              <CacheControl 
-                variant="button" 
-                className="flex-shrink-0"
-              />
+              {/* ⚠️ Cache removido - Ahora se usa CacheConfig centralizado del backend */}
               
               <button
                 onClick={() => setShowCategoriesModal(true)}

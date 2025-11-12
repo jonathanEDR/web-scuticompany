@@ -27,6 +27,7 @@ const PublicHeaderOptimized = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
   
   // Hook personalizado para detectar usuario de Clerk
   const { userData, getUserInitials } = useClerkDetection();
@@ -101,6 +102,19 @@ const PublicHeaderOptimized = () => {
         clearTimeout(timeoutId);
       }
     };
+  }, []);
+
+  // 🔧 Efecto para cerrar dropdowns al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.dropdown-container')) {
+        setShowResourcesDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -189,11 +203,15 @@ const PublicHeaderOptimized = () => {
                 </svg>
               </button>
             </div>
-            <div className="relative group">
+            <div className="relative group dropdown-container">
               <button 
                 className="theme-text-secondary theme-transition flex items-center px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-                onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
+                onMouseEnter={(e) => {
+                  (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                  setShowResourcesDropdown(true);
+                }}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
+                onClick={() => setShowResourcesDropdown(!showResourcesDropdown)}
                 aria-label="Menú de recursos"
               >
                 Recursos
@@ -201,23 +219,44 @@ const PublicHeaderOptimized = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
+              
+              {/* Dropdown Menu */}
+              <div 
+                className={`absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
+                  showResourcesDropdown ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                }`}
+                onMouseEnter={() => setShowResourcesDropdown(true)}
+                onMouseLeave={() => setShowResourcesDropdown(false)}
+              >
+                <div className="py-2">
+                  <Link
+                    to="/blog"
+                    className="block px-4 py-2 text-sm theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 theme-transition"
+                    onClick={() => setShowResourcesDropdown(false)}
+                  >
+                    📖 Blog de Tecnología
+                  </Link>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 theme-transition opacity-60 cursor-not-allowed"
+                    disabled
+                    title="Próximamente - Portafolio de proyectos"
+                  >
+                    🚀 Proyectos Destacados
+                    <span className="text-xs text-gray-400 ml-2">(Próximamente)</span>
+                  </button>
+                </div>
+              </div>
             </div>
-            <Link 
-              to="/proyectos" 
-              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-              onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
-            >
-              Proyectos destacados
-            </Link>
+
+            {/* Blog - Solo visible en móvil */}
             <Link 
               to="/blog" 
-              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+              className="sm:hidden theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
               onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
               onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
               aria-label="Blog de tecnología"
             >
-              Blog
+              📖 Blog
             </Link>
 
             {/* CONTÁCTANOS en navegación - Solo visible en móvil */}

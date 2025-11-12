@@ -25,14 +25,15 @@ interface CacheStats {
 
 /**
  * Configuración de TTL por tipo de contenido
- * Servicios públicos: Contenido semi-estático
+ * ⚠️ REDUCIDO DRÁSTICAMENTE - Respeta CacheConfig del backend
+ * El backend controla el cache real, el frontend solo cachea brevemente
  */
 export const SERVICIOS_CACHE_TTL = {
-  SERVICIOS_LIST: 4 * 60 * 60 * 1000,       // 4 horas - Listado completo de servicios
-  SERVICIO_DETAIL: 4 * 60 * 60 * 1000,      // 4 horas - Detalle de servicio individual
-  SERVICIOS_FEATURED: 6 * 60 * 60 * 1000,   // 6 horas - Servicios destacados
-  SERVICIOS_BY_CATEGORY: 4 * 60 * 60 * 1000, // 4 horas - Servicios por categoría
-  SEARCH_RESULTS: 30 * 60 * 1000,           // 30 minutos - Resultados de búsqueda
+  SERVICIOS_LIST: 5 * 60 * 1000,            // 5 minutos - Respeta backend
+  SERVICIO_DETAIL: 10 * 60 * 1000,          // 10 minutos - Respeta backend
+  SERVICIOS_FEATURED: 15 * 60 * 1000,       // 15 minutos - Respeta backend
+  SERVICIOS_BY_CATEGORY: 5 * 60 * 1000,     // 5 minutos - Respeta backend
+  SEARCH_RESULTS: 2 * 60 * 1000,            // 2 minutos - Resultados de búsqueda
 } as const;
 
 /**
@@ -138,10 +139,43 @@ class ServiciosCacheManager {
 
   /**
    * Obtener datos del cache (memoria + localStorage)
+   * ⚠️ NUEVO: Verifica headers del backend para respetar CacheConfig
    */
-  get<T>(type: keyof typeof SERVICIOS_CACHE_TTL, identifier: string | Record<string, any>): T | null {
+  get<T>(
+    type: keyof typeof SERVICIOS_CACHE_TTL, 
+    identifier: string | Record<string, any>,
+    backendCacheStatus?: { invalidated?: boolean; disabled?: boolean }
+  ): T | null {
     const key = this.generateKey(type, identifier);
+
+    console.log('\n════════════════════════════════════════════════════════════════');
+    console.log('🔍 [CACHE FRONTEND] Buscando datos en cache');
+    console.log('════════════════════════════════════════════════════════════════');
+    console.log('🔑 Key:', key);
+    console.log('📦 Tipo:', type);
+
+    // ⚠️ NUEVO: Si el backend indica que el cache fue invalidado, NO usar cache local
+    if (backendCacheStatus?.invalidated) {
+      console.log('🚫 Backend indica CACHE INVALIDADO - Forzando recarga');
+      this.memoryCache.delete(key);
+      try {
+        localStorage.removeItem(this.STORAGE_PREFIX + key);
+      } catch (e) {
+        console.error('❌ Error limpiando localStorage:', e);
+      }
+      console.log('════════════════════════════════════════════════════════════════\n');
+      return null;
+    }
+
+    // ⚠️ NUEVO: Si el backend indica que el cache está deshabilitado, NO usar cache local
+    if (backendCacheStatus?.disabled) {
+      console.log('🚫 Backend indica CACHE DESHABILITADO - Forzando recarga');
+      console.log('════════════════════════════════════════════════════════════════\n');
+      return null;
+    }
+
     let entry = this.memoryCache.get(key);
+    console.log('🧠 En memoria:', !!entry);
 
     // Si no está en memoria, intentar cargar desde localStorage
     if (!entry) {
@@ -151,22 +185,28 @@ class ServiciosCacheManager {
           entry = JSON.parse(stored);
           if (entry) {
             this.memoryCache.set(key, entry);
+            console.log('💾 Recuperado desde localStorage');
           }
         }
       } catch (e) {
-        // Silenciar errores de localStorage
+        console.error('❌ Error leyendo localStorage:', e);
       }
     }
 
     if (!entry) {
       this.stats.misses++;
       this.saveStats();
-      console.log(`[ServiciosCache] ❌ MISS - ${key}`);
+      console.log('❌ CACHE MISS - No hay datos cacheados');
+      console.log('════════════════════════════════════════════════════════════════\n');
       return null;
     }
 
     const ttl = SERVICIOS_CACHE_TTL[type];
     const age = Date.now() - entry.timestamp;
+
+    console.log('📊 TTL:', ttl, 'ms');
+    console.log('⏰ Edad del cache:', age, 'ms');
+    console.log('🕐 Expirado:', age > ttl);
 
     // Si está expirado, eliminar y retornar null
     if (age > ttl) {
@@ -174,10 +214,12 @@ class ServiciosCacheManager {
       try {
         localStorage.removeItem(this.STORAGE_PREFIX + key);
       } catch (e) {
-        // Silenciar errores de localStorage
+        console.error('❌ Error limpiando localStorage:', e);
       }
       this.stats.misses++;
       this.saveStats();
+      console.log('❌ CACHE EXPIRADO - Eliminando');
+      console.log('════════════════════════════════════════════════════════════════\n');
       return null;
     }
 
@@ -185,6 +227,11 @@ class ServiciosCacheManager {
     entry.hits++;
     this.stats.hits++;
     this.saveStats();
+    
+    console.log('✅ CACHE HIT - Usando datos cacheados');
+    console.log('📦 Hits totales:', entry.hits);
+    console.log('⏰ Cache creado hace:', Math.floor(age / 1000), 'segundos');
+    console.log('════════════════════════════════════════════════════════════════\n');
     
     return entry.data;
   }
