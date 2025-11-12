@@ -19,3 +19,6 @@ export { useServicios } from './useServicios';
 // AI Agents Optimizados
 export { useServicesAgentOptimized } from './useServicesAgentOptimized';
 export { useBlogAgentOptimized } from './useBlogAgentOptimized';
+
+// Scroll Reveal
+export { useScrollReveal, useScrollRevealRef, useScrollRevealList } from './useScrollReveal';

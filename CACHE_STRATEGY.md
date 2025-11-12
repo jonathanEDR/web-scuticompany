@@ -15,7 +15,8 @@
 |------|----------|-------|
 | **Home, About, Contact** | 8 horas | Contenido institucional que cambia semanalmente |
 | **Footer** | 8 horas | Datos de contacto estables |
-| **Servicios** | 4 horas | Catálogo de servicios semi-estático |
+| **Servicios (Lista)** | 4 horas | Catálogo de servicios semi-estático (Frontend + Backend) |
+| **Servicio (Detalle)** | 4 horas | Detalle de servicio individual (Frontend + Backend) |
 | **Blog Posts** | 2 horas | Contenido publicado que no cambia frecuentemente |
 
 ### 📊 Contenido Semi-Dinámico
@@ -203,9 +204,47 @@ Si necesitas cambiar duraciones:
 - Home: 8 horas
 - Footer: 8 horas  
 - Blog: 1-2 horas
-- Servicios: 4-6 horas
+- **Servicios (Lista)**: 4 horas (Frontend + Backend)
+- **Servicio (Detalle)**: 4 horas (Frontend + Backend)
+
+### 📦 Sistema de Cache de Servicios (Nuevo)
+
+**Ubicación:**
+- `/utils/serviciosCache.ts` - Manager de cache con localStorage + memoria
+- `/hooks/useServiciosCache.ts` - Hooks personalizados para servicios
+
+**Características:**
+- ✅ Cache en memoria (acceso instantáneo)
+- ✅ Persistencia en localStorage (sobrevive recargas)
+- ✅ TTL configurables (4 horas para servicios)
+- ✅ Prevención de race conditions (AbortController)
+- ✅ Estadísticas de rendimiento (hits, misses, hit rate)
+- ✅ Auto-limpieza de entradas expiradas
+- ✅ Logs detallados para debugging
+
+**TTL Configurados:**
+```typescript
+SERVICIOS_LIST: 4 horas        // Listado completo de servicios
+SERVICIO_DETAIL: 4 horas       // Detalle de servicio individual  
+SERVICIOS_FEATURED: 6 horas    // Servicios destacados
+SERVICIOS_BY_CATEGORY: 4 horas // Servicios por categoría
+SEARCH_RESULTS: 30 minutos     // Resultados de búsqueda
+```
+
+**Hooks Disponibles:**
+- `useServiciosList(filters)` - Lista de servicios con filtros
+- `useServicioDetail(slug)` - Detalle de servicio por slug
+- `useServiciosDestacados()` - Servicios destacados
+- `useServiciosByCategoria(categoria)` - Servicios por categoría
+
+**Beneficios:**
+- ⚡ Navegación instantánea (0ms en cache hits)
+- 🚫 Previene race conditions al navegar rápido
+- 💾 Reduce carga del servidor
+- 📊 Métricas en tiempo real
 
 🔍 **Monitoreando**
 - Tamaño de localStorage
-- Hit rate de cache
+- Hit rate de cache (meta: >70%)
 - Feedback de usuarios sobre actualización de contenido
+

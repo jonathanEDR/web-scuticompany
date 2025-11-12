@@ -112,10 +112,10 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
 
   return (
     <div className={`
-      group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl 
-      transition-all duration-300 transform hover:-translate-y-2
+      group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg 
+      transition-all duration-500 hover-lift
       border border-gray-100 dark:border-gray-700 overflow-hidden
-      ${featured ? 'ring-2 ring-purple-500 ring-opacity-50' : ''}
+      ${featured ? 'ring-2 ring-purple-500 ring-opacity-50 hover-glow' : ''}
       ${className}
     `}>
       {/* Badge de destacado */}

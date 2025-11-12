@@ -5,21 +5,38 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { serviciosApi } from '../../services/serviciosApi';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import ContactModal from '../../components/public/ContactModal';
-import CacheDebug from '../../components/debug/CacheDebug';
 import { useSeo } from '../../hooks/useSeo';
+import { useServicioDetail } from '../../hooks/useServiciosCache';
 import type { Servicio } from '../../types/servicios';
 
 export const ServicioDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [servicio, setServicio] = useState<Servicio | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  // ============================================
+  // HOOK DE CACHE - REEMPLAZA USEEFFECT + API CALL
+  // ============================================
+
+  const {
+    data: servicio,
+    loading,
+    error: errorServicio,
+    isFromCache
+  } = useServicioDetail(slug || '', {
+    enabled: !!slug,
+    onSuccess: (data) => {
+      console.log(`✅ Servicio cargado: ${data.titulo} ${isFromCache ? '(desde cache)' : '(desde API)'}`);
+    },
+    onError: (err) => {
+      console.error('❌ Error cargando servicio:', err);
+    }
+  });
+
+  const error = errorServicio;
 
   // SEO dinámico
   const { SeoHelmet } = useSeo({
@@ -36,64 +53,6 @@ export const ServicioDetail: React.FC = () => {
     }, 150);
 
     return () => clearTimeout(scrollTimeout);
-  }, [slug]);
-
-  useEffect(() => {
-    const controller = new AbortController(); // ✅ AbortController para cancelar requests
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
-    const fetchServicio = async () => {
-      if (!slug) {
-        setError('Servicio no encontrado');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-
-        const response = await serviciosApi.getAll();
-        
-        if (controller.signal.aborted) return;
-
-        const servicioEncontrado = response.data.find(s => 
-          s.slug === slug || s._id === slug
-        );
-
-        if (!servicioEncontrado) {
-          setError('Servicio no encontrado');
-        } else if (!servicioEncontrado.activo || !servicioEncontrado.visibleEnWeb) {
-          setError('Este servicio no está disponible actualmente');
-        } else {
-          setServicio(servicioEncontrado);
-          
-          timeoutId = setTimeout(() => {
-            if (window.scrollY > 100) {
-              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            }
-          }, 300);
-        }
-      } catch (err: any) {
-        // ✅ No mostrar error si fue cancelado
-        if (err.name !== 'AbortError') {
-          setError('Error al cargar el servicio');
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchServicio();
-
-    // ✅ Cleanup function
-    return () => {
-      controller.abort();
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
   }, [slug]);
 
   const formatPrice = (servicio: Servicio) => {
@@ -125,11 +84,20 @@ export const ServicioDetail: React.FC = () => {
         <PublicHeader />
         <div className="pt-20 pb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-center items-center h-96">
+            <div className="flex justify-center items-center h-96 animate-fade-in">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">Cargando servicio...</p>
+                <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400 text-lg animate-pulse">Cargando servicio...</p>
               </div>
+            </div>
+            
+            {/* Skeleton del contenido */}
+            <div className="max-w-4xl mx-auto mt-12 space-y-6 animate-pulse">
+              <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-2xl shimmer"></div>
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded shimmer"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded shimmer"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-4/5 shimmer"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 shimmer"></div>
             </div>
           </div>
         </div>
@@ -145,8 +113,8 @@ export const ServicioDetail: React.FC = () => {
         <PublicHeader />
         <div className="pt-20 pb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center py-20">
-              <div className="text-8xl mb-6">🚫</div>
+            <div className="text-center py-20 animate-scale-in">
+              <div className="text-8xl mb-6 animate-bounce">🚫</div>
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 {error || 'Servicio no encontrado'}
               </h1>
@@ -168,17 +136,17 @@ export const ServicioDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 animate-fade-in">
       <SeoHelmet />
       <PublicHeader />
       
-      {/* Hero Section */}
+      {/* Hero Section con animación */}
       <section className="pt-20 pb-12 bg-gradient-to-br from-gray-50 dark:from-gray-900 via-purple-100/20 dark:via-purple-900/20 to-blue-100/20 dark:to-blue-900/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <nav className="mb-8">
+          {/* Breadcrumb con animación */}
+          <nav className="mb-8 animate-fade-in-down">
             <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-              <li><Link to="/" className="hover:text-gray-900 dark:hover:text-white transition-colors">Inicio</Link></li>
+              <li><Link to="/" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300">Inicio</Link></li>
               <li>{'>'}</li>
               <li><Link to="/servicios" className="hover:text-gray-900 dark:hover:text-white transition-colors">Servicios</Link></li>
               <li>{'>'}</li>
@@ -187,35 +155,35 @@ export const ServicioDetail: React.FC = () => {
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Información principal */}
-            <div>
-              {/* Categoría */}
-              <div className="mb-4">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+            {/* Información principal con animación */}
+            <div className="animate-slide-in-right">
+              {/* Categoría con animación */}
+              <div className="mb-4 animate-fade-in delay-100">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 transition-all duration-300 hover:scale-105">
                   {typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'}
                 </span>
                 {servicio.destacado && (
-                  <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                  <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 transition-all duration-300 hover:scale-105">
                     ⭐ Destacado
                   </span>
                 )}
               </div>
 
-              {/* Título */}
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              {/* Título con animación */}
+              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in delay-200">
                 {servicio.titulo}
               </h1>
 
-              {/* Descripción corta */}
+              {/* Descripción corta con animación */}
               {servicio.descripcionCorta && (
-                <p className="text-xl text-gray-700 dark:text-gray-300 mb-8">
+                <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 animate-fade-in delay-300">
                   {servicio.descripcionCorta}
                 </p>
               )}
 
-              {/* Precio y duración */}
-              <div className="flex flex-wrap gap-4 mb-8">
-                <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-700">
+              {/* Precio y duración con animación */}
+              <div className="flex flex-wrap gap-4 mb-8 animate-fade-in delay-400">
+                <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-700 hover-lift transition-all duration-300">
                   <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Precio</div>
                   <div className="text-2xl font-bold text-gray-900 dark:text-white">
                     {formatPrice(servicio)}
@@ -223,7 +191,7 @@ export const ServicioDetail: React.FC = () => {
                 </div>
                 
                 {getDurationText(servicio) && (
-                  <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-700">
+                  <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-700 hover-lift transition-all duration-300">
                     <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Duración</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {servicio.duracion?.valor} {servicio.duracion?.unidad}
@@ -698,9 +666,6 @@ export const ServicioDetail: React.FC = () => {
           }
         }}
       />
-      
-      {/* 🔍 Componente de debug para cache */}
-      <CacheDebug />
     </div>
   );
 };
