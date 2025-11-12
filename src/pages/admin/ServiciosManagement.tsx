@@ -14,14 +14,11 @@ import { useNotification } from '../../hooks/useNotification';
 import { useVirtualPagination } from '../../hooks/useVirtualPagination';
 import { useAuth } from '../../contexts/AuthContext';
 import { useServicesManagementCache } from '../../hooks/useServicesManagementCache';
-import { useCacheControl } from '../../hooks/useCacheControl';
 import { FiltersPanel } from '../../components/servicios/FiltersPanel';
 import { SortSelector } from '../../components/servicios/SortSelector';
 import { ServicioCard } from '../../components/servicios/ServicioCard';
 import { SearchWithAutocomplete } from '../../components/common/SearchWithAutocomplete';
 import { CacheControl } from '../../components/servicios/CacheControl';
-import { CacheLog } from '../../components/servicios/CacheLog';
-import { CacheTTLConfig } from '../../components/servicios/CacheTTLConfig';
 import { PaginationControls } from '../../components/common/PaginationControls';
 import { SkeletonGrid } from '../../components/common/Skeleton';
 import { CreateServicioModal } from '../../components/servicios/CreateServicioModal';
@@ -104,7 +101,6 @@ export const ServiciosManagementOptimized = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCategoriesModal, setShowCategoriesModal] = useState(false);
-  const [showCacheTTLConfig, setShowCacheTTLConfig] = useState(false);
 
   // ============================================
   // HOOKS
@@ -121,9 +117,6 @@ export const ServiciosManagementOptimized = () => {
 
   // 🎨 Hook para cache de servicios
   const { invalidateAllCache } = useServicesManagementCache();
-  
-  // 🔧 Hook para control de cache
-  const { isEnabled: isCacheEnabled } = useCacheControl();
 
   // ============================================
   // SINCRONIZACIÓN CON SERVICES CANVAS
@@ -333,11 +326,6 @@ export const ServiciosManagementOptimized = () => {
                 {totalItems} servicios totales
                 {activeFiltersCount > 0 && ` • ${activeFiltersCount} filtro${activeFiltersCount > 1 ? 's' : ''} activo${activeFiltersCount > 1 ? 's' : ''}`}
               </p>
-              
-              {/* Log de Estado del Cache */}
-              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                <CacheLog />
-              </div>
             </div>
             
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
@@ -355,20 +343,7 @@ export const ServiciosManagementOptimized = () => {
               <CacheControl 
                 variant="button" 
                 className="flex-shrink-0"
-                showStats={true}
               />
-              
-              {/* Configurar TTL del Cache - Solo visible cuando cache está activado */}
-              {isCacheEnabled && (
-                <button
-                  onClick={() => setShowCacheTTLConfig(true)}
-                  className="px-3 sm:px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 shadow-sm flex-shrink-0"
-                  title="Configurar tiempos de duración del cache"
-                >
-                  <span>⏱️</span>
-                  <span className="hidden md:inline">TTL Cache</span>
-                </button>
-              )}
               
               <button
                 onClick={() => setShowCategoriesModal(true)}
@@ -600,26 +575,6 @@ export const ServiciosManagementOptimized = () => {
         isOpen={isCanvasOpen}
         onClose={closeCanvas}
       />
-
-      {/* Modal de Configuración de TTL del Cache */}
-      {showCacheTTLConfig && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Configurar TTL del Cache</h2>
-              <button
-                onClick={() => setShowCacheTTLConfig(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 text-2xl"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-6">
-              <CacheTTLConfig onClose={() => setShowCacheTTLConfig(false)} />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
