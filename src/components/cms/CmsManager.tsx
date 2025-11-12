@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useCmsUpdaters } from '../../hooks/cms/useCmsUpdaters';
 import HeroConfigSection from './HeroConfigSection';
+import MissionVisionConfigSection from './MissionVisionConfigSection';
 import SolutionsConfigSection from './SolutionsConfigSection';
 import ValueAddedConfigSection from './ValueAddedConfigSection';
 import ClientLogosConfigSection from './ClientLogosConfigSection';
@@ -17,6 +18,9 @@ import ContactFormEditor from './ContactFormEditor';
 const CmsManager: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // 🆕 Estado para manejar qué página se está editando
+  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact'>('home');
   
   // Determinar tab activo desde la URL
   const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' => {
@@ -62,7 +66,15 @@ const CmsManager: React.FC = () => {
     setThemeConfig,
     loadPageData,
     handleSave
-  } = useCmsData();
+  } = useCmsData(selectedPage); // 🔥 Pasar selectedPage al hook
+
+  // 🔥 Recargar datos cuando cambia la página seleccionada
+  useEffect(() => {
+    console.log('🔄 [CMS Manager] Cambiando a página:', selectedPage);
+    setHasGlobalChanges(false); // Resetear cambios al cambiar de página
+    setSaveStatus('idle');
+    loadPageData(); // Recargar datos de la nueva página
+  }, [selectedPage]);
 
   const {
     updateContent,
@@ -269,6 +281,13 @@ const CmsManager: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
             <p className="text-gray-600 dark:text-gray-300">No se encontraron datos de página</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Página seleccionada: {selectedPage}</p>
+            <button
+              onClick={loadPageData}
+              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
+            >
+              🔄 Recargar
+            </button>
           </div>
         </div>
       </div>
@@ -280,18 +299,44 @@ const CmsManager: React.FC = () => {
       {/* Header */}
       <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 mb-6 border border-gray-100 dark:border-gray-700/50">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-3">
-              🎛️ Gestor de Contenido CMS
-              {hasGlobalChanges && (
-                <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full animate-pulse">
-                  🟡 Cambios sin guardar
-                </span>
-              )}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+          <div className="flex-1">
+            <div className="flex items-center gap-4 mb-2">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                🎛️ Gestor de Contenido CMS
+                {hasGlobalChanges && (
+                  <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full animate-pulse">
+                    🟡 Cambios sin guardar
+                  </span>
+                )}
+              </h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 mb-3">
               Administra el contenido, SEO y temas de tu página web
             </p>
+            
+            {/* 🆕 Indicador de página actual */}
+            {pageData && (
+              <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                📄 Editando: {pageData.pageName || selectedPage} ({pageData.pageSlug})
+              </div>
+            )}
+            
+            {/* 🆕 Selector de Página */}
+            <div className="flex items-center gap-3 mt-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                📑 Página a editar:
+              </label>
+              <select
+                value={selectedPage}
+                onChange={(e) => setSelectedPage(e.target.value as any)}
+                className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 font-medium hover:border-purple-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all"
+              >
+                <option value="home">🏠 Home (Inicio)</option>
+                <option value="about">👥 About (Nosotros)</option>
+                <option value="services">🚀 Services (Servicios)</option>
+                <option value="contact">📞 Contact (Contacto)</option>
+              </select>
+            </div>
           </div>
           <div className="flex flex-row flex-wrap items-center gap-3 w-full sm:w-auto">
             {/* Status Badge */}
@@ -350,50 +395,117 @@ const CmsManager: React.FC = () => {
       <div className="w-full space-y-6">
         {activeTab === 'content' && (
           <>
+            {/* 🎯 SIEMPRE mostrar Hero Section (común para todas las páginas) */}
             <HeroConfigSection
               pageData={pageData}
               updateContent={handleUpdateContent}
               updateTextStyle={handleUpdateTextStyle}
             />
-            {/* Configuración General de Soluciones (sin gestión de items) */}
-            <SolutionsConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-              updateTextStyle={handleUpdateTextStyle}
-            />
-            {/* Editor de Tarjetas con Upload de Iconos */}
-            <CardItemsEditor
-              items={pageData.content.solutions.items || []}
-              onUpdate={(updatedItems) => handleUpdateContent('solutions.items', updatedItems)}
-              onSave={handleSave} // Función de save manual
-              pageData={pageData} // Para obtener estilos actuales
-              updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
-              className="mt-6"
-            />
-            {/* Configuración General de Valor Agregado */}
-            <ValueAddedConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-              updateTextStyle={handleUpdateTextStyle}
-            />
-            {/* Editor de Tarjetas de Valor Agregado */}
-            <ValueAddedItemsEditor
-              items={pageData.content.valueAdded?.items || []}
-              onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
-              onSave={handleSave} // Función de save manual
-              pageData={pageData} // Para obtener estilos actuales
-              updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
-              className="mt-6"
-            />
-            {/* Configuración de Logos de Clientes */}
-            <ClientLogosConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-              updateTextStyle={handleUpdateTextStyle}
-            />
+            
+            {/* 🏠 SECCIONES ESPECÍFICAS PARA HOME */}
+            {selectedPage === 'home' && (
+              <>
+                {/* Configuración General de Soluciones (sin gestión de items) */}
+                <SolutionsConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                  updateTextStyle={handleUpdateTextStyle}
+                />
+                {/* Editor de Tarjetas con Upload de Iconos */}
+                <CardItemsEditor
+                  items={pageData.content.solutions?.items || []}
+                  onUpdate={(updatedItems) => handleUpdateContent('solutions.items', updatedItems)}
+                  onSave={handleSave} // Función de save manual
+                  pageData={pageData} // Para obtener estilos actuales
+                  updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
+                  className="mt-6"
+                />
+                {/* Configuración General de Valor Agregado */}
+                <ValueAddedConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                  updateTextStyle={handleUpdateTextStyle}
+                />
+                {/* Editor de Tarjetas de Valor Agregado */}
+                <ValueAddedItemsEditor
+                  items={pageData.content.valueAdded?.items || []}
+                  onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
+                  onSave={handleSave} // Función de save manual
+                  pageData={pageData} // Para obtener estilos actuales
+                  updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
+                  className="mt-6"
+                />
+                {/* Configuración de Logos de Clientes */}
+                <ClientLogosConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                  updateTextStyle={handleUpdateTextStyle}
+                />
+              </>
+            )}
+
+            {/* 📄 SECCIONES ESPECÍFICAS PARA ABOUT */}
+            {selectedPage === 'about' && (
+              <>
+                {/* Configuración de Misión y Visión */}
+                <MissionVisionConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-blue-800 dark:text-blue-200 mb-3">
+                    📝 Configuración de Página "Nosotros"
+                  </h3>
+                  <p className="text-blue-700 dark:text-blue-300 mb-4">
+                    Configura el contenido principal de la página "Nosotros".
+                  </p>
+                  <ul className="text-blue-600 dark:text-blue-400 space-y-2">
+                    <li>✅ <strong>Título Principal:</strong> Configura en "Hero Section" arriba</li>
+                    <li>✅ <strong>Misión:</strong> Configura arriba en la sección correspondiente</li>
+                    <li>✅ <strong>Visión:</strong> Configura arriba en la sección correspondiente</li>
+                    <li>✅ <strong>SEO:</strong> Configura en la pestaña "SEO"</li>
+                  </ul>
+                </div>
+              </>
+            )}
+
+            {/* 🛠️ SECCIONES ESPECÍFICAS PARA SERVICES */}
+            {selectedPage === 'services' && (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
+                <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
+                  🛠️ Configuración de Página "Servicios"
+                </h3>
+                <p className="text-green-700 dark:text-green-300 mb-4">
+                  Esta página mostrará la lista de servicios disponibles desde el módulo de servicios.
+                </p>
+                <ul className="text-green-600 dark:text-green-400 space-y-2">
+                  <li>✅ <strong>Hero Section:</strong> Introducción a los servicios</li>
+                  <li>✅ <strong>Servicios:</strong> Se cargan automáticamente desde la base de datos</li>
+                  <li>✅ <strong>SEO:</strong> Optimización para búsquedas de servicios</li>
+                </ul>
+              </div>
+            )}
+
+            {/* 📞 SECCIONES ESPECÍFICAS PARA CONTACT */}
+            {selectedPage === 'contact' && (
+              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-6">
+                <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-3">
+                  📞 Configuración de Página "Contacto"
+                </h3>
+                <p className="text-purple-700 dark:text-purple-300 mb-4">
+                  Página de contacto con formulario y información de contacto.
+                </p>
+                <ul className="text-purple-600 dark:text-purple-400 space-y-2">
+                  <li>✅ <strong>Hero Section:</strong> Mensaje de bienvenida</li>
+                  <li>✅ <strong>Formulario:</strong> Configurar en pestaña "Contacto"</li>
+                  <li>✅ <strong>Información:</strong> Teléfono, email, dirección</li>
+                </ul>
+              </div>
+            )}
           </>
         )}
-        {activeTab === 'cards' && (
+        {activeTab === 'cards' && selectedPage === 'home' && (
           <div className="space-y-8">
             {/* 🔥 NUEVO: Configuración Unificada para Solutions y Value Added Cards */}
             <CardsDesignConfigSection
@@ -401,6 +513,16 @@ const CmsManager: React.FC = () => {
               updateContent={handleUpdateContent}
               setHasGlobalChanges={setHasGlobalChanges} // 🔥 PASAR LA FUNCIÓN
             />
+          </div>
+        )}
+        {activeTab === 'cards' && selectedPage !== 'home' && (
+          <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center">
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              🎴 Diseño de Tarjetas
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              El diseño de tarjetas solo está disponible para la página "Home"
+            </p>
           </div>
         )}
         {activeTab === 'contact' && (
@@ -421,12 +543,22 @@ const CmsManager: React.FC = () => {
             updateContent={handleUpdateSeo}
           />
         )}
-        {activeTab === 'theme' && (
+        {activeTab === 'theme' && selectedPage === 'home' && (
           <ThemeConfigSection
             pageData={pageData}
             updateContent={handleUpdateContent}
             updateSimpleButtonStyle={handleUpdateSimpleButtonStyle}
           />
+        )}
+        {activeTab === 'theme' && selectedPage !== 'home' && (
+          <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center">
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              🎨 Configuración de Tema
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              La configuración avanzada de tema solo está disponible para la página "Home"
+            </p>
+          </div>
         )}
       </div>
     </div>

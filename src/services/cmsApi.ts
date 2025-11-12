@@ -243,12 +243,17 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
 
     return data.data;
   } catch (error) {
-    console.error('Error obteniendo página:', error);
+    // Solo loguear errores en desarrollo
+    if (import.meta.env.DEV) {
+      console.error('Error obteniendo página:', error);
+    }
     
     // ⚡ Intentar usar datos en caché aunque estén expirados
     const staleData = cache.getStale(cacheKey);
     if (staleData) {
-      console.warn('Usando datos expirados del RequestCache como fallback');
+      if (import.meta.env.DEV) {
+        console.warn('Usando datos expirados del RequestCache como fallback');
+      }
       return staleData;
     }
 
@@ -257,7 +262,9 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
       const localData = localStorage.getItem(localStorageKey);
       if (localData) {
         const { data } = JSON.parse(localData);
-        console.warn('Usando datos expirados del localStorage como fallback');
+        if (import.meta.env.DEV) {
+          console.warn('Usando datos expirados del localStorage como fallback');
+        }
         return data;
       }
     } catch (e) {
@@ -392,11 +399,38 @@ export const forceReload = async (slug: string) => {
   return await getPageBySlug(slug, false);
 };
 
+// ⚡ Inicializar todas las páginas públicas (about, services, contact)
+export const initAllPages = async () => {
+  try {
+    const headers = await getAuthHeaders();
+    
+    const response = await fetch(`${API_URL}/cms/pages/init-all`, {
+      method: 'POST',
+      headers,
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || 'Error al inicializar páginas');
+    }
+
+    // Limpiar cache después de inicializar
+    clearCache();
+
+    return data;
+  } catch (error) {
+    console.error('Error en initAllPages:', error);
+    throw error;
+  }
+};
+
 export default {
   getAllPages,
   getPageBySlug,
   updatePage,
   initHomePage,
+  initAllPages,
   clearCache,
   forceReload
 };

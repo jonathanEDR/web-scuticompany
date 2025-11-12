@@ -95,27 +95,50 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
         
         // 🎯 Si es página CMS, cargar datos dinámicos
         if (needsCmsData) {
-          const data = forceRefresh 
-            ? await forceReload(pageName)  // Limpia caché y recarga
-            : await getPageBySlug(pageName, true); // Usa caché si está disponible
-          
-          if (data && data.seo) {
-            const newSeoData: SeoData = {
-              metaTitle: data.seo.metaTitle || fallbackTitle || DEFAULT_SEO.metaTitle,
-              metaDescription: data.seo.metaDescription || fallbackDescription || DEFAULT_SEO.metaDescription,
-              keywords: data.seo.keywords || DEFAULT_SEO.keywords,
-              ogTitle: data.seo.ogTitle || data.seo.metaTitle || fallbackTitle || DEFAULT_SEO.ogTitle,
-              ogDescription: data.seo.ogDescription || data.seo.metaDescription || fallbackDescription || DEFAULT_SEO.ogDescription,
-              ogImage: data.seo.ogImage || ''
-            };
+          try {
+            const data = forceRefresh 
+              ? await forceReload(pageName)  // Limpia caché y recarga
+              : await getPageBySlug(pageName, true); // Usa caché si está disponible
             
-            setSeoData(newSeoData);
-            document.title = newSeoData.metaTitle;
+            if (data && data.seo) {
+              const newSeoData: SeoData = {
+                metaTitle: data.seo.metaTitle || fallbackTitle || DEFAULT_SEO.metaTitle,
+                metaDescription: data.seo.metaDescription || fallbackDescription || DEFAULT_SEO.metaDescription,
+                keywords: data.seo.keywords || DEFAULT_SEO.keywords,
+                ogTitle: data.seo.ogTitle || data.seo.metaTitle || fallbackTitle || DEFAULT_SEO.ogTitle,
+                ogDescription: data.seo.ogDescription || data.seo.metaDescription || fallbackDescription || DEFAULT_SEO.ogDescription,
+                ogImage: data.seo.ogImage || ''
+              };
+              
+              setSeoData(newSeoData);
+              document.title = newSeoData.metaTitle;
+            }
+          } catch (cmsError) {
+            // 🎯 Si falla cargar desde CMS, usar fallbacks silenciosamente
+            const fallbackSeoData: SeoData = {
+              metaTitle: fallbackTitle || DEFAULT_SEO.metaTitle,
+              metaDescription: fallbackDescription || DEFAULT_SEO.metaDescription,
+              keywords: DEFAULT_SEO.keywords,
+              ogTitle: fallbackTitle || DEFAULT_SEO.ogTitle,
+              ogDescription: fallbackDescription || DEFAULT_SEO.ogDescription,
+              ogImage: ''
+            };
+            setSeoData(fallbackSeoData);
+            document.title = fallbackSeoData.metaTitle;
+            
+            // 🎯 Solo loguear en desarrollo
+            if (import.meta.env.DEV) {
+              console.warn(`⚠️ [useSeo] Usando fallback para "${pageName}":`, cmsError);
+            }
           }
         }
         
       } catch (error) {
-        console.error(`❌ [useSeo] Error en "${pageName}":`, error);
+        // 🎯 Solo loguear en desarrollo
+        if (import.meta.env.DEV) {
+          console.error(`❌ [useSeo] Error en "${pageName}":`, error);
+        }
+        // Silenciar en producción
       } finally {
         setIsLoading(false);
       }

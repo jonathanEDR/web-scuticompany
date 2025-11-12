@@ -5,19 +5,17 @@ import { DEFAULT_PAGE_CONFIG } from '../../utils/defaultConfig';
 import { cms } from '../../utils/contentManagementCache';
 import type { PageData, MessageState } from '../../types/cms';
 
-export const useCmsData = () => {
+export const useCmsData = (pageSlug: string = 'home') => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [message, setMessage] = useState<MessageState | null>(null);
   const { setThemeConfig } = useTheme();
 
-  // Cargar datos de la página Home
+  // Cargar datos de la página especificada
   useEffect(() => {
-    if (!pageData) {
-      loadPageData();
-    }
-  }, [pageData]);
+    loadPageData();
+  }, [pageSlug]); // 🔥 Recargar cuando cambie el slug
 
   // Sincronizar el tema con el contexto cuando cambian los datos
   useEffect(() => {
@@ -33,9 +31,9 @@ export const useCmsData = () => {
       let data: PageData;
       
       // 1️⃣ Intentar cargar del cache primero
-      const cachedData = cms.getPages<PageData>('home');
+      const cachedData = cms.getPages<PageData>(pageSlug);
       if (cachedData) {
-        console.log('✅ [CMS] Datos cargados desde cache');
+        console.log(`✅ [CMS] Datos de "${pageSlug}" cargados desde cache`);
         data = cachedData;
         setPageData(data);
         setLoading(false);
@@ -44,18 +42,18 @@ export const useCmsData = () => {
       
       // 2️⃣ Si no hay cache, obtener de la API
       try {
-        console.log('🌐 [CMS] Obteniendo datos de la API');
-        data = await getPageBySlug('home');
+        console.log(`🌐 [CMS] Obteniendo datos de "${pageSlug}" de la API`);
+        data = await getPageBySlug(pageSlug);
         
         // 3️⃣ Guardar en cache
-        cms.setPages<PageData>(data, 'home');
+        cms.setPages<PageData>(data, pageSlug);
       } catch (apiError) {
-        console.warn('⚠️ No se pudo conectar con la base de datos, usando configuración predeterminada');
+        console.warn(`⚠️ No se pudo conectar con la base de datos para "${pageSlug}", usando configuración predeterminada`);
         
         // Usar configuración predeterminada como fallback
         data = {
-          pageSlug: 'home',
-          pageName: 'Página de Inicio',
+          pageSlug: pageSlug,
+          pageName: pageSlug === 'home' ? 'Página de Inicio' : pageSlug === 'about' ? 'Sobre Nosotros' : 'Página',
           content: {
             hero: {
               title: DEFAULT_PAGE_CONFIG.hero.title,
@@ -332,19 +330,19 @@ export const useCmsData = () => {
     try {
       setSaving(true);
       
-      await updatePage('home', {
+      await updatePage(pageSlug, {
         content: pageData.content,
         seo: pageData.seo,
         theme: pageData.theme,
         isPublished: pageData.isPublished
       });
       
-      // �️ ACTUALIZADO: Invalidar cache para forzar refresh en próxima carga
-      cms.invalidatePages('home');
-      console.log('✅ [CMS] Cache invalidado after save');
+      // ✅ ACTUALIZADO: Invalidar cache para forzar refresh en próxima carga
+      cms.invalidatePages(pageSlug);
+      console.log(`✅ [CMS] Cache invalidado para "${pageSlug}" after save`);
       
       // 🔧 MANTENER: Limpiar caché para forzar que la página pública use datos frescos
-      clearCache('page-home');
+      clearCache(`page-${pageSlug}`);
       
       setMessage({ type: 'success', text: '✅ Cambios guardados correctamente' });
       
