@@ -24,8 +24,7 @@ export const ServicioDetail: React.FC = () => {
   const {
     data: servicio,
     loading,
-    error: errorServicio,
-    isFromCache
+    error: errorServicio
   } = useServicioDetail(slug || '', {
     enabled: !!slug,
     onSuccess: (data, fromCache) => {
