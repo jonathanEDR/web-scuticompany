@@ -256,6 +256,7 @@ export function useServiciosList(
 
 /**
  * Hook especializado para detalle de servicio
+ * 🔥 OPTIMIZADO: Usa endpoint directo por slug/ID en lugar de cargar todos
  */
 export function useServicioDetail(
   slug: string,
@@ -264,39 +265,19 @@ export function useServicioDetail(
   const fetchFn = useCallback(async () => {
     const { serviciosApi } = await import('../services/serviciosApi');
     
-    // Primero intentar obtener por slug específico si es posible
     try {
-      // Intentar búsqueda eficiente - buscar solo en servicios activos/visibles
-      const response = await serviciosApi.getAll({ 
-        visibleEnWeb: true, 
-        activo: true 
-      });
+      // 🔥 SOLUCIÓN ÓPTIMA: Usar endpoint directo GET /api/servicios/:slug
+      // El backend acepta tanto ID como slug en el mismo endpoint
+      const response = await serviciosApi.getById(slug, true, false);
       
-      const servicio = response.data.find(s => s.slug === slug || s._id === slug);
-      
-      if (!servicio) {
+      if (!response.success || !response.data) {
         throw new Error('Servicio no encontrado');
       }
       
-      if (!servicio.activo || !servicio.visibleEnWeb) {
-        throw new Error('Este servicio no está disponible actualmente');
-      }
-      
-      return servicio;
-    } catch (error) {
-      // Si falla, hacer fallback a búsqueda sin filtros
-      const response = await serviciosApi.getAll();
-      const servicio = response.data.find(s => s.slug === slug || s._id === slug);
-      
-      if (!servicio) {
-        throw new Error('Servicio no encontrado');
-      }
-      
-      if (!servicio.activo || !servicio.visibleEnWeb) {
-        throw new Error('Este servicio no está disponible actualmente');
-      }
-      
-      return servicio;
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ [useServicioDetail] Error obteniendo servicio por slug:', error);
+      throw new Error(error.message || 'Servicio no encontrado');
     }
   }, [slug]);
 
