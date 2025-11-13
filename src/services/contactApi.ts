@@ -23,6 +23,27 @@ export interface ContactResponse {
   }>;
 }
 
+export interface CategoriaConTipoServicio {
+  _id: string;
+  nombre: string;
+  slug: string;
+  descripcion?: string;
+  icono?: string;
+  color?: string;
+  tipoServicio: string; // Valor del enum Lead.tipoServicio
+}
+
+export interface CategoriasResponse {
+  success: boolean;
+  data: {
+    categorias: CategoriaConTipoServicio[];
+    mapping: Record<string, string>;
+    enumValues: string[];
+  };
+  message?: string;
+  error?: string;
+}
+
 /**
  * Enviar mensaje de contacto (público, sin autenticación)
  */
@@ -53,6 +74,41 @@ export const submitContact = async (data: ContactFormData): Promise<ContactRespo
     return {
       success: false,
       message: 'Error de conexión. Por favor, verifica tu internet e intenta nuevamente.',
+    };
+  }
+};
+
+/**
+ * Obtener categorías con su mapeo a tipos de servicio
+ */
+export const getCategoriasTipoServicio = async (): Promise<CategoriasResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/contact/categorias-tipos`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: { categorias: [], mapping: {}, enumValues: [] },
+        message: result.message || 'Error al obtener categorías',
+        error: result.error,
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error al obtener categorías:', error);
+    return {
+      success: false,
+      data: { categorias: [], mapping: {}, enumValues: [] },
+      message: 'Error de conexión al obtener categorías',
+      error: error instanceof Error ? error.message : 'Error desconocido',
     };
   }
 };

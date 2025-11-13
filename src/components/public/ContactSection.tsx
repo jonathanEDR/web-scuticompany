@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useContactForm } from '../../hooks/useContactForm';
 import SimpleGoogleMap from './SimpleGoogleMap';
+import RegisterSuggestionModal from './RegisterSuggestionModal';
 import type { Categoria } from '../../services/categoriasApi';
 
 interface ContactFormData {
@@ -176,7 +178,10 @@ interface ContactSectionProps {
 const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState<string>('');
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  
   const { theme: currentTheme } = useTheme();
+  const { user } = useAuth(); // ✅ Detectar si usuario está autenticado
 
   // Obtener imagen de fondo según el tema actual
   const currentBackground = data?.backgroundImage?.[currentTheme === 'light' ? 'light' : 'dark'];
@@ -191,15 +196,42 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
     successMessage,
     errorMessage,
     handleChange,
-    handleSubmit,
+    handleSubmit: originalHandleSubmit,
   } = useContactForm();
 
   // Obtener estilos según el tema activo
   const currentStyles = data?.styles?.[currentTheme === 'light' ? 'light' : 'dark'];
   const currentCardsDesign = data?.cardsDesign?.[currentTheme === 'light' ? 'light' : 'dark'];
-  // currentBackground ya está declarado arriba con los logs
-  
 
+  // 🎯 INTERCEPTOR DEL FORMULARIO
+  // Si el usuario NO está autenticado, mostrar modal de sugerencia
+  // Si está autenticado, enviar directamente
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Si el usuario está autenticado, enviar directamente
+    if (user) {
+      await originalHandleSubmit(e);
+      return;
+    }
+
+    // Si NO está autenticado, mostrar modal de sugerencia
+    setShowRegisterModal(true);
+  };
+
+  // Enviar formulario sin registro (usuario decidió continuar sin registrarse)
+  const handleContinueWithoutRegister = async () => {
+    setShowRegisterModal(false);
+    
+    // Crear evento sintético para enviar el formulario
+    const syntheticEvent = new Event('submit', { bubbles: true, cancelable: true }) as any;
+    await originalHandleSubmit(syntheticEvent);
+  };
+
+  // Cerrar modal
+  const handleCloseModal = () => {
+    setShowRegisterModal(false);
+  };
 
   // Animación de entrada
   useEffect(() => {
@@ -309,7 +341,7 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
               e.currentTarget.style.boxShadow = currentCardsDesign?.shadow || currentStyles?.formShadow || '0 10px 40px rgba(0, 0, 0, 0.1)';
             }}
           >
-          <form id="formulario" onSubmit={handleSubmit} className="space-y-4">
+          <form id="formulario" onSubmit={handleFormSubmit} className="space-y-4">
             {/* Campo: Nombre */}
             <div>
               <label 
@@ -604,6 +636,15 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
         </div>
 
       </div>
+
+      {/* 🎉 Modal de Sugerencia de Registro */}
+      {showRegisterModal && (
+        <RegisterSuggestionModal
+          onContinueWithout={handleContinueWithoutRegister}
+          onClose={handleCloseModal}
+          isLoading={isLoading}
+        />
+      )}
     </section>
   );
 };

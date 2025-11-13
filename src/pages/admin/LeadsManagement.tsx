@@ -298,7 +298,7 @@ const LeadsManagement: React.FC = () => {
                 <option value="baja">⬇️ Baja</option>
               </select>
 
-              {/* Filtro Origen (nuevo filtro útil) */}
+              {/* Filtro Origen */}
               <select
                 value={filters.origen || 'all'}
                 onChange={(e) => handleFilterChange('origen', e.target.value)}
@@ -306,6 +306,7 @@ const LeadsManagement: React.FC = () => {
               >
                 <option value="all">🌐 Todos los orígenes</option>
                 <option value="web">🌐 Sitio Web</option>
+                <option value="web-authenticated">👤 Web (Registrado)</option>
                 <option value="facebook">📘 Facebook</option>
                 <option value="instagram">📷 Instagram</option>
                 <option value="google">🔍 Google</option>
@@ -324,6 +325,53 @@ const LeadsManagement: React.FC = () => {
                 <span>🔄</span>
                 <span className="hidden sm:inline">Refrescar</span>
               </Button>
+            </div>
+
+            {/* 🆕 Filtros Rápidos por Tipo de Usuario */}
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center">
+                Filtros rápidos:
+              </div>
+              <button
+                onClick={() => updateFilters({ origen: undefined })}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  !filters.origen || filters.origen === 'all'
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                📊 Todos
+              </button>
+              <button
+                onClick={() => updateFilters({ origen: 'web-authenticated' })}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  filters.origen === 'web-authenticated'
+                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                👤 Con Registro
+              </button>
+              <button
+                onClick={() => updateFilters({ origen: 'web' })}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  filters.origen === 'web'
+                    ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                📝 Sin Registro
+              </button>
+              <button
+                onClick={() => updateFilters({ prioridad: 'alta' })}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  filters.prioridad === 'alta'
+                    ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                ⭐ Prioridad Alta
+              </button>
             </div>
           </div>
         </Card>
@@ -425,7 +473,19 @@ const LeadsManagement: React.FC = () => {
                           <PriorityBadge prioridad={lead.prioridad} />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <OrigenBadge origen={lead.origen} />
+                          <div className="flex items-center gap-2">
+                            <OrigenBadge origen={lead.origen} />
+                            {/* 🆕 Badge para usuarios registrados */}
+                            {lead.origen === 'web-authenticated' || lead.tags?.includes('usuario-registrado') ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                ✓ Registrado
+                              </span>
+                            ) : lead.origen === 'web' || lead.tags?.includes('contacto-publico') ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
+                                📝 Público
+                              </span>
+                            ) : null}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                           {new Date(lead.createdAt).toLocaleDateString('es-ES')}

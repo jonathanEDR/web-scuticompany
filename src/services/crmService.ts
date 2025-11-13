@@ -83,7 +83,7 @@ export interface Lead {
     nombre: string;
     email: string;
   };
-  origen: 'web' | 'referido' | 'redes_sociales' | 'email' | 'telefono' | 'evento' | 'chat' | 'otro';
+  origen: 'web' | 'web-authenticated' | 'referido' | 'redes_sociales' | 'email' | 'telefono' | 'evento' | 'chat' | 'otro';
   actividades: LeadActivity[];
   creadoPor: {
     userId: string;

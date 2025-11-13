@@ -118,23 +118,29 @@ export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[field as keyof QuoteFormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
+    setErrors(prev => {
+      if (prev[field as keyof QuoteFormErrors]) {
+        return { ...prev, [field]: undefined };
+      }
+      return prev;
+    });
     
     // Limpiar mensajes de estado
-    if (isSuccess) setIsSuccess(false);
-    if (isError) setIsError(false);
-  }, [errors, isSuccess, isError]);
+    setIsSuccess(false);
+    setIsError(false);
+  }, []);
 
   /**
    * Inicializar mensaje (para pre-llenado)
    */
   const initializeMessage = useCallback((message: string) => {
-    if (formData.mensaje === '' && message) {
-      setFormData(prev => ({ ...prev, mensaje: message }));
-    }
-  }, [formData.mensaje]);
+    setFormData(prev => {
+      if (prev.mensaje === '' && message) {
+        return { ...prev, mensaje: message };
+      }
+      return prev;
+    });
+  }, []);
 
   /**
    * Manejar envío del formulario
