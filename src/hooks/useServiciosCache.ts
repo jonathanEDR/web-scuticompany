@@ -44,6 +44,9 @@ export function useServiciosCache<T>(
   const isMountedRef = useRef(true);
   const fetchIdRef = useRef(0);
   const isLoadingRef = useRef(false); // ⚡ Prevenir múltiples requests simultáneos
+  const retryCountRef = useRef(0); // ⚡ Contador de reintentos
+  const maxRetriesRef = useRef(2); // ⚡ Máximo de 2 reintentos
+  const lastErrorTimeRef = useRef(0); // ⚡ Timestamp del último error
 
   // Función para cargar datos (con cache o fetch)
   const loadData = useCallback(async (force = false) => {
@@ -51,6 +54,13 @@ export function useServiciosCache<T>(
     
     // ⚡ Si ya hay una carga pendiente y no es forzada, saltarse
     if (isLoadingRef.current && !force) {
+      return;
+    }
+
+    // ⚡ NUEVO: Evitar reintentos infinitos
+    const now = Date.now();
+    if (retryCountRef.current > maxRetriesRef.current && (now - lastErrorTimeRef.current) < 5000) {
+      console.warn('[useServiciosCache] ⚠️ Máximo número de reintentos alcanzado, esperando...');
       return;
     }
 
@@ -80,6 +90,7 @@ export function useServiciosCache<T>(
             setIsFromCache(true);
             setLoading(false);
             isLoadingRef.current = false;
+            retryCountRef.current = 0; // ⚡ Resetear contador
             onSuccess?.(cachedData, true); // Pasar true para indicar que es del cache
           }
           return;
@@ -109,6 +120,7 @@ export function useServiciosCache<T>(
       // 7. Actualizar estado
       setData(fetchedData);
       setIsFromCache(false);
+      retryCountRef.current = 0; // ⚡ Resetear contador en éxito
       onSuccess?.(fetchedData, false); // Pasar false para indicar que es de API
 
     } catch (err: any) {
@@ -122,9 +134,14 @@ export function useServiciosCache<T>(
         return;
       }
 
+      // ⚡ NUEVO: Incrementar contador de reintentos en error
+      retryCountRef.current++;
+      lastErrorTimeRef.current = Date.now();
+
       if (isMountedRef.current) {
         const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
         setError(errorMessage);
+        console.error(`❌ [useServiciosCache] Error (intento ${retryCountRef.current}/${maxRetriesRef.current + 1}):`, errorMessage);
         onError?.(err instanceof Error ? err : new Error(errorMessage));
       }
     } finally {

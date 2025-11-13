@@ -60,13 +60,16 @@ const ServicesPublicV2 = () => {
   }, []);
 
   // ============================================
-  // FILTROS PARA EL CACHE
+  // FILTROS PARA EL CACHE - AHORA INCLUYEN BÚSQUEDA Y CATEGORÍA
   // ============================================
 
   const filtros: ServicioFilters = useMemo(() => ({
     visibleEnWeb: true,
-    activo: true
-  }), []);
+    activo: true,
+    // ✨ NUEVO: Pasar búsqueda y categoría al backend
+    ...(busqueda && { search: busqueda }),
+    ...(categoriaSeleccionada && { categoria: categoriaSeleccionada })
+  }), [busqueda, categoriaSeleccionada]);
 
   // ✨ NUEVO: Filtros con paginación incluida
   const filtrosConPaginacion = useMemo(() => ({
@@ -98,6 +101,14 @@ const ServicesPublicV2 = () => {
       console.log('📦 Servicios en esta página:', data?.data?.length || 0);
       console.log('💾 Desde cache:', isFromCache ? 'SÍ ✅' : 'NO ❌ (Fresco desde backend)');
       console.log('⏰ Timestamp:', new Date().toISOString());
+      
+      // 🔍 DEBUG: Ver slugs de cada servicio
+      if (data?.data && Array.isArray(data.data)) {
+        data.data.forEach((serv: any, idx: number) => {
+          console.log(`  ├─ Servicio ${idx + 1}: ID=${serv._id} | SLUG=${serv.slug || 'SIN SLUG'} | TÍTULO=${serv.titulo}`);
+        });
+      }
+      
       console.log('════════════════════════════════════════════════════════════════\n');
       
       // ✨ NUEVO: Actualizar información de paginación
@@ -148,39 +159,12 @@ const ServicesPublicV2 = () => {
   // ============================================
 
   // ⚡ Memoizar lista filtrada para evitar recalcular en cada render
+  // ✨ AHORA: El backend ya filtra, solo usamos los datos directamente
   const serviciosFiltrados = useMemo(() => {
-    // Verificar que servicios no sea null
+    // Los datos ya vienen filtrados del backend
     if (!servicios) return [];
-    
-    return servicios.filter((servicio: Servicio) => {
-    // Filtro por búsqueda
-    if (busqueda) {
-      const busquedaLower = busqueda.toLowerCase();
-      const matchTitulo = servicio.titulo.toLowerCase().includes(busquedaLower);
-      const matchDescripcion = servicio.descripcion.toLowerCase().includes(busquedaLower);
-      const matchEtiquetas = servicio.etiquetas?.some((etiqueta: string) => 
-        etiqueta.toLowerCase().includes(busquedaLower)
-      );
-      
-      if (!matchTitulo && !matchDescripcion && !matchEtiquetas) {
-        return false;
-      }
-    }
-
-    // Filtro por categoría
-    if (categoriaSeleccionada) {
-      const categoriaServicio = typeof servicio.categoria === 'string' 
-        ? servicio.categoria 
-        : servicio.categoria?.nombre || servicio.categoria?._id || '';
-      
-      if (categoriaServicio !== categoriaSeleccionada) {
-        return false;
-      }
-    }
-
-    return true;
-    });
-  }, [servicios, busqueda, categoriaSeleccionada]);
+    return servicios;
+  }, [servicios]);
 
   // ⚡ Aplicar ordenamiento a los servicios filtrados
   const serviciosOrdenados = useMemo(() => {
