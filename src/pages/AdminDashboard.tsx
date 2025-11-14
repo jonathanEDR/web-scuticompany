@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { adminService } from '../services/adminService';
 import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import RoleBadge from '../components/RoleBadge';
+import EventStats from '../components/agenda/EventStats';
 import { Permission, type UserStats, formatUserName } from '../types/roles';
 import { LoadingSpinner } from '../components/UI';
 
@@ -371,6 +372,20 @@ export default function AdminDashboard() {
             </a>
           </div>
         </div>
+
+        {/* Widget de Agenda/Eventos */}
+        {canManageContent && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <EventStats onEventClick={(filter) => {
+              // Redirigir a la página de agenda con el filtro aplicado
+              if (filter === 'create') {
+                window.location.href = '/dashboard/agenda?action=create';
+              } else {
+                window.location.href = `/dashboard/agenda${filter !== 'all' ? '?filter=' + filter : ''}`;
+              }
+            }} />
+          </div>
+        )}
 
         {/* Información del Administrador */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">

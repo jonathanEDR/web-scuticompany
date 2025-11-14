@@ -6,7 +6,7 @@
 import { getApiUrl } from '../utils/apiConfig';
 
 export interface AgentConfigData {
-  agentName: 'blog' | 'seo' | 'services';
+  agentName: 'blog' | 'seo' | 'services' | 'gerente';
   enabled: boolean;
   
   // Configuración básica (compartida entre agentes)

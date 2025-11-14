@@ -79,6 +79,9 @@ const BlogCategory = lazy(() => import('./pages/public/blog/BlogCategory'));
 // Módulo de Blog - Páginas Administrativas
 const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
 
+// Módulo de Agenda - Administrativo
+const AgendaManagement = lazy(() => import('./pages/admin/AgendaManagement'));
+
 // Componente de Testing IA (temporal) - Comentado hasta implementar
 // const AISystemTestWithAuth = lazy(() => import('./components/testing/AISystemTestWithAuth'));
 const PostEditor = lazy(() => import('./pages/admin/blog/PostEditor'));
@@ -284,6 +287,17 @@ function AppContent() {
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
                     <CrmMessages />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 📅 MÓDULO DE AGENDA - Solo ADMIN, MODERATOR y SUPER_ADMIN */}
+              
+              {/* Dashboard de Agenda - Calendario de reuniones y eventos */}
+              <Route path="/dashboard/agenda" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <AgendaManagement />
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />

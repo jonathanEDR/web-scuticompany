@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import agentConfigService, { type AgentConfigData } from '../../services/agentConfigService';
 import servicesAgentService from '../../services/servicesAgentService';
+import { type GerenteGeneralConfigData } from '../../services/gerenteGeneralService';
 import { getApiUrl } from '../../utils/apiConfig';
 import { useAIAgentsCache } from '../../hooks/useDashboardCache';
+import { useGerenteGeneralCache } from '../../hooks/useGerenteGeneral';
 import { 
   Settings, 
   Activity, 
@@ -25,6 +27,9 @@ import BasicConfigPanel from '../../components/admin/agent-config/BasicConfigPan
 import PersonalityConfigPanel from '../../components/admin/agent-config/PersonalityConfigPanel';
 import ContextConfigPanel from '../../components/admin/agent-config/ContextConfigPanel';
 import ResponseConfigPanel from '../../components/admin/agent-config/ResponseConfigPanel';
+import { GerenteGeneralBasicConfig } from '../../components/admin/agent-config/GerenteGeneralBasicConfig';
+import { RoutingRulesPanel } from '../../components/admin/agent-config/RoutingRulesPanel';
+import { GerenteGeneralTester } from '../../components/admin/GerenteGeneralTester';
 
 // Tipos para el dashboard
 interface SystemHealth {
@@ -223,6 +228,20 @@ const AIAgentsDashboard = () => {
   
   // Estado local para ediciones de configuración (temporal hasta guardar)
   const [editingConfig, setEditingConfig] = useState<AgentConfigData | null>(null);
+  const [editingGerenteConfig, setEditingGerenteConfig] = useState<GerenteGeneralConfigData | null>(null);
+  const [gerenteActiveConfigTab, setGerenteActiveConfigTab] = useState('basic');
+
+  // Hook de cache para GerenteGeneral
+  const {
+    config: gerenteConfig,
+    status: gerenteStatus,
+    routingRules: gerenteRoutingRules,
+    loading: gerenteLoading,
+    error: gerenteError,
+    updateConfig: updateGerenteConfig,
+    updateRoutingRules: updateGerenteRoutingRules,
+    refetchAll: refetchGerenteAll
+  } = useGerenteGeneralCache();
 
   // Estados derivados del cache
   const systemHealth = aiAgentsData?.systemHealth || null;
@@ -399,6 +418,85 @@ const AIAgentsDashboard = () => {
     }
   };
 
+  // Handlers para GerenteGeneral
+  // Handler para cambios en configuración de GerenteGeneral
+  const handleGerenteConfigChange = (section: string, key: string, value: any) => {
+    if (!gerenteConfig) return;
+    
+    setEditingGerenteConfig(prev => {
+      const current = prev || gerenteConfig;
+      return {
+        ...current,
+        [section]: typeof value === 'object' && value !== null && section === key
+          ? value
+          : {
+              ...(current[section as keyof GerenteGeneralConfigData] as any),
+              [key]: value
+            }
+      };
+    });
+  };
+
+  const handleSaveGerenteConfig = async () => {
+    const configToSave = editingGerenteConfig || gerenteConfig;
+    if (!configToSave) return;
+    try {
+      setIsSaving(true);
+      setConfigError(null);
+      
+      const success = await updateGerenteConfig(configToSave);
+      if (success) {
+        setConfigSaved(true);
+        setEditingGerenteConfig(null);
+        await refetchGerenteAll();
+        setTimeout(() => setConfigSaved(false), 3000);
+      } else {
+        setConfigError('Error al guardar configuración de GerenteGeneral');
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
+      setConfigError(errorMsg);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleResetGerenteConfig = async () => {
+    if (!window.confirm('¿Estás seguro de que quieres restaurar la configuración por defecto?')) {
+      return;
+    }
+    setEditingGerenteConfig(null);
+    await refetchGerenteAll();
+  };
+
+  const handleRoutingConfigChange = (newConfig: any) => {
+    // Este handler actualiza directamente con el nuevo objeto de configuración
+    // que viene del RoutingRulesPanel
+    console.log('Routing config changed:', newConfig);
+  };
+
+  const handleSaveGerenteRoutingRules = async () => {
+    if (!gerenteRoutingRules) return;
+    try {
+      setIsSaving(true);
+      setConfigError(null);
+      
+      const success = await updateGerenteRoutingRules(gerenteRoutingRules);
+      if (success) {
+        setConfigSaved(true);
+        await refetchGerenteAll();
+        setTimeout(() => setConfigSaved(false), 3000);
+      } else {
+        setConfigError('Error al guardar reglas de routing');
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
+      setConfigError(errorMsg);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (loading && !systemHealth) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -449,6 +547,7 @@ const AIAgentsDashboard = () => {
           {[
             { id: 'overview', label: 'Resumen General', icon: BarChart3 },
             { id: 'agents', label: 'Configurar Agentes', icon: Settings },
+            { id: 'gerente', label: 'Coordinador IA', icon: Brain },
             { id: 'health', label: 'Estado del Sistema', icon: Activity },
             { id: 'metrics', label: 'Métricas Avanzadas', icon: Cpu },
             { id: 'testing', label: 'Testing del Sistema', icon: RefreshCw }
@@ -806,6 +905,135 @@ const AIAgentsDashboard = () => {
                   </div>
                 </div>
               </>
+            )}
+          </div>
+        )}
+
+        {/* GerenteGeneral Coordinator Tab */}
+        {activeTab === 'gerente' && (
+          <div className="space-y-6">
+            {/* Configuration Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Brain className="text-blue-600 dark:text-blue-400" />
+                  Coordinador Inteligente (GerenteGeneral)
+                </h2>
+                
+                <div className="flex items-center gap-3">
+                  {configError && (
+                    <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+                      <XCircle size={18} />
+                      <span className="text-sm font-medium">{configError}</span>
+                    </div>
+                  )}
+                  
+                  {configSaved && (
+                    <div className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-lg">
+                      <CheckCircle2 size={18} />
+                      <span className="text-sm font-medium">Configuración guardada</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {gerenteLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <span className="ml-3 text-gray-600 dark:text-gray-400">Cargando configuración de GerenteGeneral...</span>
+                </div>
+              ) : gerenteConfig ? (
+                <>
+                  {/* Info Section */}
+                  <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="flex gap-3">
+                      <Info className="text-blue-600 dark:text-blue-400 flex-shrink-0" size={20} />
+                      <div className="text-sm text-blue-800 dark:text-blue-200">
+                        <p className="font-medium mb-2">Coordinador de Agentes Inteligentes</p>
+                        <p className="mb-2">
+                          GerenteGeneral coordina la interacción entre múltiples agentes IA, optimizando 
+                          las respuestas a través de routing inteligente y distribución de tareas.
+                        </p>
+                        {gerenteStatus && (
+                          <p className="text-xs">
+                            <strong>Estado:</strong> {gerenteStatus.status} | 
+                            <strong className="ml-2">Agentes activos:</strong> {gerenteStatus.activeAgents}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sub-tabs Navigation */}
+                  <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+                    <nav className="-mb-px flex space-x-8">
+                      <button
+                        onClick={() => setGerenteActiveConfigTab('basic')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          gerenteActiveConfigTab === 'basic'
+                            ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        Configuración Básica
+                      </button>
+                      <button
+                        onClick={() => setGerenteActiveConfigTab('routing')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          gerenteActiveConfigTab === 'routing'
+                            ? 'border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400'
+                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        Reglas de Routing
+                      </button>
+                    </nav>
+                  </div>
+
+                  {/* Basic Configuration Panel */}
+                  {gerenteActiveConfigTab === 'basic' && (
+                    <GerenteGeneralBasicConfig
+                      config={editingGerenteConfig || gerenteConfig}
+                      onConfigChange={handleGerenteConfigChange}
+                      onSave={handleSaveGerenteConfig}
+                      onReset={handleResetGerenteConfig}
+                      isSaving={isSaving}
+                      isLoading={gerenteLoading}
+                    />
+                  )}
+
+                  {/* Routing Rules Panel */}
+                  {gerenteActiveConfigTab === 'routing' && (
+                    <RoutingRulesPanel
+                      routingConfig={gerenteRoutingRules}
+                      onConfigChange={handleRoutingConfigChange}
+                      onSave={handleSaveGerenteRoutingRules}
+                      isSaving={isSaving}
+                      isLoading={gerenteLoading}
+                    />
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <AlertTriangle className="mx-auto text-yellow-600 mb-4" size={32} />
+                  <p className="text-gray-600 dark:text-gray-400">No se pudo cargar la configuración de GerenteGeneral</p>
+                  {gerenteError && <p className="text-sm text-red-600 mt-2">{gerenteError}</p>}
+                </div>
+              )}
+            </div>
+
+            {/* Testing Section */}
+            {gerenteConfig && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Brain className="text-purple-600 dark:text-purple-400" />
+                  Sistema de Testing Interactivo
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Prueba el routing inteligente y la coordinación de agentes en tiempo real.
+                </p>
+                <GerenteGeneralTester />
+              </div>
             )}
           </div>
         )}

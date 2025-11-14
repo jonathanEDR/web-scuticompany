@@ -104,6 +104,15 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       adminOnly: true,
     },
     {
+      name: 'Agenda',
+      icon: '📅',
+      path: '/dashboard/agenda',
+      description: 'Calendario y eventos',
+      permission: Permission.MANAGE_CONTENT,
+      adminOnly: true,
+      // Solo roles administrativos - Módulo de agenda
+    },
+    {
       name: 'Media Library',
       icon: '🖼️',
       path: '/dashboard/media',
