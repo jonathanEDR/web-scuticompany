@@ -98,6 +98,9 @@ const BlogAgentTraining = lazy(() => import('./pages/admin/BlogAgentTraining'));
 const SEOAgentTraining = lazy(() => import('./pages/admin/SEOAgentTraining'));
 const ServicesAgentConfig = lazy(() => import('./pages/admin/ServicesAgentConfig'));
 const ServicesAgentTraining = lazy(() => import('./pages/admin/ServicesAgentTraining'));
+
+// 🚀 SCUTI AI - Chat Principal con GerenteGeneral
+const ScutiAIChatPage = lazy(() => import('./pages/admin/ScutiAIChatPage'));
 const AIAnalytics = lazy(() => import('./pages/admin/AIAnalytics'));
 
 // Componente de loading minimalista
@@ -451,6 +454,15 @@ function AppContent() {
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
                     <ServicesAgentTraining />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 🚀 SCUTI AI - Chat Principal con GerenteGeneral */}
+              <Route path="/dashboard/scuti-ai" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <ScutiAIChatPage />
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />

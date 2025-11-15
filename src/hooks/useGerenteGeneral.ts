@@ -57,16 +57,17 @@ export function useGerenteGeneralCache(): UseGerenteGeneralCacheReturn {
     }
   }, []);
 
-  const fetchStatus = useCallback(async () => {
-    try {
-      const result = await gerenteGeneralService.getStatus();
-      if (!result.success) return null;
-      return result.data!;
-    } catch (error) {
-      console.warn('GerenteGeneral status not available:', error);
-      return null;
-    }
-  }, []);
+  // fetchStatus no se usa actualmente - comentado para evitar warnings
+  // const fetchStatus = useCallback(async () => {
+  //   try {
+  //     const result = await gerenteGeneralService.getStatus();
+  //     if (!result.success) return null;
+  //     return result.data!;
+  //   } catch (error) {
+  //     console.warn('GerenteGeneral status not available:', error);
+  //     return null;
+  //   }
+  // }, []);
 
   const fetchRoutingRules = useCallback(async () => {
     try {

@@ -140,6 +140,15 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       // Solo ADMIN y SUPER_ADMIN - Sistema de IA
     },
     {
+      name: 'SCUTI AI',
+      icon: '🚀',
+      path: '/dashboard/scuti-ai',
+      description: 'Chat inteligente con asistente IA',
+      permission: Permission.MANAGE_SYSTEM,
+      roles: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+      // Solo ADMIN y SUPER_ADMIN - Chat principal
+    },
+    {
       name: 'Gestión de Usuarios',
       icon: '👥',
       path: '/dashboard/admin/users',

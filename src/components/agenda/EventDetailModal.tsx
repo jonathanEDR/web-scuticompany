@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Button } from '../UI';
-import { StatusBadge, PriorityBadge, TypeBadge, CategoryBadge, LocationBadge, TimeBadge } from './EventBadges';
+import { StatusBadge, PriorityBadge, TypeBadge, CategoryBadge } from './EventBadges';
 import type { Event } from '../../types/event';
 
 interface EventDetailModalProps {

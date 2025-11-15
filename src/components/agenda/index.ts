@@ -2,7 +2,6 @@
  * Exportaciones centralizadas del módulo de Agenda
  */
 
-export { default as EventBadges } from './EventBadges';
 export { default as EventFormModal } from './EventFormModal';
 export { default as EventDetailModal } from './EventDetailModal';
 export { default as EventStats } from './EventStats';

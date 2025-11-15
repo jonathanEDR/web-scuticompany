@@ -253,7 +253,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
                   {/* Eventos del día (máximo 3 visibles) */}
                   <div className="space-y-1">
-                    {day.events.slice(0, 3).map((event, idx) => (
+                    {day.events.slice(0, 3).map((event) => (
                       <div
                         key={event._id}
                         onClick={(e) => {

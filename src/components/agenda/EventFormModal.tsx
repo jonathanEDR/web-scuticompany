@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '../UI';
-import type { Event, CreateEventData } from '../../types/event';
+import type { Event } from '../../types/event';
 
 interface EventFormModalProps {
   show: boolean;

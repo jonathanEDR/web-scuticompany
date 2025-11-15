@@ -5,7 +5,6 @@
 
 import axios from 'axios';
 import type {
-  Event,
   CreateEventData,
   UpdateEventData,
   EventFilters,
