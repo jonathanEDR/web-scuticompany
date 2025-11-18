@@ -6,7 +6,7 @@
 import { useEffect, useState } from 'react';
 import { 
   FileText, MessageCircle, Eye, TrendingUp, 
-  Users, Calendar, BarChart3, Clock, Target
+  Users, Calendar, BarChart3, Clock, Target, Trash2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCategories, useAdminPosts } from '../../../hooks/blog';
@@ -15,6 +15,7 @@ import { useBlogDashboardCache } from '../../../hooks/blog/useBlogDashboardCache
 import { BlogAnalyticsDashboard } from '../../../components/blog/analytics/BlogAnalyticsDashboard';
 import { SEOCanvasModal } from '../../../components/admin/seo';
 import { useAuth } from '../../../contexts/AuthContext';
+import { blogPostApi } from '../../../services/blog';
 
 export default function BlogDashboard() {
   
@@ -26,11 +27,14 @@ export default function BlogDashboard() {
   const [selectedPostForSEO, setSelectedPostForSEO] = useState<any>(null);
   const [seoCanvasInitialMode, setSeoCanvasInitialMode] = useState<'chat' | 'analysis' | 'structure' | 'review'>('chat');
   
+  // Estado para eliminación de posts
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
+  
   // Hook de autenticación para verificar permisos
   const { role } = useAuth();
   
   // Usar useAdminPosts para obtener TODOS los posts (incluye borradores)
-  const { posts, loading: postsLoading } = useAdminPosts({ 
+  const { posts, loading: postsLoading, refetch } = useAdminPosts({ 
     limit: 100 // Cargar más posts para estadísticas precisas
   });
   
@@ -49,6 +53,36 @@ export default function BlogDashboard() {
       loadStats(posts);
     }
   }, [posts, loadStats]);
+
+  // Handler para eliminar post
+  const handleDeletePost = async (postId: string, postTitle: string) => {
+    const confirmMessage = `¿Estás seguro de que deseas eliminar el post "${postTitle}"?\n\nEsta acción no se puede deshacer.`;
+    
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      setDeletingPostId(postId);
+      
+      const response = await blogPostApi.admin.deletePost(postId);
+      
+      if (response.success) {
+        // Refrescar la lista de posts
+        await refetch();
+        
+        // Notificar éxito
+        alert('✅ Post eliminado exitosamente');
+      } else {
+        throw new Error(response.message || 'Error al eliminar el post');
+      }
+    } catch (error: any) {
+      console.error('❌ Error al eliminar post:', error);
+      alert(`❌ Error al eliminar el post: ${error.message || 'Error desconocido'}`);
+    } finally {
+      setDeletingPostId(null);
+    }
+  };
 
   // Tarjetas de estadísticas
   const statCards = [
@@ -330,6 +364,15 @@ export default function BlogDashboard() {
                             <FileText className="w-3 h-3" />
                             <span>Editar</span>
                           </Link>
+                          
+                          <button
+                            onClick={() => handleDeletePost(post._id, post.title)}
+                            disabled={deletingPostId === post._id}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>{deletingPostId === post._id ? 'Eliminando...' : 'Eliminar'}</span>
+                          </button>
                         </div>
                       )}
                     </div>

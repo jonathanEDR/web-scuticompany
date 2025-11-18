@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useClerkDetection } from '../../hooks/useClerkDetection';
+import { blogPostApi } from '../../services/blog';
+import type { BlogPost } from '../../types/blog';
 import Logo from '../Logo';
 import '../../styles/gradient-borders.css';
 
@@ -28,6 +30,8 @@ const PublicHeaderOptimized = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
+  const [showSolutionsDropdown, setShowSolutionsDropdown] = useState(false);
+  const [headerMenuPosts, setHeaderMenuPosts] = useState<BlogPost[]>([]);
   
   // Hook personalizado para detectar usuario de Clerk
   const { userData, getUserInitials } = useClerkDetection();
@@ -110,11 +114,28 @@ const PublicHeaderOptimized = () => {
       const target = event.target as Element;
       if (!target.closest('.dropdown-container')) {
         setShowResourcesDropdown(false);
+        setShowSolutionsDropdown(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 📡 Efecto para cargar posts del header menu
+  useEffect(() => {
+    const loadHeaderMenuPosts = async () => {
+      try {
+        const response = await blogPostApi.getHeaderMenuPosts();
+        if (response.success && response.data) {
+          setHeaderMenuPosts(response.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar posts del header menu:', error);
+      }
+    };
+
+    loadHeaderMenuPosts();
   }, []);
 
   return (
@@ -190,11 +211,15 @@ const PublicHeaderOptimized = () => {
             >
               Servicios
             </Link>
-            <div className="relative group">
+            <div className="relative group dropdown-container">
               <button 
                 className="theme-text-secondary theme-transition flex items-center px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-                onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
+                onMouseEnter={(e) => {
+                  (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                  setShowSolutionsDropdown(true);
+                }}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
+                onClick={() => setShowSolutionsDropdown(!showSolutionsDropdown)}
                 aria-label="Menú de soluciones"
               >
                 Soluciones
@@ -202,6 +227,30 @@ const PublicHeaderOptimized = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
+              
+              {/* Dropdown Menu */}
+              {headerMenuPosts.length > 0 && (
+                <div 
+                  className={`absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
+                    showSolutionsDropdown ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                  }`}
+                  onMouseEnter={() => setShowSolutionsDropdown(true)}
+                  onMouseLeave={() => setShowSolutionsDropdown(false)}
+                >
+                  <div className="py-2">
+                    {headerMenuPosts.map((post) => (
+                      <Link
+                        key={post._id}
+                        to={`/blog/${post.slug}`}
+                        className="block px-4 py-2 text-sm theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 theme-transition"
+                        onClick={() => setShowSolutionsDropdown(false)}
+                      >
+                        📄 {post.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="relative group dropdown-container">
               <button 

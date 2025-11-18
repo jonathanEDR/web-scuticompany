@@ -41,6 +41,7 @@ interface PostFormData {
   isPublished: boolean;
   allowComments: boolean;
   isPinned: boolean;
+  showInHeaderMenu: boolean;
 }
 
 export default function PostEditor() {
@@ -61,7 +62,8 @@ export default function PostEditor() {
     tags: [],
     isPublished: false,
     allowComments: true,
-    isPinned: false
+    isPinned: false,
+    showInHeaderMenu: false
   });
 
   const [showPreview, setShowPreview] = useState(false);
@@ -184,7 +186,8 @@ export default function PostEditor() {
           tags: tagsAsStrings,
           isPublished: post.isPublished || false,
           allowComments: post.allowComments !== undefined ? post.allowComments : true,
-          isPinned: post.isPinned || false
+          isPinned: post.isPinned || false,
+          showInHeaderMenu: post.showInHeaderMenu || false
         });
       }
     } catch (error) {
@@ -464,14 +467,18 @@ export default function PostEditor() {
         featuredImage: formData.featuredImage,
         isPublished: false,
         allowComments: formData.allowComments,
-        isPinned: formData.isPinned
+        isPinned: formData.isPinned,
+        showInHeaderMenu: formData.showInHeaderMenu
       };
 
       if (isEditing && id) {
         await blogPostApi.admin.updatePost(id, postData as UpdatePostDto);
         alert('✅ Borrador actualizado exitosamente');
       } else {
+        console.log('➕ [handleSaveDraft] Creando nuevo borrador');
         const response = await blogPostApi.admin.createPost(postData);
+        console.log('✅ [handleSaveDraft] Response del backend:', response);
+        console.log('📊 [handleSaveDraft] Post creado:', response.data);
         if (response.success && response.data) {
           alert('✅ Borrador guardado exitosamente');
           navigate(`/dashboard/blog/posts/${response.data._id}/edit`);
@@ -505,7 +512,6 @@ export default function PostEditor() {
       return;
     }
 
-    console.log('✅ Validación pasada, enviando datos...');
     setIsSaving(true);
     try {
       // Generar excerpt automáticamente si está vacío
@@ -520,20 +526,18 @@ export default function PostEditor() {
         featuredImage: formData.featuredImage,
         isPublished: true,
         allowComments: formData.allowComments,
-        isPinned: formData.isPinned
+        isPinned: formData.isPinned,
+        showInHeaderMenu: formData.showInHeaderMenu
       };
 
-      console.log('📤 [handlePublish] Enviando datos al backend:', postData);
-
       if (isEditing && id) {
-        console.log('🔄 [handlePublish] Actualizando post existente, ID:', id);
         const response = await blogPostApi.admin.updatePost(id, { ...postData, isPublished: true } as UpdatePostDto);
-        console.log('✅ [handlePublish] Response de actualización:', response);
         alert('✅ Post actualizado y publicado exitosamente');
       } else {
         console.log('➕ [handlePublish] Creando nuevo post');
         const response = await blogPostApi.admin.createPost(postData);
-        console.log('✅ [handlePublish] Response de creación:', response);
+        console.log('✅ [handlePublish] Response del backend:', response);
+        console.log('📊 [handlePublish] Post creado:', response.data);
         if (response.success) {
           alert('✅ Post publicado exitosamente');
         }
@@ -1150,6 +1154,18 @@ export default function PostEditor() {
                   className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 dark:focus:ring-blue-400"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">Fijar post (destacado)</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showInHeaderMenu}
+                  onChange={(e) => handleChange('showInHeaderMenu', e.target.checked)}
+                  className="w-4 h-4 text-purple-600 dark:text-purple-400 rounded focus:ring-purple-500 dark:focus:ring-purple-400"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Mostrar en Header de Home (Soluciones)
+                </span>
               </label>
             </div>
           </div>

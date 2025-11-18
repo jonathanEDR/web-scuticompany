@@ -142,6 +142,14 @@ const getPopularPosts = async (limit: number = 5): Promise<ApiResponse<BlogPost[
 };
 
 /**
+ * Obtiene posts configurados para mostrar en header menu
+ */
+const getHeaderMenuPosts = async (): Promise<ApiResponse<BlogPost[]>> => {
+  const response = await publicBlogApiClient.get('/posts/header-menu');
+  return response.data;
+};
+
+/**
  * Busca posts por término
  */
 const searchPosts = async (
@@ -258,6 +266,7 @@ export const blogPostApi = {
   getAllPosts,
   getPostBySlug,
   getFeaturedPosts,
+  getHeaderMenuPosts,
   getPopularPosts,
   searchPosts,
   

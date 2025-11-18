@@ -34,6 +34,7 @@ export interface BlogPost {
   isPublished: boolean;
   allowComments: boolean;
   isPinned: boolean;
+  showInHeaderMenu?: boolean;
   category: BlogCategory;
   author: BlogAuthor | null; // Puede ser null si no tiene autor asignado
   tags: (string | BlogTag)[];
@@ -230,6 +231,7 @@ export interface CreatePostDto {
   isPublished?: boolean;
   allowComments?: boolean;
   isPinned?: boolean;
+  showInHeaderMenu?: boolean;
   publishedAt?: string;
 }
 
