@@ -531,13 +531,10 @@ export default function PostEditor() {
       };
 
       if (isEditing && id) {
-        const response = await blogPostApi.admin.updatePost(id, { ...postData, isPublished: true } as UpdatePostDto);
+        await blogPostApi.admin.updatePost(id, { ...postData, isPublished: true } as UpdatePostDto);
         alert('✅ Post actualizado y publicado exitosamente');
       } else {
-        console.log('➕ [handlePublish] Creando nuevo post');
         const response = await blogPostApi.admin.createPost(postData);
-        console.log('✅ [handlePublish] Response del backend:', response);
-        console.log('📊 [handlePublish] Post creado:', response.data);
         if (response.success) {
           alert('✅ Post publicado exitosamente');
         }
