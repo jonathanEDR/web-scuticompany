@@ -7,6 +7,17 @@ import SimpleGoogleMap from './SimpleGoogleMap';
 import RegisterSuggestionModal from './RegisterSuggestionModal';
 import type { Categoria } from '../../services/categoriasApi';
 
+/**
+ * Utilidad para limpiar HTML de texto (por seguridad y compatibilidad)
+ */
+const stripHtml = (html: string): string => {
+  if (!html) return '';
+  if (!html.includes('<')) return html; // Si no tiene HTML, retornar directamente
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
+
 interface ContactFormData {
   title: string;
   subtitle: string;
@@ -287,7 +298,7 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
               className="text-xs font-semibold tracking-wider uppercase mb-2"
               style={{ color: currentStyles?.subtitleColor || '#6b7280' }}
             >
-              {data.subtitle}
+              {stripHtml(data.subtitle)}
             </p>
           )}
           
@@ -295,7 +306,7 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
             className="text-2xl md:text-3xl font-bold mb-3"
             style={{ color: currentStyles?.titleColor || currentCardsDesign?.titleColor || '#1f2937' }}
           >
-            {data?.title || 'Contáctanos'}
+            {stripHtml(data?.title || 'Contáctanos')}
           </h2>
           
           {data?.description && (
@@ -303,7 +314,7 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
               className="text-sm max-w-2xl mx-auto"
               style={{ color: currentStyles?.descriptionColor || currentCardsDesign?.descriptionColor || '#4b5563' }}
             >
-              {data.description}
+              {stripHtml(data.description)}
             </p>
           )}
         </div>
