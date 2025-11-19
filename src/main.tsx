@@ -10,6 +10,7 @@ import { HelmetProvider } from 'react-helmet-async'
  * - ClerkProvider removido de aquí (ahora solo en rutas protegidas)
  * - Páginas públicas se cargan sin dependencias de autenticación
  * - Mejora significativa en tiempo de carga inicial
+ * - StrictMode deshabilitado para evitar problemas con animaciones
  */
 
 createRoot(document.getElementById('root')!).render(

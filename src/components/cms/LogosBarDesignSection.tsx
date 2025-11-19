@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { PageData, LogosBarDesignStyles } from '../../types/cms';
-import ColorWithOpacity from './ColorWithOpacity';
-import GradientPicker from './GradientPicker';
-import ShadowControl from './ShadowControl';
 
 interface LogosBarDesignSectionProps {
   pageData: PageData;
@@ -16,52 +13,32 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // 🎨 Valores por defecto para la barra de logos
+  // 🎨 Valores por defecto para configuración de logos (sin barra)
   const defaultLightStyles: LogosBarDesignStyles = {
-    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%)',
-    borderColor: 'rgba(139, 92, 246, 0.15)',
-    borderWidth: '1px',
-    borderRadius: '1rem',
-    shadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)',
-    backdropBlur: true,
-    disperseEffect: false,
-    // 🆕 Configuraciones de animación por defecto
     animationsEnabled: true,
     rotationMode: 'individual',
     animationSpeed: 'normal',
     hoverEffects: true,
     hoverIntensity: 'normal',
-    particleEffects: true,
     glowEffects: true,
     autoDetectTech: true,
     logoSize: 'medium',
     logoSpacing: 'normal',
-    // 🔳 Configuración de formato
     logoFormat: 'rectangle',
     maxLogoWidth: 'medium',
     uniformSize: false
   };
 
   const defaultDarkStyles: LogosBarDesignStyles = {
-    background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(31, 41, 55, 0.8) 100%)',
-    borderColor: 'rgba(139, 92, 246, 0.25)',
-    borderWidth: '1px',
-    borderRadius: '1rem',
-    shadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(255, 255, 255, 0.05)',
-    backdropBlur: true,
-    disperseEffect: false,
-    // 🆕 Configuraciones de animación por defecto
     animationsEnabled: true,
     rotationMode: 'individual',
     animationSpeed: 'normal',
     hoverEffects: true,
     hoverIntensity: 'normal',
-    particleEffects: true,
     glowEffects: true,
     autoDetectTech: true,
     logoSize: 'medium',
     logoSpacing: 'normal',
-    // 🔳 Configuración de formato
     logoFormat: 'rectangle',
     maxLogoWidth: 'medium',
     uniformSize: false
@@ -78,7 +55,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
     ...(pageData.content.valueAdded?.logosBarDesign?.dark || {})
   }));
 
-  // Sincronizar estados locales cuando pageData cambie (ej. al cargar desde BD)
+  // Sincronizar estados locales cuando pageData cambie
   useEffect(() => {
     const newLightStyles = {
       ...defaultLightStyles,
@@ -97,72 +74,36 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
   // Obtener estilos actuales del estado local según el tema activo
   const currentStyles = activeTheme === 'light' ? localLightStyles : localDarkStyles;
   
-  // 🐛 LOG CMS: Ver estilos actuales del selector
-  console.log('🎨 DEBUG CMS - Estilos actuales del selector:', {
-    activeTheme,
-    currentStyles: {
-      rotationMode: currentStyles.rotationMode,
-      animationsEnabled: currentStyles.animationsEnabled,
-      animationSpeed: currentStyles.animationSpeed,
-      logoFormat: currentStyles.logoFormat
-    }
-  });
-
-  const updateBarStyle = (field: keyof LogosBarDesignStyles, value: string | boolean) => {
-    // 🐛 LOG CMS: Ver qué se está cambiando
-    console.log('🔧 DEBUG CMS - Cambiando configuración:', {
-      field,
-      value,
-      activeTheme,
-      path: `valueAdded.logosBarDesign.${activeTheme}.${field}`
-    });
-
-    // Actualizar estado local inmediatamente (para vista previa)
+  // Función para actualizar un estilo individual
+  const updateBarStyle = (key: keyof LogosBarDesignStyles, value: any) => {
+    const updatedStyles = {
+      ...(activeTheme === 'light' ? localLightStyles : localDarkStyles),
+      [key]: value
+    };
+    
+    // Actualizar estado local
     if (activeTheme === 'light') {
-      setLocalLightStyles(prev => {
-        const newStyles = { ...prev, [field]: value };
-        console.log('💡 DEBUG CMS - Nuevos estilos Light:', newStyles);
-        return newStyles;
-      });
+      setLocalLightStyles(updatedStyles);
     } else {
-      setLocalDarkStyles(prev => {
-        const newStyles = { ...prev, [field]: value };
-        console.log('🌙 DEBUG CMS - Nuevos estilos Dark:', newStyles);
-        return newStyles;
-      });
+      setLocalDarkStyles(updatedStyles);
     }
-
-    // También actualizar pageData inmediatamente para sincronización completa
-    const currentPath = `valueAdded.logosBarDesign.${activeTheme}.${field}`;
-    updateContent(currentPath, value);
-
-    // Marcar como cambios pendientes
+    
+    // Actualizar pageData
+    updateContent(`valueAdded.logosBarDesign.${activeTheme}`, updatedStyles);
     setHasUnsavedChanges(true);
   };
 
-  // Función para guardar los cambios al padre (llamada por el botón Guardar global)
-  const saveChanges = useCallback(() => {
-    // Guardar valores COMPLETOS - AMBOS TEMAS SIEMPRE
-    // Esto asegura que toda la configuración se persista correctamente
-    const completeLogosBarDesign = {
-      light: { ...localLightStyles },
-      dark: { ...localDarkStyles }
-    };
-    
-    // 🐛 LOG GUARDAR: Ver qué se está guardando
-    console.log('💾 DEBUG GUARDAR - Configuración completa a guardar:', {
-      completeLogosBarDesign,
-      lightRotationMode: completeLogosBarDesign.light.rotationMode,
-      darkRotationMode: completeLogosBarDesign.dark.rotationMode
+  const saveChanges = useCallback(async () => {
+    // Guardar ambos temas
+    updateContent('valueAdded.logosBarDesign', {
+      light: localLightStyles,
+      dark: localDarkStyles
     });
     
-    // Actualizar la configuración completa de una vez
-    updateContent('valueAdded.logosBarDesign', completeLogosBarDesign);
-    
     setHasUnsavedChanges(false);
+    return true;
   }, [localLightStyles, localDarkStyles, updateContent]);
 
-  // Exponer saveChanges para que CmsManager pueda llamarlo
   useEffect(() => {
     (window as any).__logosBarDesignSave = saveChanges;
     
@@ -174,18 +115,14 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
   const resetToDefaults = () => {
     const defaults = activeTheme === 'light' ? defaultLightStyles : defaultDarkStyles;
     
-    // Actualizar estado local
     if (activeTheme === 'light') {
       setLocalLightStyles(defaults);
-      // También actualizar pageData inmediatamente
       updateContent('valueAdded.logosBarDesign.light', defaults);
     } else {
       setLocalDarkStyles(defaults);
-      // También actualizar pageData inmediatamente
       updateContent('valueAdded.logosBarDesign.dark', defaults);
     }
     
-    // Marcar como cambios pendientes
     setHasUnsavedChanges(true);
   };
 
@@ -199,10 +136,10 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Diseño de la Barra de Logos
+              Configuración de Burbujas Flotantes 🫧
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Personaliza el estilo de la barra que contiene los logos
+              Personaliza el comportamiento de los logos que flotan como burbujas por toda la sección
             </p>
           </div>
         </div>
@@ -222,6 +159,23 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
               Tienes cambios sin guardar. Usa el botón "Guardar" de arriba.
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Info Banner */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">🫧</span>
+          <div>
+            <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">
+              Efecto de Burbujas Flotantes
+            </h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Los logos flotan libremente por toda la sección como burbujas en el espacio. Se mueven de forma aleatoria, 
+              rebotan en los bordes, rotan suavemente y reaccionan al cursor del mouse. Algunas burbujas flotan detrás 
+              de las tarjetas y otras por delante, creando un efecto de profundidad 3D.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -252,420 +206,248 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
         </div>
       </div>
 
-      {/* Vista Previa */}
-      <div className="mb-8">
-        <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-          👁️ Vista Previa - Tema {activeTheme === 'light' ? 'Claro' : 'Oscuro'}
-        </h4>
-        
-        <div className="p-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl relative overflow-hidden">
-          {/* Simulación del fondo de la sección */}
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-cyan-900/20"></div>
-          
-          {/* Preview de la barra */}
-          <div className="relative">
-            <div 
-              className={`relative ${currentStyles.backdropBlur ? 'backdrop-blur-sm' : ''}`}
-              style={{
-                background: currentStyles.background,
-                border: `${currentStyles.borderWidth} solid ${currentStyles.borderColor}`,
-                borderRadius: currentStyles.borderRadius,
-                boxShadow: currentStyles.shadow,
-                padding: '1.5rem 3rem',
-                // Efectos de dispersión con máscara de degradado en las puntas
-                ...(currentStyles.disperseEffect && {
-                  maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
-                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
-                })
-              }}
-            >
-              <div className="flex justify-center items-center gap-8">
-                {/* Logos de ejemplo */}
-                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold">
-                  SQL
+      {/* Configuraciones */}
+      <div className="space-y-6">
+        {/* Grid de 2 columnas para Movimiento e Interacción */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Columna 1: Movimiento de Burbujas */}
+          <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-4">🫧 Movimiento de Burbujas</h4>
+            
+            <div className="space-y-4">
+              {/* Animaciones Habilitadas */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                    Movimiento Activo
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Flotan con rebotes y rotación
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold">
-                  JS
+                <input
+                  type="checkbox"
+                  checked={currentStyles.animationsEnabled ?? true}
+                  onChange={(e) => updateBarStyle('animationsEnabled', e.target.checked)}
+                  className="w-5 h-5"
+                />
+              </div>
+
+              {/* Modo de Rotación */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Estilo de Rotación
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Rotación suave mientras flotan
+                </p>
+                <select
+                  value={currentStyles.rotationMode || 'individual'}
+                  onChange={(e) => updateBarStyle('rotationMode', e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                >
+                  <option value="none">Sin rotación</option>
+                  <option value="individual">Rotación continua</option>
+                </select>
+              </div>
+
+              {/* Velocidad de Animación */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Velocidad de Movimiento
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Velocidad de desplazamiento
+                </p>
+                <select
+                  value={currentStyles.animationSpeed || 'normal'}
+                  onChange={(e) => updateBarStyle('animationSpeed', e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                >
+                  <option value="slow">🐌 Lenta (relajante)</option>
+                  <option value="normal">⚡ Normal (equilibrado)</option>
+                  <option value="fast">🚀 Rápida (energética)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Columna 2: Interacción con Mouse */}
+          <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-4">👆 Interacción con Mouse</h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+              El cursor empuja las burbujas al pasar cerca
+            </p>
+            
+            <div className="space-y-4">
+              {/* Hover Habilitado */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                    Efectos Hover
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Escala al pasar el mouse
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold">
-                  PY
+                <input
+                  type="checkbox"
+                  checked={currentStyles.hoverEffects ?? true}
+                  onChange={(e) => updateBarStyle('hoverEffects', e.target.checked)}
+                  className="w-5 h-5"
+                />
+              </div>
+
+              {/* Intensidad de Hover */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Fuerza de Empuje
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Qué tan fuerte empuja el cursor
+                </p>
+                <select
+                  value={currentStyles.hoverIntensity || 'normal'}
+                  onChange={(e) => updateBarStyle('hoverIntensity', e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                >
+                  <option value="subtle">💨 Sutil</option>
+                  <option value="normal">💫 Normal</option>
+                  <option value="intense">💥 Intenso</option>
+                </select>
+              </div>
+
+              {/* Efectos de Glow */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                    Efectos de Brillo
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Resplandor alrededor de burbujas
+                  </p>
                 </div>
+                <input
+                  type="checkbox"
+                  checked={currentStyles.glowEffects ?? true}
+                  onChange={(e) => updateBarStyle('glowEffects', e.target.checked)}
+                  className="w-5 h-5"
+                />
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Controles de configuración */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Columna izquierda */}
-        <div className="space-y-6">
-          {/* Fondo */}
-          <div>
-            <GradientPicker
-              key={`background-${activeTheme}`}
-              label="Fondo de la Barra"
-              value={currentStyles.background}
-              onChange={(value) => updateBarStyle('background', value)}
-            />
-          </div>
+        {/* Grid de 2 columnas para Tamaño/Espaciado y Detección Inteligente */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Columna 1: Tamaño y Espaciado */}
+          <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-4">📏 Tamaño y Espaciado</h4>
+            
+            <div className="space-y-4">
+              {/* Tamaño de Logos */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Tamaño de Burbujas
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Tamaño de los logos dentro de las burbujas
+                </p>
+                <select
+                  value={currentStyles.logoSize || 'medium'}
+                  onChange={(e) => updateBarStyle('logoSize', e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                >
+                  <option value="small">🔹 Pequeño</option>
+                  <option value="medium">🔸 Mediano</option>
+                  <option value="large">🔶 Grande</option>
+                </select>
+              </div>
 
-          {/* Color del borde */}
-          <div>
-            <ColorWithOpacity
-              label="Color del Borde"
-              value={currentStyles.borderColor}
-              onChange={(value) => updateBarStyle('borderColor', value)}
-            />
-          </div>
+              {/* Formato de Logo */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Formato de Logo
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Proporción de la imagen
+                </p>
+                <select
+                  value={currentStyles.logoFormat || 'rectangle'}
+                  onChange={(e) => updateBarStyle('logoFormat', e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                >
+                  <option value="square">⬛ Cuadrado</option>
+                  <option value="rectangle">▭ Rectangular</option>
+                  <option value="original">🖼️ Original</option>
+                </select>
+              </div>
 
-          {/* Grosor del borde */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Grosor del Borde
-            </label>
-            <select
-              value={currentStyles.borderWidth}
-              onChange={(e) => updateBarStyle('borderWidth', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-            >
-              <option value="0px">Sin borde</option>
-              <option value="1px">1px</option>
-              <option value="2px">2px</option>
-              <option value="3px">3px</option>
-            </select>
-          </div>
-        </div>
+              {/* Ancho Máximo */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Ancho Máximo
+                </label>
+                <select
+                  value={currentStyles.maxLogoWidth || 'medium'}
+                  onChange={(e) => updateBarStyle('maxLogoWidth', e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                >
+                  <option value="small">Pequeño (80px)</option>
+                  <option value="medium">Mediano (120px)</option>
+                  <option value="large">Grande (160px)</option>
+                </select>
+              </div>
 
-        {/* Columna derecha */}
-        <div className="space-y-6">
-          {/* Border radius */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Redondez de las Esquinas
-            </label>
-            <div className="space-y-2">
-              <input
-                type="range"
-                min="0"
-                max="3"
-                step="0.25"
-                value={parseFloat(currentStyles.borderRadius.replace('rem', ''))}
-                onChange={(e) => updateBarStyle('borderRadius', `${e.target.value}rem`)}
-                className="w-full"
-              />
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {currentStyles.borderRadius} ({Math.round(parseFloat(currentStyles.borderRadius.replace('rem', '')) * 16)}px)
+              {/* Tamaño Uniforme */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                    Tamaño Uniforme
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Todas las burbujas del mismo tamaño
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={currentStyles.uniformSize ?? false}
+                  onChange={(e) => updateBarStyle('uniformSize', e.target.checked)}
+                  className="w-5 h-5"
+                />
               </div>
             </div>
           </div>
 
-          {/* Sombra */}
-          <div>
-            <ShadowControl
-              label="Sombra"
-              value={currentStyles.shadow}
-              onChange={(value) => updateBarStyle('shadow', value)}
-            />
-          </div>
-
-          {/* Opciones adicionales */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Efecto Backdrop Blur
-              </label>
-              <button
-                onClick={() => updateBarStyle('backdropBlur', !currentStyles.backdropBlur)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  currentStyles.backdropBlur ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    currentStyles.backdropBlur ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Efecto de Dispersión en Puntas
-                <span className="block text-xs text-gray-500 dark:text-gray-400">
-                  Desvanece gradualmente los bordes izquierdo y derecho
-                </span>
-              </label>
-              <button
-                onClick={() => updateBarStyle('disperseEffect', !currentStyles.disperseEffect)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  currentStyles.disperseEffect ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    currentStyles.disperseEffect ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* 🎬 Configuración de Animaciones */}
-            <div className="space-y-6 border-t border-gray-200 dark:border-gray-600 pt-6">
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                🎬 Configuración de Animaciones
-              </h4>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Activar/Desactivar Animaciones */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Activar Animaciones
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Habilita todos los efectos de animación
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => updateBarStyle('animationsEnabled', !currentStyles.animationsEnabled)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      currentStyles.animationsEnabled ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        currentStyles.animationsEnabled ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Modo de Rotación */}
+          {/* Columna 2: Detección Inteligente */}
+          <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-4">🤖 Detección Inteligente</h4>
+            
+            <div className="space-y-4">
+              {/* Detección Automática */}
+              <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Modo de Rotación
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                    Detección Automática de Tecnología
                   </label>
-                  <select
-                    value={currentStyles.rotationMode || 'individual'}
-                    onChange={(e) => updateBarStyle('rotationMode', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
-                    disabled={!currentStyles.animationsEnabled}
-                  >
-                    <option value="none">
-                      Sin animaciones{(currentStyles.rotationMode || 'individual') === 'none' ? ' (actual)' : ''}
-                    </option>
-                    <option value="individual">
-                      Efectos elegantes individuales{(currentStyles.rotationMode || 'individual') === 'individual' ? ' (actual)' : ''}
-                    </option>
-                  </select>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {currentStyles.rotationMode === 'individual' && '✨ Efectos suaves adaptados por categoría: rebote, pulso, flotación, brillo'}
-                    {currentStyles.rotationMode === 'none' && '🚫 Sin efectos de animación'}
+                    Aplica animaciones específicas según el tipo de tecnología
                   </p>
                 </div>
-
-                {/* Velocidad de Animación */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Velocidad de Animación
-                  </label>
-                  <select
-                    value={currentStyles.animationSpeed || 'normal'}
-                    onChange={(e) => updateBarStyle('animationSpeed', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
-                    disabled={!currentStyles.animationsEnabled}
-                  >
-                    <option value="slow">Lenta (20-30s)</option>
-                    <option value="normal">Normal (12-18s)</option>
-                    <option value="fast">Rápida (6-10s)</option>
-                  </select>
-                </div>
-
-                {/* Intensidad de Hover */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Intensidad de Hover
-                  </label>
-                  <select
-                    value={currentStyles.hoverIntensity || 'normal'}
-                    onChange={(e) => updateBarStyle('hoverIntensity', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
-                    disabled={!currentStyles.hoverEffects}
-                  >
-                    <option value="subtle">Sutil (1.1x)</option>
-                    <option value="normal">Normal (1.3x)</option>
-                    <option value="intense">Intensa (1.5x)</option>
-                  </select>
-                </div>
-
-                {/* Tamaño de Logos */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Tamaño de Logos
-                  </label>
-                  <select
-                    value={currentStyles.logoSize || 'medium'}
-                    onChange={(e) => updateBarStyle('logoSize', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
-                  >
-                    <option value="small">Pequeño (h-10)</option>
-                    <option value="medium">Mediano (h-16)</option>
-                    <option value="large">Grande (h-20)</option>
-                  </select>
-                </div>
-
-                {/* Espaciado de Logos */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Espaciado entre Logos
-                  </label>
-                  <select
-                    value={currentStyles.logoSpacing || 'normal'}
-                    onChange={(e) => updateBarStyle('logoSpacing', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
-                  >
-                    <option value="compact">Compacto (gap-4)</option>
-                    <option value="normal">Normal (gap-8)</option>
-                    <option value="wide">Amplio (gap-12)</option>
-                  </select>
-                </div>
-
-                {/* 🔳 Formato de Logos */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Formato de Logos
-                  </label>
-                  <select
-                    value={currentStyles.logoFormat || 'rectangle'}
-                    onChange={(e) => updateBarStyle('logoFormat', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
-                  >
-                    <option value="rectangle">📏 Rectangular (mantiene proporciones)</option>
-                    <option value="square">⬜ Cuadrado (altura fija)</option>
-                    <option value="original">🖼️ Original (sin restricciones)</option>
-                  </select>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {currentStyles.logoFormat === 'rectangle' && '📏 Los logos mantienen su aspect ratio original'}
-                    {currentStyles.logoFormat === 'square' && '⬜ Todos los logos tienen la misma altura (puede distorsionar)'}
-                    {currentStyles.logoFormat === 'original' && '🖼️ Sin restricciones de tamaño'}
-                  </p>
-                </div>
-
-                {/* Ancho máximo (solo para modo rectangle y original) */}
-                {(currentStyles.logoFormat === 'rectangle' || currentStyles.logoFormat === 'original') && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Ancho Máximo
-                    </label>
-                    <select
-                      value={currentStyles.maxLogoWidth || 'medium'}
-                      onChange={(e) => updateBarStyle('maxLogoWidth', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
-                    >
-                      <option value="small">Pequeño (80px)</option>
-                      <option value="medium">Mediano (120px)</option>
-                      <option value="large">Grande (160px)</option>
-                    </select>
-                  </div>
-                )}
+                <input
+                  type="checkbox"
+                  checked={currentStyles.autoDetectTech ?? true}
+                  onChange={(e) => updateBarStyle('autoDetectTech', e.target.checked)}
+                  className="w-5 h-5"
+                />
               </div>
 
-              {/* Efectos Adicionales */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Efectos Hover
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Escala y rotación
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => updateBarStyle('hoverEffects', !currentStyles.hoverEffects)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      currentStyles.hoverEffects ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        currentStyles.hoverEffects ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Partículas
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Puntos flotantes
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => updateBarStyle('particleEffects', !currentStyles.particleEffects)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      currentStyles.particleEffects ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
-                    }`}
-                    disabled={!currentStyles.hoverEffects}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        currentStyles.particleEffects ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Glow Effects
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Brillo y sombras
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => updateBarStyle('glowEffects', !currentStyles.glowEffects)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      currentStyles.glowEffects ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
-                    }`}
-                    disabled={!currentStyles.hoverEffects}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        currentStyles.glowEffects ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Auto-Detección
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Categorías smart
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => updateBarStyle('autoDetectTech', !currentStyles.autoDetectTech)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      currentStyles.autoDetectTech ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        currentStyles.autoDetectTech ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
+              {/* Info adicional sobre detección */}
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  💡 <strong>Detección inteligente:</strong> El sistema reconoce automáticamente tecnologías 
+                  como React, Python, Docker, etc., y aplica efectos visuales personalizados a cada burbuja.
+                </p>
               </div>
             </div>
           </div>

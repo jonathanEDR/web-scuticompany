@@ -126,10 +126,10 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Logos de Tecnologías
+              Logos Flotantes 🫧
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Gestiona los logos que aparecen en la barra superior
+              Los logos flotan como burbujas por toda la sección con movimiento interactivo
             </p>
           </div>
         </div>

@@ -50,6 +50,136 @@
   }
 }
 
+/* 🎈 Animaciones de burbujas flotantes para logos */
+@keyframes logoEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animación base de flotación (se sobrescribe con keyframes dinámicos) */
+@keyframes bubble-float-base {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(10px, -15px) scale(1.05);
+  }
+  50% {
+    transform: translate(-5px, -25px) scale(1);
+  }
+  75% {
+    transform: translate(-15px, -10px) scale(0.95);
+  }
+}
+
+/* Clase para contenedor de burbujas */
+.logos-bubble-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Clase para cada logo flotante */
+.logo-bubble {
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition: transform 0.5s ease, filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Clase de entrada */
+.logo-entrance {
+  animation: logoEntrance 0.8s ease-out forwards;
+}
+
+/* Clase base para logos mejorados */
+.logo-enhanced {
+  position: relative;
+  display: inline-block;
+}
+
+/* Efectos hover elegantes por categoría */
+.logo-bounce-elegant:hover {
+  animation-play-state: paused;
+  transform: translateY(-8px) scale(1.1);
+  filter: brightness(1.2);
+}
+
+.logo-pulse-smooth:hover {
+  animation-play-state: paused;
+  transform: scale(1.15);
+  filter: brightness(1.15) drop-shadow(0 4px 12px rgba(6, 182, 212, 0.4));
+}
+
+.logo-float-gentle:hover {
+  animation-play-state: paused;
+  transform: translateY(-10px) scale(1.1);
+  filter: brightness(1.1) drop-shadow(0 6px 16px rgba(34, 197, 94, 0.3));
+}
+
+.logo-glow-soft:hover {
+  animation-play-state: paused;
+  transform: scale(1.12);
+  filter: brightness(1.2) drop-shadow(0 0 20px rgba(139, 92, 246, 0.6));
+}
+
+.logo-ai:hover {
+  animation-play-state: paused;
+  transform: scale(1.15) rotate(5deg);
+  filter: brightness(1.25) drop-shadow(0 0 24px rgba(168, 85, 247, 0.7));
+}
+
+.logo-scale-smooth:hover {
+  animation-play-state: paused;
+  transform: scale(1.18);
+  filter: brightness(1.15);
+}
+
+.logo-wobble-gentle:hover {
+  animation-play-state: paused;
+  transform: scale(1.1) rotate(-3deg);
+  filter: brightness(1.1);
+}
+
+.logo-lift-elegant:hover {
+  animation-play-state: paused;
+  transform: translateY(-12px) scale(1.12);
+  filter: brightness(1.15) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.2));
+}
+
+/* Intensidades de hover */
+.hover-light:hover {
+  transform-origin: center;
+}
+
+.hover-normal:hover {
+  transform-origin: center;
+}
+
+.hover-strong:hover {
+  transform-origin: center;
+  filter: brightness(1.3) !important;
+}
+
+/* Efectos de glow */
+.glow-enabled:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.glow-disabled:hover {
+  box-shadow: none;
+}
+
+/* Sin hover */
+.logo-no-hover {
+  pointer-events: none;
+}
+
 @keyframes slideDown {
   from { 
     opacity: 0;

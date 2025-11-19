@@ -8,7 +8,7 @@ import ClientLogosSection from '../../components/public/ClientLogosSection';
 import BlogSection from '../../components/public/BlogSection';
 import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
-import { getPageBySlug, clearCache, forceReload } from '../../services/cmsApi';
+import { forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
 import { categoriasApi, type Categoria } from '../../services/categoriasApi';
@@ -87,6 +87,44 @@ interface PageData {
         iconDark?: string;
         gradient?: string;
       }>;
+      logos?: Array<{
+        _id: string;
+        name: string;
+        imageUrl: string;
+        alt: string;
+        link?: string;
+        order: number;
+      }>;
+      logosBarDesign?: {
+        light?: {
+          animationsEnabled?: boolean;
+          rotationMode?: 'none' | 'individual';
+          animationSpeed?: 'slow' | 'normal' | 'fast';
+          hoverEffects?: boolean;
+          hoverIntensity?: 'light' | 'normal' | 'strong';
+          glowEffects?: boolean;
+          autoDetectTech?: boolean;
+          logoSize?: 'small' | 'medium' | 'large';
+          logoSpacing?: 'compact' | 'normal' | 'wide';
+          logoFormat?: 'square' | 'rectangle' | 'original';
+          maxLogoWidth?: 'small' | 'medium' | 'large';
+          uniformSize?: boolean;
+        };
+        dark?: {
+          animationsEnabled?: boolean;
+          rotationMode?: 'none' | 'individual';
+          animationSpeed?: 'slow' | 'normal' | 'fast';
+          hoverEffects?: boolean;
+          hoverIntensity?: 'light' | 'normal' | 'strong';
+          glowEffects?: boolean;
+          autoDetectTech?: boolean;
+          logoSize?: 'small' | 'medium' | 'large';
+          logoSpacing?: 'compact' | 'normal' | 'wide';
+          logoFormat?: 'square' | 'rectangle' | 'original';
+          maxLogoWidth?: 'small' | 'medium' | 'large';
+          uniformSize?: boolean;
+        };
+      };
     };
     clientLogos?: ClientLogosContent;
     contactForm?: any;
@@ -215,13 +253,11 @@ const HomeOptimized = () => {
     
     // Escuchar eventos de actualización del CMS
     const handleCMSUpdate = () => {
-      clearCache('page-home');
-      loadPageData(true, true); // Forzar recarga cuando el CMS se actualiza
+      loadPageData(true); // Forzar recarga cuando el CMS se actualiza
     };
 
     const handleClearCache = () => {
-      clearCache('page-home');
-      loadPageData(true, true);
+      loadPageData(true);
     };
 
     window.addEventListener('cmsUpdate', handleCMSUpdate);
@@ -234,13 +270,11 @@ const HomeOptimized = () => {
     };
   }, []);
 
-  const loadPageData = async (silent = false, forceRefresh = false) => {
+  const loadPageData = async (silent = false) => {
     try {
       if (!silent) setIsLoadingCMS(true);
       
-      const data = forceRefresh 
-        ? await forceReload('home')
-        : await getPageBySlug('home', true);
+      const data = await forceReload('home');
 
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {

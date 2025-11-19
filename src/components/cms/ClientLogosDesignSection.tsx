@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { PageData, ClientLogosSectionDesignStyles, ClientLogosDesignStyles } from '../../types/cms';
-import ColorWithOpacity from './ColorWithOpacity';
-import GradientPicker from './GradientPicker';
-import ShadowControl from './ShadowControl';
+import type { PageData, ClientLogosDesignStyles } from '../../types/cms';
 
 interface ClientLogosDesignSectionProps {
   pageData: PageData;
@@ -14,29 +11,8 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
   updateContent
 }) => {
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
-  const [activeTab, setActiveTab] = useState<'section' | 'logos'>('section');
+  const [activeTab, setActiveTab] = useState<'logos' | 'animations'>('logos');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  // 🎨 Valores por defecto para el diseño de la sección
-  const defaultSectionLightStyles: ClientLogosSectionDesignStyles = {
-    background: 'transparent', // Sin fondo por defecto, solo el configurado en CMS
-    borderColor: 'transparent',
-    borderWidth: '0px',
-    borderRadius: '0px',
-    shadow: 'none',
-    padding: '3rem',
-    margin: '2rem 0'
-  };
-
-  const defaultSectionDarkStyles: ClientLogosSectionDesignStyles = {
-    background: 'transparent', // Sin fondo por defecto, solo el configurado en CMS
-    borderColor: 'transparent',
-    borderWidth: '0px',
-    borderRadius: '0px',
-    shadow: 'none',
-    padding: '3rem',
-    margin: '2rem 0'
-  };
 
   // 🎨 Valores por defecto para el diseño de los logos
   const defaultLogosLightStyles: ClientLogosDesignStyles = {
@@ -46,12 +22,21 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
     logoHoverOpacity: '1',
     logoFilter: 'grayscale(0%)',
     logoHoverFilter: 'grayscale(0%)',
-    logoBackground: 'transparent',
-    logoPadding: '1rem',
-    logosBorderRadius: '0.5rem',
     logosGap: '2rem',
-    logosPerRow: 4,
-    logosAlignment: 'center'
+    logosAlignment: 'center',
+    // Animaciones
+    floatAnimation: true,
+    floatIntensity: 'normal',
+    mouseTracking: true,
+    mouseIntensity: 'normal',
+    hoverScale: 1.15,
+    hoverRotation: true,
+    // Carrusel
+    carouselEnabled: true,
+    carouselSpeed: 3000,
+    logosToShowDesktop: 6,
+    logosToShowTablet: 4,
+    logosToShowMobile: 3
   };
 
   const defaultLogosDarkStyles: ClientLogosDesignStyles = {
@@ -61,25 +46,24 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
     logoHoverOpacity: '1',
     logoFilter: 'brightness(0) invert(1)',
     logoHoverFilter: 'brightness(0) invert(1)',
-    logoBackground: 'transparent',
-    logoPadding: '1rem',
-    logosBorderRadius: '0.5rem',
     logosGap: '2rem',
-    logosPerRow: 4,
-    logosAlignment: 'center'
+    logosAlignment: 'center',
+    // Animaciones
+    floatAnimation: true,
+    floatIntensity: 'normal',
+    mouseTracking: true,
+    mouseIntensity: 'normal',
+    hoverScale: 1.15,
+    hoverRotation: true,
+    // Carrusel
+    carouselEnabled: true,
+    carouselSpeed: 3000,
+    logosToShowDesktop: 6,
+    logosToShowTablet: 4,
+    logosToShowMobile: 3
   };
 
   // Estado local temporal para los estilos que se están editando
-  const [localSectionLightStyles, setLocalSectionLightStyles] = useState<ClientLogosSectionDesignStyles>(() => ({
-    ...defaultSectionLightStyles,
-    ...(pageData.content.clientLogos?.sectionDesign?.light || {})
-  }));
-  
-  const [localSectionDarkStyles, setLocalSectionDarkStyles] = useState<ClientLogosSectionDesignStyles>(() => ({
-    ...defaultSectionDarkStyles,
-    ...(pageData.content.clientLogos?.sectionDesign?.dark || {})
-  }));
-
   const [localLogosLightStyles, setLocalLogosLightStyles] = useState<ClientLogosDesignStyles>(() => ({
     ...defaultLogosLightStyles,
     ...(pageData.content.clientLogos?.logosDesign?.light || {})
@@ -92,16 +76,6 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
 
   // Sincronizar estados locales cuando pageData cambie
   useEffect(() => {
-    const newSectionLightStyles = {
-      ...defaultSectionLightStyles,
-      ...(pageData.content.clientLogos?.sectionDesign?.light || {})
-    };
-    
-    const newSectionDarkStyles = {
-      ...defaultSectionDarkStyles,
-      ...(pageData.content.clientLogos?.sectionDesign?.dark || {})
-    };
-
     const newLogosLightStyles = {
       ...defaultLogosLightStyles,
       ...(pageData.content.clientLogos?.logosDesign?.light || {})
@@ -112,32 +86,14 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
       ...(pageData.content.clientLogos?.logosDesign?.dark || {})
     };
     
-    setLocalSectionLightStyles(newSectionLightStyles);
-    setLocalSectionDarkStyles(newSectionDarkStyles);
     setLocalLogosLightStyles(newLogosLightStyles);
     setLocalLogosDarkStyles(newLogosDarkStyles);
-  }, [pageData.content.clientLogos?.sectionDesign, pageData.content.clientLogos?.logosDesign]);
+  }, [pageData.content.clientLogos?.logosDesign]);
 
-  // Obtener estilos actuales del estado local según el tema y tab activos
-  const currentSectionStyles = activeTheme === 'light' ? localSectionLightStyles : localSectionDarkStyles;
+  // Obtener estilos actuales del estado local según el tema activo
   const currentLogosStyles = activeTheme === 'light' ? localLogosLightStyles : localLogosDarkStyles;
 
-  const updateSectionStyle = (field: keyof ClientLogosSectionDesignStyles, value: string) => {
-    // Actualizar estado local inmediatamente (para vista previa)
-    if (activeTheme === 'light') {
-      setLocalSectionLightStyles(prev => ({ ...prev, [field]: value }));
-    } else {
-      setLocalSectionDarkStyles(prev => ({ ...prev, [field]: value }));
-    }
-
-    // También actualizar pageData inmediatamente para sincronización completa
-    const currentPath = `clientLogos.sectionDesign.${activeTheme}.${field}`;
-    updateContent(currentPath, value);
-
-    setHasUnsavedChanges(true);
-  };
-
-  const updateLogosStyle = (field: keyof ClientLogosDesignStyles, value: string | number) => {
+  const updateLogosStyle = (field: keyof ClientLogosDesignStyles, value: string | number | boolean) => {
     // Actualizar estado local inmediatamente (para vista previa)
     if (activeTheme === 'light') {
       setLocalLogosLightStyles(prev => ({ ...prev, [field]: value }));
@@ -155,22 +111,16 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
   // Función para guardar los cambios al padre
   const saveChanges = useCallback(() => {
     // Guardar valores COMPLETOS - AMBOS TEMAS SIEMPRE
-    const completeSectionDesign = {
-      light: { ...localSectionLightStyles },
-      dark: { ...localSectionDarkStyles }
-    };
-
     const completeLogosDesign = {
       light: { ...localLogosLightStyles },
       dark: { ...localLogosDarkStyles }
     };
     
     // Actualizar la configuración completa de una vez
-    updateContent('clientLogos.sectionDesign', completeSectionDesign);
     updateContent('clientLogos.logosDesign', completeLogosDesign);
     
     setHasUnsavedChanges(false);
-  }, [localSectionLightStyles, localSectionDarkStyles, localLogosLightStyles, localLogosDarkStyles, updateContent]);
+  }, [localLogosLightStyles, localLogosDarkStyles, updateContent]);
 
   // Exponer saveChanges para que CmsManager pueda llamarlo
   useEffect(() => {
@@ -182,28 +132,15 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
   }, [saveChanges]);
 
   const resetToDefaults = () => {
-    if (activeTab === 'section') {
-      const defaults = activeTheme === 'light' ? defaultSectionLightStyles : defaultSectionDarkStyles;
-      
-      // Actualizar estado local
-      if (activeTheme === 'light') {
-        setLocalSectionLightStyles(defaults);
-        updateContent('clientLogos.sectionDesign.light', defaults);
-      } else {
-        setLocalSectionDarkStyles(defaults);
-        updateContent('clientLogos.sectionDesign.dark', defaults);
-      }
+    const defaults = activeTheme === 'light' ? defaultLogosLightStyles : defaultLogosDarkStyles;
+    
+    // Actualizar estado local
+    if (activeTheme === 'light') {
+      setLocalLogosLightStyles(defaults);
+      updateContent('clientLogos.logosDesign.light', defaults);
     } else {
-      const defaults = activeTheme === 'light' ? defaultLogosLightStyles : defaultLogosDarkStyles;
-      
-      // Actualizar estado local
-      if (activeTheme === 'light') {
-        setLocalLogosLightStyles(defaults);
-        updateContent('clientLogos.logosDesign.light', defaults);
-      } else {
-        setLocalLogosDarkStyles(defaults);
-        updateContent('clientLogos.logosDesign.dark', defaults);
-      }
+      setLocalLogosDarkStyles(defaults);
+      updateContent('clientLogos.logosDesign.dark', defaults);
     }
     
     setHasUnsavedChanges(true);
@@ -277,16 +214,6 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Configurar:</span>
         <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
           <button
-            onClick={() => setActiveTab('section')}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-              activeTab === 'section'
-                ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-            }`}
-          >
-            📦 Sección
-          </button>
-          <button
             onClick={() => setActiveTab('logos')}
             className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'logos'
@@ -294,7 +221,17 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            🖼️ Logos
+            🖼️ Diseño de Logos
+          </button>
+          <button
+            onClick={() => setActiveTab('animations')}
+            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+              activeTab === 'animations'
+                ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            ✨ Animaciones y Carrusel
           </button>
         </div>
       </div>
@@ -309,18 +246,9 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
           {/* Simulación del fondo de la página */}
           <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-cyan-900/20"></div>
           
-          {/* Preview de la sección completa */}
+          {/* Preview de logos directamente */}
           <div className="relative">
-            <div 
-              style={{
-                background: currentSectionStyles.background,
-                border: `${currentSectionStyles.borderWidth} solid ${currentSectionStyles.borderColor}`,
-                borderRadius: currentSectionStyles.borderRadius,
-                boxShadow: currentSectionStyles.shadow,
-                padding: currentSectionStyles.padding,
-                margin: currentSectionStyles.margin
-              }}
-            >
+            <div className="py-8 px-4">
               {/* Título y descripción de ejemplo */}
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
@@ -331,30 +259,26 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                 </p>
               </div>
 
-              {/* Grid de logos */}
+              {/* Logos sin tarjetas - Directo en flexbox */}
               <div 
-                className="grid gap-4"
+                className="flex flex-wrap items-center"
                 style={{
-                  gridTemplateColumns: `repeat(${currentLogosStyles.logosPerRow}, 1fr)`,
                   gap: currentLogosStyles.logosGap,
-                  justifyItems: currentLogosStyles.logosAlignment
+                  justifyContent: currentLogosStyles.logosAlignment
                 }}
               >
                 {/* Logos reales o placeholders */}
                 {pageData.content.clientLogos?.logos && pageData.content.clientLogos.logos.length > 0 ? (
-                  pageData.content.clientLogos.logos.map((logo, index) => (
+                  pageData.content.clientLogos.logos.slice(0, 6).map((logo, index) => (
                     <div
                       key={`preview-logo-${index}-${logo.name || 'logo'}`}
                       style={{
                         maxWidth: currentLogosStyles.logoMaxWidth,
                         maxHeight: currentLogosStyles.logoMaxHeight,
                         opacity: currentLogosStyles.logoOpacity,
-                        background: logo.background && logo.background !== 'transparent' ? logo.background : currentLogosStyles.logoBackground,
-                        padding: currentLogosStyles.logoPadding,
-                        borderRadius: currentLogosStyles.logosBorderRadius,
                         filter: currentLogosStyles.logoFilter
                       }}
-                      className="transition-all duration-300 hover:opacity-100 cursor-pointer flex items-center justify-center"
+                      className="transition-all duration-300 hover:opacity-100 cursor-pointer"
                     >
                       {logo.imageUrl ? (
                         <img 
@@ -371,22 +295,19 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                   ))
                 ) : (
                   // Mostrar placeholders cuando no hay logos
-                  [1, 2, 3, 4].map((i) => (
+                  [1, 2, 3, 4, 5, 6].map((i) => (
                     <div
                       key={`placeholder-${i}`}
                       style={{
                         maxWidth: currentLogosStyles.logoMaxWidth,
                         maxHeight: currentLogosStyles.logoMaxHeight,
                         opacity: currentLogosStyles.logoOpacity,
-                        background: currentLogosStyles.logoBackground,
-                        padding: currentLogosStyles.logoPadding,
-                        borderRadius: currentLogosStyles.logosBorderRadius,
                         filter: currentLogosStyles.logoFilter
                       }}
                       className="transition-all duration-300 hover:opacity-100 cursor-pointer"
                     >
                       <div className="w-16 h-12 bg-gradient-to-r from-gray-400 to-gray-500 rounded flex items-center justify-center text-white font-bold text-sm">
-                        Logo {i}
+                        {i}
                       </div>
                     </div>
                   ))
@@ -398,102 +319,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
       </div>
 
       {/* Controles de configuración */}
-      {activeTab === 'section' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Columna izquierda - Sección */}
-          <div className="space-y-6">
-            {/* Fondo */}
-            <div>
-              <GradientPicker
-                key={`section-background-${activeTheme}`}
-                label="Fondo de la Sección"
-                value={currentSectionStyles.background}
-                onChange={(value) => updateSectionStyle('background', value)}
-              />
-            </div>
-
-            {/* Color del borde */}
-            <div>
-              <ColorWithOpacity
-                label="Color del Borde"
-                value={currentSectionStyles.borderColor}
-                onChange={(value) => updateSectionStyle('borderColor', value)}
-              />
-            </div>
-
-            {/* Grosor del borde */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Grosor del Borde
-              </label>
-              <select
-                value={currentSectionStyles.borderWidth}
-                onChange={(e) => updateSectionStyle('borderWidth', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              >
-                <option value="0px">Sin borde</option>
-                <option value="1px">1px</option>
-                <option value="2px">2px</option>
-                <option value="3px">3px</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Columna derecha - Sección */}
-          <div className="space-y-6">
-            {/* Border radius */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Redondez de las Esquinas
-              </label>
-              <div className="space-y-2">
-                <input
-                  type="range"
-                  min="0"
-                  max="3"
-                  step="0.25"
-                  value={parseFloat(currentSectionStyles.borderRadius.replace('rem', ''))}
-                  onChange={(e) => updateSectionStyle('borderRadius', `${e.target.value}rem`)}
-                  className="w-full"
-                />
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {currentSectionStyles.borderRadius} ({Math.round(parseFloat(currentSectionStyles.borderRadius.replace('rem', '')) * 16)}px)
-                </div>
-              </div>
-            </div>
-
-            {/* Sombra */}
-            <div>
-              <ShadowControl
-                label="Sombra"
-                value={currentSectionStyles.shadow}
-                onChange={(value) => updateSectionStyle('shadow', value)}
-              />
-            </div>
-
-            {/* Padding */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Espaciado Interno
-              </label>
-              <div className="space-y-2">
-                <input
-                  type="range"
-                  min="1"
-                  max="6"
-                  step="0.5"
-                  value={parseFloat(currentSectionStyles.padding.replace('rem', ''))}
-                  onChange={(e) => updateSectionStyle('padding', `${e.target.value}rem`)}
-                  className="w-full"
-                />
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {currentSectionStyles.padding} ({Math.round(parseFloat(currentSectionStyles.padding.replace('rem', '')) * 16)}px)
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
+      {activeTab === 'logos' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Columna izquierda - Logos */}
           <div className="space-y-6">
@@ -560,23 +386,6 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
               </div>
             </div>
 
-            {/* Logos por fila */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Logos por Fila (Desktop)
-              </label>
-              <select
-                value={currentLogosStyles.logosPerRow}
-                onChange={(e) => updateLogosStyle('logosPerRow', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              >
-                <option value={2}>2 logos</option>
-                <option value={3}>3 logos</option>
-                <option value={4}>4 logos</option>
-                <option value={5}>5 logos</option>
-                <option value={6}>6 logos</option>
-              </select>
-            </div>
           </div>
 
           {/* Columna derecha - Logos */}
@@ -635,29 +444,198 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
               </select>
             </div>
 
-            {/* Padding de logos */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Espaciado Interno de Logos
-              </label>
-              <div className="space-y-2">
-                <input
-                  type="range"
-                  min="0.5"
-                  max="3"
-                  step="0.25"
-                  value={parseFloat(currentLogosStyles.logoPadding.replace('rem', ''))}
-                  onChange={(e) => updateLogosStyle('logoPadding', `${e.target.value}rem`)}
-                  className="w-full"
-                />
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {currentLogosStyles.logoPadding} ({Math.round(parseFloat(currentLogosStyles.logoPadding.replace('rem', '')) * 16)}px)
+          </div>
+        </div>
+      ) : activeTab === 'animations' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Columna izquierda - Animaciones de Flotación */}
+          <div className="space-y-6">
+            <div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg border border-cyan-200 dark:border-cyan-700">
+              <h4 className="font-medium text-cyan-800 dark:text-cyan-300 mb-2 flex items-center gap-2">
+                <span>🎈</span> Animación de Flotación
+              </h4>
+              <p className="text-sm text-cyan-700 dark:text-cyan-400 mb-4">
+                Los logos flotarán suavemente hacia arriba y abajo
+              </p>
+
+              {/* Habilitar flotación */}
+              <div className="mb-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={currentLogosStyles.floatAnimation !== false}
+                    onChange={(e) => updateLogosStyle('floatAnimation', e.target.checked)}
+                    className="w-5 h-5 text-cyan-600 rounded focus:ring-2 focus:ring-cyan-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Habilitar animación flotante
+                  </span>
+                </label>
+              </div>
+
+              {/* Intensidad de flotación */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Intensidad de Flotación
+                </label>
+                <select
+                  value={currentLogosStyles.floatIntensity || 'normal'}
+                  onChange={(e) => updateLogosStyle('floatIntensity', e.target.value)}
+                  disabled={currentLogosStyles.floatAnimation === false}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                >
+                  <option value="subtle">Sutil (8px)</option>
+                  <option value="normal">Normal (15px)</option>
+                  <option value="strong">Fuerte (20px)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
+              <h4 className="font-medium text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
+                <span>🖱️</span> Interacción con Mouse
+              </h4>
+              <p className="text-sm text-purple-700 dark:text-purple-400 mb-4">
+                Los logos reaccionarán cuando pases el mouse sobre ellos
+              </p>
+
+              {/* Escala en hover */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Escala al Pasar Mouse
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="range"
+                    min="1"
+                    max="1.5"
+                    step="0.05"
+                    value={currentLogosStyles.hoverScale || 1.15}
+                    onChange={(e) => updateLogosStyle('hoverScale', parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {((currentLogosStyles.hoverScale || 1.15) * 100).toFixed(0)}%
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Columna derecha - Carrusel */}
+          <div className="space-y-6">
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+              <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+                <span>🎠</span> Carrusel Automático
+              </h4>
+              <p className="text-sm text-blue-700 dark:text-blue-400 mb-4">
+                Muestra solo algunos logos y rota automáticamente
+              </p>
+
+              {/* Habilitar carrusel */}
+              <div className="mb-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={currentLogosStyles.carouselEnabled !== false}
+                    onChange={(e) => updateLogosStyle('carouselEnabled', e.target.checked)}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Habilitar rotación automática
+                  </span>
+                </label>
+              </div>
+
+              {/* Velocidad del carrusel */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Velocidad de Rotación
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="range"
+                    min="1000"
+                    max="8000"
+                    step="500"
+                    value={currentLogosStyles.carouselSpeed || 3000}
+                    onChange={(e) => updateLogosStyle('carouselSpeed', parseInt(e.target.value))}
+                    disabled={currentLogosStyles.carouselEnabled === false}
+                    className="w-full disabled:opacity-50"
+                  />
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {((currentLogosStyles.carouselSpeed || 3000) / 1000).toFixed(1)} segundos
+                  </div>
+                </div>
+              </div>
+
+              {/* Logos visibles - Desktop */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Logos Visibles en Desktop
+                </label>
+                <select
+                  value={currentLogosStyles.logosToShowDesktop || 6}
+                  onChange={(e) => updateLogosStyle('logosToShowDesktop', parseInt(e.target.value))}
+                  disabled={currentLogosStyles.carouselEnabled === false}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                >
+                  <option value={4}>4 logos</option>
+                  <option value={5}>5 logos</option>
+                  <option value={6}>6 logos</option>
+                  <option value={7}>7 logos</option>
+                  <option value={8}>8 logos</option>
+                </select>
+              </div>
+
+              {/* Logos visibles - Tablet */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Logos Visibles en Tablet
+                </label>
+                <select
+                  value={currentLogosStyles.logosToShowTablet || 4}
+                  onChange={(e) => updateLogosStyle('logosToShowTablet', parseInt(e.target.value))}
+                  disabled={currentLogosStyles.carouselEnabled === false}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                >
+                  <option value={2}>2 logos</option>
+                  <option value={3}>3 logos</option>
+                  <option value={4}>4 logos</option>
+                  <option value={5}>5 logos</option>
+                </select>
+              </div>
+
+              {/* Logos visibles - Móvil */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Logos Visibles en Móvil
+                </label>
+                <select
+                  value={currentLogosStyles.logosToShowMobile || 3}
+                  onChange={(e) => updateLogosStyle('logosToShowMobile', parseInt(e.target.value))}
+                  disabled={currentLogosStyles.carouselEnabled === false}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                >
+                  <option value={2}>2 logos</option>
+                  <option value={3}>3 logos</option>
+                  <option value={4}>4 logos</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Info de torbellino */}
+            <div className="p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-lg border border-green-200 dark:border-green-700">
+              <h4 className="font-medium text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
+                <span>🌪️</span> Efecto Torbellino
+              </h4>
+              <p className="text-sm text-green-700 dark:text-green-400">
+                Al hacer clic en un logo, desaparecerá con un efecto de torbellino girando 4 vueltas completas (1440°) y reaparecerá automáticamente después de 2.5 segundos.
+              </p>
+            </div>
+          </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

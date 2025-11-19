@@ -30,8 +30,11 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
         aria-controls="value-added-section-content"
         style={{ cursor: 'pointer' }}
       >
-        <span className="flex items-center">
+        <span className="flex items-center gap-2">
           ⭐ Sección Valor Agregado
+          <span className="text-sm font-normal text-purple-600 dark:text-purple-400">
+            (con burbujas flotantes 🫧)
+          </span>
         </span>
         <span className="ml-2 text-lg">
           {collapsed ? '▼ Mostrar' : '▲ Ocultar'}

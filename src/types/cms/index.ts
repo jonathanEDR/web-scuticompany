@@ -150,25 +150,17 @@ export interface ClientLogo {
 }
 
 export interface LogosBarDesignStyles {
-  background: string;
-  borderColor: string;
-  borderWidth: string;
-  borderRadius: string;
-  shadow: string;
-  backdropBlur: boolean;
-  disperseEffect: boolean;
-  // 🆕 Configuraciones de animación
+  // Configuraciones de animación y comportamiento
   animationsEnabled?: boolean;
-  rotationMode?: 'none' | 'individual' | 'carousel' | 'gear';
+  rotationMode?: 'none' | 'individual';
   animationSpeed?: 'slow' | 'normal' | 'fast';
   hoverEffects?: boolean;
-  hoverIntensity?: 'subtle' | 'normal' | 'intense';
-  particleEffects?: boolean;
+  hoverIntensity?: 'subtle' | 'normal' | 'intense' | 'light' | 'strong'; // Incluye valores legacy
   glowEffects?: boolean;
   autoDetectTech?: boolean;
+  // Configuración de tamaño y espaciado de logos
   logoSize?: 'small' | 'medium' | 'large';
   logoSpacing?: 'compact' | 'normal' | 'wide';
-  // 🔳 Configuración de formato de logos
   logoFormat?: 'square' | 'rectangle' | 'original';
   maxLogoWidth?: 'small' | 'medium' | 'large';
   uniformSize?: boolean;
@@ -201,12 +193,25 @@ export interface ClientLogosDesignStyles {
   logoHoverOpacity: string;
   logoFilter: string;
   logoHoverFilter: string;
-  logoBackground: string;
-  logoPadding: string;
-  logosBorderRadius: string;
+  logoBackground?: string; // OBSOLETO - Ya no se usa (sin tarjetas)
+  logoPadding?: string; // OBSOLETO - Ya no se usa (sin tarjetas)
+  logosBorderRadius?: string; // OBSOLETO - Ya no se usa (sin tarjetas)
   logosGap: string;
-  logosPerRow: number;
+  logosPerRow?: number; // OBSOLETO - Reemplazado por logosToShow* en carrusel
   logosAlignment: 'left' | 'center' | 'right';
+  // Propiedades para animaciones
+  floatAnimation?: boolean; // Habilitar animación flotante
+  floatIntensity?: 'subtle' | 'normal' | 'strong'; // Intensidad del float
+  mouseTracking?: boolean; // Seguimiento del mouse
+  mouseIntensity?: 'subtle' | 'normal' | 'strong'; // Intensidad de reacción al mouse
+  hoverScale?: number; // Escala en hover (ej: 1.15)
+  hoverRotation?: boolean; // Rotación en hover
+  // Configuración del carrusel
+  carouselEnabled?: boolean; // Habilitar carrusel automático
+  carouselSpeed?: number; // Velocidad en milisegundos (ej: 3000)
+  logosToShowDesktop?: number; // Logos visibles en desktop (por defecto 6)
+  logosToShowTablet?: number; // Logos visibles en tablet (por defecto 4)
+  logosToShowMobile?: number; // Logos visibles en móvil (por defecto 3)
 }
 
 export interface ClientLogosDesign {
