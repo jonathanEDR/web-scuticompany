@@ -59,23 +59,23 @@ export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({
   };
 
   return (
-    <div className={`flex gap-3 group ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-      {/* Avatar */}
+    <div className={`flex gap-2 sm:gap-3 group ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+      {/* Avatar - Responsive */}
       <div 
-        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-medium ${
+        className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-medium ${
           isUser 
             ? 'bg-blue-600 dark:bg-blue-500' 
             : `bg-${getAgentColor(message.agentUsed)}-600 dark:bg-${getAgentColor(message.agentUsed)}-500`
         }`}
       >
-        {isUser ? <User size={16} /> : <span className="text-sm">{getAgentIcon(message.agentUsed)}</span>}
+        {isUser ? <User size={14} className="sm:w-4 sm:h-4" /> : <span className="text-xs sm:text-sm">{getAgentIcon(message.agentUsed)}</span>}
       </div>
 
-      {/* Mensaje */}
-      <div className={`flex flex-col gap-1 max-w-2xl ${isUser ? 'items-end' : 'items-start'}`}>
+      {/* Mensaje - Responsive */}
+      <div className={`flex flex-col gap-1 max-w-[85%] sm:max-w-2xl ${isUser ? 'items-end' : 'items-start'}`}>
         {/* Bubble */}
         <div
-          className={`relative group rounded-2xl px-4 py-3 ${
+          className={`relative group rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
             isUser
               ? 'bg-blue-600 text-white rounded-tr-sm'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm'
@@ -83,21 +83,21 @@ export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({
         >
           {/* Contenido del mensaje - usando displayContent */}
           <div className="prose prose-sm max-w-none dark:prose-invert">
-            <p className="mb-0 whitespace-pre-wrap break-words">{displayContent}</p>
+            <p className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">{displayContent}</p>
           </div>
 
-          {/* Botón copiar (aparece en hover) */}
+          {/* Botón copiar (aparece en hover en desktop, siempre visible en móvil) */}
           <button
             onClick={handleCopy}
-            className={`absolute -top-2 ${
-              isUser ? '-left-2' : '-right-2'
-            } opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-700 rounded-full p-1.5 shadow-lg hover:scale-110 transform`}
+            className={`absolute -top-1 sm:-top-2 ${
+              isUser ? '-left-1 sm:-left-2' : '-right-1 sm:-right-2'
+            } opacity-70 sm:opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-700 rounded-full p-1 sm:p-1.5 shadow-lg hover:scale-110 transform touch-manipulation`}
             title="Copiar mensaje"
           >
             {copied ? (
-              <CheckCircle size={14} className="text-green-600" />
+              <CheckCircle size={12} className="text-green-600 sm:w-3.5 sm:h-3.5" />
             ) : (
-              <Copy size={14} className="text-gray-600 dark:text-gray-300" />
+              <Copy size={12} className="text-gray-600 dark:text-gray-300 sm:w-3.5 sm:h-3.5" />
             )}
           </button>
         </div>

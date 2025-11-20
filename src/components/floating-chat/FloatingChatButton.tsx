@@ -187,10 +187,13 @@ export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
         focus:outline-none
         ${animationClass}
         ${className}
+        
+        /* Responsive - Más grande en móvil para mejor touch target */
+        ${!hasCustomIcon ? 'sm:w-14 sm:h-14 w-16 h-16' : ''}
       `}
       style={{
-        bottom: config.buttonStyles.position.bottom,
-        right: config.buttonStyles.position.right,
+        bottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
+        right: window.innerWidth < 640 ? '16px' : config.buttonStyles.position.right,
         ...(hasCustomIcon ? { 
           background: 'none',
           border: 'none',

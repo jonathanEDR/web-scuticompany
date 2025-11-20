@@ -338,15 +338,15 @@ export const InteractiveButtons: React.FC<InteractiveButtonsProps> = ({
     <div className="mt-3">
       <div className={`grid gap-2 ${
         finalButtons.length === 1 ? 'grid-cols-1' :
-        finalButtons.length === 4 ? 'grid-cols-2' : 
+        finalButtons.length === 4 ? 'grid-cols-1 sm:grid-cols-2' : 
         finalButtons.length <= 2 ? 'grid-cols-1' : 
-        'grid-cols-2'
+        'grid-cols-1 sm:grid-cols-2'
       }`}>
         {finalButtons.map((button, index) => (
           <button
             key={index}
             onClick={() => onButtonClick(button.message)}
-            className="flex items-center gap-2 px-3 py-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 border border-blue-200 dark:border-blue-800 text-left"
+            className="flex items-center gap-2 px-3 py-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 border border-blue-200 dark:border-blue-800 text-left touch-manipulation min-h-[44px]"
           >
             <span className="text-lg">{button.icon}</span>
             <span className="flex-1">{button.text}</span>

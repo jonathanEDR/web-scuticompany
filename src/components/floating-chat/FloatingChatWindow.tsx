@@ -100,9 +100,19 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         flex flex-col
         transition-all duration-300 ease-in-out
         border border-gray-200 dark:border-gray-800
+        
+        /* Responsive para móvil */
         ${isExpanded 
-          ? 'bottom-6 right-6 w-[90vw] h-[85vh] max-w-4xl' 
-          : 'bottom-24 right-6 w-96 h-[600px]'
+          ? /* Expandido - Fullscreen en móvil, modal en desktop */
+            'sm:bottom-6 sm:right-6 sm:w-[90vw] sm:h-[85vh] sm:max-w-4xl ' +
+            'bottom-0 right-0 left-0 top-0 w-full h-full rounded-none sm:rounded-2xl'
+          : /* Normal - Casi fullscreen en móvil, ventana en desktop */
+            'sm:bottom-24 sm:right-6 sm:w-96 sm:h-[600px] ' +
+            'bottom-0 right-0 left-0 w-full rounded-none sm:rounded-2xl sm:h-[600px] ' +
+            // Safe area para iOS
+            'h-[100dvh] pb-[env(safe-area-inset-bottom)] ' +
+            // Evitar que el teclado cubra el input
+            'max-h-[100dvh]'
         }
         animate-slideUp
       `}
@@ -110,9 +120,9 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         animation: 'slideUp 0.3s ease-out'
       }}
     >
-      {/* Header Compacto con estilos dinámicos del CMS */}
+      {/* Header Compacto con estilos dinámicos del CMS - Responsive */}
       <div 
-        className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800 rounded-t-2xl"
+        className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-200 dark:border-gray-800 rounded-t-2xl sm:rounded-t-2xl"
         style={{ background: headerStyles.background }}
       >
         {/* Logo y Título */}
@@ -172,20 +182,21 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         </div>
       </div>
 
-      {/* Área de Mensajes */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-gray-50 dark:bg-gray-950">
+      {/* Área de Mensajes - Responsive */}
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4 bg-gray-50 dark:bg-gray-950">
         {messages.length === 0 ? (
           // Estado vacío - Mensaje de bienvenida desde CMS
-          <div className="flex flex-col items-center justify-center h-full text-center px-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-full flex items-center justify-center mb-4">
-              <Brain size={40} className="text-blue-600 dark:text-blue-400" />
+          <div className="flex flex-col items-center justify-center h-full text-center px-4 sm:px-6">
+            <div className="w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+              <Brain size={32} className="text-blue-600 dark:text-blue-400 sm:hidden" />
+              <Brain size={40} className="text-blue-600 dark:text-blue-400 hidden sm:block" />
             </div>
             {/* Título desde CMS */}
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">
               {config.welcomeMessage.title}
             </h3>
             {/* Descripción desde CMS */}
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
               {config.welcomeMessage.description}
             </p>
             
@@ -195,11 +206,11 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
                 <button
                   key={index}
                   onClick={() => onSendMessage(question.message)}
-                  className="w-full px-4 py-2.5 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg text-sm text-left transition-all border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 group"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg text-xs sm:text-sm text-left transition-all border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 group"
                 >
                   <span className="flex items-center gap-2">
-                    <span className="text-lg">{question.icon || '📝'}</span>
-                    <span className="group-hover:text-blue-600 dark:group-hover:text-blue-400">{question.text}</span>
+                    <span className="text-base sm:text-lg">{question.icon || '📝'}</span>
+                    <span className="group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-tight">{question.text}</span>
                   </span>
                 </button>
               ))}
@@ -227,14 +238,16 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         )}
       </div>
 
-      {/* Input Area */}
+      {/* Input Area - Responsive */}
       <div className="border-t border-gray-200 dark:border-gray-800">
-        <ChatInput
-          onSend={onSendMessage}
-          disabled={loading}
-          loading={loading}
-          placeholder="Escribe tu mensaje..."
-        />
+        <div className="px-3 sm:px-0">
+          <ChatInput
+            onSend={onSendMessage}
+            disabled={loading}
+            loading={loading}
+            placeholder="Escribe tu mensaje..."
+          />
+        </div>
       </div>
 
       {/* Powered by badge (condicional según config) */}
