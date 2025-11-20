@@ -52,7 +52,7 @@ function GestionCategoriasModal({
       const response = await categoriasApi.getAll();
       setCategorias(response.data);
     } catch (error) {
-      console.error('Error cargando categorías:', error);
+      // Error al cargar categorías
     } finally {
       setLoading(false);
     }
@@ -106,7 +106,6 @@ function GestionCategoriasModal({
       setShowForm(false);
       setEditingCategory(null);
     } catch (error) {
-      console.error('Error guardando categoría:', error);
       alert('Error al guardar la categoría');
     } finally {
       setLoading(false);
@@ -127,7 +126,6 @@ function GestionCategoriasModal({
         await loadCategorias();
         onCategoryChange?.();
       } catch (error) {
-        console.error('Error eliminando categoría:', error);
         alert('Error al eliminar la categoría');
       } finally {
         setLoading(false);

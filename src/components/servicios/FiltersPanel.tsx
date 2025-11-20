@@ -77,7 +77,7 @@ export const FiltersPanel = ({
         const response = await categoriasApi.getAll({ activas: true });
         setCategorias(response.data);
       } catch (error) {
-        console.error('Error cargando categorías:', error);
+        // Error cargando categorías
       }
     };
     loadCategorias();

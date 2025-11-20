@@ -50,6 +50,7 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isMobile, setIsMobile] = useState(false);
 
   // Detectar tema actual
   useEffect(() => {
@@ -68,6 +69,18 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
     });
     
     return () => observer.disconnect();
+  }, []);
+
+  // Detectar tamaño de pantalla
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Auto-scroll al último mensaje
@@ -104,11 +117,11 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         /* Responsive para móvil */
         ${isExpanded 
           ? /* Expandido - Fullscreen en móvil, modal en desktop */
-            'sm:bottom-6 sm:right-6 sm:w-[90vw] sm:h-[85vh] sm:max-w-4xl ' +
+            'sm:w-[90vw] sm:h-[85vh] sm:max-w-4xl sm:bottom-6 sm:right-6 ' +
             'bottom-0 right-0 left-0 top-0 w-full h-full rounded-none sm:rounded-2xl'
-          : /* Normal - Casi fullscreen en móvil, ventana en desktop */
-            'sm:bottom-24 sm:right-6 sm:w-96 sm:h-[600px] ' +
-            'bottom-0 right-0 left-0 w-full rounded-none sm:rounded-2xl sm:h-[600px] ' +
+          : /* Normal - Casi fullscreen en móvil, ventana en desktop posicionada según CMS */
+            'sm:w-96 sm:h-[600px] ' +
+            'bottom-0 left-0 w-full sm:left-auto sm:w-96 rounded-none sm:rounded-2xl sm:h-[600px] ' +
             // Safe area para iOS
             'h-[100dvh] pb-[env(safe-area-inset-bottom)] ' +
             // Evitar que el teclado cubra el input
@@ -116,9 +129,13 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         }
         animate-slideUp
       `}
-      style={{
-        animation: 'slideUp 0.3s ease-out'
-      }}
+      style={
+        !isMobile && !isExpanded ? {
+          // Solo en desktop y modo normal: usar posicionamiento del CMS
+          bottom: `calc(${config.buttonStyles.position.bottom} + 80px)`,
+          right: config.buttonStyles.position.right
+        } : undefined
+      }
     >
       {/* Header Compacto con estilos dinámicos del CMS - Responsive */}
       <div 

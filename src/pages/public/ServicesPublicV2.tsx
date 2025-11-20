@@ -51,8 +51,7 @@ const ServicesPublicV2 = () => {
         const response = await categoriasApi.getAll({ activas: true });
         setCategorias(response.data);
       } catch (error) {
-        console.error('Error cargando categorías:', error);
-        // Fallback a categorías por defecto en caso de error
+        // Error al cargar categorías, usar fallback
         setCategorias([]);
       }
     };
@@ -93,25 +92,6 @@ const ServicesPublicV2 = () => {
   } = useServiciosList(filtrosConPaginacion, {
     enabled: true,
     onSuccess: (data) => {
-      console.log('\n════════════════════════════════════════════════════════════════');
-      console.log('📡 [FRONTEND] Servicios cargados exitosamente');
-      console.log('════════════════════════════════════════════════════════════════');
-      console.log('📦 Total servicios:', data?.total || 0);
-      console.log('📄 Página actual:', data?.page || 1);
-      console.log('📄 Total páginas:', data?.pages || 1);
-      console.log('📦 Servicios en esta página:', data?.data?.length || 0);
-      console.log('💾 Desde cache:', isFromCache ? 'SÍ ✅' : 'NO ❌ (Fresco desde backend)');
-      console.log('⏰ Timestamp:', new Date().toISOString());
-      
-      // 🔍 DEBUG: Ver slugs de cada servicio
-      if (data?.data && Array.isArray(data.data)) {
-        data.data.forEach((serv: any, idx: number) => {
-          console.log(`  ├─ Servicio ${idx + 1}: ID=${serv._id} | SLUG=${serv.slug || 'SIN SLUG'} | TÍTULO=${serv.titulo}`);
-        });
-      }
-      
-      console.log('════════════════════════════════════════════════════════════════\n');
-      
       // ✨ NUEVO: Actualizar información de paginación
       if (data && typeof data === 'object' && 'total' in data) {
         setTotalItems(data.total || 0);
@@ -119,9 +99,7 @@ const ServicesPublicV2 = () => {
       }
     },
     onError: () => {
-      console.error('\n════════════════════════════════════════════════════════════════');
-      console.error('❌ [FRONTEND] Error cargando servicios');
-      console.error('════════════════════════════════════════════════════════════════\n');
+      // Error manejado por el hook
     }
   });
 
@@ -131,17 +109,13 @@ const ServicesPublicV2 = () => {
   // 🔄 Función para invalidar cache y recargar
   const recargarConInvalidacion = async () => {
     try {
-      console.log('🗑️ [FRONTEND] Invalidando cache y recargando servicios...');
-      
       // 1. Invalidar cache local
       invalidateServiciosCache();
       
       // 2. Recargar servicios
       await recargarServicios();
-      
-      console.log('✅ [FRONTEND] Cache invalidado y servicios recargados');
     } catch (error) {
-      console.error('❌ [FRONTEND] Error al invalidar cache y recargar:', error);
+      // Error manejado silenciosamente
     }
   };
 

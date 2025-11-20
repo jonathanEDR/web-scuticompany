@@ -121,7 +121,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
       const response = await categoriasApi.getActivas();
       setCategorias(response);
     } catch (err: any) {
-      console.error('Error al cargar categorías:', err);
+      // Error al cargar categorías
     } finally {
       setLoadingCategorias(false);
     }
@@ -172,7 +172,6 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
         success('Imagen principal subida correctamente');
         
       } catch (err: any) {
-        console.error('Error al subir imagen:', err);
         error('Error al subir imagen principal', err.message || 'Error desconocido');
       } finally {
         setUploadingMainImage(false);
@@ -221,7 +220,6 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
       handleClose();
       onSuccess?.();
     } catch (err: any) {
-      console.error('❌ Error al crear servicio:', err);
       error('Error al crear el servicio', err.response?.data?.error || err.message);
     } finally {
       setIsSubmitting(false);

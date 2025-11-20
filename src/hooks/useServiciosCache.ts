@@ -60,7 +60,7 @@ export function useServiciosCache<T>(
     // ⚡ NUEVO: Evitar reintentos infinitos
     const now = Date.now();
     if (retryCountRef.current > maxRetriesRef.current && (now - lastErrorTimeRef.current) < 5000) {
-      console.warn('[useServiciosCache] ⚠️ Máximo número de reintentos alcanzado, esperando...');
+      // Máximo de reintentos alcanzado
       return;
     }
 
@@ -105,7 +105,7 @@ export function useServiciosCache<T>(
 
       // 4. Verificar si este request sigue siendo el más reciente
       if (currentFetchId !== fetchIdRef.current) {
-        console.log('[useServiciosCache] Request obsoleto, ignorando resultado');
+        // Request obsoleto, ignorar resultado
         return;
       }
 
@@ -141,7 +141,6 @@ export function useServiciosCache<T>(
       if (isMountedRef.current) {
         const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
         setError(errorMessage);
-        console.error(`❌ [useServiciosCache] Error (intento ${retryCountRef.current}/${maxRetriesRef.current + 1}):`, errorMessage);
         onError?.(err instanceof Error ? err : new Error(errorMessage));
       }
     } finally {
@@ -229,7 +228,6 @@ export function useServiciosList(
         });
         
         if (recentServices.length > 0) {
-          console.log(`� [FRONTEND] Detectados ${recentServices.length} servicios recientes, invalidando cache...`);
           const { invalidateServiciosCache } = await import('../utils/serviciosCache');
           invalidateServiciosCache('SERVICIOS_');
         }
@@ -241,7 +239,6 @@ export function useServiciosList(
       // Retornar respuesta completa para acceder a datos de paginación
       return response;
     } catch (error) {
-      console.error('❌ [FRONTEND] Error fetching servicios:', error);
       throw error;
     }
   }, [filters]);
@@ -276,7 +273,6 @@ export function useServicioDetail(
       
       return response.data;
     } catch (error: any) {
-      console.error('❌ [useServicioDetail] Error obteniendo servicio por slug:', error);
       throw new Error(error.message || 'Servicio no encontrado');
     }
   }, [slug]);

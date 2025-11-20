@@ -113,7 +113,7 @@ class ServiciosCacheManager {
           }
         }
       }
-      console.log(`[ServiciosCache] Loaded ${this.memoryCache.size} entries from localStorage`);
+      // Log removido para producción
     } catch (e) {
       console.warn('[ServiciosCache] Error loading from localStorage:', e);
     }
@@ -148,34 +148,23 @@ class ServiciosCacheManager {
   ): T | null {
     const key = this.generateKey(type, identifier);
 
-    console.log('\n════════════════════════════════════════════════════════════════');
-    console.log('🔍 [CACHE FRONTEND] Buscando datos en cache');
-    console.log('════════════════════════════════════════════════════════════════');
-    console.log('🔑 Key:', key);
-    console.log('📦 Tipo:', type);
-
     // ⚠️ NUEVO: Si el backend indica que el cache fue invalidado, NO usar cache local
     if (backendCacheStatus?.invalidated) {
-      console.log('🚫 Backend indica CACHE INVALIDADO - Forzando recarga');
       this.memoryCache.delete(key);
       try {
         localStorage.removeItem(this.STORAGE_PREFIX + key);
       } catch (e) {
         console.error('❌ Error limpiando localStorage:', e);
       }
-      console.log('════════════════════════════════════════════════════════════════\n');
       return null;
     }
 
     // ⚠️ NUEVO: Si el backend indica que el cache está deshabilitado, NO usar cache local
     if (backendCacheStatus?.disabled) {
-      console.log('🚫 Backend indica CACHE DESHABILITADO - Forzando recarga');
-      console.log('════════════════════════════════════════════════════════════════\n');
       return null;
     }
 
     let entry = this.memoryCache.get(key);
-    console.log('🧠 En memoria:', !!entry);
 
     // Si no está en memoria, intentar cargar desde localStorage
     if (!entry) {
@@ -185,7 +174,6 @@ class ServiciosCacheManager {
           entry = JSON.parse(stored);
           if (entry) {
             this.memoryCache.set(key, entry);
-            console.log('💾 Recuperado desde localStorage');
           }
         }
       } catch (e) {
@@ -196,17 +184,11 @@ class ServiciosCacheManager {
     if (!entry) {
       this.stats.misses++;
       this.saveStats();
-      console.log('❌ CACHE MISS - No hay datos cacheados');
-      console.log('════════════════════════════════════════════════════════════════\n');
       return null;
     }
 
     const ttl = SERVICIOS_CACHE_TTL[type];
     const age = Date.now() - entry.timestamp;
-
-    console.log('📊 TTL:', ttl, 'ms');
-    console.log('⏰ Edad del cache:', age, 'ms');
-    console.log('🕐 Expirado:', age > ttl);
 
     // Si está expirado, eliminar y retornar null
     if (age > ttl) {
@@ -218,8 +200,6 @@ class ServiciosCacheManager {
       }
       this.stats.misses++;
       this.saveStats();
-      console.log('❌ CACHE EXPIRADO - Eliminando');
-      console.log('════════════════════════════════════════════════════════════════\n');
       return null;
     }
 
@@ -227,11 +207,6 @@ class ServiciosCacheManager {
     entry.hits++;
     this.stats.hits++;
     this.saveStats();
-    
-    console.log('✅ CACHE HIT - Usando datos cacheados');
-    console.log('📦 Hits totales:', entry.hits);
-    console.log('⏰ Cache creado hace:', Math.floor(age / 1000), 'segundos');
-    console.log('════════════════════════════════════════════════════════════════\n');
     
     return entry.data;
   }

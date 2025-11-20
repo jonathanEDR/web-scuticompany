@@ -142,7 +142,7 @@ export const CategoriaBadge: React.FC<CategoriaBadgeProps> = ({
     if (isObject) {
       // Si es un objeto pero no tiene nombre, probablemente es un ObjectId no poblado
       categoriaStr = 'otro'; // Default fallback
-      console.warn('CategoriaBadge: Recibido objeto sin propiedades de categoría:', categoria);
+      // Objeto sin propiedades de categoría
     } else {
       categoriaStr = categoria as string;
     }
