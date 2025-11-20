@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from '../../contexts/ThemeContext';
 import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useCmsUpdaters } from '../../hooks/cms/useCmsUpdaters';
 import HeroConfigSection from './HeroConfigSection';
@@ -14,25 +15,29 @@ import ThemeConfigSection from './ThemeConfigSection';
 import CardsDesignConfigSection from './CardsDesignConfigSection';
 import ContactConfigSection from './ContactConfigSection';
 import ContactFormEditor from './ContactFormEditor';
+import ChatbotConfigSection from './ChatbotConfigSection';
+import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme: currentTheme } = useTheme(); // 🆕 Obtener tema actual
   
   // 🆕 Estado para manejar qué página se está editando
   const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact'>('home');
   
   // Determinar tab activo desde la URL
-  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' => {
+  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' => {
     const path = location.pathname;
     if (path.includes('/seo')) return 'seo';
     if (path.includes('/theme')) return 'theme';
     if (path.includes('/cards')) return 'cards';
     if (path.includes('/contact')) return 'contact';
+    if (path.includes('/chatbot')) return 'chatbot';
     return 'content';
   };
 
-  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact'>(getInitialTab());
+  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot'>(getInitialTab());
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [hasGlobalChanges, setHasGlobalChanges] = useState(false); // 🔥 Estado para detectar cambios globales
@@ -48,7 +53,7 @@ const CmsManager: React.FC = () => {
   }, [location.pathname]);
 
   // Actualizar URL cuando cambia el tab
-  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards' | 'contact') => {
+  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot') => {
     setActiveTab(tab);
     const baseUrl = '/dashboard/cms';
     if (tab === 'content') {
@@ -219,6 +224,7 @@ const CmsManager: React.FC = () => {
     { id: 'content' as const, label: 'Contenido', icon: '📝' },
     { id: 'cards' as const, label: 'Diseño de Tarjetas', icon: '🎴' },
     { id: 'contact' as const, label: 'Contacto', icon: '📞' },
+    { id: 'chatbot' as const, label: 'Chatbot', icon: '🤖' },
     { id: 'seo' as const, label: 'SEO', icon: '🔍' },
     { id: 'theme' as const, label: 'Tema', icon: '🎨' }
   ];
@@ -559,6 +565,13 @@ const CmsManager: React.FC = () => {
               La configuración avanzada de tema solo está disponible para la página "Home"
             </p>
           </div>
+        )}
+        {activeTab === 'chatbot' && (
+          <ChatbotConfigSection
+            config={pageData?.content?.chatbotConfig || defaultChatbotConfig}
+            onUpdate={(field, value) => handleUpdateContent(field, value)}
+            theme={currentTheme}
+          />
         )}
       </div>
     </div>

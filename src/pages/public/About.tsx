@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
+import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { useSeo } from '../../hooks/useSeo';
 import { getPageBySlug } from '../../services/cmsApi';
 
@@ -134,6 +135,9 @@ const About = () => {
         </main>
         
         <PublicFooter />
+        
+        {/* 💬 Chatbot de Ventas Flotante */}
+        <FloatingChatWidget />
       </div>
     </>
   );

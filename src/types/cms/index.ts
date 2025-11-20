@@ -379,6 +379,81 @@ export interface ContactFormContent {
   };
 }
 
+// ========================================
+// 🆕 CHATBOT CONFIGURATION INTERFACES
+// ========================================
+
+export interface ChatbotLogo {
+  light?: string;
+  dark?: string;
+}
+
+export interface WelcomeMessage {
+  title: string;
+  description: string;
+}
+
+export interface SuggestedQuestion {
+  _id?: string;
+  icon: string;
+  text: string;
+  message: string;
+}
+
+export interface HeaderStyles {
+  background: string;
+  titleColor: string;
+  subtitleColor: string;
+  logoBackground: string;
+}
+
+export interface ChatbotHeaderStyles {
+  light: HeaderStyles;
+  dark: HeaderStyles;
+}
+
+export interface ButtonPosition {
+  bottom: string;
+  right: string;
+}
+
+export interface ButtonGradient {
+  from: string;
+  to: string;
+}
+
+export interface ButtonStyles {
+  size: 'small' | 'medium' | 'large';
+  position: ButtonPosition;
+  gradient: ButtonGradient;
+  shape: 'circle' | 'rounded' | 'square';
+  icon: ChatbotLogo; // Icono personalizado por tema
+}
+
+export interface ChatbotBehavior {
+  autoOpen: boolean;
+  autoOpenDelay: number;
+  showUnreadBadge: boolean;
+  showPoweredBy: boolean;
+}
+
+export interface ChatbotConfig {
+  botName: string;
+  statusText: string;
+  logo: ChatbotLogo;
+  logoAlt: string;
+  welcomeMessage: WelcomeMessage;
+  suggestedQuestions: SuggestedQuestion[];
+  headerStyles: ChatbotHeaderStyles;
+  buttonStyles: ButtonStyles;
+  behavior: ChatbotBehavior;
+  enabled?: boolean;
+}
+
+// ========================================
+// END CHATBOT CONFIGURATION INTERFACES
+// ========================================
+
 export interface PageSection {
   type: 'text' | 'image' | 'grid' | 'cta';
   title?: string;
@@ -393,6 +468,7 @@ export interface PageContent {
   clientLogos?: ClientLogosContent;
   contact?: ContactContent;
   contactForm?: ContactFormContent;
+  chatbotConfig?: ChatbotConfig; // 🆕 CHATBOT CONFIGURATION
   sections?: PageSection[];
 }
 

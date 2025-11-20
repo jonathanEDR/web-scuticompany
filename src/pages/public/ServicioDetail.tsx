@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
+import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import ContactModal from '../../components/public/ContactModal';
 import { useSeo } from '../../hooks/useSeo';
 import { useServicioDetail } from '../../hooks/useServiciosCache';
@@ -636,6 +637,9 @@ export const ServicioDetail: React.FC = () => {
       </section>
 
       <PublicFooter />
+
+      {/* 💬 Chatbot de Ventas Flotante */}
+      <FloatingChatWidget />
 
       {/* Modal de contacto */}
       <ContactModal

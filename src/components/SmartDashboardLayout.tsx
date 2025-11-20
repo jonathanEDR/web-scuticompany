@@ -3,6 +3,7 @@
  * Layout inteligente que selecciona el sidebar correcto según el rol del usuario
  * - USER/CLIENT → ClientSidebar (simplificado)
  * - ADMIN/MODERATOR/SUPER_ADMIN → Sidebar (completo)
+ * - Incluye FloatingChatWidget global para asistencia
  */
 
 import { useState, useEffect } from 'react';

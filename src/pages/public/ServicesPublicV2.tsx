@@ -7,6 +7,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
+import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { ServicioPublicCard } from '../../components/public/ServicioPublicCard';
 import { SearchBar } from '../../components/common/SearchBar';
 import { useSeo } from '../../hooks/useSeo';
@@ -566,6 +567,9 @@ const ServicesPublicV2 = () => {
         </main>
         
         <PublicFooter />
+        
+        {/* 💬 Chatbot de Ventas Flotante */}
+        <FloatingChatWidget />
       </div>
     </>
   );

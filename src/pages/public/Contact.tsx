@@ -1,6 +1,7 @@
 import ContactSection from '../../components/public/ContactSection';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
+import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { useCategoriasTipoServicio } from '../../hooks/useCategoriasTipoServicio';
 
 /**
@@ -246,6 +247,9 @@ const Contact = () => {
       </section>
 
       <PublicFooter />
+      
+      {/* 💬 Chatbot de Ventas Flotante */}
+      <FloatingChatWidget />
     </div>
   );
 };

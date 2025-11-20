@@ -8,6 +8,7 @@ import ClientLogosSection from '../../components/public/ClientLogosSection';
 import BlogSection from '../../components/public/BlogSection';
 import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
+import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
@@ -344,6 +345,9 @@ const HomeOptimized = () => {
           />
         </main>
         <PublicFooter />
+        
+        {/* 💬 Chatbot de Ventas Flotante */}
+        <FloatingChatWidget />
         
         {/* Indicador sutil de carga del CMS (opcional) */}
         {isLoadingCMS && (

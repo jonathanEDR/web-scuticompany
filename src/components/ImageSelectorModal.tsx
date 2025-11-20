@@ -37,7 +37,14 @@ const ImageSelectorModal: React.FC<ImageSelectorModalProps> = ({
 
   // Helper function para construir URLs completas de imágenes
   const getImageUrl = (url: string) => {
-    if (url.startsWith('http')) return url;
+    if (url.startsWith('http')) {
+      // Si es una URL de Cloudinary de tipo 'raw' sin extensión, probablemente sea SVG
+      const pathPart = url.split('/').pop();
+      if (url.includes('/raw/upload/') && pathPart && !pathPart.includes('.') && pathPart.length > 10) {
+        return `${url}.svg`;
+      }
+      return url;
+    }
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     const baseUrl = API_URL.replace('/api', '');
     return `${baseUrl}${url}`;

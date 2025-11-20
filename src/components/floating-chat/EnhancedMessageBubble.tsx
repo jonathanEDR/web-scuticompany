@@ -1,39 +1,36 @@
 /**
- * MessageBubble Component
- * Componente para renderizar un mensaje individual del chat
- * 
- * Features:
- * - Diseño diferenciado para user/assistant
- * - Soporte para Markdown
- * - Muestra agente que respondió
- * - Timestamps
- * - Animaciones suaves
- * - 🆕 Botones interactivos para mejorar el flujo
+ * Enhanced MessageBubble Component  
+ * Versión mejorada que puede modificar su contenido dinámicamente
+ * Para unificar listas de texto con botones interactivos
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { User, Copy, CheckCircle } from 'lucide-react';
 import type { ChatMessage } from '../../types/scutiAI.types';
 import InteractiveButtons from '../floating-chat/InteractiveButtons';
 
-interface MessageBubbleProps {
+interface EnhancedMessageBubbleProps {
   message: ChatMessage;
   isLatest?: boolean;
   onInteractiveClick?: (message: string) => void;
 }
 
-export const MessageBubble: React.FC<MessageBubbleProps> = ({ 
+export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({ 
   message, 
-  isLatest, 
   onInteractiveClick 
 }) => {
-  const [copied, setCopied] = React.useState(false);
+  const [displayContent, setDisplayContent] = useState(message.content);
+  const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(message.content);
+    navigator.clipboard.writeText(displayContent);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleContentReplace = (newContent: string) => {
+    setDisplayContent(newContent);
   };
 
   const formatTime = (date: Date) => {
@@ -57,24 +54,18 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     if (agent === 'MULTI_AGENT') return 'indigo';
     if (agent.toLowerCase().includes('blog')) return 'blue';
     if (agent.toLowerCase().includes('seo')) return 'green';
-    if (agent.toLowerCase().includes('services')) return 'pink';
+    if (agent.toLowerCase().includes('services')) return 'orange';
     return 'purple';
   };
 
   return (
-    <div
-      className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} ${
-        isLatest ? 'animate-fadeIn' : ''
-      }`}
-    >
+    <div className={`flex gap-3 group ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       {/* Avatar */}
-      <div
-        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser
-            ? 'bg-blue-600 text-white'
-            : `bg-${getAgentColor(message.agentUsed)}-100 dark:bg-${getAgentColor(
-                message.agentUsed
-              )}-900/30`
+      <div 
+        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-medium ${
+          isUser 
+            ? 'bg-blue-600 dark:bg-blue-500' 
+            : `bg-${getAgentColor(message.agentUsed)}-600 dark:bg-${getAgentColor(message.agentUsed)}-500`
         }`}
       >
         {isUser ? <User size={16} /> : <span className="text-sm">{getAgentIcon(message.agentUsed)}</span>}
@@ -90,9 +81,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm'
           }`}
         >
-          {/* Contenido del mensaje */}
+          {/* Contenido del mensaje - usando displayContent */}
           <div className="prose prose-sm max-w-none dark:prose-invert">
-            <p className="mb-0 whitespace-pre-wrap break-words">{message.content}</p>
+            <p className="mb-0 whitespace-pre-wrap break-words">{displayContent}</p>
           </div>
 
           {/* Botón copiar (aparece en hover) */}
@@ -116,6 +107,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           <InteractiveButtons 
             message={message}
             onButtonClick={onInteractiveClick}
+            onReplaceContent={handleContentReplace}
           />
         )}
 
@@ -169,4 +161,4 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   );
 };
 
-export default MessageBubble;
+export default EnhancedMessageBubble;
