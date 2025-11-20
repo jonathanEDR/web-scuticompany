@@ -31,16 +31,45 @@ export const InteractiveButtons: React.FC<InteractiveButtonsProps> = ({
     let shouldReplace = false;
     let cleanContent = content;
 
-    // Categorías principales de servicios - mensajes optimizados para detección
-    const categoryMatches = [
-      { text: 'Desarrollo', icon: '🌐', regex: /desarrollo/i, message: 'desarrollo' },
-      { text: 'Diseño', icon: '🎨', regex: /diseño/i, message: 'diseño' },
-      { text: 'Marketing', icon: '📈', regex: /marketing/i, message: 'marketing' },
-      { text: 'Consultoría', icon: '💼', regex: /consultoría|consultoria/i, message: 'consultoria' },
-      { text: 'Mantenimiento', icon: '🔧', regex: /mantenimiento/i, message: 'mantenimiento' },
-      { text: 'Otro', icon: '💎', regex: /otro/i, message: 'otro' },
-      { text: 'Finanzas', icon: '💰', regex: /finanzas/i, message: 'finanzas' }
-    ];
+    // 🆕 MAPEO DE ICONOS POR CATEGORÍA (dinámico desde BD)
+    const categoryIconMap: Record<string, string> = {
+      'desarrollo': '🌐',
+      'software': '💻',
+      'inteligencia': '🧠',
+      'artificial': '🤖',
+      'ia': '🤖',
+      'integración': '🔗',
+      'sistemas': '⚙️',
+      'consultoría': '💼',
+      'consultoria': '💼',
+      'soporte': '🔧',
+      'mantenimiento': '🛠️',
+      'analítica': '📊',
+      'analytics': '📊',
+      'business': '📈',
+      'intelligence': '💡',
+      'transformación': '🚀',
+      'digital': '📱',
+      'capacitación': '📚',
+      'transferencia': '🎓',
+      'tecnológica': '⚡',
+      'tecnologica': '⚡',
+      'diseño': '🎨',
+      'marketing': '📈',
+      'finanzas': '💰'
+    };
+
+    // Función auxiliar para obtener icono basado en el nombre de la categoría
+    const getIconForCategory = (categoryName: string): string => {
+      const nameLower = categoryName.toLowerCase();
+      // Buscar coincidencia en el mapa de iconos
+      for (const [key, icon] of Object.entries(categoryIconMap)) {
+        if (nameLower.includes(key)) {
+          return icon;
+        }
+      }
+      return '💎'; // Icono por defecto
+    };
 
     // Detectar si es una respuesta de listado de servicios
     const isServiceListing = content.toLowerCase().includes('ofrecemos servicios en las siguientes categorías') ||
@@ -50,21 +79,81 @@ export const InteractiveButtons: React.FC<InteractiveButtonsProps> = ({
     if (isServiceListing) {
       shouldReplace = true;
       
+      // 🔥 EXTRACCIÓN DINÁMICA: Buscar categorías en múltiples formatos
+      // Formatos soportados:
+      // 1. "🌐 Desarrollo de Software"
+      // 2. "- Inteligencia Artificial"
+      // 3. "• Consultoría Tecnológica"
+      // 4. "Desarrollo de Software, Inteligencia Artificial, ..." (separados por coma)
+      
+      // Tipo unificado para matches
+      const extractedCategories: string[] = [];
+      
+      // Método 1: Buscar con emojis
+      const categoryPattern = /(?:^|\n)\s*[\u{1F300}-\u{1F9FF}]\s*([^\n]+)/ug;
+      let matches = [...content.matchAll(categoryPattern)];
+      
+      if (matches.length > 0) {
+        extractedCategories.push(...matches.map(m => m[1].trim()));
+      }
+      
+      // Método 2: Buscar con bullets (- o •)
+      if (extractedCategories.length === 0) {
+        const bulletPattern = /(?:^|\n)\s*[-•]\s*([^\n]+)/g;
+        matches = [...content.matchAll(bulletPattern)];
+        extractedCategories.push(...matches.map(m => m[1].trim()));
+      }
+      
+      // Método 3: Buscar en texto separado por comas (después de "CATEGORÍAS:")
+      if (extractedCategories.length === 0) {
+        const commaListMatch = content.match(/CATEGORÍAS[:\s]+([^\n]+)/i);
+        if (commaListMatch) {
+          const categoriesList = commaListMatch[1].split(/,|y/).map(c => c.trim());
+          extractedCategories.push(...categoriesList);
+        }
+      }
+      
+      // Método 4: Buscar después de "siguientes categorías:" hasta el final
+      if (extractedCategories.length === 0) {
+        const afterCategoriesText = content.split(/siguientes categorías:?/i)[1];
+        if (afterCategoriesText) {
+          // Extraer líneas que parecen categorías (con emoji o bullet)
+          const lines = afterCategoriesText.split('\n').filter(line => {
+            const trimmed = line.trim();
+            return trimmed.length > 3 && 
+                   (trimmed.match(/^[\u{1F300}-\u{1F9FF}]/u) || trimmed.startsWith('-') || trimmed.startsWith('•'));
+          });
+          
+          const cleanedLines = lines.map(line => 
+            line.replace(/^[\u{1F300}-\u{1F9FF}\-•]\s*/u, '').trim()
+          );
+          extractedCategories.push(...cleanedLines);
+        }
+      }
+      
+      if (extractedCategories.length > 0) {
+        // Crear botones desde las categorías extraídas
+        extractedCategories.forEach(categoryName => {
+          if (!categoryName) return;
+          
+          // Limpiar el nombre (quitar descripciones extra después de ":" o "-")
+          const cleanName = categoryName.split(/[:–-]/)[0].trim();
+          
+          if (cleanName && cleanName.length > 3 && cleanName.length < 80) {
+            const icon = getIconForCategory(cleanName);
+            buttons.push({
+              text: cleanName,
+              icon: icon,
+              message: cleanName.toLowerCase(),
+              category: cleanName.toLowerCase()
+            });
+          }
+        });
+      }
+      
       // Generar contenido limpio sin la lista
       cleanContent = content.split(/ofrecemos servicios en las siguientes categorías|servicios en las siguientes categorías/i)[0].trim() + 
                     '\n\nSelecciona la categoría que te interesa:';
-      
-      // Agregar botones para todas las categorías encontradas
-      categoryMatches.forEach(category => {
-        if (category.regex.test(content)) {
-          buttons.push({
-            text: category.text,
-            icon: category.icon,
-            message: category.message,
-            category: category.text.toLowerCase()
-          });
-        }
-      });
     }
 
     return { buttons, shouldReplace, cleanContent };
