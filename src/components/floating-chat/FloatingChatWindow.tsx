@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import EnhancedMessageBubble from './EnhancedMessageBubble';
 import ChatInput from '../scuti-ai/ChatInput';
+import ChatTextSelection from './ChatTextSelection';
 import type { ChatMessage } from '../../types/scutiAI.types';
 import type { ChatbotConfig } from '../../types/cms';
 
@@ -49,6 +50,7 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
   config
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isMobile, setIsMobile] = useState(false);
 
@@ -200,7 +202,10 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
       </div>
 
       {/* Área de Mensajes - Responsive */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4 bg-gray-50 dark:bg-gray-950">
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4 bg-gray-50 dark:bg-gray-950"
+      >
         {messages.length === 0 ? (
           // Estado vacío - Mensaje de bienvenida desde CMS
           <div className="flex flex-col items-center justify-center h-full text-center px-4 sm:px-6">
@@ -275,6 +280,12 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
           </span>
         </div>
       )}
+
+      {/* 🆕 Menú de selección de texto */}
+      <ChatTextSelection 
+        onSendMessage={onSendMessage}
+        containerRef={messagesContainerRef}
+      />
     </div>
   );
 };
