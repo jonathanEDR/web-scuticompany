@@ -33,6 +33,52 @@ export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({
     setDisplayContent(newContent);
   };
 
+  // 🆕 Detectar y hacer clickeables las listas numeradas
+  const renderClickableContent = () => {
+    if (isUser || !onInteractiveClick) {
+      return <p className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">{displayContent}</p>;
+    }
+
+    // Detectar si hay lista numerada (1. 2. 3. etc.)
+    const listPattern = /^(\d+)\.\s+(.+)$/gm;
+    const lines = displayContent.split('\n');
+    const hasNumberedList = lines.some(line => listPattern.test(line.trim()));
+
+    if (!hasNumberedList) {
+      return <p className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">{displayContent}</p>;
+    }
+
+    // Renderizar con elementos clickeables
+    return (
+      <div className="mb-0 text-sm sm:text-base leading-relaxed">
+        {lines.map((line, index) => {
+          const match = line.trim().match(/^(\d+)\.\s+(.+)$/);
+          
+          if (match) {
+            const [, number, text] = match;
+            return (
+              <div 
+                key={index}
+                onClick={() => onInteractiveClick(text.trim())}
+                className="py-1.5 px-2 -mx-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer transition-colors group"
+              >
+                <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  <span className="font-semibold">{number}.</span> {text}
+                </span>
+              </div>
+            );
+          } else {
+            return (
+              <p key={index} className="whitespace-pre-wrap break-words">
+                {line || '\u00A0'}
+              </p>
+            );
+          }
+        })}
+      </div>
+    );
+  };
+
   const formatTime = (date: Date) => {
     return new Date(date).toLocaleTimeString('es-ES', {
       hour: '2-digit',
@@ -81,9 +127,9 @@ export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({
               : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm'
           }`}
         >
-          {/* Contenido del mensaje - usando displayContent */}
+          {/* Contenido del mensaje - usando displayContent con elementos clickeables */}
           <div className="prose prose-sm max-w-none dark:prose-invert">
-            <p className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">{displayContent}</p>
+            {renderClickableContent()}
           </div>
 
           {/* Botón copiar (aparece en hover en desktop, siempre visible en móvil) */}
