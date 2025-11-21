@@ -21,11 +21,11 @@ import { TableHeader } from '@tiptap/extension-table-header';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { 
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
-  Code, Heading1, Heading2, Heading3,
+  Code,
   List, ListOrdered, Quote, Minus, Undo, Redo,
   Link2, Unlink, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Image as ImageIcon, Youtube, Palette, Highlighter,
-  Table as TableIcon, Plus, Trash2, Columns, Rows
+  Table as TableIcon, Plus, Trash2
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 

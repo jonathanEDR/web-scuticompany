@@ -12,7 +12,8 @@ import {
   Star,
   MessageCircle,
   FileText,
-  Twitter,
+  Facebook,
+  Music,
   Github,
   Linkedin,
   ExternalLink,
@@ -400,11 +401,18 @@ export const PublicProfile: React.FC<PublicProfileProps> = ({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Redes Sociales</h3>
                 <div className="space-y-3">
-                  {profile.social.twitter && (
+                  {profile.social.facebook && (
                     <SocialLink
-                      platform="twitter"
-                      value={profile.social.twitter}
-                      icon={<Twitter size={18} />}
+                      platform="facebook"
+                      value={profile.social.facebook}
+                      icon={<Facebook size={18} />}
+                    />
+                  )}
+                  {profile.social.tiktok && (
+                    <SocialLink
+                      platform="tiktok"
+                      value={profile.social.tiktok}
+                      icon={<Music size={18} />}
                     />
                   )}
                   {profile.social.github && (

@@ -12,7 +12,8 @@ import {
   Camera,
   Save,
   AlertCircle,
-  Twitter,
+  Facebook,
+  Music,
   Github,
   Linkedin,
   Eye,
@@ -130,9 +131,20 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
       newErrors.website = 'El sitio web debe ser una URL válida (http:// o https://)';
     }
     
-    // Validar Twitter
-    if (formData.social?.twitter && !formData.social.twitter.startsWith('@')) {
-      newErrors.twitter = 'El usuario de Twitter debe comenzar con @';
+    // Validar Facebook
+    if (formData.social?.facebook && formData.social.facebook.trim()) {
+      const fbPattern = /^[a-zA-Z0-9._-]+$|^\/[a-zA-Z0-9._-]+$|^(https?:\/\/)?(www\.)?facebook\.com\/.+/;
+      if (!fbPattern.test(formData.social.facebook)) {
+        newErrors.facebook = 'Facebook debe ser un username válido o una URL';
+      }
+    }
+    
+    // Validar TikTok
+    if (formData.social?.tiktok && formData.social.tiktok.trim()) {
+      const ttPattern = /^@?[a-zA-Z0-9._]+$|^(https?:\/\/)?(www\.)?tiktok\.com\/.+/;
+      if (!ttPattern.test(formData.social.tiktok)) {
+        newErrors.tiktok = 'TikTok debe ser un @username válido o una URL';
+      }
     }
     
     // Validar GitHub
@@ -411,7 +423,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     <div className="space-y-4">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-center gap-2 text-blue-800 mb-2">
-          <Twitter size={16} />
+          <Facebook size={16} />
           <h3 className="font-medium">Conecta tus redes sociales</h3>
         </div>
         <p className="text-sm text-blue-700">
@@ -421,21 +433,45 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Twitter / X
+          Facebook
         </label>
         <div className="relative">
-          <Twitter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+          <Facebook className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
           <input
             type="text"
-            value={formData.social?.twitter || ''}
-            onChange={(e) => handleSocialChange('twitter', e.target.value)}
+            value={formData.social?.facebook || ''}
+            onChange={(e) => handleSocialChange('facebook', e.target.value)}
             className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.twitter ? 'border-red-500' : 'border-gray-300'
+              errors.facebook ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="usuario o URL completa"
+          />
+        </div>
+        {errors.facebook && (
+          <p className="mt-1 text-sm text-red-600">
+            <AlertCircle className="inline w-4 h-4 mr-1" />
+            {errors.facebook}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          TikTok
+        </label>
+        <div className="relative">
+          <Music className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+          <input
+            type="text"
+            value={formData.social?.tiktok || ''}
+            onChange={(e) => handleSocialChange('tiktok', e.target.value)}
+            className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.tiktok ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="@usuario"
           />
         </div>
-        {errors.twitter && (
+        {errors.tiktok && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
             <AlertCircle size={14} />
             {errors.twitter}
@@ -635,7 +671,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         <nav className="flex space-x-8">
           {[
             { id: 'basic', label: 'Información básica', icon: User },
-            { id: 'social', label: 'Redes sociales', icon: Twitter },
+            { id: 'social', label: 'Redes sociales', icon: Facebook },
             { id: 'privacy', label: 'Privacidad', icon: Eye }
           ].map(({ id, label, icon: Icon }) => (
             <button

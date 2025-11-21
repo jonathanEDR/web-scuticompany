@@ -12,10 +12,10 @@ import {
   Globe,
   Save,
   AlertCircle,
-  Twitter,
+  Facebook,
+  Music,
   Github,
   Linkedin,
-  Instagram,
   Loader
 } from 'lucide-react';
 import { 
@@ -30,10 +30,10 @@ interface FormData extends BlogProfile {
   location?: string;
   website?: string;
   social?: {
-    twitter?: string;
+    facebook?: string;
+    tiktok?: string;
     github?: string;
     linkedin?: string;
-    instagram?: string;
   };
 }
 
@@ -48,10 +48,10 @@ const ProfileEditor: React.FC = () => {
     location: '',
     website: '',
     social: {
-      twitter: '',
+      facebook: '',
+      tiktok: '',
       github: '',
-      linkedin: '',
-      instagram: ''
+      linkedin: ''
     }
   });
   
@@ -76,10 +76,10 @@ const ProfileEditor: React.FC = () => {
             location: blogProfile.location || '',
             website: blogProfile.website || '',
             social: {
-              twitter: blogProfile.social?.twitter || '',
+              facebook: blogProfile.social?.facebook || '',
+              tiktok: blogProfile.social?.tiktok || '',
               github: blogProfile.social?.github || '',
-              linkedin: blogProfile.social?.linkedin || '',
-              instagram: blogProfile.social?.instagram || ''
+              linkedin: blogProfile.social?.linkedin || ''
             }
           });
         }
@@ -235,18 +235,18 @@ const ProfileEditor: React.FC = () => {
             Redes Sociales
           </h3>
 
-          {/* Twitter */}
+          {/* Facebook */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Twitter className="inline w-4 h-4 mr-2" />
-              Twitter
+              <Facebook className="inline w-4 h-4 mr-2" />
+              Facebook
             </label>
             <input
               type="text"
-              value={formData.social?.twitter || ''}
-              onChange={(e) => handleSocialChange('twitter', e.target.value)}
+              value={formData.social?.facebook || ''}
+              onChange={(e) => handleSocialChange('facebook', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="@usuario"
+              placeholder="usuario o URL completa"
             />
           </div>
 
@@ -280,16 +280,16 @@ const ProfileEditor: React.FC = () => {
             />
           </div>
 
-          {/* Instagram */}
+          {/* TikTok */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Instagram className="inline w-4 h-4 mr-2" />
-              Instagram
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <Music className="inline w-4 h-4 mr-2" />
+              TikTok
             </label>
             <input
               type="text"
-              value={formData.social?.instagram || ''}
-              onChange={(e) => handleSocialChange('instagram', e.target.value)}
+              value={formData.social?.tiktok || ''}
+              onChange={(e) => handleSocialChange('tiktok', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="@usuario"
             />

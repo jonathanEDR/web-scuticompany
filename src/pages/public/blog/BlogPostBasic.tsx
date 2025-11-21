@@ -6,7 +6,6 @@ import {
   ShareButtons, 
   TagList, 
   RelatedPosts, 
-  TableOfContents, 
   PostNavigation, 
   SEOHead, 
   PostHeader,
@@ -87,11 +86,11 @@ const BlogPost: React.FC = () => {
           {/* Sidebar - TOC and Share (Hidden on mobile) */}
           <aside className="hidden lg:block lg:col-span-3">
             <div className="sticky top-24 space-y-6">
-              {/* Table of Contents */}
-              <TableOfContents 
+              {/* Table of Contents - Deshabilitado, usar BlogPost.tsx en su lugar */}
+              {/* <TableOfContents 
                 content={post.content}
                 maxLevel={3}
-              />
+              /> */}
               
               {/* Share Buttons */}
               <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
