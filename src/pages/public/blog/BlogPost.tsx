@@ -9,6 +9,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Tag as TagIcon } from 'lucide-react';
 import { useBlogPost } from '../../../hooks/blog';
+import { usePostContent } from '../../../hooks/blog/usePostContent';
 import { 
   ShareButtons, 
   TagList, 
@@ -17,7 +18,8 @@ import {
   PostNavigation, 
   PostHeader,
   AuthorCard,
-  LazyImage
+  LazyImage,
+  ReadingProgress
 } from '../../../components/blog/common';
 import { CommentsList } from '../../../components/blog/comments';
 import { sanitizeHTML } from '../../../utils/blog';
@@ -27,6 +29,9 @@ import PublicFooter from '../../../components/public/PublicFooter';
 const BlogPostEnhanced: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { post, loading, error } = useBlogPost(slug || '');
+  
+  // Procesar contenido y generar TOC
+  const { html: processedContent, tocItems } = usePostContent(post?.content || '', 3);
 
   useEffect(() => {
     if (post) {
@@ -68,6 +73,9 @@ const BlogPostEnhanced: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Barra de progreso de lectura */}
+      <ReadingProgress />
+      
       {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
       <Helmet>
         <title>{post.title} | WebScuti Blog</title>
@@ -129,18 +137,21 @@ const BlogPostEnhanced: React.FC = () => {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           
-          {/* Sidebar */}
+          {/* Sidebar - Solo visible en desktop */}
           <aside className="hidden lg:block lg:col-span-3">
             <div className="sticky top-24 space-y-6">
-              {/* Table of Contents */}
-              <TableOfContents 
-                content={post.content}
-                maxLevel={3}
-              />
+              {/* Table of Contents - Sidebar variant */}
+              {tocItems.length > 0 && (
+                <TableOfContents 
+                  tocItems={tocItems}
+                  variant="sidebar"
+                />
+              )}
               
               {/* Share Buttons */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <span>🔗</span>
                   Compartir
                 </h3>
                 <ShareButtons 
@@ -155,27 +166,35 @@ const BlogPostEnhanced: React.FC = () => {
           {/* Main Article */}
           <article className="lg:col-span-9 space-y-8">
             {/* Contenido Principal */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8 lg:p-12">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 sm:p-8 lg:p-12">
               {/* Content */}
               <div 
                 className="prose prose-lg lg:prose-xl max-w-none
-                  prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-headings:scroll-mt-24
-                  prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed 
-                  prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium
+                  prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
+                  prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8
+                  prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-8 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-200 dark:prose-h2:border-gray-700
+                  prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-6
+                  prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4
+                  prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-a:transition-colors
                   prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-semibold
-                  prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-blue-600
-                  prose-li:text-gray-700 dark:prose-li:text-gray-300
+                  prose-ul:list-disc prose-ul:my-6 prose-ol:list-decimal prose-ol:my-6
+                  prose-li:marker:text-blue-600 dark:prose-li:marker:text-blue-400
+                  prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:my-2
                   prose-blockquote:border-l-4 prose-blockquote:border-blue-600 dark:prose-blockquote:border-blue-400 
-                  prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
-                  prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:py-2
+                  prose-blockquote:pl-6 prose-blockquote:pr-4 prose-blockquote:py-3 prose-blockquote:my-6
+                  prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
+                  prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:rounded-r-lg
                   prose-code:bg-gray-100 dark:prose-code:bg-gray-700 prose-code:text-gray-800 dark:prose-code:text-gray-200
                   prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono
                   prose-code:before:content-[''] prose-code:after:content-['']
-                  prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:rounded-lg
-                  prose-pre:shadow-lg prose-pre:border prose-pre:border-gray-700
-                  prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto
-                  prose-hr:border-gray-200 dark:prose-hr:border-gray-700"
-                dangerouslySetInnerHTML={{ __html: sanitizeHTML(post.content) }} 
+                  prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:rounded-xl
+                  prose-pre:shadow-lg prose-pre:border prose-pre:border-gray-700 prose-pre:my-6 prose-pre:p-6
+                  prose-img:rounded-xl prose-img:shadow-lg prose-img:mx-auto prose-img:my-8
+                  prose-hr:border-gray-200 dark:prose-hr:border-gray-700 prose-hr:my-8
+                  prose-table:w-full prose-table:my-6
+                  prose-th:bg-gray-100 dark:prose-th:bg-gray-700 prose-th:px-4 prose-th:py-3 prose-th:text-left prose-th:font-semibold
+                  prose-td:border prose-td:border-gray-200 dark:prose-td:border-gray-700 prose-td:px-4 prose-td:py-3"
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(processedContent) }} 
               />
 
               {/* Tags Section */}
@@ -217,6 +236,16 @@ const BlogPostEnhanced: React.FC = () => {
           </article>
         </div>
       </section>
+
+      {/* Floating TOC Button - Solo visible en móvil/tablet */}
+      {tocItems.length > 0 && (
+        <div className="lg:hidden">
+          <TableOfContents 
+            tocItems={tocItems}
+            variant="floating"
+          />
+        </div>
+      )}
 
       <PublicFooter />
     </div>

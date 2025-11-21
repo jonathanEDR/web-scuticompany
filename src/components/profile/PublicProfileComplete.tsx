@@ -13,10 +13,10 @@ import {
   Share2,
   ExternalLink,
   Mail,
-  Twitter,
+  Facebook,
+  Music,
   Github,
   Linkedin,
-  Instagram,
   MessageSquare,
   FileText,
   Users,
@@ -128,11 +128,10 @@ const PublicProfileComplete: React.FC = () => {
       }
     },
     {
-      name: 'Twitter',
-      icon: Twitter,
+      name: 'Facebook',
+      icon: Facebook,
       action: (url: string) => {
-        const title = `Perfil de ${profile?.displayName || username} - SCUTI Company`;
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
       }
     },
     {
@@ -508,29 +507,48 @@ const PublicProfileComplete: React.FC = () => {
                   {Object.entries(profile.social).map(([platform, value]) => {
                     if (!value) return null;
                     
-                    const icons = {
-                      twitter: Twitter,
-                      github: Github,
-                      linkedin: Linkedin,
-                      instagram: Instagram
+                    const socialConfig = {
+                      facebook: { 
+                        icon: Facebook, 
+                        name: 'Facebook',
+                        color: 'text-blue-600 hover:text-blue-700'
+                      },
+                      tiktok: { 
+                        icon: Music, 
+                        name: 'TikTok',
+                        color: 'text-pink-600 hover:text-pink-700'
+                      },
+                      github: { 
+                        icon: Github, 
+                        name: 'GitHub',
+                        color: 'text-gray-700 hover:text-gray-900'
+                      },
+                      linkedin: { 
+                        icon: Linkedin, 
+                        name: 'LinkedIn',
+                        color: 'text-blue-700 hover:text-blue-800'
+                      }
                     };
                     
-                    const Icon = icons[platform as keyof typeof icons];
-                    if (!Icon) return null;
+                    const config = socialConfig[platform as keyof typeof socialConfig];
+                    if (!config) return null;
+                    
+                    const Icon = config.icon;
                     
                     return (
-                      <div key={platform} className="flex items-center space-x-3">
-                        <Icon className="w-5 h-5 text-gray-400" />
-                        <a
-                          href={getSocialUrl(platform, value)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-700 flex items-center"
-                        >
-                          {value}
-                          <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                      </div>
+                      <a
+                        key={platform}
+                        href={getSocialUrl(platform, value)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all hover:shadow-sm group ${config.color}`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Icon className="w-5 h-5" />
+                          <span className="font-medium">{config.name}</span>
+                        </div>
+                        <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
                     );
                   })}
                 </div>

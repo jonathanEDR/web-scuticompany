@@ -14,10 +14,9 @@ import {
   Save,
   AlertCircle,
   CheckCircle,
-  Twitter,
   Github,
   Linkedin,
-  Instagram,
+  Facebook,
   Loader,
   X,
   Eye,
@@ -26,7 +25,8 @@ import {
   MessageSquare,
   ExternalLink,
   Info,
-  Zap
+  Zap,
+  Music
 } from 'lucide-react';
 import { 
   getMyProfile, 
@@ -48,10 +48,10 @@ interface FormData {
   website: string;
   expertise: string[];
   social: {
-    twitter: string;
+    facebook: string;
+    tiktok: string;
     github: string;
     linkedin: string;
-    instagram: string;
   };
   privacy: {
     showEmail: boolean;
@@ -104,10 +104,10 @@ const ProfileEditor: React.FC = () => {
     website: '',
     expertise: [] as string[],
     social: {
-      twitter: '',
+      facebook: '',
+      tiktok: '',
       github: '',
-      linkedin: '',
-      instagram: ''
+      linkedin: ''
     },
     privacy: {
       showEmail: false,
@@ -154,10 +154,10 @@ const ProfileEditor: React.FC = () => {
              : []),
         avatar: String(bp.avatar || ''),
         social: {
-          twitter: String(bp.social?.twitter || ''),
+          facebook: String(bp.social?.facebook || ''),
+          tiktok: String(bp.social?.tiktok || ''),
           github: String(bp.social?.github || ''),
-          linkedin: String(bp.social?.linkedin || ''),
-          instagram: String(bp.social?.instagram || '')
+          linkedin: String(bp.social?.linkedin || '')
         },
         privacy: {
           showEmail: Boolean(bp.showEmail),
@@ -179,10 +179,10 @@ const ProfileEditor: React.FC = () => {
         expertise: [],
         avatar: '',
         social: {
-          twitter: '',
+          facebook: '',
+          tiktok: '',
           github: '',
-          linkedin: '',
-          instagram: ''
+          linkedin: ''
         },
         privacy: {
           showEmail: false,
@@ -253,14 +253,32 @@ const ProfileEditor: React.FC = () => {
         break;
 
       default:
-        // Validación de redes sociales
+        // Validación de redes sociales - Más flexible para aceptar URLs sin protocolo
         if (field.startsWith('social.') && value && value.trim()) {
           const platform = field.split('.')[1];
-          if (platform === 'twitter' && !value.match(/^@?\w+$/)) {
-            return 'Formato inválido para Twitter (ej: @usuario)';
+          if (platform === 'facebook') {
+            // Permitir username, /username, URL con o sin protocolo
+            if (!value.match(/^[a-zA-Z0-9._-]+$|^\/[a-zA-Z0-9._-]+$|^(https?:\/\/)?(www\.)?facebook\.com\/.+/)) {
+              return 'Formato inválido para Facebook';
+            }
           }
-          if (platform === 'github' && !value.match(/^[\w-]+$/)) {
-            return 'Formato inválido para GitHub (ej: usuario)';
+          if (platform === 'tiktok') {
+            // Permitir @username, username, URL con o sin protocolo
+            if (!value.match(/^@?[a-zA-Z0-9._]+$|^(https?:\/\/)?(www\.)?tiktok\.com\/.+/)) {
+              return 'Formato inválido para TikTok';
+            }
+          }
+          if (platform === 'github') {
+            // Permitir username, URL con o sin protocolo
+            if (!value.match(/^[a-zA-Z0-9_-]+$|^(https?:\/\/)?(www\.)?github\.com\/.+/)) {
+              return 'Formato inválido para GitHub';
+            }
+          }
+          if (platform === 'linkedin') {
+            // Permitir in/username, URL con o sin protocolo
+            if (!value.match(/^in\/[a-zA-Z0-9_-]+$|^(https?:\/\/)?(www\.)?linkedin\.com\/.+/)) {
+              return 'Formato inválido para LinkedIn';
+            }
           }
         }
     }
@@ -739,23 +757,23 @@ const ProfileEditor: React.FC = () => {
                 </div>
               </div>
 
-              {/* Twitter */}
+              {/* Facebook */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Twitter className="inline w-4 h-4 mr-2" />
-                  Twitter
+                  <Facebook className="inline w-4 h-4 mr-2" />
+                  Facebook
                 </label>
                 <input
                   type="text"
-                  value={formData.social.twitter}
-                  onChange={(e) => handleSocialChange('twitter', e.target.value)}
+                  value={formData.social.facebook}
+                  onChange={(e) => handleSocialChange('facebook', e.target.value)}
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('social.twitter') ? 'border-red-300' : 'border-gray-300'
+                    getFieldError('social.facebook') ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="@usuario"
+                  placeholder="usuario o facebook.com/usuario"
                 />
-                {getFieldError('social.twitter') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.twitter')}</p>
+                {getFieldError('social.facebook') && (
+                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.facebook')}</p>
                 )}
               </div>
 
@@ -799,23 +817,23 @@ const ProfileEditor: React.FC = () => {
                 )}
               </div>
 
-              {/* Instagram */}
+              {/* TikTok */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Instagram className="inline w-4 h-4 mr-2" />
-                  Instagram
+                  <Music className="inline w-4 h-4 mr-2" />
+                  TikTok
                 </label>
                 <input
                   type="text"
-                  value={formData.social.instagram}
-                  onChange={(e) => handleSocialChange('instagram', e.target.value)}
+                  value={formData.social.tiktok}
+                  onChange={(e) => handleSocialChange('tiktok', e.target.value)}
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('social.instagram') ? 'border-red-300' : 'border-gray-300'
+                    getFieldError('social.tiktok') ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="@usuario"
                 />
-                {getFieldError('social.instagram') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.instagram')}</p>
+                {getFieldError('social.tiktok') && (
+                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.tiktok')}</p>
                 )}
               </div>
             </div>

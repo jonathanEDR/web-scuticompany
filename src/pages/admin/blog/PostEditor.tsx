@@ -565,49 +565,57 @@ export default function PostEditor() {
   };
 
   return (
-    <div className="post-editor w-full">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm mb-6">
-        <div className="flex items-center justify-between p-4">
+    <div className="post-editor w-full min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header Moderno con Glassmorphism */}
+      <div className="sticky top-0 z-10 backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700 shadow-lg mb-8">
+        <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/dashboard/blog')}
-              className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {isEditing ? 'Editar Post' : 'Nuevo Post'}
+                {isEditing ? '✏️ Editar Post' : '✨ Nuevo Post'}
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {formData.isPublished ? 'Publicado' : 'Borrador'}
+              <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1">
+                {formData.isPublished ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-medium">
+                    ✓ Publicado
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-full text-xs font-medium">
+                    📝 Borrador
+                  </span>
+                )}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={() => setShowPreview(!showPreview)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <Eye className="w-4 h-4" />
-              <span>{showPreview ? 'Editor' : 'Vista Previa'}</span>
+              <span className="font-medium">{showPreview ? 'Editor' : 'Vista Previa'}</span>
             </button>
 
             <button
               onClick={handleSaveDraft}
               disabled={isSaving}
-              className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />
-              <span>Guardar Borrador</span>
+              <span className="font-medium">Guardar Borrador</span>
             </button>
 
             <button
               onClick={handlePublish}
               disabled={isSaving}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors font-medium disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-md hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
             >
               <Send className="w-4 h-4" />
               <span>{isEditing ? 'Actualizar' : 'Publicar'}</span>
@@ -622,9 +630,9 @@ export default function PostEditor() {
             {/* Botón Asistente IA */}
             <button
               onClick={() => setShowAISidebar(!showAISidebar)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium ${
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium shadow-md hover:shadow-xl transform hover:scale-105 ${
                 showAISidebar
-                  ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg'
+                  ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white'
                   : 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/20 border border-purple-300 dark:border-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/30'
               }`}
             >
@@ -635,44 +643,45 @@ export default function PostEditor() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 pb-8">
-        {/* Editor Principal */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Título */}
-          <div>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleChange('title', e.target.value)}
-              placeholder="Título del post..."
-              className="w-full text-4xl font-bold text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-transparent border-0 focus:ring-0 p-0"
-            />
-          </div>
-
-          {/* Slug */}
-          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <span>URL:</span>
-            <input
-              type="text"
-              value={formData.slug}
-              onChange={(e) => handleChange('slug', e.target.value)}
-              placeholder="url-del-post"
-              className="flex-1 px-2 py-1 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-            />
-          </div>
-
-          {/* Editor / Preview */}
-          {showPreview ? (
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                {formData.title || 'Título del Post'}
-              </h2>
-              <ContentPreview content={formData.content} />
+      <div className="max-w-[1600px] mx-auto px-6 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Editor Principal */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Título con diseño mejorado */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleChange('title', e.target.value)}
+                placeholder="Título del post..."
+                className="w-full text-4xl font-bold text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-transparent border-0 focus:ring-0 p-0 focus:outline-none"
+              />
             </div>
-          ) : (
+
+            {/* Slug con diseño mejorado */}
+            <div className="flex items-center gap-3 px-4">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">🔗 URL:</span>
+              <input
+                type="text"
+                value={formData.slug}
+                onChange={(e) => handleChange('slug', e.target.value)}
+                placeholder="url-del-post"
+                className="flex-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200"
+              />
+            </div>
+
+            {/* Editor / Preview con diseño mejorado */}
+            {showPreview ? (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-10">
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  {formData.title || 'Título del Post'}
+                </h2>
+                <ContentPreview content={formData.content} />
+              </div>
+            ) : (
             <div className="space-y-4 relative">
-              {/* RichTextEditor SIN sugerencias integradas - mantener el editor limpio */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {/* RichTextEditor con diseño moderno */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                 <RichTextEditor
                   content={formData.content}
                   onChange={(html) => {
@@ -691,45 +700,47 @@ export default function PostEditor() {
                       console.error('Error en onChange del editor:', error);
                     }
                   }}
-                  minHeight="400px"
-                  maxHeight="800px"
+                  minHeight="500px"
+                  maxHeight="1000px"
                 />
               </div>
 
-              {/* ✅ Panel de sugerencias - Solo visible cuando effectiveEnabled está activo */}
+              {/* ✅ Panel de sugerencias moderno */}
               {suggestion && effectiveEnabled && (
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-300 dark:border-purple-700 rounded-lg p-4 ai-suggestion-active relative">
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-2 border-purple-400 dark:border-purple-600 rounded-xl p-5 ai-suggestion-active relative shadow-lg">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       rejectSuggestion();
                     }}
-                    className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
                     title="Cerrar sugerencias"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                   </button>
 
-                  <div className="flex items-center justify-between mb-3 pr-8">
+                  <div className="flex items-center justify-between mb-4 pr-10">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400 animate-pulse" />
-                      <span className="font-medium text-purple-900 dark:text-purple-100">
-                        🎯 Sugerencia AI disponible
+                      <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 animate-pulse" />
+                      <span className="font-semibold text-purple-900 dark:text-purple-100 text-lg">
+                        🎯 Sugerencia AI
                       </span>
                       {currentPosition && (
-                        <span className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">
-                          Línea {currentPosition.line}, Col {currentPosition.column}
+                        <span className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2.5 py-1 rounded-full font-medium">
+                          L{currentPosition.line}:C{currentPosition.column}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="mb-3 p-3 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500">
-                    <div className="text-sm text-gray-700 dark:text-gray-300 italic">
-                      "{suggestion.text.slice(0, 150)}{suggestion.text.length > 150 ? '...' : ''}"
+                  <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500 shadow-sm">
+                    <div className="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
+                      "{suggestion.text.slice(0, 200)}{suggestion.text.length > 200 ? '...' : ''}"
                     </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                      {suggestion.text.length} caracteres • Confianza: {Math.round((suggestion.confidence || 0.8) * 100)}%
+                    <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+                      <span>{suggestion.text.length} caracteres</span>
+                      <span>•</span>
+                      <span>Confianza: {Math.round((suggestion.confidence || 0.8) * 100)}%</span>
                     </div>
                   </div>
                   
@@ -740,7 +751,7 @@ export default function PostEditor() {
                           e.stopPropagation();
                           acceptSuggestion();
                         }}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all transform hover:scale-105"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-md"
                       >
                         ✅ Aceptar <kbd className="px-2 py-1 text-xs bg-green-700 rounded">Tab</kbd>
                       </button>
@@ -750,7 +761,7 @@ export default function PostEditor() {
                           e.stopPropagation();
                           rejectSuggestion();
                         }}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-all transform hover:scale-105"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-md"
                       >
                         ❌ Rechazar <kbd className="px-2 py-1 text-xs bg-red-600 rounded">Esc</kbd>
                       </button>
@@ -763,22 +774,20 @@ export default function PostEditor() {
                   </div>
                 </div>
               )}
-
-              {/* Sección de contenido continúa aquí... */}
             </div>
           )}
 
-          {/* Excerpt con IA - Enfoque Simplificado */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 relative">
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                Extracto (Resumen)
+          {/* Excerpt con diseño moderno */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 relative">
+            <div className="flex items-center justify-between mb-3">
+              <label className="block text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                📄 Extracto (Resumen)
               </label>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleExcerptAIAction('expand')}
                   disabled={!formData.excerpt.trim() || isProcessingAI}
-                  className="px-3 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
                   title="Expandir extracto con IA"
                 >
                   🚀 Expandir
@@ -786,7 +795,7 @@ export default function PostEditor() {
                 <button
                   onClick={() => handleExcerptAIAction('improve')}
                   disabled={!formData.excerpt.trim() || isProcessingAI}
-                  className="px-3 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-1.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
                   title="Mejorar extracto con IA"
                 >
                   ✨ Mejorar
@@ -796,36 +805,39 @@ export default function PostEditor() {
             <textarea
               value={formData.excerpt}
               onChange={(e) => handleChange('excerpt', e.target.value)}
-              placeholder="Escribe un breve resumen del post..."
+              placeholder="Escribe un breve resumen del post que capte la atención..."
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 resize-none transition-all duration-200"
               maxLength={300}
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              {formData.excerpt.length}/300 caracteres
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center justify-between">
+              <span>{formData.excerpt.length}/300 caracteres</span>
+              {formData.excerpt.length > 250 && (
+                <span className="text-orange-600 dark:text-orange-400">⚠️ Cerca del límite</span>
+              )}
             </p>
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Sidebar Moderna */}
         <div className="space-y-6">
-          {/* Imagen Destacada */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+          {/* Imagen Destacada con diseño mejorado */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center gap-2 mb-4">
-              <ImageIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">Imagen Destacada</h3>
+              <ImageIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="font-bold text-gray-900 dark:text-white">🖼️ Imagen Destacada</h3>
             </div>
 
             {formData.featuredImage ? (
-              <div className="relative">
+              <div className="relative group">
                 <img
                   src={formData.featuredImage}
                   alt="Featured"
-                  className="w-full h-48 object-cover rounded-lg"
+                  className="w-full h-52 object-cover rounded-xl shadow-md transition-transform duration-200 group-hover:scale-[1.02]"
                 />
                 <button
                   onClick={() => handleChange('featuredImage', '')}
-                  className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                  className="absolute top-3 right-3 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 text-sm font-medium shadow-lg opacity-0 group-hover:opacity-100"
                 >
                   Eliminar
                 </button>
@@ -878,17 +890,17 @@ export default function PostEditor() {
             )}
           </div>
 
-          {/* Categoría */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+          {/* Categoría con diseño mejorado */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Folder className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">Categoría</h3>
+              <Folder className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <h3 className="font-bold text-gray-900 dark:text-white">📁 Categoría</h3>
             </div>
 
             <select
               value={formData.category}
               onChange={(e) => handleChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+              className="w-full px-4 py-2.5 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 font-medium"
             >
               <option value="">Seleccionar categoría...</option>
               {categories.map((category) => (
@@ -899,7 +911,7 @@ export default function PostEditor() {
             </select>
 
             {formData.category && (
-              <div className="mt-3">
+              <div className="mt-4">
                 {categories
                   .filter(c => c._id === formData.category)
                   .map(category => (
@@ -910,14 +922,14 @@ export default function PostEditor() {
             )}
           </div>
 
-          {/* Tags */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+          {/* Tags con diseño mejorado */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Tag className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">Tags</h3>
+              <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <h3 className="font-bold text-gray-900 dark:text-white">🏷️ Tags</h3>
             </div>
 
-            <div className="flex gap-2 mb-3">
+            <div className="flex gap-2 mb-4">
               <input
                 type="text"
                 value={tagInput}
@@ -929,11 +941,11 @@ export default function PostEditor() {
                   }
                 }}
                 placeholder="Agregar tag..."
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                className="flex-1 px-3 py-2.5 text-sm border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200"
               />
               <button
                 onClick={handleAddTag}
-                className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium"
+                className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105"
               >
                 Agregar
               </button>
@@ -950,12 +962,12 @@ export default function PostEditor() {
                   return (
                     <span
                       key={index}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200"
                     >
                       <span>{tagText}</span>
                       <button
                         onClick={() => handleRemoveTag(tag)}
-                        className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"
+                        className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                       >
                         ×
                       </button>
@@ -966,49 +978,54 @@ export default function PostEditor() {
             )}
           </div>
 
-          {/* Configuración */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+          {/* Configuración con diseño mejorado */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Settings className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">Configuración</h3>
+              <Settings className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              <h3 className="font-bold text-gray-900 dark:text-white">⚙️ Configuración</h3>
             </div>
 
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 cursor-pointer">
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={formData.allowComments}
                   onChange={(e) => handleChange('allowComments', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 dark:focus:ring-blue-400"
+                  className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Permitir comentarios</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                  💬 Permitir comentarios
+                </span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={formData.isPinned}
                   onChange={(e) => handleChange('isPinned', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 dark:focus:ring-blue-400"
+                  className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Fijar post (destacado)</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                  📌 Fijar post (destacado)
+                </span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={formData.showInHeaderMenu}
                   onChange={(e) => handleChange('showInHeaderMenu', e.target.checked)}
-                  className="w-4 h-4 text-purple-600 dark:text-purple-400 rounded focus:ring-purple-500 dark:focus:ring-purple-400"
+                  className="w-5 h-5 text-purple-600 dark:text-purple-400 rounded-md focus:ring-purple-500 dark:focus:ring-purple-400 transition-all duration-200"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Mostrar en Header de Home (Soluciones)
+                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                  🏠 Mostrar en Header (Soluciones)
                 </span>
               </label>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
       {/* ✅ Enhanced AI Sidebar - Controlado por botón Asistente IA */}
       <EnhancedEditorAISidebar

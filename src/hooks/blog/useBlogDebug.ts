@@ -148,7 +148,8 @@ export function useBlogDebugConsole() {
   const debugInfo = useBlogDebug();
 
   useEffect(() => {
-    if (!isProduction() || import.meta.env.VITE_DEBUG_API === 'true') {
+    // Solo mostrar si VITE_DEBUG_API está explícitamente habilitado
+    if (import.meta.env.VITE_DEBUG_API === 'true') {
       console.group('🔍 Blog Module Debug Info');
       console.log('Environment:', debugInfo.environment);
       console.log('API URL:', debugInfo.apiUrl);

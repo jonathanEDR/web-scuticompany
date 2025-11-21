@@ -90,11 +90,11 @@ export default function CommentItem({
 
   // Estilos según el estado
   const statusColors: Record<string, string> = {
-    approved: 'bg-white',
-    pending: 'bg-yellow-50 border-yellow-200',
-    rejected: 'bg-red-50 border-red-200',
-    spam: 'bg-gray-100 border-gray-300',
-    hidden: 'bg-gray-100 border-gray-300'
+    approved: 'bg-white dark:bg-gray-800',
+    pending: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800',
+    rejected: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
+    spam: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600',
+    hidden: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600'
   };
 
   const containerClass = `
@@ -173,13 +173,13 @@ export default function CommentItem({
           <div>
             {/* Nombre del autor - solo enlazar si el perfil es público */}
             {isPublicProfile ? (
-              <Link to={`/perfil/${(comment.author.userId as any).username}`} className="font-semibold text-gray-900 hover:underline">
+              <Link to={`/perfil/${(comment.author.userId as any).username}`} className="font-semibold text-gray-900 dark:text-white hover:underline">
                 {authorName}
               </Link>
             ) : (
-              <p className="font-semibold text-gray-900">{authorName}</p>
+              <p className="font-semibold text-gray-900 dark:text-white">{authorName}</p>
             )}
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
               <span>{formattedDate}</span>
               {comment.editedAt && (
                 <>
@@ -202,7 +202,7 @@ export default function CommentItem({
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+              className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
             >
               <MoreVertical className="w-5 h-5" />
             </button>
@@ -213,14 +213,14 @@ export default function CommentItem({
                   className="fixed inset-0 z-10" 
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-20 min-w-[150px]">
+                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-20 min-w-[150px]">
                   {isAuthor && onEdit && (
                     <button
                       onClick={() => {
                         onEdit(comment._id);
                         setShowMenu(false);
                       }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 w-full px-3 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                       <span>Editar</span>
@@ -233,7 +233,7 @@ export default function CommentItem({
                         onDelete(comment._id);
                         setShowMenu(false);
                       }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-left text-red-600 hover:bg-red-50 transition-colors"
+                      className="flex items-center gap-2 w-full px-3 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>Eliminar</span>
@@ -246,7 +246,7 @@ export default function CommentItem({
                         onReport(comment._id);
                         setShowMenu(false);
                       }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-left text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="flex items-center gap-2 w-full px-3 py-2 text-left text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
                     >
                       <Flag className="w-4 h-4" />
                       <span>Reportar</span>
@@ -261,7 +261,7 @@ export default function CommentItem({
 
       {/* Contenido del comentario */}
       <div className="prose prose-sm max-w-none mb-3">
-        <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{comment.content}</p>
       </div>
 
       {/* Footer con acciones */}
@@ -271,7 +271,7 @@ export default function CommentItem({
           <button
             onClick={() => handleVote('like')}
             disabled={isVoting}
-            className="inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors disabled:opacity-50"
           >
             <ThumbsUp className="w-4 h-4" />
             <span className="font-medium">{localVotes.likes}</span>
@@ -280,7 +280,7 @@ export default function CommentItem({
           <button
             onClick={() => handleVote('dislike')}
             disabled={isVoting}
-            className="inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors disabled:opacity-50"
           >
             <ThumbsDown className="w-4 h-4" />
             <span className="font-medium">{localVotes.dislikes}</span>
@@ -288,9 +288,9 @@ export default function CommentItem({
 
           {/* Score */}
           <span className={`text-sm font-semibold ${
-            localVotes.score > 0 ? 'text-green-600' :
-            localVotes.score < 0 ? 'text-red-600' :
-            'text-gray-500'
+            localVotes.score > 0 ? 'text-green-600 dark:text-green-400' :
+            localVotes.score < 0 ? 'text-red-600 dark:text-red-400' :
+            'text-gray-500 dark:text-gray-400'
           }`}>
             {localVotes.score > 0 && '+'}{localVotes.score}
           </span>
@@ -300,7 +300,7 @@ export default function CommentItem({
         {canReply && onReply && (
           <button
             onClick={() => onReply(comment._id)}
-            className="inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
           >
             <Reply className="w-4 h-4" />
             <span>Responder</span>

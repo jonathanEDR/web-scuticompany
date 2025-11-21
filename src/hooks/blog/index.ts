@@ -22,6 +22,9 @@ export {
   usePostInteractions,
 } from './useBlogPost';
 
+// Post content processing
+export { usePostContent } from './usePostContent';
+
 // Comentarios
 export {
   useComments,

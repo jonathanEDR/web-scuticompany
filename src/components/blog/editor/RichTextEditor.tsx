@@ -1,7 +1,8 @@
 /**
  * ✏️ RichTextEditor Component
- * Editor de contenido rico con TipTap - Versión Profesional
+ * Editor de contenido rico con TipTap - Versión Profesional Moderna
  * Estilo: Similar a Medium, Notion, WordPress
+ * ✨ Con soporte completo de tablas
  */
 
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -14,12 +15,17 @@ import { Color } from '@tiptap/extension-color';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import Highlight from '@tiptap/extension-highlight';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TableCell } from '@tiptap/extension-table-cell';
 import { 
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Code, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Minus, Undo, Redo,
   Link2, Unlink, AlignLeft, AlignCenter, AlignRight, AlignJustify,
-  Image as ImageIcon, Youtube, Palette, Highlighter
+  Image as ImageIcon, Youtube, Palette, Highlighter,
+  Table as TableIcon, Plus, Trash2, Columns, Rows
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -55,6 +61,7 @@ export default function RichTextEditor({
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showTableMenu, setShowTableMenu] = useState(false);
 
   // Configurar editor con extensiones profesionales
   const editor = useEditor({
@@ -134,7 +141,29 @@ export default function RichTextEditor({
         showOnlyCurrent: false
       }),
       TextStyle,
-      Color
+      Color,
+      // ✨ Extensiones de Tabla
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: 'border-collapse table-auto w-full my-4'
+        }
+      }),
+      TableRow.configure({
+        HTMLAttributes: {
+          class: 'border-b border-gray-200 dark:border-gray-700'
+        }
+      }),
+      TableHeader.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-3 text-left font-semibold text-gray-900 dark:text-white'
+        }
+      }),
+      TableCell.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-700 dark:text-gray-300'
+        }
+      })
     ],
     content,
     editable,
@@ -242,6 +271,52 @@ export default function RichTextEditor({
     setShowColorPicker(false);
   };
 
+  // 📊 Funciones para manipular tablas
+  const insertTable = () => {
+    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    setShowTableMenu(false);
+  };
+
+  const deleteTable = () => {
+    editor.chain().focus().deleteTable().run();
+  };
+
+  const addColumnBefore = () => {
+    editor.chain().focus().addColumnBefore().run();
+  };
+
+  const addColumnAfter = () => {
+    editor.chain().focus().addColumnAfter().run();
+  };
+
+  const deleteColumn = () => {
+    editor.chain().focus().deleteColumn().run();
+  };
+
+  const addRowBefore = () => {
+    editor.chain().focus().addRowBefore().run();
+  };
+
+  const addRowAfter = () => {
+    editor.chain().focus().addRowAfter().run();
+  };
+
+  const deleteRow = () => {
+    editor.chain().focus().deleteRow().run();
+  };
+
+  const toggleHeaderRow = () => {
+    editor.chain().focus().toggleHeaderRow().run();
+  };
+
+  const mergeCells = () => {
+    editor.chain().focus().mergeCells().run();
+  };
+
+  const splitCell = () => {
+    editor.chain().focus().splitCell().run();
+  };
+
   // Colores predefinidos
   const colors = [
     '#000000', '#666666', '#999999', '#CCCCCC', '#FFFFFF',
@@ -255,314 +330,481 @@ export default function RichTextEditor({
   const charCount = text.length;
 
   return (
-    <div className={`rich-text-editor border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 ${className}`}>
-      {/* Toolbar */}
+    <div className={`rich-text-editor border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden ${className}`}>
+      {/* Toolbar Moderno y Profesional */}
       {showToolbar && (
-        <div className="border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-2 flex flex-wrap gap-1">
-          {/* Formato de texto */}
-          <div className="flex gap-1 border-r border-gray-300 pr-2">
-            <button
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('bold') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Negrita (Ctrl+B)"
-            >
-              <Bold className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('italic') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Cursiva (Ctrl+I)"
-            >
-              <Italic className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('underline') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Subrayado (Ctrl+U)"
-            >
-              <UnderlineIcon className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleStrike().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('strike') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Tachado"
-            >
-              <Strikethrough className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleCode().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('code') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Código"
-            >
-              <Code className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleHighlight().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('highlight') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Resaltar texto"
-            >
-              <Highlighter className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Encabezados */}
-          <div className="flex gap-1 border-r border-gray-300 dark:border-gray-600 pr-2">
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('heading', { level: 1 }) ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Encabezado 1"
-            >
-              <Heading1 className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('heading', { level: 2 }) ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Encabezado 2"
-            >
-              <Heading2 className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('heading', { level: 3 }) ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Encabezado 3"
-            >
-              <Heading3 className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Listas */}
-          <div className="flex gap-1 border-r border-gray-300 dark:border-gray-600 pr-2">
-            <button
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('bulletList') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Lista con viñetas"
-            >
-              <List className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('orderedList') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Lista numerada"
-            >
-              <ListOrdered className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive('blockquote') ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Cita"
-            >
-              <Quote className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().setHorizontalRule().run()}
-              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
-              title="Línea horizontal"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Alineación */}
-          <div className="flex gap-1 border-r border-gray-300 dark:border-gray-600 pr-2">
-            <button
-              onClick={() => editor.chain().focus().setTextAlign('left').run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive({ textAlign: 'left' }) ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Alinear a la izquierda"
-            >
-              <AlignLeft className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().setTextAlign('center').run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive({ textAlign: 'center' }) ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Centrar"
-            >
-              <AlignCenter className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().setTextAlign('right').run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive({ textAlign: 'right' }) ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Alinear a la derecha"
-            >
-              <AlignRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-              className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                editor.isActive({ textAlign: 'justify' }) ? 'bg-gray-300 dark:bg-gray-600' : ''
-              }`}
-              title="Justificar"
-            >
-              <AlignJustify className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Enlaces y Media */}
-          <div className="flex gap-1 border-r border-gray-300 dark:border-gray-600 pr-2">
-            <div className="relative">
+        <div className="border-b border-gray-300 dark:border-gray-600 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 p-3">
+          <div className="flex flex-wrap gap-2">
+            
+            {/* 📝 GRUPO: Formato de Texto */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mr-1">Texto</span>
               <button
-                onClick={() => setShowLinkInput(!showLinkInput)}
-                className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 ${
-                  editor.isActive('link') ? 'bg-gray-300 dark:bg-gray-600' : ''
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('bold') 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
-                title="Insertar enlace"
+                title="Negrita (Ctrl+B)"
               >
-                <Link2 className="w-4 h-4" />
+                <Bold className="w-4 h-4" />
               </button>
 
-              {showLinkInput && (
-                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-2 z-10 w-64">
-                  <input
-                    type="url"
-                    value={linkUrl}
-                    onChange={(e) => setLinkUrl(e.target.value)}
-                    placeholder="https://ejemplo.com"
-                    className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded mb-2"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        setLink();
-                      }
-                    }}
-                  />
-                  <div className="flex gap-1">
-                    <button
-                      onClick={setLink}
-                      className="flex-1 px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Insertar
-                    </button>
-                    <button
-                      onClick={() => setShowLinkInput(false)}
-                      className="px-2 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-700"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={unsetLink}
-              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 disabled:opacity-30"
-              title="Quitar enlace"
-              disabled={!editor.isActive('link')}
-            >
-              <Unlink className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={addImage}
-              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
-              title="Insertar imagen"
-            >
-              <ImageIcon className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={addYouTube}
-              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
-              title="Insertar video de YouTube"
-            >
-              <Youtube className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Color */}
-          <div className="flex gap-1 border-r border-gray-300 dark:border-gray-600 pr-2">
-            <div className="relative">
               <button
-                onClick={() => setShowColorPicker(!showColorPicker)}
-                className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
-                title="Color de texto"
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('italic') 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Cursiva (Ctrl+I)"
               >
-                <Palette className="w-4 h-4" />
+                <Italic className="w-4 h-4" />
               </button>
 
-              {showColorPicker && (
-                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-2 z-10">
-                  <div className="grid grid-cols-5 gap-1">
-                    {colors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => setColor(color)}
-                        className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform"
-                        style={{ backgroundColor: color }}
-                        title={color}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+              <button
+                onClick={() => editor.chain().focus().toggleUnderline().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('underline') 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Subrayado (Ctrl+U)"
+              >
+                <UnderlineIcon className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().toggleStrike().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('strike') 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Tachado"
+              >
+                <Strikethrough className="w-4 h-4" />
+              </button>
+
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+              <button
+                onClick={() => editor.chain().focus().toggleCode().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('code') 
+                    ? 'bg-purple-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Código inline"
+              >
+                <Code className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().toggleHighlight().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('highlight') 
+                    ? 'bg-yellow-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Resaltar"
+              >
+                <Highlighter className="w-4 h-4" />
+              </button>
             </div>
-          </div>
 
-          {/* Deshacer/Rehacer */}
-          <div className="flex gap-1">
-            <button
-              onClick={() => editor.chain().focus().undo().run()}
-              disabled={!editor.can().undo()}
-              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 disabled:opacity-30"
-              title="Deshacer (Ctrl+Z)"
-            >
-              <Undo className="w-4 h-4" />
-            </button>
+            {/* 📰 GRUPO: Encabezados */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mr-1">Título</span>
+              <button
+                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                className={`px-3 py-2 rounded-md transition-all duration-200 font-bold text-sm ${
+                  editor.isActive('heading', { level: 1 }) 
+                    ? 'bg-indigo-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Encabezado 1"
+              >
+                H1
+              </button>
 
-            <button
-              onClick={() => editor.chain().focus().redo().run()}
-              disabled={!editor.can().redo()}
-              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300 disabled:opacity-30"
-              title="Rehacer (Ctrl+Y)"
-            >
-              <Redo className="w-4 h-4" />
-            </button>
+              <button
+                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                className={`px-3 py-2 rounded-md transition-all duration-200 font-bold text-sm ${
+                  editor.isActive('heading', { level: 2 }) 
+                    ? 'bg-indigo-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Encabezado 2"
+              >
+                H2
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                className={`px-3 py-2 rounded-md transition-all duration-200 font-bold text-sm ${
+                  editor.isActive('heading', { level: 3 }) 
+                    ? 'bg-indigo-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Encabezado 3"
+              >
+                H3
+              </button>
+            </div>
+
+            {/* 📋 GRUPO: Listas y Bloques */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mr-1">Bloques</span>
+              <button
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('bulletList') 
+                    ? 'bg-green-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Lista con viñetas"
+              >
+                <List className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('orderedList') 
+                    ? 'bg-green-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Lista numerada"
+              >
+                <ListOrdered className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive('blockquote') 
+                    ? 'bg-green-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Cita"
+              >
+                <Quote className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                className="p-2 rounded-md transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                title="Línea separadora"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 📐 GRUPO: Alineación */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mr-1">Alinear</span>
+              <button
+                onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive({ textAlign: 'left' }) 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Izquierda"
+              >
+                <AlignLeft className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive({ textAlign: 'center' }) 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Centro"
+              >
+                <AlignCenter className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive({ textAlign: 'right' }) 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Derecha"
+              >
+                <AlignRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  editor.isActive({ textAlign: 'justify' }) 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title="Justificar"
+              >
+                <AlignJustify className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 🔗 GRUPO: Enlaces y Media */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mr-1">Media</span>
+              <div className="relative">
+                <button
+                  onClick={() => setShowLinkInput(!showLinkInput)}
+                  className={`p-2 rounded-md transition-all duration-200 ${
+                    editor.isActive('link') 
+                      ? 'bg-cyan-500 text-white shadow-md' 
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                  title="Enlace"
+                >
+                  <Link2 className="w-4 h-4" />
+                </button>
+
+                {showLinkInput && (
+                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl p-3 z-20 w-72">
+                    <input
+                      type="url"
+                      value={linkUrl}
+                      onChange={(e) => setLinkUrl(e.target.value)}
+                      placeholder="https://ejemplo.com"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md mb-2 focus:ring-2 focus:ring-blue-500"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') setLink();
+                      }}
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={setLink}
+                        className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+                      >
+                        Insertar
+                      </button>
+                      <button
+                        onClick={() => setShowLinkInput(false)}
+                        className="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-700"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={unsetLink}
+                disabled={!editor.isActive('link')}
+                className="p-2 rounded-md transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Quitar enlace"
+              >
+                <Unlink className="w-4 h-4" />
+              </button>
+
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+              <button
+                onClick={addImage}
+                className="p-2 rounded-md transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                title="Imagen"
+              >
+                <ImageIcon className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={addYouTube}
+                className="p-2 rounded-md transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                title="YouTube"
+              >
+                <Youtube className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 🎨 GRUPO: Color */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <div className="relative">
+                <button
+                  onClick={() => setShowColorPicker(!showColorPicker)}
+                  className="p-2 rounded-md transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  title="Color"
+                >
+                  <Palette className="w-4 h-4" />
+                </button>
+
+                {showColorPicker && (
+                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl p-3 z-20">
+                    <div className="grid grid-cols-5 gap-2">
+                      {colors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setColor(color)}
+                          className="w-7 h-7 rounded-md border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform shadow-sm"
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 📊 GRUPO: Tablas (NUEVO) */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mr-1">Tabla</span>
+              <div className="relative">
+                <button
+                  onClick={() => setShowTableMenu(!showTableMenu)}
+                  className={`p-2 rounded-md transition-all duration-200 ${
+                    editor.isActive('table') 
+                      ? 'bg-teal-500 text-white shadow-md' 
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                  title="Insertar tabla"
+                >
+                  <TableIcon className="w-4 h-4" />
+                </button>
+
+                {showTableMenu && (
+                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl p-3 z-20 w-64">
+                    <div className="space-y-2">
+                      {!editor.isActive('table') ? (
+                        <button
+                          onClick={insertTable}
+                          className="w-full px-3 py-2 text-sm bg-teal-600 text-white rounded-md hover:bg-teal-700 font-medium flex items-center justify-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Insertar Tabla 3x3
+                        </button>
+                      ) : (
+                        <>
+                          <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 pb-2 border-b border-gray-200 dark:border-gray-600">
+                            Editar Tabla
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Columnas:</div>
+                            <div className="flex gap-1">
+                              <button
+                                onClick={addColumnBefore}
+                                className="flex-1 px-2 py-1.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                                title="Agregar columna antes"
+                              >
+                                ← Agregar
+                              </button>
+                              <button
+                                onClick={addColumnAfter}
+                                className="flex-1 px-2 py-1.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                                title="Agregar columna después"
+                              >
+                                Agregar →
+                              </button>
+                              <button
+                                onClick={deleteColumn}
+                                className="px-2 py-1.5 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-900/50"
+                                title="Eliminar columna"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Filas:</div>
+                            <div className="flex gap-1">
+                              <button
+                                onClick={addRowBefore}
+                                className="flex-1 px-2 py-1.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-900/50"
+                                title="Agregar fila arriba"
+                              >
+                                ↑ Agregar
+                              </button>
+                              <button
+                                onClick={addRowAfter}
+                                className="flex-1 px-2 py-1.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-900/50"
+                                title="Agregar fila abajo"
+                              >
+                                Agregar ↓
+                              </button>
+                              <button
+                                onClick={deleteRow}
+                                className="px-2 py-1.5 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-900/50"
+                                title="Eliminar fila"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="pt-2 border-t border-gray-200 dark:border-gray-600 space-y-1">
+                            <button
+                              onClick={toggleHeaderRow}
+                              className="w-full px-2 py-1.5 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-900/50"
+                            >
+                              Toggle Header Row
+                            </button>
+                            <button
+                              onClick={mergeCells}
+                              className="w-full px-2 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                            >
+                              Combinar Celdas
+                            </button>
+                            <button
+                              onClick={splitCell}
+                              className="w-full px-2 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                            >
+                              Dividir Celda
+                            </button>
+                            <button
+                              onClick={deleteTable}
+                              className="w-full px-2 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 font-medium"
+                            >
+                              Eliminar Tabla
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ↩️ GRUPO: Deshacer/Rehacer */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              <button
+                onClick={() => editor.chain().focus().undo().run()}
+                disabled={!editor.can().undo()}
+                className="p-2 rounded-md transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Deshacer (Ctrl+Z)"
+              >
+                <Undo className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => editor.chain().focus().redo().run()}
+                disabled={!editor.can().redo()}
+                className="p-2 rounded-md transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Rehacer (Ctrl+Y)"
+              >
+                <Redo className="w-4 h-4" />
+              </button>
+            </div>
+
           </div>
         </div>
       )}
 
-      {/* Editor Content - Área de escritura profesional */}
+      {/* Editor Content - Área de escritura profesional con mejor espaciado */}
       <div 
         className="overflow-y-auto bg-white dark:bg-gray-800"
         style={{ minHeight, maxHeight }}
@@ -573,16 +815,27 @@ export default function RichTextEditor({
         />
       </div>
 
-      {/* Footer con estadísticas */}
+      {/* Footer con estadísticas mejorado */}
       {showWordCount && (
-        <div className="border-t border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-          <div className="flex gap-4">
-            <span>{wordCount} palabras</span>
-            <span>{charCount} caracteres</span>
+        <div className="border-t border-gray-300 dark:border-gray-600 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 px-4 py-3 flex items-center justify-between text-sm">
+          <div className="flex gap-6">
+            <span className="text-gray-700 dark:text-gray-300 font-medium">
+              📝 {wordCount} palabras
+            </span>
+            <span className="text-gray-600 dark:text-gray-400">
+              {charCount} caracteres
+            </span>
+            {editor.isActive('table') && (
+              <span className="text-teal-600 dark:text-teal-400 font-medium">
+                📊 Tabla activa
+              </span>
+            )}
           </div>
           
           {!editable && (
-            <span className="text-orange-600 dark:text-orange-400 font-medium">Modo solo lectura</span>
+            <span className="text-orange-600 dark:text-orange-400 font-medium flex items-center gap-1">
+              🔒 Solo lectura
+            </span>
           )}
         </div>
       )}

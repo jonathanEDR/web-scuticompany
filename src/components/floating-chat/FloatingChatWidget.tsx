@@ -33,22 +33,13 @@ export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
   useEffect(() => {
     const loadChatbotConfig = async () => {
       try {
-        // Obtener configuración desde la página home
-        const pageData = await getPageBySlug('home');
-        console.log('🔍 [FloatingChat] Datos completos del CMS:', pageData);
-        console.log('🔍 [FloatingChat] Content:', pageData?.content);
-        console.log('🔍 [FloatingChat] ChatbotConfig:', pageData?.content?.chatbotConfig);
-        
-        if (pageData?.content?.chatbotConfig) {
-          setChatbotConfig(pageData.content.chatbotConfig);
-          console.log('✅ [FloatingChat] Configuración cargada desde CMS:', pageData.content.chatbotConfig);
-          console.log('✅ [FloatingChat] Preguntas sugeridas:', pageData.content.chatbotConfig.suggestedQuestions);
-        } else {
-          console.log('⚠️ [FloatingChat] Sin configuración en CMS, usando defaults');
-          console.log('⚠️ [FloatingChat] Preguntas por defecto:', defaultChatbotConfig.suggestedQuestions);
-        }
+          // Obtener configuración desde la página home
+          const pageData = await getPageBySlug('home');
+          if (pageData?.content?.chatbotConfig) {
+            setChatbotConfig(pageData.content.chatbotConfig);
+          }
       } catch (error) {
-        console.error('❌ [FloatingChat] Error cargando configuración:', error);
+          // Opcional: podrías manejar el error con una alerta o log externo si es necesario
       } finally {
         setConfigLoading(false);
       }

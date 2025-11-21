@@ -133,7 +133,6 @@ function AppContent() {
   // Configurar el token getter para el blog API
   useEffect(() => {
     setTokenGetter(getToken);
-    console.log('🔧 [App] Token getter configurado para Blog API');
   }, [getToken]);
 
   return (

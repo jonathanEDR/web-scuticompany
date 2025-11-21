@@ -8,6 +8,9 @@
  * @version 1.0.0
  */
 
+// Modo debug solo en desarrollo
+const DEBUG = import.meta.env.DEV && false; // Cambiar a true para debug
+
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
@@ -110,7 +113,7 @@ class BlogCacheManager {
     entry.hits++;
     
     if (import.meta.env.DEV) {
-      console.log(`✅ Cache HIT: ${key} (age: ${Math.round(age / 1000)}s, hits: ${entry.hits})`);
+      if (DEBUG) console.log(`✅ Cache HIT: ${key} (age: ${Math.round(age / 1000)}s, hits: ${entry.hits})`);
     }
 
     return entry.data as T;
@@ -130,7 +133,7 @@ class BlogCacheManager {
       if (oldestKey) {
         this.cache.delete(oldestKey);
         if (import.meta.env.DEV) {
-          console.log(`🗑️ Cache eviction: ${oldestKey}`);
+          if (DEBUG) console.log(`🗑️ Cache eviction: ${oldestKey}`);
         }
       }
     }
@@ -142,7 +145,7 @@ class BlogCacheManager {
     });
 
     if (import.meta.env.DEV) {
-      console.log(`💾 Cache SET: ${key}`);
+      if (DEBUG) console.log(`💾 Cache SET: ${key}`);
     }
   }
 
@@ -154,7 +157,7 @@ class BlogCacheManager {
     const deleted = this.cache.delete(key);
     
     if (deleted && import.meta.env.DEV) {
-      console.log(`🗑️ Cache invalidated: ${key}`);
+      if (DEBUG) console.log(`🗑️ Cache invalidated: ${key}`);
     }
   }
 
@@ -173,7 +176,7 @@ class BlogCacheManager {
     }
 
     if (import.meta.env.DEV && deleted > 0) {
-      console.log(`🗑️ Cache invalidated ${deleted} entries of type: ${type}`);
+      if (DEBUG) console.log(`🗑️ Cache invalidated ${deleted} entries of type: ${type}`);
     }
   }
 
@@ -203,7 +206,7 @@ class BlogCacheManager {
     }
 
     if (import.meta.env.DEV && cleaned > 0) {
-      console.log(`🧹 Cache cleaned ${cleaned} expired entries`);
+      if (DEBUG) console.log(`🧹 Cache cleaned ${cleaned} expired entries`);
     }
   }
 
@@ -215,7 +218,7 @@ class BlogCacheManager {
     this.cache.clear();
     
     if (import.meta.env.DEV) {
-      console.log(`🗑️ Cache cleared (${size} entries removed)`);
+      if (DEBUG) console.log(`🗑️ Cache cleared (${size} entries removed)`);
     }
   }
 

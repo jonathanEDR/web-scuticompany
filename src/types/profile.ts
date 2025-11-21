@@ -8,10 +8,10 @@
 // ============================================
 
 export interface SocialLinks {
-  twitter?: string;
+  facebook?: string;
+  tiktok?: string;
   linkedin?: string;
   github?: string;
-  instagram?: string;
   orcid?: string;
 }
 

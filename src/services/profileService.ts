@@ -294,17 +294,32 @@ export const getSocialUrl = (platform: string, value: string): string => {
   if (!value) return '';
   
   switch (platform) {
-    case 'twitter':
-      if (value.startsWith('@')) {
-        return `https://twitter.com/${value.slice(1)}`;
+    case 'facebook':
+      // Manejar username, /username, o URL completa
+      if (value.startsWith('http')) {
+        return value;
       }
-      return value.startsWith('http') ? value : `https://twitter.com/${value}`;
+      const fbUsername = value.startsWith('/') ? value.slice(1) : value;
+      return `https://facebook.com/${fbUsername}`;
+    
+    case 'tiktok':
+      // Manejar @username o username
+      if (value.startsWith('http')) {
+        return value;
+      }
+      const tiktokUsername = value.startsWith('@') ? value.slice(1) : value;
+      return `https://tiktok.com/@${tiktokUsername}`;
     
     case 'github':
       return value.startsWith('http') ? value : `https://github.com/${value}`;
     
     case 'linkedin':
-      return value.startsWith('http') ? value : `https://linkedin.com/in/${value}`;
+      // Manejar in/username o URL completa
+      if (value.startsWith('http')) {
+        return value;
+      }
+      const linkedinUsername = value.startsWith('in/') ? value.slice(3) : value;
+      return `https://linkedin.com/in/${linkedinUsername}`;
     
     case 'orcid':
       return value.startsWith('http') ? value : `https://orcid.org/${value}`;

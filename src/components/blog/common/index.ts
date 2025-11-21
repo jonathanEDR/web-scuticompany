@@ -7,6 +7,7 @@ export { default as BlogCard } from './BlogCard';
 export { default as CategoryBadge } from './CategoryBadge';
 export { default as TagList } from './TagList';
 export { default as ReadingTimeIndicator } from './ReadingTimeIndicator';
+export { default as ReadingProgress } from './ReadingProgress';
 export { default as ShareButtons } from './ShareButtons';
 export { default as RelatedPosts } from './RelatedPosts';
 export { default as TableOfContents } from './TableOfContents';

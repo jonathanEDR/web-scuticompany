@@ -265,8 +265,8 @@ export default function CommentForm({
                 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg
                 transition-all duration-200
                 ${canSubmit
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-md'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                 }
               `}
             >

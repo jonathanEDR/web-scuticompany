@@ -325,18 +325,23 @@
   margin-top: 0.75rem;
 }
 
-/* Tablas (si se añaden en el futuro) */
+/* Tablas profesionales con estilo moderno */
 .ProseMirror table {
   border-collapse: collapse;
-  margin: 1.5rem 0;
+  margin: 2rem 0;
   width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .ProseMirror table td,
 .ProseMirror table th {
   border: 1px solid #e2e8f0;
-  padding: 0.75rem;
+  padding: 0.875rem 1rem;
   text-align: left;
+  vertical-align: top;
+  min-width: 100px;
 }
 
 .dark .ProseMirror table td,
@@ -345,12 +350,83 @@
 }
 
 .ProseMirror table th {
-  background-color: #f7fafc;
+  background: linear-gradient(to bottom, #f7fafc, #edf2f7);
   font-weight: 600;
+  color: #1a202c;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
 }
 
 .dark .ProseMirror table th {
+  background: linear-gradient(to bottom, #2d3748, #1a202c);
+  color: #e2e8f0;
+}
+
+/* Efecto hover en filas de tabla */
+.ProseMirror table tbody tr {
+  transition: background-color 0.15s ease-in-out;
+}
+
+.ProseMirror table tbody tr:hover {
+  background-color: #f7fafc;
+}
+
+.dark .ProseMirror table tbody tr:hover {
   background-color: #2d3748;
+}
+
+/* Zebra striping para mejor legibilidad */
+.ProseMirror table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.dark .ProseMirror table tbody tr:nth-child(even) {
+  background-color: #1f2937;
+}
+
+/* Celda seleccionada */
+.ProseMirror .selectedCell {
+  background-color: #dbeafe !important;
+  position: relative;
+}
+
+.dark .ProseMirror .selectedCell {
+  background-color: #1e3a8a !important;
+}
+
+/* Indicador de celda editable */
+.ProseMirror table td:focus,
+.ProseMirror table th:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+  background-color: #eff6ff;
+}
+
+.dark .ProseMirror table td:focus,
+.dark .ProseMirror table th:focus {
+  background-color: #1e3a8a;
+}
+
+/* Control de resize de columnas */
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #3b82f6;
+  cursor: col-resize;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ProseMirror table:hover .column-resize-handle {
+  opacity: 0.3;
+}
+
+.ProseMirror .column-resize-handle:hover {
+  opacity: 1 !important;
 }
 
 /* Videos responsive (iframes de YouTube, etc.) */

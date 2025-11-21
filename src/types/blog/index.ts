@@ -72,7 +72,9 @@ export interface BlogAuthor {
   firstName?: string;
   lastName?: string;
   email: string;
-  // Datos del perfil público del blog
+  username?: string;
+  profileImage?: string;
+  // Datos del perfil público del blog (legacy - mantener para compatibilidad)
   displayName?: string;
   avatar?: string;
   bio?: string;
@@ -84,6 +86,21 @@ export interface BlogAuthor {
   // Datos adicionales para el contexto del blog
   profileCompleteness?: number;
   publicUsername?: string;
+  // ✅ blogProfile completo del backend
+  blogProfile?: {
+    displayName?: string;
+    bio?: string;
+    avatar?: string;
+    website?: string;
+    location?: string;
+    expertise?: string[];
+    social?: SocialLinks;
+    isPublicProfile?: boolean;
+    allowComments?: boolean;
+    showEmail?: boolean;
+    profileCompleteness?: number;
+    lastProfileUpdate?: string;
+  };
 }
 
 export interface BlogComment {

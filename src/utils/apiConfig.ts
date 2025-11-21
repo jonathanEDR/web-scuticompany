@@ -21,25 +21,14 @@ function detectApiConfiguration(): ApiConfigType {
   // Determinar el entorno de forma más robusta
   environment = import.meta.env.PROD ? 'production' : 'development';
   
-  // DEBUG: Logging para troubleshooting
-  if (environment === 'development') {
-    console.log('🔧 [API Config] Variables disponibles:', {
-      VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
-      VITE_API_URL: import.meta.env.VITE_API_URL,
-      PROD: import.meta.env.PROD,
-      hostname: typeof window !== 'undefined' ? window.location.hostname : 'SSR'
-    });
-  }
 
   // 1. PRIORIDAD MÁXIMA: Variable de entorno VITE_BACKEND_URL
   if (import.meta.env.VITE_BACKEND_URL) {
     baseUrl = import.meta.env.VITE_BACKEND_URL;
-    console.log(`🎯 [API Config] Usando VITE_BACKEND_URL: ${baseUrl}`);
   }
   // 2. Variable de entorno VITE_API_URL (remover /api)
   else if (import.meta.env.VITE_API_URL) {
     baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
-    console.log(`🎯 [API Config] Usando VITE_API_URL (processed): ${baseUrl}`);
   }
   // 3. Detección automática por hostname (MEJORADA PARA PRODUCCIÓN)
   else if (typeof window !== 'undefined') {
@@ -59,13 +48,11 @@ function detectApiConfiguration(): ApiConfigType {
       // Desarrollo local
       baseUrl = 'http://localhost:5000';
       environment = 'development';
-      console.log(`🏠 [API Config] Detectado entorno DESARROLLO para: ${hostname}`);
     } 
     else if (isProductionDomain || import.meta.env.PROD) {
       // Producción - usar Render backend
       baseUrl = 'https://web-scuticompany-back.onrender.com';
       environment = 'production';
-      console.log(`🌐 [API Config] Detectado entorno PRODUCCIÓN para: ${hostname} → ${baseUrl}`);
     } 
     else {
       // Fallback basado en PROD flag de Vite
@@ -73,7 +60,6 @@ function detectApiConfiguration(): ApiConfigType {
         ? 'https://web-scuticompany-back.onrender.com'
         : 'http://localhost:5000';
       environment = import.meta.env.PROD ? 'production' : 'development';
-      console.warn(`⚠️ [API Config] Dominio no reconocido: ${hostname}, usando fallback basado en PROD=${import.meta.env.PROD}: ${baseUrl}`);
     }
   }
   // 4. Fallback absoluto (SSR o caso extremo)
@@ -81,7 +67,6 @@ function detectApiConfiguration(): ApiConfigType {
     baseUrl = import.meta.env.PROD 
       ? 'https://web-scuticompany-back.onrender.com'
       : 'http://localhost:5000';
-    console.warn(`⚠️ [API Config] Modo SSR detectado, usando fallback: ${baseUrl}`);
   }
 
   const config: ApiConfigType = {

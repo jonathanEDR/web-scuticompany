@@ -50,7 +50,6 @@ export const useFloatingChat = () => {
       const identifier = userId || 'anonymous';
       const newSessionId = `floating-chat-${identifier}-${Date.now()}`;
       setSessionId(newSessionId);
-      console.log('✅ Floating chat session created:', newSessionId, `(${userId ? 'authenticated' : 'anonymous'})`);
     }
   }, [sessionId, userId]);
 
@@ -102,18 +101,15 @@ export const useFloatingChat = () => {
    */
   const sendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim()) {
-      console.warn('⚠️ Mensaje vacío');
       return;
     }
 
     if (!sessionId) {
-      console.error('❌ No sessionId available');
       return;
     }
 
     // 🆕 Permitir mensajes sin userId (usuarios anónimos)
     const userIdentifier = userId || 'anonymous';
-    console.log(`📤 Sending message as: ${userIdentifier}`);
 
     setLoading(true);
 
@@ -129,7 +125,6 @@ export const useFloatingChat = () => {
       // Agregar mensaje del usuario inmediatamente
       setMessages(prev => [...prev, userMessage]);
 
-      console.log('📤 Sending message to Asesor de Ventas SCUTI:', messageText);
 
       // Enviar directamente al Asesor de Ventas SCUTI (con userId opcional)
       const result = await salesChatService.sendMessage(
@@ -150,7 +145,6 @@ export const useFloatingChat = () => {
         };
 
         setMessages(prev => [...prev, assistantMessage]);
-        console.log('✅ Response received from:', result.data.agent);
 
         // Actualizar estado del sistema (siempre operational si hay respuesta exitosa)
         setSystemStatus('operational');
@@ -158,7 +152,6 @@ export const useFloatingChat = () => {
         throw new Error(result.error || 'Error al enviar mensaje');
       }
     } catch (error) {
-      console.error('❌ Error sending message:', error);
 
       // Agregar mensaje de error
       const errorMessage: ChatMessage = {
@@ -181,7 +174,6 @@ export const useFloatingChat = () => {
    */
   const clearMessages = useCallback(() => {
     setMessages([]);
-    console.log('🧹 Messages cleared');
   }, []);
 
   /**
@@ -193,7 +185,6 @@ export const useFloatingChat = () => {
     setSessionId(newSessionId);
     setMessages([]);
     setUnreadCount(0);
-    console.log('🔄 Session reset:', newSessionId, `(${userId ? 'authenticated' : 'anonymous'})`);
   }, [userId]);
 
   // ============================================

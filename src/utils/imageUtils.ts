@@ -10,11 +10,8 @@ import { getApiUrl } from './apiConfig';
  * Maneja tanto URLs absolutas (Cloudinary) como relativas (servidor local)
  */
 export function getImageUrl(url: string): string {
-  console.log('🖼️ [imageUtils] Processing URL:', { originalUrl: url });
-  
   // Si ya es una URL absoluta (http/https), devolverla tal como está
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    console.log('🌐 [imageUtils] URL is absolute, returning as-is:', url);
     return url;
   }
 
@@ -26,13 +23,6 @@ export function getImageUrl(url: string): string {
   const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
   const finalUrl = `${baseUrl}${normalizedUrl}`;
   
-  console.log('🔧 [imageUtils] Constructed URL:', { 
-    originalUrl: url, 
-    apiUrl, 
-    baseUrl, 
-    normalizedUrl, 
-    finalUrl 
-  });
   
   return finalUrl;
 }
