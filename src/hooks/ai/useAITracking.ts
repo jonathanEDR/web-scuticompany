@@ -42,7 +42,6 @@ export const useAITracking = () => {
           startTime: new Date()
         };
         
-        console.log('📊 Sesión de tracking creada:', data.data.sessionId);
         return data.data.sessionId;
       }
     } catch (error) {
@@ -62,7 +61,6 @@ export const useAITracking = () => {
     // porque el backend ya lo hace en BlogAgent.js
     // Solo retornamos un ID temporal para la sesión actual
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-    console.log('🎯 Tracking temporal creado:', tempId);
     return tempId;
   }, []);
 

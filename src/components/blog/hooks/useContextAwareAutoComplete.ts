@@ -93,10 +93,6 @@ export const useContextAwareAutoComplete = (options: UseContextAwareAutoComplete
         const suggestions = contextParser.getSuggestions(textAfterHash);
         setPatternSuggestions(suggestions);
         
-        if (import.meta.env.DEV) {
-          console.log('⌨️ [ContextAware] Escribiendo patrón:', textAfterHash, 'Sugerencias:', suggestions.length);
-        }
-        
         return true;
       }
     }

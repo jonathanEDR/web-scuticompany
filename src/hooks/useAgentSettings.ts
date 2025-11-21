@@ -23,12 +23,9 @@ export const useAgentSettings = (agentName: string): AgentSettings => {
       setLoading(true);
       setError(null);
       
-      console.log(`🔄 [useAgentSettings] Loading config for agent: ${agentName}`);
-      
       const response = await agentConfigService.getConfig(agentName);
       
       if (response.success && response.data) {
-        console.log(`✅ [useAgentSettings] Config loaded for ${agentName}:`, response.data);
         setConfig(response.data);
       } else {
         console.warn(`⚠️ [useAgentSettings] No config found for ${agentName}`);

@@ -5,10 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@clerk/clerk-react';
 import { 
   Save, Eye, Send, ArrowLeft, Image as ImageIcon,
-  Tag, Folder, Settings, Upload, Sparkles
+  Tag, Folder, Settings, Upload, Sparkles, X
 } from 'lucide-react';
 import { RichTextEditor, ContentPreview, EnhancedEditorAISidebar, QuickSuggestionToggle } from '../../../components/blog/editor';
 import { CategoryBadge } from '../../../components/blog/common';
@@ -25,7 +24,6 @@ import { useCategories } from '../../../hooks/blog';
 import { useAutoSuggestionSettings } from '../../../hooks/useAgentSettings';
 import { useQuickSuggestionControl } from '../../../hooks/useQuickSuggestionControl';
 import { generateSlug } from '../../../utils/blog';
-import { getApiUrl } from '../../../utils/apiConfig';
 import { blogPostApi } from '../../../services/blog';
 import { uploadImage } from '../../../services/imageService';
 import type { CreatePostDto, UpdatePostDto } from '../../../types/blog';
@@ -48,7 +46,6 @@ export default function PostEditor() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditing = !!id;
-  const { getToken } = useAuth();
 
   const { categories } = useCategories();
 
@@ -92,7 +89,7 @@ export default function PostEditor() {
   // Hook para control directo de sugerencias
   const { effectiveEnabled, isOverridden } = useQuickSuggestionControl();
 
-  // Hook de autocompletado contextual (como Copilot) - ahora usa estado efectivo
+  // Hook de autocompletado contextual (como Copilot) - ✅ Controlado por toggle
   const {
     suggestion,
     isVisible: showAutoComplete,
@@ -101,7 +98,7 @@ export default function PostEditor() {
     acceptSuggestion,
     rejectSuggestion
   } = useCursorAwareAutoComplete({
-    enabled: effectiveEnabled, // Usar estado efectivo del toggle
+    enabled: effectiveEnabled, // ✅ Controlado por el botón de toggle
     debounceMs: suggestionSettings.debounceMs,
     minLength: suggestionSettings.minLength,
     contextLength: suggestionSettings.contextLength
@@ -113,7 +110,7 @@ export default function PostEditor() {
     addRating
   } = useAITracking();
 
-  // Hook de context-aware para patrones #...#
+  // Hook de context-aware para patrones #...# - ✅ Controlado por toggle
   const {
     patternSuggestions,
     isTypingPattern,
@@ -121,7 +118,7 @@ export default function PostEditor() {
     handleContentChange: handlePatternContentChange,
     insertPatternSuggestion
   } = useContextAwareAutoComplete({
-    enabled: effectiveEnabled
+    enabled: effectiveEnabled // ✅ Controlado por el botón de toggle
   });
 
   // Crear sesión de tracking al montar el componente
@@ -137,6 +134,20 @@ export default function PostEditor() {
     }
   }, [createSession, id, formData.title, formData.category]);
 
+  // ✅ NUEVO: Limpiar sugerencias cuando el usuario hace click en la toolbar
+  React.useEffect(() => {
+    const handleToolbarClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Si el click es en la toolbar, rechazar sugerencias activas
+      if (target.closest('.rich-text-editor .border-b') && suggestion) {
+        rejectSuggestion();
+      }
+    };
+
+    document.addEventListener('click', handleToolbarClick);
+    return () => document.removeEventListener('click', handleToolbarClick);
+  }, [suggestion, rejectSuggestion]);
+
   // Cargar post si está editando
   useEffect(() => {
     if (isEditing && id) {
@@ -144,10 +155,14 @@ export default function PostEditor() {
     }
   }, [isEditing, id]);
 
-  // Manejar teclas Tab/Esc para sugerencias
+  // Manejar teclas Tab/Esc para sugerencias - SOLO cuando el editor NO tiene foco
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (showAutoComplete && suggestion) {
+      // ✅ Solo procesar si hay sugerencia Y el foco NO está en el editor
+      const isEditorFocused = document.activeElement?.closest('.ProseMirror') || 
+                              document.activeElement?.closest('.rich-text-editor');
+      
+      if (showAutoComplete && suggestion && !isEditorFocused) {
         if (e.key === 'Tab') {
           e.preventDefault();
           acceptSuggestion();
@@ -598,13 +613,13 @@ export default function PostEditor() {
               <span>{isEditing ? 'Actualizar' : 'Publicar'}</span>
             </button>
 
-            {/* Control de Sugerencias Automáticas */}
+            {/* ✅ Control de Sugerencias Automáticas - Controla TODOS los sistemas de IA */}
             <QuickSuggestionToggle
               size="md"
               showLabel={true}
             />
 
-            {/* Botón Asistente IA - Más visible al final */}
+            {/* Botón Asistente IA */}
             <button
               onClick={() => setShowAISidebar(!showAISidebar)}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium ${
@@ -656,7 +671,7 @@ export default function PostEditor() {
             </div>
           ) : (
             <div className="space-y-4 relative">
-              {/* RichTextEditor con sugerencia integrada */}
+              {/* RichTextEditor SIN sugerencias integradas - mantener el editor limpio */}
               <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <RichTextEditor
                   content={formData.content}
@@ -679,86 +694,51 @@ export default function PostEditor() {
                   minHeight="400px"
                   maxHeight="800px"
                 />
-
-                {/* Sugerencia AI Contextual */}
-                {suggestion && (
-                  <div className="border-t border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4">
-                    <div className="flex items-start gap-3">
-                      <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5 animate-pulse" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="text-sm font-semibold text-purple-900 dark:text-purple-100">
-                            🎯 Continuación AI
-                          </div>
-                          {currentPosition && (
-                            <div className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">
-                              Línea {currentPosition.line}, Col {currentPosition.column}
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Mostrar contexto antes del cursor */}
-                        {suggestion.contextBefore && (
-                          <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                            <span className="opacity-60">...{suggestion.contextBefore.slice(-80)}</span>
-                            <span className="bg-yellow-200 dark:bg-yellow-800 px-1">|CURSOR|</span>
-                          </div>
-                        )}
-                        
-                        {/* Sugerencia principal */}
-                        <div 
-                          className="text-purple-800 dark:text-purple-200 italic p-3 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500 shadow-sm font-medium"
-                          style={{ fontFamily: 'inherit' }}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded font-bold">
-                              SUGERENCIA ✨
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              Confianza: {Math.round((suggestion.confidence || 0.8) * 100)}%
-                            </span>
-                          </div>
-                          "{suggestion.text}"
-                        </div>
-                        
-                        <div className="mt-3 flex items-center justify-between">
-                          <div className="text-xs text-purple-600 dark:text-purple-400">
-                            <kbd className="px-2 py-1 bg-purple-200 dark:bg-purple-800 rounded text-xs mr-1">Tab</kbd> Aceptar |
-                            <kbd className="px-2 py-1 bg-purple-200 dark:bg-purple-800 rounded text-xs ml-1">Esc</kbd> Rechazar
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {suggestion.text.length} caracteres
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              {/* Controles de sugerencia más prominentes - DEBUGGING VERSION */}
-              {suggestion && (
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-300 dark:border-purple-700 rounded-lg p-4">
-                  {/* Header con información de la sugerencia */}
-                  <div className="flex items-center justify-between mb-3">
+              {/* ✅ Panel de sugerencias - Solo visible cuando effectiveEnabled está activo */}
+              {suggestion && effectiveEnabled && (
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-300 dark:border-purple-700 rounded-lg p-4 ai-suggestion-active relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      rejectSuggestion();
+                    }}
+                    className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    title="Cerrar sugerencias"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center justify-between mb-3 pr-8">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400 animate-pulse" />
                       <span className="font-medium text-purple-900 dark:text-purple-100">
-                        🎯 SUGERENCIA DETECTADA: {suggestion.text.slice(0, 30)}...
+                        🎯 Sugerencia AI disponible
                       </span>
-                      <small className="text-xs bg-yellow-200 dark:bg-yellow-800 px-2 py-1 rounded">
-                        DEBUG: showAuto={showAutoComplete ? 'true' : 'false'}, suggestion=exists
-                      </small>
+                      {currentPosition && (
+                        <span className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">
+                          Línea {currentPosition.line}, Col {currentPosition.column}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mb-3 p-3 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500">
+                    <div className="text-sm text-gray-700 dark:text-gray-300 italic">
+                      "{suggestion.text.slice(0, 150)}{suggestion.text.length > 150 ? '...' : ''}"
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      {suggestion.text.length} caracteres • Confianza: {Math.round((suggestion.confidence || 0.8) * 100)}%
                     </div>
                   </div>
                   
-                  {/* Botones y Rating */}
                   <div className="flex items-center justify-between">
                     <div className="flex gap-3">
                       <button
-                        onClick={() => {
-                          const accepted = acceptSuggestion();
-                          console.log('🎯 Sugerencia aceptada y trackeada:', accepted);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          acceptSuggestion();
                         }}
                         className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all transform hover:scale-105"
                       >
@@ -766,9 +746,9 @@ export default function PostEditor() {
                       </button>
                       
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           rejectSuggestion();
-                          console.log('❌ Sugerencia rechazada y trackeada');
                         }}
                         className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-all transform hover:scale-105"
                       >
@@ -776,7 +756,6 @@ export default function PostEditor() {
                       </button>
                     </div>
                     
-                    {/* Rating component */}
                     <SuggestionRating 
                       onRating={handleSuggestionRating}
                       className="ml-4"
@@ -785,145 +764,7 @@ export default function PostEditor() {
                 </div>
               )}
 
-              {/* Botones de personalización de contenido */}
-              <div className="flex flex-wrap gap-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 mr-4">
-                  <Sparkles className="w-4 h-4 text-purple-500" />
-                  Herramientas IA:
-                </div>
-                
-                <button
-                  onClick={async () => {
-                    try {
-                      const token = await getToken();
-                      const result = await fetch(`${getApiUrl()}/agents/blog/generate-content`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                          action: 'expand',
-                          content: formData.content,
-                          length: 'medium'
-                        })
-                      });
-                      
-                      if (result.ok) {
-                        const data = await result.json();
-                        if (data.content) {
-                          handleChange('content', formData.content + '\n\n' + data.content);
-                        }
-                      }
-                    } catch (error) {
-                      console.error('Error expandir:', error);
-                    }
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 bg-pink-100 hover:bg-pink-200 dark:bg-pink-900/20 dark:hover:bg-pink-900/30 text-pink-700 dark:text-pink-300 text-sm rounded-lg transition-colors"
-                >
-                  📈 Expandir contenido
-                </button>
-                
-                <button
-                  onClick={async () => {
-                    try {
-                      const token = await getToken();
-                      const result = await fetch(`${getApiUrl()}/agents/blog/generate-content`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                          action: 'improve',
-                          content: formData.content,
-                          tone: 'professional'
-                        })
-                      });
-                      
-                      if (result.ok) {
-                        const data = await result.json();
-                        if (data.content) {
-                          handleChange('content', data.content);
-                        }
-                      }
-                    } catch (error) {
-                      console.error('Error mejorar:', error);
-                    }
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded-lg transition-colors"
-                >
-                  ✨ Mejorar calidad
-                </button>
-                
-                <button
-                  onClick={async () => {
-                    try {
-                      const token = await getToken();
-                      const result = await fetch(`${getApiUrl()}/agents/blog/generate-content`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                          action: 'seo',
-                          content: formData.content,
-                          keywords: [formData.title, formData.category]
-                        })
-                      });
-                      
-                      if (result.ok) {
-                        const data = await result.json();
-                        if (data.suggestions) {
-                          handleChange('content', formData.content + '\n\n' + JSON.stringify(data.suggestions, null, 2));
-                        }
-                      }
-                    } catch (error) {
-                      console.error('Error SEO:', error);
-                    }
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 bg-green-100 hover:bg-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 text-sm rounded-lg transition-colors"
-                >
-                  🔍 Optimizar SEO
-                </button>
-                
-                <button
-                  onClick={async () => {
-                    try {
-                      const token = await getToken();
-                      const result = await fetch(`${getApiUrl()}/agents/blog/chat`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                          message: `Sugiere 3 ideas específicas para mejorar este contenido: "${formData.content.substring(0, 200)}..."`,
-                          context: { 
-                            mode: 'suggestions',
-                            postId: id || 'new',
-                            title: formData.title,
-                            category: formData.category
-                          }
-                        })
-                      });
-                      
-                      if (result.ok) {
-                        const data = await result.json();
-                        if (data.response) {
-                          handleChange('content', formData.content + '\n\n' + data.response);
-                        }
-                      }
-                    } catch (error) {
-                      console.error('Error sugerir:', error);
-                    }
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/20 dark:hover:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-sm rounded-lg transition-colors"
-                >
-                  💡 Sugerir ideas
-                </button>
-              </div>
+              {/* Sección de contenido continúa aquí... */}
             </div>
           )}
 
@@ -1169,7 +1010,7 @@ export default function PostEditor() {
         </div>
       </div>
 
-      {/* Enhanced AI Sidebar with Chat & Generation */}
+      {/* ✅ Enhanced AI Sidebar - Controlado por botón Asistente IA */}
       <EnhancedEditorAISidebar
         title={formData.title}
         content={formData.content}
@@ -1208,20 +1049,21 @@ export default function PostEditor() {
         </div>
       )}
 
-      {/* Menú contextual para selección de texto */}
-      <SelectionContextMenu
-        onActionSelect={handleSelectionAction}
-        onClose={() => {
-          // Limpiar selección al cerrar menú
-          const selection = window.getSelection();
-          if (selection) {
-            selection.removeAllRanges();
-          }
-        }}
-      />
+      {/* ✅ Menú contextual de selección - Solo cuando effectiveEnabled está activo */}
+      {effectiveEnabled && (
+        <SelectionContextMenu
+          onActionSelect={handleSelectionAction}
+          onClose={() => {
+            const selection = window.getSelection();
+            if (selection) {
+              selection.removeAllRanges();
+            }
+          }}
+        />
+      )}
 
-      {/* Helper de patrones #...# */}
-      {(isTypingPattern || activePattern) && (
+      {/* ✅ Helper de patrones #...# - Solo cuando effectiveEnabled está activo */}
+      {effectiveEnabled && (isTypingPattern || activePattern) && (
         <ContextPatternHelper
           isTypingPattern={isTypingPattern}
           suggestions={patternSuggestions}

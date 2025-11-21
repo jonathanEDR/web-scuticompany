@@ -144,6 +144,27 @@ export const useCursorAwareAutoComplete = (options: CursorAwareAutoCompleteOptio
 
   // Manejar cambios en el contenido con detección de cursor
   const handleContentChange = useCallback(async (content: string, additionalContext?: any) => {
+    // ✅ PRIORIDAD 1: No generar sugerencias si el editor tiene foco o está en uso
+    const isEditorActive = document.activeElement?.closest('.ProseMirror') || 
+                           document.activeElement?.closest('.rich-text-editor') ||
+                           document.activeElement?.closest('.rich-text-editor .border-b'); // Toolbar
+    
+    if (isEditorActive) {
+      // Limpiar sugerencias existentes si el editor está activo
+      setSuggestion(null);
+      setIsVisible(false);
+      return;
+    }
+
+    // ✅ PRIORIDAD 2: No generar si el usuario está interactuando con la toolbar
+    const isInteractingWithToolbar = document.activeElement?.closest('.rich-text-editor .border-b');
+    if (isInteractingWithToolbar) {
+      devLog('🛑 Toolbar activa, sugerencias deshabilitadas temporalmente');
+      setSuggestion(null);
+      setIsVisible(false);
+      return;
+    }
+
     if (!enabled || content.length < minLength) {
       setSuggestion(null);
       setIsVisible(false);

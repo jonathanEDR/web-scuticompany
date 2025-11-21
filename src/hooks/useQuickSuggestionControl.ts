@@ -121,27 +121,30 @@ export const useQuickSuggestionControl = () => {
   }, []);
 
   // Toggle estado local (override temporal)
-  const toggleLocal = useCallback(async () => {
-    const currentEffective = getEffectiveState();
-    const newLocalEnabled = !currentEffective.enabled;
-    
-    setLocalState(prev => ({
-      ...prev,
-      localEnabled: newLocalEnabled,
-      isOverridden: true
-    }));
-    
-    saveLocalState(newLocalEnabled);
-    
-    // Log para debugging
-    if (import.meta.env.DEV) {
-      console.log('🎛️ [QuickSuggestionControl] Local toggle:', {
-        from: currentEffective.enabled,
-        to: newLocalEnabled,
-        isOverride: true
-      });
-    }
-  }, [saveLocalState]);
+  const toggleLocal = useCallback(() => {
+    setLocalState(prev => {
+      // Calcular estado efectivo actual
+      const currentEnabled = prev.localEnabled !== null ? prev.localEnabled : prev.globalEnabled;
+      const newLocalEnabled = !currentEnabled;
+      
+      // Guardar inmediatamente en localStorage
+      try {
+        const stateToSave = {
+          localEnabled: newLocalEnabled,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
+      } catch (error) {
+        console.error('Error saving local suggestion state:', error);
+      }
+      
+      return {
+        ...prev,
+        localEnabled: newLocalEnabled,
+        isOverridden: true
+      };
+    });
+  }, []);
 
   // Sincronizar con configuración global (remover override)
   const syncWithGlobal = useCallback(() => {
@@ -155,10 +158,6 @@ export const useQuickSuggestionControl = () => {
     
     // Refetch para asegurar sincronización
     refetch();
-    
-    if (import.meta.env.DEV) {
-      console.log('🔄 [QuickSuggestionControl] Synced with global config');
-    }
   }, [saveLocalState, refetch]);
 
   // Obtener estado efectivo (combinando local + global) - REACTIVO
