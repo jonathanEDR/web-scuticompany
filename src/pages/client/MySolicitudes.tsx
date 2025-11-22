@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import { crmService, type Lead } from '../../services/crmService';
 import { SolicitudTimeline, ActivityTimeline } from '../../components/crm/SolicitudTimeline';
 import { StatusBadge, PriorityBadge } from '../../components/crm/Badges';
@@ -60,8 +59,7 @@ const MySolicitudes: React.FC = () => {
 
   if (loading) {
     return (
-      <SmartDashboardLayout>
-        <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-400">Cargando solicitudes...</p>
@@ -73,8 +71,7 @@ const MySolicitudes: React.FC = () => {
 
   if (error) {
     return (
-      <SmartDashboardLayout>
-        <div className="w-full px-4 py-8">
+      <div className="w-full px-4 py-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6">
             <p className="text-red-800 dark:text-red-300">❌ {error}</p>
             <button
@@ -85,13 +82,11 @@ const MySolicitudes: React.FC = () => {
             </button>
           </div>
         </div>
-      </SmartDashboardLayout>
     );
   }
 
   return (
-    <SmartDashboardLayout>
-      <div className="w-full px-4 py-6 md:py-8">
+    <div className="w-full px-4 py-6 md:py-8">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 rounded-2xl p-6 md:p-8 mb-6 text-white shadow-xl">
           <div className="flex items-center justify-between">
@@ -404,7 +399,6 @@ const MySolicitudes: React.FC = () => {
         </div>
       )}
     </div>
-    </SmartDashboardLayout>
   );
 };
 

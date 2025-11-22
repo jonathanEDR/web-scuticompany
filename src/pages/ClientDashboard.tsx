@@ -6,7 +6,6 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import RoleBadge from '../components/RoleBadge';
 import { formatUserName } from '../types/roles';
 import { blogPostApi } from '../services/blog';
@@ -91,8 +90,7 @@ export default function ClientDashboard() {
   const userName = formatUserName(user);
 
   return (
-    <SmartDashboardLayout>
-      <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto">
         {/* Header de Bienvenida */}
         <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 rounded-2xl p-8 mb-8 text-white shadow-xl">
           <div className="flex items-center justify-between">
@@ -373,6 +371,5 @@ export default function ClientDashboard() {
           </div>
         </div>
       </div>
-    </SmartDashboardLayout>
   );
 }

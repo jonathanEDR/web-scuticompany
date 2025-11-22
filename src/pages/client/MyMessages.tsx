@@ -7,7 +7,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import type { LeadMessage } from '../../types/message.types';
 import type { Lead } from '../../services/crmService';
 import { messageService } from '../../services/messageService';
@@ -213,21 +212,18 @@ export default function MyMessages() {
 
   if (isLoading) {
     return (
-      <SmartDashboardLayout>
-        <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <Loader className="w-12 h-12 text-green-600 mx-auto mb-4 animate-spin" />
             <p className="text-gray-600 dark:text-gray-400">Cargando mensajes...</p>
           </div>
         </div>
-      </SmartDashboardLayout>
     );
   }
 
   if (error) {
     return (
-      <SmartDashboardLayout>
-        <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
           <div className="text-center max-w-md mx-auto p-6">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error al Cargar</h2>
@@ -240,13 +236,11 @@ export default function MyMessages() {
             </button>
           </div>
         </div>
-      </SmartDashboardLayout>
     );
   }
 
   return (
-    <SmartDashboardLayout>
-      <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-6">
         
         {/* Header */}
         <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 rounded-2xl p-8 mb-6 text-white shadow-xl">
@@ -525,6 +519,5 @@ export default function MyMessages() {
           </div>
         )}
       </div>
-    </SmartDashboardLayout>
   );
 }

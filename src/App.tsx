@@ -1,5 +1,5 @@
 ﻿import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { ClerkProvider, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -125,6 +125,23 @@ const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
   </DashboardProviders>
 );
 
+/**
+ * 🎯 Layout Persistente SOLO para Dashboard del Cliente
+ * Este wrapper mantiene el SmartDashboardLayout montado mientras navegas
+ * entre las páginas del cliente, evitando re-renderizados innecesarios
+ */
+const ClientDashboardLayoutWrapper = () => (
+  <DashboardProviders>
+    <ProtectedRoute>
+      <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
+        <SmartDashboardLayout>
+          <Outlet />
+        </SmartDashboardLayout>
+      </RoleBasedRoute>
+    </ProtectedRoute>
+  </DashboardProviders>
+);
+
 function AppContent() {
   const { showWelcomeNotification, onboardingData, dismissWelcomeNotification } = useAuth();
   const { getToken } = useClerkAuth();
@@ -175,46 +192,23 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* 👤 Dashboard para USER y CLIENT */}
-              <Route path="/dashboard/client" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
-                    <ClientDashboard />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-
-              {/* 🏠 Portal Cliente - Dashboard Principal */}
-              <Route path="/dashboard/client/portal" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
-                    <ClientPortal />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-
-              {/* 📋 Redirección de ruta antigua "leads" a nueva "solicitudes" */}
-              <Route path="/dashboard/client/leads" element={
-                <Navigate to="/dashboard/client/solicitudes" replace />
-              } />
-
-              {/* 💬 Mis Mensajes */}
-              <Route path="/dashboard/client/messages" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
-                    <MyMessages />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-
-              {/* 📋 Mis Solicitudes con Timeline */}
-              <Route path="/dashboard/client/solicitudes" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
-                    <MySolicitudes />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
+              {/* 👤 RUTAS DEL CLIENTE con Layout Persistente */}
+              <Route path="/dashboard/client" element={<ClientDashboardLayoutWrapper />}>
+                {/* Dashboard principal del cliente */}
+                <Route index element={<ClientDashboard />} />
+                
+                {/* Portal Cliente */}
+                <Route path="portal" element={<ClientPortal />} />
+                
+                {/* Mis Mensajes */}
+                <Route path="messages" element={<MyMessages />} />
+                
+                {/* Mis Solicitudes con Timeline */}
+                <Route path="solicitudes" element={<MySolicitudes />} />
+                
+                {/* Redirección de ruta antigua "leads" a nueva "solicitudes" */}
+                <Route path="leads" element={<Navigate to="/dashboard/client/solicitudes" replace />} />
+              </Route>
               
               {/* ⚡ Dashboard para ADMIN, MODERATOR y SUPER_ADMIN */}
               <Route path="/dashboard/admin" element={

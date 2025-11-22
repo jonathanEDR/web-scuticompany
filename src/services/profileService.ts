@@ -250,11 +250,14 @@ export const uploadAvatar = async (file: File, token?: string): Promise<string> 
     const formData = new FormData();
     formData.append('avatar', file);
     
-    // Configurar headers para multipart/form-data y autenticación
-    const headers = {
-      'Content-Type': 'multipart/form-data',
-      ...(token && { Authorization: `Bearer ${token}` })
-    };
+    // IMPORTANTE: NO establecer Content-Type manualmente con FormData
+    // Axios lo establece automáticamente con el boundary correcto
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    console.log('🔄 Uploading avatar to:', `${API_BASE_URL}/api/upload/avatar`);
     
     const response = await profileApiClient.post<AvatarUploadResponse>('/upload/avatar', formData, { headers });
     
@@ -262,9 +265,11 @@ export const uploadAvatar = async (file: File, token?: string): Promise<string> 
       throw new Error(response.data.message || 'Error al subir avatar');
     }
     
+    console.log('✅ Avatar uploaded successfully:', response.data.data.avatar);
     return response.data.data.avatar;
   } catch (error: any) {
-    console.error('Error uploading avatar:', error);
+    console.error('❌ Error uploading avatar:', error);
+    console.error('Response:', error.response?.data);
     throw new Error(error.response?.data?.message || 'Error al subir avatar');
   }
 };

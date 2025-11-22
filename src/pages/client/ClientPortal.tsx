@@ -6,7 +6,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import type { Lead } from '../../services/crmService';
 import type { LeadMessage } from '../../types/message.types';
 import { crmService } from '../../services/crmService';
@@ -135,8 +134,7 @@ export default function ClientPortal() {
   const secureMessages = useFilterPrivateMessages(recentMessages);
 
   return (
-    <SmartDashboardLayout>
-      <div className="w-full">
+    <div className="w-full">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 dark:from-green-700 dark:via-blue-700 dark:to-purple-700 rounded-2xl p-6 md:p-8 mb-8 text-white shadow-xl">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -383,6 +381,5 @@ export default function ClientPortal() {
           </div>
         </div>
       </div>
-    </SmartDashboardLayout>
   );
 }
