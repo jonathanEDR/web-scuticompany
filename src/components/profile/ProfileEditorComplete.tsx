@@ -142,6 +142,9 @@ const ProfileEditor: React.FC = () => {
       const bp = profileData.blogProfile;
       console.log('✅ [ProfileEditor] Cargando datos de cache/API:', bp);
       
+      // Usar avatar de Clerk como fallback si no hay avatar guardado
+      const avatarFallback = bp.avatar || user?.imageUrl || '';
+      
       const newFormData = {
         displayName: String(bp.displayName || profileData.firstName || (profileData.email?.split('@')[0]) || ''),
         bio: String(bp.bio || ''),
@@ -152,7 +155,7 @@ const ProfileEditor: React.FC = () => {
           : (typeof bp.expertise === 'string' && bp.expertise 
              ? (bp.expertise as string).split(', ').filter((e: string) => e.trim())
              : []),
-        avatar: String(bp.avatar || ''),
+        avatar: String(avatarFallback),
         social: {
           facebook: String(bp.social?.facebook || ''),
           tiktok: String(bp.social?.tiktok || ''),
@@ -170,14 +173,14 @@ const ProfileEditor: React.FC = () => {
       setFormData(newFormData);
     } else if (profileData && !profileData.blogProfile) {
       console.log('⚠️ [ProfileEditor] No hay blogProfile, usando valores por defecto');
-      // Usar valores por defecto del usuario
+      // Usar valores por defecto del usuario con avatar de Clerk
       const defaultFormData = {
         displayName: String(user?.firstName || (user?.primaryEmailAddress?.emailAddress?.split('@')[0]) || ''),
         bio: '',
         location: '',
         website: '',
         expertise: [],
-        avatar: '',
+        avatar: String(user?.imageUrl || ''),
         social: {
           facebook: '',
           tiktok: '',
