@@ -87,19 +87,19 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       // Solo ADMIN, MODERATOR, SUPER_ADMIN
     },
     {
-      name: 'CRM',
-      icon: '💼',
+      name: 'Solicitudes',
+      icon: '📝',
       path: '/dashboard/crm',
-      description: 'Gestión de leads',
+      description: 'Gestión de solicitudes',
       permission: Permission.MANAGE_CONTENT,
       adminOnly: true,
-      // Solo roles administrativos - CRM para gestión de clientes potenciales
+      // Solo roles administrativos - Sistema de gestión de solicitudes
     },
     {
-      name: 'Mensajería',
+      name: 'Mensajes',
       icon: '💬',
       path: '/dashboard/crm/messages',
-      description: 'Sistema de mensajería CRM',
+      description: 'Mensajes de solicitudes',
       permission: Permission.MANAGE_CONTENT,
       adminOnly: true,
     },
@@ -163,13 +163,6 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       path: '/dashboard/settings',
       description: 'Ajustes de la cuenta',
       // Todos pueden configurar su cuenta
-    },
-    {
-      name: 'Ayuda',
-      icon: '❓',
-      path: '/dashboard/help',
-      description: 'Centro de ayuda',
-      // Todos pueden acceder a ayuda
     }
   ];
 

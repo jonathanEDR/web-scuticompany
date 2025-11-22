@@ -275,14 +275,28 @@ const LeadsManagement: React.FC = () => {
                 className="px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">📊 Todos los estados</option>
-                <option value="nuevo">🆕 Nuevo</option>
-                <option value="contactado">📞 Contactado</option>
-                <option value="calificado">✅ Calificado</option>
-                <option value="propuesta">📋 Propuesta</option>
-                <option value="negociacion">🤝 Negociación</option>
-                <option value="ganado">🎯 Ganado</option>
-                <option value="perdido">❌ Perdido</option>
-                <option value="pausado">⏸️ Pausado</option>
+                <optgroup label="📍 Estados Activos">
+                  <option value="nuevo">📝 Nueva</option>
+                  <option value="en_revision">👀 En Revisión</option>
+                  <option value="contactando">📞 Contactando</option>
+                  <option value="cotizacion">💰 Cotización</option>
+                  <option value="aprobado">✅ Aprobado</option>
+                  <option value="en_desarrollo">🚀 En Desarrollo</option>
+                </optgroup>
+                <optgroup label="✅ Estados Finales">
+                  <option value="completado">✨ Completado</option>
+                  <option value="rechazado">❌ Rechazado</option>
+                  <option value="cancelado">🚫 Cancelado</option>
+                </optgroup>
+                <optgroup label="📦 Estados Legacy">
+                  <option value="contactado">📞 Contactado (Legacy)</option>
+                  <option value="calificado">✅ Calificado (Legacy)</option>
+                  <option value="propuesta">📋 Propuesta (Legacy)</option>
+                  <option value="negociacion">🤝 Negociación (Legacy)</option>
+                  <option value="ganado">🎯 Ganado (Legacy)</option>
+                  <option value="perdido">❌ Perdido (Legacy)</option>
+                  <option value="pausado">⏸️ Pausado (Legacy)</option>
+                </optgroup>
               </select>
 
               {/* Filtro Prioridad */}

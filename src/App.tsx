@@ -1,5 +1,5 @@
 ﻿import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClerkProvider, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -44,17 +44,16 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 // Páginas del dashboard - Con autenticación
 const Profile = lazy(() => import('./pages/dashboard/Profile'));
-const Services = lazy(() => import('./pages/Services'));
 const Settings = lazy(() => import('./pages/Settings'));
 const LeadsManagement = lazy(() => import('./pages/admin/LeadsManagement'));
 // Página de mensajería CRM (admin)
 const CrmMessages = lazy(() => import('./pages/admin/CrmMessages'));
-const Help = lazy(() => import('./pages/Help'));
 const CmsManager = lazy(() => import('./pages/CmsManager'));
 const MediaLibrary = lazy(() => import('./pages/MediaLibrary'));
 
 // Páginas administrativas
 const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
+const UserRoleManagement = lazy(() => import('./pages/admin/UserRoleManagement'));
 
 // Páginas demo
 const NotificationDemo = lazy(() => import('./pages/demo/NotificationDemo'));
@@ -67,8 +66,8 @@ const ServicioForm = lazy(() => import('./pages/admin/ServicioFormV3'));
 
 // Páginas del Portal Cliente
 const ClientPortal = lazy(() => import('./pages/client/ClientPortal'));
-const MyLeads = lazy(() => import('./pages/client/MyLeads'));
 const MyMessages = lazy(() => import('./pages/client/MyMessages'));
+const MySolicitudes = lazy(() => import('./pages/client/MySolicitudes'));
 
 // Módulo de Blog - Páginas Públicas
 const BlogHome = lazy(() => import('./pages/public/blog/BlogHome'));
@@ -194,13 +193,9 @@ function AppContent() {
                 </DashboardRoute>
               } />
 
-              {/* 📊 Mis Proyectos/Leads */}
+              {/* 📋 Redirección de ruta antigua "leads" a nueva "solicitudes" */}
               <Route path="/dashboard/client/leads" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
-                    <MyLeads />
-                  </RoleBasedRoute>
-                </DashboardRoute>
+                <Navigate to="/dashboard/client/solicitudes" replace />
               } />
 
               {/* 💬 Mis Mensajes */}
@@ -208,6 +203,15 @@ function AppContent() {
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
                     <MyMessages />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 📋 Mis Solicitudes con Timeline */}
+              <Route path="/dashboard/client/solicitudes" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.USER, UserRole.CLIENT]}>
+                    <MySolicitudes />
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -228,24 +232,10 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* Servicios - Accesible para todos */}
-              <Route path="/dashboard/services" element={
-                <DashboardRoute>
-                  <Services />
-                </DashboardRoute>
-              } />
-              
               {/* Configuración - Accesible para todos */}
               <Route path="/dashboard/settings" element={
                 <DashboardRoute>
                   <Settings />
-                </DashboardRoute>
-              } />
-              
-              {/* Ayuda - Accesible para todos */}
-              <Route path="/dashboard/help" element={
-                <DashboardRoute>
-                  <Help />
                 </DashboardRoute>
               } />
               
@@ -480,6 +470,15 @@ function AppContent() {
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
                     <UsersManagement />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 🎯 Gestión de Roles y Promociones - Solo ADMIN y SUPER_ADMIN */}
+              <Route path="/dashboard/admin/user-roles" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <UserRoleManagement />
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />

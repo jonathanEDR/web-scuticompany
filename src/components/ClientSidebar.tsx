@@ -35,16 +35,10 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
       description: 'Panel principal'
     },
     {
-      name: 'Mis Proyectos',
-      icon: '📊',
-      path: '/dashboard/client/leads',
-      description: 'Ver mis proyectos'
-    },
-    {
       name: 'Mensajes',
       icon: '💬',
       path: '/dashboard/client/messages',
-      description: 'Comunicación con el equipo'
+      description: 'Comunicación y solicitudes'
     },
     {
       name: 'Mi Actividad',
@@ -57,12 +51,6 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
       icon: '👤',
       path: '/dashboard/profile',
       description: 'Tu información'
-    },
-    {
-      name: 'Ayuda',
-      icon: '❓',
-      path: '/dashboard/help',
-      description: 'Centro de ayuda'
     }
   ];
 
@@ -112,37 +100,66 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
                       />
                     </div>
                   </div>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="text-white hover:bg-white/20 rounded-lg p-1.5 transition-colors"
-                    title="Contraer sidebar"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                    </svg>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {/* Botón Cerrar Sesión compacto */}
+                    <SignOutButton>
+                      <button
+                        className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-1.5 transition-all duration-200"
+                        title="Cerrar Sesión"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                      </button>
+                    </SignOutButton>
+                    {/* Botón contraer */}
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-1.5 transition-all duration-200"
+                      title="Contraer sidebar"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Indicador de sesión activa + Badge de Rol */}
+                {/* Panel de Usuario mejorado */}
                 <div className="bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-lg p-3 border border-white/30 dark:border-white/20 shadow-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-white text-xs">
-                        Panel de Usuario
-                      </p>
-                      <p className="text-xs text-blue-50 opacity-80">
-                        Sesión Activa
-                      </p>
-                    </div>
-                  </div>
-                  {/* Badge de Rol */}
-                  {role && (
-                    <div className="flex items-center justify-between pt-2 border-t border-white/20">
-                      <span className="text-xs text-white/80">Tu rol:</span>
-                      <RoleBadge role={role} size="sm" />
+                  {/* Información del usuario */}
+                  {user && (
+                    <div className="flex items-center gap-3 mb-3">
+                      {user.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt="Tu foto"
+                          className="w-12 h-12 rounded-full object-cover border-2 border-white/40 shadow-md"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center text-white font-bold border-2 border-white/40 shadow-md">
+                          {(user.firstName || user.email).charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">
+                          {user.firstName || user.email.split('@')[0]}
+                        </p>
+                        <p className="text-xs text-white/70 truncate">
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
                   )}
+
+                  {/* Status y Badge de Rol */}
+                  <div className="flex items-center justify-between pt-3 border-t border-white/20">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+                      <span className="text-xs text-white/80 font-medium">Sesión Activa</span>
+                    </div>
+                    {role && <RoleBadge role={role} size="sm" />}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -157,7 +174,20 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                   </svg>
                 </button>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+                
+                {/* Botón Cerrar Sesión en modo colapsado */}
+                <SignOutButton>
+                  <button
+                    className="text-white/80 hover:text-white hover:bg-red-500/20 rounded-lg p-1.5 transition-all duration-200"
+                    title="Cerrar Sesión"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </button>
+                </SignOutButton>
+                
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg mt-2"></div>
               </div>
             )}
           </div>
@@ -206,33 +236,6 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
                   );
                 })}
               </div>
-
-              {/* Información del usuario */}
-              {user && (
-                <div className="mt-6 p-3 bg-slate-100/50 dark:bg-gray-800/50 rounded-lg border border-slate-200/50 dark:border-gray-700/50">
-                  <div className="flex items-center gap-3">
-                    {user.profileImage ? (
-                      <img
-                        src={user.profileImage}
-                        alt="Tu foto"
-                        className="w-10 h-10 rounded-full object-cover border-2 border-slate-300 dark:border-gray-600"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                        {(user.firstName || user.email).charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
-                        {user.firstName || user.email.split('@')[0]}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-gray-400 truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             // Navegación colapsada (solo iconos)
@@ -264,51 +267,21 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
           )}
         </nav>
 
-        {/* Footer con Theme Toggle y Cerrar Sesión */}
+        {/* Footer con Theme Toggle */}
         <div className="bg-slate-100/80 dark:bg-gray-950/80 backdrop-blur-sm border-t border-slate-200/80 dark:border-gray-700/80 transition-colors duration-300">
           {isOpen ? (
             // Footer expandido
-            <div className="p-3 space-y-2">
-              {/* Theme Toggle */}
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-medium text-slate-600 dark:text-gray-400">Apariencia</span>
-                <ThemeToggle />
-              </div>
-
-              <SignOutButton>
-                <button
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white hover:from-red-600 hover:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800 transition-all duration-200 font-medium shadow-lg shadow-red-500/20 hover:shadow-red-500/40 hover:scale-[1.01]"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  <span className="text-sm">Cerrar Sesión</span>
-                </button>
-              </SignOutButton>
-
-              <div className="text-center">
+            <div className="p-3 flex items-center justify-between gap-2">
+              <div className="flex-1 text-left">
                 <p className="text-xs text-slate-500 dark:text-gray-400 font-medium">Web Scuti v1.0.0</p>
                 <p className="text-xs text-slate-400 dark:text-gray-500">© 2025</p>
               </div>
+              <ThemeToggle />
             </div>
           ) : (
             // Footer colapsado
-            <div className="p-1.5 space-y-1.5">
-              {/* Theme Toggle */}
-              <div className="flex justify-center">
-                <ThemeToggle />
-              </div>
-
-              <SignOutButton>
-                <button
-                  className="w-full flex items-center justify-center p-2.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white hover:from-red-600 hover:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800 transition-all duration-200 shadow-lg hover:scale-105"
-                  title="Cerrar Sesión"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </button>
-              </SignOutButton>
+            <div className="p-2 flex justify-center">
+              <ThemeToggle />
             </div>
           )}
         </div>

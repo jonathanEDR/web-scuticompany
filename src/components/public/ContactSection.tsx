@@ -197,6 +197,10 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
   // Obtener imagen de fondo según el tema actual
   const currentBackground = data?.backgroundImage?.[currentTheme === 'light' ? 'light' : 'dark'];
 
+  // Obtener datos del usuario para auto-relleno
+  const userEmail = user?.email;
+  const userName = user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
+
   // Usar hook del formulario
   const {
     formData,
@@ -208,7 +212,8 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
     errorMessage,
     handleChange,
     handleSubmit: originalHandleSubmit,
-  } = useContactForm();
+    isUserAuthenticated,
+  } = useContactForm(undefined, userEmail, userName);
 
   // Obtener estilos según el tema activo
   const currentStyles = data?.styles?.[currentTheme === 'light' ? 'light' : 'dark'];
@@ -353,37 +358,51 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
             }}
           >
           <form id="formulario" onSubmit={handleFormSubmit} className="space-y-4">
-            {/* Campo: Nombre */}
-            <div>
-              <label 
-                htmlFor="nombre"
-                className="block text-xs font-medium mb-1"
-                style={{ color: currentStyles?.labelColor || '#374151' }}
-              >
-                {data?.fields?.nombreLabel || 'Nombre'}
-                {data?.fields?.nombreRequired && <span className="text-red-500 ml-1">*</span>}
-              </label>
-              <input
-                type="text"
-                id="nombre"
-                value={formData.nombre}
-                onChange={(e) => handleChange('nombre', e.target.value)}
-                placeholder={data?.fields?.nombrePlaceholder || 'Tu nombre completo'}
-                required={data?.fields?.nombreRequired}
-                disabled={isLoading || isSuccess}
-                className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
-                style={{
-                  background: currentStyles?.inputBackground || '#ffffff',
-                  border: `1px solid ${errors.nombre ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
-                  color: currentStyles?.inputText || '#1f2937',
-                }}
-              />
-              {errors.nombre && (
-                <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
-                  {errors.nombre}
+            {/* Mensaje de usuario autenticado */}
+            {isUserAuthenticated && (
+              <div className="mb-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-700/50">
+                <p className="text-xs text-green-800 dark:text-green-200 flex items-center gap-2">
+                  <span className="text-base">✓</span>
+                  <span>
+                    Sesión iniciada como <strong>{userName}</strong>
+                  </span>
                 </p>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Campo: Nombre - Solo visible si NO está autenticado */}
+            {!isUserAuthenticated && (
+              <div>
+                <label 
+                  htmlFor="nombre"
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: currentStyles?.labelColor || '#374151' }}
+                >
+                  {data?.fields?.nombreLabel || 'Nombre'}
+                  {data?.fields?.nombreRequired && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                <input
+                  type="text"
+                  id="nombre"
+                  value={formData.nombre}
+                  onChange={(e) => handleChange('nombre', e.target.value)}
+                  placeholder={data?.fields?.nombrePlaceholder || 'Tu nombre completo'}
+                  required={data?.fields?.nombreRequired}
+                  disabled={isLoading || isSuccess}
+                  className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
+                  style={{
+                    background: currentStyles?.inputBackground || '#ffffff',
+                    border: `1px solid ${errors.nombre ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
+                    color: currentStyles?.inputText || '#1f2937',
+                  }}
+                />
+                {errors.nombre && (
+                  <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                    {errors.nombre}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Campo: Celular */}
             <div>
@@ -417,37 +436,39 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
               )}
             </div>
 
-            {/* Campo: Correo */}
-            <div>
-              <label 
-                htmlFor="correo"
-                className="block text-xs font-medium mb-1"
-                style={{ color: currentStyles?.labelColor || '#374151' }}
-              >
-                {data?.fields?.correoLabel || 'Correo Electrónico'}
-                {data?.fields?.correoRequired && <span className="text-red-500 ml-1">*</span>}
-              </label>
-              <input
-                type="email"
-                id="correo"
-                value={formData.correo}
-                onChange={(e) => handleChange('correo', e.target.value)}
-                placeholder={data?.fields?.correoPlaceholder || 'tu@email.com'}
-                required={data?.fields?.correoRequired}
-                disabled={isLoading || isSuccess}
-                className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
-                style={{
-                  background: currentStyles?.inputBackground || '#ffffff',
-                  border: `1px solid ${errors.correo ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
-                  color: currentStyles?.inputText || '#1f2937',
-                }}
-              />
-              {errors.correo && (
-                <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
-                  {errors.correo}
-                </p>
-              )}
-            </div>
+            {/* Campo: Correo - Solo visible si NO está autenticado */}
+            {!isUserAuthenticated && (
+              <div>
+                <label 
+                  htmlFor="correo"
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: currentStyles?.labelColor || '#374151' }}
+                >
+                  {data?.fields?.correoLabel || 'Correo Electrónico'}
+                  {data?.fields?.correoRequired && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                <input
+                  type="email"
+                  id="correo"
+                  value={formData.correo}
+                  onChange={(e) => handleChange('correo', e.target.value)}
+                  placeholder={data?.fields?.correoPlaceholder || 'tu@email.com'}
+                  required={data?.fields?.correoRequired}
+                  disabled={isLoading || isSuccess}
+                  className="w-full px-3 py-2 text-sm rounded-md transition-all duration-300 outline-none focus:ring-2"
+                  style={{
+                    background: currentStyles?.inputBackground || '#ffffff',
+                    border: `1px solid ${errors.correo ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
+                    color: currentStyles?.inputText || '#1f2937',
+                  }}
+                />
+                {errors.correo && (
+                  <p className="mt-1 text-xs" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                    {errors.correo}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Campo: Categoría de Interés (opcional) */}
             {data?.fields?.categoriaEnabled && categorias.length > 0 && (

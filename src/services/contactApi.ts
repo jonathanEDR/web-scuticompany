@@ -45,15 +45,39 @@ export interface CategoriasResponse {
 }
 
 /**
- * Enviar mensaje de contacto (público, sin autenticación)
+ * Enviar mensaje de contacto (público o autenticado)
+ * Si el usuario está autenticado, incluye el token para vincular automáticamente
  */
 export const submitContact = async (data: ContactFormData): Promise<ContactResponse> => {
   try {
+    // Intentar obtener el token de autenticación de Clerk
+    let authToken: string | null = null;
+    
+    // Verificar si window.Clerk está disponible (autenticación con Clerk)
+    if (typeof window !== 'undefined' && (window as any).Clerk) {
+      try {
+        const session = await (window as any).Clerk.session;
+        if (session) {
+          authToken = await session.getToken();
+        }
+      } catch (error) {
+        console.warn('No se pudo obtener token de Clerk:', error);
+      }
+    }
+
+    // Construir headers
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Agregar token si está disponible
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
     const response = await fetch(`${API_URL}/contact`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(data),
     });
 

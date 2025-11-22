@@ -98,6 +98,10 @@ export const ContactModal: React.FC<ContactModalProps> = ({
   // Hook para obtener categorías y mapeo dinámico
   const { mapearCategoria } = useCategoriasTipoServicio();
 
+  // Obtener datos del usuario para auto-relleno
+  const userEmail = user?.email;
+  const userName = user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
+
   // Usar hook del formulario para cotización
   const {
     formData,
@@ -111,11 +115,12 @@ export const ContactModal: React.FC<ContactModalProps> = ({
     handleSubmit: originalHandleSubmit,
     resetForm,
     initializeMessage,
+    isUserAuthenticated,
   } = useQuoteForm(() => {
     setTimeout(() => {
       onClose();
     }, 2000);
-  });
+  }, userEmail, userName);
 
   // INTERCEPTOR DEL FORMULARIO
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -245,37 +250,51 @@ export const ContactModal: React.FC<ContactModalProps> = ({
 
           {/* Formulario */}
           <form onSubmit={handleFormSubmit} className="space-y-4">
-            {/* Campo: Nombre */}
-            <div>
-              <label 
-                htmlFor="modal-nombre"
-                className="block text-sm font-medium mb-2"
-                style={{ color: currentStyles?.labelColor || '#374151' }}
-              >
-                {data?.fields?.nombreLabel || 'Nombre'}
-                {(data?.fields?.nombreRequired !== false) && <span className="text-red-500 ml-1">*</span>}
-              </label>
-              <input
-                type="text"
-                id="modal-nombre"
-                value={formData.nombre}
-                onChange={(e) => handleChange('nombre', e.target.value)}
-                placeholder={data?.fields?.nombrePlaceholder || 'Tu nombre completo'}
-                required={data?.fields?.nombreRequired !== false}
-                disabled={isLoading || isSuccess}
-                className="w-full px-4 py-3 text-sm rounded-lg transition-all duration-300 outline-none focus:ring-2 focus:ring-purple-500"
-                style={{
-                  background: currentStyles?.inputBackground || '#ffffff',
-                  border: `1px solid ${errors.nombre ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
-                  color: currentStyles?.inputText || '#1f2937',
-                }}
-              />
-              {errors.nombre && (
-                <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
-                  {errors.nombre}
+            {/* Mensaje de usuario autenticado */}
+            {isUserAuthenticated && (
+              <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-700/50">
+                <p className="text-sm text-green-800 dark:text-green-200 flex items-center gap-2">
+                  <span className="text-lg">✓</span>
+                  <span>
+                    Sesión iniciada como <strong>{userName}</strong>
+                  </span>
                 </p>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Campo: Nombre - Solo visible si NO está autenticado */}
+            {!isUserAuthenticated && (
+              <div>
+                <label 
+                  htmlFor="modal-nombre"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentStyles?.labelColor || '#374151' }}
+                >
+                  {data?.fields?.nombreLabel || 'Nombre'}
+                  {(data?.fields?.nombreRequired !== false) && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                <input
+                  type="text"
+                  id="modal-nombre"
+                  value={formData.nombre}
+                  onChange={(e) => handleChange('nombre', e.target.value)}
+                  placeholder={data?.fields?.nombrePlaceholder || 'Tu nombre completo'}
+                  required={data?.fields?.nombreRequired !== false}
+                  disabled={isLoading || isSuccess}
+                  className="w-full px-4 py-3 text-sm rounded-lg transition-all duration-300 outline-none focus:ring-2 focus:ring-purple-500"
+                  style={{
+                    background: currentStyles?.inputBackground || '#ffffff',
+                    border: `1px solid ${errors.nombre ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
+                    color: currentStyles?.inputText || '#1f2937',
+                  }}
+                />
+                {errors.nombre && (
+                  <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                    {errors.nombre}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Campo: Celular */}
             <div>
@@ -309,37 +328,39 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               )}
             </div>
 
-            {/* Campo: Correo */}
-            <div>
-              <label 
-                htmlFor="modal-correo"
-                className="block text-sm font-medium mb-2"
-                style={{ color: currentStyles?.labelColor || '#374151' }}
-              >
-                {data?.fields?.correoLabel || 'Correo Electrónico'}
-                {(data?.fields?.correoRequired !== false) && <span className="text-red-500 ml-1">*</span>}
-              </label>
-              <input
-                type="email"
-                id="modal-correo"
-                value={formData.correo}
-                onChange={(e) => handleChange('correo', e.target.value)}
-                placeholder={data?.fields?.correoPlaceholder || 'tu@email.com'}
-                required={data?.fields?.correoRequired !== false}
-                disabled={isLoading || isSuccess}
-                className="w-full px-4 py-3 text-sm rounded-lg transition-all duration-300 outline-none focus:ring-2 focus:ring-purple-500"
-                style={{
-                  background: currentStyles?.inputBackground || '#ffffff',
-                  border: `1px solid ${errors.correo ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
-                  color: currentStyles?.inputText || '#1f2937',
-                }}
-              />
-              {errors.correo && (
-                <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
-                  {errors.correo}
-                </p>
-              )}
-            </div>
+            {/* Campo: Correo - Solo visible si NO está autenticado */}
+            {!isUserAuthenticated && (
+              <div>
+                <label 
+                  htmlFor="modal-correo"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentStyles?.labelColor || '#374151' }}
+                >
+                  {data?.fields?.correoLabel || 'Correo Electrónico'}
+                  {(data?.fields?.correoRequired !== false) && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                <input
+                  type="email"
+                  id="modal-correo"
+                  value={formData.correo}
+                  onChange={(e) => handleChange('correo', e.target.value)}
+                  placeholder={data?.fields?.correoPlaceholder || 'tu@email.com'}
+                  required={data?.fields?.correoRequired !== false}
+                  disabled={isLoading || isSuccess}
+                  className="w-full px-4 py-3 text-sm rounded-lg transition-all duration-300 outline-none focus:ring-2 focus:ring-purple-500"
+                  style={{
+                    background: currentStyles?.inputBackground || '#ffffff',
+                    border: `1px solid ${errors.correo ? '#ef4444' : currentStyles?.inputBorder || '#e5e7eb'}`,
+                    color: currentStyles?.inputText || '#1f2937',
+                  }}
+                />
+                {errors.correo && (
+                  <p className="mt-1 text-sm" style={{ color: currentStyles?.errorColor || '#ef4444' }}>
+                    {errors.correo}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Campo: Mensaje */}
             <div>

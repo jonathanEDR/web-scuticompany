@@ -54,12 +54,12 @@ export default function MyComments() {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
             <div className="flex gap-4">
               <div className="flex-1 space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-20 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
               </div>
             </div>
           </div>
@@ -70,9 +70,9 @@ export default function MyComments() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p className="text-red-800 font-medium">Error al cargar comentarios</p>
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+        <p className="text-red-800 dark:text-red-200 font-medium">Error al cargar comentarios</p>
+        <p className="text-red-600 dark:text-red-400 text-sm mt-1">{error}</p>
       </div>
     );
   }
@@ -80,10 +80,10 @@ export default function MyComments() {
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">Filtrar por:</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por:</span>
             <div className="flex gap-2">
               {(['all', 'approved', 'pending', 'rejected'] as StatusFilter[]).map((status) => (
                 <button
@@ -95,7 +95,7 @@ export default function MyComments() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     statusFilter === status
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   {status === 'all' ? 'Todos' : 
@@ -107,7 +107,7 @@ export default function MyComments() {
           </div>
           
           {pagination && (
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
               {pagination.total} comentario{pagination.total !== 1 ? 's' : ''}
             </span>
           )}
@@ -116,10 +116,10 @@ export default function MyComments() {
 
       {/* Comments List */}
       {comments.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
-          <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">No tienes comentarios</p>
-          <p className="text-gray-500 text-sm mt-1">
+        <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
+          <MessageSquare className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400 font-medium">No tienes comentarios</p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
             {statusFilter === 'all' 
               ? 'Empieza a participar en el blog'
               : `No hay comentarios ${statusFilter === 'approved' ? 'aprobados' : statusFilter === 'pending' ? 'pendientes' : 'rechazados'}`
@@ -131,13 +131,13 @@ export default function MyComments() {
           {comments.map((comment) => (
             <div 
               key={comment._id}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex-1">
                   <Link
                     to={`/blog/${comment.post.slug}`}
-                    className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                    className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
                     {comment.post.title}
                   </Link>
@@ -152,7 +152,7 @@ export default function MyComments() {
                       {comment.post.category.name}
                     </span>
                     {getStatusBadge(comment.status)}
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {new Date(comment.createdAt).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
@@ -165,14 +165,14 @@ export default function MyComments() {
                 <div className="flex gap-2">
                   <Link
                     to={`/blog/${comment.post.slug}#comment-${comment._id}`}
-                    className="p-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors"
                     title="Ver comentario"
                   >
                     <Eye className="w-5 h-5" />
                   </Link>
                   <button
                     onClick={() => handleDelete(comment._id)}
-                    className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-colors"
                     title="Eliminar comentario"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -180,13 +180,13 @@ export default function MyComments() {
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-gray-700 leading-relaxed">{comment.content}</p>
+              <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{comment.content}</p>
               </div>
 
               {comment.replies && comment.replies.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600 font-medium mb-2">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mb-2">
                     {comment.replies.length} respuesta{comment.replies.length !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -202,17 +202,17 @@ export default function MyComments() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Anterior
           </button>
-          <span className="px-4 py-2 text-gray-700">
+          <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
             Página {page} de {pagination.pages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
             disabled={page === pagination.pages}
-            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Siguiente
           </button>

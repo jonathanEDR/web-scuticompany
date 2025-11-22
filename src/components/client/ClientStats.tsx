@@ -44,23 +44,23 @@ export default function ClientStats({ stats, isLoading, className = '' }: Client
 
   const statsConfig = [
     {
-      icon: '📊',
-      label: 'Total Proyectos',
+      icon: '📋',
+      label: 'Total Solicitudes',
       value: stats.totalLeads,
       color: 'border-blue-500',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
       textColor: 'text-blue-600 dark:text-blue-400',
-      action: () => navigate('/dashboard/client/leads'),
-      actionLabel: 'Ver todos',
+      action: () => navigate('/dashboard/client/solicitudes'),
+      actionLabel: 'Ver todas',
     },
     {
       icon: '⚡',
-      label: 'Proyectos Activos',
+      label: 'Solicitudes Activas',
       value: stats.activeLeads,
       color: 'border-green-500',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
       textColor: 'text-green-600 dark:text-green-400',
-      action: () => navigate('/dashboard/client/leads'),
+      action: () => navigate('/dashboard/client/solicitudes'),
       actionLabel: 'En progreso',
     },
     {

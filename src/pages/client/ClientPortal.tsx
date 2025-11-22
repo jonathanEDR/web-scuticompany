@@ -154,26 +154,26 @@ export default function ClientPortal() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-          {/* Total Proyectos */}
+          {/* Total Solicitudes */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-blue-500">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-3xl">📊</div>
+              <div className="text-3xl">📋</div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {stats.totalLeads}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Total Proyectos</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Total Solicitudes</div>
               </div>
             </div>
             <button
-              onClick={() => navigate('/dashboard/client/leads')}
+              onClick={() => navigate('/dashboard/client/solicitudes')}
               className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
             >
               Ver todos →
             </button>
           </div>
 
-          {/* Proyectos Activos */}
+          {/* Solicitudes Activas */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between mb-2">
               <div className="text-3xl">⚡</div>
@@ -181,7 +181,7 @@ export default function ClientPortal() {
                 <div className="text-3xl font-bold text-gray-900 dark:text-white">
                   {stats.activeLeads}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Proyectos Activos</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Solicitudes Activas</div>
               </div>
             </div>
             <div className="text-green-600 dark:text-green-400 text-sm font-medium">
@@ -211,28 +211,28 @@ export default function ClientPortal() {
 
         {/* Grid de Contenido */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Mis Proyectos Recientes */}
+          {/* Mis Solicitudes Recientes */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                📁 Mis Proyectos Recientes
+                📋 Mis Solicitudes Recientes
               </h2>
               <button
-                onClick={() => navigate('/dashboard/client/leads')}
+                onClick={() => navigate('/dashboard/client/solicitudes')}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
               >
-                Ver todos
+                Ver todas
               </button>
             </div>
 
             {leads.length === 0 ? (
               <div className="text-center py-12">
-                <div className="text-6xl mb-4">📭</div>
+                <div className="text-6xl mb-4">💭</div>
                 <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  No tienes proyectos activos
+                  No tienes solicitudes activas
                 </p>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
-                  Los proyectos aparecerán aquí cuando el equipo los cree
+                  Las solicitudes aparecerán aquí cuando el equipo las cree
                 </p>
               </div>
             ) : (
@@ -355,12 +355,12 @@ export default function ClientPortal() {
           <h2 className="text-2xl font-bold mb-4">🚀 Accesos Rápidos</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
-              onClick={() => navigate('/dashboard/client/leads')}
+              onClick={() => navigate('/dashboard/client/solicitudes')}
               className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg p-4 transition-all text-left"
             >
-              <div className="text-3xl mb-2">📊</div>
-              <div className="font-semibold">Mis Proyectos</div>
-              <div className="text-sm text-white/80">Ver todos los proyectos</div>
+              <div className="text-3xl mb-2">📋</div>
+              <div className="font-semibold">Mis Solicitudes</div>
+              <div className="text-sm text-white/80">Ver todas las solicitudes</div>
             </button>
 
             <button

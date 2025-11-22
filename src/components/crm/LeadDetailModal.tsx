@@ -356,17 +356,97 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   {/* Botones de cambio de estado según el estado actual */}
                   {onChangeStatus && (
                     <>
-                      {/* Si es nuevo, mostrar Contactar */}
+                      {/* FLUJO NUEVO: nuevo → en_revision → contactando → cotizacion → aprobado → en_desarrollo → completado */}
+                      
+                      {/* Si es nuevo, mostrar En Revisión */}
                       {lead.estado === 'nuevo' && (
                         <button
-                          onClick={() => handleChangeStatus('contactado')}
-                          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm"
+                          onClick={() => handleChangeStatus('en_revision')}
+                          className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors text-sm"
                         >
-                          � Marcar como Contactado
+                          👀 Marcar en Revisión
                         </button>
                       )}
 
-                      {/* Si está contactado, mostrar Calificar */}
+                      {/* Si está en revisión, mostrar Contactando */}
+                      {lead.estado === 'en_revision' && (
+                        <button
+                          onClick={() => handleChangeStatus('contactando')}
+                          className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-colors text-sm"
+                        >
+                          📞 Comenzar a Contactar
+                        </button>
+                      )}
+
+                      {/* Si está contactando, mostrar Enviar Cotización */}
+                      {lead.estado === 'contactando' && (
+                        <button
+                          onClick={() => handleChangeStatus('cotizacion')}
+                          className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors text-sm"
+                        >
+                          💰 Enviar Cotización
+                        </button>
+                      )}
+
+                      {/* Si hay cotización, mostrar Aprobar/Rechazar */}
+                      {lead.estado === 'cotizacion' && (
+                        <>
+                          <button
+                            onClick={() => handleChangeStatus('aprobado')}
+                            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors text-sm"
+                          >
+                            ✅ Marcar como Aprobado
+                          </button>
+                          <button
+                            onClick={() => handleChangeStatus('rechazado')}
+                            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm"
+                          >
+                            ❌ Marcar como Rechazado
+                          </button>
+                        </>
+                      )}
+
+                      {/* Si está aprobado, mostrar Iniciar Desarrollo */}
+                      {lead.estado === 'aprobado' && (
+                        <button
+                          onClick={() => handleChangeStatus('en_desarrollo')}
+                          className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm"
+                        >
+                          🚀 Iniciar Desarrollo
+                        </button>
+                      )}
+
+                      {/* Si está en desarrollo, mostrar Completar */}
+                      {lead.estado === 'en_desarrollo' && (
+                        <button
+                          onClick={() => handleChangeStatus('completado')}
+                          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors text-sm"
+                        >
+                          ✨ Marcar como Completado
+                        </button>
+                      )}
+
+                      {/* Botón para cancelar (excepto si ya está completado, rechazado o cancelado) */}
+                      {!['completado', 'rechazado', 'cancelado'].includes(lead.estado) && (
+                        <button
+                          onClick={() => handleChangeStatus('cancelado')}
+                          className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+                        >
+                          🚫 Cancelar Solicitud
+                        </button>
+                      )}
+
+                      {/* Si está rechazado o cancelado, permitir reactivar */}
+                      {(lead.estado === 'rechazado' || lead.estado === 'cancelado') && (
+                        <button
+                          onClick={() => handleChangeStatus('en_revision')}
+                          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm"
+                        >
+                          🔄 Reactivar Solicitud
+                        </button>
+                      )}
+
+                      {/* COMPATIBILIDAD CON ESTADOS LEGACY */}
                       {lead.estado === 'contactado' && (
                         <button
                           onClick={() => handleChangeStatus('calificado')}
@@ -376,17 +456,15 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                         </button>
                       )}
 
-                      {/* Si está calificado, mostrar Enviar Propuesta */}
                       {lead.estado === 'calificado' && (
                         <button
                           onClick={() => handleChangeStatus('propuesta')}
                           className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm"
                         >
-                          � Enviar Propuesta
+                          📋 Enviar Propuesta
                         </button>
                       )}
 
-                      {/* Si hay propuesta, mostrar Negociar */}
                       {lead.estado === 'propuesta' && (
                         <button
                           onClick={() => handleChangeStatus('negociacion')}
@@ -396,8 +474,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                         </button>
                       )}
 
-                      {/* Si está en negociación o cualquier estado activo, mostrar Ganado y Perdido */}
-                      {!['ganado', 'perdido', 'pausado'].includes(lead.estado) && (
+                      {!['ganado', 'perdido', 'pausado', 'completado', 'rechazado', 'cancelado'].includes(lead.estado) && (
                         <>
                           <button
                             onClick={() => handleChangeStatus('ganado')}
@@ -414,17 +491,6 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                         </>
                       )}
 
-                      {/* Botón para pausar (excepto si ya está pausado, ganado o perdido) */}
-                      {!['pausado', 'ganado', 'perdido'].includes(lead.estado) && (
-                        <button
-                          onClick={() => handleChangeStatus('pausado')}
-                          className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
-                        >
-                          ⏸️ Pausar Lead
-                        </button>
-                      )}
-
-                      {/* Si está pausado, permitir reactivar */}
                       {lead.estado === 'pausado' && (
                         <button
                           onClick={() => handleChangeStatus('contactado')}
@@ -434,7 +500,6 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                         </button>
                       )}
 
-                      {/* Si está perdido, permitir reabrir */}
                       {lead.estado === 'perdido' && (
                         <button
                           onClick={() => handleChangeStatus('contactado')}

@@ -472,8 +472,8 @@ const ProfileEditor: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <Loader className="w-8 h-8 animate-spin text-indigo-600 mx-auto mb-4" />
-          <p className="text-gray-600">Cargando perfil...</p>
+          <Loader className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Cargando perfil...</p>
         </div>
       </div>
     );
@@ -493,7 +493,7 @@ const ProfileEditor: React.FC = () => {
             <p className="text-indigo-100">Completa tu perfil para conectar mejor con la comunidad</p>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold ${getCompletenessColor(completeness.score)} bg-white rounded-lg px-3 py-2`}>
+            <div className={`text-2xl font-bold ${getCompletenessColor(completeness.score)} bg-white dark:bg-gray-800 rounded-lg px-3 py-2`}>
               {completeness.score}%
             </div>
             <p className="text-sm text-indigo-100 mt-1">Completado</p>
@@ -523,27 +523,27 @@ const ProfileEditor: React.FC = () => {
 
       {/* Notificación de Éxito */}
       {showSuccess && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-          <p className="text-green-800">{successMessage}</p>
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center">
+          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3" />
+          <p className="text-green-800 dark:text-green-200">{successMessage}</p>
         </div>
       )}
 
       {/* Errores Generales */}
       {errors.some(e => e.field === 'general') && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
-          <AlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0 mt-0.5" />
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start">
+          <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mr-3 flex-shrink-0 mt-0.5" />
           <div>
             {errors.filter(e => e.field === 'general').map((error, index) => (
-              <p key={index} className="text-red-800">{error.message}</p>
+              <p key={index} className="text-red-800 dark:text-red-200">{error.message}</p>
             ))}
           </div>
         </div>
       )}
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'basic', label: 'Información Básica', icon: User },
@@ -557,8 +557,8 @@ const ProfileEditor: React.FC = () => {
                   onClick={() => setActiveTab(tab.id as TabType)}
                   className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center transition-colors ${
                     activeTab === tab.id
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <Icon className="w-4 h-4 mr-2" />
@@ -584,21 +584,21 @@ const ProfileEditor: React.FC = () => {
                   size="lg"
                 />
                 <div className="flex-1 w-full">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Foto de Perfil</h3>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Foto de Perfil</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                     Sube una imagen para tu perfil. Se recomienda una imagen cuadrada de al menos 200x200px.
                   </p>
-                  <div className="flex flex-wrap gap-2 text-sm text-gray-500">
+                  <div className="flex flex-wrap gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <span className="flex items-center">
-                      <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                      <CheckCircle className="w-4 h-4 mr-1 text-green-500 dark:text-green-400" />
                       Drag & Drop
                     </span>
                     <span className="flex items-center">
-                      <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                      <CheckCircle className="w-4 h-4 mr-1 text-green-500 dark:text-green-400" />
                       JPG, PNG, WebP
                     </span>
                     <span className="flex items-center">
-                      <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                      <CheckCircle className="w-4 h-4 mr-1 text-green-500 dark:text-green-400" />
                       Máximo 5MB
                     </span>
                   </div>
@@ -607,7 +607,7 @@ const ProfileEditor: React.FC = () => {
 
               {/* Display Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <User className="inline w-4 h-4 mr-2" />
                   Nombre para mostrar *
                 </label>
@@ -615,19 +615,19 @@ const ProfileEditor: React.FC = () => {
                   type="text"
                   value={formData.displayName}
                   onChange={(e) => handleBasicChange('displayName', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('displayName') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('displayName') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="Tu nombre completo"
                 />
                 {getFieldError('displayName') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('displayName')}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getFieldError('displayName')}</p>
                 )}
               </div>
 
               {/* Bio */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Biografía
                 </label>
                 <textarea
@@ -635,24 +635,24 @@ const ProfileEditor: React.FC = () => {
                   onChange={(e) => handleBasicChange('bio', e.target.value)}
                   rows={4}
                   maxLength={500}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('bio') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('bio') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="Cuéntanos sobre ti..."
                 />
                 <div className="flex justify-between items-center mt-1">
                   {getFieldError('bio') ? (
-                    <p className="text-sm text-red-600">{getFieldError('bio')}</p>
+                    <p className="text-sm text-red-600 dark:text-red-400">{getFieldError('bio')}</p>
                   ) : (
-                    <p className="text-sm text-gray-500">Describe tu experiencia, intereses o lo que te hace único</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Describe tu experiencia, intereses o lo que te hace único</p>
                   )}
-                  <p className="text-sm text-gray-500">{formData.bio.length}/500</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{formData.bio.length}/500</p>
                 </div>
               </div>
 
               {/* Location */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <MapPin className="inline w-4 h-4 mr-2" />
                   Ubicación
                 </label>
@@ -660,19 +660,19 @@ const ProfileEditor: React.FC = () => {
                   type="text"
                   value={formData.location}
                   onChange={(e) => handleBasicChange('location', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('location') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('location') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="Ciudad, País"
                 />
                 {getFieldError('location') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('location')}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getFieldError('location')}</p>
                 )}
               </div>
 
               {/* Website */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Globe className="inline w-4 h-4 mr-2" />
                   Sitio Web
                 </label>
@@ -680,19 +680,19 @@ const ProfileEditor: React.FC = () => {
                   type="url"
                   value={formData.website}
                   onChange={(e) => handleBasicChange('website', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('website') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('website') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="https://tusitio.com"
                 />
                 {getFieldError('website') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('website')}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getFieldError('website')}</p>
                 )}
               </div>
 
               {/* Expertise */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Zap className="inline w-4 h-4 mr-2" />
                   Áreas de Especialización
                 </label>
@@ -700,13 +700,13 @@ const ProfileEditor: React.FC = () => {
                   {(formData.expertise || []).map(skill => (
                     <span
                       key={skill}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-800"
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300"
                     >
                       {skill}
                       <button
                         type="button"
                         onClick={() => handleExpertiseRemove(skill)}
-                        className="ml-2 hover:text-indigo-600"
+                        className="ml-2 hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -720,7 +720,7 @@ const ProfileEditor: React.FC = () => {
                       e.target.value = '';
                     }
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
                   <option value="">Selecciona una especialización</option>
                   {[
@@ -745,12 +745,12 @@ const ProfileEditor: React.FC = () => {
           {/* Tab: Redes Sociales */}
           {activeTab === 'social' && (
             <div className="space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-start">
-                  <Info className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="text-sm font-medium text-blue-800">Conecta tus Redes Sociales</h3>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">Conecta tus Redes Sociales</h3>
+                    <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
                       Permite que otros te encuentren y conecten contigo en diferentes plataformas.
                     </p>
                   </div>
@@ -759,7 +759,7 @@ const ProfileEditor: React.FC = () => {
 
               {/* Facebook */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Facebook className="inline w-4 h-4 mr-2" />
                   Facebook
                 </label>
@@ -767,19 +767,19 @@ const ProfileEditor: React.FC = () => {
                   type="text"
                   value={formData.social.facebook}
                   onChange={(e) => handleSocialChange('facebook', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('social.facebook') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('social.facebook') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="usuario o facebook.com/usuario"
                 />
                 {getFieldError('social.facebook') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.facebook')}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getFieldError('social.facebook')}</p>
                 )}
               </div>
 
               {/* GitHub */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Github className="inline w-4 h-4 mr-2" />
                   GitHub
                 </label>
@@ -787,19 +787,19 @@ const ProfileEditor: React.FC = () => {
                   type="text"
                   value={formData.social.github}
                   onChange={(e) => handleSocialChange('github', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('social.github') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('social.github') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="usuario"
                 />
                 {getFieldError('social.github') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.github')}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getFieldError('social.github')}</p>
                 )}
               </div>
 
               {/* LinkedIn */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Linkedin className="inline w-4 h-4 mr-2" />
                   LinkedIn
                 </label>
@@ -807,19 +807,19 @@ const ProfileEditor: React.FC = () => {
                   type="text"
                   value={formData.social.linkedin}
                   onChange={(e) => handleSocialChange('linkedin', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('social.linkedin') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('social.linkedin') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="in/usuario"
                 />
                 {getFieldError('social.linkedin') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.linkedin')}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getFieldError('social.linkedin')}</p>
                 )}
               </div>
 
               {/* TikTok */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Music className="inline w-4 h-4 mr-2" />
                   TikTok
                 </label>
@@ -827,13 +827,13 @@ const ProfileEditor: React.FC = () => {
                   type="text"
                   value={formData.social.tiktok}
                   onChange={(e) => handleSocialChange('tiktok', e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    getFieldError('social.tiktok') ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getFieldError('social.tiktok') ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="@usuario"
                 />
                 {getFieldError('social.tiktok') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('social.tiktok')}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getFieldError('social.tiktok')}</p>
                 )}
               </div>
             </div>
@@ -842,12 +842,12 @@ const ProfileEditor: React.FC = () => {
           {/* Tab: Privacidad */}
           {activeTab === 'privacy' && (
             <div className="space-y-6">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
                 <div className="flex items-start">
-                  <Shield className="w-5 h-5 text-amber-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400 mr-3 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="text-sm font-medium text-amber-800">Configuración de Privacidad</h3>
-                    <p className="text-sm text-amber-700 mt-1">
+                    <h3 className="text-sm font-medium text-amber-800 dark:text-amber-300">Configuración de Privacidad</h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
                       Controla qué información es visible para otros usuarios.
                     </p>
                   </div>
@@ -855,13 +855,13 @@ const ProfileEditor: React.FC = () => {
               </div>
 
               {/* Perfil Público */}
-              <div className="flex items-start justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <Eye className="w-5 h-5 text-gray-600 mr-3" />
-                    <h3 className="text-sm font-medium text-gray-900">Perfil Público</h3>
+                    <Eye className="w-5 h-5 text-gray-600 dark:text-gray-400 mr-3" />
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Perfil Público</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1 ml-8">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 ml-8">
                     Permite que otros usuarios vean tu perfil en el directorio público
                   </p>
                 </div>
@@ -869,7 +869,7 @@ const ProfileEditor: React.FC = () => {
                   type="button"
                   onClick={() => handlePrivacyChange('isPublicProfile', !formData.privacy.isPublicProfile)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    formData.privacy.isPublicProfile ? 'bg-indigo-600' : 'bg-gray-200'
+                    formData.privacy.isPublicProfile ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
                   <span
@@ -881,13 +881,13 @@ const ProfileEditor: React.FC = () => {
               </div>
 
               {/* Mostrar Email */}
-              <div className="flex items-start justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <Mail className="w-5 h-5 text-gray-600 mr-3" />
-                    <h3 className="text-sm font-medium text-gray-900">Mostrar Email</h3>
+                    <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400 mr-3" />
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Mostrar Email</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1 ml-8">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 ml-8">
                     Permite que otros usuarios vean tu dirección de email
                   </p>
                 </div>
@@ -895,7 +895,7 @@ const ProfileEditor: React.FC = () => {
                   type="button"
                   onClick={() => handlePrivacyChange('showEmail', !formData.privacy.showEmail)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    formData.privacy.showEmail ? 'bg-indigo-600' : 'bg-gray-200'
+                    formData.privacy.showEmail ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
                   <span
@@ -907,13 +907,13 @@ const ProfileEditor: React.FC = () => {
               </div>
 
               {/* Permitir Comentarios */}
-              <div className="flex items-start justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <MessageSquare className="w-5 h-5 text-gray-600 mr-3" />
-                    <h3 className="text-sm font-medium text-gray-900">Permitir Comentarios</h3>
+                    <MessageSquare className="w-5 h-5 text-gray-600 dark:text-gray-400 mr-3" />
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Permitir Comentarios</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1 ml-8">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 ml-8">
                     Permite que otros usuarios comenten en tus artículos del blog
                   </p>
                 </div>
@@ -921,7 +921,7 @@ const ProfileEditor: React.FC = () => {
                   type="button"
                   onClick={() => handlePrivacyChange('allowComments', !formData.privacy.allowComments)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    formData.privacy.allowComments ? 'bg-indigo-600' : 'bg-gray-200'
+                    formData.privacy.allowComments ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
                   <span
@@ -935,7 +935,7 @@ const ProfileEditor: React.FC = () => {
           )}
 
           {/* Botones de Acción */}
-          <div className="flex gap-4 pt-6 border-t border-gray-200">
+          <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               type="submit"
               disabled={saving || !hasChanges}
@@ -958,7 +958,7 @@ const ProfileEditor: React.FC = () => {
               <button
                 type="button"
                 onClick={viewPublicProfile}
-                className="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center"
+                className="px-6 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center"
               >
                 <ExternalLink className="w-5 h-5 mr-2" />
                 Ver Perfil Público

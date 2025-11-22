@@ -53,7 +53,7 @@ export const WelcomeNotification: React.FC<WelcomeNotificationProps> = ({
             {/* Stats */}
             <div className="bg-white/10 rounded-lg p-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-blue-100">Proyecto creado:</span>
+                <span className="text-blue-100">Solicitud creada:</span>
                 <span className="text-white font-semibold">
                   {onboarding.leadCreated ? '✅ Sí' : '❌ No'}
                 </span>
@@ -68,7 +68,7 @@ export const WelcomeNotification: React.FC<WelcomeNotificationProps> = ({
               
               {onboarding.leadName && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-blue-100">Proyecto:</span>
+                  <span className="text-blue-100">Solicitud:</span>
                   <span className="text-white font-semibold truncate ml-2">
                     {onboarding.leadName}
                   </span>

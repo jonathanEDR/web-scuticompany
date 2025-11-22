@@ -302,29 +302,6 @@ export default function AdminDashboard() {
               </a>
             )}
 
-            {/* Servicios */}
-            <a
-              href="/dashboard/services"
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                  ⚙️
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Servicios
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Gestión de servicios
-                  </p>
-                </div>
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Administra los servicios disponibles en la plataforma.
-              </p>
-            </a>
-
             {/* Perfil */}
             <a
               href="/dashboard/profile"

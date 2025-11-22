@@ -29,9 +29,9 @@ const BlogSection = () => {
 
     const fetchRecentPosts = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
         const response = await fetch(
-          `${apiUrl}/api/blog/posts?limit=3&status=published&sort=-publishedAt`,
+          `${apiUrl}/blog/posts?limit=3&status=published&sort=-publishedAt`,
           { signal: controller.signal }
         );
         

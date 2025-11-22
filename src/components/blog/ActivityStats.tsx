@@ -20,13 +20,13 @@ export default function ActivityStats() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-pulse">
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="h-4 bg-gray-200 rounded w-24 mb-3"></div>
-                <div className="h-8 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-3"></div>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
               </div>
-              <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
+              <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
             </div>
           </div>
         ))}
@@ -36,17 +36,17 @@ export default function ActivityStats() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p className="text-red-800 font-medium">Error al cargar estadísticas</p>
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+        <p className="text-red-800 dark:text-red-200 font-medium">Error al cargar estadísticas</p>
+        <p className="text-red-600 dark:text-red-400 text-sm mt-1">{error}</p>
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
-        <p className="text-gray-600">No hay estadísticas disponibles</p>
+      <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
+        <p className="text-gray-600 dark:text-gray-400">No hay estadísticas disponibles</p>
       </div>
     );
   }
@@ -109,17 +109,17 @@ export default function ActivityStats() {
           return (
             <div 
               key={index}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600 mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                     {card.title}
                   </p>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white">
                     {card.isText ? card.value : `${card.value}${card.suffix || ''}`}
                   </p>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                     {card.description}
                   </p>
                 </div>
@@ -133,8 +133,8 @@ export default function ActivityStats() {
       </div>
 
       {/* Recent Activity Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Resumen de Actividad
         </h3>
         <div className="space-y-4">
@@ -160,9 +160,9 @@ export default function ActivityStats() {
       </div>
 
       {/* Achievements Section */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-blue-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Trophy className="w-6 h-6 text-yellow-500" />
+      <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <Trophy className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
           Logros Desbloqueados
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -171,13 +171,13 @@ export default function ActivityStats() {
               key={index}
               className={`text-center p-4 rounded-lg ${
                 achievement.unlocked 
-                  ? 'bg-white border-2 border-blue-200' 
-                  : 'bg-gray-100 opacity-50'
+                  ? 'bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-600' 
+                  : 'bg-gray-100 dark:bg-gray-800/50 opacity-50'
               }`}
             >
               <div className="text-3xl mb-2">{achievement.icon}</div>
-              <p className="text-sm font-medium text-gray-900">{achievement.title}</p>
-              <p className="text-xs text-gray-600 mt-1">{achievement.description}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{achievement.title}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{achievement.description}</p>
             </div>
           ))}
         </div>
@@ -204,10 +204,10 @@ function ActivityProgressBar({
   return (
     <div>
       <div className="flex justify-between text-sm mb-2">
-        <span className="font-medium text-gray-700">{label}</span>
-        <span className="text-gray-600">{current} / {goal}</span>
+        <span className="font-medium text-gray-700 dark:text-gray-300">{label}</span>
+        <span className="text-gray-600 dark:text-gray-400">{current} / {goal}</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
         <div 
           className={`${colorClasses.progress} h-2.5 rounded-full transition-all duration-500`}
           style={{ width: `${percentage}%` }}

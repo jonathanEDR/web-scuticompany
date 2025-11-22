@@ -31,13 +31,13 @@ export default function MyLikes() {
     return (
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
             <div className="flex gap-4">
-              <div className="w-32 h-32 bg-gray-200 rounded-lg flex-shrink-0"></div>
+              <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg flex-shrink-0"></div>
               <div className="flex-1 space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-16 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
               </div>
             </div>
           </div>
@@ -48,9 +48,9 @@ export default function MyLikes() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p className="text-red-800 font-medium">Error al cargar me gusta</p>
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+        <p className="text-red-800 dark:text-red-200 font-medium">Error al cargar me gusta</p>
+        <p className="text-red-600 dark:text-red-400 text-sm mt-1">{error}</p>
       </div>
     );
   }
@@ -59,16 +59,16 @@ export default function MyLikes() {
     <div className="space-y-6">
       {/* Header Stats */}
       {pagination && (
-        <div className="bg-gradient-to-r from-pink-50 to-red-50 rounded-lg border border-pink-200 p-6">
+        <div className="bg-gradient-to-r from-pink-50 to-red-50 dark:from-pink-900/20 dark:to-red-900/20 rounded-lg border border-pink-200 dark:border-pink-800/30 p-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-pink-100 rounded-lg">
-              <Heart className="w-6 h-6 text-pink-600 fill-current" />
+            <div className="p-3 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
+              <Heart className="w-6 h-6 text-pink-600 dark:text-pink-400 fill-current" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {pagination.total} Artículo{pagination.total !== 1 ? 's' : ''}
               </h3>
-              <p className="text-gray-600 text-sm">que te gustaron</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">que te gustaron</p>
             </div>
           </div>
         </div>
@@ -76,10 +76,10 @@ export default function MyLikes() {
 
       {/* Likes List */}
       {likes.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
-          <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">No has dado me gusta a ningún artículo</p>
-          <p className="text-gray-500 text-sm mt-1">
+        <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
+          <Heart className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400 font-medium">No has dado me gusta a ningún artículo</p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
             Explora el blog y marca tus favoritos
           </p>
         </div>
@@ -88,7 +88,7 @@ export default function MyLikes() {
           {likes.map((like) => (
             <article 
               key={like._id}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow group"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow group"
             >
               <div className="flex gap-6">
                 {/* Featured Image */}
@@ -122,21 +122,21 @@ export default function MyLikes() {
 
                   {/* Title */}
                   <Link to={`/blog/${like.slug}`}>
-                    <h3 className="text-xl font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
                       {like.title}
                     </h3>
                   </Link>
 
                   {/* Excerpt */}
                   {like.excerpt && (
-                    <p className="text-gray-600 line-clamp-2 mb-4">
+                    <p className="text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
                       {like.excerpt}
                     </p>
                   )}
 
                   {/* Meta */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center gap-1">
                         <User className="w-4 h-4" />
                         <span>{like.author?.name || 'Anónimo'}</span>
@@ -161,7 +161,7 @@ export default function MyLikes() {
 
                     <button
                       onClick={() => handleUnlike(like._id)}
-                      className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg transition-colors group/btn"
+                      className="p-2 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors group/btn"
                       title="Quitar me gusta"
                     >
                       <HeartOff className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
@@ -180,17 +180,17 @@ export default function MyLikes() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Anterior
           </button>
-          <span className="px-4 py-2 text-gray-700">
+          <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
             Página {page} de {pagination.pages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
             disabled={page === pagination.pages}
-            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Siguiente
           </button>

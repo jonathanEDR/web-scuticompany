@@ -39,6 +39,19 @@ export interface BlogPost {
   author: BlogAuthor | null; // Puede ser null si no tiene autor asignado
   tags: (string | BlogTag)[];
   stats: PostStats;
+  analytics?: {
+    views: number;
+    uniqueVisitors?: number;
+    likes: number;
+    shares?: {
+      facebook?: number;
+      twitter?: number;
+      linkedin?: number;
+      whatsapp?: number;
+    };
+    avgTimeOnPage?: number;
+    bounceRate?: number;
+  };
   seo: SEOMetadata;
   images?: PostImage[];
   version: number;

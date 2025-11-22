@@ -75,7 +75,25 @@ export interface Lead {
   descripcionProyecto: string;
   presupuestoEstimado?: number;
   fechaDeseada?: string;
-  estado: 'nuevo' | 'contactado' | 'calificado' | 'propuesta' | 'negociacion' | 'ganado' | 'perdido' | 'pausado';
+  estado: 
+    // Estados nuevos (orientados al cliente)
+    | 'nuevo'           // 📝 Solicitud recibida
+    | 'en_revision'     // 👀 En revisión del equipo
+    | 'contactando'     // 📞 Contactando al cliente
+    | 'cotizacion'      // 💰 Cotización enviada
+    | 'aprobado'        // ✅ Aprobado por el cliente
+    | 'en_desarrollo'   // 🚀 Trabajo en progreso
+    | 'completado'      // ✨ Trabajo completado
+    | 'rechazado'       // ❌ Rechazado por el cliente
+    | 'cancelado'       // 🚫 Cancelado
+    // Estados legacy (mantener compatibilidad)
+    | 'contactado'      // → Migrar a 'contactando'
+    | 'calificado'      // → Migrar a 'en_revision'
+    | 'propuesta'       // → Migrar a 'cotizacion'
+    | 'negociacion'     // → Migrar a 'cotizacion'
+    | 'ganado'          // → Migrar a 'aprobado'
+    | 'perdido'         // → Migrar a 'rechazado'
+    | 'pausado';        // → Migrar a 'en_revision'
   prioridad: 'baja' | 'media' | 'alta' | 'urgente';
   fechaProximoSeguimiento?: string;
   asignadoA?: {

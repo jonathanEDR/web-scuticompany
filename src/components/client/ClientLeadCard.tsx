@@ -72,7 +72,7 @@ export default function ClientLeadCard({
   };
 
   const handleViewDetails = () => {
-    navigate('/dashboard/client/leads', { state: { selectedLeadId: lead._id } });
+    navigate('/dashboard/client/solicitudes', { state: { selectedLeadId: lead._id } });
   };
 
   if (compact) {

@@ -10,19 +10,42 @@ import { getApiUrl } from './apiConfig';
  * Maneja tanto URLs absolutas (Cloudinary) como relativas (servidor local)
  */
 export function getImageUrl(url: string): string {
+  // Si está vacío, devolver string vacío
+  if (!url || url.trim() === '') {
+    return '';
+  }
+
   // Si ya es una URL absoluta (http/https), devolverla tal como está
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
 
-  // Si es una URL relativa, construir URL completa
+  // Si es una URL de Cloudinary sin protocolo (res.cloudinary.com)
+  if (url.includes('cloudinary.com')) {
+    return url.startsWith('//') ? `https:${url}` : `https://${url}`;
+  }
+
+  // Si es solo un nombre de archivo sin ruta (ej: "imagen.jpg")
+  // Intentar construir URL de Cloudinary si parece ser un public_id
+  if (!url.startsWith('/') && !url.includes('/')) {
+    // Si tiene extensión de imagen, podría ser un archivo de Cloudinary
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+    const hasImageExt = imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+    
+    if (hasImageExt) {
+      console.warn('⚠️ Imagen sin ruta completa detectada:', url);
+      // No intentar construir URL, dejar que falle y use el fallback
+      return url;
+    }
+  }
+
+  // Si es una URL relativa, construir URL completa del backend
   const apiUrl = getApiUrl();
   const baseUrl = apiUrl.replace('/api', '');
   
   // Asegurar que la URL empiece con /
   const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
   const finalUrl = `${baseUrl}${normalizedUrl}`;
-  
   
   return finalUrl;
 }

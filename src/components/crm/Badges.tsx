@@ -6,11 +6,21 @@ interface StatusBadgeProps {
 }
 
 /**
- * 🏷️ Badge de estado del lead
+ * 🏷️ Badge de estado del lead (solicitud)
  */
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ estado, size = 'md' }) => {
   const colorClasses = {
+    // Estados nuevos
     nuevo: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    en_revision: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    contactando: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-300',
+    cotizacion: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+    aprobado: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300',
+    en_desarrollo: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+    completado: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+    rechazado: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+    cancelado: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+    // Estados legacy (mantener compatibilidad)
     contactado: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
     calificado: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
     propuesta: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
@@ -27,7 +37,17 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ estado, size = 'md' })
   };
 
   const labels = {
-    nuevo: 'Nuevo',
+    // Estados nuevos (con emojis)
+    nuevo: '📝 Nueva',
+    en_revision: '👀 En Revisión',
+    contactando: '📞 Contactando',
+    cotizacion: '💰 Cotización',
+    aprobado: '✅ Aprobado',
+    en_desarrollo: '🚀 En Desarrollo',
+    completado: '✨ Completado',
+    rechazado: '❌ Rechazado',
+    cancelado: '🚫 Cancelado',
+    // Estados legacy
     contactado: 'Contactado',
     calificado: 'Calificado',
     propuesta: 'Propuesta',

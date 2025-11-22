@@ -31,16 +31,17 @@ export interface UseContactFormReturn {
   handleChange: (field: keyof ContactFormState, value: string | boolean) => void;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   resetForm: () => void;
+  isUserAuthenticated: boolean;
 }
 
-const initialFormState: ContactFormState = {
-  nombre: '',
+const getInitialFormState = (userEmail?: string, userName?: string): ContactFormState => ({
+  nombre: userName || '',
   celular: '',
-  correo: '',
+  correo: userEmail || '',
   mensaje: '',
   categoria: '',
   acceptTerms: false,
-};
+});
 
 /**
  * Validar email
@@ -62,9 +63,14 @@ const isValidPhone = (phone: string): boolean => {
  * Hook principal
  */
 export const useContactForm = (
-  onSuccessCallback?: () => void
+  onSuccessCallback?: () => void,
+  userEmail?: string,
+  userName?: string
 ): UseContactFormReturn => {
-  const [formData, setFormData] = useState<ContactFormState>(initialFormState);
+  const isUserAuthenticated = Boolean(userEmail && userName);
+  const [formData, setFormData] = useState<ContactFormState>(
+    getInitialFormState(userEmail, userName)
+  );
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -78,13 +84,15 @@ export const useContactForm = (
   const validateForm = (): boolean => {
     const newErrors: ContactFormErrors = {};
 
-    // Validar nombre
-    if (!formData.nombre.trim()) {
-      newErrors.nombre = 'El nombre es requerido';
-    } else if (formData.nombre.trim().length < 2) {
-      newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
-    } else if (formData.nombre.trim().length > 100) {
-      newErrors.nombre = 'El nombre no puede exceder 100 caracteres';
+    // Validar nombre (solo si el usuario NO está autenticado)
+    if (!isUserAuthenticated) {
+      if (!formData.nombre.trim()) {
+        newErrors.nombre = 'El nombre es requerido';
+      } else if (formData.nombre.trim().length < 2) {
+        newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+      } else if (formData.nombre.trim().length > 100) {
+        newErrors.nombre = 'El nombre no puede exceder 100 caracteres';
+      }
     }
 
     // Validar celular
@@ -94,11 +102,13 @@ export const useContactForm = (
       newErrors.celular = 'Formato de celular inválido';
     }
 
-    // Validar correo
-    if (!formData.correo.trim()) {
-      newErrors.correo = 'El correo es requerido';
-    } else if (!isValidEmail(formData.correo)) {
-      newErrors.correo = 'Formato de correo inválido';
+    // Validar correo (solo si el usuario NO está autenticado)
+    if (!isUserAuthenticated) {
+      if (!formData.correo.trim()) {
+        newErrors.correo = 'El correo es requerido';
+      } else if (!isValidEmail(formData.correo)) {
+        newErrors.correo = 'Formato de correo inválido';
+      }
     }
 
     // Validar mensaje
@@ -209,7 +219,7 @@ export const useContactForm = (
    * Resetear formulario
    */
   const resetForm = () => {
-    setFormData(initialFormState);
+    setFormData(getInitialFormState(userEmail, userName));
     setErrors({});
     setIsLoading(false);
     setIsSuccess(false);
@@ -229,6 +239,7 @@ export const useContactForm = (
     handleChange,
     handleSubmit,
     resetForm,
+    isUserAuthenticated,
   };
 };
 

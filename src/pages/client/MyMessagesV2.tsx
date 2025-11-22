@@ -1,11 +1,10 @@
 /**
  * 💬 MIS MENSAJES - Inbox de Mensajes del Cliente (Versión Mejorada)
  * Vista de lista compacta con detalle al hacer clic
- * Incluye navegación a Solicitudes
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import type { LeadMessage } from '../../types/message.types';
@@ -18,7 +17,6 @@ import { Mail, MailOpen, Reply, X, Send, Loader, Filter, Inbox, Search } from 'l
 
 export default function MyMessages() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user: _clerkUser } = useUser();
 
   // ========================================
@@ -177,7 +175,7 @@ export default function MyMessages() {
 
   const getLeadName = (leadId: string): string => {
     const lead = leads.find((l) => l._id === leadId);
-    return lead ? lead.nombre : 'Solicitud Desconocida';
+    return lead ? lead.nombre : 'Proyecto Desconocido';
   };
 
   const getMessagePreview = (content: string, maxLength: number = 100): string => {
@@ -254,10 +252,11 @@ export default function MyMessages() {
             <div>
               <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
                 <Inbox className="w-10 h-10" />
-                Comunicación y Solicitudes
+                Mis Mensajes
               </h1>
               <p className="text-green-100 text-lg">
-                Gestiona tus mensajes y el seguimiento de tus solicitudes
+                {filteredMessages.length} {filteredMessages.length === 1 ? 'mensaje' : 'mensajes'}
+                {unreadCount > 0 && ` • ${unreadCount} sin leer`}
               </p>
             </div>
             <button
@@ -265,43 +264,6 @@ export default function MyMessages() {
               className="px-6 py-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg transition-all border border-white/30"
             >
               ← Volver
-            </button>
-          </div>
-        </div>
-
-        {/* Pestañas de navegación */}
-        <div className="mb-6">
-          <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
-            <button
-              onClick={() => navigate('/dashboard/client/messages')}
-              className={`px-6 py-3 font-medium transition-colors relative ${
-                location.pathname === '/dashboard/client/messages'
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-            >
-              💬 Mensajes
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-              {location.pathname === '/dashboard/client/messages' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400" />
-              )}
-            </button>
-            <button
-              onClick={() => navigate('/dashboard/client/solicitudes')}
-              className={`px-6 py-3 font-medium transition-colors relative ${
-                location.pathname === '/dashboard/client/solicitudes'
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-            >
-              📋 Mis Solicitudes
-              {location.pathname === '/dashboard/client/solicitudes' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400" />
-              )}
             </button>
           </div>
         </div>
@@ -321,7 +283,7 @@ export default function MyMessages() {
               />
             </div>
 
-            {/* Filtro por solicitud */}
+            {/* Filtro por proyecto */}
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <select
@@ -329,7 +291,7 @@ export default function MyMessages() {
                 onChange={(e) => setSelectedLead(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
               >
-                <option value="all">Todas las solicitudes</option>
+                <option value="all">Todos los proyectos</option>
                 {leads.map((lead) => (
                   <option key={lead._id} value={lead._id}>
                     {lead.nombre}

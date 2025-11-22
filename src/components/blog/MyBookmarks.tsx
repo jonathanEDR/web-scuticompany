@@ -41,11 +41,11 @@ export default function MyBookmarks() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
-            <div className="h-48 bg-gray-200"></div>
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse">
+            <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
             <div className="p-4 space-y-3">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             </div>
           </div>
         ))}
@@ -55,9 +55,9 @@ export default function MyBookmarks() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p className="text-red-800 font-medium">Error al cargar guardados</p>
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+        <p className="text-red-800 dark:text-red-200 font-medium">Error al cargar guardados</p>
+        <p className="text-red-600 dark:text-red-400 text-sm mt-1">{error}</p>
       </div>
     );
   }
@@ -66,10 +66,10 @@ export default function MyBookmarks() {
     <div className="space-y-6">
       {/* Filters */}
       {categories.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium text-gray-700">Categorías:</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Categorías:</span>
               <button
                 onClick={() => {
                   setCategoryFilter(undefined);
@@ -78,7 +78,7 @@ export default function MyBookmarks() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   !categoryFilter
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 Todas
@@ -93,7 +93,7 @@ export default function MyBookmarks() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     categoryFilter === category.slug
                       ? 'text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                   style={{
                     backgroundColor: categoryFilter === category.slug ? category.color : undefined
@@ -105,7 +105,7 @@ export default function MyBookmarks() {
             </div>
             
             {pagination && (
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {pagination.total} guardado{pagination.total !== 1 ? 's' : ''}
               </span>
             )}
@@ -115,10 +115,10 @@ export default function MyBookmarks() {
 
       {/* Bookmarks Grid */}
       {bookmarks.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
-          <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">No tienes artículos guardados</p>
-          <p className="text-gray-500 text-sm mt-1">
+        <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
+          <Bookmark className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400 font-medium">No tienes artículos guardados</p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
             Guarda artículos para leerlos más tarde
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function MyBookmarks() {
           {bookmarks.map((bookmark) => (
             <article 
               key={bookmark._id}
-              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow group"
             >
               {/* Featured Image */}
               {bookmark.featuredImage && (
@@ -145,10 +145,10 @@ export default function MyBookmarks() {
                         e.preventDefault();
                         handleRemoveBookmark(bookmark._id);
                       }}
-                      className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors"
+                      className="p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 rounded-full shadow-lg transition-colors"
                       title="Quitar de guardados"
                     >
-                      <BookmarkX className="w-5 h-5 text-red-500" />
+                      <BookmarkX className="w-5 h-5 text-red-500 dark:text-red-400" />
                     </button>
                   </div>
                 </Link>
@@ -169,20 +169,20 @@ export default function MyBookmarks() {
 
                 {/* Title */}
                 <Link to={`/blog/${bookmark.slug}`}>
-                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
                     {bookmark.title}
                   </h3>
                 </Link>
 
                 {/* Excerpt */}
                 {bookmark.excerpt && (
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
                     {bookmark.excerpt}
                   </p>
                 )}
 
                 {/* Meta */}
-                <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-3 border-t border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-1">
                     <User className="w-4 h-4" />
                     <span>{bookmark.author?.name || 'Anónimo'}</span>
@@ -209,17 +209,17 @@ export default function MyBookmarks() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Anterior
           </button>
-          <span className="px-4 py-2 text-gray-700">
+          <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
             Página {page} de {pagination.pages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
             disabled={page === pagination.pages}
-            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Siguiente
           </button>

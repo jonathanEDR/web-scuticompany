@@ -37,16 +37,17 @@ export interface UseQuoteFormReturn {
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   resetForm: () => void;
   initializeMessage: (message: string) => void;
+  isUserAuthenticated: boolean;
 }
 
-const initialFormState: QuoteFormState = {
-  nombre: '',
+const getInitialFormState = (userEmail?: string, userName?: string): QuoteFormState => ({
+  nombre: userName || '',
   celular: '',
-  correo: '',
+  correo: userEmail || '',
   mensaje: '',
   categoria: '',
   acceptTerms: false,
-};
+});
 
 /**
  * Validar email
@@ -64,8 +65,15 @@ const isValidPhone = (phone: string): boolean => {
   return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 9;
 };
 
-export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn => {
-  const [formData, setFormData] = useState<QuoteFormState>(initialFormState);
+export const useQuoteForm = (
+  onSuccessCallback?: () => void,
+  userEmail?: string,
+  userName?: string
+): UseQuoteFormReturn => {
+  const isUserAuthenticated = Boolean(userEmail && userName);
+  const [formData, setFormData] = useState<QuoteFormState>(
+    getInitialFormState(userEmail, userName)
+  );
   const [errors, setErrors] = useState<QuoteFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -79,11 +87,13 @@ export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn
   const validateForm = useCallback((): boolean => {
     const newErrors: QuoteFormErrors = {};
 
-    // Validar nombre
-    if (!formData.nombre.trim()) {
-      newErrors.nombre = 'El nombre es requerido';
-    } else if (formData.nombre.trim().length < 2) {
-      newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+    // Validar nombre (solo si el usuario NO está autenticado)
+    if (!isUserAuthenticated) {
+      if (!formData.nombre.trim()) {
+        newErrors.nombre = 'El nombre es requerido';
+      } else if (formData.nombre.trim().length < 2) {
+        newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+      }
     }
 
     // Validar celular
@@ -93,11 +103,13 @@ export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn
       newErrors.celular = 'Formato de celular inválido';
     }
 
-    // Validar correo
-    if (!formData.correo.trim()) {
-      newErrors.correo = 'El correo es requerido';
-    } else if (!isValidEmail(formData.correo)) {
-      newErrors.correo = 'Formato de correo inválido';
+    // Validar correo (solo si el usuario NO está autenticado)
+    if (!isUserAuthenticated) {
+      if (!formData.correo.trim()) {
+        newErrors.correo = 'El correo es requerido';
+      } else if (!isValidEmail(formData.correo)) {
+        newErrors.correo = 'Formato de correo inválido';
+      }
     }
 
     // Validar mensaje
@@ -109,7 +121,7 @@ export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
+  }, [formData, isUserAuthenticated]);
 
   /**
    * Manejar cambios en los campos
@@ -210,14 +222,14 @@ export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn
    * Resetear formulario
    */
   const resetForm = useCallback(() => {
-    setFormData(initialFormState);
+    setFormData(getInitialFormState(userEmail, userName));
     setErrors({});
     setIsLoading(false);
     setIsSuccess(false);
     setIsError(false);
     setSuccessMessage('');
     setErrorMessage('');
-  }, []);
+  }, [userEmail, userName]);
 
   return {
     formData,
@@ -231,6 +243,7 @@ export const useQuoteForm = (onSuccessCallback?: () => void): UseQuoteFormReturn
     handleSubmit,
     resetForm,
     initializeMessage,
+    isUserAuthenticated,
   };
 };
 
