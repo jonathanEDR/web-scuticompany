@@ -65,7 +65,6 @@ const MySolicitudes: React.FC = () => {
             <p className="mt-4 text-gray-600 dark:text-gray-400">Cargando solicitudes...</p>
           </div>
         </div>
-      </SmartDashboardLayout>
     );
   }
 
