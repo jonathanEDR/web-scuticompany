@@ -847,31 +847,139 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   placeholder="16px"
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Alto de Tarjeta
-                </label>
-                <input
-                  type="text"
-                  value={config.imageCard?.cardHeight || '400px'}
-                  onChange={(e) => handleChange('imageCard.cardHeight', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  placeholder="400px"
-                />
+            {/* Sección de Tamaño de Tarjeta */}
+            <div className="p-4 rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20">
+              <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300 mb-4 flex items-center gap-2">
+                📐 Tamaño de Tarjeta
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Alto de Tarjeta */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Alto de Tarjeta
+                  </label>
+                  <div className="space-y-2">
+                    {/* Opciones predefinidas */}
+                    <div className="flex flex-wrap gap-2">
+                      {['280px', '320px', '360px', '400px', '450px', '500px'].map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => handleChange('imageCard.cardHeight', size)}
+                          className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
+                            config.imageCard?.cardHeight === size
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Input personalizado */}
+                    <input
+                      type="text"
+                      value={config.imageCard?.cardHeight || '400px'}
+                      onChange={(e) => handleChange('imageCard.cardHeight', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                      placeholder="400px o auto"
+                    />
+                    {/* Slider para ajuste fino */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">200px</span>
+                      <input
+                        type="range"
+                        min="200"
+                        max="600"
+                        value={parseInt(config.imageCard?.cardHeight || '400') || 400}
+                        onChange={(e) => handleChange('imageCard.cardHeight', `${e.target.value}px`)}
+                        className="flex-1"
+                      />
+                      <span className="text-xs text-gray-500">600px</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ancho de Tarjeta */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Ancho de Tarjeta
+                  </label>
+                  <div className="space-y-2">
+                    {/* Opciones predefinidas */}
+                    <div className="flex flex-wrap gap-2">
+                      {['100%', '280px', '320px', '360px', '400px', 'auto'].map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => handleChange('imageCard.cardWidth', size)}
+                          className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
+                            (config.imageCard?.cardWidth || '100%') === size
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Input personalizado */}
+                    <input
+                      type="text"
+                      value={config.imageCard?.cardWidth || '100%'}
+                      onChange={(e) => handleChange('imageCard.cardWidth', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                      placeholder="100% o 320px"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
+              {/* Aspect Ratio (nuevo) */}
+              <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Ancho de Tarjeta
+                  Aspecto de Tarjeta (Proporción)
                 </label>
-                <input
-                  type="text"
-                  value={config.imageCard?.cardWidth || '100%'}
-                  onChange={(e) => handleChange('imageCard.cardWidth', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  placeholder="100%"
-                />
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: 'Cuadrada (1:1)', value: 'square' },
+                    { label: 'Horizontal (4:3)', value: 'landscape' },
+                    { label: 'Vertical (3:4)', value: 'portrait' },
+                    { label: 'Ancha (16:9)', value: 'wide' },
+                    { label: 'Personalizado', value: 'custom' }
+                  ].map((aspect) => (
+                    <button
+                      key={aspect.value}
+                      type="button"
+                      onClick={() => {
+                        if (aspect.value === 'square') {
+                          handleChange('imageCard.cardHeight', '320px');
+                          handleChange('imageCard.cardWidth', '320px');
+                        } else if (aspect.value === 'landscape') {
+                          handleChange('imageCard.cardHeight', '280px');
+                          handleChange('imageCard.cardWidth', '100%');
+                        } else if (aspect.value === 'portrait') {
+                          handleChange('imageCard.cardHeight', '450px');
+                          handleChange('imageCard.cardWidth', '100%');
+                        } else if (aspect.value === 'wide') {
+                          handleChange('imageCard.cardHeight', '240px');
+                          handleChange('imageCard.cardWidth', '100%');
+                        }
+                        handleChange('imageCard.aspectRatio', aspect.value);
+                      }}
+                      className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
+                        config.imageCard?.aspectRatio === aspect.value
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {aspect.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -1077,6 +1185,83 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 />
               </div>
             </div>
+
+            {/* Sección de Tamaño de Tarjeta Texto */}
+            <div className="p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/20">
+              <h4 className="text-sm font-semibold text-indigo-700 dark:text-indigo-300 mb-4 flex items-center gap-2">
+                📐 Tamaño de Tarjeta de Texto
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Alto de Tarjeta */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Alto de Tarjeta
+                  </label>
+                  <div className="space-y-2">
+                    {/* Opciones predefinidas */}
+                    <div className="flex flex-wrap gap-2">
+                      {['auto', '280px', '320px', '360px', '400px', '450px'].map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => handleChange('textCard.cardHeight', size)}
+                          className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
+                            (config.textCard?.cardHeight || 'auto') === size
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Input personalizado */}
+                    <input
+                      type="text"
+                      value={config.textCard?.cardHeight || 'auto'}
+                      onChange={(e) => handleChange('textCard.cardHeight', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                      placeholder="auto o 320px"
+                    />
+                  </div>
+                </div>
+
+                {/* Ancho de Tarjeta */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Ancho de Tarjeta
+                  </label>
+                  <div className="space-y-2">
+                    {/* Opciones predefinidas */}
+                    <div className="flex flex-wrap gap-2">
+                      {['100%', '280px', '320px', '360px', '400px', 'auto'].map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => handleChange('textCard.cardWidth', size)}
+                          className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
+                            (config.textCard?.cardWidth || '100%') === size
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Input personalizado */}
+                    <input
+                      type="text"
+                      value={config.textCard?.cardWidth || '100%'}
+                      onChange={(e) => handleChange('textCard.cardWidth', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                      placeholder="100% o 320px"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1116,7 +1301,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 </div>
 
                 {/* Border Width */}
-                <div>
+                <div className={config.sidebar?.showBorder === false ? 'opacity-50 pointer-events-none' : ''}>
                   <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
                     Ancho Borde (px)
                   </label>
@@ -1131,7 +1316,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 </div>
 
                 {/* Border Color Light */}
-                <div>
+                <div className={config.sidebar?.showBorder === false ? 'opacity-50 pointer-events-none' : ''}>
                   <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
                     Color Borde (Claro)
                   </label>
@@ -1147,7 +1332,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 </div>
 
                 {/* Border Color Dark */}
-                <div>
+                <div className={config.sidebar?.showBorder === false ? 'opacity-50 pointer-events-none' : ''}>
                   <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
                     Color Borde (Oscuro)
                   </label>
@@ -1207,6 +1392,25 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                     <span className="ml-3 text-xs text-gray-600 dark:text-gray-400">
                       {config.sidebar?.transparentBg ? 'Activado' : 'Desactivado'}
+                    </span>
+                  </label>
+                </div>
+
+                {/* Mostrar Borde Toggle */}
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    Mostrar Borde
+                  </label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.sidebar?.showBorder !== false}
+                      onChange={(e) => handleChange('sidebar.showBorder', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                    <span className="ml-3 text-xs text-gray-600 dark:text-gray-400">
+                      {config.sidebar?.showBorder !== false ? 'Activado' : 'Desactivado'}
                     </span>
                   </label>
                 </div>
@@ -1534,6 +1738,24 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       className="w-8 h-8 rounded cursor-pointer"
                     />
                     <span className="text-xs text-gray-500">{config.sidebar?.tagActiveTextColor || '#ffffff'}</span>
+                  </div>
+                </div>
+
+                {/* Máximo de tags visibles */}
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    Máx. Tags Visibles
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={config.sidebar?.maxVisibleTags || 8}
+                      onChange={(e) => handleChange('sidebar.maxVisibleTags', parseInt(e.target.value) || 8)}
+                      className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                    />
+                    <span className="text-xs text-gray-500">tags</span>
                   </div>
                 </div>
               </div>

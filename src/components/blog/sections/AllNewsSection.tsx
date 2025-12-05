@@ -206,8 +206,10 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                     post={group[0]}
                     variant="image-overlay"
                     config={{
+                      // Primero textCard para hover styles
+                      ...config.textCard,
+                      // Luego imageCard para sobrescribir tamaños y estilos de imagen
                       ...config.imageCard,
-                      ...config.textCard, // Mezclar config de texto para hover
                       fontFamily
                     }}
                     className="md:col-span-1"
@@ -219,8 +221,8 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                     post={group[1]}
                     variant="image-overlay"
                     config={{
-                      ...config.imageCard,
                       ...config.textCard,
+                      ...config.imageCard,
                       fontFamily
                     }}
                     className="md:col-span-1"
@@ -232,8 +234,8 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                     post={group[2]}
                     variant="image-overlay"
                     config={{
-                      ...config.imageCard,
                       ...config.textCard,
+                      ...config.imageCard,
                       fontFamily
                     }}
                     className="md:col-span-1"
@@ -361,14 +363,14 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                   : (isDarkMode 
                       ? (sidebarConfig.bgColorDark || 'rgba(15, 23, 42, 0.8)')
                       : (sidebarConfig.bgColorLight || '#ffffff')),
-                border: sidebarConfig.transparentBg 
-                  ? 'none'
-                  : `${sidebarConfig.borderWidth ?? 1}px solid ${
+                border: (sidebarConfig.showBorder !== false) 
+                  ? `${sidebarConfig.borderWidth ?? 1}px solid ${
                       isDarkMode 
                         ? (sidebarConfig.borderColorDark || 'rgba(139, 92, 246, 0.3)')
                         : (sidebarConfig.borderColorLight || '#e5e7eb')
-                    }`,
-                borderRadius: sidebarConfig.transparentBg ? '0' : (sidebarConfig.borderRadius || '12px'),
+                    }`
+                  : 'none',
+                borderRadius: sidebarConfig.borderRadius || '12px',
                 padding: sidebarConfig.padding || '24px',
                 backdropFilter: sidebarConfig.transparentBg ? 'none' : 'blur(10px)'
               }}
@@ -443,7 +445,7 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                     >
                       All
                     </button>
-                    {tags.map((tag) => (
+                    {tags.slice(0, sidebarConfig.maxVisibleTags || 8).map((tag) => (
                       <button
                         key={tag._id}
                         onClick={() => onTagSelect?.(tag._id)}
@@ -460,6 +462,17 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                         {tag.name}
                       </button>
                     ))}
+                    {tags.length > (sidebarConfig.maxVisibleTags || 8) && (
+                      <span 
+                        className="px-4 py-2 rounded-full text-sm font-medium"
+                        style={{
+                          backgroundColor: tagBgColor,
+                          color: tagTextColor
+                        }}
+                      >
+                        +{tags.length - (sidebarConfig.maxVisibleTags || 8)}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}

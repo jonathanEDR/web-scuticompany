@@ -236,7 +236,10 @@ export const DEFAULT_ALL_NEWS_CONFIG = {
     categoryTextColor: '#ffffff',
     authorNameColor: '#ffffff',
     authorDateColor: '#9ca3af',
-    borderRadius: '16px'
+    borderRadius: '16px',
+    cardHeight: '400px',
+    cardWidth: '100%',
+    aspectRatio: 'portrait' as const
   },
   // Tarjeta solo texto
   textCard: {
@@ -249,12 +252,15 @@ export const DEFAULT_ALL_NEWS_CONFIG = {
     buttonBgColor: 'transparent',
     buttonTextColor: '#ffffff',
     buttonBorderColor: '#ffffff',
-    borderRadius: '16px'
+    borderRadius: '16px',
+    cardHeight: 'auto',
+    cardWidth: '100%'
   },
   // Sidebar
   sidebar: {
     fontFamily: 'Montserrat',
     bgColor: 'transparent',
+    showBorder: true,
     bgColorLight: '#ffffff',
     bgColorDark: '#1f2937',
     borderWidth: 1,
@@ -274,7 +280,8 @@ export const DEFAULT_ALL_NEWS_CONFIG = {
     tagTextColor: '#4b5563',
     tagTextColorDark: '#d1d5db',
     tagActiveBgColor: '#2563eb',
-    tagActiveTextColor: '#ffffff'
+    tagActiveTextColor: '#ffffff',
+    maxVisibleTags: 8
   }
 };
 
@@ -312,6 +319,7 @@ export interface AllNewsConfig {
     borderRadius?: string;
     cardHeight?: string;
     cardWidth?: string;
+    aspectRatio?: 'square' | 'landscape' | 'portrait' | 'wide' | 'custom';
   };
   // Tarjeta solo texto
   textCard?: {
@@ -325,11 +333,14 @@ export interface AllNewsConfig {
     buttonTextColor?: string;
     buttonBorderColor?: string;
     borderRadius?: string;
+    cardHeight?: string;
+    cardWidth?: string;
   };
   // Sidebar
   sidebar?: {
     fontFamily?: string;
     transparentBg?: boolean;
+    showBorder?: boolean;
     bgColor?: string;
     bgColorLight?: string;
     bgColorDark?: string;
@@ -351,6 +362,7 @@ export interface AllNewsConfig {
     tagTextColorDark?: string;
     tagActiveBgColor?: string;
     tagActiveTextColor?: string;
+    maxVisibleTags?: number;
   };
   // Paginación
   paginationStyle?: 'numbered' | 'simple' | 'loadMore';
