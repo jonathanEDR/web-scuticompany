@@ -461,14 +461,127 @@ export interface PageSection {
   order?: number;
 }
 
+// ============================================
+// 🆕 TIPOS PARA PÁGINA DE SERVICIOS
+// ============================================
+
+export interface ServicesFilterConfig {
+  searchTitle?: string;
+  searchDescription?: string;
+  searchPlaceholder?: string;
+  categoriesTitle?: string;
+  showAllCategoriesText?: string;
+  sortTitle?: string;
+  resultsText?: string;
+  styles?: {
+    panelWidth?: string;
+    shadow?: string;
+    borderWidth?: string;
+    sectionGap?: string;
+    titleFontFamily?: string;
+    contentFontFamily?: string;
+    titleFontWeight?: string;
+    contentFontWeight?: string;
+    sectionTitleColor?: string;
+    sectionTitleColorDark?: string;
+    [key: string]: any;
+  };
+}
+
+export interface ServicesGridConfig {
+  featuredSection?: {
+    title?: string;
+    icon?: string;
+    backgroundImage?: BackgroundImage;
+    backgroundOpacity?: number;
+  };
+  allServicesSection?: {
+    title?: string;
+    icon?: string;
+  };
+  cardDesign?: {
+    borderRadius?: string;
+    imageHeight?: string;
+    imageObjectFit?: 'cover' | 'contain' | 'fill';
+    titleColor?: string;
+    titleColorDark?: string;
+    titleHoverColor?: string;
+    priceColor?: string;
+    titleFontFamily?: string;
+    titleFontWeight?: string;
+    descriptionFontFamily?: string;
+    descriptionFontWeight?: string;
+    transparentCards?: boolean;
+    featuredBadge?: {
+      text?: string;
+      gradient?: string;
+    };
+    buttonText?: string;
+    buttonGradient?: string;
+    buttonBorderRadius?: string;
+    contentConfig?: {
+      showImage?: boolean;
+      imageHeight?: string;
+      showFeaturedBadge?: boolean;
+      showCategory?: boolean;
+      titleMaxLines?: number;
+      showDescription?: boolean;
+      descriptionMaxLines?: number;
+      showFeatures?: boolean;
+      maxFeatures?: number;
+      showPrice?: boolean;
+      showTags?: boolean;
+      maxTags?: number;
+      showButton?: boolean;
+      minCardHeight?: string;
+    };
+  };
+}
+
+export interface ServicesAccordionConfig {
+  enabled?: boolean;
+  sectionTitle?: string;
+  sectionSubtitle?: string;
+  titleColor?: string;
+  titleColorDark?: string;
+  subtitleColor?: string;
+  subtitleColorDark?: string;
+  numberColor?: string;
+  numberColorDark?: string;
+  serviceTitleColor?: string;
+  serviceTitleColorDark?: string;
+  descriptionColor?: string;
+  descriptionColorDark?: string;
+  titleFontFamily?: string;
+  contentFontFamily?: string;
+  titleFontWeight?: string;
+  borderColor?: string;
+  borderColorDark?: string;
+  iconColor?: string;
+  iconColorDark?: string;
+  buttonText?: string;
+  buttonGradient?: string;
+  buttonTextColor?: string;
+  buttonBorderRadius?: string;
+  featureIconColor?: string;
+  featureIconColorDark?: string;
+  maxFeatures?: number;
+  backgroundImage?: BackgroundImage;
+  backgroundOpacity?: number;
+}
+
 export interface PageContent {
   hero: HeroContent;
-  solutions: SolutionsContent;
+  solutions?: SolutionsContent;
   valueAdded?: ValueAddedContent;
   clientLogos?: ClientLogosContent;
   contact?: ContactContent;
   contactForm?: ContactFormContent;
-  chatbotConfig?: ChatbotConfig; // 🆕 CHATBOT CONFIGURATION
+  chatbotConfig?: ChatbotConfig;
+  // 🆕 CONTENIDO PARA PÁGINA DE SERVICIOS
+  servicesFilter?: ServicesFilterConfig;
+  servicesGrid?: ServicesGridConfig;
+  servicesAccordion?: ServicesAccordionConfig;
   sections?: PageSection[];
 }
 

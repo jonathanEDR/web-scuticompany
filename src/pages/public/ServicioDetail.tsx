@@ -189,7 +189,7 @@ export const ServicioDetail: React.FC = () => {
                 </div>
                 
                 {getDurationText(servicio) && (
-                  <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-700 hover-lift transition-all duration-300">
+                  <div className="bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-800 hover-lift transition-all duration-300">
                     <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Duración</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {servicio.duracion?.valor} {servicio.duracion?.unidad}
@@ -306,7 +306,7 @@ export const ServicioDetail: React.FC = () => {
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
                 📝 Información Detallada
               </h2>
-              <div className="prose prose-lg dark:prose-invert max-w-none bg-white/80 dark:bg-gray-800/30 rounded-lg p-8 border border-gray-300 dark:border-gray-700">
+              <div className="prose prose-lg dark:prose-invert max-w-none bg-white/80 dark:bg-gray-900/50 rounded-lg p-8 border border-gray-300 dark:border-gray-800">
                 <div 
                   className="text-gray-700 dark:text-gray-300 leading-relaxed"
                   dangerouslySetInnerHTML={{ 
@@ -334,7 +334,7 @@ export const ServicioDetail: React.FC = () => {
 
       {/* Video */}
       {servicio.videoUrl && servicio.videoUrl.trim() && (
-        <section className="py-16 bg-white/50 dark:bg-gray-800/50">
+        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
               🎥 Video del Servicio
@@ -378,7 +378,7 @@ export const ServicioDetail: React.FC = () => {
 
       {/* Contenido Adicional */}
       {servicio.contenidoAdicional && servicio.contenidoAdicional.trim() && (
-        <section className="py-16 bg-white/50 dark:bg-gray-800/50">
+        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
@@ -406,7 +406,7 @@ export const ServicioDetail: React.FC = () => {
               {servicio.caracteristicas.map((caracteristica, index) => (
                 <div
                   key={index}
-                  className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-300 dark:border-gray-700 hover:border-purple-400 dark:hover:border-purple-500/50 transition-colors"
+                  className="bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm rounded-lg p-6 border border-gray-300 dark:border-gray-800 hover:border-purple-400 dark:hover:border-purple-500/50 transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <div className="text-2xl">✅</div>
@@ -423,7 +423,7 @@ export const ServicioDetail: React.FC = () => {
 
       {/* Tecnologías */}
       {servicio.tecnologias && servicio.tecnologias.length > 0 && (
-        <section className="py-16 bg-white/50 dark:bg-gray-800/50">
+        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
               🛠️ Tecnologías que utilizamos
@@ -474,7 +474,7 @@ export const ServicioDetail: React.FC = () => {
 
       {/* Incluye / No Incluye */}
       {((servicio.incluye && servicio.incluye.length > 0) || (servicio.noIncluye && servicio.noIncluye.length > 0)) && (
-        <section className="py-16 bg-white/50 dark:bg-gray-800/50">
+        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
               📋 ¿Qué está incluido?
@@ -543,7 +543,7 @@ export const ServicioDetail: React.FC = () => {
               {servicio.faq.map((item, index) => (
                 <details
                   key={index}
-                  className="group bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:border-purple-400 dark:hover:border-purple-500 transition-colors"
+                  className="group bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-purple-400 dark:hover:border-purple-500 transition-colors"
                 >
                   <summary className="cursor-pointer px-6 py-4 font-semibold text-gray-900 dark:text-white flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <span className="flex items-center gap-3">
@@ -591,7 +591,7 @@ export const ServicioDetail: React.FC = () => {
 
       {/* Etiquetas */}
       {servicio.etiquetas && servicio.etiquetas.length > 0 && (
-        <section className="py-16 bg-white/50 dark:bg-gray-800/50">
+        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
               🏷️ Etiquetas

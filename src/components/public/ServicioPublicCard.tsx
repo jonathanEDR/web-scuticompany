@@ -12,11 +12,81 @@ import type { Servicio } from '../../types/servicios';
 // TIPOS
 // ============================================
 
+// Configuración de qué elementos mostrar en la tarjeta
+interface CardContentConfig {
+  // Imagen
+  showImage?: boolean;
+  imageHeight?: string;
+  
+  // Badge destacado
+  showFeaturedBadge?: boolean;
+  
+  // Categoría
+  showCategory?: boolean;
+  
+  // Título (siempre visible, pero configurable)
+  titleMaxLines?: number; // 1, 2, 3
+  
+  // Descripción
+  showDescription?: boolean;
+  descriptionMaxLines?: number; // 1, 2, 3
+  
+  // Características/Beneficios
+  showFeatures?: boolean;
+  maxFeatures?: number; // 0-5
+  featureHighlightBgColor?: string; // Color de fondo del resaltado
+  featureHighlightBgColorDark?: string; // Color de fondo modo oscuro
+  featureHighlightTextColor?: string; // Color del texto
+  featureHighlightTextColorDark?: string; // Color del texto modo oscuro
+  featureHighlightBorderColor?: string; // Color del borde
+  featureHighlightBorderColorDark?: string; // Color del borde modo oscuro
+  
+  // Precio
+  showPrice?: boolean;
+  
+  // Tags/Etiquetas
+  showTags?: boolean;
+  maxTags?: number; // 0-5
+  
+  // Botón
+  showButton?: boolean;
+  
+  // Altura mínima de tarjeta para uniformidad
+  minCardHeight?: string;
+}
+
+interface CardDesignConfig {
+  borderRadius?: string;
+  imageHeight?: string;
+  imageObjectFit?: 'cover' | 'contain' | 'fill';
+  titleColor?: string;
+  titleColorDark?: string;
+  titleHoverColor?: string;
+  priceColor?: string;
+  featuredBadge?: {
+    text?: string;
+    gradient?: string;
+  };
+  buttonText?: string;
+  buttonGradient?: string;
+  buttonBorderRadius?: string;
+  transparentCards?: boolean;
+  // Tipografía
+  titleFontFamily?: string;
+  titleFontWeight?: string;
+  descriptionFontFamily?: string;
+  descriptionFontWeight?: string;
+  // Nueva configuración de contenido
+  contentConfig?: CardContentConfig;
+}
+
 interface ServicioPublicCardProps {
   servicio: Servicio;
   featured?: boolean;
   showPrice?: boolean;
   className?: string;
+  cardConfig?: CardDesignConfig;
+  currentTheme?: 'light' | 'dark';
 }
 
 // ============================================
@@ -27,7 +97,9 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
   servicio,
   featured = false,
   showPrice = true,
-  className = ''
+  className = '',
+  cardConfig,
+  currentTheme = 'light'
 }) => {
   // ============================================
   // FUNCIONES AUXILIARES
@@ -110,138 +182,271 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
   // RENDER
   // ============================================
 
+  // Obtener configuración de contenido con valores por defecto
+  const content = cardConfig?.contentConfig || {};
+  const showImage = content.showImage !== false; // true por defecto
+  const showFeaturedBadge = content.showFeaturedBadge !== false; // true por defecto
+  const showCategory = content.showCategory !== false; // true por defecto
+  const showDescription = content.showDescription !== false; // true por defecto
+  const showFeatures = content.showFeatures !== false; // true por defecto
+  const showTags = content.showTags ?? false; // false por defecto para uniformidad
+  const showButton = content.showButton !== false; // true por defecto
+  const showPriceConfig = content.showPrice !== false; // true por defecto
+  
+  const titleMaxLines = content.titleMaxLines || 2;
+  const descriptionMaxLines = content.descriptionMaxLines || 2;
+  const maxFeatures = content.maxFeatures ?? 3;
+  const maxTags = content.maxTags ?? 3;
+
+  // Determinar si las tarjetas deben ser transparentes
+  const isTransparent = cardConfig?.transparentCards && featured;
+  
+  // Clase para limitar líneas de texto
+  const getLineClampClass = (lines: number) => {
+    switch(lines) {
+      case 1: return 'line-clamp-1';
+      case 2: return 'line-clamp-2';
+      case 3: return 'line-clamp-3';
+      default: return 'line-clamp-2';
+    }
+  };
+  
   return (
-    <div className={`
-      group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg 
-      transition-all duration-500 hover-lift
-      border border-gray-100 dark:border-gray-700 overflow-hidden
-      ${featured ? 'ring-2 ring-purple-500 ring-opacity-50 hover-glow' : ''}
-      ${className}
-    `}>
-      {/* Badge de destacado */}
-      {servicio.destacado && (
+    <div 
+      className={`
+        group relative transition-all duration-500 hover-lift overflow-hidden flex flex-col
+        ${isTransparent 
+          ? 'bg-white/10 dark:bg-gray-900/40 backdrop-blur-sm border border-white/20 dark:border-gray-700/50' 
+          : 'bg-white dark:bg-gray-900 shadow-lg border border-gray-100 dark:border-gray-800'
+        }
+        ${featured ? 'ring-2 ring-purple-500 ring-opacity-50 hover-glow' : ''}
+        ${className}
+      `}
+      style={{
+        borderRadius: cardConfig?.borderRadius || '0.75rem',
+        minHeight: content.minCardHeight || undefined
+      }}
+    >
+      {/* Badge de destacado - solo si está configurado para mostrarse */}
+      {servicio.destacado && showFeaturedBadge && (
         <div className="absolute top-4 right-4 z-10">
-          <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-            ⭐ Destacado
+          <span 
+            className="text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+            style={{
+              background: cardConfig?.featuredBadge?.gradient || 'linear-gradient(90deg, #8B5CF6, #EC4899)'
+            }}
+          >
+            {cardConfig?.featuredBadge?.text || '⭐ Destacado'}
           </span>
         </div>
       )}
 
-      {/* Imagen principal */}
-      <div className="relative h-48 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 overflow-hidden">
-        {servicio.imagen ? (
-          <img
-            src={servicio.imagen}
-            alt={servicio.titulo}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div 
-              className="text-6xl opacity-80"
-              style={{ color: servicio.colorIcono || '#8B5CF6' }}
-            >
-              {servicio.icono || '🚀'}
+      {/* Imagen principal - solo si está configurado para mostrarse */}
+      {showImage && (
+        <div 
+          className="relative bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 overflow-hidden flex-shrink-0"
+          style={{
+            height: content.imageHeight || cardConfig?.imageHeight || '12rem'
+          }}
+        >
+          {servicio.imagen ? (
+            <img
+              src={servicio.imagen}
+              alt={servicio.titulo}
+              className="w-full h-full group-hover:scale-110 transition-transform duration-300"
+              style={{
+                objectFit: cardConfig?.imageObjectFit || 'cover'
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div 
+                className="text-6xl opacity-80"
+                style={{ color: servicio.colorIcono || '#8B5CF6' }}
+              >
+                {servicio.icono || '🚀'}
+              </div>
             </div>
-          </div>
-        )}
-        
-        {/* Overlay gradiente */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
+          )}
+          
+          {/* Overlay gradiente */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </div>
+      )}
 
       {/* Contenido */}
-      <div className="p-6">
-        {/* Categoría */}
-        <div className="flex items-center justify-between mb-3">
-          <span 
-            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(servicio.categoria)}`}
-            style={{
-              backgroundColor: servicio.categoria?.color || undefined,
-              color: servicio.categoria?.color ? 'white' : undefined
-            }}
-          >
-            {servicio.categoria?.icono && (
-              <span className="mr-1">{servicio.categoria.icono}</span>
-            )}
-            {getCategoryName(servicio.categoria)}
-          </span>
-          
-          {servicio.requiereContacto && (
-            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-              💬 Consulta
+      <div className="p-6 flex-1 flex flex-col">
+        {/* Categoría - solo si está configurado */}
+        {showCategory && (
+          <div className="flex items-center justify-between mb-3">
+            <span 
+              className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(servicio.categoria)}`}
+              style={{
+                backgroundColor: servicio.categoria?.color || undefined,
+                color: servicio.categoria?.color ? 'white' : undefined
+              }}
+            >
+              {servicio.categoria?.icono && (
+                <span className="mr-1">{servicio.categoria.icono}</span>
+              )}
+              {getCategoryName(servicio.categoria)}
             </span>
-          )}
-        </div>
+            
+            {servicio.requiereContacto && (
+              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                💬 Consulta
+              </span>
+            )}
+          </div>
+        )}
 
-        {/* Título */}
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+        {/* Título - siempre visible pero con líneas configurables */}
+        <h3 
+          className={`text-xl mb-3 ${getLineClampClass(titleMaxLines)} transition-colors text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400`}
+          style={{
+            fontFamily: cardConfig?.titleFontFamily || 'inherit',
+            fontWeight: cardConfig?.titleFontWeight || '700',
+            ...(cardConfig?.titleColor ? { color: cardConfig.titleColor } : {})
+          }}
+          onMouseEnter={(e) => {
+            if (cardConfig?.titleHoverColor) {
+              e.currentTarget.style.color = cardConfig.titleHoverColor;
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (cardConfig?.titleHoverColor) {
+              e.currentTarget.style.color = cardConfig?.titleColor || '';
+            }
+          }}
+        >
           {servicio.titulo}
         </h3>
 
-        {/* Descripción corta */}
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
-          {servicio.descripcionCorta || servicio.descripcion}
-        </p>
+        {/* Descripción corta - solo si está configurado */}
+        {showDescription && (
+          <p 
+            className={`text-gray-600 dark:text-gray-300 text-sm mb-4 ${getLineClampClass(descriptionMaxLines)}`}
+            style={{
+              fontFamily: cardConfig?.descriptionFontFamily || 'inherit',
+              fontWeight: cardConfig?.descriptionFontWeight || '400'
+            }}
+          >
+            {servicio.descripcionCorta || servicio.descripcion}
+          </p>
+        )}
 
-        {/* Características destacadas */}
-        {servicio.caracteristicas && servicio.caracteristicas.length > 0 && (
+        {/* Características destacadas - solo si está configurado y hay características */}
+        {showFeatures && maxFeatures > 0 && servicio.caracteristicas && servicio.caracteristicas.length > 0 && (
           <div className="mb-4">
-            <div className="flex flex-wrap gap-1">
-              {servicio.caracteristicas.slice(0, 3).map((caracteristica, idx) => (
-                <span
-                  key={idx}
-                  className="text-xs bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 px-2 py-1 rounded border border-gray-200 dark:border-gray-600"
-                >
-                  ✓ {caracteristica}
-                </span>
-              ))}
-              {servicio.caracteristicas.length > 3 && (
+            <div className="flex flex-wrap gap-1.5">
+              {servicio.caracteristicas.slice(0, maxFeatures).map((caracteristica, idx) => {
+                // Obtener colores configurables o usar defaults según el tema actual
+                const bgColor = currentTheme === 'dark'
+                  ? (content.featureHighlightBgColorDark || '#581C87') // purple-900
+                  : (content.featureHighlightBgColor || '#F3E8FF'); // purple-100
+                
+                const textColor = currentTheme === 'dark'
+                  ? (content.featureHighlightTextColorDark || '#E9D5FF') // purple-200
+                  : (content.featureHighlightTextColor || '#6B21A8'); // purple-800
+                
+                const borderColor = currentTheme === 'dark'
+                  ? (content.featureHighlightBorderColorDark || '#7C3AED') // purple-600
+                  : (content.featureHighlightBorderColor || '#C084FC'); // purple-400
+                
+                return (
+                  <span
+                    key={idx}
+                    className="text-xs px-2.5 py-1.5 rounded-md font-medium transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: 'var(--feature-bg)',
+                      color: 'var(--feature-text)',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: 'var(--feature-border)',
+                      '--feature-bg': bgColor,
+                      '--feature-text': textColor,
+                      '--feature-border': borderColor
+                    } as React.CSSProperties & Record<string, string>}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.setProperty('--feature-bg', textColor);
+                      e.currentTarget.style.setProperty('--feature-text', bgColor);
+                      e.currentTarget.style.setProperty('--feature-border', textColor);
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.setProperty('--feature-bg', bgColor);
+                      e.currentTarget.style.setProperty('--feature-text', textColor);
+                      e.currentTarget.style.setProperty('--feature-border', borderColor);
+                    }}
+                  >
+                    ✓ {caracteristica}
+                  </span>
+                );
+              })}
+              {servicio.caracteristicas.length > maxFeatures && (
                 <span className="text-xs text-gray-400 dark:text-gray-500 px-2 py-1">
-                  +{servicio.caracteristicas.length - 3} más
+                  +{servicio.caracteristicas.length - maxFeatures} más
                 </span>
               )}
             </div>
           </div>
         )}
 
+        {/* Espaciador flexible para empujar el footer hacia abajo */}
+        <div className="flex-1"></div>
+
         {/* Footer con precio y botón */}
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            {formatPrice()}
-          </div>
+        <div className="flex items-center justify-between mt-auto">
+          {/* Precio - solo si está configurado */}
+          {showPrice && showPriceConfig && (
+            <div className="flex-1">
+              {formatPrice()}
+            </div>
+          )}
           
-          <Link
-            to={`/servicios/${servicio.slug || servicio._id}`}
-            onClick={() => {
-              // Ensure scroll to top when navigating
-              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-            }}
-            className="
-              bg-gradient-to-r from-purple-600 to-blue-600 
-              hover:from-purple-700 hover:to-blue-700
-              text-white px-4 py-2 rounded-lg font-medium
-              transition-all duration-200 transform hover:scale-105
-              shadow-lg hover:shadow-xl
-              text-sm
-            "
-          >
-            Ver detalles
-          </Link>
+          {/* Si no hay precio, añadir espacio */}
+          {(!showPrice || !showPriceConfig) && <div className="flex-1"></div>}
+          
+          {/* Botón - solo si está configurado */}
+          {showButton && (
+            <Link
+              to={`/servicios/${servicio.slug || servicio._id}`}
+              onClick={() => {
+                // Ensure scroll to top when navigating
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              }}
+              className="
+                text-white px-4 py-2 font-medium
+                transition-all duration-200 transform hover:scale-105
+                shadow-lg hover:shadow-xl
+                text-sm
+              "
+              style={{
+                background: cardConfig?.buttonGradient || 'linear-gradient(90deg, #8B5CF6, #3B82F6)',
+                borderRadius: cardConfig?.buttonBorderRadius || '0.5rem'
+              }}
+            >
+              {cardConfig?.buttonText || 'Ver detalles'}
+            </Link>
+          )}
         </div>
 
-        {/* Etiquetas */}
-        {servicio.etiquetas && servicio.etiquetas.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
+        {/* Etiquetas - solo si está configurado */}
+        {showTags && maxTags > 0 && servicio.etiquetas && servicio.etiquetas.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
             <div className="flex flex-wrap gap-1">
-              {servicio.etiquetas.slice(0, 4).map((etiqueta, idx) => (
+              {servicio.etiquetas.slice(0, maxTags).map((etiqueta, idx) => (
                 <span
                   key={idx}
-                  className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full"
+                  className="text-xs text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-1 rounded-full"
                 >
                   #{etiqueta}
                 </span>
               ))}
+              {servicio.etiquetas.length > maxTags && (
+                <span className="text-xs text-gray-400 px-1">
+                  +{servicio.etiquetas.length - maxTags}
+                </span>
+              )}
             </div>
           </div>
         )}

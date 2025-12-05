@@ -50,75 +50,217 @@ export const useCmsData = (pageSlug: string = 'home') => {
       } catch (apiError) {
         console.warn(`⚠️ No se pudo conectar con la base de datos para "${pageSlug}", usando configuración predeterminada`);
         
-        // Usar configuración predeterminada como fallback
-        data = {
-          pageSlug: pageSlug,
-          pageName: pageSlug === 'home' ? 'Página de Inicio' : pageSlug === 'about' ? 'Sobre Nosotros' : 'Página',
-          content: {
-            hero: {
-              title: DEFAULT_PAGE_CONFIG.hero.title,
-              subtitle: DEFAULT_PAGE_CONFIG.hero.subtitle,
-              description: DEFAULT_PAGE_CONFIG.hero.description,
-              ctaText: DEFAULT_PAGE_CONFIG.hero.ctaText,
-              ctaLink: DEFAULT_PAGE_CONFIG.hero.ctaLink,
-              backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
-              backgroundImageAlt: DEFAULT_PAGE_CONFIG.hero.backgroundImageAlt,
-              styles: DEFAULT_PAGE_CONFIG.hero.styles
-            },
-            solutions: {
-              title: DEFAULT_PAGE_CONFIG.solutions.title,
-              description: DEFAULT_PAGE_CONFIG.solutions.subtitle,
-              backgroundImage: DEFAULT_PAGE_CONFIG.solutions.backgroundImage,
-              backgroundImageAlt: DEFAULT_PAGE_CONFIG.solutions.backgroundImageAlt,
-              items: DEFAULT_PAGE_CONFIG.solutions.cards.map(card => ({
-                title: card.title,
-                description: card.description,
-                icon: card.icon,
-                gradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
-              })),
-              cardsDesign: {
-                light: {
-                  background: '#ffffff',
-                  border: '#e2e8f0',
-                  borderWidth: '1px',
-                  shadow: '0 1px 3px rgba(0,0,0,0.1)',
-                  hoverBackground: '#f8fafc',
-                  hoverBorder: '#8b5cf6',
-                  hoverShadow: '0 4px 12px rgba(139,92,246,0.15)',
-                  iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
-                  iconBackground: '#f8fafc',
-                  iconColor: '#8b5cf6',
-                  titleColor: '#1e293b',
-                  descriptionColor: '#64748b',
-                  linkColor: '#8b5cf6'
-                },
-                dark: {
-                  background: '#1e293b',
-                  border: '#334155',
-                  borderWidth: '1px',
-                  shadow: '0 1px 3px rgba(0,0,0,0.3)',
-                  hoverBackground: '#334155',
-                  hoverBorder: '#a78bfa',
-                  hoverShadow: '0 4px 12px rgba(167,139,250,0.25)',
-                  iconGradient: 'linear-gradient(135deg, #A78BFA, #22D3EE)',
-                  iconBackground: '#334155',
-                  iconColor: '#a78bfa',
-                  titleColor: '#f8fafc',
-                  descriptionColor: '#cbd5e1',
-                  linkColor: '#a78bfa'
+        // 🔥 NUEVO: Configuración de fallback ESPECÍFICA por página
+        // Obtener nombre de página según el slug
+        const getPageName = (slug: string): string => {
+          switch (slug) {
+            case 'home': return 'Página de Inicio';
+            case 'about': return 'Sobre Nosotros';
+            case 'services': return 'Servicios';
+            case 'contact': return 'Contacto';
+            default: return 'Página';
+          }
+        };
+
+        // 🔥 NUEVO: SEO específico por página
+        const getSeoForPage = (slug: string) => {
+          switch (slug) {
+            case 'home':
+              return {
+                metaTitle: 'Scuti Company - Transformamos tu empresa con tecnología inteligente',
+                metaDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio',
+                keywords: ['tecnología', 'software', 'inteligencia artificial', 'transformación digital'],
+                ogTitle: 'Scuti Company - Tecnología Inteligente',
+                ogDescription: 'Transformamos procesos con soluciones digitales y modelos de IA personalizados',
+                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                twitterCard: 'summary_large_image'
+              };
+            case 'services':
+              return {
+                metaTitle: 'Nuestros Servicios - SCUTI Company',
+                metaDescription: 'Consultoría IT, Proyectos Tecnológicos e Inteligencia Artificial para impulsar tu negocio',
+                keywords: ['servicios', 'consultoría', 'tecnología', 'software', 'inteligencia artificial'],
+                ogTitle: 'Servicios - SCUTI Company',
+                ogDescription: 'Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa',
+                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                twitterCard: 'summary_large_image'
+              };
+            case 'about':
+              return {
+                metaTitle: 'Sobre Nosotros - SCUTI Company',
+                metaDescription: 'Conoce más sobre SCUTI Company, nuestra misión, visión y el equipo de expertos en tecnología',
+                keywords: ['sobre nosotros', 'equipo', 'misión', 'visión', 'SCUTI'],
+                ogTitle: 'Sobre Nosotros - SCUTI Company',
+                ogDescription: 'Conoce más sobre SCUTI Company y nuestro equipo',
+                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                twitterCard: 'summary_large_image'
+              };
+            case 'contact':
+              return {
+                metaTitle: 'Contacto - SCUTI Company',
+                metaDescription: 'Contáctanos para conocer más sobre nuestras soluciones tecnológicas',
+                keywords: ['contacto', 'SCUTI', 'consulta', 'soporte'],
+                ogTitle: 'Contacto - SCUTI Company',
+                ogDescription: 'Ponte en contacto con nuestro equipo',
+                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                twitterCard: 'summary_large_image'
+              };
+            default:
+              return {
+                metaTitle: 'SCUTI Company',
+                metaDescription: 'Soluciones tecnológicas inteligentes',
+                keywords: ['tecnología', 'software'],
+                ogTitle: 'SCUTI Company',
+                ogDescription: 'Soluciones tecnológicas',
+                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                twitterCard: 'summary_large_image'
+              };
+          }
+        };
+
+        // 🔥 NUEVO: Hero específico por página
+        const getHeroForPage = (slug: string) => {
+          switch (slug) {
+            case 'home':
+              return {
+                title: DEFAULT_PAGE_CONFIG.hero.title,
+                subtitle: DEFAULT_PAGE_CONFIG.hero.subtitle,
+                description: DEFAULT_PAGE_CONFIG.hero.description,
+                ctaText: DEFAULT_PAGE_CONFIG.hero.ctaText,
+                ctaLink: DEFAULT_PAGE_CONFIG.hero.ctaLink,
+                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
+                backgroundImageAlt: DEFAULT_PAGE_CONFIG.hero.backgroundImageAlt,
+                styles: DEFAULT_PAGE_CONFIG.hero.styles
+              };
+            case 'services':
+              return {
+                title: 'Nuestros Servicios',
+                subtitle: 'Soluciones inteligentes para tu negocio',
+                description: 'Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa y potenciar su crecimiento.',
+                ctaText: 'Ver Servicios',
+                ctaLink: '/servicios',
+                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
+                backgroundImageAlt: 'Servicios profesionales de tecnología',
+                styles: DEFAULT_PAGE_CONFIG.hero.styles
+              };
+            case 'about':
+              return {
+                title: 'Sobre Nosotros',
+                subtitle: 'Conoce nuestra historia',
+                description: 'Somos un equipo apasionado por la tecnología y la innovación.',
+                ctaText: 'Conocer más',
+                ctaLink: '/nosotros',
+                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
+                backgroundImageAlt: 'Equipo SCUTI Company',
+                styles: DEFAULT_PAGE_CONFIG.hero.styles
+              };
+            case 'contact':
+              return {
+                title: 'Contáctanos',
+                subtitle: 'Estamos aquí para ayudarte',
+                description: 'Ponte en contacto con nosotros y descubre cómo podemos impulsar tu negocio.',
+                ctaText: 'Enviar mensaje',
+                ctaLink: '/contacto',
+                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
+                backgroundImageAlt: 'Contacto SCUTI Company',
+                styles: DEFAULT_PAGE_CONFIG.hero.styles
+              };
+            default:
+              return {
+                title: 'SCUTI Company',
+                subtitle: 'Tecnología Inteligente',
+                description: 'Transformamos empresas con soluciones digitales.',
+                ctaText: 'Comenzar',
+                ctaLink: '/',
+                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
+                backgroundImageAlt: 'SCUTI Company',
+                styles: DEFAULT_PAGE_CONFIG.hero.styles
+              };
+          }
+        };
+
+        // 🔥 NUEVO: Content específico por página
+        // SOLO HOME tiene solutions, valueAdded, clientLogos
+        const getContentForPage = (slug: string) => {
+          const baseContent = {
+            hero: getHeroForPage(slug)
+          };
+
+          // ✅ SOLO para HOME: agregar solutions, valueAdded, clientLogos
+          if (slug === 'home') {
+            return {
+              ...baseContent,
+              solutions: {
+                title: DEFAULT_PAGE_CONFIG.solutions.title,
+                description: DEFAULT_PAGE_CONFIG.solutions.subtitle,
+                backgroundImage: DEFAULT_PAGE_CONFIG.solutions.backgroundImage,
+                backgroundImageAlt: DEFAULT_PAGE_CONFIG.solutions.backgroundImageAlt,
+                items: DEFAULT_PAGE_CONFIG.solutions.cards.map(card => ({
+                  title: card.title,
+                  description: card.description,
+                  icon: card.icon,
+                  gradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
+                })),
+                cardsDesign: {
+                  light: {
+                    background: '#ffffff',
+                    border: '#e2e8f0',
+                    borderWidth: '1px',
+                    shadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    hoverBackground: '#f8fafc',
+                    hoverBorder: '#8b5cf6',
+                    hoverShadow: '0 4px 12px rgba(139,92,246,0.15)',
+                    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+                    iconBackground: '#f8fafc',
+                    iconColor: '#8b5cf6',
+                    titleColor: '#1e293b',
+                    descriptionColor: '#64748b',
+                    linkColor: '#8b5cf6'
+                  },
+                  dark: {
+                    background: '#1e293b',
+                    border: '#334155',
+                    borderWidth: '1px',
+                    shadow: '0 1px 3px rgba(0,0,0,0.3)',
+                    hoverBackground: '#334155',
+                    hoverBorder: '#a78bfa',
+                    hoverShadow: '0 4px 12px rgba(167,139,250,0.25)',
+                    iconGradient: 'linear-gradient(135deg, #A78BFA, #22D3EE)',
+                    iconBackground: '#334155',
+                    iconColor: '#a78bfa',
+                    titleColor: '#f8fafc',
+                    descriptionColor: '#cbd5e1',
+                    linkColor: '#a78bfa'
+                  }
                 }
               }
-            }
-          },
-          seo: {
-            metaTitle: 'Scuti Company - Transformamos tu empresa con tecnología inteligente',
-            metaDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio',
-            keywords: ['tecnología', 'software', 'inteligencia artificial', 'transformación digital'],
-            ogTitle: 'Scuti Company - Tecnología Inteligente',
-            ogDescription: 'Transformamos procesos con soluciones digitales y modelos de IA personalizados',
-            ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
-            twitterCard: 'summary_large_image'
-          },
+            };
+          }
+
+          // ✅ Para SERVICES: solo hero (servicios se cargan de otra tabla)
+          if (slug === 'services') {
+            return baseContent;
+          }
+
+          // ✅ Para ABOUT: hero + campos de misión/visión
+          if (slug === 'about') {
+            return {
+              ...baseContent,
+              mission: 'Nuestra misión es transformar empresas con tecnología inteligente.',
+              vision: 'Ser líderes en soluciones tecnológicas innovadoras.'
+            };
+          }
+
+          // ✅ Para CONTACT, SERVICES y otras páginas: solo hero
+          return baseContent;
+        };
+
+        // Usar configuración predeterminada ESPECÍFICA como fallback
+        data = {
+          pageSlug: pageSlug,
+          pageName: getPageName(pageSlug),
+          content: getContentForPage(pageSlug),
+          seo: getSeoForPage(pageSlug),
           theme: {
             default: 'dark' as const,
             lightMode: {
@@ -195,7 +337,8 @@ export const useCmsData = (pageSlug: string = 'home') => {
         };
       }
       
-      if (typeof data.content.solutions.backgroundImage === 'string') {
+      // 🔥 CORREGIDO: Solo migrar solutions si existe (solo HOME tiene solutions)
+      if (data.content.solutions && typeof data.content.solutions.backgroundImage === 'string') {
         const oldValue = data.content.solutions.backgroundImage;
         data.content.solutions.backgroundImage = {
           light: DEFAULT_PAGE_CONFIG.solutions.backgroundImage.light,
@@ -208,7 +351,8 @@ export const useCmsData = (pageSlug: string = 'home') => {
         data.content.hero.styles = DEFAULT_PAGE_CONFIG.hero.styles;
       }
       
-      if (!data.content.solutions.styles) {
+      // 🔥 CORREGIDO: Solo asegurar estilos de solutions si existe
+      if (data.content.solutions && !data.content.solutions.styles) {
         data.content.solutions.styles = {
           light: { titleColor: '', descriptionColor: '' },
           dark: { titleColor: '', descriptionColor: '' }

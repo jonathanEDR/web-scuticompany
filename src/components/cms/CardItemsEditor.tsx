@@ -248,8 +248,8 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                           onChange={(html: string) => updateItem(index, 'title', html)}
                           placeholder="Título de la solución"
                           themeColors={{
-                            light: pageData.content.solutions.items?.[index]?.styles?.light?.titleColor || '',
-                            dark: pageData.content.solutions.items?.[index]?.styles?.dark?.titleColor || ''
+                            light: pageData.content.solutions?.items?.[index]?.styles?.light?.titleColor || '',
+                            dark: pageData.content.solutions?.items?.[index]?.styles?.dark?.titleColor || ''
                           }}
                           onThemeColorChange={(mode: 'light' | 'dark', color: string) => {
                             // Crear estructura para el item específico
@@ -275,8 +275,8 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                           onChange={(html: string) => updateItem(index, 'description', html)}
                           placeholder="Descripción detallada de la solución..."
                           themeColors={{
-                            light: pageData.content.solutions.items?.[index]?.styles?.light?.descriptionColor || '',
-                            dark: pageData.content.solutions.items?.[index]?.styles?.dark?.descriptionColor || ''
+                            light: pageData.content.solutions?.items?.[index]?.styles?.light?.descriptionColor || '',
+                            dark: pageData.content.solutions?.items?.[index]?.styles?.dark?.descriptionColor || ''
                           }}
                           onThemeColorChange={(mode: 'light' | 'dark', color: string) => {
                             // Crear estructura para el item específico

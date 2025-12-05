@@ -177,6 +177,39 @@ const HeroConfigSection: React.FC<HeroConfigSectionProps> = ({
                       : pageData.content.hero.backgroundImage?.dark)}
                   />
                 </div>
+
+                {/* 🆕 Control de Opacidad de la Imagen */}
+                <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700/50">
+                  <div className="flex items-center mb-3">
+                    <div className="bg-white dark:bg-gray-800 rounded-full p-2 mr-3 shadow-sm">
+                      <span className="text-lg">🎚️</span>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-bold text-gray-800 dark:text-gray-200">Opacidad de la Imagen</h5>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {Math.round(((pageData.content.hero as any).backgroundOpacity || 0.8) * 100)}% 
+                        <span className="ml-1">
+                          {((pageData.content.hero as any).backgroundOpacity || 0.8) >= 0.9 ? '🔥 Ultra HD' : 
+                           ((pageData.content.hero as any).backgroundOpacity || 0.8) >= 0.7 ? '✨ Alta calidad' : 
+                           ((pageData.content.hero as any).backgroundOpacity || 0.8) >= 0.4 ? '👍 Normal' : '💨 Sutil'}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="5"
+                    value={((pageData.content.hero as any).backgroundOpacity || 0.8) * 100}
+                    onChange={(e) => updateContent('hero.backgroundOpacity', parseInt(e.target.value) / 100)}
+                    className="w-full h-2 bg-gradient-to-r from-gray-300 via-purple-400 to-purple-600 rounded-lg appearance-none cursor-pointer dark:from-gray-600 dark:via-purple-500 dark:to-purple-400"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <span>5% (Sutil)</span>
+                    <span>100% (HD)</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

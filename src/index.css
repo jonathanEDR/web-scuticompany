@@ -441,5 +441,15 @@ html {
   animation: float 3s ease-in-out infinite;
 }
 
-
+/* Ocultar scrollbar pero mantener funcionalidad */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+}
 

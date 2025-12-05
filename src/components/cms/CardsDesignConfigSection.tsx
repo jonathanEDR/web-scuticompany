@@ -165,7 +165,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   const initialData = useMemo(() => {
     let cardData;
     if (activeSection === 'solutions') {
-      cardData = pageData.content.solutions.cardsDesign;
+      cardData = pageData.content.solutions?.cardsDesign;
     } else if (activeSection === 'valueAdded') {
       cardData = pageData.content.valueAdded?.cardsDesign;
     } else if (activeSection === 'contact') {

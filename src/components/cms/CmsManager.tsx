@@ -16,6 +16,9 @@ import CardsDesignConfigSection from './CardsDesignConfigSection';
 import ContactConfigSection from './ContactConfigSection';
 import ContactFormEditor from './ContactFormEditor';
 import ChatbotConfigSection from './ChatbotConfigSection';
+import ServicesFilterConfigSection from './ServicesFilterConfigSection';
+import ServicesGridConfigSection from './ServicesGridConfigSection';
+import ServicesAccordionConfigSection from './ServicesAccordionConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -342,6 +345,21 @@ const CmsManager: React.FC = () => {
                 <option value="services">🚀 Services (Servicios)</option>
                 <option value="contact">📞 Contact (Contacto)</option>
               </select>
+              
+              {/* 🔄 Botón para limpiar cache y recargar */}
+              <button
+                onClick={() => {
+                  // Limpiar cache de localStorage para esta página
+                  localStorage.removeItem(`cmsCache_page-${selectedPage}`);
+                  console.log(`🗑️ Cache limpiado para ${selectedPage}`);
+                  // Recargar datos
+                  loadPageData();
+                }}
+                className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors flex items-center gap-1"
+                title="Limpiar cache y recargar datos"
+              >
+                🔄 Recargar
+              </button>
             </div>
           </div>
           <div className="flex flex-row flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -478,19 +496,45 @@ const CmsManager: React.FC = () => {
 
             {/* 🛠️ SECCIONES ESPECÍFICAS PARA SERVICES */}
             {selectedPage === 'services' && (
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
-                  🛠️ Configuración de Página "Servicios"
-                </h3>
-                <p className="text-green-700 dark:text-green-300 mb-4">
-                  Esta página mostrará la lista de servicios disponibles desde el módulo de servicios.
-                </p>
-                <ul className="text-green-600 dark:text-green-400 space-y-2">
-                  <li>✅ <strong>Hero Section:</strong> Introducción a los servicios</li>
-                  <li>✅ <strong>Servicios:</strong> Se cargan automáticamente desde la base de datos</li>
-                  <li>✅ <strong>SEO:</strong> Optimización para búsquedas de servicios</li>
-                </ul>
-              </div>
+              <>
+                {/* Configuración de Filtros de Servicios */}
+                <ServicesFilterConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                
+                {/* Configuración de Sección y Tarjetas de Servicios */}
+                <ServicesGridConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                
+                {/* 🆕 Configuración de Acordeón de Servicios */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+                  <ServicesAccordionConfigSection
+                    config={pageData?.content?.servicesAccordion || {}}
+                    onChange={(newConfig) => handleUpdateContent('servicesAccordion', newConfig)}
+                  />
+                </div>
+                
+                {/* Panel informativo */}
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
+                    🛠️ Configuración de Página "Servicios"
+                  </h3>
+                  <p className="text-green-700 dark:text-green-300 mb-4">
+                    Esta página muestra la lista de servicios con filtros personalizables.
+                  </p>
+                  <ul className="text-green-600 dark:text-green-400 space-y-2">
+                    <li>✅ <strong>Hero Section:</strong> Introducción a los servicios</li>
+                    <li>✅ <strong>Filtros:</strong> Panel de búsqueda y categorías</li>
+                    <li>✅ <strong>Sección Destacados:</strong> Título e imagen de fondo</li>
+                    <li>✅ <strong>Tarjetas:</strong> Diseño visual de las tarjetas de servicio</li>
+                    <li>✅ <strong>Acordeón:</strong> Lista expandible de todos los servicios</li>
+                    <li>✅ <strong>SEO:</strong> Optimización para búsquedas de servicios</li>
+                  </ul>
+                </div>
+              </>
             )}
 
             {/* 📞 SECCIONES ESPECÍFICAS PARA CONTACT */}

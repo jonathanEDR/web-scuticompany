@@ -1,0 +1,1440 @@
+/**
+ * 🎯 CONFIGURACIÓN DE ACORDEÓN DE SERVICIOS
+ * Panel de configuración para la sección de lista de servicios en acordeón
+ */
+
+import React from 'react';
+import ManagedImageSelector from '../ManagedImageSelector';
+
+interface AccordionConfig {
+  sectionTitle?: string;
+  sectionSubtitle?: string;
+  titleColor?: string;
+  titleColorDark?: string;
+  subtitleColor?: string;
+  subtitleColorDark?: string;
+  numberColor?: string;
+  numberColorDark?: string;
+  serviceTitleColor?: string;
+  serviceTitleColorDark?: string;
+  descriptionColor?: string;
+  descriptionColorDark?: string;
+  titleFontFamily?: string;
+  contentFontFamily?: string;
+  titleFontWeight?: string;
+  borderColor?: string;
+  borderColorDark?: string;
+  iconColor?: string;
+  iconColorDark?: string;
+  buttonText?: string;
+  buttonGradient?: string;
+  buttonTextColor?: string;
+  buttonBorderRadius?: string;
+  featureIconColor?: string;
+  featureIconColorDark?: string;
+  maxFeatures?: number;
+  // Colores de resaltado de características
+  featureHighlightBgColor?: string;
+  featureHighlightBgColorDark?: string;
+  featureHighlightTextColor?: string;
+  featureHighlightTextColorDark?: string;
+  featureHighlightBorderColor?: string;
+  featureHighlightBorderColorDark?: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
+  };
+  backgroundOpacity?: number;
+  enabled?: boolean;
+  // 🆕 Configuración de líneas de separación
+  separatorLineColor?: string;
+  separatorLineColorDark?: string;
+  separatorLineWidth?: number;
+  expandedSeparatorColor?: string;
+  expandedSeparatorColorDark?: string;
+  // 🆕 Configuración de fondo expandido
+  expandedBg?: string;
+  expandedBgDark?: string;
+  expandedBgOpacity?: number;
+  expandedBgBlur?: number;
+  // 🆕 Configuración de fondo del header (botón)
+  headerBg?: string;
+  headerBgDark?: string;
+  headerBgOpacity?: number;
+  headerBgHover?: string;
+  headerBgHoverDark?: string;
+  headerBgHoverOpacity?: number;
+  // 🆕 Paginación
+  itemsPerPage?: number;
+  paginationBgColor?: string;
+  paginationBgColorDark?: string;
+  paginationActiveColor?: string;
+  paginationActiveColorDark?: string;
+  paginationTextColor?: string;
+  paginationTextColorDark?: string;
+}
+
+interface ServicesAccordionConfigSectionProps {
+  config: AccordionConfig;
+  onChange: (config: AccordionConfig) => void;
+}
+
+// Opciones de fuentes disponibles
+const FONT_OPTIONS = [
+  { value: 'inherit', label: 'Por defecto (Sistema)' },
+  { value: "'Montserrat', sans-serif", label: 'Montserrat' },
+  { value: "'Poppins', sans-serif", label: 'Poppins' },
+  { value: "'Inter', sans-serif", label: 'Inter' },
+  { value: "'Roboto', sans-serif", label: 'Roboto' },
+  { value: "'Open Sans', sans-serif", label: 'Open Sans' },
+  { value: "'Lato', sans-serif", label: 'Lato' },
+  { value: "'Raleway', sans-serif", label: 'Raleway' },
+  { value: "'Nunito', sans-serif", label: 'Nunito' },
+  { value: "'Playfair Display', serif", label: 'Playfair Display' },
+];
+
+export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSectionProps> = ({
+  config,
+  onChange
+}) => {
+  const handleUpdate = (field: string, value: any) => {
+    const keys = field.split('.');
+    if (keys.length === 1) {
+      onChange({ ...config, [field]: value });
+    } else {
+      const newConfig = { ...config };
+      let current: any = newConfig;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]]) current[keys[i]] = {};
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+      onChange(newConfig);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            📋 Sección Acordeón de Servicios
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Lista expandible con todos los servicios (diseño tipo acordeón)
+          </p>
+        </div>
+        
+        {/* Toggle habilitar/deshabilitar */}
+        <label className="flex items-center gap-2 cursor-pointer">
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            {config.enabled !== false ? 'Habilitado' : 'Deshabilitado'}
+          </span>
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={config.enabled !== false}
+              onChange={(e) => handleUpdate('enabled', e.target.checked)}
+              className="sr-only"
+            />
+            <div className={`w-11 h-6 rounded-full transition-colors ${
+              config.enabled !== false ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'
+            }`}>
+              <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                config.enabled !== false ? 'translate-x-5' : ''
+              }`} />
+            </div>
+          </div>
+        </label>
+      </div>
+
+      {/* Contenido configurable */}
+      {config.enabled !== false && (
+        <div className="space-y-6">
+          
+          {/* ===== TEXTOS DE LA SECCIÓN ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              ✏️ Textos de la Sección
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Título de la sección
+                </label>
+                <input
+                  type="text"
+                  value={config.sectionTitle || ''}
+                  onChange={(e) => handleUpdate('sectionTitle', e.target.value)}
+                  placeholder="Todos los servicios"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Subtítulo
+                </label>
+                <input
+                  type="text"
+                  value={config.sectionSubtitle || ''}
+                  onChange={(e) => handleUpdate('sectionSubtitle', e.target.value)}
+                  placeholder="Trabajamos para llevar tus operaciones al siguiente nivel."
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ===== TIPOGRAFÍA ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              🔤 Tipografía
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Fuente de títulos
+                </label>
+                <select
+                  value={config.titleFontFamily || 'inherit'}
+                  onChange={(e) => handleUpdate('titleFontFamily', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  style={{ fontFamily: config.titleFontFamily || 'inherit' }}
+                >
+                  {FONT_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value} style={{ fontFamily: opt.value }}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Fuente de contenido
+                </label>
+                <select
+                  value={config.contentFontFamily || 'inherit'}
+                  onChange={(e) => handleUpdate('contentFontFamily', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  style={{ fontFamily: config.contentFontFamily || 'inherit' }}
+                >
+                  {FONT_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value} style={{ fontFamily: opt.value }}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Peso de títulos
+                </label>
+                <select
+                  value={config.titleFontWeight || '700'}
+                  onChange={(e) => handleUpdate('titleFontWeight', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="400">Normal (400)</option>
+                  <option value="500">Medio (500)</option>
+                  <option value="600">Semi-Bold (600)</option>
+                  <option value="700">Bold (700)</option>
+                  <option value="800">Extra Bold (800)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Items por página
+                </label>
+                <select
+                  value={config.itemsPerPage || 9}
+                  onChange={(e) => handleUpdate('itemsPerPage', parseInt(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="6">6 servicios</option>
+                  <option value="8">8 servicios</option>
+                  <option value="9">9 servicios</option>
+                  <option value="10">10 servicios</option>
+                  <option value="12">12 servicios</option>
+                  <option value="15">15 servicios</option>
+                </select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Servicios mostrados por página
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== COLORES MODO CLARO ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              ☀️ Colores Modo Claro
+            </h3>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Título sección
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.titleColor || '#8B5CF6'}
+                    onChange={(e) => handleUpdate('titleColor', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.titleColor || '#8B5CF6'}
+                    onChange={(e) => handleUpdate('titleColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Números
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.numberColor || '#8B5CF6'}
+                    onChange={(e) => handleUpdate('numberColor', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.numberColor || '#8B5CF6'}
+                    onChange={(e) => handleUpdate('numberColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Título servicio
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.serviceTitleColor || '#1F2937'}
+                    onChange={(e) => handleUpdate('serviceTitleColor', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.serviceTitleColor || '#1F2937'}
+                    onChange={(e) => handleUpdate('serviceTitleColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                  💡 Si usas fondo claro/transparente, usa texto oscuro (#1F2937 o similar)
+                </p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Features ✓
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.featureIconColor || '#06B6D4'}
+                    onChange={(e) => handleUpdate('featureIconColor', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.featureIconColor || '#06B6D4'}
+                    onChange={(e) => handleUpdate('featureIconColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== COLORES MODO OSCURO ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              🌙 Colores Modo Oscuro
+            </h3>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Título sección
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.titleColorDark || '#A78BFA'}
+                    onChange={(e) => handleUpdate('titleColorDark', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.titleColorDark || '#A78BFA'}
+                    onChange={(e) => handleUpdate('titleColorDark', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Números
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.numberColorDark || '#A78BFA'}
+                    onChange={(e) => handleUpdate('numberColorDark', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.numberColorDark || '#A78BFA'}
+                    onChange={(e) => handleUpdate('numberColorDark', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Título servicio
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.serviceTitleColorDark || '#FFFFFF'}
+                    onChange={(e) => handleUpdate('serviceTitleColorDark', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.serviceTitleColorDark || '#FFFFFF'}
+                    onChange={(e) => handleUpdate('serviceTitleColorDark', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                  💡 Si usas fondo oscuro, usa texto claro (#FFFFFF o similar)
+                </p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Features ✓
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.featureIconColorDark || '#22D3EE'}
+                    onChange={(e) => handleUpdate('featureIconColorDark', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.featureIconColorDark || '#22D3EE'}
+                    onChange={(e) => handleUpdate('featureIconColorDark', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== LÍNEAS DE SEPARACIÓN ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              ➖ Líneas de Separación
+            </h3>
+            
+            <div className="space-y-4">
+              {/* Grosor de línea */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Grosor de línea: {config.separatorLineWidth || 2}px
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  step="1"
+                  value={config.separatorLineWidth || 2}
+                  onChange={(e) => handleUpdate('separatorLineWidth', parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>Delgada (1px)</span>
+                  <span>Media (3px)</span>
+                  <span>Gruesa (5px)</span>
+                </div>
+              </div>
+
+              {/* Colores de líneas - Modo Claro */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    ☀️ Modo Claro
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Línea normal (cerrado)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.separatorLineColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('separatorLineColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.separatorLineColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('separatorLineColor', e.target.value)}
+                          placeholder="rgba(255, 255, 255, 0.2)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Línea expandida (abierto)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.expandedSeparatorColor || '#a78bfa'}
+                          onChange={(e) => handleUpdate('expandedSeparatorColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.expandedSeparatorColor || '#a78bfa'}
+                          onChange={(e) => handleUpdate('expandedSeparatorColor', e.target.value)}
+                          placeholder="rgba(167, 139, 250, 0.3)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Colores de líneas - Modo Oscuro */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    🌙 Modo Oscuro
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Línea normal (cerrado)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.separatorLineColorDark || '#ffffff'}
+                          onChange={(e) => handleUpdate('separatorLineColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.separatorLineColorDark || '#ffffff'}
+                          onChange={(e) => handleUpdate('separatorLineColorDark', e.target.value)}
+                          placeholder="rgba(255, 255, 255, 0.1)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Línea expandida (abierto)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.expandedSeparatorColorDark || '#a78bfa'}
+                          onChange={(e) => handleUpdate('expandedSeparatorColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.expandedSeparatorColorDark || '#a78bfa'}
+                          onChange={(e) => handleUpdate('expandedSeparatorColorDark', e.target.value)}
+                          placeholder="rgba(167, 139, 250, 0.3)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vista previa de líneas */}
+              <div className="mt-4 p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+                <p className="text-xs text-white mb-2">Vista previa de líneas:</p>
+                <div className="space-y-2">
+                  <div 
+                    className="bg-white/20 backdrop-blur-sm rounded p-2 border-b-2"
+                    style={{
+                      borderBottomColor: config.separatorLineColor || 'rgba(255, 255, 255, 0.2)',
+                      borderBottomWidth: `${config.separatorLineWidth || 2}px`
+                    }}
+                  >
+                    <span className="text-white text-sm">Línea normal (cerrado)</span>
+                  </div>
+                  <div 
+                    className="bg-white/20 backdrop-blur-sm rounded p-2 border-b-2"
+                    style={{
+                      borderBottomColor: config.expandedSeparatorColor || 'rgba(167, 139, 250, 0.3)',
+                      borderBottomWidth: `${config.separatorLineWidth || 2}px`
+                    }}
+                  >
+                    <span className="text-white text-sm">Línea expandida (abierto)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== FONDO DEL CONTENIDO EXPANDIDO ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              🎨 Fondo del Contenido Expandido
+            </h3>
+            
+            <div className="space-y-4">
+              {/* Opacidad del fondo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Opacidad: {((config.expandedBgOpacity ?? 0.8) * 100).toFixed(0)}%
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={config.expandedBgOpacity ?? 0.8}
+                  onChange={(e) => handleUpdate('expandedBgOpacity', parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>Transparente (0%)</span>
+                  <span>Semi (50%)</span>
+                  <span>Opaco (100%)</span>
+                </div>
+              </div>
+
+              {/* Desenfoque (Blur) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Desenfoque: {config.expandedBgBlur || 8}px
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="20"
+                  step="2"
+                  value={config.expandedBgBlur || 8}
+                  onChange={(e) => handleUpdate('expandedBgBlur', parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>Sin blur (0px)</span>
+                  <span>Medio (10px)</span>
+                  <span>Alto (20px)</span>
+                </div>
+              </div>
+
+              {/* Colores de fondo */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    ☀️ Modo Claro
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color de fondo
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.expandedBg || '#f9fafb'}
+                          onChange={(e) => handleUpdate('expandedBg', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.expandedBg || '#f9fafb'}
+                          onChange={(e) => handleUpdate('expandedBg', e.target.value)}
+                          placeholder="#f9fafb o rgba(249, 250, 251, 0.8)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Tip: Usa rgba() para incluir transparencia en el color
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    🌙 Modo Oscuro
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color de fondo
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.expandedBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdate('expandedBgDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.expandedBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdate('expandedBgDark', e.target.value)}
+                          placeholder="#1f2937 o rgba(31, 41, 55, 0.8)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Tip: Usa rgba() para incluir transparencia en el color
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vista previa del fondo */}
+              <div className="mt-4 p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+                <p className="text-xs text-white mb-2">Vista previa del fondo expandido:</p>
+                <div 
+                  className="rounded-lg p-4"
+                  style={{
+                    backgroundColor: (() => {
+                      const baseColor = config.expandedBg || '#f9fafb';
+                      const opacity = config.expandedBgOpacity ?? 0.8;
+                      
+                      // Si es formato rgba, usarlo directamente
+                      if (baseColor.startsWith('rgba')) return baseColor;
+                      
+                      // Si es hex, convertir a rgba con opacidad
+                      if (baseColor.startsWith('#')) {
+                        const hex = baseColor.replace('#', '');
+                        const r = parseInt(hex.substring(0, 2), 16);
+                        const g = parseInt(hex.substring(2, 4), 16);
+                        const b = parseInt(hex.substring(4, 6), 16);
+                        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+                      }
+                      
+                      return baseColor;
+                    })(),
+                    backdropFilter: `blur(${config.expandedBgBlur || 8}px)`
+                  }}
+                >
+                  <p className="text-gray-900 dark:text-white text-sm">
+                    Este es el aspecto del fondo cuando el acordeón está expandido
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 text-xs mt-2">
+                    Opacidad: {((config.expandedBgOpacity ?? 0.8) * 100).toFixed(0)}% | 
+                    Blur: {config.expandedBgBlur || 8}px
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== FONDO DEL HEADER (BOTÓN ACORDEÓN) ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              🎨 Fondo del Header (Botón)
+            </h3>
+            
+            <div className="space-y-4">
+              {/* Opacidad normal */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Opacidad (estado normal): {((config.headerBgOpacity ?? 0.6) * 100).toFixed(0)}%
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={config.headerBgOpacity ?? 0.6}
+                  onChange={(e) => handleUpdate('headerBgOpacity', parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>Transparente (0%)</span>
+                  <span>Semi (50%)</span>
+                  <span>Opaco (100%)</span>
+                </div>
+              </div>
+
+              {/* Opacidad hover */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Opacidad (hover/cerrado): {((config.headerBgHoverOpacity ?? 0.2) * 100).toFixed(0)}%
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={config.headerBgHoverOpacity ?? 0.2}
+                  onChange={(e) => handleUpdate('headerBgHoverOpacity', parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>Transparente (0%)</span>
+                  <span>Semi (50%)</span>
+                  <span>Opaco (100%)</span>
+                </div>
+              </div>
+
+              {/* Colores de fondo */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    ☀️ Modo Claro
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color de fondo (expandido)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.headerBg || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBg', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.headerBg || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBg', e.target.value)}
+                          placeholder="#1f2937"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color de fondo (hover/cerrado)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.headerBgHover || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBgHover', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.headerBgHover || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBgHover', e.target.value)}
+                          placeholder="#1f2937"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    🌙 Modo Oscuro
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color de fondo (expandido)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.headerBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBgDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.headerBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBgDark', e.target.value)}
+                          placeholder="#1f2937"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color de fondo (hover/cerrado)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.headerBgHoverDark || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBgHoverDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.headerBgHoverDark || '#1f2937'}
+                          onChange={(e) => handleUpdate('headerBgHoverDark', e.target.value)}
+                          placeholder="#1f2937"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vista previa */}
+              <div className="mt-4 p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg space-y-2">
+                <p className="text-xs text-white mb-2">Vista previa del header:</p>
+                <div 
+                  className="rounded-lg p-4 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: (() => {
+                      const baseColor = config.headerBg || '#1f2937';
+                      const opacity = config.headerBgOpacity ?? 0.6;
+                      
+                      if (baseColor.startsWith('rgba')) return baseColor;
+                      if (baseColor.startsWith('rgb(')) {
+                        return baseColor.replace('rgb(', 'rgba(').replace(')', `, ${opacity})`);
+                      }
+                      if (baseColor.startsWith('#')) {
+                        const hex = baseColor.replace('#', '');
+                        const r = parseInt(hex.substring(0, 2), 16);
+                        const g = parseInt(hex.substring(2, 4), 16);
+                        const b = parseInt(hex.substring(4, 6), 16);
+                        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+                      }
+                      return baseColor;
+                    })()
+                  }}
+                >
+                  <p className="text-white text-sm">Header expandido - Opacidad: {((config.headerBgOpacity ?? 0.6) * 100).toFixed(0)}%</p>
+                </div>
+                <div 
+                  className="rounded-lg p-4 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: (() => {
+                      const baseColor = config.headerBgHover || '#1f2937';
+                      const opacity = config.headerBgHoverOpacity ?? 0.2;
+                      
+                      if (baseColor.startsWith('rgba')) return baseColor;
+                      if (baseColor.startsWith('rgb(')) {
+                        return baseColor.replace('rgb(', 'rgba(').replace(')', `, ${opacity})`);
+                      }
+                      if (baseColor.startsWith('#')) {
+                        const hex = baseColor.replace('#', '');
+                        const r = parseInt(hex.substring(0, 2), 16);
+                        const g = parseInt(hex.substring(2, 4), 16);
+                        const b = parseInt(hex.substring(4, 6), 16);
+                        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+                      }
+                      return baseColor;
+                    })()
+                  }}
+                >
+                  <p className="text-white text-sm">Header cerrado/hover - Opacidad: {((config.headerBgHoverOpacity ?? 0.2) * 100).toFixed(0)}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== PAGINACIÓN ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              📄 Colores de Paginación
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Modo Claro */}
+              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  ☀️ Modo Claro
+                </h4>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Fondo botones
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.paginationBgColor || '#ffffff'}
+                        onChange={(e) => handleUpdate('paginationBgColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.paginationBgColor || 'rgba(255, 255, 255, 0.2)'}
+                        onChange={(e) => handleUpdate('paginationBgColor', e.target.value)}
+                        placeholder="rgba(255, 255, 255, 0.2)"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Fondo página activa
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.paginationActiveColor || '#ffffff'}
+                        onChange={(e) => handleUpdate('paginationActiveColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.paginationActiveColor || 'rgba(255, 255, 255, 0.9)'}
+                        onChange={(e) => handleUpdate('paginationActiveColor', e.target.value)}
+                        placeholder="rgba(255, 255, 255, 0.9)"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Color de texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.paginationTextColor || '#ffffff'}
+                        onChange={(e) => handleUpdate('paginationTextColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.paginationTextColor || '#FFFFFF'}
+                        onChange={(e) => handleUpdate('paginationTextColor', e.target.value)}
+                        placeholder="#FFFFFF"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modo Oscuro */}
+              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  🌙 Modo Oscuro
+                </h4>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Fondo botones
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.paginationBgColorDark || '#ffffff'}
+                        onChange={(e) => handleUpdate('paginationBgColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.paginationBgColorDark || 'rgba(255, 255, 255, 0.15)'}
+                        onChange={(e) => handleUpdate('paginationBgColorDark', e.target.value)}
+                        placeholder="rgba(255, 255, 255, 0.15)"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Fondo página activa
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.paginationActiveColorDark || '#ffffff'}
+                        onChange={(e) => handleUpdate('paginationActiveColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.paginationActiveColorDark || 'rgba(255, 255, 255, 0.9)'}
+                        onChange={(e) => handleUpdate('paginationActiveColorDark', e.target.value)}
+                        placeholder="rgba(255, 255, 255, 0.9)"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Color de texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.paginationTextColorDark || '#ffffff'}
+                        onChange={(e) => handleUpdate('paginationTextColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.paginationTextColorDark || '#FFFFFF'}
+                        onChange={(e) => handleUpdate('paginationTextColorDark', e.target.value)}
+                        placeholder="#FFFFFF"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== BOTÓN ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              🔘 Botón "Ver más"
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Texto del botón
+                </label>
+                <input
+                  type="text"
+                  value={config.buttonText || ''}
+                  onChange={(e) => handleUpdate('buttonText', e.target.value)}
+                  placeholder="Ver más"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Gradiente del botón
+                </label>
+                <input
+                  type="text"
+                  value={config.buttonGradient || ''}
+                  onChange={(e) => handleUpdate('buttonGradient', e.target.value)}
+                  placeholder="linear-gradient(90deg, #3B82F6, #06B6D4)"
+                  className="w-full px-4 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Color de texto
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.buttonTextColor || '#FFFFFF'}
+                    onChange={(e) => handleUpdate('buttonTextColor', e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={config.buttonTextColor || '#FFFFFF'}
+                    onChange={(e) => handleUpdate('buttonTextColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Max características
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={config.maxFeatures || 3}
+                  onChange={(e) => handleUpdate('maxFeatures', parseInt(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+            
+            {/* 🎨 Colores de resaltado de características */}
+            <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+              <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2">
+                🎨 Colores de Resaltado de Características
+              </h4>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+                Configura los colores del fondo, texto y borde de las características resaltadas
+              </p>
+              
+              {/* Modo claro */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  ☀️ Modo Claro
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      Fondo
+                    </label>
+                    <input
+                      type="color"
+                      value={config.featureHighlightBgColor || '#F3E8FF'}
+                      onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
+                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+                      {config.featureHighlightBgColor || '#F3E8FF'}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      Texto
+                    </label>
+                    <input
+                      type="color"
+                      value={config.featureHighlightTextColor || '#6B21A8'}
+                      onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
+                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+                      {config.featureHighlightTextColor || '#6B21A8'}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      Borde
+                    </label>
+                    <input
+                      type="color"
+                      value={config.featureHighlightBorderColor || '#C084FC'}
+                      onChange={(e) => handleUpdate('featureHighlightBorderColor', e.target.value)}
+                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+                      {config.featureHighlightBorderColor || '#C084FC'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modo oscuro */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  🌙 Modo Oscuro
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      Fondo
+                    </label>
+                    <input
+                      type="color"
+                      value={config.featureHighlightBgColorDark || '#581C87'}
+                      onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
+                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+                      {config.featureHighlightBgColorDark || '#581C87'}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      Texto
+                    </label>
+                    <input
+                      type="color"
+                      value={config.featureHighlightTextColorDark || '#E9D5FF'}
+                      onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
+                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+                      {config.featureHighlightTextColorDark || '#E9D5FF'}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      Borde
+                    </label>
+                    <input
+                      type="color"
+                      value={config.featureHighlightBorderColorDark || '#7C3AED'}
+                      onChange={(e) => handleUpdate('featureHighlightBorderColorDark', e.target.value)}
+                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+                      {config.featureHighlightBorderColorDark || '#7C3AED'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Vista previa */}
+              <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Vista previa:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <span
+                    className="text-xs px-2.5 py-1.5 rounded-md font-medium"
+                    style={{
+                      backgroundColor: config.featureHighlightBgColor || '#F3E8FF',
+                      color: config.featureHighlightTextColor || '#6B21A8',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: config.featureHighlightBorderColor || '#C084FC'
+                    }}
+                  >
+                    ✓ Característica 1
+                  </span>
+                  <span
+                    className="text-xs px-2.5 py-1.5 rounded-md font-medium"
+                    style={{
+                      backgroundColor: config.featureHighlightBgColor || '#F3E8FF',
+                      color: config.featureHighlightTextColor || '#6B21A8',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: config.featureHighlightBorderColor || '#C084FC'
+                    }}
+                  >
+                    ✓ Característica 2
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== FONDO ===== */}
+          <div className="pb-4">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              🖼️ Imagen de Fondo
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <ManagedImageSelector
+                  label="Imagen modo claro"
+                  description="Imagen de fondo para tema claro"
+                  currentImage={config.backgroundImage?.light}
+                  onImageSelect={(url: string) => handleUpdate('backgroundImage.light', url)}
+                  hideButtonArea={!!config.backgroundImage?.light}
+                />
+              </div>
+              
+              <div>
+                <ManagedImageSelector
+                  label="Imagen modo oscuro"
+                  description="Imagen de fondo para tema oscuro"
+                  currentImage={config.backgroundImage?.dark}
+                  onImageSelect={(url: string) => handleUpdate('backgroundImage.dark', url)}
+                  hideButtonArea={!!config.backgroundImage?.dark}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                Opacidad del fondo: {Math.round((config.backgroundOpacity ?? 0.1) * 100)}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round((config.backgroundOpacity ?? 0.1) * 100)}
+                onChange={(e) => handleUpdate('backgroundOpacity', parseInt(e.target.value) / 100)}
+                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              />
+            </div>
+          </div>
+
+          {/* Vista previa */}
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">Vista previa</h4>
+            <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className="text-center mb-4">
+                <h3 
+                  className="text-xl font-bold italic"
+                  style={{ 
+                    color: config.titleColor || '#8B5CF6',
+                    fontFamily: config.titleFontFamily || 'inherit'
+                  }}
+                >
+                  {config.sectionTitle || 'Todos los servicios'}
+                </h3>
+                <p 
+                  className="text-sm"
+                  style={{ color: config.subtitleColor || '#4B5563' }}
+                >
+                  {config.sectionSubtitle || 'Trabajamos para llevar tus operaciones al siguiente nivel.'}
+                </p>
+              </div>
+              
+              <div className="border-t border-b border-gray-200 dark:border-gray-700 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span 
+                      className="text-xl font-light"
+                      style={{ color: config.numberColor || '#8B5CF6' }}
+                    >
+                      01
+                    </span>
+                    <span 
+                      className="font-semibold"
+                      style={{ 
+                        color: config.serviceTitleColor || '#1F2937',
+                        fontFamily: config.titleFontFamily || 'inherit'
+                      }}
+                    >
+                      Ejemplo de Servicio
+                    </span>
+                  </div>
+                  <span style={{ color: config.iconColor || '#8B5CF6' }}>▼</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ServicesAccordionConfigSection;

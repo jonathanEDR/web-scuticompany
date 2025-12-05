@@ -225,7 +225,11 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
     const data = await response.json();
 
     if (!data.success) {
-      throw new Error(data.message || 'Error al obtener página');
+      // 🔥 NUEVO: Distinguir entre 404 (página no existe) y otros errores
+      // Si es 404, NO usar cache - propagar el error para que useCmsData use el fallback específico
+      const error = new Error(data.message || 'Error al obtener página');
+      (error as any).isNotFound = data.message?.includes('no encontrada') || response.status === 404;
+      throw error;
     }
 
     // Guardar en RequestCache (memoria)
@@ -242,28 +246,42 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
     }
 
     return data.data;
-  } catch (error) {
+  } catch (error: any) {
     // Solo loguear errores en desarrollo
     if (import.meta.env.DEV) {
       console.error('Error obteniendo página:', error);
     }
     
-    // ⚡ Intentar usar datos en caché aunque estén expirados
+    // 🔥 NUEVO: Si es un error 404 (página no existe), NO usar cache
+    // Propagar el error para que useCmsData use el fallback específico de la página
+    if (error?.isNotFound) {
+      console.log(`🚫 [CMS API] Página "${slug}" no existe en la base de datos, propagando error para usar fallback`);
+      // Limpiar cualquier cache corrupto para esta página
+      try {
+        localStorage.removeItem(localStorageKey);
+        cache.clear(cacheKey);
+      } catch (e) {
+        // Ignorar errores de limpieza
+      }
+      throw error;
+    }
+    
+    // ⚡ Solo para errores de RED (no 404): Intentar usar datos en caché aunque estén expirados
     const staleData = cache.getStale(cacheKey);
     if (staleData) {
       if (import.meta.env.DEV) {
-        console.warn('Usando datos expirados del RequestCache como fallback');
+        console.warn('Usando datos expirados del RequestCache como fallback (error de red)');
       }
       return staleData;
     }
 
-    // ⚡ Último recurso: localStorage aunque esté expirado
+    // ⚡ Último recurso para errores de RED: localStorage aunque esté expirado
     try {
       const localData = localStorage.getItem(localStorageKey);
       if (localData) {
         const { data } = JSON.parse(localData);
         if (import.meta.env.DEV) {
-          console.warn('Usando datos expirados del localStorage como fallback');
+          console.warn('Usando datos expirados del localStorage como fallback (error de red)');
         }
         return data;
       }
