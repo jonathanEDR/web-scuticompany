@@ -143,16 +143,16 @@ const PublicHeaderOptimized = () => {
       }`} 
       style={{
         backgroundColor: lastScrollY > 50 
-          ? (theme === 'dark' ? 'rgba(17, 24, 39, 0.95)' : 'rgba(15, 23, 42, 0.95)') 
+          ? (theme === 'dark' ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.95)') 
           : 'transparent',
         backdropFilter: lastScrollY > 50 ? 'blur(12px) saturate(180%)' : 'none',
         boxShadow: lastScrollY > 50 
           ? (theme === 'dark' 
             ? '0 4px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.1)' 
-            : '0 4px 20px rgba(0, 0, 0, 0.1), 0 0 40px rgba(139, 92, 246, 0.05)')
+            : '0 4px 20px rgba(0, 0, 0, 0.08), 0 0 40px rgba(139, 92, 246, 0.05)')
           : 'none',
         borderBottom: lastScrollY > 50 
-          ? `1px solid ${theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)'}` 
+          ? `1px solid ${theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.15)'}` 
           : 'none'
       }}
     >

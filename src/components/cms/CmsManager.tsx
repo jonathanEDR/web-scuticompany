@@ -5,6 +5,7 @@ import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useCmsUpdaters } from '../../hooks/cms/useCmsUpdaters';
 import HeroConfigSection from './HeroConfigSection';
 import MissionVisionConfigSection from './MissionVisionConfigSection';
+import ValuesConfigSection from './ValuesConfigSection';
 import SolutionsConfigSection from './SolutionsConfigSection';
 import ValueAddedConfigSection from './ValueAddedConfigSection';
 import ClientLogosConfigSection from './ClientLogosConfigSection';
@@ -477,6 +478,12 @@ const CmsManager: React.FC = () => {
                   updateContent={handleUpdateContent}
                 />
                 
+                {/* 🆕 Configuración de Valores */}
+                <ValuesConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
                   <h3 className="text-xl font-bold text-blue-800 dark:text-blue-200 mb-3">
                     📝 Configuración de Página "Nosotros"
@@ -488,6 +495,7 @@ const CmsManager: React.FC = () => {
                     <li>✅ <strong>Título Principal:</strong> Configura en "Hero Section" arriba</li>
                     <li>✅ <strong>Misión:</strong> Configura arriba en la sección correspondiente</li>
                     <li>✅ <strong>Visión:</strong> Configura arriba en la sección correspondiente</li>
+                    <li>✅ <strong>Valores:</strong> Configura arriba con carrusel e imágenes</li>
                     <li>✅ <strong>SEO:</strong> Configura en la pestaña "SEO"</li>
                   </ul>
                 </div>
