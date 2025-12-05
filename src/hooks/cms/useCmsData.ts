@@ -58,6 +58,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
             case 'about': return 'Sobre Nosotros';
             case 'services': return 'Servicios';
             case 'contact': return 'Contacto';
+            case 'blog': return 'Blog - Noticias';
             default: return 'Página';
           }
         };
@@ -102,6 +103,16 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 keywords: ['contacto', 'SCUTI', 'consulta', 'soporte'],
                 ogTitle: 'Contacto - SCUTI Company',
                 ogDescription: 'Ponte en contacto con nuestro equipo',
+                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                twitterCard: 'summary_large_image'
+              };
+            case 'blog':
+              return {
+                metaTitle: 'Blog Web Scuti - Noticias y Tendencias Tecnológicas',
+                metaDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos.',
+                keywords: ['blog', 'noticias tecnológicas', 'tendencias tech', 'desarrollo web', 'programación', 'AI'],
+                ogTitle: 'Blog Web Scuti - Noticias Tecnológicas',
+                ogDescription: 'Las últimas noticias y tendencias del sector tecnológico',
                 ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
                 twitterCard: 'summary_large_image'
               };
@@ -163,6 +174,17 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 ctaLink: '/contacto',
                 backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
                 backgroundImageAlt: 'Contacto SCUTI Company',
+                styles: DEFAULT_PAGE_CONFIG.hero.styles
+              };
+            case 'blog':
+              return {
+                title: 'Blog',
+                subtitle: 'Las últimas noticias y tendencias tecnológicas',
+                description: 'Mantente informado con contenido curado por expertos en tecnología.',
+                ctaText: 'Ver Noticias',
+                ctaLink: '/blog',
+                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
+                backgroundImageAlt: 'Blog Web Scuti',
                 styles: DEFAULT_PAGE_CONFIG.hero.styles
               };
             default:
@@ -248,6 +270,48 @@ export const useCmsData = (pageSlug: string = 'home') => {
               ...baseContent,
               mission: 'Nuestra misión es transformar empresas con tecnología inteligente.',
               vision: 'Ser líderes en soluciones tecnológicas innovadoras.'
+            };
+          }
+
+          // ✅ Para BLOG: hero + configuración específica del blog
+          if (slug === 'blog') {
+            return {
+              ...baseContent,
+              blogHero: {
+                title: 'Blog',
+                titleHighlight: 'Tech',
+                subtitle: 'Las últimas noticias y tendencias tecnológicas',
+                backgroundImage: '', // Imagen de fondo (vacío = usar gradiente)
+                backgroundOverlay: 0.5, // Oscurecer imagen
+                gradientFrom: '#3b82f6',
+                gradientTo: '#9333ea',
+                showStats: true,
+                stats: {
+                  articlesLabel: 'Artículos',
+                  readersCount: '15K+',
+                  readersLabel: 'Lectores'
+                },
+                search: {
+                  placeholder: 'Buscar noticias...',
+                  buttonText: 'Buscar'
+                },
+                styles: {
+                  light: {
+                    titleColor: '#ffffff',
+                    titleHighlightColor: '#fde047',
+                    subtitleColor: '#bfdbfe',
+                    statsValueColor: '#ffffff',
+                    statsLabelColor: '#bfdbfe'
+                  },
+                  dark: {
+                    titleColor: '#ffffff',
+                    titleHighlightColor: '#fde047',
+                    subtitleColor: '#bfdbfe',
+                    statsValueColor: '#ffffff',
+                    statsLabelColor: '#bfdbfe'
+                  }
+                }
+              }
             };
           }
 

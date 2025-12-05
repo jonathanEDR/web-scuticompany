@@ -20,6 +20,9 @@ import ChatbotConfigSection from './ChatbotConfigSection';
 import ServicesFilterConfigSection from './ServicesFilterConfigSection';
 import ServicesGridConfigSection from './ServicesGridConfigSection';
 import ServicesAccordionConfigSection from './ServicesAccordionConfigSection';
+import BlogHeroConfigSection from './BlogHeroConfigSection';
+import FeaturedPostsConfigSection from './FeaturedPostsConfigSection';
+import AllNewsConfigSection from './AllNewsConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -28,7 +31,7 @@ const CmsManager: React.FC = () => {
   const { theme: currentTheme } = useTheme(); // 🆕 Obtener tema actual
   
   // 🆕 Estado para manejar qué página se está editando
-  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact'>('home');
+  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog'>('home');
   
   // Determinar tab activo desde la URL
   const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' => {
@@ -345,6 +348,7 @@ const CmsManager: React.FC = () => {
                 <option value="about">👥 About (Nosotros)</option>
                 <option value="services">🚀 Services (Servicios)</option>
                 <option value="contact">📞 Contact (Contacto)</option>
+                <option value="blog">📰 Blog (Noticias)</option>
               </select>
               
               {/* 🔄 Botón para limpiar cache y recargar */}
@@ -420,12 +424,33 @@ const CmsManager: React.FC = () => {
       <div className="w-full space-y-6">
         {activeTab === 'content' && (
           <>
-            {/* 🎯 SIEMPRE mostrar Hero Section (común para todas las páginas) */}
-            <HeroConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-              updateTextStyle={handleUpdateTextStyle}
-            />
+            {/* 🎯 Hero Section - Diferente para Blog vs otras páginas */}
+            {selectedPage === 'blog' ? (
+              <>
+                {/* 📰 Hero específico para Blog */}
+                <BlogHeroConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                {/* 📰 Sección de Noticias Destacadas */}
+                <FeaturedPostsConfigSection
+                  config={pageData.content?.featuredPosts || {}}
+                  onChange={(config) => handleUpdateContent('featuredPosts', config)}
+                />
+                {/* 📰 Sección de Todas las Noticias */}
+                <AllNewsConfigSection
+                  config={pageData.content?.allNews || {}}
+                  onChange={(config) => handleUpdateContent('allNews', config)}
+                />
+              </>
+            ) : (
+              /* 🏠 Hero genérico para otras páginas */
+              <HeroConfigSection
+                pageData={pageData}
+                updateContent={handleUpdateContent}
+                updateTextStyle={handleUpdateTextStyle}
+              />
+            )}
             
             {/* 🏠 SECCIONES ESPECÍFICAS PARA HOME */}
             {selectedPage === 'home' && (
@@ -560,6 +585,29 @@ const CmsManager: React.FC = () => {
                   <li>✅ <strong>Información:</strong> Teléfono, email, dirección</li>
                 </ul>
               </div>
+            )}
+
+            {/* 📰 SECCIONES ESPECÍFICAS PARA BLOG */}
+            {selectedPage === 'blog' && (
+              <>
+                {/* Panel informativo */}
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-indigo-800 dark:text-indigo-200 mb-3">
+                    📰 Configuración de Página "Blog"
+                  </h3>
+                  <p className="text-indigo-700 dark:text-indigo-300 mb-4">
+                    Configura la portada y apariencia del blog de noticias.
+                  </p>
+                  <ul className="text-indigo-600 dark:text-indigo-400 space-y-2">
+                    <li>✅ <strong>Hero Section:</strong> Título, colores y gradiente</li>
+                    <li>✅ <strong>Estadísticas:</strong> Contador de artículos y lectores</li>
+                    <li>✅ <strong>Búsqueda:</strong> Configuración del buscador</li>
+                    <li>🔜 <strong>SEO:</strong> Optimización para buscadores (pestaña SEO)</li>
+                    <li>🔜 <strong>Tarjetas:</strong> Diseño de tarjetas de posts (próximamente)</li>
+                    <li>🔜 <strong>Sidebar:</strong> Categorías y trending (próximamente)</li>
+                  </ul>
+                </div>
+              </>
             )}
           </>
         )}

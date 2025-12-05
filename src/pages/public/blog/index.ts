@@ -5,5 +5,4 @@
 
 export { default as BlogHome } from './BlogHome';
 export { default as BlogPost } from './BlogPost';
-export { default as BlogSearch } from './BlogSearch';
 export { default as BlogCategory } from './BlogCategory';

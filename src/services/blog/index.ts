@@ -6,6 +6,7 @@
 export { blogPostApi, default as blogPostApiDefault } from './blogPostApi';
 export { blogCommentApi, default as blogCommentApiDefault } from './blogCommentApi';
 export { blogCategoryApi, default as blogCategoryApiDefault } from './blogCategoryApi';
+export { blogTagApi, default as blogTagApiDefault } from './blogTagApi';
 export { blogModerationApi, default as blogModerationApiDefault } from './blogModerationApi';
 
 // Servicios avanzados de IA y SEO

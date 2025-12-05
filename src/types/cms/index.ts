@@ -570,6 +570,153 @@ export interface ServicesAccordionConfig {
   backgroundOpacity?: number;
 }
 
+// 🆕 CONFIGURACIÓN DEL BLOG HERO
+export interface BlogHeroStyleConfig {
+  titleColor?: string;
+  titleHighlightColor?: string;
+  subtitleColor?: string;
+  statsValueColor?: string;
+  statsLabelColor?: string;
+}
+
+// 🆕 Configuración para sección de Noticias Destacadas
+export interface FeaturedPostsConfig {
+  sectionTitle?: string;
+  showIcon?: boolean;
+  fontFamily?: string;  // Tipografía (Montserrat por defecto)
+  // Estilos para tarjeta Hero (grande)
+  heroCard?: {
+    overlayOpacity?: number;      // 0-1
+    overlayColor?: string;        // Color del overlay
+    contentBgColor?: string;      // Color de fondo del contenido (barra negra)
+    borderTopColor?: string;      // Color del borde superior de la franja
+    titleColor?: string;
+    excerptColor?: string;
+    dateColor?: string;
+    categoryBgColor?: string;
+    categoryTextColor?: string;
+    tagBgColor?: string;
+    tagTextColor?: string;
+    tagBorderColor?: string;
+    buttonBgColor?: string;
+    buttonTextColor?: string;
+    buttonBorderColor?: string;
+  };
+  // Estilos para tarjetas pequeñas
+  smallCard?: {
+    bgColor?: string;
+    borderColor?: string;
+    hoverBorderColor?: string;
+    titleColor?: string;
+    excerptColor?: string;
+    dateColor?: string;
+    categoryBgColor?: string;
+    categoryTextColor?: string;
+  };
+  // Layout
+  layout?: 'hero-right' | 'hero-left' | 'grid';
+  maxFeaturedPosts?: number;
+}
+
+export interface BlogHeroConfig {
+  title?: string;
+  titleHighlight?: string;
+  subtitle?: string;
+  // Imagen de fondo (tiene prioridad sobre el gradiente)
+  backgroundImage?: string;
+  backgroundOverlay?: number; // Oscurecer imagen (0-1)
+  // Gradiente de fondo (se usa si no hay imagen)
+  gradientFrom?: string;
+  gradientTo?: string;
+  showStats?: boolean;
+  stats?: {
+    articlesLabel?: string;
+    readersCount?: string;
+    readersLabel?: string;
+  };
+  search?: {
+    placeholder?: string;
+    buttonText?: string;
+  };
+  styles?: {
+    light?: BlogHeroStyleConfig;
+    dark?: BlogHeroStyleConfig;
+  };
+}
+
+// 🆕 Configuración para sección Todas las Noticias
+export interface AllNewsConfig {
+  sectionTitle?: string;
+  showIcon?: boolean;
+  postsPerPage?: number;
+  fontFamily?: string;
+  layoutType?: 'masonry' | 'grid' | 'list';
+  // Colores de fondo por tema
+  sectionBgColorLight?: string;
+  sectionBgColorDark?: string;
+  // Colores de título por tema
+  sectionTitleColorLight?: string;
+  sectionTitleColorDark?: string;
+  sectionIconColorLight?: string;
+  sectionIconColorDark?: string;
+  sectionIconBgLight?: string;
+  sectionIconBgDark?: string;
+  // Imagen de fondo
+  sectionBgImageLight?: string;
+  sectionBgImageDark?: string;
+  sectionBgOverlayLight?: number;
+  sectionBgOverlayDark?: number;
+  // Tarjeta con imagen
+  imageCard?: {
+    overlayColor?: string;
+    overlayOpacity?: number;
+    titleColor?: string;
+    categoryBgColor?: string;
+    categoryTextColor?: string;
+    authorNameColor?: string;
+    authorDateColor?: string;
+    borderRadius?: string;
+  };
+  // Tarjeta solo texto
+  textCard?: {
+    bgColor?: string;
+    titleColor?: string;
+    excerptColor?: string;
+    tagBgColor?: string;
+    tagTextColor?: string;
+    buttonText?: string;
+    buttonBgColor?: string;
+    buttonTextColor?: string;
+    buttonBorderColor?: string;
+    borderRadius?: string;
+  };
+  // Sidebar
+  sidebar?: {
+    fontFamily?: string;
+    bgColor?: string;
+    bgColorLight?: string;
+    bgColorDark?: string;
+    borderWidth?: number;
+    borderColorLight?: string;
+    borderColorDark?: string;
+    borderRadius?: string;
+    padding?: string;
+    categoriesTitleColor?: string;
+    categoriesTitleColorDark?: string;
+    categoryItemColor?: string;
+    categoryItemColorDark?: string;
+    categoryHoverColor?: string;
+    tagsTitleColor?: string;
+    tagsTitleColorDark?: string;
+    tagBgColor?: string;
+    tagBgColorDark?: string;
+    tagTextColor?: string;
+    tagTextColorDark?: string;
+    tagActiveBgColor?: string;
+    tagActiveTextColor?: string;
+  };
+}
+
 export interface PageContent {
   hero: HeroContent;
   solutions?: SolutionsContent;
@@ -583,6 +730,10 @@ export interface PageContent {
   servicesGrid?: ServicesGridConfig;
   servicesAccordion?: ServicesAccordionConfig;
   sections?: PageSection[];
+  // 🆕 CONTENIDO PARA PÁGINA DE BLOG
+  blogHero?: BlogHeroConfig;
+  featuredPosts?: FeaturedPostsConfig;
+  allNews?: AllNewsConfig;
 }
 
 export interface PageSeo {
