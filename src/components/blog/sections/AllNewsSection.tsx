@@ -206,10 +206,13 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                     post={group[0]}
                     variant="image-overlay"
                     config={{
-                      // Primero textCard para hover styles
-                      ...config.textCard,
-                      // Luego imageCard para sobrescribir tamaños y estilos de imagen
+                      // Combinar imageCard y textCard, priorizando textCard para estilos de botón y texto
                       ...config.imageCard,
+                      ...config.textCard,
+                      // Sobrescribir con valores específicos de imageCard para dimensiones
+                      borderRadius: config.imageCard?.borderRadius || config.textCard?.borderRadius,
+                      cardHeight: config.imageCard?.cardHeight || '400px',
+                      cardWidth: config.imageCard?.cardWidth || '100%',
                       fontFamily
                     }}
                     className="md:col-span-1"
@@ -221,8 +224,11 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                     post={group[1]}
                     variant="image-overlay"
                     config={{
-                      ...config.textCard,
                       ...config.imageCard,
+                      ...config.textCard,
+                      borderRadius: config.imageCard?.borderRadius || config.textCard?.borderRadius,
+                      cardHeight: config.imageCard?.cardHeight || '400px',
+                      cardWidth: config.imageCard?.cardWidth || '100%',
                       fontFamily
                     }}
                     className="md:col-span-1"
@@ -234,8 +240,11 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
                     post={group[2]}
                     variant="image-overlay"
                     config={{
-                      ...config.textCard,
                       ...config.imageCard,
+                      ...config.textCard,
+                      borderRadius: config.imageCard?.borderRadius || config.textCard?.borderRadius,
+                      cardHeight: config.imageCard?.cardHeight || '400px',
+                      cardWidth: config.imageCard?.cardWidth || '100%',
                       fontFamily
                     }}
                     className="md:col-span-1"

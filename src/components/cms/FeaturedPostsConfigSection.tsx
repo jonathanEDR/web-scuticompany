@@ -14,7 +14,8 @@ import {
   Loader2,
   Image as ImageIcon,
   Sun,
-  Moon
+  Moon,
+  ChevronDown
 } from 'lucide-react';
 import type { FeaturedPostsConfig } from '../../hooks/blog/useBlogCmsConfig';
 import { uploadImage } from '../../services/imageService';
@@ -29,6 +30,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
   onChange
 }) => {
   const [activeTab, setActiveTab] = useState<'general' | 'heroCard' | 'smallCard'>('general');
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isUploadingLight, setIsUploadingLight] = useState(false);
   const [isUploadingDark, setIsUploadingDark] = useState(false);
   const fileInputLightRef = useRef<HTMLInputElement>(null);
@@ -142,44 +144,57 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-          <Newspaper className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+      {/* Header Colapsable */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="w-full flex items-center justify-between gap-3 pb-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 -mx-2 px-2 py-2 rounded-lg transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <Newspaper className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Noticias Destacadas
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Configura la apariencia de las tarjetas destacadas
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Noticias Destacadas
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Configura la apariencia de las tarjetas destacadas
-          </p>
-        </div>
-      </div>
+        <ChevronDown 
+          className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+            isCollapsed ? '' : 'rotate-180'
+          }`}
+        />
+      </button>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'general' | 'heroCard' | 'smallCard')}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-              }`}
-            >
-              <Icon size={16} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* Contenido colapsable */}
+      {!isCollapsed && (
+        <>
+          {/* Tabs */}
+          <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as 'general' | 'heroCard' | 'smallCard')}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                  }`}
+                >
+                  <Icon size={16} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Tab Content */}
-      <div className="space-y-4">
+          {/* Tab Content */}
+          <div className="space-y-4">
         {activeTab === 'general' && (
           <div className="space-y-4">
             {/* Título de la sección */}
@@ -280,24 +295,42 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                     <Sun className="w-4 h-4 text-yellow-500" />
                     Color fondo (Claro)
                   </label>
-                  <input
-                    type="color"
-                    value={config.sectionBgColorLight || '#f3f4f6'}
-                    onChange={(e) => handleChange('sectionBgColorLight', e.target.value)}
-                    className="w-full h-10 cursor-pointer rounded"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={config.sectionBgColorLight || '#f3f4f6'}
+                      onChange={(e) => handleChange('sectionBgColorLight', e.target.value)}
+                      className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={config.sectionBgColorLight || '#f3f4f6'}
+                      onChange={(e) => handleChange('sectionBgColorLight', e.target.value)}
+                      placeholder="#f3f4f6"
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <Moon className="w-4 h-4 text-indigo-400" />
                     Color fondo (Oscuro)
                   </label>
-                  <input
-                    type="color"
-                    value={config.sectionBgColorDark || '#111827'}
-                    onChange={(e) => handleChange('sectionBgColorDark', e.target.value)}
-                    className="w-full h-10 cursor-pointer rounded"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={config.sectionBgColorDark || '#111827'}
+                      onChange={(e) => handleChange('sectionBgColorDark', e.target.value)}
+                      className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={config.sectionBgColorDark || '#111827'}
+                      onChange={(e) => handleChange('sectionBgColorDark', e.target.value)}
+                      placeholder="#111827"
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -450,30 +483,57 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                   <div className="space-y-3">
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">Color del título</label>
-                      <input
-                        type="color"
-                        value={config.sectionTitleColorLight || '#111827'}
-                        onChange={(e) => handleChange('sectionTitleColorLight', e.target.value)}
-                        className="w-full h-8 cursor-pointer rounded"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.sectionTitleColorLight || '#111827'}
+                          onChange={(e) => handleChange('sectionTitleColorLight', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={config.sectionTitleColorLight || '#111827'}
+                          onChange={(e) => handleChange('sectionTitleColorLight', e.target.value)}
+                          placeholder="#111827"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 font-mono"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">Color del icono</label>
-                      <input
-                        type="color"
-                        value={config.sectionIconColorLight || '#2563eb'}
-                        onChange={(e) => handleChange('sectionIconColorLight', e.target.value)}
-                        className="w-full h-8 cursor-pointer rounded"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.sectionIconColorLight || '#2563eb'}
+                          onChange={(e) => handleChange('sectionIconColorLight', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={config.sectionIconColorLight || '#2563eb'}
+                          onChange={(e) => handleChange('sectionIconColorLight', e.target.value)}
+                          placeholder="#2563eb"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 font-mono"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">Fondo del icono</label>
-                      <input
-                        type="color"
-                        value={config.sectionIconBgLight || '#dbeafe'}
-                        onChange={(e) => handleChange('sectionIconBgLight', e.target.value)}
-                        className="w-full h-8 cursor-pointer rounded"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.sectionIconBgLight || '#dbeafe'}
+                          onChange={(e) => handleChange('sectionIconBgLight', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={config.sectionIconBgLight || '#dbeafe'}
+                          onChange={(e) => handleChange('sectionIconBgLight', e.target.value)}
+                          placeholder="#dbeafe"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 font-mono"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -487,30 +547,57 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                   <div className="space-y-3">
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">Color del título</label>
-                      <input
-                        type="color"
-                        value={config.sectionTitleColorDark || '#ffffff'}
-                        onChange={(e) => handleChange('sectionTitleColorDark', e.target.value)}
-                        className="w-full h-8 cursor-pointer rounded"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.sectionTitleColorDark || '#ffffff'}
+                          onChange={(e) => handleChange('sectionTitleColorDark', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={config.sectionTitleColorDark || '#ffffff'}
+                          onChange={(e) => handleChange('sectionTitleColorDark', e.target.value)}
+                          placeholder="#ffffff"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white font-mono"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">Color del icono</label>
-                      <input
-                        type="color"
-                        value={config.sectionIconColorDark || '#60a5fa'}
-                        onChange={(e) => handleChange('sectionIconColorDark', e.target.value)}
-                        className="w-full h-8 cursor-pointer rounded"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.sectionIconColorDark || '#60a5fa'}
+                          onChange={(e) => handleChange('sectionIconColorDark', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={config.sectionIconColorDark || '#60a5fa'}
+                          onChange={(e) => handleChange('sectionIconColorDark', e.target.value)}
+                          placeholder="#60a5fa"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white font-mono"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">Fondo del icono</label>
-                      <input
-                        type="color"
-                        value={config.sectionIconBgDark || '#1e3a5f'}
-                        onChange={(e) => handleChange('sectionIconBgDark', e.target.value)}
-                        className="w-full h-8 cursor-pointer rounded"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.sectionIconBgDark || '#1e3a5f'}
+                          onChange={(e) => handleChange('sectionIconBgDark', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={config.sectionIconBgDark || '#1e3a5f'}
+                          onChange={(e) => handleChange('sectionIconBgDark', e.target.value)}
+                          placeholder="#1e3a5f"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white font-mono"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -630,68 +717,501 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                 🔘 Botón "Ver más"
               </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Color del texto
+              
+              {/* ===== FONDO DEL BOTÓN ===== */}
+              <div className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  🎨 Fondo del Botón
+                </h5>
+                
+                {/* Toggle para fondo transparente */}
+                <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.heroCard?.buttonBgTransparent || false}
+                      onChange={(e) => {
+                        handleChange('heroCard.buttonBgTransparent', e.target.checked);
+                        if (e.target.checked) {
+                          handleChange('heroCard.buttonUseGradient', false);
+                        }
+                      }}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 dark:peer-focus:ring-gray-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-gray-500"></div>
                   </label>
-                  <input
-                    type="color"
-                    value={config.heroCard?.buttonTextColor || '#00ffff'}
-                    onChange={(e) => handleChange('heroCard.buttonTextColor', e.target.value)}
-                    className="w-full h-10 cursor-pointer rounded"
-                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    🚫 Fondo transparente
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Color del borde
+
+                {/* Solo mostrar opciones de color si NO es transparente */}
+                {!config.heroCard?.buttonBgTransparent && (
+                  <>
+                    {/* Toggle para usar gradiente en fondo */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={config.heroCard?.buttonUseGradient || false}
+                          onChange={(e) => handleChange('heroCard.buttonUseGradient', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                      </label>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Usar gradiente en el fondo
+                      </span>
+                    </div>
+
+                    {/* Configuración de gradiente de fondo */}
+                    {config.heroCard?.buttonUseGradient ? (
+                      <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="grid grid-cols-2 gap-4 mb-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Color inicial
+                            </label>
+                            <div className="flex gap-2">
+                              <input
+                                type="color"
+                                value={config.heroCard?.buttonGradientFrom || '#3b82f6'}
+                                onChange={(e) => handleChange('heroCard.buttonGradientFrom', e.target.value)}
+                                className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                              />
+                              <input
+                                type="text"
+                                value={config.heroCard?.buttonGradientFrom || '#3b82f6'}
+                                onChange={(e) => handleChange('heroCard.buttonGradientFrom', e.target.value)}
+                                placeholder="#3b82f6"
+                                className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Color final
+                            </label>
+                            <div className="flex gap-2">
+                              <input
+                                type="color"
+                                value={config.heroCard?.buttonGradientTo || '#8b5cf6'}
+                                onChange={(e) => handleChange('heroCard.buttonGradientTo', e.target.value)}
+                                className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                              />
+                              <input
+                                type="text"
+                                value={config.heroCard?.buttonGradientTo || '#8b5cf6'}
+                                onChange={(e) => handleChange('heroCard.buttonGradientTo', e.target.value)}
+                                placeholder="#8b5cf6"
+                                className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Dirección del gradiente
+                          </label>
+                          <select
+                            value={config.heroCard?.buttonGradientDirection || 'to-r'}
+                            onChange={(e) => handleChange('heroCard.buttonGradientDirection', e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            <option value="to-r">→ Izquierda a Derecha</option>
+                            <option value="to-l">← Derecha a Izquierda</option>
+                            <option value="to-t">↑ Abajo a Arriba</option>
+                            <option value="to-b">↓ Arriba a Abajo</option>
+                            <option value="to-tr">↗ Diagonal Superior Derecha</option>
+                            <option value="to-tl">↖ Diagonal Superior Izquierda</option>
+                            <option value="to-br">↘ Diagonal Inferior Derecha</option>
+                            <option value="to-bl">↙ Diagonal Inferior Izquierda</option>
+                          </select>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Color de fondo sólido
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.heroCard?.buttonBgColor || '#000000'}
+                            onChange={(e) => handleChange('heroCard.buttonBgColor', e.target.value)}
+                            className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.heroCard?.buttonBgColor || '#000000'}
+                            onChange={(e) => handleChange('heroCard.buttonBgColor', e.target.value)}
+                            placeholder="#000000"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* ===== TEXTO DEL BOTÓN ===== */}
+              <div className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  ✏️ Texto del Botón
+                </h5>
+                
+                {/* Toggle para usar gradiente en texto */}
+                <div className="flex items-center gap-3 mb-4">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.heroCard?.buttonTextUseGradient || false}
+                      onChange={(e) => handleChange('heroCard.buttonTextUseGradient', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
                   </label>
-                  <input
-                    type="color"
-                    value={config.heroCard?.buttonBorderColor || '#00ffff'}
-                    onChange={(e) => handleChange('heroCard.buttonBorderColor', e.target.value)}
-                    className="w-full h-10 cursor-pointer rounded"
-                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Usar gradiente en el texto
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Color de fondo
+
+                {/* Configuración de gradiente de texto */}
+                {config.heroCard?.buttonTextUseGradient ? (
+                  <div className="p-3 bg-gradient-to-r from-green-50 to-cyan-50 dark:from-green-900/20 dark:to-cyan-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Color inicial
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.heroCard?.buttonTextGradientFrom || '#00ffff'}
+                            onChange={(e) => handleChange('heroCard.buttonTextGradientFrom', e.target.value)}
+                            className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.heroCard?.buttonTextGradientFrom || '#00ffff'}
+                            onChange={(e) => handleChange('heroCard.buttonTextGradientFrom', e.target.value)}
+                            placeholder="#00ffff"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Color final
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.heroCard?.buttonTextGradientTo || '#ff00ff'}
+                            onChange={(e) => handleChange('heroCard.buttonTextGradientTo', e.target.value)}
+                            className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.heroCard?.buttonTextGradientTo || '#ff00ff'}
+                            onChange={(e) => handleChange('heroCard.buttonTextGradientTo', e.target.value)}
+                            placeholder="#ff00ff"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Dirección del gradiente
+                      </label>
+                      <select
+                        value={config.heroCard?.buttonTextGradientDirection || 'to-r'}
+                        onChange={(e) => handleChange('heroCard.buttonTextGradientDirection', e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="to-r">→ Izquierda a Derecha</option>
+                        <option value="to-l">← Derecha a Izquierda</option>
+                        <option value="to-t">↑ Abajo a Arriba</option>
+                        <option value="to-b">↓ Arriba a Abajo</option>
+                        <option value="to-tr">↗ Diagonal Superior Derecha</option>
+                        <option value="to-tl">↖ Diagonal Superior Izquierda</option>
+                        <option value="to-br">↘ Diagonal Inferior Derecha</option>
+                        <option value="to-bl">↙ Diagonal Inferior Izquierda</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Color del texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.heroCard?.buttonTextColor || '#00ffff'}
+                        onChange={(e) => handleChange('heroCard.buttonTextColor', e.target.value)}
+                        className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={config.heroCard?.buttonTextColor || '#00ffff'}
+                        onChange={(e) => handleChange('heroCard.buttonTextColor', e.target.value)}
+                        placeholder="#00ffff"
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ===== BORDE DEL BOTÓN ===== */}
+              <div className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  🔲 Borde del Botón
+                </h5>
+                
+                {/* Toggle para usar gradiente en borde */}
+                <div className="flex items-center gap-3 mb-4">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.heroCard?.buttonBorderUseGradient || false}
+                      onChange={(e) => handleChange('heroCard.buttonBorderUseGradient', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                   </label>
-                  <input
-                    type="color"
-                    value={config.heroCard?.buttonBgColor || '#000000'}
-                    onChange={(e) => handleChange('heroCard.buttonBgColor', e.target.value)}
-                    className="w-full h-10 cursor-pointer rounded"
-                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Usar gradiente en el borde
+                  </span>
                 </div>
+
+                {/* Configuración de gradiente de borde */}
+                {config.heroCard?.buttonBorderUseGradient ? (
+                  <div className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800 mb-4">
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Color inicial
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.heroCard?.buttonBorderGradientFrom || '#00ffff'}
+                            onChange={(e) => handleChange('heroCard.buttonBorderGradientFrom', e.target.value)}
+                            className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.heroCard?.buttonBorderGradientFrom || '#00ffff'}
+                            onChange={(e) => handleChange('heroCard.buttonBorderGradientFrom', e.target.value)}
+                            placeholder="#00ffff"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Color final
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.heroCard?.buttonBorderGradientTo || '#ff00ff'}
+                            onChange={(e) => handleChange('heroCard.buttonBorderGradientTo', e.target.value)}
+                            className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.heroCard?.buttonBorderGradientTo || '#ff00ff'}
+                            onChange={(e) => handleChange('heroCard.buttonBorderGradientTo', e.target.value)}
+                            placeholder="#ff00ff"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Dirección del gradiente
+                      </label>
+                      <select
+                        value={config.heroCard?.buttonBorderGradientDirection || 'to-r'}
+                        onChange={(e) => handleChange('heroCard.buttonBorderGradientDirection', e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="to-r">→ Izquierda a Derecha</option>
+                        <option value="to-l">← Derecha a Izquierda</option>
+                        <option value="to-t">↑ Abajo a Arriba</option>
+                        <option value="to-b">↓ Arriba a Abajo</option>
+                        <option value="to-tr">↗ Diagonal Superior Derecha</option>
+                        <option value="to-tl">↖ Diagonal Superior Izquierda</option>
+                        <option value="to-br">↘ Diagonal Inferior Derecha</option>
+                        <option value="to-bl">↙ Diagonal Inferior Izquierda</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-4">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Color del borde
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.heroCard?.buttonBorderColor || '#00ffff'}
+                        onChange={(e) => handleChange('heroCard.buttonBorderColor', e.target.value)}
+                        className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={config.heroCard?.buttonBorderColor || '#00ffff'}
+                        onChange={(e) => handleChange('heroCard.buttonBorderColor', e.target.value)}
+                        placeholder="#00ffff"
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Grosor del borde */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Grosor del borde ({config.heroCard?.buttonBorderWidth || 2}px)
                   </label>
                   <input
                     type="range"
-                    min="1"
+                    min="0"
                     max="4"
                     step="1"
                     value={config.heroCard?.buttonBorderWidth || 2}
                     onChange={(e) => handleChange('heroCard.buttonBorderWidth', parseInt(e.target.value))}
                     className="w-full"
                   />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Sin borde</span>
+                    <span>Grueso</span>
+                  </div>
                 </div>
               </div>
+
               {/* Preview del botón */}
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Vista previa:</p>
-                <button
-                  className="px-5 py-2 text-sm font-semibold rounded-full transition-all"
-                  style={{
-                    backgroundColor: config.heroCard?.buttonBgColor || 'transparent',
-                    color: config.heroCard?.buttonTextColor || '#00ffff',
-                    border: `${config.heroCard?.buttonBorderWidth || 2}px solid ${config.heroCard?.buttonBorderColor || '#00ffff'}`
-                  }}
-                >
-                  Ver más
-                </button>
+              <div className="p-4 bg-gray-900 rounded-lg">
+                <p className="text-xs text-gray-400 mb-3">Vista previa:</p>
+                <div className="flex justify-center">
+                  {/* Versión con borde gradiente + fondo transparente (con wrapper) */}
+                  {config.heroCard?.buttonBorderUseGradient && config.heroCard?.buttonBgTransparent ? (
+                    <div 
+                      className="inline-block rounded-full transition-all"
+                      style={{
+                        background: `linear-gradient(${
+                          config.heroCard?.buttonBorderGradientDirection === 'to-r' ? 'to right' :
+                          config.heroCard?.buttonBorderGradientDirection === 'to-l' ? 'to left' :
+                          config.heroCard?.buttonBorderGradientDirection === 'to-t' ? 'to top' :
+                          config.heroCard?.buttonBorderGradientDirection === 'to-b' ? 'to bottom' :
+                          config.heroCard?.buttonBorderGradientDirection === 'to-tr' ? 'to top right' :
+                          config.heroCard?.buttonBorderGradientDirection === 'to-tl' ? 'to top left' :
+                          config.heroCard?.buttonBorderGradientDirection === 'to-br' ? 'to bottom right' :
+                          'to bottom left'
+                        }, ${config.heroCard?.buttonBorderGradientFrom || '#00ffff'}, ${config.heroCard?.buttonBorderGradientTo || '#ff00ff'})`,
+                        padding: `${config.heroCard?.buttonBorderWidth || 2}px`
+                      }}
+                    >
+                      <button
+                        className="px-5 py-2 text-sm font-semibold rounded-full"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}
+                      >
+                        <span
+                          style={config.heroCard?.buttonTextUseGradient ? {
+                            background: `linear-gradient(${
+                              config.heroCard?.buttonTextGradientDirection === 'to-r' ? 'to right' :
+                              config.heroCard?.buttonTextGradientDirection === 'to-l' ? 'to left' :
+                              config.heroCard?.buttonTextGradientDirection === 'to-t' ? 'to top' :
+                              config.heroCard?.buttonTextGradientDirection === 'to-b' ? 'to bottom' :
+                              config.heroCard?.buttonTextGradientDirection === 'to-tr' ? 'to top right' :
+                              config.heroCard?.buttonTextGradientDirection === 'to-tl' ? 'to top left' :
+                              config.heroCard?.buttonTextGradientDirection === 'to-br' ? 'to bottom right' :
+                              'to bottom left'
+                            }, ${config.heroCard?.buttonTextGradientFrom || '#00ffff'}, ${config.heroCard?.buttonTextGradientTo || '#ff00ff'})`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                          } : {
+                            color: config.heroCard?.buttonTextColor || '#00ffff'
+                          }}
+                        >
+                          Ver más
+                        </span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="px-5 py-2 text-sm font-semibold rounded-full transition-all"
+                      style={{
+                        background: (() => {
+                          // Si usa gradiente de borde CON fondo sólido
+                          if (config.heroCard?.buttonBorderUseGradient && !config.heroCard?.buttonBgTransparent) {
+                            const bgColor = config.heroCard?.buttonBgColor || '#000000';
+                            const gradientDirection = config.heroCard?.buttonBorderGradientDirection === 'to-r' ? 'to right' :
+                              config.heroCard?.buttonBorderGradientDirection === 'to-l' ? 'to left' :
+                              config.heroCard?.buttonBorderGradientDirection === 'to-t' ? 'to top' :
+                              config.heroCard?.buttonBorderGradientDirection === 'to-b' ? 'to bottom' :
+                              config.heroCard?.buttonBorderGradientDirection === 'to-tr' ? 'to top right' :
+                              config.heroCard?.buttonBorderGradientDirection === 'to-tl' ? 'to top left' :
+                              config.heroCard?.buttonBorderGradientDirection === 'to-br' ? 'to bottom right' :
+                              'to bottom left';
+                            return `linear-gradient(${bgColor}, ${bgColor}) padding-box, linear-gradient(${gradientDirection}, ${config.heroCard?.buttonBorderGradientFrom || '#00ffff'}, ${config.heroCard?.buttonBorderGradientTo || '#ff00ff'}) border-box`;
+                          }
+                          // Si usa gradiente de fondo
+                          if (config.heroCard?.buttonUseGradient && !config.heroCard?.buttonBgTransparent) {
+                            const gradientDirection = config.heroCard?.buttonGradientDirection === 'to-r' ? 'to right' :
+                              config.heroCard?.buttonGradientDirection === 'to-l' ? 'to left' :
+                              config.heroCard?.buttonGradientDirection === 'to-t' ? 'to top' :
+                              config.heroCard?.buttonGradientDirection === 'to-b' ? 'to bottom' :
+                              config.heroCard?.buttonGradientDirection === 'to-tr' ? 'to top right' :
+                              config.heroCard?.buttonGradientDirection === 'to-tl' ? 'to top left' :
+                              config.heroCard?.buttonGradientDirection === 'to-br' ? 'to bottom right' :
+                              'to bottom left';
+                            return `linear-gradient(${gradientDirection}, ${config.heroCard?.buttonGradientFrom || '#3b82f6'}, ${config.heroCard?.buttonGradientTo || '#8b5cf6'})`;
+                          }
+                          // Si es transparente
+                          if (config.heroCard?.buttonBgTransparent) {
+                            return 'transparent';
+                          }
+                          // Color sólido
+                          return config.heroCard?.buttonBgColor || 'transparent';
+                        })(),
+                        border: config.heroCard?.buttonBorderUseGradient 
+                          ? `${config.heroCard?.buttonBorderWidth || 2}px solid transparent`
+                          : `${config.heroCard?.buttonBorderWidth || 2}px solid ${config.heroCard?.buttonBorderColor || '#00ffff'}`,
+                      }}
+                    >
+                      <span
+                        style={config.heroCard?.buttonTextUseGradient ? {
+                          background: `linear-gradient(${
+                            config.heroCard?.buttonTextGradientDirection === 'to-r' ? 'to right' :
+                            config.heroCard?.buttonTextGradientDirection === 'to-l' ? 'to left' :
+                            config.heroCard?.buttonTextGradientDirection === 'to-t' ? 'to top' :
+                            config.heroCard?.buttonTextGradientDirection === 'to-b' ? 'to bottom' :
+                            config.heroCard?.buttonTextGradientDirection === 'to-tr' ? 'to top right' :
+                            config.heroCard?.buttonTextGradientDirection === 'to-tl' ? 'to top left' :
+                            config.heroCard?.buttonTextGradientDirection === 'to-br' ? 'to bottom right' :
+                            'to bottom left'
+                          }, ${config.heroCard?.buttonTextGradientFrom || '#00ffff'}, ${config.heroCard?.buttonTextGradientTo || '#ff00ff'})`,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text'
+                        } : {
+                          color: config.heroCard?.buttonTextColor || '#00ffff'
+                        }}
+                      >
+                        Ver más
+                      </span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -895,6 +1415,8 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

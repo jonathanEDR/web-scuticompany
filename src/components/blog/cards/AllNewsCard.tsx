@@ -17,7 +17,13 @@ export interface AllNewsCardConfig {
   overlayColor?: string;
   overlayOpacity?: number;
   bgColor?: string;
+  bgTransparent?: boolean;
   titleColor?: string;
+  // Título con gradiente
+  titleUseGradient?: boolean;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
+  titleGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
   excerptColor?: string;
   dateColor?: string;
   categoryBgColor?: string;
@@ -30,8 +36,27 @@ export interface AllNewsCardConfig {
   showButton?: boolean;
   buttonText?: string;
   buttonBgColor?: string;
+  buttonBgTransparent?: boolean;
+  buttonBgUseGradient?: boolean;
+  buttonBgGradientFrom?: string;
+  buttonBgGradientTo?: string;
+  buttonBgGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  // Compatibilidad con buttonUseGradient (para imageCard)
+  buttonUseGradient?: boolean;
+  buttonGradientFrom?: string;
+  buttonGradientTo?: string;
+  buttonGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
   buttonTextColor?: string;
+  buttonTextUseGradient?: boolean;
+  buttonTextGradientFrom?: string;
+  buttonTextGradientTo?: string;
+  buttonTextGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
   buttonBorderColor?: string;
+  buttonBorderUseGradient?: boolean;
+  buttonBorderGradientFrom?: string;
+  buttonBorderGradientTo?: string;
+  buttonBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  buttonBorderWidth?: number;
   buttonHoverBgColor?: string;
   buttonHoverTextColor?: string;
   // Autor
@@ -86,6 +111,31 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
 
   // Variante: Imagen con overlay (tarjetas laterales de la maqueta)
   if (variant === 'image-overlay') {
+    // Helper para convertir dirección de gradiente a CSS
+    const getGradientDirection = (dir?: string) => {
+      switch (dir) {
+        case 'to-r': return 'to right';
+        case 'to-l': return 'to left';
+        case 'to-t': return 'to top';
+        case 'to-b': return 'to bottom';
+        case 'to-tr': return 'to top right';
+        case 'to-tl': return 'to top left';
+        case 'to-br': return 'to bottom right';
+        case 'to-bl': return 'to bottom left';
+        default: return 'to right';
+      }
+    };
+
+    // Estilos del título con soporte de gradiente
+    const titleStyle = config.titleUseGradient ? {
+      background: `linear-gradient(${getGradientDirection(config.titleGradientDirection)}, ${config.titleGradientFrom || '#00ffff'}, ${config.titleGradientTo || '#ff00ff'})`,
+      WebkitBackgroundClip: 'text' as const,
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text' as const
+    } : {
+      color: config.titleColor || '#ffffff'
+    };
+
     // Calcular posición de la categoría
     const categoryPositionClass = config.categoryPosition === 'left' 
       ? 'left-4' 
@@ -132,11 +182,11 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
             <div 
               className="w-full h-full flex items-center justify-center"
               style={{ 
-                backgroundColor: config.bgColor || '#1f2937',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                backgroundColor: config.bgTransparent ? 'transparent' : (config.bgColor || '#1f2937'),
+                background: config.bgTransparent ? 'transparent' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
               }}
             >
-              <Newspaper className="w-16 h-16 text-white/30" />
+              {!config.bgTransparent && <Newspaper className="w-16 h-16 text-white/30" />}
             </div>
           )}
         </div>
@@ -145,16 +195,15 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
         <div 
           className="absolute inset-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)'
+            background: config.bgTransparent ? 'transparent' : 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)'
           }}
         />
 
-        {/* Overlay hover - Fondo sólido que aparece en hover */}
+        {/* Overlay hover - Fondo que aparece en hover (transparente si bgTransparent está activado) */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{
-            backgroundColor: config.bgColor || '#1e1b4b',
-            opacity: undefined // Se controla con las clases
+            backgroundColor: config.bgTransparent ? 'transparent' : (config.bgColor || '#1e1b4b')
           }}
         />
 
@@ -178,7 +227,7 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
           {/* Título */}
           <h3 
             className="text-xl font-bold mb-4 leading-tight"
-            style={{ color: config.titleColor || '#ffffff' }}
+            style={titleStyle}
           >
             <Link to={`/blog/${post.slug}`} className="block">
               {post.title}
@@ -225,7 +274,7 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
           {/* Título */}
           <h3 
             className="text-2xl font-bold mb-3 leading-tight mt-12"
-            style={{ color: config.titleColor || '#ffffff' }}
+            style={titleStyle}
           >
             <Link to={`/blog/${post.slug}`} className="block hover:underline">
               {post.title}
@@ -267,46 +316,277 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
             </div>
           )}
 
-          {/* Botón Ver más */}
-          <Link
-            to={`/blog/${post.slug}`}
-            className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-full border-2 transition-all duration-300 hover:scale-105 self-start"
-            style={{
-              borderColor: config.buttonBorderColor || '#ffffff',
-              color: config.buttonTextColor || '#ffffff',
-              backgroundColor: 'transparent'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = config.buttonHoverBgColor || '#ffffff';
-              e.currentTarget.style.color = config.buttonHoverTextColor || '#1e1b4b';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = config.buttonTextColor || '#ffffff';
-            }}
-          >
-            Ver más
-          </Link>
+          {/* Botón Ver más con soporte de gradientes */}
+          {(() => {
+            // Helper para convertir dirección de gradiente a CSS
+            const getGradientDirection = (dir?: string) => {
+              switch (dir) {
+                case 'to-r': return 'to right';
+                case 'to-l': return 'to left';
+                case 'to-t': return 'to top';
+                case 'to-b': return 'to bottom';
+                case 'to-tr': return 'to top right';
+                case 'to-tl': return 'to top left';
+                case 'to-br': return 'to bottom right';
+                case 'to-bl': return 'to bottom left';
+                default: return 'to right';
+              }
+            };
+
+            const buttonBorderWidth = config.buttonBorderWidth || 2;
+
+            // Estilos del texto del botón
+            const buttonTextStyle = config.buttonTextUseGradient ? {
+              background: `linear-gradient(${getGradientDirection(config.buttonTextGradientDirection)}, ${config.buttonTextGradientFrom || '#00ffff'}, ${config.buttonTextGradientTo || '#ff00ff'})`,
+              WebkitBackgroundClip: 'text' as const,
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text' as const
+            } : {
+              color: config.buttonTextColor || '#ffffff'
+            };
+
+            // Función para obtener el background del botón (con fallback a buttonUseGradient para compatibilidad)
+            const getButtonBackground = () => {
+              if (config.buttonBgTransparent) return 'transparent';
+              if (config.buttonBgUseGradient || config.buttonUseGradient) {
+                const from = config.buttonBgGradientFrom || config.buttonGradientFrom || '#8b5cf6';
+                const to = config.buttonBgGradientTo || config.buttonGradientTo || '#ec4899';
+                const dir = config.buttonBgGradientDirection || config.buttonGradientDirection || 'to-r';
+                return `linear-gradient(${getGradientDirection(dir)}, ${from}, ${to})`;
+              }
+              return config.buttonBgColor || 'transparent';
+            };
+
+            // Si tiene borde gradiente
+            if (config.buttonBorderUseGradient) {
+              // Si el fondo es transparente, usar técnica de doble elemento para borde redondeado
+              if (config.buttonBgTransparent) {
+                return (
+                  <div className="relative inline-block self-start">
+                    {/* Capa de borde gradiente */}
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: `linear-gradient(${getGradientDirection(config.buttonBorderGradientDirection)}, ${config.buttonBorderGradientFrom || '#00ffff'}, ${config.buttonBorderGradientTo || '#ff00ff'})`,
+                        padding: `${buttonBorderWidth}px`,
+                        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                        WebkitMaskComposite: 'xor',
+                        mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                        maskComposite: 'exclude'
+                      }}
+                    />
+                    {/* Botón transparente encima */}
+                    <Link
+                      to={`/blog/${post.slug}`}
+                      className="relative flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:scale-105"
+                      style={{
+                        background: 'transparent'
+                      }}
+                    >
+                      <span style={buttonTextStyle}>
+                        {config.buttonText || 'Ver más'}
+                      </span>
+                    </Link>
+                  </div>
+                );
+              }
+              
+              // Si tiene fondo sólido o gradiente, usar wrapper
+              const getButtonBgForGradientBorder = () => {
+                if (config.buttonBgUseGradient || config.buttonUseGradient) {
+                  return `linear-gradient(${getGradientDirection(config.buttonBgGradientDirection || config.buttonGradientDirection || 'to-r')}, ${config.buttonBgGradientFrom || config.buttonGradientFrom || '#8b5cf6'}, ${config.buttonBgGradientTo || config.buttonGradientTo || '#ec4899'})`;
+                }
+                return config.buttonBgColor || '#1e1b4b';
+              };
+              
+              return (
+                <div
+                  className="inline-block rounded-full self-start"
+                  style={{
+                    background: `linear-gradient(${getGradientDirection(config.buttonBorderGradientDirection)}, ${config.buttonBorderGradientFrom || '#00ffff'}, ${config.buttonBorderGradientTo || '#ff00ff'})`,
+                    padding: `${buttonBorderWidth}px`
+                  }}
+                >
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    className="flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:scale-105"
+                    style={{
+                      background: getButtonBgForGradientBorder()
+                    }}
+                  >
+                    <span style={buttonTextStyle}>
+                      {config.buttonText || 'Ver más'}
+                    </span>
+                  </Link>
+                </div>
+              );
+            }
+
+            // Sin borde gradiente
+            return (
+              <Link
+                to={`/blog/${post.slug}`}
+                className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:scale-105 self-start"
+                style={{
+                  background: getButtonBackground(),
+                  border: `${buttonBorderWidth}px solid ${config.buttonBorderColor || '#ffffff'}`
+                }}
+              >
+                <span style={buttonTextStyle}>
+                  {config.buttonText || 'Ver más'}
+                </span>
+              </Link>
+            );
+          })()}
         </div>
       </article>
     );
   }
 
-  // Variante: Solo texto (tarjeta central de la maqueta) - Versión simple
+  // Variante: Solo texto (tarjeta central de la maqueta) - Versión con gradientes
   if (variant === 'text-only') {
+    // Helper para convertir dirección de gradiente a CSS
+    const getGradientDirection = (dir?: string) => {
+      switch (dir) {
+        case 'to-r': return 'to right';
+        case 'to-l': return 'to left';
+        case 'to-t': return 'to top';
+        case 'to-b': return 'to bottom';
+        case 'to-tr': return 'to top right';
+        case 'to-tl': return 'to top left';
+        case 'to-br': return 'to bottom right';
+        case 'to-bl': return 'to bottom left';
+        default: return 'to right';
+      }
+    };
+
+    // Estilos del título
+    const titleStyle = config.titleUseGradient ? {
+      background: `linear-gradient(${getGradientDirection(config.titleGradientDirection)}, ${config.titleGradientFrom || '#00ffff'}, ${config.titleGradientTo || '#ff00ff'})`,
+      WebkitBackgroundClip: 'text' as const,
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text' as const
+    } : {
+      color: config.titleColor || '#ffffff'
+    };
+
+    // Estilos del texto del botón
+    const buttonTextStyle = config.buttonTextUseGradient ? {
+      background: `linear-gradient(${getGradientDirection(config.buttonTextGradientDirection)}, ${config.buttonTextGradientFrom || '#00ffff'}, ${config.buttonTextGradientTo || '#ff00ff'})`,
+      WebkitBackgroundClip: 'text' as const,
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text' as const
+    } : {
+      color: config.buttonTextColor || '#ffffff'
+    };
+
+    // Calcular fondo del botón
+    const getButtonBackground = () => {
+      if (config.buttonBgTransparent) return 'transparent';
+      if (config.buttonUseGradient) {
+        return `linear-gradient(${getGradientDirection(config.buttonGradientDirection)}, ${config.buttonGradientFrom || '#3b82f6'}, ${config.buttonGradientTo || '#8b5cf6'})`;
+      }
+      if (config.buttonBorderUseGradient && !config.buttonBgTransparent) {
+        const bgColor = config.buttonBgColor || '#1e1b4b';
+        return `linear-gradient(${bgColor}, ${bgColor}) padding-box, linear-gradient(${getGradientDirection(config.buttonBorderGradientDirection)}, ${config.buttonBorderGradientFrom || '#00ffff'}, ${config.buttonBorderGradientTo || '#ff00ff'}) border-box`;
+      }
+      return config.buttonBgColor || 'transparent';
+    };
+
+    // Renderizar botón con borde gradiente (usando wrapper para esquinas redondeadas)
+    const renderButton = () => {
+      const buttonBorderWidth = config.buttonBorderWidth || 2;
+      
+      // Si usa borde gradiente
+      if (config.buttonBorderUseGradient) {
+        // Si el fondo es transparente, usar técnica de máscara para borde redondeado
+        if (config.buttonBgTransparent) {
+          return (
+            <div className="relative inline-block mt-auto">
+              {/* Capa de borde gradiente con máscara */}
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: `linear-gradient(${getGradientDirection(config.buttonBorderGradientDirection)}, ${config.buttonBorderGradientFrom || '#00ffff'}, ${config.buttonBorderGradientTo || '#ff00ff'})`,
+                  padding: `${buttonBorderWidth}px`,
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  maskComposite: 'exclude'
+                }}
+              />
+              {/* Botón transparente encima */}
+              <Link
+                to={`/blog/${post.slug}`}
+                className="relative flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 hover:opacity-80"
+                style={{
+                  background: 'transparent'
+                }}
+              >
+                <span style={buttonTextStyle}>
+                  {config.buttonText || 'Ver más'}
+                </span>
+              </Link>
+            </div>
+          );
+        }
+        
+        // Si tiene fondo sólido, usar wrapper para esquinas redondeadas
+        return (
+          <div 
+            className="inline-block rounded-full mt-auto"
+            style={{
+              background: `linear-gradient(${getGradientDirection(config.buttonBorderGradientDirection)}, ${config.buttonBorderGradientFrom || '#00ffff'}, ${config.buttonBorderGradientTo || '#ff00ff'})`,
+              padding: `${buttonBorderWidth}px`
+            }}
+          >
+            <Link
+              to={`/blog/${post.slug}`}
+              className="flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 hover:opacity-80"
+              style={{ 
+                backgroundColor: config.buttonBgColor || '#1e1b4b'
+              }}
+            >
+              <span style={buttonTextStyle}>
+                {config.buttonText || 'Ver más'}
+              </span>
+            </Link>
+          </div>
+        );
+      }
+
+      // Versión normal del botón
+      return (
+        <Link
+          to={`/blog/${post.slug}`}
+          className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 w-fit mt-auto hover:opacity-80"
+          style={{
+            background: getButtonBackground(),
+            border: config.buttonBorderUseGradient 
+              ? `${buttonBorderWidth}px solid transparent`
+              : `${buttonBorderWidth}px solid ${config.buttonBorderColor || '#ffffff'}`,
+          }}
+        >
+          <span style={buttonTextStyle}>
+            {config.buttonText || 'Ver más'}
+          </span>
+        </Link>
+      );
+    };
+
     return (
       <article 
         className={`p-6 h-full flex flex-col ${className}`}
         style={{ 
-          backgroundColor: config.bgColor || '#1e1b4b',
+          backgroundColor: config.bgTransparent ? 'transparent' : (config.bgColor || '#1e1b4b'),
           borderRadius: config.borderRadius || '16px',
           fontFamily: `'${fontFamily}', sans-serif`
         }}
       >
-        {/* Título grande */}
+        {/* Título grande con soporte de gradiente */}
         <h3 
           className="text-2xl font-bold mb-4 leading-tight"
-          style={{ color: config.titleColor || '#ffffff' }}
+          style={titleStyle}
         >
           <Link to={`/blog/${post.slug}`} className="block hover:opacity-80 transition-opacity">
             {post.title}
@@ -348,20 +628,8 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
           </div>
         )}
 
-        {/* Botón Ver más */}
-        {config.showButton !== false && (
-          <Link
-            to={`/blog/${post.slug}`}
-            className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 w-fit mt-auto hover:opacity-80"
-            style={{
-              backgroundColor: config.buttonBgColor || 'transparent',
-              color: config.buttonTextColor || '#ffffff',
-              border: `2px solid ${config.buttonBorderColor || '#ffffff'}`
-            }}
-          >
-            {config.buttonText || 'Ver más'}
-          </Link>
-        )}
+        {/* Botón Ver más con soporte de gradientes */}
+        {config.showButton !== false && renderButton()}
       </article>
     );
   }

@@ -123,9 +123,25 @@ export const DEFAULT_FEATURED_POSTS_CONFIG = {
     tagBorderColor: 'rgba(255,255,255,0.2)',
     // Botón
     buttonBgColor: 'transparent',
+    buttonBgTransparent: true,
     buttonTextColor: '#00ffff',
     buttonBorderColor: '#00ffff',
     buttonBorderWidth: 2,
+    // Gradiente del botón (fondo)
+    buttonUseGradient: false,
+    buttonGradientFrom: '#3b82f6',
+    buttonGradientTo: '#8b5cf6',
+    buttonGradientDirection: 'to-r' as const,
+    // Gradiente del texto
+    buttonTextUseGradient: false,
+    buttonTextGradientFrom: '#00ffff',
+    buttonTextGradientTo: '#ff00ff',
+    buttonTextGradientDirection: 'to-r' as const,
+    // Gradiente del borde
+    buttonBorderUseGradient: false,
+    buttonBorderGradientFrom: '#00ffff',
+    buttonBorderGradientTo: '#ff00ff',
+    buttonBorderGradientDirection: 'to-r' as const,
     // Overlay (deprecated pero mantenido por compatibilidad)
     overlayOpacity: 0.6,
     overlayColor: '#000000'
@@ -188,9 +204,25 @@ export interface FeaturedPostsConfig {
     tagBorderColor?: string;
     // Botón
     buttonBgColor?: string;
+    buttonBgTransparent?: boolean;
     buttonTextColor?: string;
     buttonBorderColor?: string;
     buttonBorderWidth?: number;
+    // Gradiente del botón (fondo)
+    buttonUseGradient?: boolean;
+    buttonGradientFrom?: string;
+    buttonGradientTo?: string;
+    buttonGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+    // Gradiente del texto
+    buttonTextUseGradient?: boolean;
+    buttonTextGradientFrom?: string;
+    buttonTextGradientTo?: string;
+    buttonTextGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+    // Gradiente del borde
+    buttonBorderUseGradient?: boolean;
+    buttonBorderGradientFrom?: string;
+    buttonBorderGradientTo?: string;
+    buttonBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
   };
   smallCard?: {
     bgColor?: string;
@@ -244,14 +276,33 @@ export const DEFAULT_ALL_NEWS_CONFIG = {
   // Tarjeta solo texto
   textCard: {
     bgColor: '#1e1b4b',
+    bgTransparent: false,
     titleColor: '#ffffff',
+    titleUseGradient: false,
+    titleGradientFrom: '#00ffff',
+    titleGradientTo: '#ff00ff',
+    titleGradientDirection: 'to-r' as const,
     excerptColor: '#d1d5db',
     tagBgColor: 'rgba(139, 92, 246, 0.3)',
     tagTextColor: '#c4b5fd',
     buttonText: 'Ver más',
     buttonBgColor: 'transparent',
+    buttonBgTransparent: true,
+    buttonUseGradient: false,
+    buttonGradientFrom: '#3b82f6',
+    buttonGradientTo: '#8b5cf6',
+    buttonGradientDirection: 'to-r' as const,
     buttonTextColor: '#ffffff',
+    buttonTextUseGradient: false,
+    buttonTextGradientFrom: '#00ffff',
+    buttonTextGradientTo: '#ff00ff',
+    buttonTextGradientDirection: 'to-r' as const,
     buttonBorderColor: '#ffffff',
+    buttonBorderUseGradient: false,
+    buttonBorderGradientFrom: '#00ffff',
+    buttonBorderGradientTo: '#ff00ff',
+    buttonBorderGradientDirection: 'to-r' as const,
+    buttonBorderWidth: 2,
     borderRadius: '16px',
     cardHeight: 'auto',
     cardWidth: '100%'
@@ -324,14 +375,33 @@ export interface AllNewsConfig {
   // Tarjeta solo texto
   textCard?: {
     bgColor?: string;
+    bgTransparent?: boolean;
     titleColor?: string;
+    titleUseGradient?: boolean;
+    titleGradientFrom?: string;
+    titleGradientTo?: string;
+    titleGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
     excerptColor?: string;
     tagBgColor?: string;
     tagTextColor?: string;
     buttonText?: string;
     buttonBgColor?: string;
+    buttonBgTransparent?: boolean;
+    buttonUseGradient?: boolean;
+    buttonGradientFrom?: string;
+    buttonGradientTo?: string;
+    buttonGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
     buttonTextColor?: string;
+    buttonTextUseGradient?: boolean;
+    buttonTextGradientFrom?: string;
+    buttonTextGradientTo?: string;
+    buttonTextGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
     buttonBorderColor?: string;
+    buttonBorderUseGradient?: boolean;
+    buttonBorderGradientFrom?: string;
+    buttonBorderGradientTo?: string;
+    buttonBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+    buttonBorderWidth?: number;
     borderRadius?: string;
     cardHeight?: string;
     cardWidth?: string;

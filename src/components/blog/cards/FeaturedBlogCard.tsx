@@ -136,27 +136,169 @@ export const FeaturedBlogCard: React.FC<FeaturedBlogCardProps> = ({
             </div>
           )}
 
-          {/* Botón Ver más */}
-          <Link
-            to={`/blog/${post.slug}`}
-            className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-full transition-all duration-300"
-            style={{
-              backgroundColor: heroStyles.buttonBgColor || 'transparent',
-              color: heroStyles.buttonTextColor || '#00ffff',
-              border: `${heroStyles.buttonBorderWidth || 2}px solid ${heroStyles.buttonBorderColor || '#00ffff'}`,
-              fontFamily: `'${fontFamily}', sans-serif`
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = heroStyles.buttonBorderColor || '#00ffff';
-              e.currentTarget.style.color = '#000000';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = heroStyles.buttonBgColor || 'transparent';
-              e.currentTarget.style.color = heroStyles.buttonTextColor || '#00ffff';
-            }}
-          >
-            Ver más
-          </Link>
+          {/* Botón Ver más - con soporte para borde gradiente redondeado */}
+          {heroStyles.buttonBorderUseGradient && heroStyles.buttonBgTransparent ? (
+            // Versión con borde gradiente + fondo transparente (usando wrapper)
+            <div 
+              className="inline-block rounded-full p-[2px] transition-all duration-300 hover:opacity-90 hover:scale-105"
+              style={{
+                background: `linear-gradient(${
+                  heroStyles.buttonBorderGradientDirection === 'to-r' ? 'to right' :
+                  heroStyles.buttonBorderGradientDirection === 'to-l' ? 'to left' :
+                  heroStyles.buttonBorderGradientDirection === 'to-t' ? 'to top' :
+                  heroStyles.buttonBorderGradientDirection === 'to-b' ? 'to bottom' :
+                  heroStyles.buttonBorderGradientDirection === 'to-tr' ? 'to top right' :
+                  heroStyles.buttonBorderGradientDirection === 'to-tl' ? 'to top left' :
+                  heroStyles.buttonBorderGradientDirection === 'to-br' ? 'to bottom right' :
+                  'to bottom left'
+                }, ${heroStyles.buttonBorderGradientFrom || '#00ffff'}, ${heroStyles.buttonBorderGradientTo || '#ff00ff'})`,
+                padding: `${heroStyles.buttonBorderWidth || 2}px`
+              }}
+            >
+              <Link
+                to={`/blog/${post.slug}`}
+                className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-full bg-transparent"
+                style={{
+                  backgroundColor: 'rgba(0,0,0,0.9)',
+                  fontFamily: `'${fontFamily}', sans-serif`
+                }}
+              >
+                <span
+                  style={heroStyles.buttonTextUseGradient ? {
+                    background: `linear-gradient(${
+                      heroStyles.buttonTextGradientDirection === 'to-r' ? 'to right' :
+                      heroStyles.buttonTextGradientDirection === 'to-l' ? 'to left' :
+                      heroStyles.buttonTextGradientDirection === 'to-t' ? 'to top' :
+                      heroStyles.buttonTextGradientDirection === 'to-b' ? 'to bottom' :
+                      heroStyles.buttonTextGradientDirection === 'to-tr' ? 'to top right' :
+                      heroStyles.buttonTextGradientDirection === 'to-tl' ? 'to top left' :
+                      heroStyles.buttonTextGradientDirection === 'to-br' ? 'to bottom right' :
+                      'to bottom left'
+                    }, ${heroStyles.buttonTextGradientFrom || '#00ffff'}, ${heroStyles.buttonTextGradientTo || '#ff00ff'})`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  } : {
+                    color: heroStyles.buttonTextColor || '#00ffff'
+                  }}
+                >
+                  Ver más
+                </span>
+              </Link>
+            </div>
+          ) : (
+            // Versión normal (sin borde gradiente con fondo transparente)
+            <Link
+              to={`/blog/${post.slug}`}
+              className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-full transition-all duration-300 relative"
+              style={{
+                // Fondo: determinar según configuración
+                background: (() => {
+                  // Si usa gradiente de borde CON fondo sólido, usamos la técnica padding-box
+                  if (heroStyles.buttonBorderUseGradient && !heroStyles.buttonBgTransparent) {
+                    const bgColor = heroStyles.buttonBgColor || '#000000';
+                    const gradientDirection = heroStyles.buttonBorderGradientDirection === 'to-r' ? 'to right' :
+                      heroStyles.buttonBorderGradientDirection === 'to-l' ? 'to left' :
+                      heroStyles.buttonBorderGradientDirection === 'to-t' ? 'to top' :
+                      heroStyles.buttonBorderGradientDirection === 'to-b' ? 'to bottom' :
+                      heroStyles.buttonBorderGradientDirection === 'to-tr' ? 'to top right' :
+                      heroStyles.buttonBorderGradientDirection === 'to-tl' ? 'to top left' :
+                      heroStyles.buttonBorderGradientDirection === 'to-br' ? 'to bottom right' :
+                      'to bottom left';
+                    return `linear-gradient(${bgColor}, ${bgColor}) padding-box, linear-gradient(${gradientDirection}, ${heroStyles.buttonBorderGradientFrom || '#00ffff'}, ${heroStyles.buttonBorderGradientTo || '#ff00ff'}) border-box`;
+                  }
+                  // Si usa gradiente de fondo (y no es transparente)
+                  if (heroStyles.buttonUseGradient && !heroStyles.buttonBgTransparent) {
+                    const gradientDirection = heroStyles.buttonGradientDirection === 'to-r' ? 'to right' :
+                      heroStyles.buttonGradientDirection === 'to-l' ? 'to left' :
+                      heroStyles.buttonGradientDirection === 'to-t' ? 'to top' :
+                      heroStyles.buttonGradientDirection === 'to-b' ? 'to bottom' :
+                      heroStyles.buttonGradientDirection === 'to-tr' ? 'to top right' :
+                      heroStyles.buttonGradientDirection === 'to-tl' ? 'to top left' :
+                      heroStyles.buttonGradientDirection === 'to-br' ? 'to bottom right' :
+                      'to bottom left';
+                    return `linear-gradient(${gradientDirection}, ${heroStyles.buttonGradientFrom || '#3b82f6'}, ${heroStyles.buttonGradientTo || '#8b5cf6'})`;
+                  }
+                  // Si es transparente
+                  if (heroStyles.buttonBgTransparent) {
+                    return 'transparent';
+                  }
+                  // Color sólido
+                  return heroStyles.buttonBgColor || 'transparent';
+                })(),
+                // Borde
+                border: heroStyles.buttonBorderUseGradient 
+                  ? `${heroStyles.buttonBorderWidth || 2}px solid transparent`
+                  : `${heroStyles.buttonBorderWidth || 2}px solid ${heroStyles.buttonBorderColor || '#00ffff'}`,
+                fontFamily: `'${fontFamily}', sans-serif`
+              }}
+              onMouseEnter={(e) => {
+                if (!heroStyles.buttonUseGradient && !heroStyles.buttonBorderUseGradient && !heroStyles.buttonBgTransparent) {
+                  e.currentTarget.style.backgroundColor = heroStyles.buttonBorderColor || '#00ffff';
+                  const textSpan = e.currentTarget.querySelector('span');
+                  if (textSpan && !heroStyles.buttonTextUseGradient) {
+                    textSpan.style.color = '#000000';
+                    textSpan.style.background = 'none';
+                    textSpan.style.webkitTextFillColor = '#000000';
+                  }
+                } else {
+                  e.currentTarget.style.opacity = '0.9';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!heroStyles.buttonUseGradient && !heroStyles.buttonBorderUseGradient && !heroStyles.buttonBgTransparent) {
+                  e.currentTarget.style.backgroundColor = heroStyles.buttonBgColor || 'transparent';
+                  const textSpan = e.currentTarget.querySelector('span');
+                  if (textSpan) {
+                    if (heroStyles.buttonTextUseGradient) {
+                      textSpan.style.background = `linear-gradient(${
+                        heroStyles.buttonTextGradientDirection === 'to-r' ? 'to right' :
+                        heroStyles.buttonTextGradientDirection === 'to-l' ? 'to left' :
+                        heroStyles.buttonTextGradientDirection === 'to-t' ? 'to top' :
+                        heroStyles.buttonTextGradientDirection === 'to-b' ? 'to bottom' :
+                        heroStyles.buttonTextGradientDirection === 'to-tr' ? 'to top right' :
+                        heroStyles.buttonTextGradientDirection === 'to-tl' ? 'to top left' :
+                        heroStyles.buttonTextGradientDirection === 'to-br' ? 'to bottom right' :
+                        'to bottom left'
+                      }, ${heroStyles.buttonTextGradientFrom || '#00ffff'}, ${heroStyles.buttonTextGradientTo || '#ff00ff'})`;
+                      textSpan.style.webkitBackgroundClip = 'text';
+                      textSpan.style.webkitTextFillColor = 'transparent';
+                    } else {
+                      textSpan.style.color = heroStyles.buttonTextColor || '#00ffff';
+                      textSpan.style.background = 'none';
+                      textSpan.style.webkitTextFillColor = heroStyles.buttonTextColor || '#00ffff';
+                    }
+                  }
+                } else {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              <span
+                style={heroStyles.buttonTextUseGradient ? {
+                  background: `linear-gradient(${
+                    heroStyles.buttonTextGradientDirection === 'to-r' ? 'to right' :
+                    heroStyles.buttonTextGradientDirection === 'to-l' ? 'to left' :
+                    heroStyles.buttonTextGradientDirection === 'to-t' ? 'to top' :
+                    heroStyles.buttonTextGradientDirection === 'to-b' ? 'to bottom' :
+                    heroStyles.buttonTextGradientDirection === 'to-tr' ? 'to top right' :
+                    heroStyles.buttonTextGradientDirection === 'to-tl' ? 'to top left' :
+                    heroStyles.buttonTextGradientDirection === 'to-br' ? 'to bottom right' :
+                    'to bottom left'
+                  }, ${heroStyles.buttonTextGradientFrom || '#00ffff'}, ${heroStyles.buttonTextGradientTo || '#ff00ff'})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                } : {
+                  color: heroStyles.buttonTextColor || '#00ffff'
+                }}
+              >
+                Ver más
+              </span>
+            </Link>
+          )}
         </div>
       </article>
     );

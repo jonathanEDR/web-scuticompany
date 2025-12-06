@@ -16,6 +16,7 @@ import PublicFooter from '../../../components/public/PublicFooter';
 const BlogHome: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null); // 🏷️ Estado para tag seleccionado
   const [searchQuery, setSearchQuery] = useState(''); // 🔍 Estado para búsqueda
   const postsPerPage = 9;
 
@@ -37,6 +38,7 @@ const BlogHome: React.FC = () => {
     limit: postsPerPage,
     isPublished: true,
     categoria: selectedCategory || undefined,
+    tags: selectedTag ? [selectedTag] : undefined, // 🏷️ Agregar filtro de tag
     search: searchQuery || undefined // 🔍 Agregar búsqueda
   });
 
@@ -60,9 +62,6 @@ const BlogHome: React.FC = () => {
     tags 
   } = useTags();
 
-  // Estado para tag seleccionado
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-
   // Handle category filter
   const handleCategoryClick = (categoryId: string | null) => {
     setSelectedCategory(categoryId);
@@ -82,10 +81,10 @@ const BlogHome: React.FC = () => {
     setCurrentPage(1); // Reset to first page
   };
 
-  // Reset page when category changes
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, selectedTag, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

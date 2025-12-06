@@ -16,7 +16,8 @@ import {
   Moon,
   List,
   Grid,
-  Rows
+  Rows,
+  ChevronDown
 } from 'lucide-react';
 import type { AllNewsConfig } from '../../hooks/blog/useBlogCmsConfig';
 import { uploadImage } from '../../services/imageService';
@@ -33,6 +34,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
   const [activeTab, setActiveTab] = useState<'general' | 'imageCard' | 'textCard' | 'sidebar'>('general');
   const [isUploadingLight, setIsUploadingLight] = useState(false);
   const [isUploadingDark, setIsUploadingDark] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const fileInputLightRef = useRef<HTMLInputElement>(null);
   const fileInputDarkRef = useRef<HTMLInputElement>(null);
 
@@ -143,21 +145,32 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-          <Newspaper className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+      {/* Header - Clickeable para colapsar */}
+      <div 
+        className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 -mx-2 px-2 py-2 rounded-lg transition-colors"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+            <Newspaper className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Sección Todas las Noticias
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Configura el layout y estilos de la sección de noticias
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Sección Todas las Noticias
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Configura el layout y estilos de la sección de noticias
-          </p>
-        </div>
+        <ChevronDown 
+          className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${isCollapsed ? '' : 'rotate-180'}`}
+        />
       </div>
 
+      {/* Contenido colapsable */}
+      {!isCollapsed && (
+        <>
       {/* Tabs */}
       <div className="flex gap-2 flex-wrap">
         {tabs.map((tab) => (
@@ -297,34 +310,52 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <label className="text-xs text-gray-600 dark:text-gray-400 w-24">Fondo:</label>
+                      <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Fondo:</label>
                       <input
                         type="color"
                         value={config.sectionBgColorLight || '#ffffff'}
                         onChange={(e) => handleChange('sectionBgColorLight', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.sectionBgColorLight || '#ffffff'}</span>
+                      <input
+                        type="text"
+                        value={config.sectionBgColorLight || '#ffffff'}
+                        onChange={(e) => handleChange('sectionBgColorLight', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="#ffffff"
+                      />
                     </div>
                     <div className="flex items-center gap-3">
-                      <label className="text-xs text-gray-600 dark:text-gray-400 w-24">Título:</label>
+                      <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Título:</label>
                       <input
                         type="color"
-                        value={config.sectionTitleColorLight || '#111827'}
+                        value={config.sectionTitleColorLight || '#fafcff'}
                         onChange={(e) => handleChange('sectionTitleColorLight', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.sectionTitleColorLight || '#111827'}</span>
+                      <input
+                        type="text"
+                        value={config.sectionTitleColorLight || '#fafcff'}
+                        onChange={(e) => handleChange('sectionTitleColorLight', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="#fafcff"
+                      />
                     </div>
                     <div className="flex items-center gap-3">
-                      <label className="text-xs text-gray-600 dark:text-gray-400 w-24">Icono:</label>
+                      <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Icono:</label>
                       <input
                         type="color"
-                        value={config.sectionIconColorLight || '#2563eb'}
+                        value={config.sectionIconColorLight || '#dd24eb'}
                         onChange={(e) => handleChange('sectionIconColorLight', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.sectionIconColorLight || '#2563eb'}</span>
+                      <input
+                        type="text"
+                        value={config.sectionIconColorLight || '#dd24eb'}
+                        onChange={(e) => handleChange('sectionIconColorLight', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="#dd24eb"
+                      />
                     </div>
                   </div>
                 </div>
@@ -338,34 +369,52 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <label className="text-xs text-gray-600 dark:text-gray-400 w-24">Fondo:</label>
+                      <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Fondo:</label>
                       <input
                         type="color"
                         value={config.sectionBgColorDark || '#0f172a'}
                         onChange={(e) => handleChange('sectionBgColorDark', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.sectionBgColorDark || '#0f172a'}</span>
+                      <input
+                        type="text"
+                        value={config.sectionBgColorDark || '#0f172a'}
+                        onChange={(e) => handleChange('sectionBgColorDark', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="#0f172a"
+                      />
                     </div>
                     <div className="flex items-center gap-3">
-                      <label className="text-xs text-gray-600 dark:text-gray-400 w-24">Título:</label>
+                      <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Título:</label>
                       <input
                         type="color"
                         value={config.sectionTitleColorDark || '#ffffff'}
                         onChange={(e) => handleChange('sectionTitleColorDark', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.sectionTitleColorDark || '#ffffff'}</span>
+                      <input
+                        type="text"
+                        value={config.sectionTitleColorDark || '#ffffff'}
+                        onChange={(e) => handleChange('sectionTitleColorDark', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="#ffffff"
+                      />
                     </div>
                     <div className="flex items-center gap-3">
-                      <label className="text-xs text-gray-600 dark:text-gray-400 w-24">Icono:</label>
+                      <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Icono:</label>
                       <input
                         type="color"
-                        value={config.sectionIconColorDark || '#60a5fa'}
+                        value={config.sectionIconColorDark || '#d960fb'}
                         onChange={(e) => handleChange('sectionIconColorDark', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.sectionIconColorDark || '#60a5fa'}</span>
+                      <input
+                        type="text"
+                        value={config.sectionIconColorDark || '#d960fb'}
+                        onChange={(e) => handleChange('sectionIconColorDark', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="#d960fb"
+                      />
                     </div>
                   </div>
                 </div>
@@ -558,7 +607,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                         onChange={(e) => handleChange('paginationActiveBg', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.paginationActiveBg || '#8b5cf6'}</span>
+                      <input
+                        type="text"
+                        value={config.paginationActiveBg || '#8b5cf6'}
+                        onChange={(e) => handleChange('paginationActiveBg', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
                     </div>
                   </div>
                   <div>
@@ -570,7 +624,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                         onChange={(e) => handleChange('paginationActiveText', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.paginationActiveText || '#ffffff'}</span>
+                      <input
+                        type="text"
+                        value={config.paginationActiveText || '#ffffff'}
+                        onChange={(e) => handleChange('paginationActiveText', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
                     </div>
                   </div>
                   <div>
@@ -582,7 +641,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                         onChange={(e) => handleChange('paginationInactiveBg', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.paginationInactiveBg || '#f3f4f6'}</span>
+                      <input
+                        type="text"
+                        value={config.paginationInactiveBg || '#f3f4f6'}
+                        onChange={(e) => handleChange('paginationInactiveBg', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
                     </div>
                   </div>
                   <div>
@@ -594,7 +658,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                         onChange={(e) => handleChange('paginationInactiveText', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.paginationInactiveText || '#374151'}</span>
+                      <input
+                        type="text"
+                        value={config.paginationInactiveText || '#374151'}
+                        onChange={(e) => handleChange('paginationInactiveText', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
                     </div>
                   </div>
                 </div>
@@ -610,7 +679,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                         onChange={(e) => handleChange('paginationBorderColor', e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{config.paginationBorderColor || '#d1d5db'}</span>
+                      <input
+                        type="text"
+                        value={config.paginationBorderColor || '#d1d5db'}
+                        onChange={(e) => handleChange('paginationBorderColor', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
                     </div>
                   </div>
                   <div>
@@ -730,7 +804,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     onChange={(e) => handleChange('imageCard.titleColor', e.target.value)}
                     className="w-10 h-10 rounded cursor-pointer"
                   />
-                  <span className="text-sm text-gray-500">{config.imageCard?.titleColor || '#ffffff'}</span>
+                  <input
+                    type="text"
+                    value={config.imageCard?.titleColor || '#ffffff'}
+                    onChange={(e) => handleChange('imageCard.titleColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
                 </div>
               </div>
 
@@ -745,7 +824,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     onChange={(e) => handleChange('imageCard.categoryBgColor', e.target.value)}
                     className="w-10 h-10 rounded cursor-pointer"
                   />
-                  <span className="text-sm text-gray-500">{config.imageCard?.categoryBgColor || '#8b5cf6'}</span>
+                  <input
+                    type="text"
+                    value={config.imageCard?.categoryBgColor || '#8b5cf6'}
+                    onChange={(e) => handleChange('imageCard.categoryBgColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
                 </div>
               </div>
 
@@ -760,7 +844,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     onChange={(e) => handleChange('imageCard.categoryTextColor', e.target.value)}
                     className="w-10 h-10 rounded cursor-pointer"
                   />
-                  <span className="text-sm text-gray-500">{config.imageCard?.categoryTextColor || '#ffffff'}</span>
+                  <input
+                    type="text"
+                    value={config.imageCard?.categoryTextColor || '#ffffff'}
+                    onChange={(e) => handleChange('imageCard.categoryTextColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
                 </div>
               </div>
 
@@ -816,7 +905,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     onChange={(e) => handleChange('imageCard.authorNameColor', e.target.value)}
                     className="w-10 h-10 rounded cursor-pointer"
                   />
-                  <span className="text-sm text-gray-500">{config.imageCard?.authorNameColor || '#ffffff'}</span>
+                  <input
+                    type="text"
+                    value={config.imageCard?.authorNameColor || '#ffffff'}
+                    onChange={(e) => handleChange('imageCard.authorNameColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
                 </div>
               </div>
 
@@ -831,7 +925,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     onChange={(e) => handleChange('imageCard.authorDateColor', e.target.value)}
                     className="w-10 h-10 rounded cursor-pointer"
                   />
-                  <span className="text-sm text-gray-500">{config.imageCard?.authorDateColor || '#9ca3af'}</span>
+                  <input
+                    type="text"
+                    value={config.imageCard?.authorDateColor || '#9ca3af'}
+                    onChange={(e) => handleChange('imageCard.authorDateColor', e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
                 </div>
               </div>
 
@@ -996,13 +1095,28 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
             <div 
               className="p-6 rounded-xl"
               style={{ 
-                backgroundColor: config.textCard?.bgColor || '#1e1b4b',
-                borderRadius: config.textCard?.borderRadius || '16px'
+                backgroundColor: config.textCard?.bgTransparent ? 'transparent' : (config.textCard?.bgColor || '#1e1b4b'),
+                borderRadius: config.textCard?.borderRadius || '16px',
+                border: config.textCard?.bgTransparent ? '2px dashed #6b7280' : 'none'
               }}
             >
               <h4 
                 className="text-xl font-bold mb-3"
-                style={{ color: config.textCard?.titleColor || '#ffffff' }}
+                style={config.textCard?.titleUseGradient ? {
+                  background: `linear-gradient(${
+                    config.textCard?.titleGradientDirection === 'to-r' ? 'to right' :
+                    config.textCard?.titleGradientDirection === 'to-l' ? 'to left' :
+                    config.textCard?.titleGradientDirection === 'to-t' ? 'to top' :
+                    config.textCard?.titleGradientDirection === 'to-b' ? 'to bottom' :
+                    config.textCard?.titleGradientDirection === 'to-tr' ? 'to top right' :
+                    config.textCard?.titleGradientDirection === 'to-tl' ? 'to top left' :
+                    config.textCard?.titleGradientDirection === 'to-br' ? 'to bottom right' :
+                    'to bottom left'
+                  }, ${config.textCard?.titleGradientFrom || '#00ffff'}, ${config.textCard?.titleGradientTo || '#ff00ff'})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                } : { color: config.textCard?.titleColor || '#ffffff' }}
               >
                 Título del artículo destacado
               </h4>
@@ -1032,92 +1146,319 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   Tag 2
                 </span>
               </div>
-              <button
-                className="px-6 py-2 rounded-full text-sm font-semibold"
-                style={{
-                  backgroundColor: config.textCard?.buttonBgColor || 'transparent',
-                  color: config.textCard?.buttonTextColor || '#ffffff',
-                  border: `2px solid ${config.textCard?.buttonBorderColor || '#ffffff'}`
-                }}
-              >
-                {config.textCard?.buttonText || 'Ver más'}
-              </button>
+              {/* Preview del botón con gradientes */}
+              <div className="flex justify-start">
+                {config.textCard?.buttonBorderUseGradient && config.textCard?.buttonBgTransparent ? (
+                  <div 
+                    className="inline-block rounded-full"
+                    style={{
+                      background: `linear-gradient(${
+                        config.textCard?.buttonBorderGradientDirection === 'to-r' ? 'to right' :
+                        config.textCard?.buttonBorderGradientDirection === 'to-l' ? 'to left' :
+                        config.textCard?.buttonBorderGradientDirection === 'to-t' ? 'to top' :
+                        config.textCard?.buttonBorderGradientDirection === 'to-b' ? 'to bottom' :
+                        config.textCard?.buttonBorderGradientDirection === 'to-tr' ? 'to top right' :
+                        config.textCard?.buttonBorderGradientDirection === 'to-tl' ? 'to top left' :
+                        config.textCard?.buttonBorderGradientDirection === 'to-br' ? 'to bottom right' :
+                        'to bottom left'
+                      }, ${config.textCard?.buttonBorderGradientFrom || '#00ffff'}, ${config.textCard?.buttonBorderGradientTo || '#ff00ff'})`,
+                      padding: `${config.textCard?.buttonBorderWidth || 2}px`
+                    }}
+                  >
+                    <button
+                      className="px-6 py-2 rounded-full text-sm font-semibold"
+                      style={{ backgroundColor: config.textCard?.bgTransparent ? 'rgba(0,0,0,0.8)' : (config.textCard?.bgColor || '#1e1b4b') }}
+                    >
+                      <span
+                        style={config.textCard?.buttonTextUseGradient ? {
+                          background: `linear-gradient(${
+                            config.textCard?.buttonTextGradientDirection === 'to-r' ? 'to right' :
+                            config.textCard?.buttonTextGradientDirection === 'to-l' ? 'to left' :
+                            config.textCard?.buttonTextGradientDirection === 'to-t' ? 'to top' :
+                            config.textCard?.buttonTextGradientDirection === 'to-b' ? 'to bottom' :
+                            config.textCard?.buttonTextGradientDirection === 'to-tr' ? 'to top right' :
+                            config.textCard?.buttonTextGradientDirection === 'to-tl' ? 'to top left' :
+                            config.textCard?.buttonTextGradientDirection === 'to-br' ? 'to bottom right' :
+                            'to bottom left'
+                          }, ${config.textCard?.buttonTextGradientFrom || '#00ffff'}, ${config.textCard?.buttonTextGradientTo || '#ff00ff'})`,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text'
+                        } : { color: config.textCard?.buttonTextColor || '#ffffff' }}
+                      >
+                        {config.textCard?.buttonText || 'Ver más'}
+                      </span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="px-6 py-2 rounded-full text-sm font-semibold"
+                    style={{
+                      background: (() => {
+                        if (config.textCard?.buttonBorderUseGradient && !config.textCard?.buttonBgTransparent) {
+                          const bgColor = config.textCard?.buttonBgColor || '#1e1b4b';
+                          const gradientDirection = config.textCard?.buttonBorderGradientDirection === 'to-r' ? 'to right' :
+                            config.textCard?.buttonBorderGradientDirection === 'to-l' ? 'to left' :
+                            config.textCard?.buttonBorderGradientDirection === 'to-t' ? 'to top' :
+                            config.textCard?.buttonBorderGradientDirection === 'to-b' ? 'to bottom' :
+                            config.textCard?.buttonBorderGradientDirection === 'to-tr' ? 'to top right' :
+                            config.textCard?.buttonBorderGradientDirection === 'to-tl' ? 'to top left' :
+                            config.textCard?.buttonBorderGradientDirection === 'to-br' ? 'to bottom right' :
+                            'to bottom left';
+                          return `linear-gradient(${bgColor}, ${bgColor}) padding-box, linear-gradient(${gradientDirection}, ${config.textCard?.buttonBorderGradientFrom || '#00ffff'}, ${config.textCard?.buttonBorderGradientTo || '#ff00ff'}) border-box`;
+                        }
+                        if (config.textCard?.buttonUseGradient && !config.textCard?.buttonBgTransparent) {
+                          const gradientDirection = config.textCard?.buttonGradientDirection === 'to-r' ? 'to right' :
+                            config.textCard?.buttonGradientDirection === 'to-l' ? 'to left' :
+                            config.textCard?.buttonGradientDirection === 'to-t' ? 'to top' :
+                            config.textCard?.buttonGradientDirection === 'to-b' ? 'to bottom' :
+                            config.textCard?.buttonGradientDirection === 'to-tr' ? 'to top right' :
+                            config.textCard?.buttonGradientDirection === 'to-tl' ? 'to top left' :
+                            config.textCard?.buttonGradientDirection === 'to-br' ? 'to bottom right' :
+                            'to bottom left';
+                          return `linear-gradient(${gradientDirection}, ${config.textCard?.buttonGradientFrom || '#3b82f6'}, ${config.textCard?.buttonGradientTo || '#8b5cf6'})`;
+                        }
+                        if (config.textCard?.buttonBgTransparent) {
+                          return 'transparent';
+                        }
+                        return config.textCard?.buttonBgColor || 'transparent';
+                      })(),
+                      border: config.textCard?.buttonBorderUseGradient 
+                        ? `${config.textCard?.buttonBorderWidth || 2}px solid transparent`
+                        : `${config.textCard?.buttonBorderWidth || 2}px solid ${config.textCard?.buttonBorderColor || '#ffffff'}`,
+                    }}
+                  >
+                    <span
+                      style={config.textCard?.buttonTextUseGradient ? {
+                        background: `linear-gradient(${
+                          config.textCard?.buttonTextGradientDirection === 'to-r' ? 'to right' :
+                          config.textCard?.buttonTextGradientDirection === 'to-l' ? 'to left' :
+                          config.textCard?.buttonTextGradientDirection === 'to-t' ? 'to top' :
+                          config.textCard?.buttonTextGradientDirection === 'to-b' ? 'to bottom' :
+                          config.textCard?.buttonTextGradientDirection === 'to-tr' ? 'to top right' :
+                          config.textCard?.buttonTextGradientDirection === 'to-tl' ? 'to top left' :
+                          config.textCard?.buttonTextGradientDirection === 'to-br' ? 'to bottom right' :
+                          'to bottom left'
+                        }, ${config.textCard?.buttonTextGradientFrom || '#00ffff'}, ${config.textCard?.buttonTextGradientTo || '#ff00ff'})`,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                      } : { color: config.textCard?.buttonTextColor || '#ffffff' }}
+                    >
+                      {config.textCard?.buttonText || 'Ver más'}
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Configuración */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color de Fondo
-                </label>
-                <div className="flex items-center gap-2">
+            {/* Sección: Fondo de la Tarjeta */}
+            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                🎨 Fondo de la Tarjeta
+              </h4>
+              
+              {/* Toggle Fondo Transparente */}
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
                   <input
-                    type="color"
-                    value={config.textCard?.bgColor || '#1e1b4b'}
-                    onChange={(e) => handleChange('textCard.bgColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
+                    type="checkbox"
+                    checked={config.textCard?.bgTransparent || false}
+                    onChange={(e) => handleChange('textCard.bgTransparent', e.target.checked)}
+                    className="sr-only peer"
                   />
-                  <span className="text-sm text-gray-500">{config.textCard?.bgColor || '#1e1b4b'}</span>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                </label>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Fondo Transparente</span>
+              </div>
+
+              {/* Color de Fondo (solo si no es transparente) */}
+              {!config.textCard?.bgTransparent && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color de Fondo
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={config.textCard?.bgColor || '#1e1b4b'}
+                      onChange={(e) => handleChange('textCard.bgColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={config.textCard?.bgColor || '#1e1b4b'}
+                      onChange={(e) => handleChange('textCard.bgColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Sección: Título con Gradiente */}
+            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                📝 Color del Título
+              </h4>
+              
+              {/* Toggle Gradiente */}
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={config.textCard?.titleUseGradient || false}
+                    onChange={(e) => handleChange('textCard.titleUseGradient', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                </label>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Usar Gradiente</span>
+              </div>
+
+              {config.textCard?.titleUseGradient ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color Inicio</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={config.textCard?.titleGradientFrom || '#00ffff'}
+                        onChange={(e) => handleChange('textCard.titleGradientFrom', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.textCard?.titleGradientFrom || '#00ffff'}
+                        onChange={(e) => handleChange('textCard.titleGradientFrom', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color Fin</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={config.textCard?.titleGradientTo || '#ff00ff'}
+                        onChange={(e) => handleChange('textCard.titleGradientTo', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={config.textCard?.titleGradientTo || '#ff00ff'}
+                        onChange={(e) => handleChange('textCard.titleGradientTo', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Dirección</label>
+                    <select
+                      value={config.textCard?.titleGradientDirection || 'to-r'}
+                      onChange={(e) => handleChange('textCard.titleGradientDirection', e.target.value)}
+                      className="w-full px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-tr">↗ Diagonal Superior</option>
+                      <option value="to-br">↘ Diagonal Inferior</option>
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del Título
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={config.textCard?.titleColor || '#ffffff'}
+                      onChange={(e) => handleChange('textCard.titleColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={config.textCard?.titleColor || '#ffffff'}
+                      onChange={(e) => handleChange('textCard.titleColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Sección: Extracto y Tags */}
+            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                📄 Extracto y Tags
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del Extracto
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={config.textCard?.excerptColor || '#d1d5db'}
+                      onChange={(e) => handleChange('textCard.excerptColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={config.textCard?.excerptColor || '#d1d5db'}
+                      onChange={(e) => handleChange('textCard.excerptColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color Fondo Tags
+                  </label>
+                  <input
+                    type="text"
+                    value={config.textCard?.tagBgColor || 'rgba(139, 92, 246, 0.3)'}
+                    onChange={(e) => handleChange('textCard.tagBgColor', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color Texto Tags
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={config.textCard?.tagTextColor || '#c4b5fd'}
+                      onChange={(e) => handleChange('textCard.tagTextColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={config.textCard?.tagTextColor || '#c4b5fd'}
+                      onChange={(e) => handleChange('textCard.tagTextColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color del Título
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.textCard?.titleColor || '#ffffff'}
-                    onChange={(e) => handleChange('textCard.titleColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
-                  />
-                  <span className="text-sm text-gray-500">{config.textCard?.titleColor || '#ffffff'}</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color del Extracto
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.textCard?.excerptColor || '#d1d5db'}
-                    onChange={(e) => handleChange('textCard.excerptColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
-                  />
-                  <span className="text-sm text-gray-500">{config.textCard?.excerptColor || '#d1d5db'}</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color Fondo Tags
-                </label>
-                <input
-                  type="text"
-                  value={config.textCard?.tagBgColor || 'rgba(139, 92, 246, 0.3)'}
-                  onChange={(e) => handleChange('textCard.tagBgColor', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color Texto Tags
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.textCard?.tagTextColor || '#c4b5fd'}
-                    onChange={(e) => handleChange('textCard.tagTextColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
-                  />
-                  <span className="text-sm text-gray-500">{config.textCard?.tagTextColor || '#c4b5fd'}</span>
-                </div>
-              </div>
-
+            {/* Sección: Configuración del Botón */}
+            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800 space-y-4">
+              <h4 className="text-sm font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                🔘 Configuración del Botón
+              </h4>
+              
+              {/* Texto del botón */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Texto del Botón
@@ -1130,51 +1471,214 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color Fondo Botón
-                </label>
-                <input
-                  type="text"
-                  value={config.textCard?.buttonBgColor || 'transparent'}
-                  onChange={(e) => handleChange('textCard.buttonBgColor', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color Texto Botón
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.textCard?.buttonTextColor || '#ffffff'}
-                    onChange={(e) => handleChange('textCard.buttonTextColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
-                  />
-                  <span className="text-sm text-gray-500">{config.textCard?.buttonTextColor || '#ffffff'}</span>
+              {/* Sub-sección: Fondo del Botón */}
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-lg space-y-3">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Fondo del Botón</h5>
+                
+                {/* Toggle Transparente */}
+                <div className="flex items-center gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.textCard?.buttonBgTransparent || false}
+                      onChange={(e) => handleChange('textCard.buttonBgTransparent', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                  </label>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Transparente</span>
                 </div>
+
+                {!config.textCard?.buttonBgTransparent && (
+                  <>
+                    {/* Toggle Gradiente */}
+                    <div className="flex items-center gap-3">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={config.textCard?.buttonUseGradient || false}
+                          onChange={(e) => handleChange('textCard.buttonUseGradient', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                      </label>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
+                    </div>
+
+                    {config.textCard?.buttonUseGradient ? (
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Inicio</label>
+                          <div className="flex items-center gap-1">
+                            <input type="color" value={config.textCard?.buttonGradientFrom || '#3b82f6'} onChange={(e) => handleChange('textCard.buttonGradientFrom', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                            <input type="text" value={config.textCard?.buttonGradientFrom || '#3b82f6'} onChange={(e) => handleChange('textCard.buttonGradientFrom', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Fin</label>
+                          <div className="flex items-center gap-1">
+                            <input type="color" value={config.textCard?.buttonGradientTo || '#8b5cf6'} onChange={(e) => handleChange('textCard.buttonGradientTo', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                            <input type="text" value={config.textCard?.buttonGradientTo || '#8b5cf6'} onChange={(e) => handleChange('textCard.buttonGradientTo', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                          <select value={config.textCard?.buttonGradientDirection || 'to-r'} onChange={(e) => handleChange('textCard.buttonGradientDirection', e.target.value)} className="w-full px-1 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="to-r">→</option>
+                            <option value="to-l">←</option>
+                            <option value="to-t">↑</option>
+                            <option value="to-b">↓</option>
+                            <option value="to-tr">↗</option>
+                            <option value="to-br">↘</option>
+                          </select>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Color de Fondo</label>
+                        <div className="flex items-center gap-2">
+                          <input type="color" value={config.textCard?.buttonBgColor || '#1e1b4b'} onChange={(e) => handleChange('textCard.buttonBgColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                          <input type="text" value={config.textCard?.buttonBgColor || '#1e1b4b'} onChange={(e) => handleChange('textCard.buttonBgColor', e.target.value)} className="flex-1 px-2 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Color Borde Botón
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.textCard?.buttonBorderColor || '#ffffff'}
-                    onChange={(e) => handleChange('textCard.buttonBorderColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
-                  />
-                  <span className="text-sm text-gray-500">{config.textCard?.buttonBorderColor || '#ffffff'}</span>
+              {/* Sub-sección: Texto del Botón */}
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-lg space-y-3">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Texto del Botón</h5>
+                
+                {/* Toggle Gradiente */}
+                <div className="flex items-center gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.textCard?.buttonTextUseGradient || false}
+                      onChange={(e) => handleChange('textCard.buttonTextUseGradient', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                  </label>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                 </div>
+
+                {config.textCard?.buttonTextUseGradient ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Inicio</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.textCard?.buttonTextGradientFrom || '#00ffff'} onChange={(e) => handleChange('textCard.buttonTextGradientFrom', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.textCard?.buttonTextGradientFrom || '#00ffff'} onChange={(e) => handleChange('textCard.buttonTextGradientFrom', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Fin</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.textCard?.buttonTextGradientTo || '#ff00ff'} onChange={(e) => handleChange('textCard.buttonTextGradientTo', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.textCard?.buttonTextGradientTo || '#ff00ff'} onChange={(e) => handleChange('textCard.buttonTextGradientTo', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                      <select value={config.textCard?.buttonTextGradientDirection || 'to-r'} onChange={(e) => handleChange('textCard.buttonTextGradientDirection', e.target.value)} className="w-full px-1 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="to-r">→</option>
+                        <option value="to-l">←</option>
+                        <option value="to-t">↑</option>
+                        <option value="to-b">↓</option>
+                        <option value="to-tr">↗</option>
+                        <option value="to-br">↘</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Color del Texto</label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={config.textCard?.buttonTextColor || '#ffffff'} onChange={(e) => handleChange('textCard.buttonTextColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                      <input type="text" value={config.textCard?.buttonTextColor || '#ffffff'} onChange={(e) => handleChange('textCard.buttonTextColor', e.target.value)} className="flex-1 px-2 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                    </div>
+                  </div>
+                )}
               </div>
 
+              {/* Sub-sección: Borde del Botón */}
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-lg space-y-3">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Borde del Botón</h5>
+                
+                {/* Toggle Gradiente */}
+                <div className="flex items-center gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.textCard?.buttonBorderUseGradient || false}
+                      onChange={(e) => handleChange('textCard.buttonBorderUseGradient', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                  </label>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
+                </div>
+
+                {/* Ancho del borde */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Ancho del Borde (px)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={config.textCard?.buttonBorderWidth || 2}
+                    onChange={(e) => handleChange('textCard.buttonBorderWidth', parseInt(e.target.value))}
+                    className="w-20 px-2 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                {config.textCard?.buttonBorderUseGradient ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Inicio</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.textCard?.buttonBorderGradientFrom || '#00ffff'} onChange={(e) => handleChange('textCard.buttonBorderGradientFrom', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.textCard?.buttonBorderGradientFrom || '#00ffff'} onChange={(e) => handleChange('textCard.buttonBorderGradientFrom', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Fin</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.textCard?.buttonBorderGradientTo || '#ff00ff'} onChange={(e) => handleChange('textCard.buttonBorderGradientTo', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.textCard?.buttonBorderGradientTo || '#ff00ff'} onChange={(e) => handleChange('textCard.buttonBorderGradientTo', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                      <select value={config.textCard?.buttonBorderGradientDirection || 'to-r'} onChange={(e) => handleChange('textCard.buttonBorderGradientDirection', e.target.value)} className="w-full px-1 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="to-r">→</option>
+                        <option value="to-l">←</option>
+                        <option value="to-t">↑</option>
+                        <option value="to-b">↓</option>
+                        <option value="to-tr">↗</option>
+                        <option value="to-br">↘</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Color del Borde</label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={config.textCard?.buttonBorderColor || '#ffffff'} onChange={(e) => handleChange('textCard.buttonBorderColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                      <input type="text" value={config.textCard?.buttonBorderColor || '#ffffff'} onChange={(e) => handleChange('textCard.buttonBorderColor', e.target.value)} className="flex-1 px-2 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Sección: Border Radius */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Border Radius
+                  Border Radius de la Tarjeta
                 </label>
                 <input
                   type="text"
@@ -1327,7 +1831,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.borderColorLight', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.borderColorLight || '#e5e7eb'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.borderColorLight || '#e5e7eb'}
+                      onChange={(e) => handleChange('sidebar.borderColorLight', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
 
@@ -1343,7 +1852,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.borderColorDark', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.borderColorDark || '#374151'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.borderColorDark || '#374151'}
+                      onChange={(e) => handleChange('sidebar.borderColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
               </div>
@@ -1427,7 +1941,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.bgColorLight', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.bgColorLight || '#ffffff'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.bgColorLight || '#ffffff'}
+                      onChange={(e) => handleChange('sidebar.bgColorLight', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
               </div>
@@ -1444,7 +1963,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.bgColorDark', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.bgColorDark || '#1f2937'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.bgColorDark || '#1f2937'}
+                      onChange={(e) => handleChange('sidebar.bgColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
               </div>
@@ -1560,7 +2084,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.categoriesTitleColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.categoriesTitleColor || '#111827'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.categoriesTitleColor || '#111827'}
+                      onChange={(e) => handleChange('sidebar.categoriesTitleColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1574,7 +2103,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.categoriesTitleColorDark', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.categoriesTitleColorDark || '#ffffff'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.categoriesTitleColorDark || '#ffffff'}
+                      onChange={(e) => handleChange('sidebar.categoriesTitleColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1588,7 +2122,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.categoryItemColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.categoryItemColor || '#4b5563'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.categoryItemColor || '#4b5563'}
+                      onChange={(e) => handleChange('sidebar.categoryItemColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1602,7 +2141,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.categoryItemColorDark', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.categoryItemColorDark || '#d1d5db'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.categoryItemColorDark || '#d1d5db'}
+                      onChange={(e) => handleChange('sidebar.categoryItemColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1616,7 +2160,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.categoryHoverColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.categoryHoverColor || '#2563eb'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.categoryHoverColor || '#2563eb'}
+                      onChange={(e) => handleChange('sidebar.categoryHoverColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
               </div>
@@ -1639,7 +2188,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagsTitleColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagsTitleColor || '#111827'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagsTitleColor || '#111827'}
+                      onChange={(e) => handleChange('sidebar.tagsTitleColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1653,7 +2207,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagsTitleColorDark', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagsTitleColorDark || '#ffffff'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagsTitleColorDark || '#ffffff'}
+                      onChange={(e) => handleChange('sidebar.tagsTitleColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1667,7 +2226,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagBgColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagBgColor || '#e5e7eb'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagBgColor || '#e5e7eb'}
+                      onChange={(e) => handleChange('sidebar.tagBgColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1681,7 +2245,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagBgColorDark', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagBgColorDark || '#374151'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagBgColorDark || '#374151'}
+                      onChange={(e) => handleChange('sidebar.tagBgColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1695,7 +2264,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagTextColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagTextColor || '#4b5563'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagTextColor || '#4b5563'}
+                      onChange={(e) => handleChange('sidebar.tagTextColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1709,7 +2283,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagTextColorDark', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagTextColorDark || '#d1d5db'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagTextColorDark || '#d1d5db'}
+                      onChange={(e) => handleChange('sidebar.tagTextColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1723,7 +2302,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagActiveBgColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagActiveBgColor || '#2563eb'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagActiveBgColor || '#2563eb'}
+                      onChange={(e) => handleChange('sidebar.tagActiveBgColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
@@ -1737,7 +2321,12 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('sidebar.tagActiveTextColor', e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />
-                    <span className="text-xs text-gray-500">{config.sidebar?.tagActiveTextColor || '#ffffff'}</span>
+                    <input
+                      type="text"
+                      value={config.sidebar?.tagActiveTextColor || '#ffffff'}
+                      onChange={(e) => handleChange('sidebar.tagActiveTextColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
 
@@ -1763,6 +2352,8 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 };
