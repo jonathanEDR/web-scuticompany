@@ -66,8 +66,14 @@ interface CardDesignConfig {
   featuredBadge?: {
     text?: string;
     gradient?: string;
+    icon?: string;
+    iconColor?: string;
+    color1?: string;
+    color2?: string;
   };
   buttonText?: string;
+  buttonIcon?: string;
+  buttonIconPosition?: 'left' | 'right' | 'none';
   buttonGradient?: string;
   buttonBorderRadius?: string;
   transparentCards?: boolean;
@@ -428,11 +434,11 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
                 borderRadius: cardConfig?.buttonBorderRadius || '0.5rem'
               }}
             >
-              {cardConfig?.buttonIconPosition === 'left' && cardConfig?.buttonIconPosition !== 'none' && (
+              {cardConfig?.buttonIconPosition === 'left' && (
                 <span>{cardConfig?.buttonIcon || '→'}</span>
               )}
               <span>{cardConfig?.buttonText || 'Ver detalles'}</span>
-              {(cardConfig?.buttonIconPosition === 'right' || !cardConfig?.buttonIconPosition) && cardConfig?.buttonIconPosition !== 'none' && (
+              {(cardConfig?.buttonIconPosition === 'right' || (!cardConfig?.buttonIconPosition && cardConfig?.buttonIconPosition !== 'none')) && (
                 <span>{cardConfig?.buttonIcon || '→'}</span>
               )}
             </Link>

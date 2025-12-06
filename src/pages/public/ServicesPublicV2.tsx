@@ -175,7 +175,7 @@ const ServicesPublicV2 = () => {
     loading,
     error,
     refetch: recargarServicios,
-    isFromCache
+    // isFromCache - removido porque no se usa actualmente
   } = useServiciosList(filtros, {
     enabled: true,
     onError: () => {

@@ -515,8 +515,14 @@ export interface ServicesGridConfig {
     featuredBadge?: {
       text?: string;
       gradient?: string;
+      icon?: string;
+      iconColor?: string;
+      color1?: string;
+      color2?: string;
     };
     buttonText?: string;
+    buttonIcon?: string;
+    buttonIconPosition?: 'left' | 'right' | 'none';
     buttonGradient?: string;
     buttonBorderRadius?: string;
     contentConfig?: {
