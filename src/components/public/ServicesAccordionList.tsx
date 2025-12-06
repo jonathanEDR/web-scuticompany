@@ -483,27 +483,6 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
     ? config?.titleGradientDirectionDark 
     : config?.titleGradientDirection;
   
-  // Estilos del título de sección
-  const sectionTitleStyle: React.CSSProperties = useTitleGradient ? {
-    background: `linear-gradient(${getGradientDirection(gradientDirection)}, ${gradientFrom}, ${gradientTo})`,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    color: 'transparent',
-    fontFamily: config?.titleFontFamily || 'inherit',
-    fontWeight: config?.titleFontWeight || '700',
-    display: 'inline-block'
-  } : {
-    color: isDark ? (config?.titleColorDark || '#A78BFA') : (config?.titleColor || '#8B5CF6'),
-    fontFamily: config?.titleFontFamily || 'inherit',
-    fontWeight: config?.titleFontWeight || '700'
-  };
-  
-  // Colores de la sección (para compatibilidad)
-  const sectionTitleColor = isDark
-    ? (config?.titleColorDark || '#A78BFA')
-    : (config?.titleColor || '#8B5CF6');
-  
   const sectionSubtitleColor = isDark
     ? (config?.subtitleColorDark || '#D1D5DB')
     : (config?.subtitleColor || '#4B5563');
