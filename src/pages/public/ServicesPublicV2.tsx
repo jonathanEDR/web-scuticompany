@@ -478,11 +478,14 @@ const ServicesPublicV2 = () => {
                           className="absolute left-3 top-1/2 -translate-y-1/2"
                           style={{
                             color: currentTheme === 'dark'
-                              ? (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholderDark || '#6b7280')
-                              : (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholder || '#9ca3af')
+                              ? (pageData?.content?.servicesFilter?.styles?.iconSearchColorDark || '#6b7280')
+                              : (pageData?.content?.servicesFilter?.styles?.iconSearchColor || '#9ca3af')
                           }}
                         >
-                          🔍
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                          </svg>
                         </span>
                         <input
                           type="text"
@@ -521,8 +524,8 @@ const ServicesPublicV2 = () => {
                             className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
                             style={{
                               color: currentTheme === 'dark'
-                                ? (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholderDark || '#6b7280')
-                                : (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholder || '#9ca3af')
+                                ? (pageData?.content?.servicesFilter?.styles?.iconClearColorDark || '#6b7280')
+                                : (pageData?.content?.servicesFilter?.styles?.iconClearColor || '#9ca3af')
                             }}
                           >
                             ✕
@@ -732,21 +735,47 @@ const ServicesPublicV2 = () => {
                             fontWeight: pageData?.content?.servicesFilter?.styles?.contentFontWeight || '500'
                           }}
                         >
-                          <option value="destacado">⭐ Destacados</option>
-                          <option value="nuevo">🆕 Recientes</option>
-                          <option value="titulo">🔤 A-Z</option>
-                          <option value="precio-asc">💰 Menor precio</option>
-                          <option value="precio-desc">💎 Mayor precio</option>
+                          <option value="destacado">★ Destacados</option>
+                          <option value="nuevo">● Recientes</option>
+                          <option value="titulo">◆ A-Z</option>
+                          <option value="precio-asc">▼ Menor precio</option>
+                          <option value="precio-desc">▲ Mayor precio</option>
                         </select>
                         <span 
-                          className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center"
                           style={{
-                            color: currentTheme === 'dark'
-                              ? (pageData?.content?.servicesFilter?.styles?.sortSelectTextDark || '#9ca3af')
-                              : (pageData?.content?.servicesFilter?.styles?.sortSelectText || '#6b7280')
+                            color: (() => {
+                              const s = pageData?.content?.servicesFilter?.styles;
+                              // Si hay color configurado en CMS, usar ese
+                              const configuredColor = currentTheme === 'dark'
+                                ? s?.iconDropdownColorDark
+                                : s?.iconDropdownColor;
+                              
+                              if (configuredColor) {
+                                return configuredColor;
+                              }
+                              
+                              // Si no hay color configurado, usar el mismo color que el texto del select
+                              return currentTheme === 'dark'
+                                ? (s?.sortSelectTextDark || '#f9fafb')
+                                : (s?.sortSelectText || '#111827');
+                            })()
                           }}
                         >
-                          ▼
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="16" 
+                            height="16" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2.5" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            style={{ display: 'block' }}
+                          >
+                            <path d="m6 9 6 6 6-6"></path>
+                          </svg>
                         </span>
                       </div>
                     </div>
@@ -772,13 +801,6 @@ const ServicesPublicV2 = () => {
                           {serviciosFiltrados.length}
                         </span>
                       </div>
-                      
-                      {isFromCache && (
-                        <div className="mt-2 flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                          <span>⚡</span>
-                          <span>Carga optimizada</span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Botón Limpiar Filtros */}
@@ -851,11 +873,14 @@ const ServicesPublicV2 = () => {
                               className="absolute left-3 top-1/2 -translate-y-1/2"
                               style={{
                                 color: isDark
-                                  ? (styles?.searchInputPlaceholderDark || '#6b7280')
-                                  : (styles?.searchInputPlaceholder || '#9ca3af')
+                                  ? (styles?.iconSearchColorDark || '#6b7280')
+                                  : (styles?.iconSearchColor || '#9ca3af')
                               }}
                             >
-                              🔍
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                              </svg>
                             </span>
                             <input
                               type="text"
@@ -890,8 +915,8 @@ const ServicesPublicV2 = () => {
                                 className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
                                 style={{
                                   color: isDark
-                                    ? (styles?.searchInputPlaceholderDark || '#6b7280')
-                                    : (styles?.searchInputPlaceholder || '#9ca3af')
+                                    ? (styles?.iconClearColorDark || '#6b7280')
+                                    : (styles?.iconClearColor || '#9ca3af')
                                 }}
                               >
                                 ✕
@@ -1092,21 +1117,46 @@ const ServicesPublicV2 = () => {
                                 fontWeight: styles?.contentFontWeight || '500'
                               }}
                             >
-                              <option value="destacado">⭐ Destacados</option>
-                              <option value="nuevo">🆕 Recientes</option>
-                              <option value="titulo">🔤 A-Z</option>
-                              <option value="precio-asc">💰 Menor precio</option>
-                              <option value="precio-desc">💎 Mayor precio</option>
+                              <option value="destacado">★ Destacados</option>
+                              <option value="nuevo">● Recientes</option>
+                              <option value="titulo">◆ A-Z</option>
+                              <option value="precio-asc">▼ Menor precio</option>
+                              <option value="precio-desc">▲ Mayor precio</option>
                             </select>
                             <span 
-                              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center"
                               style={{
-                                color: isDark
-                                  ? (styles?.sortSelectTextDark || '#9ca3af')
-                                  : (styles?.sortSelectText || '#6b7280')
+                                color: (() => {
+                                  // Si hay color configurado en CMS, usar ese
+                                  const configuredColor = isDark
+                                    ? styles?.iconDropdownColorDark
+                                    : styles?.iconDropdownColor;
+                                  
+                                  if (configuredColor) {
+                                    return configuredColor;
+                                  }
+                                  
+                                  // Si no hay color configurado, usar el mismo color que el texto del select
+                                  return isDark
+                                    ? (styles?.sortSelectTextDark || '#f9fafb')
+                                    : (styles?.sortSelectText || '#111827');
+                                })()
                               }}
                             >
-                              ▼
+                              <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="16" 
+                                height="16" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="2.5" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round"
+                                style={{ display: 'block' }}
+                              >
+                                <path d="m6 9 6 6 6-6"></path>
+                              </svg>
                             </span>
                           </div>
                         </div>
@@ -1132,13 +1182,6 @@ const ServicesPublicV2 = () => {
                               {serviciosFiltrados.length}
                             </span>
                           </div>
-                          
-                          {isFromCache && (
-                            <div className="mt-2 flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                              <span>⚡</span>
-                              <span>Carga optimizada</span>
-                            </div>
-                          )}
                         </div>
 
                         {/* Botón Limpiar Filtros */}
@@ -1204,13 +1247,24 @@ const ServicesPublicV2 = () => {
                   <div className="mb-12 animate-fade-in-up delay-200">
                     {/* Header con título */}
                     <h2 
-                      className="text-3xl text-gray-900 dark:text-white mb-6 flex items-center gap-2"
+                      className="text-3xl mb-6 flex items-center gap-2"
                       style={{
                         fontFamily: (pageData?.content as any)?.servicesGrid?.cardDesign?.titleFontFamily || 'inherit',
-                        fontWeight: (pageData?.content as any)?.servicesGrid?.cardDesign?.titleFontWeight || '700'
+                        fontWeight: (pageData?.content as any)?.servicesGrid?.cardDesign?.titleFontWeight || '700',
+                        color: currentTheme === 'dark'
+                          ? ((pageData?.content as any)?.servicesGrid?.featuredSection?.titleColorDark || '#f9fafb')
+                          : ((pageData?.content as any)?.servicesGrid?.featuredSection?.titleColor || '#1f2937')
                       }}
                     >
-                      {(pageData?.content as any)?.servicesGrid?.featuredSection?.icon || '⭐'}
+                      <span 
+                        style={{
+                          color: currentTheme === 'dark'
+                            ? ((pageData?.content as any)?.servicesGrid?.featuredSection?.iconColorDark || '#fbbf24')
+                            : ((pageData?.content as any)?.servicesGrid?.featuredSection?.iconColor || '#f59e0b')
+                        }}
+                      >
+                        {(pageData?.content as any)?.servicesGrid?.featuredSection?.icon || '★'}
+                      </span>
                       <span>{(pageData?.content as any)?.servicesGrid?.featuredSection?.title?.replace(/^[^\s]+\s/, '') || 'Servicios Destacados'}</span>
                     </h2>
                     

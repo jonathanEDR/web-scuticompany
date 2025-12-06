@@ -466,7 +466,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               {...register('destacado')}
               className="mr-2 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">⭐ Servicio destacado</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">★ Servicio destacado</span>
           </label>
           
           <label className="flex items-center">

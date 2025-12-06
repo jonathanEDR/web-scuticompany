@@ -22,9 +22,9 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
   const gridConfig = (pageData?.content as any)?.servicesGrid || {
     // Sección de servicios destacados
     featuredSection: {
-      title: '⭐ Servicios Destacados',
+      title: '★ Servicios Destacados',
       showIcon: true,
-      icon: '⭐',
+      icon: '★',
       backgroundImage: {
         light: '',
         dark: ''
@@ -35,9 +35,9 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
     
     // Sección de todos los servicios
     allServicesSection: {
-      title: '📋 Todos los Servicios',
+      title: '■ Todos los Servicios',
       showIcon: true,
-      icon: '📋'
+      icon: '■'
     },
     
     // Diseño de tarjetas
@@ -62,7 +62,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
       
       // Badge destacado
       featuredBadge: {
-        text: '⭐ Destacado',
+        text: '★ Destacado',
         gradient: 'linear-gradient(90deg, #8B5CF6, #EC4899)',
         textColor: '#ffffff'
       },
@@ -155,11 +155,132 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={gridConfig.featuredSection?.icon || '⭐'}
+                  value={gridConfig.featuredSection?.icon || '★'}
                   onChange={(e) => handleUpdate('featuredSection.icon', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
-                  placeholder="⭐"
+                  placeholder="★ ☆ ✶ ● ◆"
                 />
+              </div>
+            </div>
+
+            {/* Colores del Título e Icono */}
+            <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                🎨 Colores del Título e Icono
+              </h4>
+              
+              {/* Nota importante sobre emojis */}
+              <div className="mb-4 p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg border border-amber-300 dark:border-amber-700">
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  💡 <strong>Nota:</strong> Los emojis (⭐🌟) son imágenes y <strong>no cambian de color</strong> con CSS. 
+                  Para usar colores personalizados, usa símbolos unicode como: <strong>★ ✦ ✧ ● ◆ ▶</strong>
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Modo Claro */}
+                <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-2">
+                    ☀️ Modo Claro
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Color del Título */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                        Color del Título
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.featuredSection?.titleColor || '#1f2937'}
+                          onChange={(e) => handleUpdate('featuredSection.titleColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.featuredSection?.titleColor || '#1f2937'}
+                          onChange={(e) => handleUpdate('featuredSection.titleColor', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          placeholder="#1f2937"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Color del Icono */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                        Color del Icono
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.featuredSection?.iconColor || '#f59e0b'}
+                          onChange={(e) => handleUpdate('featuredSection.iconColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.featuredSection?.iconColor || '#f59e0b'}
+                          onChange={(e) => handleUpdate('featuredSection.iconColor', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          placeholder="#f59e0b"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Modo Oscuro */}
+                <div className="p-4 bg-gray-800 rounded-lg shadow-sm">
+                  <h5 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                    🌙 Modo Oscuro
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Color del Título */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-2">
+                        Color del Título
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.featuredSection?.titleColorDark || '#f9fafb'}
+                          onChange={(e) => handleUpdate('featuredSection.titleColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.featuredSection?.titleColorDark || '#f9fafb'}
+                          onChange={(e) => handleUpdate('featuredSection.titleColorDark', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                          placeholder="#f9fafb"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Color del Icono */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-2">
+                        Color del Icono
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.featuredSection?.iconColorDark || '#fbbf24'}
+                          onChange={(e) => handleUpdate('featuredSection.iconColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.featuredSection?.iconColorDark || '#fbbf24'}
+                          onChange={(e) => handleUpdate('featuredSection.iconColorDark', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                          placeholder="#fbbf24"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -518,17 +639,65 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
               🏷️ Badge "Destacado"
             </h3>
             
-            {/* Texto del badge */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                Texto del badge
+            {/* Texto e Icono del badge */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Icono del badge
+                </label>
+                <input
+                  type="text"
+                  value={gridConfig.cardDesign?.featuredBadge?.icon || '★'}
+                  onChange={(e) => handleUpdate('cardDesign.featuredBadge.icon', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="★ ☆ ✶ ●"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Texto del badge
+                </label>
+                <input
+                  type="text"
+                  value={gridConfig.cardDesign?.featuredBadge?.text || 'Destacado'}
+                  onChange={(e) => handleUpdate('cardDesign.featuredBadge.text', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+            
+            {/* Color del icono del badge */}
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-4 border border-yellow-200 dark:border-yellow-800">
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                🌟 Color del Icono del Badge
               </label>
-              <input
-                type="text"
-                value={gridConfig.cardDesign?.featuredBadge?.text || '⭐ Destacado'}
-                onChange={(e) => handleUpdate('cardDesign.featuredBadge.text', e.target.value)}
-                className="w-full md:w-1/2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    Color del Icono
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={gridConfig.cardDesign?.featuredBadge?.iconColor || '#fbbf24'}
+                      onChange={(e) => handleUpdate('cardDesign.featuredBadge.iconColor', e.target.value)}
+                      className="w-12 h-10 rounded cursor-pointer border-2 border-gray-200 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={gridConfig.cardDesign?.featuredBadge?.iconColor || '#fbbf24'}
+                      onChange={(e) => handleUpdate('cardDesign.featuredBadge.iconColor', e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                      placeholder="#fbbf24"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-end">
+                  <div className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-3 py-2 rounded-lg">
+                    💡 <strong>Nota:</strong> Los emojis (⭐) no cambian de color con CSS. Usa símbolos unicode (★) o texto para ver el color aplicado.
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Colores del gradiente */}
@@ -604,10 +773,13 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   </label>
                   <div className="flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
                     <span 
-                      className="text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+                      className="text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1"
                       style={{ background: gridConfig.cardDesign?.featuredBadge?.gradient || `linear-gradient(90deg, ${gridConfig.cardDesign?.featuredBadge?.color1 || '#8B5CF6'}, ${gridConfig.cardDesign?.featuredBadge?.color2 || '#EC4899'})` }}
                     >
-                      {gridConfig.cardDesign?.featuredBadge?.text || '⭐ Destacado'}
+                      <span style={{ color: gridConfig.cardDesign?.featuredBadge?.iconColor || '#fbbf24' }}>
+                        {gridConfig.cardDesign?.featuredBadge?.icon || '★'}
+                      </span>
+                      <span>{gridConfig.cardDesign?.featuredBadge?.text || 'Destacado'}</span>
                     </span>
                   </div>
                 </div>
@@ -652,17 +824,45 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
               🔘 Botón "Ver detalles"
             </h3>
             
-            {/* Texto del botón */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                Texto del botón
-              </label>
-              <input
-                type="text"
-                value={gridConfig.cardDesign?.buttonText || 'Ver detalles'}
-                onChange={(e) => handleUpdate('cardDesign.buttonText', e.target.value)}
-                className="w-full md:w-1/2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
+            {/* Texto e Icono del botón */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Texto del botón
+                </label>
+                <input
+                  type="text"
+                  value={gridConfig.cardDesign?.buttonText || 'Ver detalles'}
+                  onChange={(e) => handleUpdate('cardDesign.buttonText', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Icono del botón
+                </label>
+                <input
+                  type="text"
+                  value={gridConfig.cardDesign?.buttonIcon || '→'}
+                  onChange={(e) => handleUpdate('cardDesign.buttonIcon', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="→ ▶ ➔ ›"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Posición del icono
+                </label>
+                <select
+                  value={gridConfig.cardDesign?.buttonIconPosition || 'right'}
+                  onChange={(e) => handleUpdate('cardDesign.buttonIconPosition', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="left">← Izquierda</option>
+                  <option value="right">Derecha →</option>
+                  <option value="none">Sin icono</option>
+                </select>
+              </div>
             </div>
 
             {/* Tipo de fondo */}
@@ -786,13 +986,19 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   </label>
                   <div className="flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
                     <span 
-                      className="text-white text-sm font-medium px-4 py-2 shadow-lg cursor-pointer transition-transform hover:scale-105"
+                      className="text-white text-sm font-medium px-4 py-2 shadow-lg cursor-pointer transition-transform hover:scale-105 flex items-center gap-2"
                       style={{ 
                         background: gridConfig.cardDesign?.buttonGradient || `linear-gradient(90deg, ${gridConfig.cardDesign?.buttonColor1 || '#8B5CF6'}, ${gridConfig.cardDesign?.buttonColor2 || '#3B82F6'})`,
                         borderRadius: gridConfig.cardDesign?.buttonBorderRadius || '0.5rem'
                       }}
                     >
-                      {gridConfig.cardDesign?.buttonText || 'Ver detalles'}
+                      {gridConfig.cardDesign?.buttonIconPosition === 'left' && gridConfig.cardDesign?.buttonIconPosition !== 'none' && (
+                        <span>{gridConfig.cardDesign?.buttonIcon || '→'}</span>
+                      )}
+                      <span>{gridConfig.cardDesign?.buttonText || 'Ver detalles'}</span>
+                      {(gridConfig.cardDesign?.buttonIconPosition === 'right' || !gridConfig.cardDesign?.buttonIconPosition) && gridConfig.cardDesign?.buttonIconPosition !== 'none' && (
+                        <span>{gridConfig.cardDesign?.buttonIcon || '→'}</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -1220,12 +1426,15 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 {gridConfig.cardDesign?.contentConfig?.showFeaturedBadge !== false && (
                   <div className="absolute top-4 right-4 z-10">
                     <span 
-                      className="text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+                      className="text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1"
                       style={{
                         background: gridConfig.cardDesign?.featuredBadge?.gradient || 'linear-gradient(90deg, #8B5CF6, #EC4899)'
                       }}
                     >
-                      {gridConfig.cardDesign?.featuredBadge?.text || '⭐ Destacado'}
+                      <span style={{ color: gridConfig.cardDesign?.featuredBadge?.iconColor || '#fbbf24' }}>
+                        {gridConfig.cardDesign?.featuredBadge?.icon || '★'}
+                      </span>
+                      <span>{gridConfig.cardDesign?.featuredBadge?.text || 'Destacado'}</span>
                     </span>
                   </div>
                 )}

@@ -162,7 +162,7 @@ export const ServicioDetail: React.FC = () => {
                 </span>
                 {servicio.destacado && (
                   <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 transition-all duration-300 hover:scale-105">
-                    ⭐ Destacado
+                    ★ Destacado
                   </span>
                 )}
               </div>
@@ -456,8 +456,8 @@ export const ServicioDetail: React.FC = () => {
                   className="group relative bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 transition-all hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center text-2xl shadow-lg">
-                      ⭐
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center text-2xl shadow-lg text-white">
+                      ★
                     </div>
                     <div className="flex-1">
                       <p className="text-gray-900 dark:text-white font-semibold text-lg leading-relaxed">

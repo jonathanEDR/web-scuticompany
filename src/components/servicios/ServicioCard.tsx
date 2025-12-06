@@ -154,7 +154,7 @@ export const ServicioCard: React.FC<ServicioCardProps> = ({
             {/* Badge destacado - Debajo del icono */}
             {servicio.destacado && (
               <span className="text-xs bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1 rounded-full font-semibold shadow-sm whitespace-nowrap">
-                ⭐ Destacado
+                ★ Destacado
               </span>
             )}
           </div>

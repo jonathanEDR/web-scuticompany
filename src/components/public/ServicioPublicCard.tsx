@@ -231,12 +231,15 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
       {servicio.destacado && showFeaturedBadge && (
         <div className="absolute top-4 right-4 z-10">
           <span 
-            className="text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+            className="text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1"
             style={{
               background: cardConfig?.featuredBadge?.gradient || 'linear-gradient(90deg, #8B5CF6, #EC4899)'
             }}
           >
-            {cardConfig?.featuredBadge?.text || '⭐ Destacado'}
+            <span style={{ color: cardConfig?.featuredBadge?.iconColor || '#fbbf24' }}>
+              {cardConfig?.featuredBadge?.icon || '★'}
+            </span>
+            <span>{cardConfig?.featuredBadge?.text || 'Destacado'}</span>
           </span>
         </div>
       )}
@@ -418,14 +421,20 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
                 text-white px-4 py-2 font-medium
                 transition-all duration-200 transform hover:scale-105
                 shadow-lg hover:shadow-xl
-                text-sm
+                text-sm flex items-center gap-2
               "
               style={{
                 background: cardConfig?.buttonGradient || 'linear-gradient(90deg, #8B5CF6, #3B82F6)',
                 borderRadius: cardConfig?.buttonBorderRadius || '0.5rem'
               }}
             >
-              {cardConfig?.buttonText || 'Ver detalles'}
+              {cardConfig?.buttonIconPosition === 'left' && cardConfig?.buttonIconPosition !== 'none' && (
+                <span>{cardConfig?.buttonIcon || '→'}</span>
+              )}
+              <span>{cardConfig?.buttonText || 'Ver detalles'}</span>
+              {(cardConfig?.buttonIconPosition === 'right' || !cardConfig?.buttonIconPosition) && cardConfig?.buttonIconPosition !== 'none' && (
+                <span>{cardConfig?.buttonIcon || '→'}</span>
+              )}
             </Link>
           )}
         </div>

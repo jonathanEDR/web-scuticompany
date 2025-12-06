@@ -31,11 +31,11 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
     // Sección de ordenamiento
     sortTitle: 'ORDENAR',
     sortOptions: [
-      { value: 'destacado', label: '⭐ Destacados', icon: '⭐' },
-      { value: 'nuevo', label: '🆕 Recientes', icon: '🆕' },
-      { value: 'titulo', label: '🔤 A-Z', icon: '🔤' },
-      { value: 'precio-asc', label: '💰 Menor precio', icon: '💰' },
-      { value: 'precio-desc', label: '💎 Mayor precio', icon: '💎' }
+      { value: 'destacado', label: '★ Destacados', icon: '★' },
+      { value: 'nuevo', label: '● Recientes', icon: '●' },
+      { value: 'titulo', label: '◆ A-Z', icon: '◆' },
+      { value: 'precio-asc', label: '▼ Menor precio', icon: '▼' },
+      { value: 'precio-desc', label: '▲ Mayor precio', icon: '▲' }
     ],
     
     // Resultados
@@ -91,6 +91,15 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
       sortSelectBgTransparentDark: false,
       sortSelectBorderDark: '#374151',
       sortSelectTextDark: '#f9fafb',
+      
+      // Iconos del Panel - Modo Claro
+      iconSearchColor: '#9ca3af',
+      iconDropdownColor: '#6b7280',
+      iconClearColor: '#9ca3af',
+      // Iconos del Panel - Modo Oscuro
+      iconSearchColorDark: '#6b7280',
+      iconDropdownColorDark: '#9ca3af',
+      iconClearColorDark: '#6b7280',
       
       // Títulos de sección
       sectionTitleColor: '#8B5CF6',
@@ -1245,6 +1254,163 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
             </div>
           </div>
 
+          {/* ===== COLORES DE ICONOS ===== */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+              🎯 Colores de Iconos
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Modo Claro */}
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-2">
+                  ☀️ Modo Claro
+                </h5>
+                <div className="space-y-3">
+                  {/* Icono de búsqueda */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      🔍 Icono de Búsqueda
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.iconSearchColor || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('iconSearchColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.iconSearchColor || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('iconSearchColor', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#9ca3af"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Icono de dropdown */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      ▼ Icono Dropdown (Ordenar)
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.iconDropdownColor || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('iconDropdownColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.iconDropdownColor || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('iconDropdownColor', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#6b7280"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Icono de limpiar */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      ✕ Icono Limpiar Búsqueda
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.iconClearColor || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('iconClearColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.iconClearColor || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('iconClearColor', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#9ca3af"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modo Oscuro */}
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                  🌙 Modo Oscuro
+                </h5>
+                <div className="space-y-3">
+                  {/* Icono de búsqueda */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      🔍 Icono de Búsqueda
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.iconSearchColorDark || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('iconSearchColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.iconSearchColorDark || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('iconSearchColorDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#6b7280"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Icono de dropdown */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      ▼ Icono Dropdown (Ordenar)
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.iconDropdownColorDark || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('iconDropdownColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.iconDropdownColorDark || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('iconDropdownColorDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#9ca3af"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Icono de limpiar */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                      ✕ Icono Limpiar Búsqueda
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.iconClearColorDark || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('iconClearColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.iconClearColorDark || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('iconClearColorDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#6b7280"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* ===== ESTILOS VISUALES ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
             <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
@@ -2035,7 +2201,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                     {filterConfig.sortTitle || 'ORDENAR'}
                   </p>
                   <div className="bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2 text-sm text-gray-600 flex justify-between">
-                    <span>⭐ Destacados</span>
+                    <span>★ Destacados</span>
                     <span>▼</span>
                   </div>
                 </div>
