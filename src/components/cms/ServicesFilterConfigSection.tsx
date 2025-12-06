@@ -61,9 +61,36 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
       borderWidth: '2px',
       borderRadius: '1rem',
       
-      // Fondo
+      // Fondo - Modo Claro
       backgroundColor: '#ffffff',
+      bgTransparent: false,
+      // Fondo - Modo Oscuro
       backgroundColorDark: '#1e293b',
+      bgTransparentDark: false,
+      
+      // Fondo del Input de Búsqueda - Modo Claro
+      searchInputBg: '#ffffff',
+      searchInputBgTransparent: false,
+      searchInputBorder: '#e5e7eb',
+      searchInputText: '#111827',
+      searchInputPlaceholder: '#9ca3af',
+      // Fondo del Input de Búsqueda - Modo Oscuro
+      searchInputBgDark: '#1f2937',
+      searchInputBgTransparentDark: false,
+      searchInputBorderDark: '#374151',
+      searchInputTextDark: '#f9fafb',
+      searchInputPlaceholderDark: '#6b7280',
+      
+      // Fondo del Select de Ordenamiento - Modo Claro
+      sortSelectBg: '#ffffff',
+      sortSelectBgTransparent: false,
+      sortSelectBorder: '#e5e7eb',
+      sortSelectText: '#111827',
+      // Fondo del Select de Ordenamiento - Modo Oscuro
+      sortSelectBgDark: '#1f2937',
+      sortSelectBgTransparentDark: false,
+      sortSelectBorderDark: '#374151',
+      sortSelectTextDark: '#f9fafb',
       
       // Títulos de sección
       sectionTitleColor: '#8B5CF6',
@@ -73,13 +100,38 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
       textColor: '#374151',
       textColorDark: '#D1D5DB',
       
-      // Categoría activa
+      // Categoría activa - Modo Claro
       activeCategoryBg: 'rgba(139, 92, 246, 0.1)',
-      activeCategoryBgDark: 'rgba(139, 92, 246, 0.2)',
+      activeCategoryBgStyle: 'solid', // 'solid', 'gradient', 'transparent'
+      activeCategoryBgGradientFrom: '#8B5CF6',
+      activeCategoryBgGradientTo: '#06B6D4',
+      activeCategoryBgGradientDirection: '135deg',
       activeCategoryText: '#8B5CF6',
-      activeCategoryTextDark: '#A78BFA',
+      activeCategoryTextStyle: 'solid', // 'solid', 'gradient'
+      activeCategoryTextGradientFrom: '#8B5CF6',
+      activeCategoryTextGradientTo: '#06B6D4',
+      activeCategoryTextGradientDirection: '90deg',
       activeCategoryBorder: '#8B5CF6',
-      activeCategoryBorderDark: '#A78BFA'
+      activeCategoryBorderStyle: 'solid', // 'solid', 'gradient', 'none'
+      activeCategoryBorderGradientFrom: '#8B5CF6',
+      activeCategoryBorderGradientTo: '#06B6D4',
+      activeCategoryBorderGradientDirection: '90deg',
+      // Categoría activa - Modo Oscuro
+      activeCategoryBgDark: 'rgba(139, 92, 246, 0.2)',
+      activeCategoryBgStyleDark: 'solid',
+      activeCategoryBgGradientFromDark: '#A78BFA',
+      activeCategoryBgGradientToDark: '#22D3EE',
+      activeCategoryBgGradientDirectionDark: '135deg',
+      activeCategoryTextDark: '#A78BFA',
+      activeCategoryTextStyleDark: 'solid',
+      activeCategoryTextGradientFromDark: '#A78BFA',
+      activeCategoryTextGradientToDark: '#22D3EE',
+      activeCategoryTextGradientDirectionDark: '90deg',
+      activeCategoryBorderDark: '#A78BFA',
+      activeCategoryBorderStyleDark: 'solid',
+      activeCategoryBorderGradientFromDark: '#A78BFA',
+      activeCategoryBorderGradientToDark: '#22D3EE',
+      activeCategoryBorderGradientDirectionDark: '90deg'
     }
   };
 
@@ -87,7 +139,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
     updateContent(`servicesFilter.${field}`, value);
   };
 
-  const handleUpdateStyle = (field: string, value: string) => {
+  const handleUpdateStyle = (field: string, value: string | boolean) => {
     updateContent(`servicesFilter.styles.${field}`, value);
   };
 
@@ -157,6 +209,237 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                 />
               </div>
             </div>
+            
+            {/* Estilos del Input de Búsqueda */}
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                🎨 Estilos del Input de Búsqueda
+              </h4>
+              
+              {/* Modo Claro */}
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-2">
+                  ☀️ Modo Claro
+                </h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Fondo transparente */}
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="searchInputBgTransparent"
+                      checked={filterConfig.styles?.searchInputBgTransparent === true || filterConfig.styles?.searchInputBgTransparent === 'true'}
+                      onChange={(e) => handleUpdateStyle('searchInputBgTransparent', e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <label htmlFor="searchInputBgTransparent" className="text-sm text-gray-600 dark:text-gray-400">
+                      Fondo Transparente
+                    </label>
+                  </div>
+                  
+                  {/* Color de fondo */}
+                  {!(filterConfig.styles?.searchInputBgTransparent === true || filterConfig.styles?.searchInputBgTransparent === 'true') && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                        Color de Fondo
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.searchInputBg || '#ffffff'}
+                          onChange={(e) => handleUpdateStyle('searchInputBg', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.searchInputBg || '#ffffff'}
+                          onChange={(e) => handleUpdateStyle('searchInputBg', e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          placeholder="#ffffff"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Color del borde */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Color del Borde
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.searchInputBorder || '#e5e7eb'}
+                        onChange={(e) => handleUpdateStyle('searchInputBorder', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.searchInputBorder || '#e5e7eb'}
+                        onChange={(e) => handleUpdateStyle('searchInputBorder', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#e5e7eb"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Color del texto */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Color del Texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.searchInputText || '#111827'}
+                        onChange={(e) => handleUpdateStyle('searchInputText', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.searchInputText || '#111827'}
+                        onChange={(e) => handleUpdateStyle('searchInputText', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#111827"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Color del placeholder */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Color del Placeholder
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.searchInputPlaceholder || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('searchInputPlaceholder', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.searchInputPlaceholder || '#9ca3af'}
+                        onChange={(e) => handleUpdateStyle('searchInputPlaceholder', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#9ca3af"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modo Oscuro */}
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                  🌙 Modo Oscuro
+                </h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Fondo transparente */}
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="searchInputBgTransparentDark"
+                      checked={filterConfig.styles?.searchInputBgTransparentDark === true || filterConfig.styles?.searchInputBgTransparentDark === 'true'}
+                      onChange={(e) => handleUpdateStyle('searchInputBgTransparentDark', e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-600 text-purple-600 focus:ring-purple-500"
+                    />
+                    <label htmlFor="searchInputBgTransparentDark" className="text-sm text-gray-300">
+                      Fondo Transparente
+                    </label>
+                  </div>
+                  
+                  {/* Color de fondo */}
+                  {!(filterConfig.styles?.searchInputBgTransparentDark === true || filterConfig.styles?.searchInputBgTransparentDark === 'true') && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Color de Fondo
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.searchInputBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdateStyle('searchInputBgDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.searchInputBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdateStyle('searchInputBgDark', e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                          placeholder="#1f2937"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Color del borde */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Color del Borde
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.searchInputBorderDark || '#374151'}
+                        onChange={(e) => handleUpdateStyle('searchInputBorderDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.searchInputBorderDark || '#374151'}
+                        onChange={(e) => handleUpdateStyle('searchInputBorderDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#374151"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Color del texto */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Color del Texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.searchInputTextDark || '#f9fafb'}
+                        onChange={(e) => handleUpdateStyle('searchInputTextDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.searchInputTextDark || '#f9fafb'}
+                        onChange={(e) => handleUpdateStyle('searchInputTextDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#f9fafb"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Color del placeholder */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Color del Placeholder
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.searchInputPlaceholderDark || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('searchInputPlaceholderDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.searchInputPlaceholderDark || '#6b7280'}
+                        onChange={(e) => handleUpdateStyle('searchInputPlaceholderDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#6b7280"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ===== SECCIÓN DE CATEGORÍAS ===== */}
@@ -192,6 +475,552 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                 />
               </div>
             </div>
+            
+            {/* Estilos de Categoría Activa/Seleccionada */}
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                ✨ Estilos de Categoría Seleccionada
+              </h4>
+              
+              {/* Modo Claro */}
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4 flex items-center gap-2">
+                  ☀️ Modo Claro
+                </h5>
+                
+                {/* FONDO */}
+                <div className="mb-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <h6 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">🎨 Fondo</h6>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Tipo</label>
+                      <select
+                        value={filterConfig.styles?.activeCategoryBgStyle || 'solid'}
+                        onChange={(e) => handleUpdateStyle('activeCategoryBgStyle', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="solid">Sólido</option>
+                        <option value="gradient">Gradiente</option>
+                        <option value="transparent">Transparente</option>
+                      </select>
+                    </div>
+                    
+                    {filterConfig.styles?.activeCategoryBgStyle === 'solid' && (
+                      <div>
+                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color</label>
+                        <div className="flex gap-1">
+                          <input
+                            type="color"
+                            value={filterConfig.styles?.activeCategoryBg || '#8B5CF6'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBg', e.target.value)}
+                            className="w-8 h-8 rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={filterConfig.styles?.activeCategoryBg || 'rgba(139, 92, 246, 0.1)'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBg', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {filterConfig.styles?.activeCategoryBgStyle === 'gradient' && (
+                      <>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Desde</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBgGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientFrom', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBgGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientFrom', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Hasta</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBgGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientTo', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBgGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientTo', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Dirección</label>
+                          <select
+                            value={filterConfig.styles?.activeCategoryBgGradientDirection || '135deg'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBgGradientDirection', e.target.value)}
+                            className="w-full px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            <option value="0deg">↑ Arriba</option>
+                            <option value="45deg">↗ Diagonal</option>
+                            <option value="90deg">→ Derecha</option>
+                            <option value="135deg">↘ Diagonal</option>
+                            <option value="180deg">↓ Abajo</option>
+                            <option value="225deg">↙ Diagonal</option>
+                            <option value="270deg">← Izquierda</option>
+                            <option value="315deg">↖ Diagonal</option>
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* TEXTO */}
+                <div className="mb-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <h6 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">📝 Texto</h6>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Tipo</label>
+                      <select
+                        value={filterConfig.styles?.activeCategoryTextStyle || 'solid'}
+                        onChange={(e) => handleUpdateStyle('activeCategoryTextStyle', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="solid">Sólido</option>
+                        <option value="gradient">Gradiente</option>
+                      </select>
+                    </div>
+                    
+                    {filterConfig.styles?.activeCategoryTextStyle !== 'gradient' && (
+                      <div>
+                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color</label>
+                        <div className="flex gap-1">
+                          <input
+                            type="color"
+                            value={filterConfig.styles?.activeCategoryText || '#8B5CF6'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryText', e.target.value)}
+                            className="w-8 h-8 rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={filterConfig.styles?.activeCategoryText || '#8B5CF6'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryText', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {filterConfig.styles?.activeCategoryTextStyle === 'gradient' && (
+                      <>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Desde</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryTextGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientFrom', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryTextGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientFrom', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Hasta</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryTextGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientTo', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryTextGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientTo', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Dirección</label>
+                          <select
+                            value={filterConfig.styles?.activeCategoryTextGradientDirection || '90deg'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryTextGradientDirection', e.target.value)}
+                            className="w-full px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            <option value="0deg">↑ Arriba</option>
+                            <option value="45deg">↗ Diagonal</option>
+                            <option value="90deg">→ Derecha</option>
+                            <option value="135deg">↘ Diagonal</option>
+                            <option value="180deg">↓ Abajo</option>
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* BORDE */}
+                <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <h6 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">🔲 Borde Izquierdo</h6>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Tipo</label>
+                      <select
+                        value={filterConfig.styles?.activeCategoryBorderStyle || 'solid'}
+                        onChange={(e) => handleUpdateStyle('activeCategoryBorderStyle', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="solid">Sólido</option>
+                        <option value="gradient">Gradiente</option>
+                        <option value="none">Sin borde</option>
+                      </select>
+                    </div>
+                    
+                    {filterConfig.styles?.activeCategoryBorderStyle !== 'gradient' && filterConfig.styles?.activeCategoryBorderStyle !== 'none' && (
+                      <div>
+                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color</label>
+                        <div className="flex gap-1">
+                          <input
+                            type="color"
+                            value={filterConfig.styles?.activeCategoryBorder || '#8B5CF6'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBorder', e.target.value)}
+                            className="w-8 h-8 rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={filterConfig.styles?.activeCategoryBorder || '#8B5CF6'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBorder', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {filterConfig.styles?.activeCategoryBorderStyle === 'gradient' && (
+                      <>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Desde</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBorderGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientFrom', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBorderGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientFrom', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Hasta</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBorderGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientTo', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBorderGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientTo', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modo Oscuro */}
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
+                  🌙 Modo Oscuro
+                </h5>
+                
+                {/* FONDO DARK */}
+                <div className="mb-4 p-3 bg-gray-700 rounded-lg border border-gray-600">
+                  <h6 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wide">🎨 Fondo</h6>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Tipo</label>
+                      <select
+                        value={filterConfig.styles?.activeCategoryBgStyleDark || 'solid'}
+                        onChange={(e) => handleUpdateStyle('activeCategoryBgStyleDark', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-600 rounded bg-gray-800 text-white"
+                      >
+                        <option value="solid">Sólido</option>
+                        <option value="gradient">Gradiente</option>
+                        <option value="transparent">Transparente</option>
+                      </select>
+                    </div>
+                    
+                    {filterConfig.styles?.activeCategoryBgStyleDark === 'solid' && (
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1">Color</label>
+                        <div className="flex gap-1">
+                          <input
+                            type="color"
+                            value={filterConfig.styles?.activeCategoryBgDark || '#A78BFA'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBgDark', e.target.value)}
+                            className="w-8 h-8 rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={filterConfig.styles?.activeCategoryBgDark || 'rgba(139, 92, 246, 0.2)'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBgDark', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {filterConfig.styles?.activeCategoryBgStyleDark === 'gradient' && (
+                      <>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Desde</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBgGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientFromDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBgGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientFromDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Hasta</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBgGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientToDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBgGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBgGradientToDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Dirección</label>
+                          <select
+                            value={filterConfig.styles?.activeCategoryBgGradientDirectionDark || '135deg'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBgGradientDirectionDark', e.target.value)}
+                            className="w-full px-2 py-1.5 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                          >
+                            <option value="0deg">↑ Arriba</option>
+                            <option value="45deg">↗ Diagonal</option>
+                            <option value="90deg">→ Derecha</option>
+                            <option value="135deg">↘ Diagonal</option>
+                            <option value="180deg">↓ Abajo</option>
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* TEXTO DARK */}
+                <div className="mb-4 p-3 bg-gray-700 rounded-lg border border-gray-600">
+                  <h6 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wide">📝 Texto</h6>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Tipo</label>
+                      <select
+                        value={filterConfig.styles?.activeCategoryTextStyleDark || 'solid'}
+                        onChange={(e) => handleUpdateStyle('activeCategoryTextStyleDark', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-600 rounded bg-gray-800 text-white"
+                      >
+                        <option value="solid">Sólido</option>
+                        <option value="gradient">Gradiente</option>
+                      </select>
+                    </div>
+                    
+                    {filterConfig.styles?.activeCategoryTextStyleDark !== 'gradient' && (
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1">Color</label>
+                        <div className="flex gap-1">
+                          <input
+                            type="color"
+                            value={filterConfig.styles?.activeCategoryTextDark || '#A78BFA'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryTextDark', e.target.value)}
+                            className="w-8 h-8 rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={filterConfig.styles?.activeCategoryTextDark || '#A78BFA'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryTextDark', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {filterConfig.styles?.activeCategoryTextStyleDark === 'gradient' && (
+                      <>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Desde</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryTextGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientFromDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryTextGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientFromDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Hasta</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryTextGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientToDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryTextGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryTextGradientToDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Dirección</label>
+                          <select
+                            value={filterConfig.styles?.activeCategoryTextGradientDirectionDark || '90deg'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryTextGradientDirectionDark', e.target.value)}
+                            className="w-full px-2 py-1.5 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                          >
+                            <option value="0deg">↑ Arriba</option>
+                            <option value="45deg">↗ Diagonal</option>
+                            <option value="90deg">→ Derecha</option>
+                            <option value="135deg">↘ Diagonal</option>
+                            <option value="180deg">↓ Abajo</option>
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* BORDE DARK */}
+                <div className="p-3 bg-gray-700 rounded-lg border border-gray-600">
+                  <h6 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wide">🔲 Borde Izquierdo</h6>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Tipo</label>
+                      <select
+                        value={filterConfig.styles?.activeCategoryBorderStyleDark || 'solid'}
+                        onChange={(e) => handleUpdateStyle('activeCategoryBorderStyleDark', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-600 rounded bg-gray-800 text-white"
+                      >
+                        <option value="solid">Sólido</option>
+                        <option value="gradient">Gradiente</option>
+                        <option value="none">Sin borde</option>
+                      </select>
+                    </div>
+                    
+                    {filterConfig.styles?.activeCategoryBorderStyleDark !== 'gradient' && filterConfig.styles?.activeCategoryBorderStyleDark !== 'none' && (
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1">Color</label>
+                        <div className="flex gap-1">
+                          <input
+                            type="color"
+                            value={filterConfig.styles?.activeCategoryBorderDark || '#A78BFA'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBorderDark', e.target.value)}
+                            className="w-8 h-8 rounded cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={filterConfig.styles?.activeCategoryBorderDark || '#A78BFA'}
+                            onChange={(e) => handleUpdateStyle('activeCategoryBorderDark', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {filterConfig.styles?.activeCategoryBorderStyleDark === 'gradient' && (
+                      <>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Desde</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBorderGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientFromDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBorderGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientFromDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Hasta</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.activeCategoryBorderGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientToDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.activeCategoryBorderGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('activeCategoryBorderGradientToDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-800 text-white"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ===== SECCIÓN DE ORDENAMIENTO ===== */}
@@ -225,6 +1054,193 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
                   placeholder="Resultados:"
                 />
+              </div>
+            </div>
+            
+            {/* Estilos del Select de Ordenamiento */}
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                🎨 Estilos del Select de Ordenamiento
+              </h4>
+              
+              {/* Modo Claro */}
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-2">
+                  ☀️ Modo Claro
+                </h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Fondo transparente */}
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="sortSelectBgTransparent"
+                      checked={filterConfig.styles?.sortSelectBgTransparent === true || filterConfig.styles?.sortSelectBgTransparent === 'true'}
+                      onChange={(e) => handleUpdateStyle('sortSelectBgTransparent', e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <label htmlFor="sortSelectBgTransparent" className="text-sm text-gray-600 dark:text-gray-400">
+                      Fondo Transparente
+                    </label>
+                  </div>
+                  
+                  {/* Color de fondo */}
+                  {!(filterConfig.styles?.sortSelectBgTransparent === true || filterConfig.styles?.sortSelectBgTransparent === 'true') && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                        Color de Fondo
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.sortSelectBg || '#ffffff'}
+                          onChange={(e) => handleUpdateStyle('sortSelectBg', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.sortSelectBg || '#ffffff'}
+                          onChange={(e) => handleUpdateStyle('sortSelectBg', e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          placeholder="#ffffff"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Color del borde */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Color del Borde
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.sortSelectBorder || '#e5e7eb'}
+                        onChange={(e) => handleUpdateStyle('sortSelectBorder', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.sortSelectBorder || '#e5e7eb'}
+                        onChange={(e) => handleUpdateStyle('sortSelectBorder', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#e5e7eb"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Color del texto */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Color del Texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.sortSelectText || '#111827'}
+                        onChange={(e) => handleUpdateStyle('sortSelectText', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.sortSelectText || '#111827'}
+                        onChange={(e) => handleUpdateStyle('sortSelectText', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        placeholder="#111827"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modo Oscuro */}
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <h5 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                  🌙 Modo Oscuro
+                </h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Fondo transparente */}
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="sortSelectBgTransparentDark"
+                      checked={filterConfig.styles?.sortSelectBgTransparentDark === true || filterConfig.styles?.sortSelectBgTransparentDark === 'true'}
+                      onChange={(e) => handleUpdateStyle('sortSelectBgTransparentDark', e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-600 text-purple-600 focus:ring-purple-500"
+                    />
+                    <label htmlFor="sortSelectBgTransparentDark" className="text-sm text-gray-300">
+                      Fondo Transparente
+                    </label>
+                  </div>
+                  
+                  {/* Color de fondo */}
+                  {!(filterConfig.styles?.sortSelectBgTransparentDark === true || filterConfig.styles?.sortSelectBgTransparentDark === 'true') && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Color de Fondo
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.sortSelectBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdateStyle('sortSelectBgDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.sortSelectBgDark || '#1f2937'}
+                          onChange={(e) => handleUpdateStyle('sortSelectBgDark', e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                          placeholder="#1f2937"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Color del borde */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Color del Borde
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.sortSelectBorderDark || '#374151'}
+                        onChange={(e) => handleUpdateStyle('sortSelectBorderDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.sortSelectBorderDark || '#374151'}
+                        onChange={(e) => handleUpdateStyle('sortSelectBorderDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#374151"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Color del texto */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Color del Texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={filterConfig.styles?.sortSelectTextDark || '#f9fafb'}
+                        onChange={(e) => handleUpdateStyle('sortSelectTextDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={filterConfig.styles?.sortSelectTextDark || '#f9fafb'}
+                        onChange={(e) => handleUpdateStyle('sortSelectTextDark', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
+                        placeholder="#f9fafb"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -488,7 +1504,149 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* ===== CONFIGURACIÓN DEL FONDO ===== */}
+            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                🎨 Fondo del Panel
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Modo Claro */}
+                <div className="p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <h5 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-1">
+                    ☀️ Modo Claro
+                  </h5>
+                  
+                  {/* Toggle transparente */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <input
+                      type="checkbox"
+                      id="bgTransparent"
+                      checked={filterConfig.styles?.bgTransparent || false}
+                      onChange={(e) => handleUpdateStyle('bgTransparent', e.target.checked ? 'true' : 'false')}
+                      className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="bgTransparent" className="text-xs text-gray-600 dark:text-gray-400">
+                      Fondo transparente
+                    </label>
+                  </div>
+                  
+                  {filterConfig.styles?.bgTransparent !== true && filterConfig.styles?.bgTransparent !== 'true' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Color de fondo</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.backgroundColor || '#ffffff'}
+                          onChange={(e) => handleUpdateStyle('backgroundColor', e.target.value)}
+                          className="w-10 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.backgroundColor || '#ffffff'}
+                          onChange={(e) => handleUpdateStyle('backgroundColor', e.target.value)}
+                          placeholder="#ffffff"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Vista previa */}
+                  <div 
+                    className="mt-3 h-8 rounded border border-gray-300 dark:border-gray-500 flex items-center justify-center text-xs"
+                    style={{
+                      backgroundColor: filterConfig.styles?.bgTransparent === true || filterConfig.styles?.bgTransparent === 'true'
+                        ? 'transparent'
+                        : (filterConfig.styles?.backgroundColor || '#ffffff'),
+                      backgroundImage: filterConfig.styles?.bgTransparent === true || filterConfig.styles?.bgTransparent === 'true'
+                        ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)'
+                        : 'none',
+                      backgroundSize: '10px 10px',
+                      backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0px'
+                    }}
+                  >
+                    <span style={{ 
+                      color: filterConfig.styles?.bgTransparent === true || filterConfig.styles?.bgTransparent === 'true' 
+                        ? '#666' 
+                        : '#374151',
+                      textShadow: filterConfig.styles?.bgTransparent === true || filterConfig.styles?.bgTransparent === 'true'
+                        ? '0 0 2px white'
+                        : 'none'
+                    }}>
+                      {filterConfig.styles?.bgTransparent === true || filterConfig.styles?.bgTransparent === 'true' ? '🔲 Transparente' : 'Vista previa'}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Modo Oscuro */}
+                <div className="p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <h5 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-1">
+                    🌙 Modo Oscuro
+                  </h5>
+                  
+                  {/* Toggle transparente */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <input
+                      type="checkbox"
+                      id="bgTransparentDark"
+                      checked={filterConfig.styles?.bgTransparentDark || false}
+                      onChange={(e) => handleUpdateStyle('bgTransparentDark', e.target.checked ? 'true' : 'false')}
+                      className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="bgTransparentDark" className="text-xs text-gray-600 dark:text-gray-400">
+                      Fondo transparente
+                    </label>
+                  </div>
+                  
+                  {filterConfig.styles?.bgTransparentDark !== true && filterConfig.styles?.bgTransparentDark !== 'true' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Color de fondo</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.backgroundColorDark || '#1e293b'}
+                          onChange={(e) => handleUpdateStyle('backgroundColorDark', e.target.value)}
+                          className="w-10 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.backgroundColorDark || '#1e293b'}
+                          onChange={(e) => handleUpdateStyle('backgroundColorDark', e.target.value)}
+                          placeholder="#1e293b"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Vista previa */}
+                  <div 
+                    className="mt-3 h-8 rounded border border-gray-500 flex items-center justify-center text-xs"
+                    style={{
+                      backgroundColor: filterConfig.styles?.bgTransparentDark === true || filterConfig.styles?.bgTransparentDark === 'true'
+                        ? 'transparent'
+                        : (filterConfig.styles?.backgroundColorDark || '#1e293b'),
+                      backgroundImage: filterConfig.styles?.bgTransparentDark === true || filterConfig.styles?.bgTransparentDark === 'true'
+                        ? 'linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%)'
+                        : 'none',
+                      backgroundSize: '10px 10px',
+                      backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0px'
+                    }}
+                  >
+                    <span style={{ 
+                      color: filterConfig.styles?.bgTransparentDark === true || filterConfig.styles?.bgTransparentDark === 'true' 
+                        ? '#aaa' 
+                        : '#D1D5DB'
+                    }}>
+                      {filterConfig.styles?.bgTransparentDark === true || filterConfig.styles?.bgTransparentDark === 'true' ? '🔲 Transparente' : 'Vista previa'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 
               {/* Color de título de sección */}
               <div>

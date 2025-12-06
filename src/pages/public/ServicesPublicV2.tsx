@@ -366,60 +366,89 @@ const ServicesPublicV2 = () => {
               {/* SIDEBAR - Barra Lateral de Filtros con estilos del CMS */}
               {/* En móvil: 100% ancho, En desktop: ancho fijo (20rem = 320px por defecto) */}
               <aside className="w-full lg:w-80 lg:flex-shrink-0 animate-fade-in delay-100">
-                {/* Contenedor con borde gradiente como en la maqueta */}
-                <div 
-                  className="sticky top-24 overflow-hidden"
-                  style={{
-                    borderRadius: pageData?.content?.servicesFilter?.styles?.borderRadius || '1rem',
-                    padding: pageData?.content?.servicesFilter?.styles?.borderWidth || '2px',
-                    background: (() => {
-                      const styles = pageData?.content?.servicesFilter?.styles;
-                      const isDark = currentTheme === 'dark';
-                      
-                      // Obtener el estilo de borde según el tema
-                      const borderStyle = isDark 
-                        ? (styles?.borderStyleDark || styles?.borderStyle || 'gradient')
-                        : (styles?.borderStyle || 'gradient');
-                      
-                      if (borderStyle === 'none') {
-                        return 'transparent';
-                      }
-                      
-                      if (borderStyle === 'solid') {
-                        return isDark 
-                          ? (styles?.borderColorDark || styles?.borderColor || '#A78BFA')
-                          : (styles?.borderColor || '#8B5CF6');
-                      }
-                      
-                      // Gradiente
-                      const direction = isDark 
-                        ? (styles?.borderGradientDirectionDark || styles?.borderGradientDirection || '135deg')
-                        : (styles?.borderGradientDirection || '135deg');
-                      const from = isDark 
-                        ? (styles?.borderGradientFromDark || '#A78BFA')
-                        : (styles?.borderGradientFrom || '#8B5CF6');
-                      const to = isDark 
-                        ? (styles?.borderGradientToDark || '#22D3EE')
-                        : (styles?.borderGradientTo || '#06B6D4');
-                      
-                      return `linear-gradient(${direction}, ${from}, ${to})`;
-                    })(),
-                    minHeight: pageData?.content?.servicesFilter?.styles?.panelMinHeight !== 'auto' 
-                      ? pageData?.content?.servicesFilter?.styles?.panelMinHeight 
-                      : undefined,
-                    boxShadow: pageData?.content?.servicesFilter?.styles?.shadow === 'none' ? 'none' :
-                               pageData?.content?.servicesFilter?.styles?.shadow === 'sm' ? '0 1px 2px rgba(0,0,0,0.05)' :
-                               pageData?.content?.servicesFilter?.styles?.shadow === 'md' ? '0 4px 6px rgba(0,0,0,0.1)' :
-                               pageData?.content?.servicesFilter?.styles?.shadow === 'lg' ? '0 10px 15px rgba(0,0,0,0.1)' :
-                               pageData?.content?.servicesFilter?.styles?.shadow === 'xl' ? '0 20px 25px rgba(0,0,0,0.15)' : undefined
-                  }}
-                >
-                  <div 
-                    className="bg-white dark:bg-gray-900 rounded-[calc(1rem-2px)]"
-                    style={{
-                      padding: pageData?.content?.servicesFilter?.styles?.panelPadding || '1.5rem'
-                    }}
-                  >
+                {/* Contenedor con borde gradiente */}
+                {(() => {
+                  const styles = pageData?.content?.servicesFilter?.styles;
+                  const isDark = currentTheme === 'dark';
+                  
+                  // Verificar si el fondo es transparente
+                  const isTransparent = isDark 
+                    ? (styles?.bgTransparentDark === true || styles?.bgTransparentDark === 'true')
+                    : (styles?.bgTransparent === true || styles?.bgTransparent === 'true');
+                  
+                  // Obtener el estilo de borde según el tema
+                  const borderStyle = isDark 
+                    ? (styles?.borderStyleDark || styles?.borderStyle || 'gradient')
+                    : (styles?.borderStyle || 'gradient');
+                  
+                  const borderWidth = styles?.borderWidth || '2px';
+                  const borderRadius = styles?.borderRadius || '1rem';
+                  
+                  // Obtener color/gradiente del borde
+                  const getBorderBackground = () => {
+                    if (borderStyle === 'none') return 'transparent';
+                    
+                    if (borderStyle === 'solid') {
+                      return isDark 
+                        ? (styles?.borderColorDark || styles?.borderColor || '#A78BFA')
+                        : (styles?.borderColor || '#8B5CF6');
+                    }
+                    
+                    // Gradiente
+                    const direction = isDark 
+                      ? (styles?.borderGradientDirectionDark || styles?.borderGradientDirection || '135deg')
+                      : (styles?.borderGradientDirection || '135deg');
+                    const from = isDark 
+                      ? (styles?.borderGradientFromDark || '#A78BFA')
+                      : (styles?.borderGradientFrom || '#8B5CF6');
+                    const to = isDark 
+                      ? (styles?.borderGradientToDark || '#22D3EE')
+                      : (styles?.borderGradientTo || '#06B6D4');
+                    
+                    return `linear-gradient(${direction}, ${from}, ${to})`;
+                  };
+                  
+                  // Obtener color de fondo
+                  const getBackgroundColor = () => {
+                    if (isTransparent) return 'transparent';
+                    return isDark 
+                      ? (styles?.backgroundColorDark || '#1e293b')
+                      : (styles?.backgroundColor || '#ffffff');
+                  };
+                  
+                  // Si el fondo es transparente y hay borde gradiente, usar técnica de mask
+                  if (isTransparent && borderStyle === 'gradient') {
+                    return (
+                      <div 
+                        className="sticky top-24 relative"
+                        style={{
+                          borderRadius: borderRadius,
+                          padding: borderWidth,
+                          minHeight: styles?.panelMinHeight !== 'auto' ? styles?.panelMinHeight : undefined,
+                        }}
+                      >
+                        {/* Borde gradiente con mask */}
+                        <div
+                          className="absolute inset-0 rounded-[inherit]"
+                          style={{
+                            background: getBorderBackground(),
+                            mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                            maskComposite: 'xor',
+                            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                            WebkitMaskComposite: 'xor',
+                            padding: borderWidth,
+                            pointerEvents: 'none'
+                          }}
+                        />
+                        {/* Contenido interior */}
+                        <div 
+                          className="relative"
+                          style={{
+                            padding: styles?.panelPadding || '1.5rem',
+                            borderRadius: `calc(${borderRadius} - ${borderWidth})`,
+                            backgroundColor: 'transparent'
+                          }}
+                        >
                     
                     {/* Sección BUSCAR */}
                     <div style={{ marginBottom: pageData?.content?.servicesFilter?.styles?.sectionGap || '1.5rem' }}>
@@ -445,7 +474,14 @@ const ServicesPublicV2 = () => {
                         {pageData?.content?.servicesFilter?.searchDescription || 'Escribe aquí para encontrar el servicio que necesitas...'}
                       </p>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <span 
+                          className="absolute left-3 top-1/2 -translate-y-1/2"
+                          style={{
+                            color: currentTheme === 'dark'
+                              ? (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholderDark || '#6b7280')
+                              : (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholder || '#9ca3af')
+                          }}
+                        >
                           🔍
                         </span>
                         <input
@@ -453,12 +489,41 @@ const ServicesPublicV2 = () => {
                           value={busqueda}
                           onChange={(e) => setBusqueda(e.target.value)}
                           placeholder={pageData?.content?.servicesFilter?.searchPlaceholder || 'Busca un servicio...'}
-                          className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                          className="w-full pl-10 pr-10 py-3 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                          style={{
+                            backgroundColor: (() => {
+                              const s = pageData?.content?.servicesFilter?.styles;
+                              if (currentTheme === 'dark') {
+                                return (s?.searchInputBgTransparentDark === true || s?.searchInputBgTransparentDark === 'true')
+                                  ? 'transparent'
+                                  : (s?.searchInputBgDark || '#1f2937');
+                              }
+                              return (s?.searchInputBgTransparent === true || s?.searchInputBgTransparent === 'true')
+                                ? 'transparent'
+                                : (s?.searchInputBg || '#ffffff');
+                            })(),
+                            borderWidth: '1px',
+                            borderStyle: 'solid',
+                            borderColor: currentTheme === 'dark'
+                              ? (pageData?.content?.servicesFilter?.styles?.searchInputBorderDark || '#374151')
+                              : (pageData?.content?.servicesFilter?.styles?.searchInputBorder || '#e5e7eb'),
+                            color: currentTheme === 'dark'
+                              ? (pageData?.content?.servicesFilter?.styles?.searchInputTextDark || '#f9fafb')
+                              : (pageData?.content?.servicesFilter?.styles?.searchInputText || '#111827'),
+                            '--placeholder-color': currentTheme === 'dark'
+                              ? (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholderDark || '#6b7280')
+                              : (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholder || '#9ca3af')
+                          } as React.CSSProperties}
                         />
                         {busqueda && (
                           <button
                             onClick={() => setBusqueda('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                            style={{
+                              color: currentTheme === 'dark'
+                                ? (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholderDark || '#6b7280')
+                                : (pageData?.content?.servicesFilter?.styles?.searchInputPlaceholder || '#9ca3af')
+                            }}
                           >
                             ✕
                           </button>
@@ -482,39 +547,145 @@ const ServicesPublicV2 = () => {
                       </h3>
                       <div className="space-y-1">
                         {/* Opción "Todas las categorías" */}
-                        <button
-                          onClick={() => setCategoriaSeleccionada('')}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                            categoriaSeleccionada === ''
-                              ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30'
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                          }`}
-                          style={{
-                            fontFamily: pageData?.content?.servicesFilter?.styles?.contentFontFamily || 'inherit',
-                            fontWeight: pageData?.content?.servicesFilter?.styles?.contentFontWeight || '500'
-                          }}
-                        >
-                          {pageData?.content?.servicesFilter?.showAllCategoriesText || 'Todas las categorías'}
-                        </button>
+                        {(() => {
+                          const s = pageData?.content?.servicesFilter?.styles;
+                          const isActive = categoriaSeleccionada === '';
+                          const isDark = currentTheme === 'dark';
+                          
+                          // Función para obtener el estilo de fondo
+                          const getActiveBg = () => {
+                            if (!isActive) return 'transparent';
+                            const bgStyle = isDark ? (s?.activeCategoryBgStyleDark || 'solid') : (s?.activeCategoryBgStyle || 'solid');
+                            if (bgStyle === 'transparent') return 'transparent';
+                            if (bgStyle === 'gradient') {
+                              const dir = isDark ? (s?.activeCategoryBgGradientDirectionDark || '135deg') : (s?.activeCategoryBgGradientDirection || '135deg');
+                              const from = isDark ? (s?.activeCategoryBgGradientFromDark || '#A78BFA') : (s?.activeCategoryBgGradientFrom || '#8B5CF6');
+                              const to = isDark ? (s?.activeCategoryBgGradientToDark || '#22D3EE') : (s?.activeCategoryBgGradientTo || '#06B6D4');
+                              return `linear-gradient(${dir}, ${from}, ${to})`;
+                            }
+                            return isDark ? (s?.activeCategoryBgDark || 'rgba(139, 92, 246, 0.2)') : (s?.activeCategoryBg || 'rgba(139, 92, 246, 0.1)');
+                          };
+                          
+                          // Función para obtener el estilo de texto
+                          const getActiveTextStyle = (): React.CSSProperties => {
+                            if (!isActive) {
+                              return { color: isDark ? (s?.textColorDark || '#D1D5DB') : (s?.textColor || '#374151') };
+                            }
+                            const textStyle = isDark ? (s?.activeCategoryTextStyleDark || 'solid') : (s?.activeCategoryTextStyle || 'solid');
+                            if (textStyle === 'gradient') {
+                              const dir = isDark ? (s?.activeCategoryTextGradientDirectionDark || '90deg') : (s?.activeCategoryTextGradientDirection || '90deg');
+                              const from = isDark ? (s?.activeCategoryTextGradientFromDark || '#A78BFA') : (s?.activeCategoryTextGradientFrom || '#8B5CF6');
+                              const to = isDark ? (s?.activeCategoryTextGradientToDark || '#22D3EE') : (s?.activeCategoryTextGradientTo || '#06B6D4');
+                              return {
+                                background: `linear-gradient(${dir}, ${from}, ${to})`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text'
+                              };
+                            }
+                            return { color: isDark ? (s?.activeCategoryTextDark || '#A78BFA') : (s?.activeCategoryText || '#8B5CF6') };
+                          };
+                          
+                          // Función para obtener el borde
+                          const getActiveBorder = () => {
+                            if (!isActive) return '3px solid transparent';
+                            const borderStyle = isDark ? (s?.activeCategoryBorderStyleDark || 'solid') : (s?.activeCategoryBorderStyle || 'solid');
+                            if (borderStyle === 'none') return 'none';
+                            if (borderStyle === 'gradient') {
+                              // Para borde gradiente usamos el color "from" como fallback
+                              const from = isDark ? (s?.activeCategoryBorderGradientFromDark || '#A78BFA') : (s?.activeCategoryBorderGradientFrom || '#8B5CF6');
+                              return `3px solid ${from}`;
+                            }
+                            return `3px solid ${isDark ? (s?.activeCategoryBorderDark || '#A78BFA') : (s?.activeCategoryBorder || '#8B5CF6')}`;
+                          };
+                          
+                          return (
+                            <button
+                              onClick={() => setCategoriaSeleccionada('')}
+                              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                                !isActive ? 'hover:bg-gray-50 dark:hover:bg-gray-700/50' : ''
+                              }`}
+                              style={{
+                                background: getActiveBg(),
+                                borderLeft: getActiveBorder(),
+                                fontFamily: s?.contentFontFamily || 'inherit',
+                                fontWeight: isActive ? '600' : (s?.contentFontWeight || '500'),
+                                ...getActiveTextStyle()
+                              }}
+                            >
+                              {pageData?.content?.servicesFilter?.showAllCategoriesText || 'Todas las categorías'}
+                            </button>
+                          );
+                        })()}
 
                         {/* Categorías dinámicas */}
-                        {categorias.map(categoria => (
-                          <button
-                            key={categoria.slug}
-                            onClick={() => setCategoriaSeleccionada(categoria.slug)}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                              categoriaSeleccionada === categoria.slug
-                                ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30'
-                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                            }`}
-                            style={{
-                              fontFamily: pageData?.content?.servicesFilter?.styles?.contentFontFamily || 'inherit',
-                              fontWeight: pageData?.content?.servicesFilter?.styles?.contentFontWeight || '500'
-                            }}
-                          >
-                            {categoria.nombre}
-                          </button>
-                        ))}
+                        {categorias.map(categoria => {
+                          const s = pageData?.content?.servicesFilter?.styles;
+                          const isActive = categoriaSeleccionada === categoria.slug;
+                          const isDark = currentTheme === 'dark';
+                          
+                          const getActiveBg = () => {
+                            if (!isActive) return 'transparent';
+                            const bgStyle = isDark ? (s?.activeCategoryBgStyleDark || 'solid') : (s?.activeCategoryBgStyle || 'solid');
+                            if (bgStyle === 'transparent') return 'transparent';
+                            if (bgStyle === 'gradient') {
+                              const dir = isDark ? (s?.activeCategoryBgGradientDirectionDark || '135deg') : (s?.activeCategoryBgGradientDirection || '135deg');
+                              const from = isDark ? (s?.activeCategoryBgGradientFromDark || '#A78BFA') : (s?.activeCategoryBgGradientFrom || '#8B5CF6');
+                              const to = isDark ? (s?.activeCategoryBgGradientToDark || '#22D3EE') : (s?.activeCategoryBgGradientTo || '#06B6D4');
+                              return `linear-gradient(${dir}, ${from}, ${to})`;
+                            }
+                            return isDark ? (s?.activeCategoryBgDark || 'rgba(139, 92, 246, 0.2)') : (s?.activeCategoryBg || 'rgba(139, 92, 246, 0.1)');
+                          };
+                          
+                          const getActiveTextStyle = (): React.CSSProperties => {
+                            if (!isActive) {
+                              return { color: isDark ? (s?.textColorDark || '#D1D5DB') : (s?.textColor || '#374151') };
+                            }
+                            const textStyle = isDark ? (s?.activeCategoryTextStyleDark || 'solid') : (s?.activeCategoryTextStyle || 'solid');
+                            if (textStyle === 'gradient') {
+                              const dir = isDark ? (s?.activeCategoryTextGradientDirectionDark || '90deg') : (s?.activeCategoryTextGradientDirection || '90deg');
+                              const from = isDark ? (s?.activeCategoryTextGradientFromDark || '#A78BFA') : (s?.activeCategoryTextGradientFrom || '#8B5CF6');
+                              const to = isDark ? (s?.activeCategoryTextGradientToDark || '#22D3EE') : (s?.activeCategoryTextGradientTo || '#06B6D4');
+                              return {
+                                background: `linear-gradient(${dir}, ${from}, ${to})`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text'
+                              };
+                            }
+                            return { color: isDark ? (s?.activeCategoryTextDark || '#A78BFA') : (s?.activeCategoryText || '#8B5CF6') };
+                          };
+                          
+                          const getActiveBorder = () => {
+                            if (!isActive) return '3px solid transparent';
+                            const borderStyle = isDark ? (s?.activeCategoryBorderStyleDark || 'solid') : (s?.activeCategoryBorderStyle || 'solid');
+                            if (borderStyle === 'none') return 'none';
+                            if (borderStyle === 'gradient') {
+                              const from = isDark ? (s?.activeCategoryBorderGradientFromDark || '#A78BFA') : (s?.activeCategoryBorderGradientFrom || '#8B5CF6');
+                              return `3px solid ${from}`;
+                            }
+                            return `3px solid ${isDark ? (s?.activeCategoryBorderDark || '#A78BFA') : (s?.activeCategoryBorder || '#8B5CF6')}`;
+                          };
+                          
+                          return (
+                            <button
+                              key={categoria.slug}
+                              onClick={() => setCategoriaSeleccionada(categoria.slug)}
+                              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                                !isActive ? 'hover:bg-gray-50 dark:hover:bg-gray-700/50' : ''
+                              }`}
+                              style={{
+                                background: getActiveBg(),
+                                borderLeft: getActiveBorder(),
+                                fontFamily: s?.contentFontFamily || 'inherit',
+                                fontWeight: isActive ? '600' : (s?.contentFontWeight || '500'),
+                                ...getActiveTextStyle()
+                              }}
+                            >
+                              {categoria.nombre}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -536,8 +707,27 @@ const ServicesPublicV2 = () => {
                         <select
                           value={ordenamiento}
                           onChange={(e) => setOrdenamiento(e.target.value)}
-                          className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none cursor-pointer transition-all"
+                          className="w-full px-4 py-3 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none cursor-pointer transition-all"
                           style={{
+                            backgroundColor: (() => {
+                              const s = pageData?.content?.servicesFilter?.styles;
+                              if (currentTheme === 'dark') {
+                                return (s?.sortSelectBgTransparentDark === true || s?.sortSelectBgTransparentDark === 'true')
+                                  ? 'transparent'
+                                  : (s?.sortSelectBgDark || '#1f2937');
+                              }
+                              return (s?.sortSelectBgTransparent === true || s?.sortSelectBgTransparent === 'true')
+                                ? 'transparent'
+                                : (s?.sortSelectBg || '#ffffff');
+                            })(),
+                            borderWidth: '1px',
+                            borderStyle: 'solid',
+                            borderColor: currentTheme === 'dark'
+                              ? (pageData?.content?.servicesFilter?.styles?.sortSelectBorderDark || '#374151')
+                              : (pageData?.content?.servicesFilter?.styles?.sortSelectBorder || '#e5e7eb'),
+                            color: currentTheme === 'dark'
+                              ? (pageData?.content?.servicesFilter?.styles?.sortSelectTextDark || '#f9fafb')
+                              : (pageData?.content?.servicesFilter?.styles?.sortSelectText || '#111827'),
                             fontFamily: pageData?.content?.servicesFilter?.styles?.contentFontFamily || 'inherit',
                             fontWeight: pageData?.content?.servicesFilter?.styles?.contentFontWeight || '500'
                           }}
@@ -548,7 +738,14 @@ const ServicesPublicV2 = () => {
                           <option value="precio-asc">💰 Menor precio</option>
                           <option value="precio-desc">💎 Mayor precio</option>
                         </select>
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <span 
+                          className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{
+                            color: currentTheme === 'dark'
+                              ? (pageData?.content?.servicesFilter?.styles?.sortSelectTextDark || '#9ca3af')
+                              : (pageData?.content?.servicesFilter?.styles?.sortSelectText || '#6b7280')
+                          }}
+                        >
                           ▼
                         </span>
                       </div>
@@ -598,8 +795,369 @@ const ServicesPublicV2 = () => {
                       </button>
                     )}
 
-                  </div>
-                </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  // Caso normal: fondo sólido o sin borde gradiente
+                  return (
+                    <div 
+                      className="sticky top-24 overflow-hidden"
+                      style={{
+                        borderRadius: borderRadius,
+                        padding: borderWidth,
+                        background: getBorderBackground(),
+                        minHeight: styles?.panelMinHeight !== 'auto' ? styles?.panelMinHeight : undefined,
+                        boxShadow: styles?.shadow === 'none' ? 'none' :
+                                   styles?.shadow === 'sm' ? '0 1px 2px rgba(0,0,0,0.05)' :
+                                   styles?.shadow === 'md' ? '0 4px 6px rgba(0,0,0,0.1)' :
+                                   styles?.shadow === 'lg' ? '0 10px 15px rgba(0,0,0,0.1)' :
+                                   styles?.shadow === 'xl' ? '0 20px 25px rgba(0,0,0,0.15)' : undefined
+                      }}
+                    >
+                      <div 
+                        style={{
+                          padding: styles?.panelPadding || '1.5rem',
+                          borderRadius: `calc(${borderRadius} - ${borderWidth})`,
+                          backgroundColor: getBackgroundColor()
+                        }}
+                      >
+                        {/* Sección BUSCAR */}
+                        <div style={{ marginBottom: styles?.sectionGap || '1.5rem' }}>
+                          <h3 
+                            className="text-sm uppercase tracking-wider mb-1"
+                            style={{ 
+                              color: isDark 
+                                ? (styles?.sectionTitleColorDark || '#A78BFA')
+                                : (styles?.sectionTitleColor || '#8B5CF6'),
+                              fontFamily: styles?.titleFontFamily || 'inherit',
+                              fontWeight: styles?.titleFontWeight || '700'
+                            }}
+                          >
+                            {pageData?.content?.servicesFilter?.searchTitle || 'BUSCAR'}
+                          </h3>
+                          <p 
+                            className="text-xs text-gray-500 dark:text-gray-400 mb-3"
+                            style={{
+                              fontFamily: styles?.contentFontFamily || 'inherit',
+                              fontWeight: styles?.contentFontWeight || '400'
+                            }}
+                          >
+                            {pageData?.content?.servicesFilter?.searchDescription || 'Escribe aquí para encontrar el servicio que necesitas...'}
+                          </p>
+                          <div className="relative">
+                            <span 
+                              className="absolute left-3 top-1/2 -translate-y-1/2"
+                              style={{
+                                color: isDark
+                                  ? (styles?.searchInputPlaceholderDark || '#6b7280')
+                                  : (styles?.searchInputPlaceholder || '#9ca3af')
+                              }}
+                            >
+                              🔍
+                            </span>
+                            <input
+                              type="text"
+                              value={busqueda}
+                              onChange={(e) => setBusqueda(e.target.value)}
+                              placeholder={pageData?.content?.servicesFilter?.searchPlaceholder || 'Busca un servicio...'}
+                              className="w-full pl-10 pr-10 py-3 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                              style={{
+                                backgroundColor: (() => {
+                                  if (isDark) {
+                                    return (styles?.searchInputBgTransparentDark === true || styles?.searchInputBgTransparentDark === 'true')
+                                      ? 'transparent'
+                                      : (styles?.searchInputBgDark || '#1f2937');
+                                  }
+                                  return (styles?.searchInputBgTransparent === true || styles?.searchInputBgTransparent === 'true')
+                                    ? 'transparent'
+                                    : (styles?.searchInputBg || '#ffffff');
+                                })(),
+                                borderWidth: '1px',
+                                borderStyle: 'solid',
+                                borderColor: isDark
+                                  ? (styles?.searchInputBorderDark || '#374151')
+                                  : (styles?.searchInputBorder || '#e5e7eb'),
+                                color: isDark
+                                  ? (styles?.searchInputTextDark || '#f9fafb')
+                                  : (styles?.searchInputText || '#111827')
+                              }}
+                            />
+                            {busqueda && (
+                              <button
+                                onClick={() => setBusqueda('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                                style={{
+                                  color: isDark
+                                    ? (styles?.searchInputPlaceholderDark || '#6b7280')
+                                    : (styles?.searchInputPlaceholder || '#9ca3af')
+                                }}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Sección CATEGORÍAS */}
+                        <div style={{ marginBottom: styles?.sectionGap || '1.5rem' }}>
+                          <h3 
+                            className="text-sm uppercase tracking-wider mb-3"
+                            style={{ 
+                              color: isDark 
+                                ? (styles?.sectionTitleColorDark || '#A78BFA')
+                                : (styles?.sectionTitleColor || '#8B5CF6'),
+                              fontFamily: styles?.titleFontFamily || 'inherit',
+                              fontWeight: styles?.titleFontWeight || '700'
+                            }}
+                          >
+                            {pageData?.content?.servicesFilter?.categoriesTitle || 'CATEGORÍAS'}
+                          </h3>
+                          <div className="space-y-1">
+                            {/* Botón "Todas las categorías" */}
+                            {(() => {
+                              const isActive = categoriaSeleccionada === '';
+                              
+                              const getActiveBg = () => {
+                                if (!isActive) return 'transparent';
+                                const bgStyle = isDark ? (styles?.activeCategoryBgStyleDark || 'solid') : (styles?.activeCategoryBgStyle || 'solid');
+                                if (bgStyle === 'transparent') return 'transparent';
+                                if (bgStyle === 'gradient') {
+                                  const dir = isDark ? (styles?.activeCategoryBgGradientDirectionDark || '135deg') : (styles?.activeCategoryBgGradientDirection || '135deg');
+                                  const from = isDark ? (styles?.activeCategoryBgGradientFromDark || '#A78BFA') : (styles?.activeCategoryBgGradientFrom || '#8B5CF6');
+                                  const to = isDark ? (styles?.activeCategoryBgGradientToDark || '#22D3EE') : (styles?.activeCategoryBgGradientTo || '#06B6D4');
+                                  return `linear-gradient(${dir}, ${from}, ${to})`;
+                                }
+                                return isDark ? (styles?.activeCategoryBgDark || 'rgba(139, 92, 246, 0.2)') : (styles?.activeCategoryBg || 'rgba(139, 92, 246, 0.1)');
+                              };
+                              
+                              const getActiveTextStyle = (): React.CSSProperties => {
+                                if (!isActive) {
+                                  return { color: isDark ? (styles?.textColorDark || '#D1D5DB') : (styles?.textColor || '#374151') };
+                                }
+                                const textStyle = isDark ? (styles?.activeCategoryTextStyleDark || 'solid') : (styles?.activeCategoryTextStyle || 'solid');
+                                if (textStyle === 'gradient') {
+                                  const dir = isDark ? (styles?.activeCategoryTextGradientDirectionDark || '90deg') : (styles?.activeCategoryTextGradientDirection || '90deg');
+                                  const from = isDark ? (styles?.activeCategoryTextGradientFromDark || '#A78BFA') : (styles?.activeCategoryTextGradientFrom || '#8B5CF6');
+                                  const to = isDark ? (styles?.activeCategoryTextGradientToDark || '#22D3EE') : (styles?.activeCategoryTextGradientTo || '#06B6D4');
+                                  return {
+                                    background: `linear-gradient(${dir}, ${from}, ${to})`,
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text'
+                                  };
+                                }
+                                return { color: isDark ? (styles?.activeCategoryTextDark || '#A78BFA') : (styles?.activeCategoryText || '#8B5CF6') };
+                              };
+                              
+                              const getActiveBorder = () => {
+                                if (!isActive) return '3px solid transparent';
+                                const borderStyle = isDark ? (styles?.activeCategoryBorderStyleDark || 'solid') : (styles?.activeCategoryBorderStyle || 'solid');
+                                if (borderStyle === 'none') return 'none';
+                                if (borderStyle === 'gradient') {
+                                  const from = isDark ? (styles?.activeCategoryBorderGradientFromDark || '#A78BFA') : (styles?.activeCategoryBorderGradientFrom || '#8B5CF6');
+                                  return `3px solid ${from}`;
+                                }
+                                return `3px solid ${isDark ? (styles?.activeCategoryBorderDark || '#A78BFA') : (styles?.activeCategoryBorder || '#8B5CF6')}`;
+                              };
+                              
+                              return (
+                                <button
+                                  onClick={() => setCategoriaSeleccionada('')}
+                                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                                    !isActive ? 'hover:bg-gray-100 dark:hover:bg-gray-700/50' : ''
+                                  }`}
+                                  style={{
+                                    background: getActiveBg(),
+                                    borderLeft: getActiveBorder(),
+                                    fontFamily: styles?.contentFontFamily || 'inherit',
+                                    fontWeight: isActive ? '600' : (styles?.contentFontWeight || '500'),
+                                    ...getActiveTextStyle()
+                                  }}
+                                >
+                                  {pageData?.content?.servicesFilter?.showAllCategoriesText || 'Todas las categorías'}
+                                </button>
+                              );
+                            })()}
+                            
+                            {/* Categorías dinámicas */}
+                            {categorias.map((cat) => {
+                              const isActive = categoriaSeleccionada === cat.slug;
+                              
+                              const getActiveBg = () => {
+                                if (!isActive) return 'transparent';
+                                const bgStyle = isDark ? (styles?.activeCategoryBgStyleDark || 'solid') : (styles?.activeCategoryBgStyle || 'solid');
+                                if (bgStyle === 'transparent') return 'transparent';
+                                if (bgStyle === 'gradient') {
+                                  const dir = isDark ? (styles?.activeCategoryBgGradientDirectionDark || '135deg') : (styles?.activeCategoryBgGradientDirection || '135deg');
+                                  const from = isDark ? (styles?.activeCategoryBgGradientFromDark || '#A78BFA') : (styles?.activeCategoryBgGradientFrom || '#8B5CF6');
+                                  const to = isDark ? (styles?.activeCategoryBgGradientToDark || '#22D3EE') : (styles?.activeCategoryBgGradientTo || '#06B6D4');
+                                  return `linear-gradient(${dir}, ${from}, ${to})`;
+                                }
+                                return isDark ? (styles?.activeCategoryBgDark || 'rgba(139, 92, 246, 0.2)') : (styles?.activeCategoryBg || 'rgba(139, 92, 246, 0.1)');
+                              };
+                              
+                              const getActiveTextStyle = (): React.CSSProperties => {
+                                if (!isActive) {
+                                  return { color: isDark ? (styles?.textColorDark || '#D1D5DB') : (styles?.textColor || '#374151') };
+                                }
+                                const textStyle = isDark ? (styles?.activeCategoryTextStyleDark || 'solid') : (styles?.activeCategoryTextStyle || 'solid');
+                                if (textStyle === 'gradient') {
+                                  const dir = isDark ? (styles?.activeCategoryTextGradientDirectionDark || '90deg') : (styles?.activeCategoryTextGradientDirection || '90deg');
+                                  const from = isDark ? (styles?.activeCategoryTextGradientFromDark || '#A78BFA') : (styles?.activeCategoryTextGradientFrom || '#8B5CF6');
+                                  const to = isDark ? (styles?.activeCategoryTextGradientToDark || '#22D3EE') : (styles?.activeCategoryTextGradientTo || '#06B6D4');
+                                  return {
+                                    background: `linear-gradient(${dir}, ${from}, ${to})`,
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text'
+                                  };
+                                }
+                                return { color: isDark ? (styles?.activeCategoryTextDark || '#A78BFA') : (styles?.activeCategoryText || '#8B5CF6') };
+                              };
+                              
+                              const getActiveBorder = () => {
+                                if (!isActive) return '3px solid transparent';
+                                const borderStyle = isDark ? (styles?.activeCategoryBorderStyleDark || 'solid') : (styles?.activeCategoryBorderStyle || 'solid');
+                                if (borderStyle === 'none') return 'none';
+                                if (borderStyle === 'gradient') {
+                                  const from = isDark ? (styles?.activeCategoryBorderGradientFromDark || '#A78BFA') : (styles?.activeCategoryBorderGradientFrom || '#8B5CF6');
+                                  return `3px solid ${from}`;
+                                }
+                                return `3px solid ${isDark ? (styles?.activeCategoryBorderDark || '#A78BFA') : (styles?.activeCategoryBorder || '#8B5CF6')}`;
+                              };
+                              
+                              return (
+                                <button
+                                  key={cat.slug}
+                                  onClick={() => setCategoriaSeleccionada(cat.slug)}
+                                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                                    !isActive ? 'hover:bg-gray-100 dark:hover:bg-gray-700/50' : ''
+                                  }`}
+                                  style={{
+                                    background: getActiveBg(),
+                                    borderLeft: getActiveBorder(),
+                                    fontFamily: styles?.contentFontFamily || 'inherit',
+                                    fontWeight: isActive ? '600' : (styles?.contentFontWeight || '500'),
+                                    ...getActiveTextStyle()
+                                  }}
+                                >
+                                  {cat.nombre}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Sección ORDENAR */}
+                        <div style={{ marginBottom: styles?.sectionGap || '1.5rem' }}>
+                          <h3 
+                            className="text-sm uppercase tracking-wider mb-3"
+                            style={{ 
+                              color: isDark 
+                                ? (styles?.sectionTitleColorDark || '#A78BFA')
+                                : (styles?.sectionTitleColor || '#8B5CF6'),
+                              fontFamily: styles?.titleFontFamily || 'inherit',
+                              fontWeight: styles?.titleFontWeight || '700'
+                            }}
+                          >
+                            {pageData?.content?.servicesFilter?.sortTitle || 'ORDENAR'}
+                          </h3>
+                          <div className="relative">
+                            <select
+                              value={ordenamiento}
+                              onChange={(e) => setOrdenamiento(e.target.value as any)}
+                              className="w-full appearance-none px-4 py-3 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all cursor-pointer"
+                              style={{
+                                backgroundColor: (() => {
+                                  if (isDark) {
+                                    return (styles?.sortSelectBgTransparentDark === true || styles?.sortSelectBgTransparentDark === 'true')
+                                      ? 'transparent'
+                                      : (styles?.sortSelectBgDark || '#1f2937');
+                                  }
+                                  return (styles?.sortSelectBgTransparent === true || styles?.sortSelectBgTransparent === 'true')
+                                    ? 'transparent'
+                                    : (styles?.sortSelectBg || '#ffffff');
+                                })(),
+                                borderWidth: '1px',
+                                borderStyle: 'solid',
+                                borderColor: isDark
+                                  ? (styles?.sortSelectBorderDark || '#374151')
+                                  : (styles?.sortSelectBorder || '#e5e7eb'),
+                                color: isDark
+                                  ? (styles?.sortSelectTextDark || '#f9fafb')
+                                  : (styles?.sortSelectText || '#111827'),
+                                fontFamily: styles?.contentFontFamily || 'inherit',
+                                fontWeight: styles?.contentFontWeight || '500'
+                              }}
+                            >
+                              <option value="destacado">⭐ Destacados</option>
+                              <option value="nuevo">🆕 Recientes</option>
+                              <option value="titulo">🔤 A-Z</option>
+                              <option value="precio-asc">💰 Menor precio</option>
+                              <option value="precio-desc">💎 Mayor precio</option>
+                            </select>
+                            <span 
+                              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                              style={{
+                                color: isDark
+                                  ? (styles?.sortSelectTextDark || '#9ca3af')
+                                  : (styles?.sortSelectText || '#6b7280')
+                              }}
+                            >
+                              ▼
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Resultados */}
+                        <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center justify-between text-sm">
+                            <span 
+                              className="text-gray-500 dark:text-gray-400"
+                              style={{
+                                fontFamily: styles?.contentFontFamily || 'inherit',
+                                fontWeight: styles?.contentFontWeight || '400'
+                              }}
+                            >
+                              {pageData?.content?.servicesFilter?.resultsText || 'Resultados:'}
+                            </span>
+                            <span 
+                              className="font-bold text-gray-900 dark:text-white"
+                              style={{
+                                fontFamily: styles?.titleFontFamily || 'inherit'
+                              }}
+                            >
+                              {serviciosFiltrados.length}
+                            </span>
+                          </div>
+                          
+                          {isFromCache && (
+                            <div className="mt-2 flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                              <span>⚡</span>
+                              <span>Carga optimizada</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Botón Limpiar Filtros */}
+                        {(busqueda || categoriaSeleccionada !== '') && (
+                          <button
+                            onClick={() => {
+                              setBusqueda('');
+                              setCategoriaSeleccionada('');
+                            }}
+                            className="w-full mt-4 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all flex items-center justify-center gap-2"
+                          >
+                            <span>✕</span>
+                            <span>Limpiar filtros</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </aside>
 
               {/* CONTENIDO PRINCIPAL - Grid de Servicios */}
