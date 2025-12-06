@@ -20,6 +20,15 @@ interface AccordionConfig {
   // Colores
   titleColor?: string;
   titleColorDark?: string;
+  // Gradiente para título
+  titleUseGradient?: boolean;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
+  titleGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  titleUseGradientDark?: boolean;
+  titleGradientFromDark?: string;
+  titleGradientToDark?: string;
+  titleGradientDirectionDark?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
   subtitleColor?: string;
   subtitleColorDark?: string;
   numberColor?: string;
@@ -44,9 +53,15 @@ interface AccordionConfig {
   
   // Botón
   buttonText?: string;
-  buttonGradient?: string;
+  buttonGradient?: string; // Mantener para compatibilidad
   buttonTextColor?: string;
   buttonBorderRadius?: string;
+  // 🆕 Configuración mejorada del gradiente del botón
+  buttonUseGradient?: boolean;
+  buttonGradientFrom?: string;
+  buttonGradientTo?: string;
+  buttonGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  buttonBgColor?: string; // Color sólido alternativo
   
   // Features
   featureIconColor?: string;
@@ -93,6 +108,16 @@ interface AccordionConfig {
   paginationActiveColorDark?: string;
   paginationTextColor?: string;
   paginationTextColorDark?: string;
+  // 🆕 Gradientes para paginación - Modo Claro
+  paginationActiveUseGradient?: boolean;
+  paginationActiveGradientFrom?: string;
+  paginationActiveGradientTo?: string;
+  paginationActiveGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  // 🆕 Gradientes para paginación - Modo Oscuro
+  paginationActiveUseGradientDark?: boolean;
+  paginationActiveGradientFromDark?: string;
+  paginationActiveGradientToDark?: string;
+  paginationActiveGradientDirectionDark?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
 }
 
 interface ServicesAccordionListProps {
@@ -373,7 +398,26 @@ const AccordionItem: React.FC<AccordionItemProps> = memo(({
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
               className="px-6 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg"
               style={{
-                background: config?.buttonGradient || 'linear-gradient(90deg, #3B82F6, #06B6D4)',
+                background: (() => {
+                  // Prioridad: buttonGradient manual > nuevas propiedades de gradiente > color sólido
+                  if (config?.buttonGradient) {
+                    return config.buttonGradient;
+                  }
+                  if (config?.buttonUseGradient !== false) {
+                    const direction = config?.buttonGradientDirection === 'to-r' ? 'to right' :
+                      config?.buttonGradientDirection === 'to-l' ? 'to left' :
+                      config?.buttonGradientDirection === 'to-t' ? 'to top' :
+                      config?.buttonGradientDirection === 'to-b' ? 'to bottom' :
+                      config?.buttonGradientDirection === 'to-tr' ? 'to top right' :
+                      config?.buttonGradientDirection === 'to-tl' ? 'to top left' :
+                      config?.buttonGradientDirection === 'to-br' ? 'to bottom right' :
+                      config?.buttonGradientDirection === 'to-bl' ? 'to bottom left' : 'to right';
+                    const from = config?.buttonGradientFrom || '#3B82F6';
+                    const to = config?.buttonGradientTo || '#06B6D4';
+                    return `linear-gradient(${direction}, ${from}, ${to})`;
+                  }
+                  return config?.buttonBgColor || '#3B82F6';
+                })(),
                 borderRadius: config?.buttonBorderRadius || '0.5rem',
                 color: config?.buttonTextColor || '#FFFFFF'
               }}
@@ -406,7 +450,56 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
   
   const isDark = currentTheme === 'dark';
   
-  // Colores de la sección
+  // Helper para convertir dirección de gradiente a CSS
+  const getGradientDirection = (dir?: string) => {
+    switch (dir) {
+      case 'to-r': return 'to right';
+      case 'to-l': return 'to left';
+      case 'to-t': return 'to top';
+      case 'to-b': return 'to bottom';
+      case 'to-tr': return 'to top right';
+      case 'to-tl': return 'to top left';
+      case 'to-br': return 'to bottom right';
+      case 'to-bl': return 'to bottom left';
+      default: return 'to right';
+    }
+  };
+  
+  // Determinar si usar gradiente según el tema
+  // En modo oscuro, solo usar gradiente si titleUseGradientDark está explícitamente habilitado
+  // En modo claro, solo usar gradiente si titleUseGradient está explícitamente habilitado
+  const useTitleGradient = isDark 
+    ? (config?.titleUseGradientDark === true) 
+    : (config?.titleUseGradient === true);
+  
+  // Obtener colores de gradiente según el tema actual
+  const gradientFrom = isDark 
+    ? (config?.titleGradientFromDark || '#A78BFA') 
+    : (config?.titleGradientFrom || '#8B5CF6');
+  const gradientTo = isDark 
+    ? (config?.titleGradientToDark || '#EC4899') 
+    : (config?.titleGradientTo || '#EC4899');
+  const gradientDirection = isDark 
+    ? config?.titleGradientDirectionDark 
+    : config?.titleGradientDirection;
+  
+  // Estilos del título de sección
+  const sectionTitleStyle: React.CSSProperties = useTitleGradient ? {
+    background: `linear-gradient(${getGradientDirection(gradientDirection)}, ${gradientFrom}, ${gradientTo})`,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    color: 'transparent',
+    fontFamily: config?.titleFontFamily || 'inherit',
+    fontWeight: config?.titleFontWeight || '700',
+    display: 'inline-block'
+  } : {
+    color: isDark ? (config?.titleColorDark || '#A78BFA') : (config?.titleColor || '#8B5CF6'),
+    fontFamily: config?.titleFontFamily || 'inherit',
+    fontWeight: config?.titleFontWeight || '700'
+  };
+  
+  // Colores de la sección (para compatibilidad)
   const sectionTitleColor = isDark
     ? (config?.titleColorDark || '#A78BFA')
     : (config?.titleColor || '#8B5CF6');
@@ -526,16 +619,34 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Header de la sección */}
         <div className="text-center mb-8">
-          <h2 
-            className="text-3xl md:text-4xl mb-3 font-bold"
-            style={{ 
-              color: sectionTitleColor,
-              fontFamily: config?.titleFontFamily || 'inherit',
-              fontWeight: config?.titleFontWeight || '700'
-            }}
-          >
-            {config?.sectionTitle || 'Todos los servicios'}
-          </h2>
+          {useTitleGradient ? (
+            <h2 
+              key={`title-gradient-${currentTheme}`}
+              className="text-3xl md:text-4xl mb-3 font-bold inline-block"
+              style={{
+                background: `linear-gradient(${getGradientDirection(gradientDirection)}, ${gradientFrom}, ${gradientTo})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                fontFamily: config?.titleFontFamily || 'inherit',
+                fontWeight: config?.titleFontWeight || '700'
+              } as React.CSSProperties}
+            >
+              {config?.sectionTitle || 'Todos los servicios'}
+            </h2>
+          ) : (
+            <h2 
+              key={`title-solid-${currentTheme}`}
+              className="text-3xl md:text-4xl mb-3 font-bold"
+              style={{
+                color: isDark ? (config?.titleColorDark || '#A78BFA') : (config?.titleColor || '#8B5CF6'),
+                fontFamily: config?.titleFontFamily || 'inherit',
+                fontWeight: config?.titleFontWeight || '700'
+              }}
+            >
+              {config?.sectionTitle || 'Todos los servicios'}
+            </h2>
+          )}
           {config?.sectionSubtitle && (
             <p 
               className="text-base md:text-lg"
@@ -618,21 +729,43 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
                   
                   if (!showPage) return null;
                   
+                  // Determinar si se usa gradiente para el botón activo
+                  const usePaginationGradient = isDark 
+                    ? config?.paginationActiveUseGradientDark 
+                    : config?.paginationActiveUseGradient;
+                  
+                  const paginationGradientFrom = isDark 
+                    ? (config?.paginationActiveGradientFromDark || '#8B5CF6')
+                    : (config?.paginationActiveGradientFrom || '#3B82F6');
+                  
+                  const paginationGradientTo = isDark 
+                    ? (config?.paginationActiveGradientToDark || '#EC4899')
+                    : (config?.paginationActiveGradientTo || '#06B6D4');
+                  
+                  const paginationGradientDir = isDark 
+                    ? config?.paginationActiveGradientDirectionDark
+                    : config?.paginationActiveGradientDirection;
+                  
+                  // Estilo de fondo para botón activo
+                  const activeButtonBackground = currentPage === page
+                    ? (usePaginationGradient
+                        ? `linear-gradient(${getGradientDirection(paginationGradientDir)}, ${paginationGradientFrom}, ${paginationGradientTo})`
+                        : (isDark
+                            ? (config?.paginationActiveColorDark || 'rgba(255, 255, 255, 0.9)')
+                            : (config?.paginationActiveColor || 'rgba(255, 255, 255, 0.9)')))
+                    : (isDark
+                        ? (config?.paginationBgColorDark || 'rgba(255, 255, 255, 0.15)')
+                        : (config?.paginationBgColor || 'rgba(255, 255, 255, 0.2)'));
+                  
                   return (
                     <button
-                      key={page}
+                      key={`page-${page}-${currentTheme}`}
                       onClick={() => handlePageChange(page)}
                       className="w-8 h-8 rounded-md text-sm font-semibold transition-all duration-300 backdrop-blur-sm"
                       style={{
-                        backgroundColor: currentPage === page
-                          ? isDark
-                            ? (config?.paginationActiveColorDark || 'rgba(255, 255, 255, 0.9)')
-                            : (config?.paginationActiveColor || 'rgba(255, 255, 255, 0.9)')
-                          : isDark
-                            ? (config?.paginationBgColorDark || 'rgba(255, 255, 255, 0.15)')
-                            : (config?.paginationBgColor || 'rgba(255, 255, 255, 0.2)'),
+                        background: activeButtonBackground,
                         color: currentPage === page
-                          ? isDark ? '#7c3aed' : '#8b5cf6'
+                          ? (usePaginationGradient ? '#FFFFFF' : (isDark ? '#7c3aed' : '#8b5cf6'))
                           : isDark
                             ? (config?.paginationTextColorDark || '#FFFFFF')
                             : (config?.paginationTextColor || '#FFFFFF'),

@@ -372,11 +372,38 @@ const ServicesPublicV2 = () => {
                   style={{
                     borderRadius: pageData?.content?.servicesFilter?.styles?.borderRadius || '1rem',
                     padding: pageData?.content?.servicesFilter?.styles?.borderWidth || '2px',
-                    background: pageData?.content?.servicesFilter?.styles?.borderStyle === 'none' 
-                      ? 'transparent'
-                      : pageData?.content?.servicesFilter?.styles?.borderStyle === 'solid'
-                        ? (pageData?.content?.servicesFilter?.styles?.borderColor || '#8B5CF6')
-                        : 'linear-gradient(135deg, #8B5CF6, #06B6D4, #8B5CF6)',
+                    background: (() => {
+                      const styles = pageData?.content?.servicesFilter?.styles;
+                      const isDark = currentTheme === 'dark';
+                      
+                      // Obtener el estilo de borde según el tema
+                      const borderStyle = isDark 
+                        ? (styles?.borderStyleDark || styles?.borderStyle || 'gradient')
+                        : (styles?.borderStyle || 'gradient');
+                      
+                      if (borderStyle === 'none') {
+                        return 'transparent';
+                      }
+                      
+                      if (borderStyle === 'solid') {
+                        return isDark 
+                          ? (styles?.borderColorDark || styles?.borderColor || '#A78BFA')
+                          : (styles?.borderColor || '#8B5CF6');
+                      }
+                      
+                      // Gradiente
+                      const direction = isDark 
+                        ? (styles?.borderGradientDirectionDark || styles?.borderGradientDirection || '135deg')
+                        : (styles?.borderGradientDirection || '135deg');
+                      const from = isDark 
+                        ? (styles?.borderGradientFromDark || '#A78BFA')
+                        : (styles?.borderGradientFrom || '#8B5CF6');
+                      const to = isDark 
+                        ? (styles?.borderGradientToDark || '#22D3EE')
+                        : (styles?.borderGradientTo || '#06B6D4');
+                      
+                      return `linear-gradient(${direction}, ${from}, ${to})`;
+                    })(),
                     minHeight: pageData?.content?.servicesFilter?.styles?.panelMinHeight !== 'auto' 
                       ? pageData?.content?.servicesFilter?.styles?.panelMinHeight 
                       : undefined,

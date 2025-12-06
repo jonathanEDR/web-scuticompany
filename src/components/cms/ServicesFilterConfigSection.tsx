@@ -43,10 +43,21 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
     
     // Estilos
     styles: {
-      // Borde del contenedor
+      // Borde del contenedor - Modo Claro
       borderStyle: 'gradient', // 'solid', 'gradient', 'none'
       borderGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
       borderColor: '#8B5CF6',
+      borderGradientFrom: '#8B5CF6',
+      borderGradientTo: '#06B6D4',
+      borderGradientDirection: '135deg',
+      // Borde del contenedor - Modo Oscuro
+      borderStyleDark: 'gradient',
+      borderGradientDark: 'linear-gradient(135deg, #A78BFA, #22D3EE)',
+      borderColorDark: '#A78BFA',
+      borderGradientFromDark: '#A78BFA',
+      borderGradientToDark: '#22D3EE',
+      borderGradientDirectionDark: '135deg',
+      // Configuración general del borde
       borderWidth: '2px',
       borderRadius: '1rem',
       
@@ -224,44 +235,223 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
               🎨 Estilos del Panel de Filtros
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Tipo de borde */}
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Tipo de borde
-                </label>
-                <select
-                  value={filterConfig.styles?.borderStyle || 'gradient'}
-                  onChange={(e) => handleUpdateStyle('borderStyle', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="gradient">✨ Gradiente</option>
-                  <option value="solid">▬ Sólido</option>
-                  <option value="none">○ Sin borde</option>
-                </select>
-              </div>
-
-              {/* Color del borde (solo para sólido) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Color del borde
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={filterConfig.styles?.borderColor || '#8B5CF6'}
-                    onChange={(e) => handleUpdateStyle('borderColor', e.target.value)}
-                    className="w-12 h-10 rounded cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={filterConfig.styles?.borderColor || '#8B5CF6'}
-                    onChange={(e) => handleUpdateStyle('borderColor', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-                  />
+            {/* Configuración del borde por tema */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* Modo Claro */}
+              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  ☀️ Borde - Modo Claro
+                </h4>
+                
+                <div className="space-y-3">
+                  {/* Tipo de borde */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Tipo de borde
+                    </label>
+                    <select
+                      value={filterConfig.styles?.borderStyle || 'gradient'}
+                      onChange={(e) => handleUpdateStyle('borderStyle', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="gradient">✨ Gradiente</option>
+                      <option value="solid">▬ Sólido</option>
+                      <option value="none">○ Sin borde</option>
+                    </select>
+                  </div>
+                  
+                  {filterConfig.styles?.borderStyle === 'gradient' ? (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Inicio</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.borderGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('borderGradientFrom', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.borderGradientFrom || '#8B5CF6'}
+                              onChange={(e) => handleUpdateStyle('borderGradientFrom', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Fin</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.borderGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('borderGradientTo', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.borderGradientTo || '#06B6D4'}
+                              onChange={(e) => handleUpdateStyle('borderGradientTo', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                        <select
+                          value={filterConfig.styles?.borderGradientDirection || '135deg'}
+                          onChange={(e) => handleUpdateStyle('borderGradientDirection', e.target.value)}
+                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="90deg">Horizontal →</option>
+                          <option value="180deg">Vertical ↓</option>
+                          <option value="135deg">Diagonal ↘</option>
+                          <option value="45deg">Diagonal ↗</option>
+                          <option value="270deg">Vertical ↑</option>
+                          <option value="0deg">Horizontal ←</option>
+                        </select>
+                      </div>
+                      {/* Vista previa */}
+                      <div 
+                        className="h-3 rounded-full"
+                        style={{
+                          background: `linear-gradient(${filterConfig.styles?.borderGradientDirection || '135deg'}, ${filterConfig.styles?.borderGradientFrom || '#8B5CF6'}, ${filterConfig.styles?.borderGradientTo || '#06B6D4'})`
+                        }}
+                      />
+                    </div>
+                  ) : filterConfig.styles?.borderStyle === 'solid' ? (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Color del borde</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.borderColor || '#8B5CF6'}
+                          onChange={(e) => handleUpdateStyle('borderColor', e.target.value)}
+                          className="w-10 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.borderColor || '#8B5CF6'}
+                          onChange={(e) => handleUpdateStyle('borderColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
-
+              
+              {/* Modo Oscuro */}
+              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  🌙 Borde - Modo Oscuro
+                </h4>
+                
+                <div className="space-y-3">
+                  {/* Tipo de borde */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Tipo de borde
+                    </label>
+                    <select
+                      value={filterConfig.styles?.borderStyleDark || 'gradient'}
+                      onChange={(e) => handleUpdateStyle('borderStyleDark', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="gradient">✨ Gradiente</option>
+                      <option value="solid">▬ Sólido</option>
+                      <option value="none">○ Sin borde</option>
+                    </select>
+                  </div>
+                  
+                  {filterConfig.styles?.borderStyleDark === 'gradient' || (filterConfig.styles?.borderStyleDark === undefined && filterConfig.styles?.borderStyle === 'gradient') ? (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Inicio</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.borderGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('borderGradientFromDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.borderGradientFromDark || '#A78BFA'}
+                              onChange={(e) => handleUpdateStyle('borderGradientFromDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Fin</label>
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={filterConfig.styles?.borderGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('borderGradientToDark', e.target.value)}
+                              className="w-8 h-8 rounded cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={filterConfig.styles?.borderGradientToDark || '#22D3EE'}
+                              onChange={(e) => handleUpdateStyle('borderGradientToDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                        <select
+                          value={filterConfig.styles?.borderGradientDirectionDark || '135deg'}
+                          onChange={(e) => handleUpdateStyle('borderGradientDirectionDark', e.target.value)}
+                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="90deg">Horizontal →</option>
+                          <option value="180deg">Vertical ↓</option>
+                          <option value="135deg">Diagonal ↘</option>
+                          <option value="45deg">Diagonal ↗</option>
+                          <option value="270deg">Vertical ↑</option>
+                          <option value="0deg">Horizontal ←</option>
+                        </select>
+                      </div>
+                      {/* Vista previa */}
+                      <div 
+                        className="h-3 rounded-full"
+                        style={{
+                          background: `linear-gradient(${filterConfig.styles?.borderGradientDirectionDark || '135deg'}, ${filterConfig.styles?.borderGradientFromDark || '#A78BFA'}, ${filterConfig.styles?.borderGradientToDark || '#22D3EE'})`
+                        }}
+                      />
+                    </div>
+                  ) : filterConfig.styles?.borderStyleDark === 'solid' ? (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Color del borde</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={filterConfig.styles?.borderColorDark || '#A78BFA'}
+                          onChange={(e) => handleUpdateStyle('borderColorDark', e.target.value)}
+                          className="w-10 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={filterConfig.styles?.borderColorDark || '#A78BFA'}
+                          onChange={(e) => handleUpdateStyle('borderColorDark', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+            
+            {/* Configuración general del borde */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               {/* Ancho del borde */}
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
@@ -278,6 +468,27 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   <option value="4px">4px - Extra grueso</option>
                 </select>
               </div>
+              
+              {/* Radio del borde */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Radio del borde
+                </label>
+                <select
+                  value={filterConfig.styles?.borderRadius || '1rem'}
+                  onChange={(e) => handleUpdateStyle('borderRadius', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="0">Sin redondeo</option>
+                  <option value="0.5rem">Pequeño</option>
+                  <option value="1rem">Normal</option>
+                  <option value="1.5rem">Grande</option>
+                  <option value="2rem">Extra grande</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               {/* Color de título de sección */}
               <div>

@@ -11,6 +11,15 @@ interface AccordionConfig {
   sectionSubtitle?: string;
   titleColor?: string;
   titleColorDark?: string;
+  // Gradiente para título de sección
+  titleUseGradient?: boolean;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
+  titleGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  titleUseGradientDark?: boolean;
+  titleGradientFromDark?: string;
+  titleGradientToDark?: string;
+  titleGradientDirectionDark?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
   subtitleColor?: string;
   subtitleColorDark?: string;
   numberColor?: string;
@@ -27,9 +36,15 @@ interface AccordionConfig {
   iconColor?: string;
   iconColorDark?: string;
   buttonText?: string;
-  buttonGradient?: string;
+  buttonGradient?: string; // Mantener para compatibilidad
   buttonTextColor?: string;
   buttonBorderRadius?: string;
+  // 🆕 Configuración mejorada del gradiente del botón
+  buttonUseGradient?: boolean;
+  buttonGradientFrom?: string;
+  buttonGradientTo?: string;
+  buttonGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  buttonBgColor?: string; // Color sólido alternativo
   featureIconColor?: string;
   featureIconColorDark?: string;
   maxFeatures?: number;
@@ -72,6 +87,16 @@ interface AccordionConfig {
   paginationActiveColorDark?: string;
   paginationTextColor?: string;
   paginationTextColorDark?: string;
+  // 🆕 Gradientes para paginación - Modo Claro
+  paginationActiveUseGradient?: boolean;
+  paginationActiveGradientFrom?: string;
+  paginationActiveGradientTo?: string;
+  paginationActiveGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  // 🆕 Gradientes para paginación - Modo Oscuro
+  paginationActiveUseGradientDark?: boolean;
+  paginationActiveGradientFromDark?: string;
+  paginationActiveGradientToDark?: string;
+  paginationActiveGradientDirectionDark?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
 }
 
 interface ServicesAccordionConfigSectionProps {
@@ -277,28 +302,74 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               ☀️ Colores Modo Claro
             </h3>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Título sección con opción de gradiente */}
+              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Título sección
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={config.titleColor || '#8B5CF6'}
-                    onChange={(e) => handleUpdate('titleColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={config.titleColor || '#8B5CF6'}
-                    onChange={(e) => handleUpdate('titleColor', e.target.value)}
-                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
+                
+                {/* Toggle Gradiente */}
+                <div className="flex items-center gap-3 mb-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.titleUseGradient || false}
+                      onChange={(e) => handleUpdate('titleUseGradient', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                  </label>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                 </div>
+                
+                {config.titleUseGradient ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Inicio</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.titleGradientFrom || '#8B5CF6'} onChange={(e) => handleUpdate('titleGradientFrom', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.titleGradientFrom || '#8B5CF6'} onChange={(e) => handleUpdate('titleGradientFrom', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Fin</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.titleGradientTo || '#EC4899'} onChange={(e) => handleUpdate('titleGradientTo', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.titleGradientTo || '#EC4899'} onChange={(e) => handleUpdate('titleGradientTo', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                      <select value={config.titleGradientDirection || 'to-r'} onChange={(e) => handleUpdate('titleGradientDirection', e.target.value)} className="w-full px-1 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="to-r">→ Derecha</option>
+                        <option value="to-l">← Izquierda</option>
+                        <option value="to-t">↑ Arriba</option>
+                        <option value="to-b">↓ Abajo</option>
+                        <option value="to-tr">↗ Diagonal</option>
+                        <option value="to-br">↘ Diagonal</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={config.titleColor || '#8B5CF6'}
+                      onChange={(e) => handleUpdate('titleColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={config.titleColor || '#8B5CF6'}
+                      onChange={(e) => handleUpdate('titleColor', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                )}
               </div>
               
-              <div>
+              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Números
                 </label>
@@ -369,28 +440,74 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               🌙 Colores Modo Oscuro
             </h3>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Título sección con opción de gradiente - Modo Oscuro */}
+              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Título sección
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={config.titleColorDark || '#A78BFA'}
-                    onChange={(e) => handleUpdate('titleColorDark', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={config.titleColorDark || '#A78BFA'}
-                    onChange={(e) => handleUpdate('titleColorDark', e.target.value)}
-                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
+                
+                {/* Toggle Gradiente */}
+                <div className="flex items-center gap-3 mb-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.titleUseGradientDark || false}
+                      onChange={(e) => handleUpdate('titleUseGradientDark', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                  </label>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                 </div>
+                
+                {config.titleUseGradientDark ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Inicio</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.titleGradientFromDark || '#A78BFA'} onChange={(e) => handleUpdate('titleGradientFromDark', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.titleGradientFromDark || '#A78BFA'} onChange={(e) => handleUpdate('titleGradientFromDark', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Fin</label>
+                      <div className="flex items-center gap-1">
+                        <input type="color" value={config.titleGradientToDark || '#EC4899'} onChange={(e) => handleUpdate('titleGradientToDark', e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                        <input type="text" value={config.titleGradientToDark || '#EC4899'} onChange={(e) => handleUpdate('titleGradientToDark', e.target.value)} className="flex-1 px-1 py-0.5 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                      <select value={config.titleGradientDirectionDark || 'to-r'} onChange={(e) => handleUpdate('titleGradientDirectionDark', e.target.value)} className="w-full px-1 py-1 text-xs border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="to-r">→ Derecha</option>
+                        <option value="to-l">← Izquierda</option>
+                        <option value="to-t">↑ Arriba</option>
+                        <option value="to-b">↓ Abajo</option>
+                        <option value="to-tr">↗ Diagonal</option>
+                        <option value="to-br">↘ Diagonal</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={config.titleColorDark || '#A78BFA'}
+                      onChange={(e) => handleUpdate('titleColorDark', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={config.titleColorDark || '#A78BFA'}
+                      onChange={(e) => handleUpdate('titleColorDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                )}
               </div>
               
-              <div>
+              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Números
                 </label>
@@ -409,7 +526,9 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   />
                 </div>
               </div>
-              
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Título servicio
@@ -1015,21 +1134,112 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                     <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Fondo página activa
                     </label>
-                    <div className="flex gap-2">
+                    
+                    {/* Toggle para usar gradiente */}
+                    <div className="flex items-center gap-2 mb-2">
                       <input
-                        type="color"
-                        value={config.paginationActiveColor || '#ffffff'}
-                        onChange={(e) => handleUpdate('paginationActiveColor', e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
+                        type="checkbox"
+                        id="paginationActiveUseGradient"
+                        checked={config.paginationActiveUseGradient || false}
+                        onChange={(e) => handleUpdate('paginationActiveUseGradient', e.target.checked)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                       />
-                      <input
-                        type="text"
-                        value={config.paginationActiveColor || 'rgba(255, 255, 255, 0.9)'}
-                        onChange={(e) => handleUpdate('paginationActiveColor', e.target.value)}
-                        placeholder="rgba(255, 255, 255, 0.9)"
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      />
+                      <label htmlFor="paginationActiveUseGradient" className="text-xs text-gray-600 dark:text-gray-400">
+                        Usar gradiente
+                      </label>
                     </div>
+                    
+                    {config.paginationActiveUseGradient ? (
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-xs text-gray-500">Color Inicio</span>
+                            <div className="flex gap-1">
+                              <input
+                                type="color"
+                                value={config.paginationActiveGradientFrom || '#3B82F6'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientFrom', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={config.paginationActiveGradientFrom || '#3B82F6'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientFrom', e.target.value)}
+                                placeholder="#3B82F6"
+                                className="flex-1 px-1 py-0.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-xs text-gray-500">Color Fin</span>
+                            <div className="flex gap-1">
+                              <input
+                                type="color"
+                                value={config.paginationActiveGradientTo || '#06B6D4'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientTo', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={config.paginationActiveGradientTo || '#06B6D4'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientTo', e.target.value)}
+                                placeholder="#06B6D4"
+                                className="flex-1 px-1 py-0.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-xs text-gray-500">Dirección</span>
+                          <select
+                            value={config.paginationActiveGradientDirection || 'to-r'}
+                            onChange={(e) => handleUpdate('paginationActiveGradientDirection', e.target.value)}
+                            className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            <option value="to-r">Derecha →</option>
+                            <option value="to-l">Izquierda ←</option>
+                            <option value="to-t">Arriba ↑</option>
+                            <option value="to-b">Abajo ↓</option>
+                            <option value="to-tr">Diagonal ↗</option>
+                            <option value="to-tl">Diagonal ↖</option>
+                            <option value="to-br">Diagonal ↘</option>
+                            <option value="to-bl">Diagonal ↙</option>
+                          </select>
+                        </div>
+                        {/* Vista previa del gradiente */}
+                        <div 
+                          className="h-6 rounded-md"
+                          style={{
+                            background: `linear-gradient(${
+                              config.paginationActiveGradientDirection === 'to-r' ? 'to right' :
+                              config.paginationActiveGradientDirection === 'to-l' ? 'to left' :
+                              config.paginationActiveGradientDirection === 'to-t' ? 'to top' :
+                              config.paginationActiveGradientDirection === 'to-b' ? 'to bottom' :
+                              config.paginationActiveGradientDirection === 'to-tr' ? 'to top right' :
+                              config.paginationActiveGradientDirection === 'to-tl' ? 'to top left' :
+                              config.paginationActiveGradientDirection === 'to-br' ? 'to bottom right' :
+                              config.paginationActiveGradientDirection === 'to-bl' ? 'to bottom left' : 'to right'
+                            }, ${config.paginationActiveGradientFrom || '#3B82F6'}, ${config.paginationActiveGradientTo || '#06B6D4'})`
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationActiveColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('paginationActiveColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationActiveColor || 'rgba(255, 255, 255, 0.9)'}
+                          onChange={(e) => handleUpdate('paginationActiveColor', e.target.value)}
+                          placeholder="rgba(255, 255, 255, 0.9)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <div>
@@ -1087,21 +1297,112 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                     <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Fondo página activa
                     </label>
-                    <div className="flex gap-2">
+                    
+                    {/* Toggle para usar gradiente */}
+                    <div className="flex items-center gap-2 mb-2">
                       <input
-                        type="color"
-                        value={config.paginationActiveColorDark || '#ffffff'}
-                        onChange={(e) => handleUpdate('paginationActiveColorDark', e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
+                        type="checkbox"
+                        id="paginationActiveUseGradientDark"
+                        checked={config.paginationActiveUseGradientDark || false}
+                        onChange={(e) => handleUpdate('paginationActiveUseGradientDark', e.target.checked)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                       />
-                      <input
-                        type="text"
-                        value={config.paginationActiveColorDark || 'rgba(255, 255, 255, 0.9)'}
-                        onChange={(e) => handleUpdate('paginationActiveColorDark', e.target.value)}
-                        placeholder="rgba(255, 255, 255, 0.9)"
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      />
+                      <label htmlFor="paginationActiveUseGradientDark" className="text-xs text-gray-600 dark:text-gray-400">
+                        Usar gradiente
+                      </label>
                     </div>
+                    
+                    {config.paginationActiveUseGradientDark ? (
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-xs text-gray-500">Color Inicio</span>
+                            <div className="flex gap-1">
+                              <input
+                                type="color"
+                                value={config.paginationActiveGradientFromDark || '#8B5CF6'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientFromDark', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={config.paginationActiveGradientFromDark || '#8B5CF6'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientFromDark', e.target.value)}
+                                placeholder="#8B5CF6"
+                                className="flex-1 px-1 py-0.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-xs text-gray-500">Color Fin</span>
+                            <div className="flex gap-1">
+                              <input
+                                type="color"
+                                value={config.paginationActiveGradientToDark || '#EC4899'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientToDark', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={config.paginationActiveGradientToDark || '#EC4899'}
+                                onChange={(e) => handleUpdate('paginationActiveGradientToDark', e.target.value)}
+                                placeholder="#EC4899"
+                                className="flex-1 px-1 py-0.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-xs text-gray-500">Dirección</span>
+                          <select
+                            value={config.paginationActiveGradientDirectionDark || 'to-r'}
+                            onChange={(e) => handleUpdate('paginationActiveGradientDirectionDark', e.target.value)}
+                            className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            <option value="to-r">Derecha →</option>
+                            <option value="to-l">Izquierda ←</option>
+                            <option value="to-t">Arriba ↑</option>
+                            <option value="to-b">Abajo ↓</option>
+                            <option value="to-tr">Diagonal ↗</option>
+                            <option value="to-tl">Diagonal ↖</option>
+                            <option value="to-br">Diagonal ↘</option>
+                            <option value="to-bl">Diagonal ↙</option>
+                          </select>
+                        </div>
+                        {/* Vista previa del gradiente */}
+                        <div 
+                          className="h-6 rounded-md"
+                          style={{
+                            background: `linear-gradient(${
+                              config.paginationActiveGradientDirectionDark === 'to-r' ? 'to right' :
+                              config.paginationActiveGradientDirectionDark === 'to-l' ? 'to left' :
+                              config.paginationActiveGradientDirectionDark === 'to-t' ? 'to top' :
+                              config.paginationActiveGradientDirectionDark === 'to-b' ? 'to bottom' :
+                              config.paginationActiveGradientDirectionDark === 'to-tr' ? 'to top right' :
+                              config.paginationActiveGradientDirectionDark === 'to-tl' ? 'to top left' :
+                              config.paginationActiveGradientDirectionDark === 'to-br' ? 'to bottom right' :
+                              config.paginationActiveGradientDirectionDark === 'to-bl' ? 'to bottom left' : 'to right'
+                            }, ${config.paginationActiveGradientFromDark || '#8B5CF6'}, ${config.paginationActiveGradientToDark || '#EC4899'})`
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationActiveColorDark || '#ffffff'}
+                          onChange={(e) => handleUpdate('paginationActiveColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationActiveColorDark || 'rgba(255, 255, 255, 0.9)'}
+                          onChange={(e) => handleUpdate('paginationActiveColorDark', e.target.value)}
+                          placeholder="rgba(255, 255, 255, 0.9)"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <div>
@@ -1135,7 +1436,8 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               🔘 Botón "Ver más"
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Fila 1: Texto y configuración básica */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Texto del botón
@@ -1146,19 +1448,6 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   onChange={(e) => handleUpdate('buttonText', e.target.value)}
                   placeholder="Ver más"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Gradiente del botón
-                </label>
-                <input
-                  type="text"
-                  value={config.buttonGradient || ''}
-                  onChange={(e) => handleUpdate('buttonGradient', e.target.value)}
-                  placeholder="linear-gradient(90deg, #3B82F6, #06B6D4)"
-                  className="w-full px-4 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
@@ -1177,6 +1466,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                     type="text"
                     value={config.buttonTextColor || '#FFFFFF'}
                     onChange={(e) => handleUpdate('buttonTextColor', e.target.value)}
+                    placeholder="#FFFFFF"
                     className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -1195,6 +1485,169 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
+            </div>
+            
+            {/* Fila 2: Configuración del fondo del botón */}
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                🎨 Fondo del Botón
+              </h4>
+              
+              {/* Toggle para usar gradiente */}
+              <div className="flex items-center gap-3 mb-4">
+                <input
+                  type="checkbox"
+                  id="buttonUseGradient"
+                  checked={config.buttonUseGradient !== false}
+                  onChange={(e) => handleUpdate('buttonUseGradient', e.target.checked)}
+                  className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="buttonUseGradient" className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                  Usar gradiente
+                </label>
+              </div>
+              
+              {config.buttonUseGradient !== false ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Color Inicio */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color Inicio
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.buttonGradientFrom || '#3B82F6'}
+                          onChange={(e) => handleUpdate('buttonGradientFrom', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.buttonGradientFrom || '#3B82F6'}
+                          onChange={(e) => handleUpdate('buttonGradientFrom', e.target.value)}
+                          placeholder="#3B82F6"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Color Fin */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color Fin
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.buttonGradientTo || '#06B6D4'}
+                          onChange={(e) => handleUpdate('buttonGradientTo', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.buttonGradientTo || '#06B6D4'}
+                          onChange={(e) => handleUpdate('buttonGradientTo', e.target.value)}
+                          placeholder="#06B6D4"
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Dirección */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Dirección
+                      </label>
+                      <select
+                        value={config.buttonGradientDirection || 'to-r'}
+                        onChange={(e) => handleUpdate('buttonGradientDirection', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="to-r">Derecha →</option>
+                        <option value="to-l">Izquierda ←</option>
+                        <option value="to-t">Arriba ↑</option>
+                        <option value="to-b">Abajo ↓</option>
+                        <option value="to-tr">Diagonal ↗</option>
+                        <option value="to-tl">Diagonal ↖</option>
+                        <option value="to-br">Diagonal ↘</option>
+                        <option value="to-bl">Diagonal ↙</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  {/* Vista previa del gradiente */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      Vista previa
+                    </label>
+                    <div 
+                      className="h-10 rounded-lg flex items-center justify-center text-white text-sm font-medium shadow-sm"
+                      style={{
+                        background: `linear-gradient(${
+                          config.buttonGradientDirection === 'to-r' ? 'to right' :
+                          config.buttonGradientDirection === 'to-l' ? 'to left' :
+                          config.buttonGradientDirection === 'to-t' ? 'to top' :
+                          config.buttonGradientDirection === 'to-b' ? 'to bottom' :
+                          config.buttonGradientDirection === 'to-tr' ? 'to top right' :
+                          config.buttonGradientDirection === 'to-tl' ? 'to top left' :
+                          config.buttonGradientDirection === 'to-br' ? 'to bottom right' :
+                          config.buttonGradientDirection === 'to-bl' ? 'to bottom left' : 'to right'
+                        }, ${config.buttonGradientFrom || '#3B82F6'}, ${config.buttonGradientTo || '#06B6D4'})`,
+                        color: config.buttonTextColor || '#FFFFFF'
+                      }}
+                    >
+                      {config.buttonText || 'Ver más'}
+                    </div>
+                  </div>
+                  
+                  {/* Input de gradiente manual (colapsado) */}
+                  <details className="text-xs">
+                    <summary className="text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-200">
+                      Código CSS avanzado (opcional)
+                    </summary>
+                    <input
+                      type="text"
+                      value={config.buttonGradient || ''}
+                      onChange={(e) => handleUpdate('buttonGradient', e.target.value)}
+                      placeholder="linear-gradient(90deg, #3B82F6, #06B6D4)"
+                      className="w-full mt-2 px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                    <p className="mt-1 text-gray-400">Si defines un código CSS aquí, tendrá prioridad sobre los selectores de color.</p>
+                  </details>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    Color de fondo sólido
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={config.buttonBgColor || '#3B82F6'}
+                      onChange={(e) => handleUpdate('buttonBgColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={config.buttonBgColor || '#3B82F6'}
+                      onChange={(e) => handleUpdate('buttonBgColor', e.target.value)}
+                      placeholder="#3B82F6"
+                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  {/* Vista previa del color sólido */}
+                  <div 
+                    className="mt-3 h-10 rounded-lg flex items-center justify-center text-white text-sm font-medium shadow-sm"
+                    style={{
+                      backgroundColor: config.buttonBgColor || '#3B82F6',
+                      color: config.buttonTextColor || '#FFFFFF'
+                    }}
+                  >
+                    {config.buttonText || 'Ver más'}
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* 🎨 Colores de resaltado de características */}
@@ -1216,43 +1669,58 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                       Fondo
                     </label>
-                    <input
-                      type="color"
-                      value={config.featureHighlightBgColor || '#F3E8FF'}
-                      onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
-                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                    />
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {config.featureHighlightBgColor || '#F3E8FF'}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="color"
+                        value={config.featureHighlightBgColor || '#F3E8FF'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={config.featureHighlightBgColor || '#F3E8FF'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                       Texto
                     </label>
-                    <input
-                      type="color"
-                      value={config.featureHighlightTextColor || '#6B21A8'}
-                      onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
-                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                    />
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {config.featureHighlightTextColor || '#6B21A8'}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="color"
+                        value={config.featureHighlightTextColor || '#6B21A8'}
+                        onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={config.featureHighlightTextColor || '#6B21A8'}
+                        onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                       Borde
                     </label>
-                    <input
-                      type="color"
-                      value={config.featureHighlightBorderColor || '#C084FC'}
-                      onChange={(e) => handleUpdate('featureHighlightBorderColor', e.target.value)}
-                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                    />
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {config.featureHighlightBorderColor || '#C084FC'}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="color"
+                        value={config.featureHighlightBorderColor || '#C084FC'}
+                        onChange={(e) => handleUpdate('featureHighlightBorderColor', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={config.featureHighlightBorderColor || '#C084FC'}
+                        onChange={(e) => handleUpdate('featureHighlightBorderColor', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1267,43 +1735,58 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                       Fondo
                     </label>
-                    <input
-                      type="color"
-                      value={config.featureHighlightBgColorDark || '#581C87'}
-                      onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
-                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                    />
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {config.featureHighlightBgColorDark || '#581C87'}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="color"
+                        value={config.featureHighlightBgColorDark || '#581C87'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={config.featureHighlightBgColorDark || '#581C87'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                       Texto
                     </label>
-                    <input
-                      type="color"
-                      value={config.featureHighlightTextColorDark || '#E9D5FF'}
-                      onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
-                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                    />
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {config.featureHighlightTextColorDark || '#E9D5FF'}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="color"
+                        value={config.featureHighlightTextColorDark || '#E9D5FF'}
+                        onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={config.featureHighlightTextColorDark || '#E9D5FF'}
+                        onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                       Borde
                     </label>
-                    <input
-                      type="color"
-                      value={config.featureHighlightBorderColorDark || '#7C3AED'}
-                      onChange={(e) => handleUpdate('featureHighlightBorderColorDark', e.target.value)}
-                      className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                    />
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {config.featureHighlightBorderColorDark || '#7C3AED'}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="color"
+                        value={config.featureHighlightBorderColorDark || '#7C3AED'}
+                        onChange={(e) => handleUpdate('featureHighlightBorderColorDark', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                      />
+                      <input
+                        type="text"
+                        value={config.featureHighlightBorderColorDark || '#7C3AED'}
+                        onChange={(e) => handleUpdate('featureHighlightBorderColorDark', e.target.value)}
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
