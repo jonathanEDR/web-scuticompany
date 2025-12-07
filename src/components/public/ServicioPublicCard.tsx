@@ -34,6 +34,7 @@ interface CardContentConfig {
   // Características/Beneficios
   showFeatures?: boolean;
   maxFeatures?: number; // 0-5
+  featureHighlightStyle?: 'highlight' | 'box'; // Estilo de resaltado
   featureHighlightBgColor?: string; // Color de fondo del resaltado
   featureHighlightBgColorDark?: string; // Color de fondo modo oscuro
   featureHighlightTextColor?: string; // Color del texto
@@ -411,13 +412,33 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
                       : (content.featureHighlightBorderColor || '#C084FC'))
                   : 'transparent';
                 
+                // Determinar estilo: 'highlight' (resaltado) o 'box' (caja)
+                const isBoxStyle = content.featureHighlightStyle === 'box';
+                
                 return (
                   <span
                     key={idx}
-                    className="text-xs px-2.5 py-1.5 rounded-md font-medium transition-all duration-200 hover:scale-105"
-                    style={{
+                    className={`font-medium transition-all duration-200 ${
+                      isBoxStyle 
+                        ? 'text-xs px-2.5 py-1.5 rounded-md hover:scale-105' 
+                        : 'text-sm inline-block'
+                    }`}
+                    style={isBoxStyle ? {
+                      // Estilo Caja/Badge
                       background: bgStyle,
                       color: textColor,
+                      borderWidth: showBorder ? '1px' : '0',
+                      borderStyle: 'solid',
+                      borderColor: borderColor
+                    } : {
+                      // Estilo Resaltado/Highlighter
+                      color: textColor,
+                      background: bgStyle,
+                      padding: '0.1em 0.35em',
+                      borderRadius: '0.2em',
+                      boxDecorationBreak: 'clone',
+                      WebkitBoxDecorationBreak: 'clone',
+                      lineHeight: '1.5',
                       borderWidth: showBorder ? '1px' : '0',
                       borderStyle: 'solid',
                       borderColor: borderColor

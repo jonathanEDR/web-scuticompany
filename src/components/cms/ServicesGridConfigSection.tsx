@@ -1226,6 +1226,51 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   Configura los colores del fondo, texto y borde de las características resaltadas
                 </p>
                 
+                {/* Estilo de resaltado */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    Estilo de resaltado
+                  </label>
+                  <div className="flex gap-3">
+                    <label className={`flex-1 flex items-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                      gridConfig.cardDesign?.contentConfig?.featureHighlightStyle !== 'box' 
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30' 
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="featureHighlightStyle"
+                        value="highlight"
+                        checked={gridConfig.cardDesign?.contentConfig?.featureHighlightStyle !== 'box'}
+                        onChange={() => handleUpdate('cardDesign.contentConfig.featureHighlightStyle', 'highlight')}
+                        className="w-4 h-4 text-purple-600"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">✨ Resaltado</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Estilo marcador fluido</p>
+                      </div>
+                    </label>
+                    <label className={`flex-1 flex items-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                      gridConfig.cardDesign?.contentConfig?.featureHighlightStyle === 'box' 
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30' 
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="featureHighlightStyle"
+                        value="box"
+                        checked={gridConfig.cardDesign?.contentConfig?.featureHighlightStyle === 'box'}
+                        onChange={() => handleUpdate('cardDesign.contentConfig.featureHighlightStyle', 'box')}
+                        className="w-4 h-4 text-purple-600"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">📦 Caja</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Estilo tarjeta/badge</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                
                 {/* Modo claro */}
                 <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -1536,54 +1581,49 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 
                 {/* Vista previa */}
                 <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Vista previa:</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    Vista previa ({gridConfig.cardDesign?.contentConfig?.featureHighlightStyle === 'box' ? '📦 Caja' : '✨ Resaltado'}):
+                  </p>
                   <div className="flex flex-wrap gap-1.5">
-                    <span
-                      className="text-xs px-2.5 py-1.5 rounded-md font-medium"
-                      style={{
-                        background: gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradient
-                          ? `linear-gradient(${
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-r' ? 'to right' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-l' ? 'to left' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-t' ? 'to top' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-b' ? 'to bottom' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-tr' ? 'to top right' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-br' ? 'to bottom right' : 'to right'
-                            }, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'})`
-                          : (gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'),
-                        color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
-                        borderWidth: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false ? '1px' : '0',
-                        borderStyle: 'solid',
-                        borderColor: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false 
-                          ? (gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC')
-                          : 'transparent'
-                      }}
-                    >
-                      ✓ Característica 1
-                    </span>
-                    <span
-                      className="text-xs px-2.5 py-1.5 rounded-md font-medium"
-                      style={{
-                        background: gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradient
-                          ? `linear-gradient(${
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-r' ? 'to right' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-l' ? 'to left' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-t' ? 'to top' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-b' ? 'to bottom' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-tr' ? 'to top right' :
-                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-br' ? 'to bottom right' : 'to right'
-                            }, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'})`
-                          : (gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'),
-                        color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
-                        borderWidth: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false ? '1px' : '0',
-                        borderStyle: 'solid',
-                        borderColor: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false 
-                          ? (gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC')
-                          : 'transparent'
-                      }}
-                    >
-                      ✓ Característica 2
-                    </span>
+                    {['Característica 1', 'Característica 2'].map((text, idx) => {
+                      const isBoxStyle = gridConfig.cardDesign?.contentConfig?.featureHighlightStyle === 'box';
+                      const bgStyle = gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradient
+                        ? `linear-gradient(${
+                            gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-r' ? 'to right' :
+                            gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-l' ? 'to left' :
+                            gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-t' ? 'to top' :
+                            gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-b' ? 'to bottom' :
+                            gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-tr' ? 'to top right' :
+                            gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-br' ? 'to bottom right' : 'to right'
+                          }, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'})`
+                        : (gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF');
+                      const showBorder = gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false;
+                      
+                      return (
+                        <span
+                          key={idx}
+                          className={`font-medium ${isBoxStyle ? 'text-xs px-2.5 py-1.5 rounded-md' : 'text-sm'}`}
+                          style={isBoxStyle ? {
+                            background: bgStyle,
+                            color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
+                            borderWidth: showBorder ? '1px' : '0',
+                            borderStyle: 'solid',
+                            borderColor: showBorder ? (gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC') : 'transparent'
+                          } : {
+                            color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
+                            background: bgStyle,
+                            padding: '0.1em 0.35em',
+                            borderRadius: '0.2em',
+                            lineHeight: '1.5',
+                            borderWidth: showBorder ? '1px' : '0',
+                            borderStyle: 'solid',
+                            borderColor: showBorder ? (gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC') : 'transparent'
+                          }}
+                        >
+                          ✓ {text}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
