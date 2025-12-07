@@ -1322,32 +1322,45 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                     )}
                   </div>
                   
-                  {/* Texto y Borde */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-                        Texto
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="color"
-                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
-                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColor', e.target.value)}
-                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
-                        />
-                        <input
-                          type="text"
-                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
-                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColor', e.target.value)}
-                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
-                          placeholder="#6B21A8"
-                        />
-                      </div>
+                  {/* Texto */}
+                  <div className="mb-4">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
+                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                      />
+                      <input
+                        type="text"
+                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
+                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColor', e.target.value)}
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                        placeholder="#6B21A8"
+                      />
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  </div>
+                  
+                  {/* Borde con checkbox */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
                         Borde
                       </label>
+                      <label className="flex items-center gap-2 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightShowBorder', e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-gray-600 dark:text-gray-400">Mostrar borde</span>
+                      </label>
+                    </div>
+                    {gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false && (
                       <div className="flex gap-2">
                         <input
                           type="color"
@@ -1363,7 +1376,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                           placeholder="#C084FC"
                         />
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
@@ -1463,32 +1476,45 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                     )}
                   </div>
                   
-                  {/* Texto y Borde */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">
-                        Texto
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="color"
-                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
-                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColorDark', e.target.value)}
-                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
-                        />
-                        <input
-                          type="text"
-                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
-                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColorDark', e.target.value)}
-                          className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
-                          placeholder="#E9D5FF"
-                        />
-                      </div>
+                  {/* Texto */}
+                  <div className="mb-4">
+                    <label className="block text-xs font-medium text-gray-400 mb-2">
+                      Texto
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
+                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
+                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColorDark', e.target.value)}
+                        className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        placeholder="#E9D5FF"
+                      />
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">
+                  </div>
+                  
+                  {/* Borde con checkbox */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs font-medium text-gray-400">
                         Borde
                       </label>
+                      <label className="flex items-center gap-2 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorderDark !== false}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightShowBorderDark', e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-gray-400">Mostrar borde</span>
+                      </label>
+                    </div>
+                    {gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorderDark !== false && (
                       <div className="flex gap-2">
                         <input
                           type="color"
@@ -1504,7 +1530,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                           placeholder="#7C3AED"
                         />
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
                 
@@ -1526,9 +1552,11 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                             }, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'})`
                           : (gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'),
                         color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
-                        borderWidth: '1px',
+                        borderWidth: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false ? '1px' : '0',
                         borderStyle: 'solid',
-                        borderColor: gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC'
+                        borderColor: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false 
+                          ? (gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC')
+                          : 'transparent'
                       }}
                     >
                       ✓ Característica 1
@@ -1547,9 +1575,11 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                             }, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'})`
                           : (gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'),
                         color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
-                        borderWidth: '1px',
+                        borderWidth: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false ? '1px' : '0',
                         borderStyle: 'solid',
-                        borderColor: gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC'
+                        borderColor: gridConfig.cardDesign?.contentConfig?.featureHighlightShowBorder !== false 
+                          ? (gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC')
+                          : 'transparent'
                       }}
                     >
                       ✓ Característica 2

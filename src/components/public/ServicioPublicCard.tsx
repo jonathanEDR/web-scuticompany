@@ -40,6 +40,8 @@ interface CardContentConfig {
   featureHighlightTextColorDark?: string; // Color del texto modo oscuro
   featureHighlightBorderColor?: string; // Color del borde
   featureHighlightBorderColorDark?: string; // Color del borde modo oscuro
+  featureHighlightShowBorder?: boolean; // Mostrar borde (modo claro)
+  featureHighlightShowBorderDark?: boolean; // Mostrar borde (modo oscuro)
   // Gradiente para fondo de características
   featureHighlightBgGradient?: boolean;
   featureHighlightBgGradientFrom?: string;
@@ -398,9 +400,16 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
                   ? (content.featureHighlightTextColorDark || '#E9D5FF')
                   : (content.featureHighlightTextColor || '#6B21A8');
                 
-                const borderColor = currentTheme === 'dark'
-                  ? (content.featureHighlightBorderColorDark || '#7C3AED')
-                  : (content.featureHighlightBorderColor || '#C084FC');
+                // Verificar si se debe mostrar borde
+                const showBorder = currentTheme === 'dark'
+                  ? (content.featureHighlightShowBorderDark !== false)
+                  : (content.featureHighlightShowBorder !== false);
+                
+                const borderColor = showBorder 
+                  ? (currentTheme === 'dark'
+                      ? (content.featureHighlightBorderColorDark || '#7C3AED')
+                      : (content.featureHighlightBorderColor || '#C084FC'))
+                  : 'transparent';
                 
                 return (
                   <span
@@ -409,7 +418,7 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
                     style={{
                       background: bgStyle,
                       color: textColor,
-                      borderWidth: '1px',
+                      borderWidth: showBorder ? '1px' : '0',
                       borderStyle: 'solid',
                       borderColor: borderColor
                     }}
