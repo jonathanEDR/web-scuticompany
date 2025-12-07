@@ -40,6 +40,15 @@ interface CardContentConfig {
   featureHighlightTextColorDark?: string; // Color del texto modo oscuro
   featureHighlightBorderColor?: string; // Color del borde
   featureHighlightBorderColorDark?: string; // Color del borde modo oscuro
+  // Gradiente para fondo de características
+  featureHighlightBgGradient?: boolean;
+  featureHighlightBgGradientFrom?: string;
+  featureHighlightBgGradientTo?: string;
+  featureHighlightBgGradientDir?: string;
+  featureHighlightBgGradientDark?: boolean;
+  featureHighlightBgGradientFromDark?: string;
+  featureHighlightBgGradientToDark?: string;
+  featureHighlightBgGradientDirDark?: string;
   
   // Precio
   showPrice?: boolean;
@@ -349,42 +358,60 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
           <div className="mb-4">
             <div className="flex flex-wrap gap-1.5">
               {servicio.caracteristicas.slice(0, maxFeatures).map((caracteristica, idx) => {
-                // Obtener colores configurables o usar defaults según el tema actual
-                const bgColor = currentTheme === 'dark'
-                  ? (content.featureHighlightBgColorDark || '#581C87') // purple-900
-                  : (content.featureHighlightBgColor || '#F3E8FF'); // purple-100
+                // Función para convertir dirección a CSS
+                const getGradientDirection = (dir: string) => {
+                  switch(dir) {
+                    case 'to-r': return 'to right';
+                    case 'to-l': return 'to left';
+                    case 'to-t': return 'to top';
+                    case 'to-b': return 'to bottom';
+                    case 'to-tr': return 'to top right';
+                    case 'to-br': return 'to bottom right';
+                    default: return 'to right';
+                  }
+                };
+                
+                // Obtener fondo (gradiente o sólido) según el tema
+                const getBgStyle = () => {
+                  if (currentTheme === 'dark') {
+                    if (content.featureHighlightBgGradientDark) {
+                      const from = content.featureHighlightBgGradientFromDark || '#581C87';
+                      const to = content.featureHighlightBgGradientToDark || '#7C3AED';
+                      const dir = getGradientDirection(content.featureHighlightBgGradientDirDark || 'to-r');
+                      return `linear-gradient(${dir}, ${from}, ${to})`;
+                    }
+                    return content.featureHighlightBgColorDark || '#581C87';
+                  } else {
+                    if (content.featureHighlightBgGradient) {
+                      const from = content.featureHighlightBgGradientFrom || '#F3E8FF';
+                      const to = content.featureHighlightBgGradientTo || '#E9D5FF';
+                      const dir = getGradientDirection(content.featureHighlightBgGradientDir || 'to-r');
+                      return `linear-gradient(${dir}, ${from}, ${to})`;
+                    }
+                    return content.featureHighlightBgColor || '#F3E8FF';
+                  }
+                };
+                
+                const bgStyle = getBgStyle();
                 
                 const textColor = currentTheme === 'dark'
-                  ? (content.featureHighlightTextColorDark || '#E9D5FF') // purple-200
-                  : (content.featureHighlightTextColor || '#6B21A8'); // purple-800
+                  ? (content.featureHighlightTextColorDark || '#E9D5FF')
+                  : (content.featureHighlightTextColor || '#6B21A8');
                 
                 const borderColor = currentTheme === 'dark'
-                  ? (content.featureHighlightBorderColorDark || '#7C3AED') // purple-600
-                  : (content.featureHighlightBorderColor || '#C084FC'); // purple-400
+                  ? (content.featureHighlightBorderColorDark || '#7C3AED')
+                  : (content.featureHighlightBorderColor || '#C084FC');
                 
                 return (
                   <span
                     key={idx}
                     className="text-xs px-2.5 py-1.5 rounded-md font-medium transition-all duration-200 hover:scale-105"
                     style={{
-                      backgroundColor: 'var(--feature-bg)',
-                      color: 'var(--feature-text)',
+                      background: bgStyle,
+                      color: textColor,
                       borderWidth: '1px',
                       borderStyle: 'solid',
-                      borderColor: 'var(--feature-border)',
-                      '--feature-bg': bgColor,
-                      '--feature-text': textColor,
-                      '--feature-border': borderColor
-                    } as React.CSSProperties & Record<string, string>}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.setProperty('--feature-bg', textColor);
-                      e.currentTarget.style.setProperty('--feature-text', bgColor);
-                      e.currentTarget.style.setProperty('--feature-border', textColor);
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.setProperty('--feature-bg', bgColor);
-                      e.currentTarget.style.setProperty('--feature-text', textColor);
-                      e.currentTarget.style.setProperty('--feature-border', borderColor);
+                      borderColor: borderColor
                     }}
                   >
                     ✓ {caracteristica}

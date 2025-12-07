@@ -1227,115 +1227,304 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 </p>
                 
                 {/* Modo claro */}
-                <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     ☀️ Modo Claro
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  
+                  {/* Fondo con opción de gradiente */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
                         Fondo
                       </label>
-                      <input
-                        type="color"
-                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'}
-                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgColor', e.target.value)}
-                        className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                      />
-                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                        {gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'}
-                      </span>
+                      <label className="flex items-center gap-2 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradient === true}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradient', e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-gray-600 dark:text-gray-400">Usar gradiente</span>
+                      </label>
                     </div>
+                    
+                    {gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradient ? (
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Inicio</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientFrom', e.target.value)}
+                              className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                            />
+                            <input
+                              type="text"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientFrom', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              placeholder="#F3E8FF"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Fin</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientTo', e.target.value)}
+                              className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                            />
+                            <input
+                              type="text"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientTo', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              placeholder="#E9D5FF"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                          <select
+                            value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir || 'to-r'}
+                            onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientDir', e.target.value)}
+                            className="w-full h-10 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            <option value="to-r">→ Derecha</option>
+                            <option value="to-l">← Izquierda</option>
+                            <option value="to-t">↑ Arriba</option>
+                            <option value="to-b">↓ Abajo</option>
+                            <option value="to-tr">↗ Diagonal ↗</option>
+                            <option value="to-br">↘ Diagonal ↘</option>
+                          </select>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgColor', e.target.value)}
+                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          placeholder="#F3E8FF"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Texto y Borde */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                         Texto
                       </label>
-                      <input
-                        type="color"
-                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
-                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColor', e.target.value)}
-                        className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                      />
-                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                        {gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
-                      </span>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColor', e.target.value)}
+                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          placeholder="#6B21A8"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                         Borde
                       </label>
-                      <input
-                        type="color"
-                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC'}
-                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBorderColor', e.target.value)}
-                        className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                      />
-                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                        {gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC'}
-                      </span>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBorderColor', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColor || '#C084FC'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBorderColor', e.target.value)}
+                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          placeholder="#C084FC"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Modo oscuro */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div className="mb-4 p-4 bg-gray-800 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
                     🌙 Modo Oscuro
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  
+                  {/* Fondo con opción de gradiente */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs font-medium text-gray-400">
                         Fondo
                       </label>
-                      <input
-                        type="color"
-                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgColorDark || '#581C87'}
-                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgColorDark', e.target.value)}
-                        className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                      />
-                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                        {gridConfig.cardDesign?.contentConfig?.featureHighlightBgColorDark || '#581C87'}
-                      </span>
+                      <label className="flex items-center gap-2 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDark === true}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientDark', e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-gray-400">Usar gradiente</span>
+                      </label>
                     </div>
+                    
+                    {gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDark ? (
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Inicio</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFromDark || '#581C87'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientFromDark', e.target.value)}
+                              className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                            />
+                            <input
+                              type="text"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFromDark || '#581C87'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientFromDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white"
+                              placeholder="#581C87"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Color Fin</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientToDark || '#7C3AED'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientToDark', e.target.value)}
+                              className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                            />
+                            <input
+                              type="text"
+                              value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientToDark || '#7C3AED'}
+                              onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientToDark', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white"
+                              placeholder="#7C3AED"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                          <select
+                            value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDirDark || 'to-r'}
+                            onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgGradientDirDark', e.target.value)}
+                            className="w-full h-10 px-2 text-xs border border-gray-600 rounded bg-gray-700 text-white"
+                          >
+                            <option value="to-r">→ Derecha</option>
+                            <option value="to-l">← Izquierda</option>
+                            <option value="to-t">↑ Arriba</option>
+                            <option value="to-b">↓ Abajo</option>
+                            <option value="to-tr">↗ Diagonal ↗</option>
+                            <option value="to-br">↘ Diagonal ↘</option>
+                          </select>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgColorDark || '#581C87'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBgColorDark || '#581C87'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBgColorDark', e.target.value)}
+                          className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                          placeholder="#581C87"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Texto y Borde */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-gray-400 mb-2">
                         Texto
                       </label>
-                      <input
-                        type="color"
-                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
-                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColorDark', e.target.value)}
-                        className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                      />
-                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                        {gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
-                      </span>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightTextColorDark || '#E9D5FF'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightTextColorDark', e.target.value)}
+                          className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                          placeholder="#E9D5FF"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      <label className="block text-xs font-medium text-gray-400 mb-2">
                         Borde
                       </label>
-                      <input
-                        type="color"
-                        value={gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColorDark || '#7C3AED'}
-                        onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBorderColorDark', e.target.value)}
-                        className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                      />
-                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                        {gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColorDark || '#7C3AED'}
-                      </span>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColorDark || '#7C3AED'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBorderColorDark', e.target.value)}
+                          className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={gridConfig.cardDesign?.contentConfig?.featureHighlightBorderColorDark || '#7C3AED'}
+                          onChange={(e) => handleUpdate('cardDesign.contentConfig.featureHighlightBorderColorDark', e.target.value)}
+                          className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                          placeholder="#7C3AED"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
                 
                 {/* Vista previa */}
-                <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Vista previa:</p>
                   <div className="flex flex-wrap gap-1.5">
                     <span
                       className="text-xs px-2.5 py-1.5 rounded-md font-medium"
                       style={{
-                        backgroundColor: gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF',
+                        background: gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradient
+                          ? `linear-gradient(${
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-r' ? 'to right' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-l' ? 'to left' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-t' ? 'to top' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-b' ? 'to bottom' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-tr' ? 'to top right' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-br' ? 'to bottom right' : 'to right'
+                            }, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'})`
+                          : (gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'),
                         color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
                         borderWidth: '1px',
                         borderStyle: 'solid',
@@ -1347,7 +1536,16 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                     <span
                       className="text-xs px-2.5 py-1.5 rounded-md font-medium"
                       style={{
-                        backgroundColor: gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF',
+                        background: gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradient
+                          ? `linear-gradient(${
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-r' ? 'to right' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-l' ? 'to left' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-t' ? 'to top' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-b' ? 'to bottom' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-tr' ? 'to top right' :
+                              gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientDir === 'to-br' ? 'to bottom right' : 'to right'
+                            }, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientFrom || '#F3E8FF'}, ${gridConfig.cardDesign?.contentConfig?.featureHighlightBgGradientTo || '#E9D5FF'})`
+                          : (gridConfig.cardDesign?.contentConfig?.featureHighlightBgColor || '#F3E8FF'),
                         color: gridConfig.cardDesign?.contentConfig?.featureHighlightTextColor || '#6B21A8',
                         borderWidth: '1px',
                         borderStyle: 'solid',
