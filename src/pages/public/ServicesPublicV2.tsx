@@ -161,6 +161,7 @@ const ServicesPublicV2 = () => {
   const filtros: ServicioFilters = useMemo(() => ({
     visibleEnWeb: true,
     activo: true,
+    limit: 100, // Obtener todos los servicios para paginar en frontend
     ...(busqueda && { search: busqueda }),
     ...(categoriaSeleccionada && { categoria: categoriaSeleccionada }),
     sort: ordenamiento === 'destacado' ? '-destacado,-createdAt' : ordenamiento

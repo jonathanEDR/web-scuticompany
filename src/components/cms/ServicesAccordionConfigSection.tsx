@@ -49,12 +49,24 @@ interface AccordionConfig {
   featureIconColorDark?: string;
   maxFeatures?: number;
   // Colores de resaltado de características
+  featureHighlightStyle?: 'highlight' | 'box';
   featureHighlightBgColor?: string;
   featureHighlightBgColorDark?: string;
   featureHighlightTextColor?: string;
   featureHighlightTextColorDark?: string;
   featureHighlightBorderColor?: string;
   featureHighlightBorderColorDark?: string;
+  featureHighlightShowBorder?: boolean;
+  featureHighlightShowBorderDark?: boolean;
+  // Gradientes para características
+  featureHighlightBgGradient?: boolean;
+  featureHighlightBgGradientFrom?: string;
+  featureHighlightBgGradientTo?: string;
+  featureHighlightBgGradientDir?: string;
+  featureHighlightBgGradientDark?: boolean;
+  featureHighlightBgGradientFromDark?: string;
+  featureHighlightBgGradientToDark?: string;
+  featureHighlightBgGradientDirDark?: string;
   backgroundImage?: {
     light?: string;
     dark?: string;
@@ -122,6 +134,16 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
   config,
   onChange
 }) => {
+  // Estado para controlar qué secciones están abiertas (todas cerradas por defecto)
+  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({});
+  
+  const toggleSection = (sectionId: string) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+  
   const handleUpdate = (field: string, value: any) => {
     const keys = field.split('.');
     if (keys.length === 1) {
@@ -179,12 +201,23 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
         <div className="space-y-6">
           
           {/* ===== TEXTOS DE LA SECCIÓN ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              ✏️ Textos de la Sección
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('textos')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                ✏️ Textos de la Sección
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['textos'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {openSections['textos'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Título de la sección
@@ -210,16 +243,29 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-            </div>
+              </div>
+              </div>
+            )}
           </div>
 
           {/* ===== TIPOGRAFÍA ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              🔤 Tipografía
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('tipografia')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🔤 Tipografía
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['tipografia'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {openSections['tipografia'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Fuente de títulos
@@ -272,46 +318,38 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   <option value="800">Extra Bold (800)</option>
                 </select>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Items por página
-                </label>
-                <select
-                  value={config.itemsPerPage || 9}
-                  onChange={(e) => handleUpdate('itemsPerPage', parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="6">6 servicios</option>
-                  <option value="8">8 servicios</option>
-                  <option value="9">9 servicios</option>
-                  <option value="10">10 servicios</option>
-                  <option value="12">12 servicios</option>
-                  <option value="15">15 servicios</option>
-                </select>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Servicios mostrados por página
-                </p>
-              </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== COLORES MODO CLARO ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              ☀️ Colores Modo Claro
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('coloresClaro')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                ☀️ Colores Modo Claro
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['coloresClaro'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Título sección con opción de gradiente */}
-              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Título sección
-                </label>
-                
-                {/* Toggle Gradiente */}
-                <div className="flex items-center gap-3 mb-3">
-                  <label className="relative inline-flex items-center cursor-pointer">
+            {openSections['coloresClaro'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Título sección con opción de gradiente */}
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Título sección
+                    </label>
+                    
+                    {/* Toggle Gradiente */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
                       checked={config.titleUseGradient || false}
@@ -432,23 +470,36 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 </div>
               </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== COLORES MODO OSCURO ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              🌙 Colores Modo Oscuro
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('coloresOscuro')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🌙 Colores Modo Oscuro
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['coloresOscuro'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Título sección con opción de gradiente - Modo Oscuro */}
-              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Título sección
-                </label>
-                
-                {/* Toggle Gradiente */}
-                <div className="flex items-center gap-3 mb-3">
+            {openSections['coloresOscuro'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Título sección con opción de gradiente - Modo Oscuro */}
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Título sección
+                    </label>
+                    
+                    {/* Toggle Gradiente */}
+                    <div className="flex items-center gap-3 mb-3">
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -572,20 +623,33 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 </div>
               </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== LÍNEAS DE SEPARACIÓN ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              ➖ Líneas de Separación
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('lineas')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                ➖ Líneas de Separación
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['lineas'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="space-y-4">
-              {/* Grosor de línea */}
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Grosor de línea: {config.separatorLineWidth || 2}px
-                </label>
+            {openSections['lineas'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="space-y-4">
+                  {/* Grosor de línea */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Grosor de línea: {config.separatorLineWidth || 2}px
+                    </label>
                 <input
                   type="range"
                   min="1"
@@ -731,28 +795,41 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 </div>
               </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== FONDO DEL CONTENIDO EXPANDIDO ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              🎨 Fondo del Contenido Expandido
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('fondoExpandido')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🎨 Fondo del Contenido Expandido
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['fondoExpandido'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="space-y-4">
-              {/* Opacidad del fondo */}
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Opacidad: {((config.expandedBgOpacity ?? 0.8) * 100).toFixed(0)}%
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={config.expandedBgOpacity ?? 0.8}
-                  onChange={(e) => handleUpdate('expandedBgOpacity', parseFloat(e.target.value))}
-                  className="w-full"
+            {openSections['fondoExpandido'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="space-y-4">
+                  {/* Opacidad del fondo */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Opacidad: {((config.expandedBgOpacity ?? 0.8) * 100).toFixed(0)}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={config.expandedBgOpacity ?? 0.8}
+                      onChange={(e) => handleUpdate('expandedBgOpacity', parseFloat(e.target.value))}
+                      className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                   <span>Transparente (0%)</span>
@@ -886,30 +963,43 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 </div>
               </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== FONDO DEL HEADER (BOTÓN ACORDEÓN) ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              🎨 Fondo del Header (Botón)
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('fondoHeader')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🎨 Fondo del Header (Botón)
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['fondoHeader'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="space-y-4">
-              {/* Opacidad normal */}
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Opacidad (estado normal): {((config.headerBgOpacity ?? 0.6) * 100).toFixed(0)}%
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={config.headerBgOpacity ?? 0.6}
-                  onChange={(e) => handleUpdate('headerBgOpacity', parseFloat(e.target.value))}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {openSections['fondoHeader'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="space-y-4">
+                  {/* Opacidad normal */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Opacidad (estado normal): {((config.headerBgOpacity ?? 0.6) * 100).toFixed(0)}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={config.headerBgOpacity ?? 0.6}
+                      onChange={(e) => handleUpdate('headerBgOpacity', parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                   <span>Transparente (0%)</span>
                   <span>Semi (50%)</span>
                   <span>Opaco (100%)</span>
@@ -1093,30 +1183,43 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 </div>
               </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== PAGINACIÓN ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              📄 Colores de Paginación
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('paginacion')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                📄 Colores de Paginación
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['paginacion'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Modo Claro */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                  ☀️ Modo Claro
-                </h4>
-                
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                      Fondo botones
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="color"
-                        value={config.paginationBgColor || '#ffffff'}
+            {openSections['paginacion'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Modo Claro */}
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                      ☀️ Modo Claro
+                    </h4>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Fondo botones
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.paginationBgColor || '#ffffff'}
                         onChange={(e) => handleUpdate('paginationBgColor', e.target.value)}
                         className="w-10 h-10 rounded cursor-pointer"
                       />
@@ -1428,13 +1531,27 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 </div>
               </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== BOTÓN ===== */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              🔘 Botón "Ver más"
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('boton')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🔘 Botón "Ver más"
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['boton'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {openSections['boton'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             
             {/* Fila 1: Texto y configuración básica */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -1659,259 +1776,512 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 Configura los colores del fondo, texto y borde de las características resaltadas
               </p>
               
-              {/* Modo claro */}
+              {/* Estilo de resaltado */}
               <div className="mb-4">
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  Estilo de resaltado
+                </label>
+                <div className="flex gap-3">
+                  <label className={`flex-1 flex items-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                    config.featureHighlightStyle !== 'box' 
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30' 
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="accordionFeatureHighlightStyle"
+                      value="highlight"
+                      checked={config.featureHighlightStyle !== 'box'}
+                      onChange={() => handleUpdate('featureHighlightStyle', 'highlight')}
+                      className="w-4 h-4 text-purple-600"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">✨ Resaltado</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Estilo marcador fluido</p>
+                    </div>
+                  </label>
+                  <label className={`flex-1 flex items-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                    config.featureHighlightStyle === 'box' 
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30' 
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="accordionFeatureHighlightStyle"
+                      value="box"
+                      checked={config.featureHighlightStyle === 'box'}
+                      onChange={() => handleUpdate('featureHighlightStyle', 'box')}
+                      className="w-4 h-4 text-purple-600"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">📦 Caja</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Estilo tarjeta/badge</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              {/* Modo claro */}
+              <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   ☀️ Modo Claro
                 </label>
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                
+                {/* Fondo con opción de gradiente */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
                       Fondo
                     </label>
-                    <div className="flex items-center gap-1">
+                    <label className="flex items-center gap-2 text-xs">
                       <input
-                        type="color"
-                        value={config.featureHighlightBgColor || '#F3E8FF'}
-                        onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                        type="checkbox"
+                        checked={config.featureHighlightBgGradient === true}
+                        onChange={(e) => handleUpdate('featureHighlightBgGradient', e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                       />
-                      <input
-                        type="text"
-                        value={config.featureHighlightBgColor || '#F3E8FF'}
-                        onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      Texto
+                      <span className="text-gray-600 dark:text-gray-400">Usar gradiente</span>
                     </label>
-                    <div className="flex items-center gap-1">
+                  </div>
+                  
+                  {config.featureHighlightBgGradient ? (
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Color Inicio</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.featureHighlightBgGradientFrom || '#F3E8FF'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientFrom', e.target.value)}
+                            className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                          />
+                          <input
+                            type="text"
+                            value={config.featureHighlightBgGradientFrom || '#F3E8FF'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientFrom', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            placeholder="#F3E8FF"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Color Fin</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.featureHighlightBgGradientTo || '#E9D5FF'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientTo', e.target.value)}
+                            className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                          />
+                          <input
+                            type="text"
+                            value={config.featureHighlightBgGradientTo || '#E9D5FF'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientTo', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            placeholder="#E9D5FF"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                        <select
+                          value={config.featureHighlightBgGradientDir || 'to-r'}
+                          onChange={(e) => handleUpdate('featureHighlightBgGradientDir', e.target.value)}
+                          className="w-full h-10 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="to-r">→ Derecha</option>
+                          <option value="to-l">← Izquierda</option>
+                          <option value="to-t">↑ Arriba</option>
+                          <option value="to-b">↓ Abajo</option>
+                          <option value="to-tr">↗ Diagonal ↗</option>
+                          <option value="to-br">↘ Diagonal ↘</option>
+                        </select>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
                       <input
                         type="color"
-                        value={config.featureHighlightTextColor || '#6B21A8'}
-                        onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                        value={config.featureHighlightBgColor || '#F3E8FF'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
                       />
                       <input
                         type="text"
-                        value={config.featureHighlightTextColor || '#6B21A8'}
-                        onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                        value={config.featureHighlightBgColor || '#F3E8FF'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColor', e.target.value)}
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                        placeholder="#F3E8FF"
                       />
                     </div>
+                  )}
+                </div>
+                
+                {/* Texto */}
+                <div className="mb-4">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    Texto
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={config.featureHighlightTextColor || '#6B21A8'}
+                      onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={config.featureHighlightTextColor || '#6B21A8'}
+                      onChange={(e) => handleUpdate('featureHighlightTextColor', e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                      placeholder="#6B21A8"
+                    />
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                </div>
+                
+                {/* Borde con checkbox */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
                       Borde
                     </label>
-                    <div className="flex items-center gap-1">
+                    <label className="flex items-center gap-2 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={config.featureHighlightShowBorder !== false}
+                        onChange={(e) => handleUpdate('featureHighlightShowBorder', e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-gray-600 dark:text-gray-400">Mostrar borde</span>
+                    </label>
+                  </div>
+                  {config.featureHighlightShowBorder !== false && (
+                    <div className="flex gap-2">
                       <input
                         type="color"
                         value={config.featureHighlightBorderColor || '#C084FC'}
                         onChange={(e) => handleUpdate('featureHighlightBorderColor', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-300"
                       />
                       <input
                         type="text"
                         value={config.featureHighlightBorderColor || '#C084FC'}
                         onChange={(e) => handleUpdate('featureHighlightBorderColor', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                        placeholder="#C084FC"
                       />
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
               {/* Modo oscuro */}
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="mb-4 p-4 bg-gray-800 rounded-lg">
+                <label className="block text-sm font-medium text-gray-300 mb-3">
                   🌙 Modo Oscuro
                 </label>
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                
+                {/* Fondo con opción de gradiente */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-medium text-gray-400">
                       Fondo
                     </label>
-                    <div className="flex items-center gap-1">
+                    <label className="flex items-center gap-2 text-xs">
                       <input
-                        type="color"
-                        value={config.featureHighlightBgColorDark || '#581C87'}
-                        onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                        type="checkbox"
+                        checked={config.featureHighlightBgGradientDark === true}
+                        onChange={(e) => handleUpdate('featureHighlightBgGradientDark', e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500"
                       />
-                      <input
-                        type="text"
-                        value={config.featureHighlightBgColorDark || '#581C87'}
-                        onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      Texto
+                      <span className="text-gray-400">Usar gradiente</span>
                     </label>
-                    <div className="flex items-center gap-1">
+                  </div>
+                  
+                  {config.featureHighlightBgGradientDark ? (
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Color Inicio</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.featureHighlightBgGradientFromDark || '#581C87'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientFromDark', e.target.value)}
+                            className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.featureHighlightBgGradientFromDark || '#581C87'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientFromDark', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white"
+                            placeholder="#581C87"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Color Fin</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.featureHighlightBgGradientToDark || '#7C3AED'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientToDark', e.target.value)}
+                            className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.featureHighlightBgGradientToDark || '#7C3AED'}
+                            onChange={(e) => handleUpdate('featureHighlightBgGradientToDark', e.target.value)}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white"
+                            placeholder="#7C3AED"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Dirección</label>
+                        <select
+                          value={config.featureHighlightBgGradientDirDark || 'to-r'}
+                          onChange={(e) => handleUpdate('featureHighlightBgGradientDirDark', e.target.value)}
+                          className="w-full h-10 px-2 text-xs border border-gray-600 rounded bg-gray-700 text-white"
+                        >
+                          <option value="to-r">→ Derecha</option>
+                          <option value="to-l">← Izquierda</option>
+                          <option value="to-t">↑ Arriba</option>
+                          <option value="to-b">↓ Abajo</option>
+                          <option value="to-tr">↗ Diagonal ↗</option>
+                          <option value="to-br">↘ Diagonal ↘</option>
+                        </select>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
                       <input
                         type="color"
-                        value={config.featureHighlightTextColorDark || '#E9D5FF'}
-                        onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                        value={config.featureHighlightBgColorDark || '#581C87'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
                       />
                       <input
                         type="text"
-                        value={config.featureHighlightTextColorDark || '#E9D5FF'}
-                        onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                        value={config.featureHighlightBgColorDark || '#581C87'}
+                        onChange={(e) => handleUpdate('featureHighlightBgColorDark', e.target.value)}
+                        className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        placeholder="#581C87"
                       />
                     </div>
+                  )}
+                </div>
+                
+                {/* Texto */}
+                <div className="mb-4">
+                  <label className="block text-xs font-medium text-gray-400 mb-2">
+                    Texto
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={config.featureHighlightTextColorDark || '#E9D5FF'}
+                      onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer border border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={config.featureHighlightTextColorDark || '#E9D5FF'}
+                      onChange={(e) => handleUpdate('featureHighlightTextColorDark', e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                      placeholder="#E9D5FF"
+                    />
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                </div>
+                
+                {/* Borde con checkbox */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-medium text-gray-400">
                       Borde
                     </label>
-                    <div className="flex items-center gap-1">
+                    <label className="flex items-center gap-2 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={config.featureHighlightShowBorderDark !== false}
+                        onChange={(e) => handleUpdate('featureHighlightShowBorderDark', e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-gray-400">Mostrar borde</span>
+                    </label>
+                  </div>
+                  {config.featureHighlightShowBorderDark !== false && (
+                    <div className="flex gap-2">
                       <input
                         type="color"
                         value={config.featureHighlightBorderColorDark || '#7C3AED'}
                         onChange={(e) => handleUpdate('featureHighlightBorderColorDark', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer flex-shrink-0"
+                        className="w-10 h-10 rounded cursor-pointer border border-gray-600"
                       />
                       <input
                         type="text"
                         value={config.featureHighlightBorderColorDark || '#7C3AED'}
                         onChange={(e) => handleUpdate('featureHighlightBorderColorDark', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                        className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        placeholder="#7C3AED"
                       />
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
               
               {/* Vista previa */}
-              <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Vista previa:</p>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  Vista previa ({config.featureHighlightStyle === 'box' ? '📦 Caja' : '✨ Resaltado'}):
+                </p>
                 <div className="flex flex-wrap gap-1.5">
-                  <span
-                    className="text-xs px-2.5 py-1.5 rounded-md font-medium"
-                    style={{
-                      backgroundColor: config.featureHighlightBgColor || '#F3E8FF',
-                      color: config.featureHighlightTextColor || '#6B21A8',
-                      borderWidth: '1px',
-                      borderStyle: 'solid',
-                      borderColor: config.featureHighlightBorderColor || '#C084FC'
-                    }}
-                  >
-                    ✓ Característica 1
-                  </span>
-                  <span
-                    className="text-xs px-2.5 py-1.5 rounded-md font-medium"
-                    style={{
-                      backgroundColor: config.featureHighlightBgColor || '#F3E8FF',
-                      color: config.featureHighlightTextColor || '#6B21A8',
-                      borderWidth: '1px',
-                      borderStyle: 'solid',
-                      borderColor: config.featureHighlightBorderColor || '#C084FC'
-                    }}
-                  >
-                    ✓ Característica 2
-                  </span>
+                  {['Característica 1', 'Característica 2'].map((text, idx) => {
+                    const isBoxStyle = config.featureHighlightStyle === 'box';
+                    const bgStyle = config.featureHighlightBgGradient
+                      ? `linear-gradient(${
+                          config.featureHighlightBgGradientDir === 'to-r' ? 'to right' :
+                          config.featureHighlightBgGradientDir === 'to-l' ? 'to left' :
+                          config.featureHighlightBgGradientDir === 'to-t' ? 'to top' :
+                          config.featureHighlightBgGradientDir === 'to-b' ? 'to bottom' :
+                          config.featureHighlightBgGradientDir === 'to-tr' ? 'to top right' :
+                          config.featureHighlightBgGradientDir === 'to-br' ? 'to bottom right' : 'to right'
+                        }, ${config.featureHighlightBgGradientFrom || '#F3E8FF'}, ${config.featureHighlightBgGradientTo || '#E9D5FF'})`
+                      : (config.featureHighlightBgColor || '#F3E8FF');
+                    const showBorder = config.featureHighlightShowBorder !== false;
+                    
+                    return (
+                      <span
+                        key={idx}
+                        className={`font-medium ${isBoxStyle ? 'text-xs px-2.5 py-1.5 rounded-md' : 'text-sm'}`}
+                        style={isBoxStyle ? {
+                          background: bgStyle,
+                          color: config.featureHighlightTextColor || '#6B21A8',
+                          borderWidth: showBorder ? '1px' : '0',
+                          borderStyle: 'solid',
+                          borderColor: showBorder ? (config.featureHighlightBorderColor || '#C084FC') : 'transparent'
+                        } : {
+                          color: config.featureHighlightTextColor || '#6B21A8',
+                          background: bgStyle,
+                          padding: '0.1em 0.35em',
+                          borderRadius: '0.2em',
+                          lineHeight: '1.5',
+                          borderWidth: showBorder ? '1px' : '0',
+                          borderStyle: 'solid',
+                          borderColor: showBorder ? (config.featureHighlightBorderColor || '#C084FC') : 'transparent'
+                        }}
+                      >
+                        ✓ {text}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>
+              </div>
+            )}
           </div>
 
           {/* ===== FONDO ===== */}
-          <div className="pb-4">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              🖼️ Imagen de Fondo
-            </h3>
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('fondo')}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🖼️ Imagen de Fondo
+              </h3>
+              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['fondo'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <ManagedImageSelector
-                  label="Imagen modo claro"
-                  description="Imagen de fondo para tema claro"
-                  currentImage={config.backgroundImage?.light}
-                  onImageSelect={(url: string) => handleUpdate('backgroundImage.light', url)}
-                  hideButtonArea={!!config.backgroundImage?.light}
-                />
-              </div>
-              
-              <div>
-                <ManagedImageSelector
-                  label="Imagen modo oscuro"
-                  description="Imagen de fondo para tema oscuro"
-                  currentImage={config.backgroundImage?.dark}
-                  onImageSelect={(url: string) => handleUpdate('backgroundImage.dark', url)}
-                  hideButtonArea={!!config.backgroundImage?.dark}
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                Opacidad del fondo: {Math.round((config.backgroundOpacity ?? 0.1) * 100)}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={Math.round((config.backgroundOpacity ?? 0.1) * 100)}
-                onChange={(e) => handleUpdate('backgroundOpacity', parseInt(e.target.value) / 100)}
-                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
-              />
-            </div>
-          </div>
-
-          {/* Vista previa */}
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
-            <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">Vista previa</h4>
-            <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-              <div className="text-center mb-4">
-                <h3 
-                  className="text-xl font-bold italic"
-                  style={{ 
-                    color: config.titleColor || '#8B5CF6',
-                    fontFamily: config.titleFontFamily || 'inherit'
-                  }}
-                >
-                  {config.sectionTitle || 'Todos los servicios'}
-                </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: config.subtitleColor || '#4B5563' }}
-                >
-                  {config.sectionSubtitle || 'Trabajamos para llevar tus operaciones al siguiente nivel.'}
-                </p>
-              </div>
-              
-              <div className="border-t border-b border-gray-200 dark:border-gray-700 py-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span 
-                      className="text-xl font-light"
-                      style={{ color: config.numberColor || '#8B5CF6' }}
-                    >
-                      01
-                    </span>
-                    <span 
-                      className="font-semibold"
-                      style={{ 
-                        color: config.serviceTitleColor || '#1F2937',
-                        fontFamily: config.titleFontFamily || 'inherit'
-                      }}
-                    >
-                      Ejemplo de Servicio
-                    </span>
+            {openSections['fondo'] && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <ManagedImageSelector
+                      label="Imagen modo claro"
+                      description="Imagen de fondo para tema claro"
+                      currentImage={config.backgroundImage?.light}
+                      onImageSelect={(url: string) => handleUpdate('backgroundImage.light', url)}
+                      hideButtonArea={!!config.backgroundImage?.light}
+                    />
                   </div>
-                  <span style={{ color: config.iconColor || '#8B5CF6' }}>▼</span>
+                  
+                  <div>
+                    <ManagedImageSelector
+                      label="Imagen modo oscuro"
+                      description="Imagen de fondo para tema oscuro"
+                      currentImage={config.backgroundImage?.dark}
+                      onImageSelect={(url: string) => handleUpdate('backgroundImage.dark', url)}
+                      hideButtonArea={!!config.backgroundImage?.dark}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    Opacidad del fondo: {Math.round((config.backgroundOpacity ?? 0.1) * 100)}%
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={Math.round((config.backgroundOpacity ?? 0.1) * 100)}
+                    onChange={(e) => handleUpdate('backgroundOpacity', parseInt(e.target.value) / 100)}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                  />
+                </div>
+
+                {/* Vista previa */}
+                <div className="mt-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">Vista previa</h4>
+                  <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <div className="text-center mb-4">
+                      <h3 
+                        className="text-xl font-bold italic"
+                        style={{ 
+                          color: config.titleColor || '#8B5CF6',
+                          fontFamily: config.titleFontFamily || 'inherit'
+                        }}
+                      >
+                        {config.sectionTitle || 'Todos los servicios'}
+                      </h3>
+                      <p 
+                        className="text-sm"
+                        style={{ color: config.subtitleColor || '#4B5563' }}
+                      >
+                        {config.sectionSubtitle || 'Trabajamos para llevar tus operaciones al siguiente nivel.'}
+                      </p>
+                    </div>
+                    
+                    <div className="border-t border-b border-gray-200 dark:border-gray-700 py-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <span 
+                            className="text-xl font-light"
+                            style={{ color: config.numberColor || '#8B5CF6' }}
+                          >
+                            01
+                          </span>
+                          <span 
+                            className="font-semibold"
+                            style={{ 
+                              color: config.serviceTitleColor || '#1F2937',
+                              fontFamily: config.titleFontFamily || 'inherit'
+                            }}
+                          >
+                            Ejemplo de Servicio
+                          </span>
+                        </div>
+                        <span style={{ color: config.iconColor || '#8B5CF6' }}>▼</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
           
         </div>

@@ -68,12 +68,24 @@ interface AccordionConfig {
   featureIconColorDark?: string;
   maxFeatures?: number;
   // Colores de resaltado de características
+  featureHighlightStyle?: 'highlight' | 'box';
   featureHighlightBgColor?: string;
   featureHighlightBgColorDark?: string;
   featureHighlightTextColor?: string;
   featureHighlightTextColorDark?: string;
   featureHighlightBorderColor?: string;
   featureHighlightBorderColorDark?: string;
+  featureHighlightShowBorder?: boolean;
+  featureHighlightShowBorderDark?: boolean;
+  // Gradientes para características
+  featureHighlightBgGradient?: boolean;
+  featureHighlightBgGradientFrom?: string;
+  featureHighlightBgGradientTo?: string;
+  featureHighlightBgGradientDir?: string;
+  featureHighlightBgGradientDark?: boolean;
+  featureHighlightBgGradientFromDark?: string;
+  featureHighlightBgGradientToDark?: string;
+  featureHighlightBgGradientDirDark?: string;
   
   // Background
   backgroundImage?: {
@@ -322,43 +334,87 @@ const AccordionItem: React.FC<AccordionItemProps> = memo(({
             <div className="mb-3">
               <div className="flex flex-wrap gap-1.5">
                 {servicio.caracteristicas.slice(0, config?.maxFeatures || 3).map((caracteristica, idx) => {
-                  // Obtener colores configurables o usar defaults según el tema actual
-                  const bgColor = currentTheme === 'dark'
-                    ? (config?.featureHighlightBgColorDark || '#581C87') // purple-900
-                    : (config?.featureHighlightBgColor || '#F3E8FF'); // purple-100
+                  // Función para obtener dirección del gradiente
+                  const getGradientDirection = (dir: string) => {
+                    switch(dir) {
+                      case 'to-r': return 'to right';
+                      case 'to-l': return 'to left';
+                      case 'to-t': return 'to top';
+                      case 'to-b': return 'to bottom';
+                      case 'to-tr': return 'to top right';
+                      case 'to-br': return 'to bottom right';
+                      default: return 'to right';
+                    }
+                  };
+                  
+                  // Obtener fondo (puede ser gradiente o sólido)
+                  const getBgStyle = () => {
+                    if (currentTheme === 'dark') {
+                      if (config?.featureHighlightBgGradientDark) {
+                        const from = config.featureHighlightBgGradientFromDark || '#581C87';
+                        const to = config.featureHighlightBgGradientToDark || '#7C3AED';
+                        const dir = getGradientDirection(config.featureHighlightBgGradientDirDark || 'to-r');
+                        return `linear-gradient(${dir}, ${from}, ${to})`;
+                      }
+                      return config?.featureHighlightBgColorDark || '#581C87';
+                    } else {
+                      if (config?.featureHighlightBgGradient) {
+                        const from = config.featureHighlightBgGradientFrom || '#F3E8FF';
+                        const to = config.featureHighlightBgGradientTo || '#E9D5FF';
+                        const dir = getGradientDirection(config.featureHighlightBgGradientDir || 'to-r');
+                        return `linear-gradient(${dir}, ${from}, ${to})`;
+                      }
+                      return config?.featureHighlightBgColor || '#F3E8FF';
+                    }
+                  };
+                  
+                  const bgStyle = getBgStyle();
                   
                   const textColor = currentTheme === 'dark'
-                    ? (config?.featureHighlightTextColorDark || '#E9D5FF') // purple-200
-                    : (config?.featureHighlightTextColor || '#6B21A8'); // purple-800
+                    ? (config?.featureHighlightTextColorDark || '#E9D5FF')
+                    : (config?.featureHighlightTextColor || '#6B21A8');
                   
-                  const borderColor = currentTheme === 'dark'
-                    ? (config?.featureHighlightBorderColorDark || '#7C3AED') // purple-600
-                    : (config?.featureHighlightBorderColor || '#C084FC'); // purple-400
+                  // Verificar si se debe mostrar borde
+                  const showBorder = currentTheme === 'dark'
+                    ? (config?.featureHighlightShowBorderDark !== false)
+                    : (config?.featureHighlightShowBorder !== false);
+                  
+                  const borderColor = showBorder 
+                    ? (currentTheme === 'dark'
+                        ? (config?.featureHighlightBorderColorDark || '#7C3AED')
+                        : (config?.featureHighlightBorderColor || '#C084FC'))
+                    : 'transparent';
+                  
+                  // Determinar estilo: 'highlight' (resaltado) o 'box' (caja)
+                  const isBoxStyle = config?.featureHighlightStyle === 'box';
                   
                   return (
                     <span
                       key={idx}
-                      className="text-xs px-2.5 py-1.5 rounded-md font-medium transition-all duration-200 hover:scale-105"
-                      style={{
-                        backgroundColor: 'var(--feature-bg)',
-                        color: 'var(--feature-text)',
-                        borderWidth: '1px',
+                      className={`font-medium transition-all duration-200 ${
+                        isBoxStyle 
+                          ? 'text-xs px-2.5 py-1.5 rounded-md hover:scale-105' 
+                          : 'text-sm inline-block'
+                      }`}
+                      style={isBoxStyle ? {
+                        // Estilo Caja/Badge
+                        background: bgStyle,
+                        color: textColor,
+                        borderWidth: showBorder ? '1px' : '0',
                         borderStyle: 'solid',
-                        borderColor: 'var(--feature-border)',
-                        fontFamily: config?.contentFontFamily || 'inherit',
-                        '--feature-bg': bgColor,
-                        '--feature-text': textColor,
-                        '--feature-border': borderColor
-                      } as React.CSSProperties & Record<string, string>}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.setProperty('--feature-bg', textColor);
-                        e.currentTarget.style.setProperty('--feature-text', bgColor);
-                        e.currentTarget.style.setProperty('--feature-border', textColor);
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.setProperty('--feature-bg', bgColor);
-                        e.currentTarget.style.setProperty('--feature-text', textColor);
-                        e.currentTarget.style.setProperty('--feature-border', borderColor);
+                        borderColor: borderColor,
+                        fontFamily: config?.contentFontFamily || 'inherit'
+                      } : {
+                        // Estilo Resaltado/Highlighter
+                        color: textColor,
+                        background: bgStyle,
+                        padding: '0.1em 0.35em',
+                        borderRadius: '0.2em',
+                        lineHeight: '1.5',
+                        borderWidth: showBorder ? '1px' : '0',
+                        borderStyle: 'solid',
+                        borderColor: borderColor,
+                        fontFamily: config?.contentFontFamily || 'inherit'
                       }}
                     >
                       ✓ {caracteristica}
@@ -446,7 +502,7 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
 }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = config?.itemsPerPage || 9; // Número de servicios por página (configurable)
+  const itemsPerPage = 10; // Número fijo de servicios por página
   
   const isDark = currentTheme === 'dark';
   
