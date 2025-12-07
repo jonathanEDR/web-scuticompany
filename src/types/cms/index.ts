@@ -606,8 +606,13 @@ export interface FeaturedPostsConfig {
     categoryBgColor?: string;
     categoryTextColor?: string;
     tagBgColor?: string;
+    tagBgTransparent?: boolean;
     tagTextColor?: string;
     tagBorderColor?: string;
+    tagBorderUseGradient?: boolean;
+    tagBorderGradientFrom?: string;
+    tagBorderGradientTo?: string;
+    tagBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-br';
     buttonBgColor?: string;
     buttonTextColor?: string;
     buttonBorderColor?: string;

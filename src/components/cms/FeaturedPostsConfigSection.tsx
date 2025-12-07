@@ -1265,103 +1265,233 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                 Personaliza la apariencia de las etiquetas que se muestran en la tarjeta principal
               </p>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Fondo del Tag
+
+              {/* ===== FONDO DEL TAG ===== */}
+              <div className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  🎨 Fondo del Tag
+                </h5>
+                
+                {/* Toggle para fondo transparente */}
+                <div className="flex items-center gap-3 mb-4">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.heroCard?.tagBgTransparent || false}
+                      onChange={(e) => handleChange('heroCard.tagBgTransparent', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="color"
-                      value={config.heroCard?.tagBgColor?.replace(/rgba?\([^)]+\)/, '#1a1a1a') || '#1a1a1a'}
-                      onChange={(e) => handleChange('heroCard.tagBgColor', e.target.value + '1a')}
-                      className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
-                    />
-                    <input
-                      type="text"
-                      value={config.heroCard?.tagBgColor || 'rgba(255,255,255,0.1)'}
-                      onChange={(e) => handleChange('heroCard.tagBgColor', e.target.value)}
-                      placeholder="rgba(255,255,255,0.1)"
-                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
-                    />
-                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    🚫 Fondo transparente
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Texto del Tag
+
+                {/* Color de fondo (solo si no es transparente) */}
+                {!config.heroCard?.tagBgTransparent && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Color de fondo</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.heroCard?.tagBgColor?.startsWith('#') ? config.heroCard.tagBgColor.slice(0, 7) : '#8b5cf6'}
+                        onChange={(e) => handleChange('heroCard.tagBgColor', e.target.value)}
+                        className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={config.heroCard?.tagBgColor || '#8b5cf6'}
+                        onChange={(e) => handleChange('heroCard.tagBgColor', e.target.value)}
+                        placeholder="#8b5cf6"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ===== TEXTO DEL TAG ===== */}
+              <div className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  ✏️ Texto del Tag
+                </h5>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={config.heroCard?.tagTextColor || '#ffffff'}
+                    onChange={(e) => handleChange('heroCard.tagTextColor', e.target.value)}
+                    className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                  />
+                  <input
+                    type="text"
+                    value={config.heroCard?.tagTextColor || '#ffffff'}
+                    onChange={(e) => handleChange('heroCard.tagTextColor', e.target.value)}
+                    placeholder="#ffffff"
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* ===== BORDE DEL TAG ===== */}
+              <div className="mb-4 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  🔲 Borde del Tag
+                </h5>
+                
+                {/* Toggle para usar gradiente en borde */}
+                <div className="flex items-center gap-3 mb-4">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.heroCard?.tagBorderUseGradient || false}
+                      onChange={(e) => handleChange('heroCard.tagBorderUseGradient', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="color"
-                      value={config.heroCard?.tagTextColor || '#d1d5db'}
-                      onChange={(e) => handleChange('heroCard.tagTextColor', e.target.value)}
-                      className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
-                    />
-                    <input
-                      type="text"
-                      value={config.heroCard?.tagTextColor || '#d1d5db'}
-                      onChange={(e) => handleChange('heroCard.tagTextColor', e.target.value)}
-                      placeholder="#d1d5db"
-                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
-                    />
-                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    🌈 Usar gradiente en el borde
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Borde del Tag
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="color"
-                      value={config.heroCard?.tagBorderColor?.replace(/rgba?\([^)]+\)/, '#333333') || '#333333'}
-                      onChange={(e) => handleChange('heroCard.tagBorderColor', e.target.value + '33')}
-                      className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
-                    />
-                    <input
-                      type="text"
-                      value={config.heroCard?.tagBorderColor || 'rgba(255,255,255,0.2)'}
-                      onChange={(e) => handleChange('heroCard.tagBorderColor', e.target.value)}
-                      placeholder="rgba(255,255,255,0.2)"
-                      className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
-                    />
+
+                {/* Configuración de gradiente de borde */}
+                {config.heroCard?.tagBorderUseGradient ? (
+                  <div className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Color inicial
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.heroCard?.tagBorderGradientFrom || '#8b5cf6'}
+                            onChange={(e) => handleChange('heroCard.tagBorderGradientFrom', e.target.value)}
+                            className="w-10 h-8 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.heroCard?.tagBorderGradientFrom || '#8b5cf6'}
+                            onChange={(e) => handleChange('heroCard.tagBorderGradientFrom', e.target.value)}
+                            placeholder="#8b5cf6"
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Color final
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={config.heroCard?.tagBorderGradientTo || '#06b6d4'}
+                            onChange={(e) => handleChange('heroCard.tagBorderGradientTo', e.target.value)}
+                            className="w-10 h-8 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                          />
+                          <input
+                            type="text"
+                            value={config.heroCard?.tagBorderGradientTo || '#06b6d4'}
+                            onChange={(e) => handleChange('heroCard.tagBorderGradientTo', e.target.value)}
+                            placeholder="#06b6d4"
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Dirección del gradiente
+                      </label>
+                      <select
+                        value={config.heroCard?.tagBorderGradientDirection || 'to-r'}
+                        onChange={(e) => handleChange('heroCard.tagBorderGradientDirection', e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="to-r">→ Izquierda a Derecha</option>
+                        <option value="to-l">← Derecha a Izquierda</option>
+                        <option value="to-t">↑ Abajo a Arriba</option>
+                        <option value="to-b">↓ Arriba a Abajo</option>
+                        <option value="to-tr">↗ Diagonal Superior Derecha</option>
+                        <option value="to-br">↘ Diagonal Inferior Derecha</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Color del borde
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={config.heroCard?.tagBorderColor?.startsWith('#') ? config.heroCard.tagBorderColor : '#8b5cf6'}
+                        onChange={(e) => handleChange('heroCard.tagBorderColor', e.target.value)}
+                        className="w-12 h-10 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={config.heroCard?.tagBorderColor || '#8b5cf6'}
+                        onChange={(e) => handleChange('heroCard.tagBorderColor', e.target.value)}
+                        placeholder="#8b5cf6"
+                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Preview de los tags */}
               <div className="mt-4 p-4 bg-gray-900 rounded-lg">
                 <p className="text-xs text-gray-400 mb-3">Vista previa:</p>
                 <div className="flex flex-wrap gap-2">
-                  <span
-                    className="px-3 py-1 text-xs rounded-full border"
-                    style={{
-                      backgroundColor: config.heroCard?.tagBgColor || 'rgba(255,255,255,0.1)',
-                      color: config.heroCard?.tagTextColor || '#d1d5db',
-                      borderColor: config.heroCard?.tagBorderColor || 'rgba(255,255,255,0.2)'
-                    }}
-                  >
-                    tecnología
-                  </span>
-                  <span
-                    className="px-3 py-1 text-xs rounded-full border"
-                    style={{
-                      backgroundColor: config.heroCard?.tagBgColor || 'rgba(255,255,255,0.1)',
-                      color: config.heroCard?.tagTextColor || '#d1d5db',
-                      borderColor: config.heroCard?.tagBorderColor || 'rgba(255,255,255,0.2)'
-                    }}
-                  >
-                    desarrollo
-                  </span>
-                  <span
-                    className="px-3 py-1 text-xs rounded-full border"
-                    style={{
-                      backgroundColor: config.heroCard?.tagBgColor || 'rgba(255,255,255,0.1)',
-                      color: config.heroCard?.tagTextColor || '#d1d5db',
-                      borderColor: config.heroCard?.tagBorderColor || 'rgba(255,255,255,0.2)'
-                    }}
-                  >
-                    web
-                  </span>
+                  {['tecnología', 'desarrollo', 'web'].map((tagName) => (
+                    config.heroCard?.tagBorderUseGradient ? (
+                      // Tag con borde gradiente (usando wrapper)
+                      <div 
+                        key={tagName}
+                        className="inline-block rounded-full p-[1px]"
+                        style={{
+                          background: `linear-gradient(${
+                            config.heroCard?.tagBorderGradientDirection === 'to-r' ? 'to right' :
+                            config.heroCard?.tagBorderGradientDirection === 'to-l' ? 'to left' :
+                            config.heroCard?.tagBorderGradientDirection === 'to-t' ? 'to top' :
+                            config.heroCard?.tagBorderGradientDirection === 'to-b' ? 'to bottom' :
+                            config.heroCard?.tagBorderGradientDirection === 'to-tr' ? 'to top right' :
+                            'to bottom right'
+                          }, ${config.heroCard?.tagBorderGradientFrom || '#8b5cf6'}, ${config.heroCard?.tagBorderGradientTo || '#06b6d4'})`
+                        }}
+                      >
+                        <span
+                          className="block px-3 py-1 text-xs rounded-full"
+                          style={{
+                            backgroundColor: config.heroCard?.tagBgTransparent 
+                              ? '#000000'  // Fondo negro sólido para ver el borde gradiente
+                              : (config.heroCard?.tagBgColor || '#8b5cf6'),
+                            color: config.heroCard?.tagTextColor || '#ffffff'
+                          }}
+                        >
+                          {tagName}
+                        </span>
+                      </div>
+                    ) : (
+                      // Tag con borde sólido
+                      <span
+                        key={tagName}
+                        className="px-3 py-1 text-xs rounded-full border"
+                        style={{
+                          backgroundColor: config.heroCard?.tagBgTransparent 
+                            ? 'transparent' 
+                            : (config.heroCard?.tagBgColor || '#8b5cf6'),
+                          color: config.heroCard?.tagTextColor || '#ffffff',
+                          borderColor: config.heroCard?.tagBorderColor || '#8b5cf6'
+                        }}
+                      >
+                        {tagName}
+                      </span>
+                    )
+                  ))}
                 </div>
               </div>
             </div>

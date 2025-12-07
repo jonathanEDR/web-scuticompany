@@ -245,9 +245,14 @@ export const DEFAULT_FEATURED_POSTS_CONFIG = {
     categoryBgColor: '#2563eb',
     categoryTextColor: '#ffffff',
     // Tags
-    tagBgColor: 'rgba(255,255,255,0.1)',
-    tagTextColor: '#d1d5db',
-    tagBorderColor: 'rgba(255,255,255,0.2)',
+    tagBgColor: '#8b5cf6',
+    tagBgTransparent: false,
+    tagTextColor: '#ffffff',
+    tagBorderColor: '#8b5cf6',
+    tagBorderUseGradient: false,
+    tagBorderGradientFrom: '#8b5cf6',
+    tagBorderGradientTo: '#06b6d4',
+    tagBorderGradientDirection: 'to-r' as const,
     // Botón
     buttonBgColor: 'transparent',
     buttonBgTransparent: true,
@@ -327,8 +332,13 @@ export interface FeaturedPostsConfig {
     categoryTextColor?: string;
     // Tags
     tagBgColor?: string;
+    tagBgTransparent?: boolean;
     tagTextColor?: string;
     tagBorderColor?: string;
+    tagBorderUseGradient?: boolean;
+    tagBorderGradientFrom?: string;
+    tagBorderGradientTo?: string;
+    tagBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-br';
     // Botón
     buttonBgColor?: string;
     buttonBgTransparent?: boolean;

@@ -116,17 +116,50 @@ export const FeaturedBlogCard: React.FC<FeaturedBlogCardProps> = ({
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {post.tags.slice(0, 2).map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-block px-3 py-1 text-xs rounded-md font-medium"
-                  style={{
-                    backgroundColor: heroStyles.tagBgColor || 'rgba(255,255,255,0.1)',
-                    color: heroStyles.tagTextColor || '#d1d5db',
-                    border: `1px solid ${heroStyles.tagBorderColor || 'rgba(255,255,255,0.2)'}`
-                  }}
-                >
-                  {typeof tag === 'string' ? tag : tag.name}
-                </span>
+                heroStyles.tagBorderUseGradient ? (
+                  // Tag con borde gradiente (usando wrapper)
+                  <div 
+                    key={index}
+                    className="inline-block rounded-full p-[1px]"
+                    style={{
+                      background: `linear-gradient(${
+                        heroStyles.tagBorderGradientDirection === 'to-r' ? 'to right' :
+                        heroStyles.tagBorderGradientDirection === 'to-l' ? 'to left' :
+                        heroStyles.tagBorderGradientDirection === 'to-t' ? 'to top' :
+                        heroStyles.tagBorderGradientDirection === 'to-b' ? 'to bottom' :
+                        heroStyles.tagBorderGradientDirection === 'to-tr' ? 'to top right' :
+                        'to bottom right'
+                      }, ${heroStyles.tagBorderGradientFrom || '#8b5cf6'}, ${heroStyles.tagBorderGradientTo || '#06b6d4'})`
+                    }}
+                  >
+                    <span
+                      className="inline-block px-3 py-1 text-xs rounded-full font-medium"
+                      style={{
+                        backgroundColor: heroStyles.tagBgTransparent 
+                          ? '#000000'  // Fondo negro sólido para que se vea el borde gradiente
+                          : (heroStyles.tagBgColor || '#8b5cf6'),
+                        color: heroStyles.tagTextColor || '#ffffff'
+                      }}
+                    >
+                      {typeof tag === 'string' ? tag : tag.name}
+                    </span>
+                  </div>
+                ) : (
+                  // Tag con borde sólido
+                  <span
+                    key={index}
+                    className="inline-block px-3 py-1 text-xs rounded-full font-medium"
+                    style={{
+                      backgroundColor: heroStyles.tagBgTransparent 
+                        ? 'transparent' 
+                        : (heroStyles.tagBgColor || '#8b5cf6'),
+                      color: heroStyles.tagTextColor || '#ffffff',
+                      border: `1px solid ${heroStyles.tagBorderColor || '#8b5cf6'}`
+                    }}
+                  >
+                    {typeof tag === 'string' ? tag : tag.name}
+                  </span>
+                )
               ))}
               {post.tags.length > 2 && (
                 <span className="text-xs text-gray-400 py-1">
