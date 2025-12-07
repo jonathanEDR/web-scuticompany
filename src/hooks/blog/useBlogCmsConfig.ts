@@ -12,6 +12,22 @@ export const DEFAULT_BLOG_HERO_CONFIG = {
   titleHighlight: 'Tech',
   subtitle: 'Las últimas noticias y tendencias tecnológicas',
   fontFamily: 'Montserrat',
+  // Estilos de resaltado del título principal (efecto badge/highlight)
+  titleStyle: {
+    italic: true, // Título en itálica
+    hasBackground: true, // Mostrar fondo de resaltado
+    backgroundColor: '#ffffff', // Color de fondo del resaltado
+    padding: '4px 16px', // Padding del badge
+    borderRadius: '8px', // Border radius del badge
+  },
+  // Estilos de resaltado de la palabra destacada
+  highlightStyle: {
+    italic: false, // Palabra destacada en itálica
+    hasBackground: false, // Mostrar fondo de resaltado
+    backgroundColor: 'transparent', // Color de fondo
+    padding: '0', // Padding
+    borderRadius: '0', // Border radius
+  },
   backgroundImage: '', // Imagen de fondo (vacío = usar gradiente)
   backgroundOverlay: 0.5, // Oscurecer imagen
   gradientFrom: '#3b82f6',
@@ -24,19 +40,75 @@ export const DEFAULT_BLOG_HERO_CONFIG = {
   },
   search: {
     placeholder: 'Buscar noticias...',
-    buttonText: 'Buscar'
+    buttonText: 'Buscar',
+    // Estilos del input de búsqueda
+    inputStyles: {
+      light: {
+        backgroundColor: '#ffffff',
+        textColor: '#1f2937',
+        placeholderColor: '#9ca3af',
+        borderColor: '#e5e7eb',
+        borderWidth: '2px',
+        borderRadius: '9999px', // Completamente redondeado
+        iconColor: '#9ca3af',
+        // Opciones de gradiente para el borde
+        useGradientBorder: false,
+        gradientBorderFrom: '#8b5cf6',
+        gradientBorderTo: '#06b6d4',
+        gradientBorderDirection: 'to right',
+      },
+      dark: {
+        backgroundColor: '#1f2937',
+        textColor: '#ffffff',
+        placeholderColor: '#9ca3af',
+        borderColor: '#374151',
+        borderWidth: '2px',
+        borderRadius: '9999px', // Completamente redondeado
+        iconColor: '#9ca3af',
+        // Opciones de gradiente para el borde
+        useGradientBorder: false,
+        gradientBorderFrom: '#8b5cf6',
+        gradientBorderTo: '#06b6d4',
+        gradientBorderDirection: 'to right',
+      }
+    },
+    // Estilos del botón de búsqueda
+    buttonStyles: {
+      light: {
+        backgroundColor: '#2563eb',
+        textColor: '#ffffff',
+        hoverBackgroundColor: '#1d4ed8',
+        borderRadius: '9999px', // Completamente redondeado
+      },
+      dark: {
+        backgroundColor: '#2563eb',
+        textColor: '#ffffff',
+        hoverBackgroundColor: '#1d4ed8',
+        borderRadius: '9999px', // Completamente redondeado
+      }
+    }
   },
   styles: {
     light: {
       titleColor: '#ffffff',
+      // Opciones de gradiente para el texto destacado
       titleHighlightColor: '#fde047',
+      titleHighlightUseGradient: false,
+      titleHighlightGradientFrom: '#8b5cf6',
+      titleHighlightGradientTo: '#06b6d4',
+      titleHighlightGradientDirection: 'to right',
       subtitleColor: '#bfdbfe',
       statsValueColor: '#ffffff',
       statsLabelColor: '#bfdbfe'
     },
     dark: {
       titleColor: '#ffffff',
+      // Opciones de gradiente para el texto destacado
       titleHighlightColor: '#fde047',
+      titleHighlightUseGradient: false,
+      titleHighlightGradientFrom: '#8b5cf6',
+      titleHighlightGradientTo: '#06b6d4',
+      titleHighlightGradientDirection: 'to right',
       subtitleColor: '#bfdbfe',
       statsValueColor: '#ffffff',
       statsLabelColor: '#bfdbfe'
@@ -44,11 +116,59 @@ export const DEFAULT_BLOG_HERO_CONFIG = {
   }
 };
 
+// Interfaz para estilos de resaltado (badge/highlight)
+export interface TitleStyleConfig {
+  italic: boolean;
+  hasBackground: boolean;
+  backgroundColor: string;
+  padding: string;
+  borderRadius: string;
+}
+
+// Interfaces para estilos del buscador
+export interface SearchInputStyles {
+  backgroundColor: string;
+  textColor: string;
+  placeholderColor: string;
+  borderColor: string;
+  borderWidth: string;
+  borderRadius: string;
+  iconColor: string;
+  // Opciones de gradiente para el borde
+  useGradientBorder?: boolean;
+  gradientBorderFrom?: string;
+  gradientBorderTo?: string;
+  gradientBorderDirection?: string;
+}
+
+export interface SearchButtonStyles {
+  backgroundColor: string;
+  textColor: string;
+  hoverBackgroundColor: string;
+  borderRadius: string;
+}
+
+export interface SearchConfig {
+  placeholder: string;
+  buttonText: string;
+  inputStyles?: {
+    light: SearchInputStyles;
+    dark: SearchInputStyles;
+  };
+  buttonStyles?: {
+    light: SearchButtonStyles;
+    dark: SearchButtonStyles;
+  };
+}
+
 export interface BlogHeroConfig {
   title: string;
   titleHighlight: string;
   subtitle: string;
   fontFamily?: string;
+  // Estilos de resaltado del título
+  titleStyle?: TitleStyleConfig;
+  highlightStyle?: TitleStyleConfig;
   backgroundImage?: string;
   backgroundOverlay?: number;
   gradientFrom: string;
@@ -59,14 +179,16 @@ export interface BlogHeroConfig {
     readersCount: string;
     readersLabel: string;
   };
-  search: {
-    placeholder: string;
-    buttonText: string;
-  };
+  search: SearchConfig;
   styles: {
     light: {
       titleColor: string;
       titleHighlightColor: string;
+      // Opciones de gradiente para texto destacado
+      titleHighlightUseGradient?: boolean;
+      titleHighlightGradientFrom?: string;
+      titleHighlightGradientTo?: string;
+      titleHighlightGradientDirection?: string;
       subtitleColor: string;
       statsValueColor: string;
       statsLabelColor: string;
@@ -74,6 +196,11 @@ export interface BlogHeroConfig {
     dark: {
       titleColor: string;
       titleHighlightColor: string;
+      // Opciones de gradiente para texto destacado
+      titleHighlightUseGradient?: boolean;
+      titleHighlightGradientFrom?: string;
+      titleHighlightGradientTo?: string;
+      titleHighlightGradientDirection?: string;
       subtitleColor: string;
       statsValueColor: string;
       statsLabelColor: string;
@@ -333,6 +460,34 @@ export const DEFAULT_ALL_NEWS_CONFIG = {
     tagActiveBgColor: '#2563eb',
     tagActiveTextColor: '#ffffff',
     maxVisibleTags: 8
+  },
+  // Paginación
+  paginationStyle: 'numbered' as const,
+  // Paginación - Tema Claro
+  paginationLight: {
+    activeBg: '#8b5cf6',
+    activeText: '#ffffff',
+    activeUseGradient: false,
+    activeGradientFrom: '#8b5cf6',
+    activeGradientTo: '#06b6d4',
+    activeGradientDirection: 'to-r' as const,
+    inactiveBg: '#f3f4f6',
+    inactiveText: '#374151',
+    borderColor: '#d1d5db',
+    borderRadius: '8px'
+  },
+  // Paginación - Tema Oscuro
+  paginationDark: {
+    activeBg: '#8b5cf6',
+    activeText: '#ffffff',
+    activeUseGradient: false,
+    activeGradientFrom: '#8b5cf6',
+    activeGradientTo: '#06b6d4',
+    activeGradientDirection: 'to-r' as const,
+    inactiveBg: '#1f2937',
+    inactiveText: '#9ca3af',
+    borderColor: '#374151',
+    borderRadius: '8px'
   }
 };
 
@@ -436,6 +591,32 @@ export interface AllNewsConfig {
   };
   // Paginación
   paginationStyle?: 'numbered' | 'simple' | 'loadMore';
+  // Paginación por tema
+  paginationLight?: {
+    activeBg?: string;
+    activeText?: string;
+    activeUseGradient?: boolean;
+    activeGradientFrom?: string;
+    activeGradientTo?: string;
+    activeGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+    inactiveBg?: string;
+    inactiveText?: string;
+    borderColor?: string;
+    borderRadius?: string;
+  };
+  paginationDark?: {
+    activeBg?: string;
+    activeText?: string;
+    activeUseGradient?: boolean;
+    activeGradientFrom?: string;
+    activeGradientTo?: string;
+    activeGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+    inactiveBg?: string;
+    inactiveText?: string;
+    borderColor?: string;
+    borderRadius?: string;
+  };
+  // Deprecados - mantener por compatibilidad
   paginationActiveBg?: string;
   paginationActiveText?: string;
   paginationInactiveBg?: string;

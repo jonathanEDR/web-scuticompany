@@ -596,106 +596,485 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
 
-                {/* Colores de paginación */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                  <div>
-                    <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Fondo Activo</label>
-                    <div className="flex items-center gap-2">
+                {/* ========== TEMA CLARO ========== */}
+                <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <h5 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    ☀️ Tema Claro
+                  </h5>
+
+                  {/* Toggle para gradiente - Tema Claro */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <label className="relative inline-flex items-center cursor-pointer">
                       <input
-                        type="color"
-                        value={config.paginationActiveBg || '#8b5cf6'}
-                        onChange={(e) => handleChange('paginationActiveBg', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer"
+                        type="checkbox"
+                        checked={config.paginationLight?.activeUseGradient || false}
+                        onChange={(e) => handleChange('paginationLight.activeUseGradient', e.target.checked)}
+                        className="sr-only peer"
                       />
-                      <input
-                        type="text"
-                        value={config.paginationActiveBg || '#8b5cf6'}
-                        onChange={(e) => handleChange('paginationActiveBg', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                    </label>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      🌈 Usar gradiente en botón activo
+                    </span>
+                  </div>
+
+                  {/* Configuración de gradiente - Tema Claro */}
+                  {config.paginationLight?.activeUseGradient ? (
+                    <div className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800 mb-4">
+                      <div className="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Color inicial</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={config.paginationLight?.activeGradientFrom || '#8b5cf6'}
+                              onChange={(e) => handleChange('paginationLight.activeGradientFrom', e.target.value)}
+                              className="w-10 h-8 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                            />
+                            <input
+                              type="text"
+                              value={config.paginationLight?.activeGradientFrom || '#8b5cf6'}
+                              onChange={(e) => handleChange('paginationLight.activeGradientFrom', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Color final</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={config.paginationLight?.activeGradientTo || '#06b6d4'}
+                              onChange={(e) => handleChange('paginationLight.activeGradientTo', e.target.value)}
+                              className="w-10 h-8 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                            />
+                            <input
+                              type="text"
+                              value={config.paginationLight?.activeGradientTo || '#06b6d4'}
+                              onChange={(e) => handleChange('paginationLight.activeGradientTo', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Dirección</label>
+                        <select
+                          value={config.paginationLight?.activeGradientDirection || 'to-r'}
+                          onChange={(e) => handleChange('paginationLight.activeGradientDirection', e.target.value)}
+                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="to-r">→ Izquierda a Derecha</option>
+                          <option value="to-l">← Derecha a Izquierda</option>
+                          <option value="to-t">↑ Abajo a Arriba</option>
+                          <option value="to-b">↓ Arriba a Abajo</option>
+                          <option value="to-tr">↗ Diagonal Superior Derecha</option>
+                          <option value="to-br">↘ Diagonal Inferior Derecha</option>
+                        </select>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-4">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Fondo Activo</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationLight?.activeBg || '#8b5cf6'}
+                          onChange={(e) => handleChange('paginationLight.activeBg', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border-2 border-gray-200 dark:border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationLight?.activeBg || '#8b5cf6'}
+                          onChange={(e) => handleChange('paginationLight.activeBg', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Colores restantes - Tema Claro */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Texto Activo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationLight?.activeText || '#ffffff'}
+                          onChange={(e) => handleChange('paginationLight.activeText', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationLight?.activeText || '#ffffff'}
+                          onChange={(e) => handleChange('paginationLight.activeText', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Fondo Inactivo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationLight?.inactiveBg || '#f3f4f6'}
+                          onChange={(e) => handleChange('paginationLight.inactiveBg', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationLight?.inactiveBg || '#f3f4f6'}
+                          onChange={(e) => handleChange('paginationLight.inactiveBg', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Texto Inactivo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationLight?.inactiveText || '#374151'}
+                          onChange={(e) => handleChange('paginationLight.inactiveText', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationLight?.inactiveText || '#374151'}
+                          onChange={(e) => handleChange('paginationLight.inactiveText', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color Borde</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationLight?.borderColor || '#d1d5db'}
+                          onChange={(e) => handleChange('paginationLight.borderColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationLight?.borderColor || '#d1d5db'}
+                          onChange={(e) => handleChange('paginationLight.borderColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Texto Activo</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={config.paginationActiveText || '#ffffff'}
-                        onChange={(e) => handleChange('paginationActiveText', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={config.paginationActiveText || '#ffffff'}
-                        onChange={(e) => handleChange('paginationActiveText', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
-                    </div>
+
+                  {/* Radio del borde - Tema Claro */}
+                  <div className="mt-3">
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Radio del Borde</label>
+                    <input
+                      type="text"
+                      value={config.paginationLight?.borderRadius || '8px'}
+                      onChange={(e) => handleChange('paginationLight.borderRadius', e.target.value)}
+                      className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                      placeholder="8px"
+                    />
                   </div>
-                  <div>
-                    <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Fondo Inactivo</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={config.paginationInactiveBg || '#f3f4f6'}
-                        onChange={(e) => handleChange('paginationInactiveBg', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={config.paginationInactiveBg || '#f3f4f6'}
-                        onChange={(e) => handleChange('paginationInactiveBg', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Texto Inactivo</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={config.paginationInactiveText || '#374151'}
-                        onChange={(e) => handleChange('paginationInactiveText', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={config.paginationInactiveText || '#374151'}
-                        onChange={(e) => handleChange('paginationInactiveText', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
+
+                  {/* Preview - Tema Claro */}
+                  <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
+                    <p className="text-xs text-gray-500 mb-2">Vista previa:</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        className="px-3 py-1.5 text-sm rounded transition-colors"
+                        style={{
+                          backgroundColor: config.paginationLight?.inactiveBg || '#f3f4f6',
+                          color: config.paginationLight?.inactiveText || '#374151',
+                          borderRadius: config.paginationLight?.borderRadius || '8px',
+                          border: `1px solid ${config.paginationLight?.borderColor || '#d1d5db'}`
+                        }}
+                      >
+                        ‹ Anterior
+                      </button>
+                      <button
+                        className="px-3 py-1.5 text-sm font-medium rounded"
+                        style={{
+                          background: config.paginationLight?.activeUseGradient 
+                            ? `linear-gradient(${
+                                config.paginationLight?.activeGradientDirection === 'to-r' ? 'to right' :
+                                config.paginationLight?.activeGradientDirection === 'to-l' ? 'to left' :
+                                config.paginationLight?.activeGradientDirection === 'to-t' ? 'to top' :
+                                config.paginationLight?.activeGradientDirection === 'to-b' ? 'to bottom' :
+                                config.paginationLight?.activeGradientDirection === 'to-tr' ? 'to top right' :
+                                'to bottom right'
+                              }, ${config.paginationLight?.activeGradientFrom || '#8b5cf6'}, ${config.paginationLight?.activeGradientTo || '#06b6d4'})`
+                            : config.paginationLight?.activeBg || '#8b5cf6',
+                          color: config.paginationLight?.activeText || '#ffffff',
+                          borderRadius: config.paginationLight?.borderRadius || '8px'
+                        }}
+                      >
+                        1
+                      </button>
+                      <button
+                        className="px-3 py-1.5 text-sm rounded"
+                        style={{
+                          backgroundColor: config.paginationLight?.inactiveBg || '#f3f4f6',
+                          color: config.paginationLight?.inactiveText || '#374151',
+                          borderRadius: config.paginationLight?.borderRadius || '8px',
+                          border: `1px solid ${config.paginationLight?.borderColor || '#d1d5db'}`
+                        }}
+                      >
+                        2
+                      </button>
+                      <button
+                        className="px-3 py-1.5 text-sm rounded transition-colors"
+                        style={{
+                          backgroundColor: config.paginationLight?.inactiveBg || '#f3f4f6',
+                          color: config.paginationLight?.inactiveText || '#374151',
+                          borderRadius: config.paginationLight?.borderRadius || '8px',
+                          border: `1px solid ${config.paginationLight?.borderColor || '#d1d5db'}`
+                        }}
+                      >
+                        Siguiente ›
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Borde de paginación */}
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Color del Borde</label>
-                    <div className="flex items-center gap-2">
+                {/* ========== TEMA OSCURO ========== */}
+                <div className="mt-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                  <h5 className="text-sm font-semibold text-gray-200 mb-4 flex items-center gap-2">
+                    🌙 Tema Oscuro
+                  </h5>
+
+                  {/* Toggle para gradiente - Tema Oscuro */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <label className="relative inline-flex items-center cursor-pointer">
                       <input
-                        type="color"
-                        value={config.paginationBorderColor || '#d1d5db'}
-                        onChange={(e) => handleChange('paginationBorderColor', e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer"
+                        type="checkbox"
+                        checked={config.paginationDark?.activeUseGradient || false}
+                        onChange={(e) => handleChange('paginationDark.activeUseGradient', e.target.checked)}
+                        className="sr-only peer"
                       />
-                      <input
-                        type="text"
-                        value={config.paginationBorderColor || '#d1d5db'}
-                        onChange={(e) => handleChange('paginationBorderColor', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
+                      <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                    <span className="text-sm font-medium text-gray-300">
+                      🌈 Usar gradiente en botón activo
+                    </span>
+                  </div>
+
+                  {/* Configuración de gradiente - Tema Oscuro */}
+                  {config.paginationDark?.activeUseGradient ? (
+                    <div className="p-3 bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-lg border border-purple-700 mb-4">
+                      <div className="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-300 mb-1">Color inicial</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={config.paginationDark?.activeGradientFrom || '#8b5cf6'}
+                              onChange={(e) => handleChange('paginationDark.activeGradientFrom', e.target.value)}
+                              className="w-10 h-8 cursor-pointer rounded border-2 border-gray-600"
+                            />
+                            <input
+                              type="text"
+                              value={config.paginationDark?.activeGradientFrom || '#8b5cf6'}
+                              onChange={(e) => handleChange('paginationDark.activeGradientFrom', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-300 mb-1">Color final</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={config.paginationDark?.activeGradientTo || '#06b6d4'}
+                              onChange={(e) => handleChange('paginationDark.activeGradientTo', e.target.value)}
+                              className="w-10 h-8 cursor-pointer rounded border-2 border-gray-600"
+                            />
+                            <input
+                              type="text"
+                              value={config.paginationDark?.activeGradientTo || '#06b6d4'}
+                              onChange={(e) => handleChange('paginationDark.activeGradientTo', e.target.value)}
+                              className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-300 mb-1">Dirección</label>
+                        <select
+                          value={config.paginationDark?.activeGradientDirection || 'to-r'}
+                          onChange={(e) => handleChange('paginationDark.activeGradientDirection', e.target.value)}
+                          className="w-full px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white"
+                        >
+                          <option value="to-r">→ Izquierda a Derecha</option>
+                          <option value="to-l">← Derecha a Izquierda</option>
+                          <option value="to-t">↑ Abajo a Arriba</option>
+                          <option value="to-b">↓ Arriba a Abajo</option>
+                          <option value="to-tr">↗ Diagonal Superior Derecha</option>
+                          <option value="to-br">↘ Diagonal Inferior Derecha</option>
+                        </select>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-4">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">Fondo Activo</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationDark?.activeBg || '#8b5cf6'}
+                          onChange={(e) => handleChange('paginationDark.activeBg', e.target.value)}
+                          className="w-10 h-8 cursor-pointer rounded border-2 border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationDark?.activeBg || '#8b5cf6'}
+                          onChange={(e) => handleChange('paginationDark.activeBg', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Colores restantes - Tema Oscuro */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Texto Activo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationDark?.activeText || '#ffffff'}
+                          onChange={(e) => handleChange('paginationDark.activeText', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationDark?.activeText || '#ffffff'}
+                          onChange={(e) => handleChange('paginationDark.activeText', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Fondo Inactivo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationDark?.inactiveBg || '#1f2937'}
+                          onChange={(e) => handleChange('paginationDark.inactiveBg', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationDark?.inactiveBg || '#1f2937'}
+                          onChange={(e) => handleChange('paginationDark.inactiveBg', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Texto Inactivo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationDark?.inactiveText || '#9ca3af'}
+                          onChange={(e) => handleChange('paginationDark.inactiveText', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationDark?.inactiveText || '#9ca3af'}
+                          onChange={(e) => handleChange('paginationDark.inactiveText', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Color Borde</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={config.paginationDark?.borderColor || '#374151'}
+                          onChange={(e) => handleChange('paginationDark.borderColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={config.paginationDark?.borderColor || '#374151'}
+                          onChange={(e) => handleChange('paginationDark.borderColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs border border-gray-600 rounded bg-gray-700 text-white font-mono"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Radio del Borde</label>
+
+                  {/* Radio del borde - Tema Oscuro */}
+                  <div className="mt-3">
+                    <label className="block text-xs text-gray-400 mb-1">Radio del Borde</label>
                     <input
                       type="text"
-                      value={config.paginationBorderRadius || '8px'}
-                      onChange={(e) => handleChange('paginationBorderRadius', e.target.value)}
-                      className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                      value={config.paginationDark?.borderRadius || '8px'}
+                      onChange={(e) => handleChange('paginationDark.borderRadius', e.target.value)}
+                      className="w-full px-3 py-1.5 border border-gray-600 rounded-lg bg-gray-700 text-white text-sm"
                       placeholder="8px"
                     />
+                  </div>
+
+                  {/* Preview - Tema Oscuro */}
+                  <div className="mt-4 p-3 bg-gray-900 rounded-lg border border-gray-700">
+                    <p className="text-xs text-gray-500 mb-2">Vista previa:</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        className="px-3 py-1.5 text-sm rounded transition-colors"
+                        style={{
+                          backgroundColor: config.paginationDark?.inactiveBg || '#1f2937',
+                          color: config.paginationDark?.inactiveText || '#9ca3af',
+                          borderRadius: config.paginationDark?.borderRadius || '8px',
+                          border: `1px solid ${config.paginationDark?.borderColor || '#374151'}`
+                        }}
+                      >
+                        ‹ Anterior
+                      </button>
+                      <button
+                        className="px-3 py-1.5 text-sm font-medium rounded"
+                        style={{
+                          background: config.paginationDark?.activeUseGradient 
+                            ? `linear-gradient(${
+                                config.paginationDark?.activeGradientDirection === 'to-r' ? 'to right' :
+                                config.paginationDark?.activeGradientDirection === 'to-l' ? 'to left' :
+                                config.paginationDark?.activeGradientDirection === 'to-t' ? 'to top' :
+                                config.paginationDark?.activeGradientDirection === 'to-b' ? 'to bottom' :
+                                config.paginationDark?.activeGradientDirection === 'to-tr' ? 'to top right' :
+                                'to bottom right'
+                              }, ${config.paginationDark?.activeGradientFrom || '#8b5cf6'}, ${config.paginationDark?.activeGradientTo || '#06b6d4'})`
+                            : config.paginationDark?.activeBg || '#8b5cf6',
+                          color: config.paginationDark?.activeText || '#ffffff',
+                          borderRadius: config.paginationDark?.borderRadius || '8px'
+                        }}
+                      >
+                        1
+                      </button>
+                      <button
+                        className="px-3 py-1.5 text-sm rounded"
+                        style={{
+                          backgroundColor: config.paginationDark?.inactiveBg || '#1f2937',
+                          color: config.paginationDark?.inactiveText || '#9ca3af',
+                          borderRadius: config.paginationDark?.borderRadius || '8px',
+                          border: `1px solid ${config.paginationDark?.borderColor || '#374151'}`
+                        }}
+                      >
+                        2
+                      </button>
+                      <button
+                        className="px-3 py-1.5 text-sm rounded transition-colors"
+                        style={{
+                          backgroundColor: config.paginationDark?.inactiveBg || '#1f2937',
+                          color: config.paginationDark?.inactiveText || '#9ca3af',
+                          borderRadius: config.paginationDark?.borderRadius || '8px',
+                          border: `1px solid ${config.paginationDark?.borderColor || '#374151'}`
+                        }}
+                      >
+                        Siguiente ›
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -28,6 +28,22 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
     title: 'Blog',
     titleHighlight: 'Tech',
     subtitle: 'Las últimas noticias y tendencias tecnológicas',
+    // Estilos de resaltado del título principal (efecto badge/highlight)
+    titleStyle: {
+      italic: true,
+      hasBackground: true,
+      backgroundColor: '#ffffff',
+      padding: '4px 16px',
+      borderRadius: '8px',
+    },
+    // Estilos de resaltado de la palabra destacada
+    highlightStyle: {
+      italic: false,
+      hasBackground: false,
+      backgroundColor: 'transparent',
+      padding: '0',
+      borderRadius: '0',
+    },
     backgroundImage: '',
     backgroundOverlay: 0.5,
     gradientFrom: '#3b82f6',
@@ -40,7 +56,41 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
     },
     search: {
       placeholder: 'Buscar noticias...',
-      buttonText: 'Buscar'
+      buttonText: 'Buscar',
+      inputStyles: {
+        light: {
+          backgroundColor: '#ffffff',
+          textColor: '#1f2937',
+          placeholderColor: '#9ca3af',
+          borderColor: '#e5e7eb',
+          borderWidth: '1px',
+          borderRadius: '8px',
+          iconColor: '#9ca3af',
+        },
+        dark: {
+          backgroundColor: '#1f2937',
+          textColor: '#ffffff',
+          placeholderColor: '#9ca3af',
+          borderColor: '#374151',
+          borderWidth: '1px',
+          borderRadius: '8px',
+          iconColor: '#9ca3af',
+        }
+      },
+      buttonStyles: {
+        light: {
+          backgroundColor: '#2563eb',
+          textColor: '#ffffff',
+          hoverBackgroundColor: '#1d4ed8',
+          borderRadius: '6px',
+        },
+        dark: {
+          backgroundColor: '#2563eb',
+          textColor: '#ffffff',
+          hoverBackgroundColor: '#1d4ed8',
+          borderRadius: '6px',
+        }
+      }
     },
     styles: {
       light: {
@@ -64,7 +114,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
     updateContent(`blogHero.${field}`, value);
   };
 
-  const handleStyleUpdate = (mode: 'light' | 'dark', field: string, value: string) => {
+  const handleStyleUpdate = (mode: 'light' | 'dark', field: string, value: string | boolean) => {
     const currentStyles = blogHero.styles || {};
     const modeStyles = currentStyles[mode] || {};
     updateContent(`blogHero.styles.${mode}`, {
@@ -135,6 +185,40 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
     return {
       background: `linear-gradient(to right, ${blogHero.gradientFrom || '#3b82f6'}, ${blogHero.gradientTo || '#9333ea'})`
     };
+  };
+
+  // Generar estilo del texto destacado (soporta gradiente)
+  // Retorna estilos separados para el contenedor (badge) y el texto (gradiente)
+  const getHighlightStyles = () => {
+    const useGradient = blogHero.styles?.light?.titleHighlightUseGradient;
+    const hasBackground = blogHero.highlightStyle?.hasBackground;
+    
+    // Estilos del contenedor (badge/fondo)
+    const containerStyle: React.CSSProperties = {
+      fontStyle: blogHero.highlightStyle?.italic ? 'italic' : 'normal',
+      backgroundColor: hasBackground 
+        ? (blogHero.highlightStyle?.backgroundColor || '#8b5cf6') 
+        : 'transparent',
+      padding: hasBackground 
+        ? (blogHero.highlightStyle?.padding || '4px 16px') 
+        : '0',
+      borderRadius: hasBackground 
+        ? (blogHero.highlightStyle?.borderRadius || '8px') 
+        : '0',
+      display: 'inline-block',
+    };
+
+    // Estilos del texto (color sólido o gradiente)
+    const textStyle: React.CSSProperties = useGradient ? {
+      background: `linear-gradient(${blogHero.styles?.light?.titleHighlightGradientDirection || 'to right'}, ${blogHero.styles?.light?.titleHighlightGradientFrom || '#8b5cf6'}, ${blogHero.styles?.light?.titleHighlightGradientTo || '#06b6d4'})`,
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+    } : {
+      color: blogHero.styles?.light?.titleHighlightColor || '#fde047',
+    };
+
+    return { containerStyle, textStyle, useGradient };
   };
 
   return (
@@ -263,6 +347,172 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                 />
               </div>
 
+              {/* ✨ Estilos de Resaltado del Título */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                  ✨ Estilos de Resaltado del Título
+                  <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(Efecto badge como en la maqueta)</span>
+                </h3>
+                
+                {/* Configuración del Título Principal */}
+                <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-4">
+                    📝 Título Principal "{blogHero.title || 'Blog'}"
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Itálica */}
+                    <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Itálica</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={blogHero.titleStyle?.italic ?? true}
+                          onChange={(e) => handleUpdate('titleStyle.italic', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    {/* Fondo */}
+                    <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Mostrar Fondo</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={blogHero.titleStyle?.hasBackground ?? true}
+                          onChange={(e) => handleUpdate('titleStyle.hasBackground', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    {/* Color de Fondo */}
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Fondo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.titleStyle?.backgroundColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('titleStyle.backgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                          disabled={!blogHero.titleStyle?.hasBackground}
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.titleStyle?.backgroundColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('titleStyle.backgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                          disabled={!blogHero.titleStyle?.hasBackground}
+                        />
+                      </div>
+                    </div>
+                    {/* Border Radius */}
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Border Radius</label>
+                      <input
+                        type="text"
+                        value={blogHero.titleStyle?.borderRadius || '8px'}
+                        onChange={(e) => handleUpdate('titleStyle.borderRadius', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        placeholder="8px"
+                        disabled={!blogHero.titleStyle?.hasBackground}
+                      />
+                    </div>
+                  </div>
+                  {/* Padding */}
+                  <div className="mt-3">
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Padding (ej: 4px 16px)</label>
+                    <input
+                      type="text"
+                      value={blogHero.titleStyle?.padding || '4px 16px'}
+                      onChange={(e) => handleUpdate('titleStyle.padding', e.target.value)}
+                      className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg"
+                      placeholder="4px 16px"
+                      disabled={!blogHero.titleStyle?.hasBackground}
+                    />
+                  </div>
+                </div>
+
+                {/* Configuración de la Palabra Destacada */}
+                <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-4">
+                    🌟 Palabra Destacada "{blogHero.titleHighlight || 'Tech'}"
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Itálica */}
+                    <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Itálica</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={blogHero.highlightStyle?.italic ?? false}
+                          onChange={(e) => handleUpdate('highlightStyle.italic', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    {/* Fondo */}
+                    <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Mostrar Fondo</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={blogHero.highlightStyle?.hasBackground ?? false}
+                          onChange={(e) => handleUpdate('highlightStyle.hasBackground', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    {/* Color de Fondo */}
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Fondo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.highlightStyle?.backgroundColor || '#8b5cf6'}
+                          onChange={(e) => handleUpdate('highlightStyle.backgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                          disabled={!blogHero.highlightStyle?.hasBackground}
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.highlightStyle?.backgroundColor || '#8b5cf6'}
+                          onChange={(e) => handleUpdate('highlightStyle.backgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                          disabled={!blogHero.highlightStyle?.hasBackground}
+                        />
+                      </div>
+                    </div>
+                    {/* Border Radius */}
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Border Radius</label>
+                      <input
+                        type="text"
+                        value={blogHero.highlightStyle?.borderRadius || '8px'}
+                        onChange={(e) => handleUpdate('highlightStyle.borderRadius', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        placeholder="8px"
+                        disabled={!blogHero.highlightStyle?.hasBackground}
+                      />
+                    </div>
+                  </div>
+                  {/* Padding */}
+                  <div className="mt-3">
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Padding (ej: 4px 16px)</label>
+                    <input
+                      type="text"
+                      value={blogHero.highlightStyle?.padding || '4px 16px'}
+                      onChange={(e) => handleUpdate('highlightStyle.padding', e.target.value)}
+                      className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg"
+                      placeholder="4px 16px"
+                      disabled={!blogHero.highlightStyle?.hasBackground}
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Colores de texto */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
@@ -288,43 +538,128 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Color Destacado
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={blogHero.styles?.light?.titleHighlightColor || '#fde047'}
-                        onChange={(e) => handleStyleUpdate('light', 'titleHighlightColor', e.target.value)}
-                        className="w-12 h-10 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={blogHero.styles?.light?.titleHighlightColor || '#fde047'}
-                        onChange={(e) => handleStyleUpdate('light', 'titleHighlightColor', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 text-sm"
-                      />
+
+                  {/* Color Destacado con opción de Gradiente */}
+                  <div className="md:col-span-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Color Destacado
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Usar Gradiente</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={blogHero.styles?.light?.titleHighlightUseGradient ?? false}
+                            onChange={(e) => handleStyleUpdate('light', 'titleHighlightUseGradient', e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
                     </div>
+                    
+                    {/* Color sólido o Gradiente */}
+                    {!blogHero.styles?.light?.titleHighlightUseGradient ? (
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={blogHero.styles?.light?.titleHighlightColor || '#fde047'}
+                          onChange={(e) => handleStyleUpdate('light', 'titleHighlightColor', e.target.value)}
+                          className="w-12 h-10 rounded cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.styles?.light?.titleHighlightColor || '#fde047'}
+                          onChange={(e) => handleStyleUpdate('light', 'titleHighlightColor', e.target.value)}
+                          className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 text-sm"
+                        />
+                      </div>
+                    ) : (
+                      <div className="space-y-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Inicio</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={blogHero.styles?.light?.titleHighlightGradientFrom || '#8b5cf6'}
+                                onChange={(e) => handleStyleUpdate('light', 'titleHighlightGradientFrom', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={blogHero.styles?.light?.titleHighlightGradientFrom || '#8b5cf6'}
+                                onChange={(e) => handleStyleUpdate('light', 'titleHighlightGradientFrom', e.target.value)}
+                                className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Fin</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={blogHero.styles?.light?.titleHighlightGradientTo || '#06b6d4'}
+                                onChange={(e) => handleStyleUpdate('light', 'titleHighlightGradientTo', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={blogHero.styles?.light?.titleHighlightGradientTo || '#06b6d4'}
+                                onChange={(e) => handleStyleUpdate('light', 'titleHighlightGradientTo', e.target.value)}
+                                className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Dirección del Gradiente</label>
+                          <select
+                            value={blogHero.styles?.light?.titleHighlightGradientDirection || 'to right'}
+                            onChange={(e) => handleStyleUpdate('light', 'titleHighlightGradientDirection', e.target.value)}
+                            className="w-full px-2 py-1 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                          >
+                            <option value="to right">Horizontal →</option>
+                            <option value="to left">Horizontal ←</option>
+                            <option value="to bottom">Vertical ↓</option>
+                            <option value="to top">Vertical ↑</option>
+                            <option value="to bottom right">Diagonal ↘</option>
+                            <option value="to bottom left">Diagonal ↙</option>
+                            <option value="to top right">Diagonal ↗</option>
+                            <option value="to top left">Diagonal ↖</option>
+                          </select>
+                        </div>
+                        {/* Preview del gradiente */}
+                        <div 
+                          className="h-8 rounded-lg"
+                          style={{
+                            background: `linear-gradient(${blogHero.styles?.light?.titleHighlightGradientDirection || 'to right'}, ${blogHero.styles?.light?.titleHighlightGradientFrom || '#8b5cf6'}, ${blogHero.styles?.light?.titleHighlightGradientTo || '#06b6d4'})`
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Color Subtítulo
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={blogHero.styles?.light?.subtitleColor || '#bfdbfe'}
-                        onChange={(e) => handleStyleUpdate('light', 'subtitleColor', e.target.value)}
-                        className="w-12 h-10 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={blogHero.styles?.light?.subtitleColor || '#bfdbfe'}
-                        onChange={(e) => handleStyleUpdate('light', 'subtitleColor', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 text-sm"
-                      />
-                    </div>
+                </div>
+
+                {/* Color Subtítulo - en nueva fila */}
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color Subtítulo
+                  </label>
+                  <div className="flex items-center gap-3 max-w-xs">
+                    <input
+                      type="color"
+                      value={blogHero.styles?.light?.subtitleColor || '#bfdbfe'}
+                      onChange={(e) => handleStyleUpdate('light', 'subtitleColor', e.target.value)}
+                      className="w-12 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={blogHero.styles?.light?.subtitleColor || '#bfdbfe'}
+                      onChange={(e) => handleStyleUpdate('light', 'subtitleColor', e.target.value)}
+                      className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 text-sm"
+                    />
                   </div>
                 </div>
               </div>
@@ -334,17 +669,40 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                 className="p-6 rounded-xl text-center"
                 style={getBackgroundStyle()}
               >
-                <h1 
-                  className="text-3xl font-bold"
-                  style={{ color: blogHero.styles?.light?.titleColor || '#ffffff' }}
-                >
-                  {blogHero.title || 'Blog'}{' '}
-                  <span style={{ color: blogHero.styles?.light?.titleHighlightColor || '#fde047' }}>
-                    {blogHero.titleHighlight || 'Tech'}
+                <h1 className="text-3xl font-bold inline-flex items-center gap-2 flex-wrap justify-center">
+                  <span 
+                    style={{ 
+                      color: blogHero.styles?.light?.titleColor || '#ffffff',
+                      fontStyle: blogHero.titleStyle?.italic ? 'italic' : 'normal',
+                      backgroundColor: blogHero.titleStyle?.hasBackground 
+                        ? (blogHero.titleStyle?.backgroundColor || '#ffffff') 
+                        : 'transparent',
+                      padding: blogHero.titleStyle?.hasBackground 
+                        ? (blogHero.titleStyle?.padding || '4px 16px') 
+                        : '0',
+                      borderRadius: blogHero.titleStyle?.hasBackground 
+                        ? (blogHero.titleStyle?.borderRadius || '8px') 
+                        : '0',
+                    }}
+                  >
+                    {blogHero.title || 'Blog'}
                   </span>
+                  {/* Texto destacado con soporte para fondo + gradiente */}
+                  {(() => {
+                    const { containerStyle, textStyle, useGradient } = getHighlightStyles();
+                    return (
+                      <span style={containerStyle}>
+                        {useGradient ? (
+                          <span style={textStyle}>{blogHero.titleHighlight || 'Tech'}</span>
+                        ) : (
+                          <span style={textStyle}>{blogHero.titleHighlight || 'Tech'}</span>
+                        )}
+                      </span>
+                    );
+                  })()}
                 </h1>
                 <p 
-                  className="mt-2"
+                  className="mt-4"
                   style={{ color: blogHero.styles?.light?.subtitleColor || '#bfdbfe' }}
                 >
                   {blogHero.subtitle || 'Las últimas noticias y tendencias tecnológicas'}
@@ -511,17 +869,40 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                 className="p-8 rounded-xl text-center"
                 style={getBackgroundStyle()}
               >
-                <h1 
-                  className="text-3xl font-bold"
-                  style={{ color: blogHero.styles?.light?.titleColor || '#ffffff' }}
-                >
-                  {blogHero.title || 'Blog'}{' '}
-                  <span style={{ color: blogHero.styles?.light?.titleHighlightColor || '#fde047' }}>
-                    {blogHero.titleHighlight || 'Tech'}
+                <h1 className="text-3xl font-bold inline-flex items-center gap-2 flex-wrap justify-center">
+                  <span 
+                    style={{ 
+                      color: blogHero.styles?.light?.titleColor || '#ffffff',
+                      fontStyle: blogHero.titleStyle?.italic ? 'italic' : 'normal',
+                      backgroundColor: blogHero.titleStyle?.hasBackground 
+                        ? (blogHero.titleStyle?.backgroundColor || '#ffffff') 
+                        : 'transparent',
+                      padding: blogHero.titleStyle?.hasBackground 
+                        ? (blogHero.titleStyle?.padding || '4px 16px') 
+                        : '0',
+                      borderRadius: blogHero.titleStyle?.hasBackground 
+                        ? (blogHero.titleStyle?.borderRadius || '8px') 
+                        : '0',
+                    }}
+                  >
+                    {blogHero.title || 'Blog'}
                   </span>
+                  {/* Texto destacado con soporte para fondo + gradiente */}
+                  {(() => {
+                    const { containerStyle, textStyle, useGradient } = getHighlightStyles();
+                    return (
+                      <span style={containerStyle}>
+                        {useGradient ? (
+                          <span style={textStyle}>{blogHero.titleHighlight || 'Tech'}</span>
+                        ) : (
+                          <span style={textStyle}>{blogHero.titleHighlight || 'Tech'}</span>
+                        )}
+                      </span>
+                    );
+                  })()}
                 </h1>
                 <p 
-                  className="mt-2"
+                  className="mt-4"
                   style={{ color: blogHero.styles?.light?.subtitleColor || '#bfdbfe' }}
                 >
                   {blogHero.subtitle || 'Las últimas noticias y tendencias tecnológicas'}
@@ -619,6 +1000,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
           {/* Search Tab */}
           {activeSubTab === 'search' && (
             <div className="space-y-6">
+              {/* Textos básicos */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -646,27 +1028,625 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                 </div>
               </div>
 
-              {/* Preview del buscador */}
-              <div 
-                className="p-6 rounded-xl"
-                style={getBackgroundStyle()}
-              >
-                <div className="max-w-xl mx-auto">
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                      <Search className="w-5 h-5" />
+              {/* ========== ESTILOS DEL INPUT DE BÚSQUEDA ========== */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                  🔍 Estilos del Buscador
+                </h3>
+
+                {/* Tema Claro */}
+                <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                    ☀️ Tema Claro
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Fondo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.light?.backgroundColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.backgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.light?.backgroundColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.backgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                      </div>
                     </div>
-                    <input
-                      type="text"
-                      placeholder={blogHero.search?.placeholder || 'Buscar noticias...'}
-                      className="w-full pl-12 pr-24 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg border-0"
-                      readOnly
-                    />
-                    <button 
-                      className="absolute right-2 top-2 bg-blue-600 text-white px-6 py-2 rounded-md font-medium"
-                    >
-                      {blogHero.search?.buttonText || 'Buscar'}
-                    </button>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Texto</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.light?.textColor || '#1f2937'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.textColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.light?.textColor || '#1f2937'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.textColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Borde</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.light?.borderColor || '#e5e7eb'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.borderColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.light?.borderColor || '#e5e7eb'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.borderColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Icono</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.light?.iconColor || '#9ca3af'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.iconColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.light?.iconColor || '#9ca3af'}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.iconColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Ancho Borde</label>
+                      <input
+                        type="text"
+                        value={blogHero.search?.inputStyles?.light?.borderWidth || '2px'}
+                        onChange={(e) => handleUpdate('search.inputStyles.light.borderWidth', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        placeholder="2px"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Border Radius</label>
+                      <input
+                        type="text"
+                        value={blogHero.search?.inputStyles?.light?.borderRadius || '9999px'}
+                        onChange={(e) => handleUpdate('search.inputStyles.light.borderRadius', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        placeholder="9999px"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Opción de Gradiente para el Borde - Tema Claro */}
+                  <div className="mt-4 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌈 Borde con Gradiente</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={blogHero.search?.inputStyles?.light?.useGradientBorder ?? false}
+                          onChange={(e) => handleUpdate('search.inputStyles.light.useGradientBorder', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    {blogHero.search?.inputStyles?.light?.useGradientBorder && (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Inicio</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={blogHero.search?.inputStyles?.light?.gradientBorderFrom || '#8b5cf6'}
+                                onChange={(e) => handleUpdate('search.inputStyles.light.gradientBorderFrom', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={blogHero.search?.inputStyles?.light?.gradientBorderFrom || '#8b5cf6'}
+                                onChange={(e) => handleUpdate('search.inputStyles.light.gradientBorderFrom', e.target.value)}
+                                className="flex-1 px-2 py-1 text-xs bg-gray-50 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Fin</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={blogHero.search?.inputStyles?.light?.gradientBorderTo || '#06b6d4'}
+                                onChange={(e) => handleUpdate('search.inputStyles.light.gradientBorderTo', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={blogHero.search?.inputStyles?.light?.gradientBorderTo || '#06b6d4'}
+                                onChange={(e) => handleUpdate('search.inputStyles.light.gradientBorderTo', e.target.value)}
+                                className="flex-1 px-2 py-1 text-xs bg-gray-50 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Dirección</label>
+                          <select
+                            value={blogHero.search?.inputStyles?.light?.gradientBorderDirection || 'to right'}
+                            onChange={(e) => handleUpdate('search.inputStyles.light.gradientBorderDirection', e.target.value)}
+                            className="w-full px-2 py-1 text-xs bg-gray-50 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded"
+                          >
+                            <option value="to right">Horizontal →</option>
+                            <option value="to left">Horizontal ←</option>
+                            <option value="to bottom">Vertical ↓</option>
+                            <option value="to top">Vertical ↑</option>
+                            <option value="to bottom right">Diagonal ↘</option>
+                            <option value="to bottom left">Diagonal ↙</option>
+                          </select>
+                        </div>
+                        {/* Preview del gradiente */}
+                        <div 
+                          className="h-6 rounded-full"
+                          style={{
+                            background: `linear-gradient(${blogHero.search?.inputStyles?.light?.gradientBorderDirection || 'to right'}, ${blogHero.search?.inputStyles?.light?.gradientBorderFrom || '#8b5cf6'}, ${blogHero.search?.inputStyles?.light?.gradientBorderTo || '#06b6d4'})`
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tema Oscuro */}
+                <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                  <h4 className="font-medium text-gray-300 mb-4 flex items-center gap-2">
+                    🌙 Tema Oscuro
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Fondo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.dark?.backgroundColor || '#1f2937'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.backgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.dark?.backgroundColor || '#1f2937'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.backgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Color Texto</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.dark?.textColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.textColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.dark?.textColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.textColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Color Borde</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.dark?.borderColor || '#374151'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.borderColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.dark?.borderColor || '#374151'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.borderColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Color Icono</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.inputStyles?.dark?.iconColor || '#9ca3af'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.iconColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.inputStyles?.dark?.iconColor || '#9ca3af'}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.iconColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Ancho Borde</label>
+                      <input
+                        type="text"
+                        value={blogHero.search?.inputStyles?.dark?.borderWidth || '2px'}
+                        onChange={(e) => handleUpdate('search.inputStyles.dark.borderWidth', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        placeholder="2px"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Border Radius</label>
+                      <input
+                        type="text"
+                        value={blogHero.search?.inputStyles?.dark?.borderRadius || '9999px'}
+                        onChange={(e) => handleUpdate('search.inputStyles.dark.borderRadius', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        placeholder="9999px"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Opción de Gradiente para el Borde - Tema Oscuro */}
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg border border-gray-600">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-gray-300">🌈 Borde con Gradiente</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={blogHero.search?.inputStyles?.dark?.useGradientBorder ?? false}
+                          onChange={(e) => handleUpdate('search.inputStyles.dark.useGradientBorder', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    {blogHero.search?.inputStyles?.dark?.useGradientBorder && (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-400 mb-1">Color Inicio</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={blogHero.search?.inputStyles?.dark?.gradientBorderFrom || '#8b5cf6'}
+                                onChange={(e) => handleUpdate('search.inputStyles.dark.gradientBorderFrom', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer border border-gray-500"
+                              />
+                              <input
+                                type="text"
+                                value={blogHero.search?.inputStyles?.dark?.gradientBorderFrom || '#8b5cf6'}
+                                onChange={(e) => handleUpdate('search.inputStyles.dark.gradientBorderFrom', e.target.value)}
+                                className="flex-1 px-2 py-1 text-xs bg-gray-600 border border-gray-500 rounded text-gray-200"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-400 mb-1">Color Fin</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={blogHero.search?.inputStyles?.dark?.gradientBorderTo || '#06b6d4'}
+                                onChange={(e) => handleUpdate('search.inputStyles.dark.gradientBorderTo', e.target.value)}
+                                className="w-8 h-8 rounded cursor-pointer border border-gray-500"
+                              />
+                              <input
+                                type="text"
+                                value={blogHero.search?.inputStyles?.dark?.gradientBorderTo || '#06b6d4'}
+                                onChange={(e) => handleUpdate('search.inputStyles.dark.gradientBorderTo', e.target.value)}
+                                className="flex-1 px-2 py-1 text-xs bg-gray-600 border border-gray-500 rounded text-gray-200"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Dirección</label>
+                          <select
+                            value={blogHero.search?.inputStyles?.dark?.gradientBorderDirection || 'to right'}
+                            onChange={(e) => handleUpdate('search.inputStyles.dark.gradientBorderDirection', e.target.value)}
+                            className="w-full px-2 py-1 text-xs bg-gray-600 border border-gray-500 rounded text-gray-200"
+                          >
+                            <option value="to right">Horizontal →</option>
+                            <option value="to left">Horizontal ←</option>
+                            <option value="to bottom">Vertical ↓</option>
+                            <option value="to top">Vertical ↑</option>
+                            <option value="to bottom right">Diagonal ↘</option>
+                            <option value="to bottom left">Diagonal ↙</option>
+                          </select>
+                        </div>
+                        {/* Preview del gradiente */}
+                        <div 
+                          className="h-6 rounded-full"
+                          style={{
+                            background: `linear-gradient(${blogHero.search?.inputStyles?.dark?.gradientBorderDirection || 'to right'}, ${blogHero.search?.inputStyles?.dark?.gradientBorderFrom || '#8b5cf6'}, ${blogHero.search?.inputStyles?.dark?.gradientBorderTo || '#06b6d4'})`
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ========== ESTILOS DEL BOTÓN ========== */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                  🔘 Estilos del Botón
+                </h3>
+
+                {/* Tema Claro - Botón */}
+                <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                    ☀️ Tema Claro
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Fondo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.buttonStyles?.light?.backgroundColor || '#2563eb'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.light.backgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.buttonStyles?.light?.backgroundColor || '#2563eb'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.light.backgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Color Texto</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.buttonStyles?.light?.textColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.light.textColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.buttonStyles?.light?.textColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.light.textColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Fondo Hover</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.buttonStyles?.light?.hoverBackgroundColor || '#1d4ed8'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.light.hoverBackgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.buttonStyles?.light?.hoverBackgroundColor || '#1d4ed8'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.light.hoverBackgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Border Radius</label>
+                      <input
+                        type="text"
+                        value={blogHero.search?.buttonStyles?.light?.borderRadius || '6px'}
+                        onChange={(e) => handleUpdate('search.buttonStyles.light.borderRadius', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                        placeholder="6px"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tema Oscuro - Botón */}
+                <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                  <h4 className="font-medium text-gray-300 mb-4 flex items-center gap-2">
+                    🌙 Tema Oscuro
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Fondo</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.buttonStyles?.dark?.backgroundColor || '#2563eb'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.dark.backgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.buttonStyles?.dark?.backgroundColor || '#2563eb'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.dark.backgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Color Texto</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.buttonStyles?.dark?.textColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.dark.textColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.buttonStyles?.dark?.textColor || '#ffffff'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.dark.textColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Fondo Hover</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={blogHero.search?.buttonStyles?.dark?.hoverBackgroundColor || '#1d4ed8'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.dark.hoverBackgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-gray-600"
+                        />
+                        <input
+                          type="text"
+                          value={blogHero.search?.buttonStyles?.dark?.hoverBackgroundColor || '#1d4ed8'}
+                          onChange={(e) => handleUpdate('search.buttonStyles.dark.hoverBackgroundColor', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Border Radius</label>
+                      <input
+                        type="text"
+                        value={blogHero.search?.buttonStyles?.dark?.borderRadius || '6px'}
+                        onChange={(e) => handleUpdate('search.buttonStyles.dark.borderRadius', e.target.value)}
+                        className="w-full px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-gray-200"
+                        placeholder="6px"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Preview del buscador - Tema Claro */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                  👁️ Vista Previa
+                </h3>
+                
+                {/* Preview Tema Claro */}
+                <div className="mb-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">☀️ Tema Claro:</p>
+                  <div 
+                    className="p-6 rounded-xl"
+                    style={getBackgroundStyle()}
+                  >
+                    <div className="max-w-xl mx-auto">
+                      {/* Wrapper para borde con gradiente */}
+                      <div 
+                        className="relative"
+                        style={blogHero.search?.inputStyles?.light?.useGradientBorder ? {
+                          padding: blogHero.search?.inputStyles?.light?.borderWidth || '2px',
+                          background: `linear-gradient(${blogHero.search?.inputStyles?.light?.gradientBorderDirection || 'to right'}, ${blogHero.search?.inputStyles?.light?.gradientBorderFrom || '#8b5cf6'}, ${blogHero.search?.inputStyles?.light?.gradientBorderTo || '#06b6d4'})`,
+                          borderRadius: blogHero.search?.inputStyles?.light?.borderRadius || '9999px',
+                        } : undefined}
+                      >
+                        <div className="relative">
+                          <div 
+                            className="absolute left-4 top-1/2 transform -translate-y-1/2"
+                            style={{ color: blogHero.search?.inputStyles?.light?.iconColor || '#9ca3af' }}
+                          >
+                            <Search className="w-5 h-5" />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder={blogHero.search?.placeholder || 'Buscar noticias...'}
+                            className="w-full pl-12 pr-28 py-4 shadow-lg"
+                            style={{
+                              backgroundColor: blogHero.search?.inputStyles?.light?.backgroundColor || '#ffffff',
+                              color: blogHero.search?.inputStyles?.light?.textColor || '#1f2937',
+                              border: blogHero.search?.inputStyles?.light?.useGradientBorder 
+                                ? 'none' 
+                                : `${blogHero.search?.inputStyles?.light?.borderWidth || '2px'} solid ${blogHero.search?.inputStyles?.light?.borderColor || '#e5e7eb'}`,
+                              borderRadius: blogHero.search?.inputStyles?.light?.borderRadius || '9999px',
+                            }}
+                            readOnly
+                          />
+                          <button 
+                            className="absolute right-2 top-2 px-6 py-2 font-medium transition-colors"
+                            style={{
+                              backgroundColor: blogHero.search?.buttonStyles?.light?.backgroundColor || '#2563eb',
+                              color: blogHero.search?.buttonStyles?.light?.textColor || '#ffffff',
+                              borderRadius: blogHero.search?.buttonStyles?.light?.borderRadius || '9999px',
+                            }}
+                          >
+                            {blogHero.search?.buttonText || 'Buscar'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview Tema Oscuro */}
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">🌙 Tema Oscuro:</p>
+                  <div 
+                    className="p-6 rounded-xl"
+                    style={getBackgroundStyle()}
+                  >
+                    <div className="max-w-xl mx-auto">
+                      {/* Wrapper para borde con gradiente */}
+                      <div 
+                        className="relative"
+                        style={blogHero.search?.inputStyles?.dark?.useGradientBorder ? {
+                          padding: blogHero.search?.inputStyles?.dark?.borderWidth || '2px',
+                          background: `linear-gradient(${blogHero.search?.inputStyles?.dark?.gradientBorderDirection || 'to right'}, ${blogHero.search?.inputStyles?.dark?.gradientBorderFrom || '#8b5cf6'}, ${blogHero.search?.inputStyles?.dark?.gradientBorderTo || '#06b6d4'})`,
+                          borderRadius: blogHero.search?.inputStyles?.dark?.borderRadius || '9999px',
+                        } : undefined}
+                      >
+                        <div className="relative">
+                          <div 
+                            className="absolute left-4 top-1/2 transform -translate-y-1/2"
+                            style={{ color: blogHero.search?.inputStyles?.dark?.iconColor || '#9ca3af' }}
+                          >
+                            <Search className="w-5 h-5" />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder={blogHero.search?.placeholder || 'Buscar noticias...'}
+                            className="w-full pl-12 pr-28 py-4 shadow-lg"
+                            style={{
+                              backgroundColor: blogHero.search?.inputStyles?.dark?.backgroundColor || '#1f2937',
+                              color: blogHero.search?.inputStyles?.dark?.textColor || '#ffffff',
+                              border: blogHero.search?.inputStyles?.dark?.useGradientBorder 
+                                ? 'none' 
+                                : `${blogHero.search?.inputStyles?.dark?.borderWidth || '2px'} solid ${blogHero.search?.inputStyles?.dark?.borderColor || '#374151'}`,
+                              borderRadius: blogHero.search?.inputStyles?.dark?.borderRadius || '9999px',
+                            }}
+                            readOnly
+                          />
+                          <button 
+                            className="absolute right-2 top-2 px-6 py-2 font-medium transition-colors"
+                            style={{
+                              backgroundColor: blogHero.search?.buttonStyles?.dark?.backgroundColor || '#2563eb',
+                              color: blogHero.search?.buttonStyles?.dark?.textColor || '#ffffff',
+                              borderRadius: blogHero.search?.buttonStyles?.dark?.borderRadius || '9999px',
+                            }}
+                          >
+                            {blogHero.search?.buttonText || 'Buscar'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

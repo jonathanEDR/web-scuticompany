@@ -256,103 +256,171 @@ export const AllNewsSection: React.FC<AllNewsSectionProps> = ({
             {/* Paginación */}
             {totalPages > 1 && config.paginationStyle !== 'loadMore' && (
               <div className="flex justify-center items-center gap-2 mt-10">
-                {/* Botón Anterior */}
-                <button
-                  onClick={goToPrevPage}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 font-medium transition-all duration-200 flex items-center gap-1 ${
-                    currentPage === 1
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'hover:scale-105'
-                  }`}
-                  style={{
-                    backgroundColor: config.paginationInactiveBg || (isDarkMode ? '#1f2937' : '#f3f4f6'),
-                    color: config.paginationInactiveText || (isDarkMode ? '#d1d5db' : '#374151'),
-                    border: `1px solid ${config.paginationBorderColor || (isDarkMode ? '#374151' : '#d1d5db')}`,
-                    borderRadius: config.paginationBorderRadius || '8px'
-                  }}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Anterior
-                </button>
+                {/* Obtener estilos de paginación según tema */}
+                {(() => {
+                  const paginationStyles = isDarkMode 
+                    ? config.paginationDark 
+                    : config.paginationLight;
+                  
+                  // Fallback a los valores antiguos si no hay configuración por tema
+                  const activeBg = paginationStyles?.activeBg || config.paginationActiveBg || (isDarkMode ? '#8b5cf6' : '#8b5cf6');
+                  const activeText = paginationStyles?.activeText || config.paginationActiveText || '#ffffff';
+                  const inactiveBg = paginationStyles?.inactiveBg || config.paginationInactiveBg || (isDarkMode ? '#1f2937' : '#f3f4f6');
+                  const inactiveText = paginationStyles?.inactiveText || config.paginationInactiveText || (isDarkMode ? '#9ca3af' : '#374151');
+                  const borderColor = paginationStyles?.borderColor || config.paginationBorderColor || (isDarkMode ? '#374151' : '#d1d5db');
+                  const borderRadius = paginationStyles?.borderRadius || config.paginationBorderRadius || '8px';
+                  const useGradient = paginationStyles?.activeUseGradient || false;
+                  const gradientFrom = paginationStyles?.activeGradientFrom || '#8b5cf6';
+                  const gradientTo = paginationStyles?.activeGradientTo || '#06b6d4';
+                  const gradientDirection = paginationStyles?.activeGradientDirection || 'to-r';
+                  
+                  // Convertir dirección de gradiente
+                  const getGradientCSS = () => {
+                    const directionMap: Record<string, string> = {
+                      'to-r': 'to right',
+                      'to-l': 'to left',
+                      'to-t': 'to top',
+                      'to-b': 'to bottom',
+                      'to-tr': 'to top right',
+                      'to-tl': 'to top left',
+                      'to-br': 'to bottom right',
+                      'to-bl': 'to bottom left'
+                    };
+                    return `linear-gradient(${directionMap[gradientDirection] || 'to right'}, ${gradientFrom}, ${gradientTo})`;
+                  };
+                  
+                  const activeBackground = useGradient ? getGradientCSS() : activeBg;
+                  
+                  return (
+                    <>
+                      {/* Botón Anterior */}
+                      <button
+                        onClick={goToPrevPage}
+                        disabled={currentPage === 1}
+                        className={`px-4 py-2 font-medium transition-all duration-200 flex items-center gap-1 ${
+                          currentPage === 1
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'hover:scale-105'
+                        }`}
+                        style={{
+                          backgroundColor: inactiveBg,
+                          color: inactiveText,
+                          border: `1px solid ${borderColor}`,
+                          borderRadius
+                        }}
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Anterior
+                      </button>
 
-                {/* Números de página (solo si es 'numbered') */}
-                {config.paginationStyle !== 'simple' && (
-                  <div className="flex items-center gap-1">
-                    {getPageNumbers().map((page, index) => (
-                      <React.Fragment key={index}>
-                        {page === '...' ? (
-                          <span 
-                            className="px-2 py-1"
-                            style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}
-                          >
-                            ...
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => goToPage(page as number)}
-                            className={`w-10 h-10 font-semibold transition-all duration-200 ${
-                              currentPage === page
-                                ? 'scale-110'
-                                : 'hover:scale-105'
-                            }`}
-                            style={{
-                              backgroundColor: currentPage === page
-                                ? (config.paginationActiveBg || iconColor)
-                                : (config.paginationInactiveBg || (isDarkMode ? '#1f2937' : '#f3f4f6')),
-                              color: currentPage === page
-                                ? (config.paginationActiveText || '#ffffff')
-                                : (config.paginationInactiveText || (isDarkMode ? '#d1d5db' : '#374151')),
-                              border: currentPage === page
-                                ? 'none'
-                                : `1px solid ${config.paginationBorderColor || (isDarkMode ? '#374151' : '#d1d5db')}`,
-                              borderRadius: config.paginationBorderRadius || '8px'
-                            }}
-                          >
-                            {page}
-                          </button>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                )}
+                      {/* Números de página (solo si es 'numbered') */}
+                      {config.paginationStyle !== 'simple' && (
+                        <div className="flex items-center gap-1">
+                          {getPageNumbers().map((page, index) => (
+                            <React.Fragment key={index}>
+                              {page === '...' ? (
+                                <span 
+                                  className="px-2 py-1"
+                                  style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}
+                                >
+                                  ...
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => goToPage(page as number)}
+                                  className={`w-10 h-10 font-semibold transition-all duration-200 ${
+                                    currentPage === page
+                                      ? 'scale-110'
+                                      : 'hover:scale-105'
+                                  }`}
+                                  style={{
+                                    background: currentPage === page
+                                      ? activeBackground
+                                      : inactiveBg,
+                                    color: currentPage === page
+                                      ? activeText
+                                      : inactiveText,
+                                    border: currentPage === page
+                                      ? 'none'
+                                      : `1px solid ${borderColor}`,
+                                    borderRadius
+                                  }}
+                                >
+                                  {page}
+                                </button>
+                              )}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      )}
 
-                {/* Botón Siguiente */}
-                <button
-                  onClick={goToNextPage}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 font-medium transition-all duration-200 flex items-center gap-1 ${
-                    currentPage === totalPages
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'hover:scale-105'
-                  }`}
-                  style={{
-                    backgroundColor: config.paginationInactiveBg || (isDarkMode ? '#1f2937' : '#f3f4f6'),
-                    color: config.paginationInactiveText || (isDarkMode ? '#d1d5db' : '#374151'),
-                    border: `1px solid ${config.paginationBorderColor || (isDarkMode ? '#374151' : '#d1d5db')}`,
-                    borderRadius: config.paginationBorderRadius || '8px'
-                  }}
-                >
-                  Siguiente
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                      {/* Botón Siguiente */}
+                      <button
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                        className={`px-4 py-2 font-medium transition-all duration-200 flex items-center gap-1 ${
+                          currentPage === totalPages
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'hover:scale-105'
+                        }`}
+                        style={{
+                          backgroundColor: inactiveBg,
+                          color: inactiveText,
+                          border: `1px solid ${borderColor}`,
+                          borderRadius
+                        }}
+                      >
+                        Siguiente
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             )}
 
             {/* Botón Cargar Más (alternativo) */}
             {totalPages > 1 && config.paginationStyle === 'loadMore' && currentPage < totalPages && (
               <div className="flex justify-center mt-10">
-                <button
-                  onClick={goToNextPage}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105"
-                  style={{
-                    backgroundColor: config.paginationActiveBg || iconColor,
-                    color: config.paginationActiveText || '#ffffff'
-                  }}
-                >
-                  Cargar más noticias
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+                {(() => {
+                  const paginationStyles = isDarkMode 
+                    ? config.paginationDark 
+                    : config.paginationLight;
+                  
+                  const activeBg = paginationStyles?.activeBg || config.paginationActiveBg || iconColor;
+                  const activeText = paginationStyles?.activeText || config.paginationActiveText || '#ffffff';
+                  const useGradient = paginationStyles?.activeUseGradient || false;
+                  const gradientFrom = paginationStyles?.activeGradientFrom || '#8b5cf6';
+                  const gradientTo = paginationStyles?.activeGradientTo || '#06b6d4';
+                  const gradientDirection = paginationStyles?.activeGradientDirection || 'to-r';
+                  
+                  const directionMap: Record<string, string> = {
+                    'to-r': 'to right',
+                    'to-l': 'to left',
+                    'to-t': 'to top',
+                    'to-b': 'to bottom',
+                    'to-tr': 'to top right',
+                    'to-br': 'to bottom right'
+                  };
+                  
+                  const activeBackground = useGradient 
+                    ? `linear-gradient(${directionMap[gradientDirection] || 'to right'}, ${gradientFrom}, ${gradientTo})`
+                    : activeBg;
+                  
+                  return (
+                    <button
+                      onClick={goToNextPage}
+                      className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105"
+                      style={{
+                        background: activeBackground,
+                        color: activeText
+                      }}
+                    >
+                      Cargar más noticias
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  );
+                })()}
               </div>
             )}
           </div>

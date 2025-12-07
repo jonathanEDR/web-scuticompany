@@ -580,6 +580,10 @@ export interface ServicesAccordionConfig {
 export interface BlogHeroStyleConfig {
   titleColor?: string;
   titleHighlightColor?: string;
+  titleHighlightUseGradient?: boolean;
+  titleHighlightGradientFrom?: string;
+  titleHighlightGradientTo?: string;
+  titleHighlightGradientDirection?: string;
   subtitleColor?: string;
   statsValueColor?: string;
   statsLabelColor?: string;
@@ -624,10 +628,61 @@ export interface FeaturedPostsConfig {
   maxFeaturedPosts?: number;
 }
 
+// Estilos del input de búsqueda
+export interface SearchInputStyles {
+  backgroundColor?: string;
+  textColor?: string;
+  placeholderColor?: string;
+  borderColor?: string;
+  borderWidth?: string;
+  borderRadius?: string;
+  iconColor?: string;
+  // Gradiente para el borde
+  useGradientBorder?: boolean;
+  gradientBorderFrom?: string;
+  gradientBorderTo?: string;
+  gradientBorderDirection?: string;
+}
+
+// Estilos del botón de búsqueda
+export interface SearchButtonStyles {
+  backgroundColor?: string;
+  textColor?: string;
+  hoverBackgroundColor?: string;
+  borderRadius?: string;
+}
+
+// Configuración completa de búsqueda
+export interface BlogSearchConfig {
+  placeholder?: string;
+  buttonText?: string;
+  inputStyles?: {
+    light?: SearchInputStyles;
+    dark?: SearchInputStyles;
+  };
+  buttonStyles?: {
+    light?: SearchButtonStyles;
+    dark?: SearchButtonStyles;
+  };
+}
+
+// Estilos de título y resaltado
+export interface TitleStyleConfig {
+  italic?: boolean;
+  hasBackground?: boolean;
+  backgroundColor?: string;
+  padding?: string;
+  borderRadius?: string;
+}
+
 export interface BlogHeroConfig {
   title?: string;
   titleHighlight?: string;
   subtitle?: string;
+  fontFamily?: string;
+  // Estilos de resaltado del título
+  titleStyle?: TitleStyleConfig;
+  highlightStyle?: TitleStyleConfig;
   // Imagen de fondo (tiene prioridad sobre el gradiente)
   backgroundImage?: string;
   backgroundOverlay?: number; // Oscurecer imagen (0-1)
@@ -640,10 +695,7 @@ export interface BlogHeroConfig {
     readersCount?: string;
     readersLabel?: string;
   };
-  search?: {
-    placeholder?: string;
-    buttonText?: string;
-  };
+  search?: BlogSearchConfig;
   styles?: {
     light?: BlogHeroStyleConfig;
     dark?: BlogHeroStyleConfig;

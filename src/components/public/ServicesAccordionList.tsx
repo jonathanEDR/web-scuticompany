@@ -503,6 +503,7 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Número fijo de servicios por página
+  const sectionRef = React.useRef<HTMLElement>(null);
   
   const isDark = currentTheme === 'dark';
   
@@ -562,8 +563,7 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     setExpandedIndex(null);
-    // Scroll suave al inicio de la sección
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // NO hacer scroll - mantener la posición actual del usuario
   };
 
   if (!servicios || servicios.length === 0) {
@@ -572,6 +572,7 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
 
   return (
     <section 
+      ref={sectionRef}
       className={'relative py-12 overflow-hidden ' + className}
       style={{
         width: '100vw',
