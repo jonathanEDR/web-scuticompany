@@ -66,6 +66,16 @@ interface SectionContent {
   imageAlt?: string;
 }
 
+// Configuración de fondo compartido para Misión y Visión
+interface MissionVisionBackground {
+  backgroundImage?: string | {
+    light?: string;
+    dark?: string;
+  };
+  backgroundOpacity?: number;
+  backgroundOverlay?: boolean;
+}
+
 interface ValueItem {
   title: string;
   description: string;
@@ -74,6 +84,7 @@ interface ValueItem {
     dark?: string;
   };
   imageAlt?: string;
+  imageOpacity?: number; // Opacidad de la imagen (0-100)
   icon?: string;
 }
 
@@ -88,12 +99,76 @@ interface ValuesContent {
     autoplay?: boolean;
     autoplaySpeed?: number;
   };
+  // Configuración de imagen de fondo
+  backgroundImage?: string | {
+    light?: string;
+    dark?: string;
+  };
+  backgroundOpacity?: number;
+  backgroundOverlay?: boolean;
+  // Configuración de tamaño de tarjetas
+  cardWidth?: string; // Ej: '100%', '350px', 'auto'
+  cardHeight?: string; // Ej: '340px', '400px', 'auto'
+  // Configuración de colores de tarjetas
+  cardBgColor?: string;
+  cardBgColorDark?: string;
+  cardBorderColor?: string;
+  cardBorderColorDark?: string;
+  cardTitleColor?: string;
+  cardTitleColorDark?: string;
+  cardTextColor?: string;
+  cardTextColorDark?: string;
+  cardImageOpacity?: number; // Opacidad global para imágenes (0-100)
+  // Configuración de gradiente para fondo de tarjetas
+  cardBgUseGradient?: boolean;
+  cardBgGradientFrom?: string;
+  cardBgGradientTo?: string;
+  cardBgGradientDirection?: string;
+  cardBgUseGradientDark?: boolean;
+  cardBgGradientFromDark?: string;
+  cardBgGradientToDark?: string;
+  cardBgGradientDirectionDark?: string;
+  // Toggle para overlay oscuro en tarjetas con imagen
+  cardImageOverlay?: boolean;
+  // Configuración de gradiente para BORDE de tarjetas
+  cardBorderUseGradient?: boolean;
+  cardBorderGradientFrom?: string;
+  cardBorderGradientTo?: string;
+  cardBorderGradientDirection?: string;
+  cardBorderUseGradientDark?: boolean;
+  cardBorderGradientFromDark?: string;
+  cardBorderGradientToDark?: string;
+  cardBorderGradientDirectionDark?: string;
+  // Configuración de gradiente para TÍTULO de tarjetas
+  cardTitleUseGradient?: boolean;
+  cardTitleGradientFrom?: string;
+  cardTitleGradientTo?: string;
+  cardTitleGradientDirection?: string;
+  cardTitleUseGradientDark?: boolean;
+  cardTitleGradientFromDark?: string;
+  cardTitleGradientToDark?: string;
+  cardTitleGradientDirectionDark?: string;
+  // Configuración de colores para TÍTULO DE LA SECCIÓN
+  sectionTitleColor?: string;
+  sectionTitleColorDark?: string;
+  sectionTitleUseGradient?: boolean;
+  sectionTitleGradientFrom?: string;
+  sectionTitleGradientTo?: string;
+  sectionTitleGradientDirection?: string;
+  sectionTitleUseGradientDark?: boolean;
+  sectionTitleGradientFromDark?: string;
+  sectionTitleGradientToDark?: string;
+  sectionTitleGradientDirectionDark?: string;
+  // Configuración de colores para SUBTÍTULO DE LA SECCIÓN
+  sectionSubtitleColor?: string;
+  sectionSubtitleColorDark?: string;
 }
 
 interface PageContent {
   hero: HeroContent;
   mission: SectionContent;
   vision: SectionContent;
+  missionVisionBackground?: MissionVisionBackground;
   values?: ValuesContent;
 }
 
@@ -321,162 +396,406 @@ const About = () => {
           </div>
         </section>
         
-        {/* 📋 Secciones de Contenido */}
-        <main className="container mx-auto px-4 py-16 md:py-24" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-          <div className="max-w-6xl mx-auto space-y-20 md:space-y-32">
-            
-            {/* 🎯 Misión - Texto izquierda, Imagen derecha */}
-            {mission?.title && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
-                {/* Contenido de texto */}
-                <div 
-                  className="order-2 lg:order-1 space-y-6"
-                  style={{ fontFamily: `'${mission.fontFamily || 'Montserrat'}', sans-serif` }}
-                >
-                  <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium ${
-                    theme === 'dark' 
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' 
-                      : 'bg-purple-100 text-purple-700 border border-purple-200'
-                  }`}>
-                    {stripHtmlTags(mission.title) || 'Nuestra Misión'}
-                  </div>
-                  <p className={`text-lg md:text-xl leading-relaxed ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
-                    {stripHtmlTags(mission.description)}
-                  </p>
-                </div>
-                
-                {/* Imagen */}
-                <div className="order-1 lg:order-2">
-                  <div 
-                    className={`relative overflow-hidden rounded-3xl aspect-[4/3] transition-all duration-500 group shadow-2xl ${
-                      theme === 'dark' 
-                        ? 'shadow-purple-500/10' 
-                        : 'shadow-purple-500/20'
-                    }`}
-                  >
-                    {(() => {
-                      const missionImage = mission.image 
-                        ? (theme === 'dark' ? mission.image.dark || mission.image.light : mission.image.light || mission.image.dark)
-                        : null;
-                      
-                      return missionImage ? (
-                        <img 
-                          src={missionImage}
-                          alt={mission.imageAlt || 'Nuestra Misión'}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        // Placeholder visual cuando no hay imagen
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
-                            theme === 'dark' 
-                              ? 'bg-gradient-to-br from-purple-500/20 to-cyan-500/20' 
-                              : 'bg-gradient-to-br from-purple-200 to-cyan-200'
-                          }`}>
-                            <svg className={`w-12 h-12 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                          </div>
-                          {/* Decoraciones */}
-                          <div className={`absolute top-4 right-4 w-16 h-16 rounded-full opacity-30 ${
-                            theme === 'dark' ? 'bg-purple-500' : 'bg-purple-300'
-                          }`}></div>
-                          <div className={`absolute bottom-8 left-8 w-12 h-12 rounded-full opacity-20 ${
-                            theme === 'dark' ? 'bg-cyan-500' : 'bg-cyan-300'
-                          }`}></div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* 👁️ Visión - Imagen izquierda, Texto derecha */}
-            {vision?.title && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
-                {/* Imagen */}
-                <div className="order-1">
-                  <div 
-                    className={`relative overflow-hidden rounded-3xl aspect-[4/3] transition-all duration-500 group shadow-2xl ${
-                      theme === 'dark' 
-                        ? 'shadow-cyan-500/10' 
-                        : 'shadow-cyan-500/20'
-                    }`}
-                  >
-                    {(() => {
-                      const visionImage = vision.image 
-                        ? (theme === 'dark' ? vision.image.dark || vision.image.light : vision.image.light || vision.image.dark)
-                        : null;
-                      
-                      return visionImage ? (
-                        <img 
-                          src={visionImage}
-                          alt={vision.imageAlt || 'Nuestra Visión'}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        // Placeholder visual cuando no hay imagen
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
-                            theme === 'dark' 
-                              ? 'bg-gradient-to-br from-cyan-500/20 to-purple-500/20' 
-                              : 'bg-gradient-to-br from-cyan-200 to-purple-200'
-                          }`}>
-                            <svg className={`w-12 h-12 ${theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                          </div>
-                          {/* Decoraciones */}
-                          <div className={`absolute top-8 left-4 w-16 h-16 rounded-full opacity-30 ${
-                            theme === 'dark' ? 'bg-cyan-500' : 'bg-cyan-300'
-                          }`}></div>
-                          <div className={`absolute bottom-4 right-8 w-12 h-12 rounded-full opacity-20 ${
-                            theme === 'dark' ? 'bg-purple-500' : 'bg-purple-300'
-                          }`}></div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </div>
-                
-                {/* Contenido de texto */}
-                <div 
-                  className="order-2 space-y-6"
-                  style={{ fontFamily: `'${vision.fontFamily || 'Montserrat'}', sans-serif` }}
-                >
-                  <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium ${
-                    theme === 'dark' 
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
-                      : 'bg-cyan-100 text-cyan-700 border border-cyan-200'
-                  }`}>
-                    {stripHtmlTags(vision.title) || 'Nuestra Visión'}
-                  </div>
-                  <p className={`text-lg md:text-xl leading-relaxed ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
-                    {stripHtmlTags(vision.description)}
-                  </p>
-                </div>
-              </div>
-            )}
-            
-            {/* ⭐ Valores - Carrusel */}
-            {values?.title && values?.items && values.items.length > 0 && (() => {
-              const itemsPerView = values.carouselConfig?.itemsPerView || 3;
-              const totalSlides = Math.ceil(values.items.length / itemsPerView);
-              const valuesFontFamily = values.fontFamily || 'Montserrat';
+        {/* 📋 Misión y Visión - Bloque unificado con fondo compartido */}
+        {(mission?.title || vision?.title) && (
+          <section 
+            className="relative py-16 md:py-24 overflow-hidden"
+            style={{
+              backgroundColor: theme === 'dark' ? '#111827' : '#F9FAFB'
+            }}
+          >
+            {/* Imagen de fondo compartida para Misión y Visión */}
+            {(() => {
+              const mvBg = pageData?.content?.missionVisionBackground;
+              // Soportar tanto string simple como objeto {light, dark}
+              const bgImage = mvBg?.backgroundImage 
+                ? (typeof mvBg.backgroundImage === 'string'
+                    ? mvBg.backgroundImage
+                    : (theme === 'dark' 
+                        ? mvBg.backgroundImage.dark || mvBg.backgroundImage.light 
+                        : mvBg.backgroundImage.light || mvBg.backgroundImage.dark))
+                : null;
+              const bgOpacity = mvBg?.backgroundOpacity ?? 1;
               
-              const visibleItems = values.items.slice(
-                currentSlide * itemsPerView,
-                currentSlide * itemsPerView + itemsPerView
-              );
+              return bgImage ? (
+                <>
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
+                    style={{
+                      backgroundImage: `url(${bgImage})`,
+                      opacity: bgOpacity
+                    }}
+                  />
+                  {/* Overlay para legibilidad - Solo si está activado explícitamente */}
+                  {mvBg?.backgroundOverlay === true && (
+                    <div 
+                      className="absolute inset-0 transition-all duration-500"
+                      style={{
+                        background: theme === 'dark'
+                          ? `linear-gradient(180deg, rgba(17, 24, 39, 0.6) 0%, rgba(17, 24, 39, 0.75) 100%)`
+                          : `linear-gradient(180deg, rgba(249, 250, 251, 0.6) 0%, rgba(249, 250, 251, 0.75) 100%)`
+                      }}
+                    />
+                  )}
+                </>
+              ) : null;
+            })()}
+            
+            <div className="relative z-10 container mx-auto px-4" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              <div className="max-w-6xl mx-auto space-y-20 md:space-y-32">
+                
+                {/* 🎯 Misión */}
+                {mission?.title && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+                    {/* Contenido de texto */}
+                    <div 
+                      className="order-2 lg:order-1 space-y-6"
+                      style={{ fontFamily: `'${mission.fontFamily || 'Montserrat'}', sans-serif` }}
+                    >
+                      <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium ${
+                        theme === 'dark' 
+                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' 
+                          : 'bg-purple-100 text-purple-700 border border-purple-200'
+                      }`}>
+                        {stripHtmlTags(mission.title) || 'Nuestra Misión'}
+                      </div>
+                      <p className={`text-lg md:text-xl leading-relaxed ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}>
+                        {stripHtmlTags(mission.description)}
+                      </p>
+                    </div>
+                    
+                    {/* Imagen */}
+                    <div className="order-1 lg:order-2">
+                      {(() => {
+                        // Soportar tanto string simple como objeto {light, dark}
+                        const missionImage = typeof mission.image === 'string'
+                          ? mission.image
+                          : (mission.image 
+                              ? (mission.image.dark || mission.image.light)
+                              : null);
+                        
+                        return missionImage ? (
+                          // Imagen sin marco - se muestra limpia
+                          <div className="relative flex items-center justify-center transition-all duration-500 group">
+                            <img 
+                              src={missionImage}
+                              alt={mission.imageAlt || 'Nuestra Misión'}
+                              className="w-full h-auto max-h-[400px] object-contain transition-transform duration-500 group-hover:scale-105"
+                            />
+                          </div>
+                        ) : (
+                          // Placeholder visual cuando no hay imagen
+                          <div 
+                            className={`relative overflow-hidden rounded-3xl aspect-[4/3] transition-all duration-500 group shadow-2xl ${
+                              theme === 'dark' 
+                                ? 'shadow-purple-500/10' 
+                                : 'shadow-purple-500/20'
+                            }`}
+                          >
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
+                                theme === 'dark' 
+                                  ? 'bg-gradient-to-br from-purple-500/20 to-cyan-500/20' 
+                                  : 'bg-gradient-to-br from-purple-200 to-cyan-200'
+                              }`}>
+                                <svg className={`w-12 h-12 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                              </div>
+                              {/* Decoraciones */}
+                              <div className={`absolute top-4 right-4 w-16 h-16 rounded-full opacity-30 ${
+                                theme === 'dark' ? 'bg-purple-500' : 'bg-purple-300'
+                              }`}></div>
+                              <div className={`absolute bottom-8 left-8 w-12 h-12 rounded-full opacity-20 ${
+                                theme === 'dark' ? 'bg-cyan-500' : 'bg-cyan-300'
+                              }`}></div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
+                
+                {/* 👁️ Visión */}
+                {vision?.title && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+                    {/* Imagen */}
+                    <div className="order-1">
+                      {(() => {
+                        // Soportar tanto string simple como objeto {light, dark}
+                        const visionImage = typeof vision.image === 'string'
+                          ? vision.image
+                          : (vision.image 
+                              ? (vision.image.dark || vision.image.light)
+                              : null);
+                        
+                        return visionImage ? (
+                          // Imagen sin marco - se muestra limpia
+                          <div className="relative flex items-center justify-center transition-all duration-500 group">
+                            <img 
+                              src={visionImage}
+                              alt={vision.imageAlt || 'Nuestra Visión'}
+                              className="w-full h-auto max-h-[400px] object-contain transition-transform duration-500 group-hover:scale-105"
+                            />
+                          </div>
+                        ) : (
+                          // Placeholder visual cuando no hay imagen
+                          <div 
+                            className={`relative overflow-hidden rounded-3xl aspect-[4/3] transition-all duration-500 group shadow-2xl ${
+                              theme === 'dark' 
+                                ? 'shadow-cyan-500/10' 
+                                : 'shadow-cyan-500/20'
+                            }`}
+                          >
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
+                                theme === 'dark' 
+                                  ? 'bg-gradient-to-br from-cyan-500/20 to-purple-500/20' 
+                                  : 'bg-gradient-to-br from-cyan-200 to-purple-200'
+                              }`}>
+                                <svg className={`w-12 h-12 ${theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                              </div>
+                              {/* Decoraciones */}
+                              <div className={`absolute top-8 left-4 w-16 h-16 rounded-full opacity-30 ${
+                                theme === 'dark' ? 'bg-cyan-500' : 'bg-cyan-300'
+                              }`}></div>
+                              <div className={`absolute bottom-4 right-8 w-12 h-12 rounded-full opacity-20 ${
+                                theme === 'dark' ? 'bg-purple-500' : 'bg-purple-300'
+                              }`}></div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                    
+                    {/* Contenido de texto */}
+                    <div 
+                      className="order-2 space-y-6"
+                      style={{ fontFamily: `'${vision.fontFamily || 'Montserrat'}', sans-serif` }}
+                    >
+                      <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium ${
+                        theme === 'dark' 
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
+                          : 'bg-cyan-100 text-cyan-700 border border-cyan-200'
+                      }`}>
+                        {stripHtmlTags(vision.title) || 'Nuestra Visión'}
+                      </div>
+                      <p className={`text-lg md:text-xl leading-relaxed ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}>
+                        {stripHtmlTags(vision.description)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+              </div>
+            </div>
+          </section>
+        )}
+        
+        {/* ⭐ Valores - Sección con imagen de fondo */}
+        {(() => {
+          // Obtener imagen de fondo de valores según el tema
+          const valuesBackgroundImage = values?.backgroundImage
+            ? typeof values.backgroundImage === 'string'
+              ? values.backgroundImage
+              : (theme === 'dark' ? values.backgroundImage.dark : values.backgroundImage.light) || 
+                values.backgroundImage.light || values.backgroundImage.dark
+            : null;
 
-              return (
-                <div className="py-12">
+          return (
+            <section 
+              className="relative py-16 md:py-24 overflow-hidden"
+              style={{ fontFamily: "'Montserrat', sans-serif" }}
+            >
+              {/* Imagen de fondo */}
+              {valuesBackgroundImage && (
+                <div 
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                  style={{ 
+                    backgroundImage: `url(${valuesBackgroundImage})`,
+                    opacity: values?.backgroundOpacity ?? 1
+                  }}
+                />
+              )}
+              
+              {/* Overlay oscuro opcional */}
+              {valuesBackgroundImage && values?.backgroundOverlay === true && (
+                <div 
+                  className="absolute inset-0"
+                  style={{ 
+                    backgroundColor: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.4)'
+                  }}
+                />
+              )}
+
+              {/* Contenido */}
+              <div className="relative z-10 container mx-auto px-4">
+                <div className="max-w-6xl mx-auto">
+                  {values?.title && values?.items && values.items.length > 0 && (() => {
+                    const itemsPerView = values.carouselConfig?.itemsPerView || 3;
+                    const totalSlides = Math.ceil(values.items.length / itemsPerView);
+                    const valuesFontFamily = values.fontFamily || 'Montserrat';
+                    const cardHeight = values.cardHeight || '340px';
+                    const cardWidth = values.cardWidth || '100%';
+                    
+                    // Configuración de colores de tarjetas con soporte de gradiente
+                    const useGradient = theme === 'dark' 
+                      ? (values.cardBgUseGradientDark || false)
+                      : (values.cardBgUseGradient || false);
+                    
+                    const gradientFrom = theme === 'dark'
+                      ? (values.cardBgGradientFromDark || '#1e3a5f')
+                      : (values.cardBgGradientFrom || '#667eea');
+                    
+                    const gradientTo = theme === 'dark'
+                      ? (values.cardBgGradientToDark || '#0d9488')
+                      : (values.cardBgGradientTo || '#764ba2');
+                    
+                    const gradientDirection = theme === 'dark'
+                      ? (values.cardBgGradientDirectionDark || 'to-br')
+                      : (values.cardBgGradientDirection || 'to-br');
+                    
+                    const getGradientCss = () => {
+                      const directionMap: Record<string, string> = {
+                        'to-r': 'to right',
+                        'to-l': 'to left', 
+                        'to-t': 'to top',
+                        'to-b': 'to bottom',
+                        'to-tr': 'to top right',
+                        'to-tl': 'to top left',
+                        'to-br': 'to bottom right',
+                        'to-bl': 'to bottom left'
+                      };
+                      return `linear-gradient(${directionMap[gradientDirection] || 'to bottom right'}, ${gradientFrom}, ${gradientTo})`;
+                    };
+                    
+                    const cardBgStyle = useGradient 
+                      ? { background: getGradientCss() }
+                      : { backgroundColor: theme === 'dark' 
+                          ? (values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)') 
+                          : (values.cardBgColor || 'rgba(255, 255, 255, 0.8)') };
+                    
+                    const cardBorderColor = theme === 'dark'
+                      ? (values.cardBorderColorDark || 'rgba(75, 85, 99, 0.5)')
+                      : (values.cardBorderColor || 'rgba(243, 244, 246, 1)');
+                    const cardTitleColor = theme === 'dark'
+                      ? (values.cardTitleColorDark || '#ffffff')
+                      : (values.cardTitleColor || '#111827');
+                    const cardTextColor = theme === 'dark'
+                      ? (values.cardTextColorDark || '#9ca3af')
+                      : (values.cardTextColor || '#4b5563');
+                    
+                    // Toggle para overlay oscuro en tarjetas con imagen (default: true para mantener legibilidad)
+                    const showImageOverlay = values.cardImageOverlay !== false;
+                    
+                    // Configuración de gradiente para BORDE de tarjetas
+                    const useBorderGradient = theme === 'dark'
+                      ? (values.cardBorderUseGradientDark || false)
+                      : (values.cardBorderUseGradient || false);
+                    const borderGradientFrom = theme === 'dark'
+                      ? (values.cardBorderGradientFromDark || '#8b5cf6')
+                      : (values.cardBorderGradientFrom || '#667eea');
+                    const borderGradientTo = theme === 'dark'
+                      ? (values.cardBorderGradientToDark || '#06b6d4')
+                      : (values.cardBorderGradientTo || '#764ba2');
+                    const borderGradientDirection = theme === 'dark'
+                      ? (values.cardBorderGradientDirectionDark || 'to-r')
+                      : (values.cardBorderGradientDirection || 'to-r');
+                    
+                    const getBorderGradientCss = () => {
+                      const directionMap: Record<string, string> = {
+                        'to-r': 'to right', 'to-l': 'to left', 'to-t': 'to top', 'to-b': 'to bottom',
+                        'to-tr': 'to top right', 'to-tl': 'to top left', 'to-br': 'to bottom right', 'to-bl': 'to bottom left'
+                      };
+                      return `linear-gradient(${directionMap[borderGradientDirection] || 'to right'}, ${borderGradientFrom}, ${borderGradientTo})`;
+                    };
+                    
+                    // Configuración de gradiente para TÍTULO de tarjetas
+                    const useTitleGradient = theme === 'dark'
+                      ? (values.cardTitleUseGradientDark || false)
+                      : (values.cardTitleUseGradient || false);
+                    const titleGradientFrom = theme === 'dark'
+                      ? (values.cardTitleGradientFromDark || '#8b5cf6')
+                      : (values.cardTitleGradientFrom || '#667eea');
+                    const titleGradientTo = theme === 'dark'
+                      ? (values.cardTitleGradientToDark || '#06b6d4')
+                      : (values.cardTitleGradientTo || '#764ba2');
+                    const titleGradientDirection = theme === 'dark'
+                      ? (values.cardTitleGradientDirectionDark || 'to-r')
+                      : (values.cardTitleGradientDirection || 'to-r');
+                    
+                    // Configuración de colores para TÍTULO DE LA SECCIÓN
+                    const useSectionTitleGradient = theme === 'dark'
+                      ? (values.sectionTitleUseGradientDark || false)
+                      : (values.sectionTitleUseGradient || false);
+                    const sectionTitleGradientFrom = theme === 'dark'
+                      ? (values.sectionTitleGradientFromDark || '#8b5cf6')
+                      : (values.sectionTitleGradientFrom || '#667eea');
+                    const sectionTitleGradientTo = theme === 'dark'
+                      ? (values.sectionTitleGradientToDark || '#06b6d4')
+                      : (values.sectionTitleGradientTo || '#764ba2');
+                    const sectionTitleGradientDirection = theme === 'dark'
+                      ? (values.sectionTitleGradientDirectionDark || 'to-r')
+                      : (values.sectionTitleGradientDirection || 'to-r');
+                    const sectionTitleColor = theme === 'dark'
+                      ? (values.sectionTitleColorDark || '#ffffff')
+                      : (values.sectionTitleColor || '#111827');
+                    const sectionSubtitleColor = theme === 'dark'
+                      ? (values.sectionSubtitleColorDark || '#9ca3af')
+                      : (values.sectionSubtitleColor || '#6b7280');
+                    
+                    const visibleItems = values.items.slice(
+                      currentSlide * itemsPerView,
+                      currentSlide * itemsPerView + itemsPerView
+                    );
+
+                    return (
+                      <div className="py-12">
+                  {/* Estilos dinámicos para gradientes */}
+                  <style>
+                    {`
+                      .section-title-gradient-${theme} {
+                        background: linear-gradient(${
+                          sectionTitleGradientDirection === 'to-r' ? 'to right' :
+                          sectionTitleGradientDirection === 'to-l' ? 'to left' :
+                          sectionTitleGradientDirection === 'to-t' ? 'to top' :
+                          sectionTitleGradientDirection === 'to-b' ? 'to bottom' :
+                          sectionTitleGradientDirection === 'to-tr' ? 'to top right' :
+                          sectionTitleGradientDirection === 'to-tl' ? 'to top left' :
+                          sectionTitleGradientDirection === 'to-br' ? 'to bottom right' :
+                          'to bottom left'
+                        }, ${sectionTitleGradientFrom}, ${sectionTitleGradientTo});
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        display: inline-block;
+                      }
+                      .card-title-gradient-${theme} {
+                        background: linear-gradient(${
+                          titleGradientDirection === 'to-r' ? 'to right' :
+                          titleGradientDirection === 'to-l' ? 'to left' :
+                          titleGradientDirection === 'to-t' ? 'to top' :
+                          titleGradientDirection === 'to-b' ? 'to bottom' :
+                          titleGradientDirection === 'to-tr' ? 'to top right' :
+                          titleGradientDirection === 'to-tl' ? 'to top left' :
+                          titleGradientDirection === 'to-br' ? 'to bottom right' :
+                          'to bottom left'
+                        }, ${titleGradientFrom}, ${titleGradientTo});
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                      }
+                    `}
+                  </style>
+
                   {/* Título y subtítulo */}
                   <div className="text-center mb-16">
                     <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-6 ${
@@ -486,15 +805,23 @@ const About = () => {
                     }`}>
                       Lo que nos define
                     </div>
-                    <h2 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`} style={{ fontFamily: `'${valuesFontFamily}', sans-serif` }}>
+                    <h2 
+                      className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${useSectionTitleGradient ? `section-title-gradient-${theme}` : ''}`}
+                      style={{ 
+                        fontFamily: `'${valuesFontFamily}', sans-serif`,
+                        ...(!useSectionTitleGradient ? { color: sectionTitleColor } : {})
+                      }}
+                    >
                       {stripHtmlTags(values.title)}
                     </h2>
                     {values.subtitle && (
-                      <p className={`text-lg max-w-2xl mx-auto ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`} style={{ fontFamily: `'${valuesFontFamily}', sans-serif` }}>
+                      <p 
+                        className="text-lg max-w-2xl mx-auto"
+                        style={{ 
+                          fontFamily: `'${valuesFontFamily}', sans-serif`,
+                          color: sectionSubtitleColor
+                        }}
+                      >
                         {stripHtmlTags(values.subtitle)}
                       </p>
                     )}
@@ -505,21 +832,108 @@ const About = () => {
                     {/* Cards del Carrusel */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 lg:px-8">
                       {visibleItems.map((value, index) => {
-                        const valueImage = value.image
-                          ? (theme === 'dark' ? value.image.dark || value.image.light : value.image.light || value.image.dark)
-                          : null;
+                        // Soportar tanto string simple como objeto {light, dark}
+                        const valueImage = typeof value.image === 'string' 
+                          ? value.image 
+                          : (value.image 
+                              ? (theme === 'dark' ? value.image.dark || value.image.light : value.image.light || value.image.dark)
+                              : null);
+                        
+                        // Opacidad individual o global
+                        const imageOpacity = (value.imageOpacity ?? values.cardImageOpacity ?? 100) / 100;
 
-                        return (
+                        return useBorderGradient ? (
+                          // Tarjeta con borde gradiente (usando wrapper)
                           <div
                             key={currentSlide * itemsPerView + index}
-                            className={`group relative overflow-hidden rounded-3xl transition-all duration-500 transform hover:scale-[1.02] ${
-                              theme === 'dark'
-                                ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 hover:border-purple-500/50 shadow-xl shadow-black/20'
-                                : 'bg-white/80 backdrop-blur-sm shadow-xl border border-gray-100 hover:shadow-2xl hover:border-purple-300'
-                            }`}
+                            className="group relative rounded-3xl transition-all duration-500 transform hover:scale-[1.02]"
+                            style={{
+                              animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`,
+                              background: getBorderGradientCss(),
+                              padding: '2px',
+                              minHeight: cardHeight,
+                              width: cardWidth,
+                              maxWidth: cardWidth === '100%' ? undefined : cardWidth
+                            }}
+                          >
+                            <div
+                              className="relative overflow-hidden rounded-3xl h-full backdrop-blur-sm shadow-xl group-hover:shadow-2xl"
+                              style={{
+                                ...cardBgStyle,
+                                minHeight: `calc(${cardHeight} - 4px)`
+                              }}
+                            >
+                              {/* Imagen de fondo o gradiente */}
+                              <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                                {valueImage ? (
+                                  <img
+                                    src={valueImage}
+                                    alt={value.imageAlt || value.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    style={{ opacity: imageOpacity }}
+                                  />
+                                ) : (
+                                  <div className={`absolute inset-0 ${
+                                    theme === 'dark'
+                                      ? 'bg-gradient-to-br from-purple-900/40 via-gray-900/60 to-cyan-900/40'
+                                      : 'bg-gradient-to-br from-purple-50 via-white to-cyan-50'
+                                  }`} />
+                                )}
+                              </div>
+
+                              {/* Contenido de la tarjeta */}
+                              <div className={`relative z-10 p-8 h-full flex flex-col justify-end ${
+                                valueImage && showImageOverlay ? 'bg-gradient-to-t from-black/70 via-black/30 to-transparent' : ''
+                              }`}>
+                                {/* Título con gradiente opcional */}
+                                <h3 
+                                  className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
+                                    !valueImage && useTitleGradient ? `card-title-gradient-${theme}` : ''
+                                  }`}
+                                  style={{ 
+                                    fontFamily: `'${valuesFontFamily}', sans-serif`,
+                                    ...(valueImage 
+                                      ? { color: '#ffffff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }
+                                      : (!useTitleGradient ? { color: cardTitleColor } : {})
+                                    )
+                                  }}
+                                >
+                                  {stripHtmlTags(value.title)}
+                                </h3>
+
+                                {/* Descripción */}
+                                <p 
+                                  className="text-base leading-relaxed"
+                                  style={{ 
+                                    fontFamily: `'${valuesFontFamily}', sans-serif`,
+                                    color: valueImage ? 'rgba(255,255,255,0.9)' : cardTextColor,
+                                    textShadow: valueImage ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+                                  }}
+                                >
+                                  {stripHtmlTags(value.description)}
+                                </p>
+
+                                {/* Línea decorativa */}
+                                <div className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 
+                                  opacity-0 group-hover:opacity-100 transition-all duration-300 transform 
+                                  translate-y-2 group-hover:translate-y-0" />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          // Tarjeta con borde sólido normal
+                          <div
+                            key={currentSlide * itemsPerView + index}
+                            className="group relative overflow-hidden rounded-3xl transition-all duration-500 transform hover:scale-[1.02] backdrop-blur-sm shadow-xl hover:shadow-2xl"
                             style={{ 
                               animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`,
-                              minHeight: '340px'
+                              minHeight: cardHeight,
+                              width: cardWidth,
+                              maxWidth: cardWidth === '100%' ? undefined : cardWidth,
+                              ...cardBgStyle,
+                              borderWidth: '1px',
+                              borderStyle: 'solid',
+                              borderColor: cardBorderColor
                             }}
                           >
                             {/* Imagen de fondo o gradiente */}
@@ -529,9 +943,9 @@ const About = () => {
                                   src={valueImage}
                                   alt={value.imageAlt || value.title}
                                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                  style={{ opacity: imageOpacity }}
                                 />
                               ) : (
-                                /* Gradiente decorativo cuando no hay imagen */
                                 <div className={`absolute inset-0 ${
                                   theme === 'dark'
                                     ? 'bg-gradient-to-br from-purple-900/40 via-gray-900/60 to-cyan-900/40'
@@ -540,34 +954,42 @@ const About = () => {
                               )}
                             </div>
 
-                            {/* Contenido de la tarjeta - Posicionado sobre la imagen */}
+                            {/* Contenido de la tarjeta */}
                             <div className={`relative z-10 p-8 h-full flex flex-col justify-end ${
-                              valueImage ? 'bg-gradient-to-t from-black/70 via-black/30 to-transparent' : ''
+                              valueImage && showImageOverlay ? 'bg-gradient-to-t from-black/70 via-black/30 to-transparent' : ''
                             }`}>
-                              {/* Título */}
-                              <h3 className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
-                                valueImage 
-                                  ? 'text-white drop-shadow-lg' 
-                                  : (theme === 'dark' ? 'text-white' : 'text-gray-900')
-                              }`} style={{ fontFamily: `'${valuesFontFamily}', sans-serif` }}>
+                              {/* Título con gradiente opcional */}
+                              <h3 
+                                className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
+                                  !valueImage && useTitleGradient ? `card-title-gradient-${theme}` : ''
+                                }`}
+                                style={{ 
+                                  fontFamily: `'${valuesFontFamily}', sans-serif`,
+                                  ...(valueImage 
+                                    ? { color: '#ffffff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }
+                                    : (!useTitleGradient ? { color: cardTitleColor } : {})
+                                  )
+                                }}
+                              >
                                 {stripHtmlTags(value.title)}
                               </h3>
 
                               {/* Descripción */}
-                              <p className={`text-base leading-relaxed ${
-                                valueImage 
-                                  ? 'text-white/90 drop-shadow-md' 
-                                  : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')
-                              }`} style={{ fontFamily: `'${valuesFontFamily}', sans-serif` }}>
+                              <p 
+                                className="text-base leading-relaxed"
+                                style={{ 
+                                  fontFamily: `'${valuesFontFamily}', sans-serif`,
+                                  color: valueImage ? 'rgba(255,255,255,0.9)' : cardTextColor,
+                                  textShadow: valueImage ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+                                }}
+                              >
                                 {stripHtmlTags(value.description)}
                               </p>
 
-                              {/* Línea decorativa inferior */}
-                              <div className={`mt-6 h-1 w-0 group-hover:w-full transition-all duration-500 rounded-full ${
-                                theme === 'dark'
-                                  ? 'bg-gradient-to-r from-purple-500 to-cyan-500'
-                                  : 'bg-gradient-to-r from-purple-600 to-cyan-600'
-                              }`} />
+                              {/* Línea decorativa */}
+                              <div className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 
+                                opacity-0 group-hover:opacity-100 transition-all duration-300 transform 
+                                translate-y-2 group-hover:translate-y-0" />
                             </div>
                           </div>
                         );
@@ -596,8 +1018,11 @@ const About = () => {
               );
             })()}
             
-          </div>
-        </main>
+                </div>
+              </div>
+            </section>
+          );
+        })()}
         
         <PublicFooter />
         

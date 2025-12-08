@@ -780,6 +780,127 @@ export interface AllNewsConfig {
   };
 }
 
+// Configuración de la sección CTA del blog
+export interface BlogCtaConfig {
+  // Contenido
+  title?: string;
+  titleHighlight?: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  secondaryButtonText?: string;
+  secondaryButtonLink?: string;
+  // Visibilidad
+  showSection?: boolean;
+  showSecondaryButton?: boolean;
+  // Tipografía
+  fontFamily?: string;
+  // Fondo
+  bgType?: 'solid' | 'gradient' | 'image';
+  bgColorLight?: string;
+  bgColorDark?: string;
+  bgGradientFrom?: string;
+  bgGradientTo?: string;
+  bgGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-br' | 'to-tl' | 'to-bl';
+  bgImage?: string;
+  bgOverlay?: number;
+  // Patrón
+  showPattern?: boolean;
+  patternType?: 'dots' | 'grid' | 'waves' | 'none';
+  patternOpacity?: number;
+  // Título
+  titleColor?: string;
+  titleHighlightColor?: string;
+  titleHighlightUseGradient?: boolean;
+  titleHighlightGradientFrom?: string;
+  titleHighlightGradientTo?: string;
+  titleHighlightGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-br' | 'to-tl' | 'to-bl';
+  // Subtítulo
+  subtitleColor?: string;
+  // Botón principal
+  buttonBgColor?: string;
+  buttonBgTransparent?: boolean;
+  buttonTextColor?: string;
+  buttonUseGradient?: boolean;
+  buttonGradientFrom?: string;
+  buttonGradientTo?: string;
+  buttonGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-br' | 'to-tl' | 'to-bl';
+  buttonBorderRadius?: string;
+  buttonBorderColor?: string;
+  buttonBorderWidth?: number;
+  buttonBorderUseGradient?: boolean;
+  buttonBorderGradientFrom?: string;
+  buttonBorderGradientTo?: string;
+  buttonBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-br' | 'to-tl' | 'to-bl';
+  buttonHoverScale?: number;
+  // Botón secundario
+  secondaryButtonBgColor?: string;
+  secondaryButtonTextColor?: string;
+  secondaryButtonBorderColor?: string;
+  secondaryButtonBorderWidth?: number;
+  secondaryButtonBorderRadius?: string;
+  secondaryButtonBorderUseGradient?: boolean;
+  secondaryButtonBorderGradientFrom?: string;
+  secondaryButtonBorderGradientTo?: string;
+  secondaryButtonBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-br' | 'to-tl' | 'to-bl';
+  // Decoración
+  showDecorations?: boolean;
+  decorationColor?: string;
+}
+
+// =============================================
+// 🆕 INTERFACES PARA PÁGINA DE CONTACTO
+// =============================================
+
+export interface ContactPageHeroSection {
+  title?: string;
+  subtitle?: string;
+  features?: string[];
+  backgroundImage?: { light?: string; dark?: string };
+  backgroundOpacity?: number;
+  backgroundOverlay?: boolean;
+  titleColor?: string;
+  titleColorDark?: string;
+  subtitleColor?: string;
+  subtitleColorDark?: string;
+  // Gradiente del título
+  titleGradientEnabled?: boolean;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
+  titleGradientDirection?: string;
+}
+
+export interface ContactPageFormSection {
+  backgroundImage?: { light?: string; dark?: string };
+  backgroundOpacity?: number;
+  backgroundOverlay?: boolean;
+  hideFormCard?: boolean;
+}
+
+export interface ContactPageFeatureItem {
+  title: string;
+  description: string;
+  icon?: string;
+  iconBgColor?: string;
+  iconColor?: string;
+}
+
+export interface ContactPageFeaturesSection {
+  title?: string;
+  items?: ContactPageFeatureItem[];
+  backgroundImage?: { light?: string; dark?: string };
+  backgroundOpacity?: number;
+  backgroundOverlay?: boolean;
+  titleColor?: string;
+  titleColorDark?: string;
+}
+
+export interface ContactPageContent {
+  hero?: ContactPageHeroSection;
+  form?: ContactPageFormSection;
+  features?: ContactPageFeaturesSection;
+}
+
 export interface PageContent {
   hero: HeroContent;
   solutions?: SolutionsContent;
@@ -797,6 +918,9 @@ export interface PageContent {
   blogHero?: BlogHeroConfig;
   featuredPosts?: FeaturedPostsConfig;
   allNews?: AllNewsConfig;
+  blogCta?: BlogCtaConfig;
+  // 🆕 CONTENIDO PARA PÁGINA DE CONTACTO
+  contactPage?: ContactPageContent;
 }
 
 export interface PageSeo {

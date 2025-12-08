@@ -23,6 +23,7 @@ interface ValueItem {
     dark?: string;
   };
   imageAlt?: string;
+  imageOpacity?: number;
 }
 
 interface ValuesContent {
@@ -35,6 +36,69 @@ interface ValuesContent {
     autoplay?: boolean;
     autoplaySpeed?: number;
   };
+  // Configuración de imagen de fondo
+  backgroundImage?: string | {
+    light?: string;
+    dark?: string;
+  };
+  backgroundOpacity?: number;
+  backgroundOverlay?: boolean;
+  // Configuración de tamaño de tarjetas
+  cardWidth?: string;
+  cardHeight?: string;
+  // Configuración de colores de tarjetas
+  cardBgColor?: string;
+  cardBgColorDark?: string;
+  cardBorderColor?: string;
+  cardBorderColorDark?: string;
+  cardTitleColor?: string;
+  cardTitleColorDark?: string;
+  cardTextColor?: string;
+  cardTextColorDark?: string;
+  cardImageOpacity?: number;
+  // Configuración de gradiente para fondo de tarjetas
+  cardBgUseGradient?: boolean;
+  cardBgGradientFrom?: string;
+  cardBgGradientTo?: string;
+  cardBgGradientDirection?: string;
+  cardBgUseGradientDark?: boolean;
+  cardBgGradientFromDark?: string;
+  cardBgGradientToDark?: string;
+  cardBgGradientDirectionDark?: string;
+  // Toggle para overlay oscuro en tarjetas con imagen
+  cardImageOverlay?: boolean;
+  // Configuración de gradiente para BORDE de tarjetas
+  cardBorderUseGradient?: boolean;
+  cardBorderGradientFrom?: string;
+  cardBorderGradientTo?: string;
+  cardBorderGradientDirection?: string;
+  cardBorderUseGradientDark?: boolean;
+  cardBorderGradientFromDark?: string;
+  cardBorderGradientToDark?: string;
+  cardBorderGradientDirectionDark?: string;
+  // Configuración de gradiente para TÍTULO de tarjetas
+  cardTitleUseGradient?: boolean;
+  cardTitleGradientFrom?: string;
+  cardTitleGradientTo?: string;
+  cardTitleGradientDirection?: string;
+  cardTitleUseGradientDark?: boolean;
+  cardTitleGradientFromDark?: string;
+  cardTitleGradientToDark?: string;
+  cardTitleGradientDirectionDark?: string;
+  // Configuración de colores para TÍTULO DE LA SECCIÓN
+  sectionTitleColor?: string;
+  sectionTitleColorDark?: string;
+  sectionTitleUseGradient?: boolean;
+  sectionTitleGradientFrom?: string;
+  sectionTitleGradientTo?: string;
+  sectionTitleGradientDirection?: string;
+  sectionTitleUseGradientDark?: boolean;
+  sectionTitleGradientFromDark?: string;
+  sectionTitleGradientToDark?: string;
+  sectionTitleGradientDirectionDark?: string;
+  // Configuración de colores para SUBTÍTULO DE LA SECCIÓN
+  sectionSubtitleColor?: string;
+  sectionSubtitleColorDark?: string;
 }
 
 interface ValuesConfigSectionProps {
@@ -181,6 +245,258 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
       </div>
 
+      {/* 🎨 COLORES DEL TÍTULO DE LA SECCIÓN */}
+      <div className="bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-cyan-200 dark:border-gray-700/50">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+          🎨 Colores del Título de Sección
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Personaliza los colores del título y subtítulo de la sección "Nuestros Valores".
+        </p>
+
+        {/* Colores de título de sección */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              ☀️ Color Título (Tema Claro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.sectionTitleColor || '#111827'}
+                onChange={(e) => updateContent('values.sectionTitleColor', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                disabled={values.sectionTitleUseGradient}
+              />
+              <input
+                type="text"
+                value={values.sectionTitleColor || '#111827'}
+                onChange={(e) => updateContent('values.sectionTitleColor', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                disabled={values.sectionTitleUseGradient}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              🌙 Color Título (Tema Oscuro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.sectionTitleColorDark || '#ffffff'}
+                onChange={(e) => updateContent('values.sectionTitleColorDark', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                disabled={values.sectionTitleUseGradientDark}
+              />
+              <input
+                type="text"
+                value={values.sectionTitleColorDark || '#ffffff'}
+                onChange={(e) => updateContent('values.sectionTitleColorDark', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                disabled={values.sectionTitleUseGradientDark}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 🌈 Gradiente para TÍTULO de sección */}
+        <div className="bg-gradient-to-r from-teal-100 to-cyan-100 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-6">
+          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🌈 Título con Gradiente</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Toggle Gradiente - Tema Claro */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.sectionTitleUseGradient || false}
+                    onChange={(e) => updateContent('values.sectionTitleUseGradient', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-teal-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">☀️ Usar Gradiente (Claro)</span>
+              </div>
+              
+              {values.sectionTitleUseGradient && (
+                <div className="space-y-3 pl-4 border-l-2 border-teal-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.sectionTitleGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientFrom', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.sectionTitleGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientFrom', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.sectionTitleGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientTo', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.sectionTitleGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientTo', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.sectionTitleGradientDirection || 'to-r'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientDirection', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                    </select>
+                  </div>
+                  {/* Preview */}
+                  <div 
+                    className="h-8 rounded-lg flex items-center justify-center text-white font-bold"
+                    style={{
+                      background: `linear-gradient(to right, ${values.sectionTitleGradientFrom || '#667eea'}, ${values.sectionTitleGradientTo || '#764ba2'})`
+                    }}
+                  >
+                    {values.title || 'Nuestros Valores'}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Toggle Gradiente - Tema Oscuro */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.sectionTitleUseGradientDark || false}
+                    onChange={(e) => updateContent('values.sectionTitleUseGradientDark', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-teal-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌙 Usar Gradiente (Oscuro)</span>
+              </div>
+              
+              {values.sectionTitleUseGradientDark && (
+                <div className="space-y-3 pl-4 border-l-2 border-teal-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.sectionTitleGradientFromDark || '#8b5cf6'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientFromDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.sectionTitleGradientFromDark || '#8b5cf6'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientFromDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.sectionTitleGradientToDark || '#06b6d4'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientToDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.sectionTitleGradientToDark || '#06b6d4'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientToDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.sectionTitleGradientDirectionDark || 'to-r'}
+                      onChange={(e) => updateContent('values.sectionTitleGradientDirectionDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                    </select>
+                  </div>
+                  {/* Preview */}
+                  <div 
+                    className="h-8 rounded-lg flex items-center justify-center text-white font-bold"
+                    style={{
+                      background: `linear-gradient(to right, ${values.sectionTitleGradientFromDark || '#8b5cf6'}, ${values.sectionTitleGradientToDark || '#06b6d4'})`
+                    }}
+                  >
+                    {values.title || 'Nuestros Valores'}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Colores de subtítulo de sección */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              ☀️ Color Subtítulo (Tema Claro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.sectionSubtitleColor || '#6b7280'}
+                onChange={(e) => updateContent('values.sectionSubtitleColor', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.sectionSubtitleColor || '#6b7280'}
+                onChange={(e) => updateContent('values.sectionSubtitleColor', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              🌙 Color Subtítulo (Tema Oscuro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.sectionSubtitleColorDark || '#9ca3af'}
+                onChange={(e) => updateContent('values.sectionSubtitleColorDark', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.sectionSubtitleColorDark || '#9ca3af'}
+                onChange={(e) => updateContent('values.sectionSubtitleColorDark', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ⚙️ CONFIGURACIÓN DEL CARRUSEL */}
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-6">
@@ -240,6 +556,956 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
               className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
+        </div>
+      </div>
+
+      {/* 📐 CONFIGURACIÓN DE TAMAÑO DE TARJETAS */}
+      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-teal-200 dark:border-gray-700/50">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+          📐 Tamaño de las Tarjetas
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Configura el ancho y alto de las tarjetas de valores.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Alto de la tarjeta */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Alto de la tarjeta
+            </label>
+            <select
+              value={values.cardHeight || '340px'}
+              onChange={(e) => updateContent('values.cardHeight', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            >
+              <option value="280px">Pequeño (280px)</option>
+              <option value="340px">Mediano (340px)</option>
+              <option value="400px">Grande (400px)</option>
+              <option value="460px">Extra Grande (460px)</option>
+              <option value="auto">Automático</option>
+            </select>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Define la altura mínima de las tarjetas
+            </p>
+          </div>
+
+          {/* Ancho de la tarjeta */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Ancho de la tarjeta
+            </label>
+            <select
+              value={values.cardWidth || '100%'}
+              onChange={(e) => updateContent('values.cardWidth', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            >
+              <option value="100%">Completo (100%)</option>
+              <option value="320px">Pequeño (320px)</option>
+              <option value="380px">Mediano (380px)</option>
+              <option value="440px">Grande (440px)</option>
+              <option value="auto">Automático</option>
+            </select>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Define el ancho máximo de las tarjetas
+            </p>
+          </div>
+        </div>
+
+        {/* Vista previa del tamaño */}
+        <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Vista previa del tamaño:</p>
+          <div 
+            className="bg-gradient-to-br from-teal-400 to-cyan-500 rounded-xl shadow-lg mx-auto flex items-center justify-center text-white font-medium"
+            style={{
+              width: values.cardWidth === '100%' ? '200px' : `min(${values.cardWidth || '200px'}, 200px)`,
+              height: values.cardHeight === 'auto' ? '100px' : `min(calc(${values.cardHeight || '340px'} / 2), 150px)`,
+              minHeight: '80px'
+            }}
+          >
+            <span className="text-sm">
+              {values.cardWidth || '100%'} × {values.cardHeight || '340px'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 🎨 CONFIGURACIÓN DE COLORES DE TARJETAS */}
+      <div className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-pink-200 dark:border-gray-700/50">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+          🎨 Colores de las Tarjetas
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Personaliza los colores de fondo, borde, título y texto de las tarjetas.
+        </p>
+
+        {/* Colores de fondo */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              ☀️ Fondo (Tema Claro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardBgColor || '#ffffff'}
+                onChange={(e) => updateContent('values.cardBgColor', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                disabled={values.cardBgUseGradient}
+              />
+              <input
+                type="text"
+                value={values.cardBgColor || 'rgba(255, 255, 255, 0.8)'}
+                onChange={(e) => updateContent('values.cardBgColor', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                placeholder="rgba(255, 255, 255, 0.8)"
+                disabled={values.cardBgUseGradient}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              🌙 Fondo (Tema Oscuro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardBgColorDark || '#1f2937'}
+                onChange={(e) => updateContent('values.cardBgColorDark', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                disabled={values.cardBgUseGradientDark}
+              />
+              <input
+                type="text"
+                value={values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)'}
+                onChange={(e) => updateContent('values.cardBgColorDark', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                placeholder="rgba(31, 41, 55, 0.5)"
+                disabled={values.cardBgUseGradientDark}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 🌈 Configuración de Gradiente */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-gray-700 dark:to-gray-700 rounded-lg border border-purple-200 dark:border-gray-600">
+          <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+            🌈 Fondo con Gradiente
+          </h4>
+          
+          {/* Toggle Gradiente - Tema Claro */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.cardBgUseGradient || false}
+                    onChange={(e) => updateContent('values.cardBgUseGradient', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-purple-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">☀️ Usar Gradiente (Claro)</span>
+              </div>
+              
+              {values.cardBgUseGradient && (
+                <div className="space-y-3 pl-4 border-l-2 border-purple-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.cardBgGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.cardBgGradientFrom', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBgGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.cardBgGradientFrom', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.cardBgGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.cardBgGradientTo', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBgGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.cardBgGradientTo', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.cardBgGradientDirection || 'to-br'}
+                      onChange={(e) => updateContent('values.cardBgGradientDirection', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-tr">↗ Arriba Derecha</option>
+                      <option value="to-tl">↖ Arriba Izquierda</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                      <option value="to-bl">↙ Abajo Izquierda</option>
+                    </select>
+                  </div>
+                  {/* Preview del gradiente claro */}
+                  <div 
+                    className="h-8 rounded-lg border border-gray-200"
+                    style={{
+                      background: `linear-gradient(${
+                        values.cardBgGradientDirection === 'to-r' ? 'to right' :
+                        values.cardBgGradientDirection === 'to-l' ? 'to left' :
+                        values.cardBgGradientDirection === 'to-t' ? 'to top' :
+                        values.cardBgGradientDirection === 'to-b' ? 'to bottom' :
+                        values.cardBgGradientDirection === 'to-tr' ? 'to top right' :
+                        values.cardBgGradientDirection === 'to-tl' ? 'to top left' :
+                        values.cardBgGradientDirection === 'to-bl' ? 'to bottom left' :
+                        'to bottom right'
+                      }, ${values.cardBgGradientFrom || '#667eea'}, ${values.cardBgGradientTo || '#764ba2'})`
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Toggle Gradiente - Tema Oscuro */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.cardBgUseGradientDark || false}
+                    onChange={(e) => updateContent('values.cardBgUseGradientDark', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-purple-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌙 Usar Gradiente (Oscuro)</span>
+              </div>
+              
+              {values.cardBgUseGradientDark && (
+                <div className="space-y-3 pl-4 border-l-2 border-purple-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.cardBgGradientFromDark || '#1e3a5f'}
+                      onChange={(e) => updateContent('values.cardBgGradientFromDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBgGradientFromDark || '#1e3a5f'}
+                      onChange={(e) => updateContent('values.cardBgGradientFromDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.cardBgGradientToDark || '#0d9488'}
+                      onChange={(e) => updateContent('values.cardBgGradientToDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBgGradientToDark || '#0d9488'}
+                      onChange={(e) => updateContent('values.cardBgGradientToDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.cardBgGradientDirectionDark || 'to-br'}
+                      onChange={(e) => updateContent('values.cardBgGradientDirectionDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-tr">↗ Arriba Derecha</option>
+                      <option value="to-tl">↖ Arriba Izquierda</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                      <option value="to-bl">↙ Abajo Izquierda</option>
+                    </select>
+                  </div>
+                  {/* Preview del gradiente oscuro */}
+                  <div 
+                    className="h-8 rounded-lg border border-gray-600"
+                    style={{
+                      background: `linear-gradient(${
+                        values.cardBgGradientDirectionDark === 'to-r' ? 'to right' :
+                        values.cardBgGradientDirectionDark === 'to-l' ? 'to left' :
+                        values.cardBgGradientDirectionDark === 'to-t' ? 'to top' :
+                        values.cardBgGradientDirectionDark === 'to-b' ? 'to bottom' :
+                        values.cardBgGradientDirectionDark === 'to-tr' ? 'to top right' :
+                        values.cardBgGradientDirectionDark === 'to-tl' ? 'to top left' :
+                        values.cardBgGradientDirectionDark === 'to-bl' ? 'to bottom left' :
+                        'to bottom right'
+                      }, ${values.cardBgGradientFromDark || '#1e3a5f'}, ${values.cardBgGradientToDark || '#0d9488'})`
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Colores de borde */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              ☀️ Borde (Tema Claro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardBorderColor || '#f3f4f6'}
+                onChange={(e) => updateContent('values.cardBorderColor', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.cardBorderColor || 'rgba(243, 244, 246, 1)'}
+                onChange={(e) => updateContent('values.cardBorderColor', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="rgba(243, 244, 246, 1)"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              🌙 Borde (Tema Oscuro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardBorderColorDark || '#4b5563'}
+                onChange={(e) => updateContent('values.cardBorderColorDark', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.cardBorderColorDark || 'rgba(75, 85, 99, 0.5)'}
+                onChange={(e) => updateContent('values.cardBorderColorDark', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="rgba(75, 85, 99, 0.5)"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 🌈 Gradiente para BORDE */}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-6">
+          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🌈 Borde con Gradiente</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Toggle Gradiente Borde - Tema Claro */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.cardBorderUseGradient || false}
+                    onChange={(e) => updateContent('values.cardBorderUseGradient', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-indigo-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">☀️ Usar Gradiente (Claro)</span>
+              </div>
+              
+              {values.cardBorderUseGradient && (
+                <div className="space-y-3 pl-4 border-l-2 border-indigo-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.cardBorderGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.cardBorderGradientFrom', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBorderGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.cardBorderGradientFrom', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.cardBorderGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.cardBorderGradientTo', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBorderGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.cardBorderGradientTo', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.cardBorderGradientDirection || 'to-r'}
+                      onChange={(e) => updateContent('values.cardBorderGradientDirection', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                    </select>
+                  </div>
+                  {/* Preview */}
+                  <div 
+                    className="h-4 rounded-lg"
+                    style={{
+                      background: `linear-gradient(to right, ${values.cardBorderGradientFrom || '#667eea'}, ${values.cardBorderGradientTo || '#764ba2'})`
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Toggle Gradiente Borde - Tema Oscuro */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.cardBorderUseGradientDark || false}
+                    onChange={(e) => updateContent('values.cardBorderUseGradientDark', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-indigo-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌙 Usar Gradiente (Oscuro)</span>
+              </div>
+              
+              {values.cardBorderUseGradientDark && (
+                <div className="space-y-3 pl-4 border-l-2 border-indigo-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.cardBorderGradientFromDark || '#8b5cf6'}
+                      onChange={(e) => updateContent('values.cardBorderGradientFromDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBorderGradientFromDark || '#8b5cf6'}
+                      onChange={(e) => updateContent('values.cardBorderGradientFromDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.cardBorderGradientToDark || '#06b6d4'}
+                      onChange={(e) => updateContent('values.cardBorderGradientToDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardBorderGradientToDark || '#06b6d4'}
+                      onChange={(e) => updateContent('values.cardBorderGradientToDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.cardBorderGradientDirectionDark || 'to-r'}
+                      onChange={(e) => updateContent('values.cardBorderGradientDirectionDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                    </select>
+                  </div>
+                  {/* Preview */}
+                  <div 
+                    className="h-4 rounded-lg"
+                    style={{
+                      background: `linear-gradient(to right, ${values.cardBorderGradientFromDark || '#8b5cf6'}, ${values.cardBorderGradientToDark || '#06b6d4'})`
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Colores de título */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              ☀️ Color Título (Tema Claro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardTitleColor || '#111827'}
+                onChange={(e) => updateContent('values.cardTitleColor', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.cardTitleColor || '#111827'}
+                onChange={(e) => updateContent('values.cardTitleColor', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              🌙 Color Título (Tema Oscuro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardTitleColorDark || '#ffffff'}
+                onChange={(e) => updateContent('values.cardTitleColorDark', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.cardTitleColorDark || '#ffffff'}
+                onChange={(e) => updateContent('values.cardTitleColorDark', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 🌈 Gradiente para TÍTULO de tarjetas */}
+        <div className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-6">
+          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🌈 Título con Gradiente</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Toggle Gradiente Título - Tema Claro */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.cardTitleUseGradient || false}
+                    onChange={(e) => updateContent('values.cardTitleUseGradient', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 dark:peer-focus:ring-rose-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-rose-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">☀️ Usar Gradiente (Claro)</span>
+              </div>
+              
+              {values.cardTitleUseGradient && (
+                <div className="space-y-3 pl-4 border-l-2 border-rose-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.cardTitleGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.cardTitleGradientFrom', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardTitleGradientFrom || '#667eea'}
+                      onChange={(e) => updateContent('values.cardTitleGradientFrom', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.cardTitleGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.cardTitleGradientTo', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardTitleGradientTo || '#764ba2'}
+                      onChange={(e) => updateContent('values.cardTitleGradientTo', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.cardTitleGradientDirection || 'to-r'}
+                      onChange={(e) => updateContent('values.cardTitleGradientDirection', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                    </select>
+                  </div>
+                  {/* Preview */}
+                  <div 
+                    className="h-6 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                    style={{
+                      background: `linear-gradient(to right, ${values.cardTitleGradientFrom || '#667eea'}, ${values.cardTitleGradientTo || '#764ba2'})`
+                    }}
+                  >
+                    Vista previa
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Toggle Gradiente Título - Tema Oscuro */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.cardTitleUseGradientDark || false}
+                    onChange={(e) => updateContent('values.cardTitleUseGradientDark', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 dark:peer-focus:ring-rose-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-rose-600"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌙 Usar Gradiente (Oscuro)</span>
+              </div>
+              
+              {values.cardTitleUseGradientDark && (
+                <div className="space-y-3 pl-4 border-l-2 border-rose-300">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Desde:</label>
+                    <input
+                      type="color"
+                      value={values.cardTitleGradientFromDark || '#8b5cf6'}
+                      onChange={(e) => updateContent('values.cardTitleGradientFromDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardTitleGradientFromDark || '#8b5cf6'}
+                      onChange={(e) => updateContent('values.cardTitleGradientFromDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Hasta:</label>
+                    <input
+                      type="color"
+                      value={values.cardTitleGradientToDark || '#06b6d4'}
+                      onChange={(e) => updateContent('values.cardTitleGradientToDark', e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer border border-gray-300"
+                    />
+                    <input
+                      type="text"
+                      value={values.cardTitleGradientToDark || '#06b6d4'}
+                      onChange={(e) => updateContent('values.cardTitleGradientToDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600 dark:text-gray-400 w-16">Dirección:</label>
+                    <select
+                      value={values.cardTitleGradientDirectionDark || 'to-r'}
+                      onChange={(e) => updateContent('values.cardTitleGradientDirectionDark', e.target.value)}
+                      className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    >
+                      <option value="to-r">→ Derecha</option>
+                      <option value="to-l">← Izquierda</option>
+                      <option value="to-t">↑ Arriba</option>
+                      <option value="to-b">↓ Abajo</option>
+                      <option value="to-br">↘ Abajo Derecha</option>
+                    </select>
+                  </div>
+                  {/* Preview */}
+                  <div 
+                    className="h-6 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                    style={{
+                      background: `linear-gradient(to right, ${values.cardTitleGradientFromDark || '#8b5cf6'}, ${values.cardTitleGradientToDark || '#06b6d4'})`
+                    }}
+                  >
+                    Vista previa
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Colores de texto */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              ☀️ Color Texto (Tema Claro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardTextColor || '#4b5563'}
+                onChange={(e) => updateContent('values.cardTextColor', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.cardTextColor || '#4b5563'}
+                onChange={(e) => updateContent('values.cardTextColor', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              🌙 Color Texto (Tema Oscuro)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={values.cardTextColorDark || '#9ca3af'}
+                onChange={(e) => updateContent('values.cardTextColorDark', e.target.value)}
+                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+              />
+              <input
+                type="text"
+                value={values.cardTextColorDark || '#9ca3af'}
+                onChange={(e) => updateContent('values.cardTextColorDark', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Opacidad de imagen */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            🖼️ Opacidad de Imagen en Tarjetas: {values.cardImageOpacity ?? 100}%
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={values.cardImageOpacity ?? 100}
+            onChange={(e) => updateContent('values.cardImageOpacity', parseInt(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          />
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>0% (Transparente)</span>
+            <span>50%</span>
+            <span>100% (Nítido)</span>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Controla la opacidad de las imágenes de fondo en las tarjetas de valores.
+          </p>
+        </div>
+
+        {/* Toggle para overlay oscuro en tarjetas con imagen */}
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                🎭 Overlay oscuro en imágenes
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Aplica un degradado oscuro sobre las imágenes para mejorar la legibilidad del texto.
+                <br />
+                <strong>Desactívalo</strong> si quieres que la imagen se vea completamente nítida.
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={values.cardImageOverlay !== false}
+                onChange={(e) => updateContent('values.cardImageOverlay', e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+        </div>
+
+        {/* Vista previa de colores */}
+        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Vista previa:</p>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Preview Tema Claro */}
+            <div 
+              className="p-4 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: values.cardBgColor || 'rgba(255, 255, 255, 0.8)',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: values.cardBorderColor || 'rgba(243, 244, 246, 1)'
+              }}
+            >
+              <p className="text-xs text-gray-400 mb-2">☀️ Tema Claro</p>
+              <h4 style={{ color: values.cardTitleColor || '#111827' }} className="font-bold mb-1">
+                Título
+              </h4>
+              <p style={{ color: values.cardTextColor || '#4b5563' }} className="text-sm">
+                Texto de ejemplo
+              </p>
+            </div>
+            {/* Preview Tema Oscuro */}
+            <div 
+              className="p-4 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: values.cardBorderColorDark || 'rgba(75, 85, 99, 0.5)'
+              }}
+            >
+              <p className="text-xs text-gray-400 mb-2">🌙 Tema Oscuro</p>
+              <h4 style={{ color: values.cardTitleColorDark || '#ffffff' }} className="font-bold mb-1">
+                Título
+              </h4>
+              <p style={{ color: values.cardTextColorDark || '#9ca3af' }} className="text-sm">
+                Texto de ejemplo
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 🖼️ IMAGEN DE FONDO DE LA SECCIÓN */}
+      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-purple-200 dark:border-gray-700/50">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+          🖼️ Imagen de Fondo (Sección Valores)
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Esta imagen se mostrará como fondo de toda la sección de valores.
+        </p>
+
+        {/* Toggle para tema claro/oscuro */}
+        <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setImageTheme('light')}
+            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+              imageTheme === 'light'
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            ☀️ Tema Claro
+          </button>
+          <button
+            type="button"
+            onClick={() => setImageTheme('dark')}
+            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+              imageTheme === 'dark'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            🌙 Tema Oscuro
+          </button>
+        </div>
+
+        {/* Selector de imagen */}
+        <ManagedImageSelector
+          label={imageTheme === 'light' ? '☀️ Imagen de fondo (Modo Claro)' : '🌙 Imagen de fondo (Modo Oscuro)'}
+          description="Tamaño recomendado: 1920x1080px"
+          currentImage={
+            typeof values.backgroundImage === 'string' 
+              ? values.backgroundImage 
+              : (values as any).backgroundImage?.[imageTheme] || ''
+          }
+          onImageSelect={(url: string) => {
+            const currentBgImage = typeof values.backgroundImage === 'object' ? values.backgroundImage : {};
+            updateContent('values.backgroundImage', {
+              ...currentBgImage,
+              [imageTheme]: url
+            });
+          }}
+          darkMode={imageTheme === 'dark'}
+          hideButtonArea={!!(typeof values.backgroundImage === 'string' 
+            ? values.backgroundImage 
+            : (values as any).backgroundImage?.[imageTheme])}
+        />
+
+        {/* Preview de imágenes */}
+        {(typeof values.backgroundImage === 'object' && 
+          ((values as any).backgroundImage?.light || (values as any).backgroundImage?.dark)) && (
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            {(values as any).backgroundImage?.light && (
+              <div className="relative">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">☀️ Modo Claro</p>
+                <img 
+                  src={(values as any).backgroundImage.light} 
+                  alt="Fondo claro" 
+                  className="w-full h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
+              </div>
+            )}
+            {(values as any).backgroundImage?.dark && (
+              <div className="relative">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">🌙 Modo Oscuro</p>
+                <img 
+                  src={(values as any).backgroundImage.dark} 
+                  alt="Fondo oscuro" 
+                  className="w-full h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Opacidad de la imagen */}
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Opacidad de la imagen: {Math.round(((values as any).backgroundOpacity ?? 1) * 100)}%
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={Math.round(((values as any).backgroundOpacity ?? 1) * 100)}
+            onChange={(e) => updateContent('values.backgroundOpacity', parseInt(e.target.value) / 100)}
+            className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+          />
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <span>0% (Invisible)</span>
+            <span>50%</span>
+            <span>100% (Nítido)</span>
+          </div>
+        </div>
+
+        {/* Toggle de overlay */}
+        <div className="mt-4 flex items-center gap-3">
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={(values as any).backgroundOverlay === true}
+              onChange={(e) => updateContent('values.backgroundOverlay', e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-500"></div>
+            <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+              Aplicar overlay oscuro (mejora legibilidad del texto)
+            </span>
+          </label>
         </div>
       </div>
 
@@ -384,66 +1650,29 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
                   {/* Imagen del valor */}
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        🖼️ Imagen del Valor (opcional)
-                      </label>
-                      {/* Selector de tema */}
-                      <div className="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                        <button
-                          onClick={() => setImageTheme('light')}
-                          className={`px-3 py-1 text-xs font-medium transition-colors ${
-                            imageTheme === 'light'
-                              ? 'bg-amber-500 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                          }`}
-                        >
-                          ☀️ Claro
-                        </button>
-                        <button
-                          onClick={() => setImageTheme('dark')}
-                          className={`px-3 py-1 text-xs font-medium transition-colors ${
-                            imageTheme === 'dark'
-                              ? 'bg-amber-500 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                          }`}
-                        >
-                          🌙 Oscuro
-                        </button>
-                      </div>
-                    </div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+                      🖼️ Imagen del Valor (opcional)
+                    </label>
 
                     <ManagedImageSelector
-                      currentImage={imageTheme === 'light' ? item.image?.light : item.image?.dark}
-                      onImageSelect={(url) => updateValue(index, `image.${imageTheme}`, url)}
-                      label={`Imagen (${imageTheme === 'light' ? 'Tema Claro' : 'Tema Oscuro'})`}
-                      description="Imagen que aparecerá como fondo de la tarjeta del valor"
+                      currentImage={typeof item.image === 'string' ? item.image : (item.image?.light || item.image?.dark || '')}
+                      onImageSelect={(url: string) => updateValue(index, 'image', url)}
+                      label="Imagen del Valor"
+                      description="Esta imagen se usará tanto en tema claro como oscuro"
                       darkMode={false}
                     />
 
-                    {/* Preview de imágenes */}
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                      <div className="text-center">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">☀️ Tema Claro</p>
-                        {item.image?.light ? (
-                          <img src={item.image.light} alt="Light" className="w-full h-20 object-cover rounded-lg border" />
-                        ) : (
-                          <div className="w-full h-20 bg-gray-100 dark:bg-gray-700 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-400 text-xs">
-                            Sin imagen
-                          </div>
-                        )}
+                    {/* Preview de imagen */}
+                    {(typeof item.image === 'string' ? item.image : (item.image?.light || item.image?.dark)) && (
+                      <div className="mt-4">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Vista previa</p>
+                        <img 
+                          src={typeof item.image === 'string' ? item.image : (item.image?.light || item.image?.dark)} 
+                          alt={item.imageAlt || item.title} 
+                          className="w-full max-w-xs h-24 object-contain rounded-lg border border-gray-200 dark:border-gray-600" 
+                        />
                       </div>
-                      <div className="text-center">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">🌙 Tema Oscuro</p>
-                        {item.image?.dark ? (
-                          <img src={item.image.dark} alt="Dark" className="w-full h-20 object-cover rounded-lg border" />
-                        ) : (
-                          <div className="w-full h-20 bg-gray-100 dark:bg-gray-700 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-400 text-xs">
-                            Sin imagen
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    )}
 
                     {/* Alt text */}
                     <div className="mt-4">

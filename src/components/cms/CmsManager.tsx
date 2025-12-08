@@ -23,6 +23,7 @@ import ServicesAccordionConfigSection from './ServicesAccordionConfigSection';
 import BlogHeroConfigSection from './BlogHeroConfigSection';
 import FeaturedPostsConfigSection from './FeaturedPostsConfigSection';
 import AllNewsConfigSection from './AllNewsConfigSection';
+import BlogCtaConfigSection from './BlogCtaConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -442,6 +443,11 @@ const CmsManager: React.FC = () => {
                   config={pageData.content?.allNews || {}}
                   onChange={(config) => handleUpdateContent('allNews', config)}
                 />
+                {/* 📢 Sección CTA (Último Llamado) */}
+                <BlogCtaConfigSection
+                  config={pageData.content?.blogCta || {}}
+                  onChange={(config) => handleUpdateContent('blogCta', config)}
+                />
               </>
             ) : (
               /* 🏠 Hero genérico para otras páginas */
@@ -631,11 +637,49 @@ const CmsManager: React.FC = () => {
             </p>
           </div>
         )}
-        {activeTab === 'contact' && (
+        {activeTab === 'contact' && selectedPage === 'contact' && (
           <div className="space-y-8">
+            {/* Configuración específica de la PÁGINA de Contacto */}
+            <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-teal-200 dark:border-gray-700/50">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">📄</span>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                    Configuración de la Página Pública de Contacto
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Esta configuración afecta a la página <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/contacto</code>
+                  </p>
+                </div>
+              </div>
+            </div>
             <ContactConfigSection
               pageData={pageData}
               updateContent={handleUpdateContent}
+              isContactPage={true}
+            />
+          </div>
+        )}
+        {activeTab === 'contact' && selectedPage !== 'contact' && (
+          <div className="space-y-8">
+            {/* Configuración de contacto general (para Home y otras páginas) */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-blue-200 dark:border-gray-700/50">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">📞</span>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                    Información de Contacto General
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Datos de contacto mostrados en el footer y secciones de contacto de la página <strong>{selectedPage}</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <ContactConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+              isContactPage={false}
             />
             <ContactFormEditor
               pageData={pageData}

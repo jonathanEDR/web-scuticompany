@@ -10,6 +10,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { SimpleHeroSection } from '../../../components/blog/hero/SimpleHeroSection';
 import { FeaturedBlogCard } from '../../../components/blog/cards/FeaturedBlogCard';
 import { AllNewsSection } from '../../../components/blog/sections/AllNewsSection';
+import { BlogCtaSection } from '../../../components/blog/sections/BlogCtaSection';
 import PublicHeader from '../../../components/public/PublicHeader';
 import PublicFooter from '../../../components/public/PublicFooter';
 
@@ -290,6 +291,9 @@ const BlogHome: React.FC = () => {
         selectedCategory={selectedCategory}
         selectedTag={selectedTag}
       />
+
+      {/* CTA Section - Último Llamado */}
+      <BlogCtaSection config={cmsConfig.blogCta} />
 
       {/* Footer */}
       <PublicFooter />

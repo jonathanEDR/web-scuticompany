@@ -501,6 +501,179 @@ export const DEFAULT_ALL_NEWS_CONFIG = {
   }
 };
 
+// Configuración por defecto de la sección CTA (Call to Action / Último Llamado)
+export const DEFAULT_BLOG_CTA_CONFIG = {
+  // Contenido
+  title: '¿Listo para transformar tu negocio?',
+  titleHighlight: 'transformar',
+  subtitle: 'Únete a miles de empresas que ya están aprovechando el poder de la tecnología para crecer.',
+  buttonText: 'Contáctanos',
+  buttonLink: '/contacto',
+  secondaryButtonText: 'Ver servicios',
+  secondaryButtonLink: '/servicios',
+  // Visibilidad
+  showSection: true,
+  showSecondaryButton: true,
+  // Tipografía
+  fontFamily: 'Montserrat',
+  // Fondo
+  bgType: 'gradient' as const, // 'solid' | 'gradient' | 'image'
+  bgColorLight: '#1e1b4b',
+  bgColorDark: '#0f0d24',
+  bgGradientFrom: '#1e1b4b',
+  bgGradientTo: '#312e81',
+  bgGradientDirection: 'to-br' as const,
+  bgImage: '',
+  bgOverlay: 0.5,
+  // Patrón decorativo
+  showPattern: true,
+  patternType: 'dots' as const, // 'dots' | 'grid' | 'waves' | 'none'
+  patternOpacity: 0.1,
+  // Título
+  titleColor: '#ffffff',
+  titleHighlightColor: '#a78bfa',
+  titleHighlightUseGradient: true,
+  titleHighlightGradientFrom: '#a78bfa',
+  titleHighlightGradientTo: '#06b6d4',
+  titleHighlightGradientDirection: 'to-r' as const,
+  // Subtítulo
+  subtitleColor: '#c4b5fd',
+  // Botón principal
+  buttonBgColor: '#8b5cf6',
+  buttonBgTransparent: false,
+  buttonTextColor: '#ffffff',
+  buttonUseGradient: true,
+  buttonGradientFrom: '#8b5cf6',
+  buttonGradientTo: '#06b6d4',
+  buttonGradientDirection: 'to-r' as const,
+  buttonBorderRadius: '9999px',
+  buttonBorderColor: '#8b5cf6',
+  buttonBorderWidth: 2,
+  buttonBorderUseGradient: false,
+  buttonBorderGradientFrom: '#8b5cf6',
+  buttonBorderGradientTo: '#06b6d4',
+  buttonBorderGradientDirection: 'to-r' as const,
+  buttonHoverScale: 1.05,
+  // Botón secundario
+  secondaryButtonBgColor: 'transparent',
+  secondaryButtonBgTransparent: true,
+  secondaryButtonTextColor: '#ffffff',
+  secondaryButtonBorderColor: '#ffffff',
+  secondaryButtonBorderWidth: 2,
+  secondaryButtonBorderRadius: '9999px',
+  secondaryButtonBorderUseGradient: false,
+  secondaryButtonBorderGradientFrom: '#8b5cf6',
+  secondaryButtonBorderGradientTo: '#06b6d4',
+  secondaryButtonBorderGradientDirection: 'to-r' as const,
+  // Decoración
+  showDecorations: true,
+  decorationColor: 'rgba(167, 139, 250, 0.3)',
+  // Tarjeta contenedora
+  showCard: true,
+  cardBgColor: '#1e3a5f',
+  cardBgTransparent: false,
+  cardBgUseGradient: true,
+  cardBgGradientFrom: '#0d9488',
+  cardBgGradientTo: '#1e3a5f',
+  cardBgGradientDirection: 'to-r' as const,
+  cardBgBlur: false,
+  cardBorderRadius: '24px',
+  cardBorderColor: 'rgba(255, 255, 255, 0.2)',
+  cardBorderWidth: 1,
+  cardPadding: '48px',
+  cardMaxWidth: '800px',
+  cardBorderUseGradient: false,
+  cardBorderGradientFrom: '#8b5cf6',
+  cardBorderGradientTo: '#06b6d4',
+  cardBorderGradientDirection: 'to-r' as const
+};
+
+export interface BlogCtaConfig {
+  // Contenido
+  title?: string;
+  titleHighlight?: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  secondaryButtonText?: string;
+  secondaryButtonLink?: string;
+  // Visibilidad
+  showSection?: boolean;
+  showSecondaryButton?: boolean;
+  // Tipografía
+  fontFamily?: string;
+  // Fondo
+  bgType?: 'solid' | 'gradient' | 'image';
+  bgColorLight?: string;
+  bgColorDark?: string;
+  bgGradientFrom?: string;
+  bgGradientTo?: string;
+  bgGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  bgImage?: string;
+  bgOverlay?: number;
+  // Patrón decorativo
+  showPattern?: boolean;
+  patternType?: 'dots' | 'grid' | 'waves' | 'none';
+  patternOpacity?: number;
+  // Título
+  titleColor?: string;
+  titleHighlightColor?: string;
+  titleHighlightUseGradient?: boolean;
+  titleHighlightGradientFrom?: string;
+  titleHighlightGradientTo?: string;
+  titleHighlightGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  // Subtítulo
+  subtitleColor?: string;
+  // Botón principal
+  buttonBgColor?: string;
+  buttonBgTransparent?: boolean;
+  buttonTextColor?: string;
+  buttonUseGradient?: boolean;
+  buttonGradientFrom?: string;
+  buttonGradientTo?: string;
+  buttonGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  buttonBorderRadius?: string;
+  buttonBorderColor?: string;
+  buttonBorderWidth?: number;
+  buttonBorderUseGradient?: boolean;
+  buttonBorderGradientFrom?: string;
+  buttonBorderGradientTo?: string;
+  buttonBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  buttonHoverScale?: number;
+  // Botón secundario
+  secondaryButtonBgColor?: string;
+  secondaryButtonBgTransparent?: boolean;
+  secondaryButtonTextColor?: string;
+  secondaryButtonBorderColor?: string;
+  secondaryButtonBorderWidth?: number;
+  secondaryButtonBorderRadius?: string;
+  secondaryButtonBorderUseGradient?: boolean;
+  secondaryButtonBorderGradientFrom?: string;
+  secondaryButtonBorderGradientTo?: string;
+  secondaryButtonBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  // Decoración
+  showDecorations?: boolean;
+  decorationColor?: string;
+  // Tarjeta contenedora
+  showCard?: boolean;
+  cardBgColor?: string;
+  cardBgTransparent?: boolean;
+  cardBgUseGradient?: boolean;
+  cardBgGradientFrom?: string;
+  cardBgGradientTo?: string;
+  cardBgGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+  cardBgBlur?: boolean;
+  cardBorderRadius?: string;
+  cardBorderColor?: string;
+  cardBorderWidth?: number;
+  cardPadding?: string;
+  cardMaxWidth?: string;
+  cardBorderUseGradient?: boolean;
+  cardBorderGradientFrom?: string;
+  cardBorderGradientTo?: string;
+  cardBorderGradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-tr' | 'to-tl' | 'to-br' | 'to-bl';
+}
+
 export interface AllNewsConfig {
   sectionTitle?: string;
   showIcon?: boolean;
@@ -639,6 +812,7 @@ export interface BlogCmsConfig {
   blogHero: BlogHeroConfig;
   featuredPosts: FeaturedPostsConfig;
   allNews: AllNewsConfig;
+  blogCta: BlogCtaConfig;
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -653,7 +827,8 @@ export const useBlogCmsConfig = () => {
   const [config, setConfig] = useState<BlogCmsConfig>({
     blogHero: DEFAULT_BLOG_HERO_CONFIG,
     featuredPosts: DEFAULT_FEATURED_POSTS_CONFIG,
-    allNews: DEFAULT_ALL_NEWS_CONFIG
+    allNews: DEFAULT_ALL_NEWS_CONFIG,
+    blogCta: DEFAULT_BLOG_CTA_CONFIG
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -715,6 +890,10 @@ export const useBlogCmsConfig = () => {
                 ...DEFAULT_ALL_NEWS_CONFIG.sidebar,
                 ...(pageData.content.allNews?.sidebar || {})
               }
+            },
+            blogCta: {
+              ...DEFAULT_BLOG_CTA_CONFIG,
+              ...(pageData.content.blogCta || {})
             },
             seo: pageData.seo
           });

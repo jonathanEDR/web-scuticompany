@@ -26,12 +26,10 @@ const MissionVisionConfigSection: React.FC<MissionVisionConfigSectionProps> = ({
 }) => {
   const mission = pageData?.content?.mission || {};
   const vision = pageData?.content?.vision || {};
+  const missionVisionBackground = pageData?.content?.missionVisionBackground || {};
   
   // Estado para controlar si la sección está colapsada
   const [collapsed, setCollapsed] = useState(true);
-  // Estado para controlar qué tema de imagen se está editando
-  const [missionImageTheme, setMissionImageTheme] = useState<'light' | 'dark'>('light');
-  const [visionImageTheme, setVisionImageTheme] = useState<'light' | 'dark'>('light');
 
   return (
     <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
@@ -55,6 +53,174 @@ const MissionVisionConfigSection: React.FC<MissionVisionConfigSectionProps> = ({
       {/* Contenido colapsable */}
       {!collapsed && (
         <div id="mission-vision-section-content" className="space-y-8">
+      
+      {/* 🌄 FONDO DE SECCIÓN MISIÓN Y VISIÓN */}
+      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-blue-200 dark:border-gray-700/50">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+            🌄 Imagen de Fondo (Misión y Visión)
+          </h3>
+        </div>
+        
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Esta imagen de fondo se aplicará a toda la sección que contiene Misión y Visión.
+        </p>
+
+        {/* Selector de imagen de fondo - Tema Claro */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          {/* Tema Claro */}
+          <div className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-700/50">
+            <div className="flex items-center mb-3">
+              <div className="bg-amber-100 dark:bg-amber-800/50 rounded-full p-2 mr-3">
+                <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <div>
+                <h5 className="text-sm font-bold text-gray-800 dark:text-gray-200">☀️ Tema Claro</h5>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Imagen para modo diurno</p>
+              </div>
+            </div>
+            <ManagedImageSelector
+              label="Imagen de Fondo (Claro)"
+              description="Tamaño recomendado: 1920x1080px"
+              currentImage={
+                typeof missionVisionBackground.backgroundImage === 'string' 
+                  ? missionVisionBackground.backgroundImage 
+                  : (missionVisionBackground.backgroundImage?.light || '')
+              }
+              onImageSelect={(url: string) => {
+                const currentBgImage = typeof missionVisionBackground.backgroundImage === 'string'
+                  ? { light: missionVisionBackground.backgroundImage, dark: missionVisionBackground.backgroundImage }
+                  : (missionVisionBackground.backgroundImage || {});
+                updateContent('missionVisionBackground.backgroundImage', {
+                  ...currentBgImage,
+                  light: url
+                });
+              }}
+              hideButtonArea={!!(
+                typeof missionVisionBackground.backgroundImage === 'string' 
+                  ? missionVisionBackground.backgroundImage 
+                  : missionVisionBackground.backgroundImage?.light
+              )}
+            />
+          </div>
+
+          {/* Tema Oscuro */}
+          <div className="bg-gradient-to-br from-slate-800 to-gray-900 p-4 rounded-lg border border-gray-600">
+            <div className="flex items-center mb-3">
+              <div className="bg-gray-700 rounded-full p-2 mr-3">
+                <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              </div>
+              <div>
+                <h5 className="text-sm font-bold text-white">🌙 Tema Oscuro</h5>
+                <p className="text-xs text-gray-400">Imagen para modo nocturno</p>
+              </div>
+            </div>
+            <ManagedImageSelector
+              label="Imagen de Fondo (Oscuro)"
+              description="Tamaño recomendado: 1920x1080px"
+              currentImage={
+                typeof missionVisionBackground.backgroundImage === 'string' 
+                  ? missionVisionBackground.backgroundImage 
+                  : (missionVisionBackground.backgroundImage?.dark || '')
+              }
+              onImageSelect={(url: string) => {
+                const currentBgImage = typeof missionVisionBackground.backgroundImage === 'string'
+                  ? { light: missionVisionBackground.backgroundImage, dark: missionVisionBackground.backgroundImage }
+                  : (missionVisionBackground.backgroundImage || {});
+                updateContent('missionVisionBackground.backgroundImage', {
+                  ...currentBgImage,
+                  dark: url
+                });
+              }}
+              darkMode={true}
+              hideButtonArea={!!(
+                typeof missionVisionBackground.backgroundImage === 'string' 
+                  ? missionVisionBackground.backgroundImage 
+                  : missionVisionBackground.backgroundImage?.dark
+              )}
+            />
+          </div>
+        </div>
+
+        {/* Preview de ambas imágenes */}
+        {(typeof missionVisionBackground.backgroundImage === 'object' && 
+          (missionVisionBackground.backgroundImage?.light || missionVisionBackground.backgroundImage?.dark)
+        ) && (
+          <div className="mb-4 grid grid-cols-2 gap-4">
+            {missionVisionBackground.backgroundImage?.light && (
+              <div>
+                <p className="text-xs text-gray-500 mb-1">☀️ Vista previa - Tema Claro</p>
+                <img 
+                  src={missionVisionBackground.backgroundImage.light} 
+                  alt="Fondo Claro" 
+                  className="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
+              </div>
+            )}
+            {missionVisionBackground.backgroundImage?.dark && (
+              <div>
+                <p className="text-xs text-gray-500 mb-1">🌙 Vista previa - Tema Oscuro</p>
+                <img 
+                  src={missionVisionBackground.backgroundImage.dark} 
+                  alt="Fondo Oscuro" 
+                  className="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Preview si es string simple (migración) */}
+        {typeof missionVisionBackground.backgroundImage === 'string' && missionVisionBackground.backgroundImage && (
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 mb-1">Vista previa del fondo (misma imagen para ambos temas)</p>
+            <img 
+              src={missionVisionBackground.backgroundImage} 
+              alt="Fondo Misión y Visión" 
+              className="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+            />
+          </div>
+        )}
+
+        {/* Opacidad del fondo */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Opacidad de la imagen: {Math.round((missionVisionBackground.backgroundOpacity ?? 1) * 100)}%
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={Math.round((missionVisionBackground.backgroundOpacity ?? 1) * 100)}
+            onChange={(e) => updateContent('missionVisionBackground.backgroundOpacity', parseInt(e.target.value) / 100)}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          />
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>0% (Invisible)</span>
+            <span>50%</span>
+            <span>100% (Nítido)</span>
+          </div>
+        </div>
+
+        {/* Toggle Overlay */}
+        <div className="flex items-center gap-3 p-4 bg-white/50 dark:bg-gray-700/50 rounded-lg">
+          <input
+            type="checkbox"
+            id="mv-background-overlay"
+            checked={missionVisionBackground.backgroundOverlay === true}
+            onChange={(e) => updateContent('missionVisionBackground.backgroundOverlay', e.target.checked)}
+            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <label htmlFor="mv-background-overlay" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Aplicar overlay oscuro (mejora legibilidad del texto)
+          </label>
+        </div>
+      </div>
+
       {/* ⚙️ CONFIGURACIÓN GENERAL DE TIPOGRAFÍA */}
       <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-indigo-200 dark:border-gray-700/50">
         <div className="flex items-center justify-between mb-6">
@@ -143,66 +309,38 @@ const MissionVisionConfigSection: React.FC<MissionVisionConfigSectionProps> = ({
 
           {/* 🖼️ Imagen de la Misión */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                🖼️ Imagen de la Misión
-              </label>
-              {/* Selector de tema para la imagen */}
-              <div className="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                <button
-                  onClick={() => setMissionImageTheme('light')}
-                  className={`px-3 py-1 text-xs font-medium transition-colors ${
-                    missionImageTheme === 'light'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  ☀️ Claro
-                </button>
-                <button
-                  onClick={() => setMissionImageTheme('dark')}
-                  className={`px-3 py-1 text-xs font-medium transition-colors ${
-                    missionImageTheme === 'dark'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  🌙 Oscuro
-                </button>
-              </div>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+              🖼️ Imagen de la Misión
+            </label>
 
             <ManagedImageSelector
-              currentImage={missionImageTheme === 'light' ? mission.image?.light : mission.image?.dark}
-              onImageSelect={(url) => updateContent(`mission.image.${missionImageTheme}`, url)}
-              label={`Imagen Misión (${missionImageTheme === 'light' ? 'Tema Claro' : 'Tema Oscuro'})`}
-              description="Imagen que aparecerá junto al texto de la misión"
+              currentImage={
+                typeof mission.image === 'string' 
+                  ? mission.image 
+                  : (mission.image?.dark || mission.image?.light || '')
+              }
+              onImageSelect={(url: string) => updateContent('mission.image', url)}
+              label="Imagen Misión"
+              description="Imagen que aparecerá junto al texto de la misión (se usará en ambos temas)"
               darkMode={false}
+              hideButtonArea={!!(
+                typeof mission.image === 'string' 
+                  ? mission.image 
+                  : (mission.image?.dark || mission.image?.light)
+              )}
             />
 
-            {/* Preview de ambas imágenes */}
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">☀️ Tema Claro</p>
-                {mission.image?.light ? (
-                  <img src={mission.image.light} alt="Misión Light" className="w-full h-24 object-cover rounded-lg border" />
-                ) : (
-                  <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-400 text-xs">
-                    Sin imagen
-                  </div>
-                )}
+            {/* Preview de la imagen */}
+            {(typeof mission.image === 'string' ? mission.image : (mission.image?.dark || mission.image?.light)) && (
+              <div className="mt-4">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Vista previa</p>
+                <img 
+                  src={typeof mission.image === 'string' ? mission.image : (mission.image?.dark || mission.image?.light || '')} 
+                  alt="Misión" 
+                  className="w-full max-w-xs h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600" 
+                />
               </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">🌙 Tema Oscuro</p>
-                {mission.image?.dark ? (
-                  <img src={mission.image.dark} alt="Misión Dark" className="w-full h-24 object-cover rounded-lg border" />
-                ) : (
-                  <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-400 text-xs">
-                    Sin imagen
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -246,66 +384,38 @@ const MissionVisionConfigSection: React.FC<MissionVisionConfigSectionProps> = ({
 
           {/* 🖼️ Imagen de la Visión */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                🖼️ Imagen de la Visión
-              </label>
-              {/* Selector de tema para la imagen */}
-              <div className="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                <button
-                  onClick={() => setVisionImageTheme('light')}
-                  className={`px-3 py-1 text-xs font-medium transition-colors ${
-                    visionImageTheme === 'light'
-                      ? 'bg-cyan-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  ☀️ Claro
-                </button>
-                <button
-                  onClick={() => setVisionImageTheme('dark')}
-                  className={`px-3 py-1 text-xs font-medium transition-colors ${
-                    visionImageTheme === 'dark'
-                      ? 'bg-cyan-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  🌙 Oscuro
-                </button>
-              </div>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+              🖼️ Imagen de la Visión
+            </label>
 
             <ManagedImageSelector
-              currentImage={visionImageTheme === 'light' ? vision.image?.light : vision.image?.dark}
-              onImageSelect={(url) => updateContent(`vision.image.${visionImageTheme}`, url)}
-              label={`Imagen Visión (${visionImageTheme === 'light' ? 'Tema Claro' : 'Tema Oscuro'})`}
-              description="Imagen que aparecerá junto al texto de la visión"
+              currentImage={
+                typeof vision.image === 'string' 
+                  ? vision.image 
+                  : (vision.image?.dark || vision.image?.light || '')
+              }
+              onImageSelect={(url: string) => updateContent('vision.image', url)}
+              label="Imagen Visión"
+              description="Imagen que aparecerá junto al texto de la visión (se usará en ambos temas)"
               darkMode={false}
+              hideButtonArea={!!(
+                typeof vision.image === 'string' 
+                  ? vision.image 
+                  : (vision.image?.dark || vision.image?.light)
+              )}
             />
 
-            {/* Preview de ambas imágenes */}
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">☀️ Tema Claro</p>
-                {vision.image?.light ? (
-                  <img src={vision.image.light} alt="Visión Light" className="w-full h-24 object-cover rounded-lg border" />
-                ) : (
-                  <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-400 text-xs">
-                    Sin imagen
-                  </div>
-                )}
+            {/* Preview de la imagen */}
+            {(typeof vision.image === 'string' ? vision.image : (vision.image?.dark || vision.image?.light)) && (
+              <div className="mt-4">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Vista previa</p>
+                <img 
+                  src={typeof vision.image === 'string' ? vision.image : (vision.image?.dark || vision.image?.light || '')} 
+                  alt="Visión" 
+                  className="w-full max-w-xs h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600" 
+                />
               </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">🌙 Tema Oscuro</p>
-                {vision.image?.dark ? (
-                  <img src={vision.image.dark} alt="Visión Dark" className="w-full h-24 object-cover rounded-lg border" />
-                ) : (
-                  <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-400 text-xs">
-                    Sin imagen
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

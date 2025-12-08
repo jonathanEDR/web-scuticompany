@@ -184,9 +184,10 @@ interface ContactFormData {
 interface ContactSectionProps {
   data?: ContactFormData;
   categorias?: Categoria[];
+  transparentBackground?: boolean; // No mostrar el fondo propio de la sección
 }
 
-const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
+const ContactSection = ({ data, categorias = [], transparentBackground = false }: ContactSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState<string>('');
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -271,13 +272,13 @@ const ContactSection = ({ data, categorias = [] }: ContactSectionProps) => {
   return (
     <section
       id="contacto"
-      className="relative min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden"
-      style={sectionStyles}
+      className={`relative py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden ${transparentBackground ? '' : 'min-h-screen'}`}
+      style={transparentBackground ? {} : sectionStyles}
     >
       {/* Overlay removido para mostrar imagen de fondo sin filtros */}
       
-      {/* Fondo por defecto si no hay imagen */}
-      {!currentBackground && (
+      {/* Fondo por defecto si no hay imagen (solo si no es transparente) */}
+      {!transparentBackground && !currentBackground && (
         <div 
           className="absolute inset-0"
           style={{
