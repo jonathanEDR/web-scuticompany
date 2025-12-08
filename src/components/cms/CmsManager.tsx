@@ -24,6 +24,7 @@ import BlogHeroConfigSection from './BlogHeroConfigSection';
 import FeaturedPostsConfigSection from './FeaturedPostsConfigSection';
 import AllNewsConfigSection from './AllNewsConfigSection';
 import BlogCtaConfigSection from './BlogCtaConfigSection';
+import ServicioDetailConfigSection from './ServicioDetailConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -32,7 +33,7 @@ const CmsManager: React.FC = () => {
   const { theme: currentTheme } = useTheme(); // 🆕 Obtener tema actual
   
   // 🆕 Estado para manejar qué página se está editando
-  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog'>('home');
+  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog' | 'servicio-detail'>('home');
   
   // Determinar tab activo desde la URL
   const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' => {
@@ -348,6 +349,7 @@ const CmsManager: React.FC = () => {
                 <option value="home">🏠 Home (Inicio)</option>
                 <option value="about">👥 About (Nosotros)</option>
                 <option value="services">🚀 Services (Servicios)</option>
+                <option value="servicio-detail">📄 Servicio Detalle (Página Individual)</option>
                 <option value="contact">📞 Contact (Contacto)</option>
                 <option value="blog">📰 Blog (Noticias)</option>
               </select>
@@ -573,6 +575,16 @@ const CmsManager: React.FC = () => {
                     <li>✅ <strong>SEO:</strong> Optimización para búsquedas de servicios</li>
                   </ul>
                 </div>
+              </>
+            )}
+
+            {/* 📄 SECCIONES ESPECÍFICAS PARA SERVICIO DETALLE */}
+            {selectedPage === 'servicio-detail' && (
+              <>
+                <ServicioDetailConfigSection
+                  config={pageData?.content?.servicioDetailConfig || {}}
+                  onChange={(newConfig) => handleUpdateContent('servicioDetailConfig', newConfig)}
+                />
               </>
             )}
 

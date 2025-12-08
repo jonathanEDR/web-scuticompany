@@ -921,6 +921,8 @@ export interface PageContent {
   blogCta?: BlogCtaConfig;
   // 🆕 CONTENIDO PARA PÁGINA DE CONTACTO
   contactPage?: ContactPageContent;
+  // 🆕 CONTENIDO PARA PÁGINA DE SERVICIO DETALLE
+  servicioDetailConfig?: any; // Configuración de la página ServicioDetail con acordeón
 }
 
 export interface PageSeo {

@@ -491,9 +491,39 @@ export const initAllPages = async () => {
   }
 };
 
+// ⚡ NUEVA FUNCIÓN: Obtener página del cache de forma SÍNCRONA
+// Útil para evitar flash de contenido default -> CMS
+export const getCachedPageSync = (slug: string): any | null => {
+  const cacheKey = `page-${slug}`;
+  const localStorageKey = `cmsCache_${cacheKey}`;
+  const CACHE_DURATION = CACHE_DURATIONS.PUBLIC_PAGES;
+
+  // 1. Intentar localStorage
+  try {
+    const localData = localStorage.getItem(localStorageKey);
+    if (localData) {
+      const { data, timestamp } = JSON.parse(localData);
+      const age = Date.now() - timestamp;
+      
+      if (age < CACHE_DURATION) {
+        return data;
+      }
+    }
+  } catch (e) {
+    // Silenciar errores
+  }
+
+  // 2. Intentar memoria
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
+  return null;
+};
+
 export default {
   getAllPages,
   getPageBySlug,
+  getCachedPageSync,
   updatePage,
   initHomePage,
   initAllPages,

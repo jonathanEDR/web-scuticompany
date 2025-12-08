@@ -33,7 +33,6 @@ export const useCmsData = (pageSlug: string = 'home') => {
       // 1️⃣ Intentar cargar del cache primero
       const cachedData = cms.getPages<PageData>(pageSlug);
       if (cachedData) {
-        console.log(`✅ [CMS] Datos de "${pageSlug}" cargados desde cache`);
         data = cachedData;
         setPageData(data);
         setLoading(false);
@@ -42,7 +41,6 @@ export const useCmsData = (pageSlug: string = 'home') => {
       
       // 2️⃣ Si no hay cache, obtener de la API
       try {
-        console.log(`🌐 [CMS] Obteniendo datos de "${pageSlug}" de la API`);
         data = await getPageBySlug(pageSlug);
         
         // 3️⃣ Guardar en cache
@@ -545,9 +543,10 @@ export const useCmsData = (pageSlug: string = 'home') => {
         isPublished: pageData.isPublished
       });
       
-      // ✅ ACTUALIZADO: Invalidar cache para forzar refresh en próxima carga
+      // ✅ ACTUALIZADO: Invalidar cache viejo y guardar datos frescos
       cms.invalidatePages(pageSlug);
-      console.log(`✅ [CMS] Cache invalidado para "${pageSlug}" after save`);
+      // Guardar los datos actuales en cache para evitar cargar datos viejos
+      cms.setPages<PageData>(pageData, pageSlug);
       
       // 🔧 MANTENER: Limpiar caché para forzar que la página pública use datos frescos
       clearCache(`page-${pageSlug}`);

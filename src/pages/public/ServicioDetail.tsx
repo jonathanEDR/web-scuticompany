@@ -1,6 +1,7 @@
 /**
  * 📄 PÁGINA DE DETALLES DEL SERVICIO
  * Página pública para mostrar información completa de un servicio
+ * Sistema de paneles acordeón unificado
  */
 
 import React, { useState, useEffect } from 'react';
@@ -11,12 +12,241 @@ import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidge
 import ContactModal from '../../components/public/ContactModal';
 import { useSeo } from '../../hooks/useSeo';
 import { useServicioDetail } from '../../hooks/useServiciosCache';
+import { useCmsData } from '../../hooks/cms/useCmsData';
+import { useTheme } from '../../contexts/ThemeContext';
 import type { Servicio } from '../../types/servicios';
+
+// Tipos para el sistema de paneles acordeón
+type PanelType = 'descripcion' | 'caracteristicas' | 'beneficios' | 'incluye' | 'info' | 'faq' | 'multimedia';
+
+interface PanelConfig {
+  id: PanelType;
+  label: string;
+  icon: string;
+  description: string;
+}
+
+const PANELS_CONFIG: PanelConfig[] = [
+  { id: 'descripcion', label: 'Descripción', icon: '📋', description: 'Información general del servicio' },
+  { id: 'caracteristicas', label: 'Características', icon: '✨', description: 'Qué ofrece este servicio' },
+  { id: 'beneficios', label: 'Beneficios', icon: '🎯', description: 'Ventajas para tu negocio' },
+  { id: 'incluye', label: 'Qué Incluye', icon: '✅', description: 'Detalle de inclusiones' },
+  { id: 'info', label: 'Información Adicional', icon: '💡', description: 'Detalles extras' },
+  { id: 'faq', label: 'Preguntas Frecuentes', icon: '❓', description: 'Dudas comunes' },
+  { id: 'multimedia', label: 'Multimedia', icon: '🎥', description: 'Videos y galería' },
+];
+
+// ============================================
+// HELPERS PARA DETECTAR CONTENIDO EN PANELES
+// ============================================
+
+const hasPanelContent = (servicio: Servicio, panelId: PanelType): boolean => {
+  switch (panelId) {
+    case 'descripcion':
+      return !!(servicio.descripcion?.trim() || servicio.descripcionRica?.trim());
+    case 'caracteristicas':
+      return !!(servicio.caracteristicas && servicio.caracteristicas.length > 0);
+    case 'beneficios':
+      return !!(servicio.beneficios && servicio.beneficios.length > 0);
+    case 'incluye':
+      return !!(
+        (servicio.incluye && servicio.incluye.length > 0) ||
+        (servicio.noIncluye && servicio.noIncluye.length > 0) ||
+        (servicio.tecnologias && servicio.tecnologias.length > 0)
+      );
+    case 'info':
+      return !!(servicio.contenidoAdicional?.trim() || (servicio.etiquetas && servicio.etiquetas.length > 0));
+    case 'faq':
+      return !!(servicio.faq && servicio.faq.length > 0);
+    case 'multimedia':
+      return !!(
+        servicio.videoUrl?.trim() ||
+        (servicio.galeriaImagenes && servicio.galeriaImagenes.length > 0) ||
+        (servicio.imagenes && servicio.imagenes.length > 0)
+      );
+    default:
+      return false;
+  }
+};
+
+/**
+ * Obtiene los paneles disponibles basados en el contenido del servicio
+ */
+const getAvailablePanels = (servicio: Servicio): PanelConfig[] => {
+  return PANELS_CONFIG.filter(panel => hasPanelContent(servicio, panel.id));
+};
 
 export const ServicioDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { theme } = useTheme(); // Hook para obtener el tema actual (light/dark)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  // Estado para el panel acordeón activo (null = todos cerrados)
+  const [activePanel, setActivePanel] = useState<PanelType | null>('descripcion');
+
+  // Obtener configuración del CMS para servicio-detail
+  const { pageData: cmsConfig } = useCmsData('servicio-detail');
+  
+  // Extraer configuración de ServicioDetail
+  const servicioDetailConfig = cmsConfig?.content?.servicioDetailConfig || {};
+  const heroConfig = servicioDetailConfig.hero || {};
+  const accordionConfig = servicioDetailConfig.accordion || {};
+  const ctaConfig = servicioDetailConfig.cta || {};
+
+  // Función para toggle del panel acordeón
+  const togglePanel = (panelId: PanelType) => {
+    setActivePanel(prev => prev === panelId ? null : panelId);
+  };
+
+  // Función helper para obtener estilos del acordeón basados en el tema
+  const getAccordionStyles = () => {
+    const styles = accordionConfig.styles;
+    if (!styles) {
+      // Valores por defecto si no hay configuración
+      return theme === 'dark' ? {
+        panelBackground: 'rgba(31, 41, 55, 0.4)',
+        panelBorder: '#374151',
+        headerBackground: 'transparent',
+        headerText: '#ffffff',
+        headerIcon: '#a78bfa',
+        contentBackground: 'rgba(17, 24, 39, 0.3)',
+        contentText: '#d1d5db',
+        accentGradientFrom: '#a78bfa',
+        accentGradientTo: '#22d3ee',
+      } : {
+        panelBackground: 'rgba(255, 255, 255, 0.6)',
+        panelBorder: '#e5e7eb',
+        headerBackground: 'transparent',
+        headerText: '#111827',
+        headerIcon: '#8b5cf6',
+        contentBackground: 'rgba(255, 255, 255, 0.5)',
+        contentText: '#374151',
+        accentGradientFrom: '#8b5cf6',
+        accentGradientTo: '#06b6d4',
+      };
+    }
+    return theme === 'dark' ? styles.dark : styles.light;
+  };
+
+  // Función helper para obtener estilos de tipografía del acordeón
+  const getAccordionTypography = () => {
+    const typography = accordionConfig.styles?.typography;
+    if (!typography) {
+      return {
+        fontFamily: 'Montserrat, sans-serif',
+        headerFontSize: '1.125rem',
+        headerFontWeight: '600',
+        contentFontSize: '1rem',
+        contentLineHeight: '1.75'
+      };
+    }
+    return typography;
+  };
+
+  // Función helper para obtener estilos de las tarjetas de contenido (beneficios, características, etc.)
+  const getCardStyles = () => {
+    const contentCards = accordionConfig.styles?.contentCards;
+    
+    // Valores por defecto
+    const defaultLight = {
+      background: 'rgba(0, 0, 0, 0.05)',
+      borderColor: 'transparent',
+      borderWidth: '0',
+      textColor: '#374151',
+      borderRadius: '0.5rem',
+      iconBackground: 'linear-gradient(to bottom right, #8b5cf6, #06b6d4)',
+      iconColor: '#ffffff',
+    };
+    
+    const defaultDark = {
+      background: 'rgba(255, 255, 255, 0.05)',
+      borderColor: 'transparent',
+      borderWidth: '0',
+      textColor: '#d1d5db',
+      borderRadius: '0.5rem',
+      iconBackground: 'linear-gradient(to bottom right, #a78bfa, #22d3ee)',
+      iconColor: '#ffffff',
+    };
+
+    if (!contentCards) {
+      return theme === 'dark' ? defaultDark : defaultLight;
+    }
+
+    const themeStyles = theme === 'dark' ? contentCards.dark : contentCards.light;
+    const defaults = theme === 'dark' ? defaultDark : defaultLight;
+    
+    // Reconstruir iconBackground si usa gradiente
+    let iconBackground = themeStyles?.iconBackground || defaults.iconBackground;
+    
+    // Si tiene configuración de gradiente separada, reconstruir el valor
+    if (themeStyles?.iconBackgroundType === 'gradient' && themeStyles?.iconGradientFrom && themeStyles?.iconGradientTo) {
+      const direction = themeStyles.iconGradientDirection || 'to bottom right';
+      iconBackground = `linear-gradient(${direction}, ${themeStyles.iconGradientFrom}, ${themeStyles.iconGradientTo})`;
+    } else if (themeStyles?.iconBackgroundType === 'solid' && themeStyles?.iconBackground) {
+      // Si es color sólido, usar directamente
+      iconBackground = themeStyles.iconBackground;
+    }
+    
+    return {
+      background: themeStyles?.background || defaults.background,
+      borderColor: themeStyles?.borderColor || defaults.borderColor,
+      borderWidth: themeStyles?.borderWidth || defaults.borderWidth,
+      textColor: themeStyles?.textColor || defaults.textColor,
+      borderRadius: themeStyles?.borderRadius || defaults.borderRadius,
+      iconBackground,
+      iconColor: themeStyles?.iconColor || defaults.iconColor,
+    };
+  };
+
+  // Función helper para generar estilos de fondo desde configuración CMS
+  const getBackgroundStyle = (bgConfig: any) => {
+    if (!bgConfig || bgConfig.type === 'none') {
+      return {};
+    }
+
+    const style: any = {};
+
+    if (bgConfig.type === 'color') {
+      style.backgroundColor = bgConfig.color || '#ffffff';
+    } else if (bgConfig.type === 'gradient') {
+      style.backgroundImage = `linear-gradient(to bottom right, ${bgConfig.gradientFrom || '#f3f4f6'}, ${bgConfig.gradientTo || '#e5e7eb'})`;
+    } else if (bgConfig.type === 'image') {
+      // Seleccionar imagen según el tema actual (light o dark)
+      const imageUrl = theme === 'dark' ? bgConfig.imageDark : bgConfig.imageLight;
+      
+      // Si no hay imagen para el tema actual, usar la del otro tema como fallback
+      const fallbackUrl = theme === 'dark' ? bgConfig.imageLight : bgConfig.imageDark;
+      const finalImageUrl = imageUrl || fallbackUrl || bgConfig.imageUrl; // imageUrl para compatibilidad con versión anterior
+      
+      console.log(`🎨 [getBackgroundStyle] Tema: ${theme}, imageLight: ${bgConfig.imageLight}, imageDark: ${bgConfig.imageDark}, final: ${finalImageUrl}`);
+      
+      if (finalImageUrl) {
+        style.backgroundImage = `url(${finalImageUrl})`;
+        style.backgroundSize = 'cover';
+        style.backgroundPosition = 'center';
+        style.backgroundRepeat = 'no-repeat';
+      } else {
+        console.warn('⚠️ [getBackgroundStyle] No se encontró URL de imagen válida');
+      }
+    }
+
+    return style;
+  };
+
+  // Función helper para generar overlay
+  const getOverlayStyle = (bgConfig: any): React.CSSProperties | undefined => {
+    if (!bgConfig || (bgConfig.type !== 'image' && bgConfig.type !== 'gradient')) {
+      return undefined;
+    }
+
+    const opacity = (bgConfig.overlayOpacity || 0) / 100;
+    if (opacity === 0) return undefined;
+
+    return {
+      backgroundColor: bgConfig.overlayColor || '#000000',
+      opacity,
+    };
+  };
 
   // ============================================
   // HOOK DE CACHE - REEMPLAZA USEEFFECT + API CALL
@@ -37,6 +267,36 @@ export const ServicioDetail: React.FC = () => {
   });
 
   const error = errorServicio;
+
+  // Calcular paneles disponibles basados en el contenido del servicio
+  const availablePanels = servicio ? getAvailablePanels(servicio) : PANELS_CONFIG;
+
+  // DEBUG: Mostrar datos del servicio en consola (remover en producción)
+  useEffect(() => {
+    if (servicio) {
+      console.log('📦 Servicio cargado:', {
+        titulo: servicio.titulo,
+        caracteristicas: servicio.caracteristicas,
+        beneficios: servicio.beneficios,
+        incluye: servicio.incluye,
+        noIncluye: servicio.noIncluye,
+        tecnologias: servicio.tecnologias,
+        faq: servicio.faq,
+        etiquetas: servicio.etiquetas,
+        videoUrl: servicio.videoUrl,
+        galeriaImagenes: servicio.galeriaImagenes,
+        imagenes: servicio.imagenes,
+      });
+      console.log('📑 Paneles disponibles:', availablePanels.map(p => p.label));
+    }
+  }, [servicio, availablePanels]);
+
+  // Abrir el primer panel disponible al cargar
+  useEffect(() => {
+    if (servicio && availablePanels.length > 0 && activePanel === null) {
+      setActivePanel(availablePanels[0].id);
+    }
+  }, [servicio, availablePanels]);
 
   // SEO dinámico
   const { SeoHelmet } = useSeo({
@@ -138,9 +398,22 @@ export const ServicioDetail: React.FC = () => {
       <SeoHelmet />
       <PublicHeader />
       
-      {/* Hero Section con animación */}
-      <section className="pt-20 pb-12 bg-gradient-to-br from-gray-50 dark:from-gray-900 via-purple-100/20 dark:via-purple-900/20 to-blue-100/20 dark:to-blue-900/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ============================================ */}
+      {/* SECCIÓN 1: HERO CON FONDO CONFIGURABLE */}
+      {/* ============================================ */}
+      <section 
+        className="pt-20 pb-12 relative"
+        style={getBackgroundStyle(heroConfig.background)}
+      >
+        {/* Overlay configurable */}
+        {getOverlayStyle(heroConfig.background) !== undefined && (
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={getOverlayStyle(heroConfig.background)}
+          />
+        )}
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Breadcrumb con animación */}
           <nav className="mb-8 animate-fade-in-down">
             <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
@@ -156,19 +429,33 @@ export const ServicioDetail: React.FC = () => {
             {/* Información principal con animación */}
             <div className="animate-slide-in-right">
               {/* Categoría con animación */}
-              <div className="mb-4 animate-fade-in delay-100">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 transition-all duration-300 hover:scale-105">
-                  {typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'}
-                </span>
-                {servicio.destacado && (
-                  <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 transition-all duration-300 hover:scale-105">
-                    ★ Destacado
+              {heroConfig.content?.showCategoryTag !== false && (
+                <div className="mb-4 animate-fade-in delay-100">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 transition-all duration-300 hover:scale-105">
+                    {typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'}
                   </span>
-                )}
-              </div>
+                  {servicio.destacado && (
+                    <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 transition-all duration-300 hover:scale-105">
+                      ★ Destacado
+                    </span>
+                  )}
+                </div>
+              )}
 
-              {/* Título con animación */}
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-in delay-200">
+              {/* Título con animación y gradiente opcional */}
+              <h1 
+                className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in delay-200"
+                style={
+                  heroConfig.content?.titleGradient?.enabled
+                    ? {
+                        backgroundImage: `linear-gradient(to right, ${heroConfig.content.titleGradient.from}, ${heroConfig.content.titleGradient.to})`,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                      }
+                    : { color: undefined } // Usa el color por defecto del tema
+                }
+              >
                 {servicio.titulo}
               </h1>
 
@@ -180,23 +467,77 @@ export const ServicioDetail: React.FC = () => {
               )}
 
               {/* Precio y duración con animación */}
-              <div className="flex flex-wrap gap-4 mb-8 animate-fade-in delay-400">
-                <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-700 hover-lift transition-all duration-300">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Precio</div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {formatPrice(servicio)}
-                  </div>
-                </div>
-                
-                {getDurationText(servicio) && (
-                  <div className="bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-300 dark:border-gray-800 hover-lift transition-all duration-300">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Duración</div>
-                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {servicio.duracion?.valor} {servicio.duracion?.unidad}
+              {heroConfig.content?.showPrice !== false && (
+                <div className="flex flex-wrap gap-4 mb-8 animate-fade-in delay-400">
+                  <div
+                    className="backdrop-blur-sm rounded-lg px-6 py-4 border hover-lift transition-all duration-300"
+                    style={{
+                      background: theme === 'dark'
+                        ? heroConfig.cards?.dark.background || 'rgba(31, 41, 55, 0.5)'
+                        : heroConfig.cards?.light.background || 'rgba(255, 255, 255, 0.8)',
+                      borderColor: theme === 'dark'
+                        ? heroConfig.cards?.dark.borderColor || '#374151'
+                        : heroConfig.cards?.light.borderColor || '#d1d5db',
+                    }}
+                  >
+                    <div
+                      className="text-sm mb-1"
+                      style={{
+                        color: theme === 'dark'
+                          ? heroConfig.cards?.dark.labelColor || '#9ca3af'
+                          : heroConfig.cards?.light.labelColor || '#6b7280',
+                      }}
+                    >
+                      Precio
+                    </div>
+                    <div
+                      className="text-2xl font-bold"
+                      style={{
+                        color: theme === 'dark'
+                          ? heroConfig.cards?.dark.textColor || '#ffffff'
+                          : heroConfig.cards?.light.textColor || '#111827',
+                      }}
+                    >
+                      {formatPrice(servicio)}
                     </div>
                   </div>
-                )}
-              </div>
+                  
+                  {getDurationText(servicio) && (
+                    <div
+                      className="backdrop-blur-sm rounded-lg px-6 py-4 border hover-lift transition-all duration-300"
+                      style={{
+                        background: theme === 'dark'
+                          ? heroConfig.cards?.dark.background || 'rgba(31, 41, 55, 0.5)'
+                          : heroConfig.cards?.light.background || 'rgba(255, 255, 255, 0.8)',
+                        borderColor: theme === 'dark'
+                          ? heroConfig.cards?.dark.borderColor || '#374151'
+                          : heroConfig.cards?.light.borderColor || '#d1d5db',
+                      }}
+                    >
+                      <div
+                        className="text-sm mb-1"
+                        style={{
+                          color: theme === 'dark'
+                            ? heroConfig.cards?.dark.labelColor || '#9ca3af'
+                            : heroConfig.cards?.light.labelColor || '#6b7280',
+                        }}
+                      >
+                        Duración
+                      </div>
+                      <div
+                        className="text-lg font-semibold"
+                        style={{
+                          color: theme === 'dark'
+                            ? heroConfig.cards?.dark.textColor || '#ffffff'
+                            : heroConfig.cards?.light.textColor || '#111827',
+                        }}
+                      >
+                        {servicio.duracion?.valor} {servicio.duracion?.unidad}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Badges informativos adicionales */}
               {(servicio.tiempoEntrega || servicio.garantia || servicio.soporte) && (
@@ -241,18 +582,63 @@ export const ServicioDetail: React.FC = () => {
 
               {/* CTA */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => setIsContactModalOpen(true)}
-                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-purple-500/50 transform hover:scale-105"
-                >
-                  💬 Solicitar Cotización
-                </button>
-                <button
-                  onClick={() => navigate(-1)}
-                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-400 dark:border-gray-600 hover:border-gray-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-lg transition-colors"
-                >
-                  ← Volver
-                </button>
+                {/* Botón Primario */}
+                {heroConfig.buttons?.primary?.enabled !== false && (
+                  <button
+                    onClick={() => setIsContactModalOpen(true)}
+                    className="inline-flex items-center justify-center px-8 py-4 font-semibold rounded-lg transition-all shadow-lg transform hover:scale-105"
+                    style={{
+                      background: heroConfig.buttons?.primary?.style === 'gradient'
+                        ? theme === 'dark'
+                          ? `linear-gradient(to right, ${heroConfig.buttons.primary.dark?.gradient?.from || '#a78bfa'}, ${heroConfig.buttons.primary.dark?.gradient?.to || '#22d3ee'})`
+                          : `linear-gradient(to right, ${heroConfig.buttons.primary.light?.gradient?.from || '#8b5cf6'}, ${heroConfig.buttons.primary.light?.gradient?.to || '#06b6d4'})`
+                        : heroConfig.buttons?.primary?.style === 'solid'
+                        ? theme === 'dark'
+                          ? heroConfig.buttons.primary.dark?.solidColor || '#a78bfa'
+                          : heroConfig.buttons.primary.light?.solidColor || '#8b5cf6'
+                        : 'transparent',
+                      color: theme === 'dark'
+                        ? heroConfig.buttons?.primary?.dark?.textColor || '#ffffff'
+                        : heroConfig.buttons?.primary?.light?.textColor || '#ffffff',
+                      border: heroConfig.buttons?.primary?.style === 'outline'
+                        ? theme === 'dark'
+                          ? `2px solid ${heroConfig.buttons.primary.dark?.borderColor || '#a78bfa'}`
+                          : `2px solid ${heroConfig.buttons.primary.light?.borderColor || '#8b5cf6'}`
+                        : 'none',
+                    }}
+                  >
+                    💬 {heroConfig.buttons?.primary?.text || 'Solicitar Cotización'}
+                  </button>
+                )}
+                
+                {/* Botón Secundario */}
+                {heroConfig.buttons?.secondary?.enabled !== false && (
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="inline-flex items-center justify-center px-8 py-4 font-semibold rounded-lg transition-all transform hover:scale-105"
+                    style={{
+                      background: heroConfig.buttons?.secondary?.style === 'gradient'
+                        ? theme === 'dark'
+                          ? `linear-gradient(to right, ${heroConfig.buttons.secondary.dark?.gradient?.from || '#f472b6'}, ${heroConfig.buttons.secondary.dark?.gradient?.to || '#fbbf24'})`
+                          : `linear-gradient(to right, ${heroConfig.buttons.secondary.light?.gradient?.from || '#ec4899'}, ${heroConfig.buttons.secondary.light?.gradient?.to || '#f59e0b'})`
+                        : heroConfig.buttons?.secondary?.style === 'solid'
+                        ? theme === 'dark'
+                          ? heroConfig.buttons.secondary.dark?.solidColor || 'transparent'
+                          : heroConfig.buttons.secondary.light?.solidColor || 'transparent'
+                        : 'transparent',
+                      color: theme === 'dark'
+                        ? heroConfig.buttons?.secondary?.dark?.textColor || '#a78bfa'
+                        : heroConfig.buttons?.secondary?.light?.textColor || '#8b5cf6',
+                      border: heroConfig.buttons?.secondary?.style === 'outline'
+                        ? theme === 'dark'
+                          ? `2px solid ${heroConfig.buttons.secondary.dark?.borderColor || '#a78bfa'}`
+                          : `2px solid ${heroConfig.buttons.secondary.light?.borderColor || '#8b5cf6'}`
+                        : 'none',
+                    }}
+                  >
+                    ← {heroConfig.buttons?.secondary?.text || 'Volver'}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -279,340 +665,912 @@ export const ServicioDetail: React.FC = () => {
         </div>
       </section>
 
-      {/* Descripción detallada */}
-      {servicio.descripcion && (
-        <section className="py-16 bg-white/50 dark:bg-gray-800/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-                📋 Descripción del Servicio
-              </h2>
-              <div className="prose prose-lg dark:prose-invert max-w-none">
-                <div 
-                  className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line"
-                  dangerouslySetInnerHTML={{ __html: servicio.descripcion.replace(/\n/g, '<br>') }}
-                />
-              </div>
-            </div>
+      {/* ============================================ */}
+      {/* SECCIÓN 2: ACORDEÓN CON FONDO CONFIGURABLE */}
+      {/* ============================================ */}
+      <section 
+        className="py-12 relative"
+        style={getBackgroundStyle(accordionConfig.background)}
+      >
+        {/* Overlay configurable */}
+        {getOverlayStyle(accordionConfig.background) !== undefined && (
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={getOverlayStyle(accordionConfig.background)}
+          />
+        )}
+        
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Título de la sección - Fuera de la tarjeta */}
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 flex items-center justify-center gap-3">
+              <span className="text-4xl">📚</span>
+              Información Completa
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">Haz clic en cada sección para ver más detalles</p>
           </div>
-        </section>
-      )}
 
-      {/* Descripción Rica (Contenido Personalizado) */}
-      {servicio.descripcionRica && servicio.descripcionRica.trim() && (
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-                📝 Información Detallada
-              </h2>
-              <div className="prose prose-lg dark:prose-invert max-w-none bg-white/80 dark:bg-gray-900/50 rounded-lg p-8 border border-gray-300 dark:border-gray-800">
-                <div 
-                  className="text-gray-700 dark:text-gray-300 leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
-                    __html: servicio.descripcionRica
-                      // Headers
-                      .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">$1</h3>')
-                      .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 mt-8">$1</h2>')
-                      .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 mt-8">$1</h1>')
-                      // Bold
-                      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900 dark:text-white">$1</strong>')
-                      // Italic
-                      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-                      // Lists
-                      .replace(/^\- (.*$)/gim, '<li class="ml-4 mb-2">• $1</li>')
-                      .replace(/^(\d+)\. (.*$)/gim, '<li class="ml-4 mb-2">$1. $2</li>')
-                      // Line breaks
-                      .replace(/\n/g, '<br>')
+          {/* Paneles Acordeón - Sin tarjeta contenedora */}
+          <div className="space-y-3">
+            
+            {/* ========== PANEL: DESCRIPCIÓN ========== */}
+            {hasPanelContent(servicio, 'descripcion') && (
+              <div 
+                className="accordion-panel rounded-xl overflow-hidden backdrop-blur-sm hover:opacity-90 transition-all duration-300 border"
+                style={{
+                  background: getAccordionStyles().panelBackground,
+                  borderColor: getAccordionStyles().panelBorder,
+                }}
+              >
+                <button
+                  onClick={() => togglePanel('descripcion')}
+                  className="w-full px-6 py-5 flex items-center justify-between transition-all duration-300"
+                  style={{
+                    background: activePanel === 'descripcion'
+                      ? `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}15, ${getAccordionStyles().accentGradientTo}15)`
+                      : getAccordionStyles().headerBackground,
                   }}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Video */}
-      {servicio.videoUrl && servicio.videoUrl.trim() && (
-        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              🎥 Video del Servicio
-            </h2>
-            <div className="max-w-4xl mx-auto">
-              <div className="relative rounded-lg overflow-hidden shadow-2xl" style={{ paddingBottom: '56.25%' }}>
-                <iframe
-                  src={servicio.videoUrl.replace('watch?v=', 'embed/')}
-                  title="Video del servicio"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute top-0 left-0 w-full h-full border-0"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Galería Personalizada */}
-      {servicio.galeriaImagenes && servicio.galeriaImagenes.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              🖼️ Galería del Servicio
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {servicio.galeriaImagenes.map((imagen, index) => (
-                <div key={index} className="group overflow-hidden rounded-lg shadow-lg">
-                  <img
-                    src={imagen}
-                    alt={`${servicio.titulo} - Imagen ${index + 1}`}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Contenido Adicional */}
-      {servicio.contenidoAdicional && servicio.contenidoAdicional.trim() && (
-        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-                💡 Información Adicional
-              </h2>
-              <div className="bg-gradient-to-r from-purple-100/80 dark:from-purple-900/20 to-blue-100/80 dark:to-blue-900/20 rounded-lg p-8 border border-purple-300/50 dark:border-purple-500/30">
-                <div 
-                  className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line text-lg"
-                  dangerouslySetInnerHTML={{ __html: servicio.contenidoAdicional.replace(/\n/g, '<br>') }}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Características */}
-      {servicio.caracteristicas && servicio.caracteristicas.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              ✨ ¿Qué incluye este servicio?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {servicio.caracteristicas.map((caracteristica, index) => (
-                <div
-                  key={index}
-                  className="bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm rounded-lg p-6 border border-gray-300 dark:border-gray-800 hover:border-purple-400 dark:hover:border-purple-500/50 transition-colors"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="text-2xl">✅</div>
-                    <div>
-                      <p className="text-gray-900 dark:text-white font-medium">{caracteristica}</p>
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      style={{
+                        background: activePanel === 'descripcion'
+                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                          : '#9ca3af',
+                        color: '#ffffff',
+                      }}
+                    >
+                      📋
+                    </div>
+                    <div className="text-left">
+                      <h3 
+                        className="font-semibold text-lg"
+                        style={{ 
+                          color: getAccordionStyles().headerText,
+                          fontFamily: getAccordionTypography().fontFamily,
+                          fontSize: getAccordionTypography().headerFontSize,
+                          fontWeight: getAccordionTypography().headerFontWeight,
+                        }}
+                      >
+                        Descripción
+                      </h3>
+                      <p className="text-sm opacity-70">Información general del servicio</p>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Tecnologías */}
-      {servicio.tecnologias && servicio.tecnologias.length > 0 && (
-        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              🛠️ Tecnologías que utilizamos
-            </h2>
-            <div className="flex flex-wrap justify-center gap-4">
-              {servicio.tecnologias.map((tecnologia, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"
-                >
-                  {tecnologia}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Beneficios */}
-      {servicio.beneficios && servicio.beneficios.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              🎯 Beneficios Clave
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {servicio.beneficios.map((beneficio, index) => (
-                <div
-                  key={index}
-                  className="group relative bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 transition-all hover:shadow-xl hover:-translate-y-1"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center text-2xl shadow-lg text-white">
-                      ★
+                  <span 
+                    className="transition-transform duration-300 text-xl"
+                    style={{ 
+                      color: getAccordionStyles().headerIcon,
+                      transform: activePanel === 'descripcion' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    ▼
+                  </span>
+                </button>
+                
+                {activePanel === 'descripcion' && (
+                  <div 
+                    className="px-6 pb-6 animate-fade-in"
+                    style={{
+                      background: getAccordionStyles().contentBackground,
+                      color: getAccordionStyles().contentText,
+                      fontFamily: getAccordionTypography().fontFamily,
+                      fontSize: getAccordionTypography().contentFontSize,
+                      lineHeight: getAccordionTypography().contentLineHeight,
+                    }}
+                  >
+                    {/* Descripción básica */}
+                    {servicio.descripcion && (
+                      <div 
+                        className="rounded-xl p-6 mb-4"
+                        style={{
+                          background: getCardStyles().background,
+                          borderColor: getCardStyles().borderColor,
+                          borderWidth: getCardStyles().borderWidth || '0',
+                          borderStyle: 'solid',
+                          borderRadius: getCardStyles().borderRadius,
+                        }}
+                      >
+                        <div 
+                          className="leading-relaxed whitespace-pre-line"
+                          style={{ color: getAccordionStyles().contentText }}
+                          dangerouslySetInnerHTML={{ __html: servicio.descripcion.replace(/\n/g, '<br>') }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Descripción Rica */}
+                    {servicio.descripcionRica?.trim() && (
+                      <div 
+                        className="rounded-xl p-6"
+                        style={{
+                          background: getCardStyles().background,
+                          borderColor: getCardStyles().borderColor,
+                          borderWidth: getCardStyles().borderWidth || '0',
+                          borderStyle: 'solid',
+                          borderRadius: getCardStyles().borderRadius,
+                        }}
+                      >
+                        <h4 
+                          className="font-semibold mb-4 flex items-center gap-2"
+                          style={{ color: getAccordionStyles().contentText }}
+                        >
+                          📝 Información Detallada
+                        </h4>
+                        <div 
+                          className="text-gray-700 dark:text-gray-300 leading-relaxed"
+                          dangerouslySetInnerHTML={{ 
+                            __html: servicio.descripcionRica
+                              .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">$1</h3>')
+                              .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 mt-8">$1</h2>')
+                              .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+                              .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+                              .replace(/^\- (.*$)/gim, '<li class="ml-4 mb-2">• $1</li>')
+                              .replace(/\n/g, '<br>')
+                          }}
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-gray-900 dark:text-white font-semibold text-lg leading-relaxed">
-                        {beneficio}
-                      </p>
+                  )}
+                </div>
+              )}
+
+            {/* ========== PANEL: CARACTERÍSTICAS ========== */}
+            {hasPanelContent(servicio, 'caracteristicas') && (
+              <div 
+                className="accordion-panel rounded-xl overflow-hidden backdrop-blur-sm hover:opacity-90 transition-all duration-300 border"
+                style={{
+                  background: getAccordionStyles().panelBackground,
+                  borderColor: getAccordionStyles().panelBorder,
+                }}
+              >
+                <button
+                  onClick={() => togglePanel('caracteristicas')}
+                  className="w-full px-6 py-5 flex items-center justify-between transition-all duration-300"
+                  style={{
+                    background: activePanel === 'caracteristicas'
+                      ? `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}15, ${getAccordionStyles().accentGradientTo}15)`
+                      : getAccordionStyles().headerBackground,
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      style={{
+                        background: activePanel === 'caracteristicas'
+                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                          : '#9ca3af',
+                        color: '#ffffff',
+                      }}
+                    >
+                      ✨
+                    </div>
+                    <div className="text-left">
+                      <h3 
+                        className="font-semibold text-lg"
+                        style={{ 
+                          color: getAccordionStyles().headerText,
+                          fontFamily: getAccordionTypography().fontFamily,
+                          fontSize: getAccordionTypography().headerFontSize,
+                          fontWeight: getAccordionTypography().headerFontWeight,
+                        }}
+                      >
+                        Características
+                      </h3>
+                      <p className="text-sm opacity-70">{servicio.caracteristicas?.length || 0} características principales</p>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+                  <span 
+                    className="transition-transform duration-300 text-xl"
+                    style={{ 
+                      color: getAccordionStyles().headerIcon,
+                      transform: activePanel === 'caracteristicas' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    ▼
+                  </span>
+                </button>
+                
+                {activePanel === 'caracteristicas' && (
+                  <div 
+                    className="px-6 pb-6 animate-fade-in"
+                    style={{
+                      background: getAccordionStyles().contentBackground,
+                      color: getAccordionStyles().contentText,
+                      fontFamily: getAccordionTypography().fontFamily,
+                      fontSize: getAccordionTypography().contentFontSize,
+                      lineHeight: getAccordionTypography().contentLineHeight,
+                    }}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {servicio.caracteristicas?.map((caracteristica, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start gap-3 p-4 hover:opacity-90 transition-colors"
+                          style={{
+                            background: getCardStyles().background,
+                            borderColor: getCardStyles().borderColor,
+                            borderWidth: getCardStyles().borderWidth || '0',
+                            borderStyle: 'solid',
+                            borderRadius: getCardStyles().borderRadius,
+                          }}
+                        >
+                          <div 
+                            className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                            style={{
+                              background: getCardStyles().iconBackground,
+                              color: getCardStyles().iconColor,
+                            }}
+                          >
+                            {index + 1}
+                          </div>
+                          <p className="font-medium" style={{ color: getCardStyles().textColor }}>{caracteristica}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
-      {/* Incluye / No Incluye */}
-      {((servicio.incluye && servicio.incluye.length > 0) || (servicio.noIncluye && servicio.noIncluye.length > 0)) && (
-        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              📋 ¿Qué está incluido?
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {/* Lo que INCLUYE */}
-              {servicio.incluye && servicio.incluye.length > 0 && (
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-8 border-2 border-green-300 dark:border-green-700">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-xl">
+            {/* ========== PANEL: BENEFICIOS ========== */}
+            {hasPanelContent(servicio, 'beneficios') && (
+              <div 
+                className="accordion-panel rounded-xl overflow-hidden backdrop-blur-sm hover:opacity-90 transition-all duration-300 border"
+                style={{
+                  background: getAccordionStyles().panelBackground,
+                  borderColor: getAccordionStyles().panelBorder,
+                }}
+              >
+                <button
+                  onClick={() => togglePanel('beneficios')}
+                  className="w-full px-6 py-5 flex items-center justify-between transition-all duration-300"
+                  style={{
+                    background: activePanel === 'beneficios'
+                      ? `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}15, ${getAccordionStyles().accentGradientTo}15)`
+                      : getAccordionStyles().headerBackground,
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      style={{
+                        background: activePanel === 'beneficios'
+                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                          : '#9ca3af',
+                        color: '#ffffff',
+                      }}
+                    >
+                      🎯
+                    </div>
+                    <div className="text-left">
+                      <h3 
+                        className="font-semibold text-lg"
+                        style={{ 
+                          color: getAccordionStyles().headerText,
+                          fontFamily: getAccordionTypography().fontFamily,
+                          fontSize: getAccordionTypography().headerFontSize,
+                          fontWeight: getAccordionTypography().headerFontWeight,
+                        }}
+                      >
+                        Beneficios
+                      </h3>
+                      <p className="text-sm opacity-70">{servicio.beneficios?.length || 0} beneficios clave</p>
+                    </div>
+                  </div>
+                  <span 
+                    className="transition-transform duration-300 text-xl"
+                    style={{ 
+                      color: getAccordionStyles().headerIcon,
+                      transform: activePanel === 'beneficios' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    ▼
+                  </span>
+                </button>
+                
+                {activePanel === 'beneficios' && (
+                  <div 
+                    className="px-6 pb-6 animate-fade-in"
+                    style={{
+                      background: getAccordionStyles().contentBackground,
+                      color: getAccordionStyles().contentText,
+                      fontFamily: getAccordionTypography().fontFamily,
+                      fontSize: getAccordionTypography().contentFontSize,
+                      lineHeight: getAccordionTypography().contentLineHeight,
+                    }}
+                  >
+                    <div className="space-y-3">
+                      {servicio.beneficios?.map((beneficio, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start gap-4 p-4"
+                          style={{
+                            background: getCardStyles().background,
+                            borderColor: getCardStyles().borderColor,
+                            borderWidth: getCardStyles().borderWidth || '0',
+                            borderStyle: 'solid',
+                            borderRadius: getCardStyles().borderRadius,
+                          }}
+                        >
+                          <div 
+                            className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg"
+                            style={{
+                              background: getCardStyles().iconBackground,
+                              color: getCardStyles().iconColor,
+                            }}
+                          >
+                            ★
+                          </div>
+                          <p className="font-medium flex-1" style={{ color: getCardStyles().textColor }}>{beneficio}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ========== PANEL: QUÉ INCLUYE ========== */}
+            {hasPanelContent(servicio, 'incluye') && (
+              <div 
+                className="accordion-panel rounded-xl overflow-hidden backdrop-blur-sm hover:opacity-90 transition-all duration-300 border"
+                style={{
+                  background: getAccordionStyles().panelBackground,
+                  borderColor: getAccordionStyles().panelBorder,
+                }}
+              >
+                <button
+                  onClick={() => togglePanel('incluye')}
+                  className="w-full px-6 py-5 flex items-center justify-between transition-all duration-300"
+                  style={{
+                    background: activePanel === 'incluye'
+                      ? `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}15, ${getAccordionStyles().accentGradientTo}15)`
+                      : getAccordionStyles().headerBackground,
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      style={{
+                        background: activePanel === 'incluye'
+                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                          : '#9ca3af',
+                        color: '#ffffff',
+                      }}
+                    >
                       ✅
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      Incluye
-                    </h3>
-                  </div>
-                  <ul className="space-y-3">
-                    {servicio.incluye.map((item, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <span className="text-green-600 dark:text-green-400 text-xl mt-0.5">✓</span>
-                        <span className="text-gray-700 dark:text-gray-300 font-medium">
-                          {item}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Lo que NO INCLUYE */}
-              {servicio.noIncluye && servicio.noIncluye.length > 0 && (
-                <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-8 border-2 border-red-300 dark:border-red-700">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-xl">
-                      ❌
+                    <div className="text-left">
+                      <h3 
+                        className="font-semibold text-lg"
+                        style={{ 
+                          color: getAccordionStyles().headerText,
+                          fontFamily: getAccordionTypography().fontFamily,
+                          fontSize: getAccordionTypography().headerFontSize,
+                          fontWeight: getAccordionTypography().headerFontWeight,
+                        }}
+                      >
+                        Qué Incluye
+                      </h3>
+                      <p className="text-sm opacity-70">Detalle de inclusiones y tecnologías</p>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      No Incluye
-                    </h3>
                   </div>
-                  <ul className="space-y-3">
-                    {servicio.noIncluye.map((item, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <span className="text-red-600 dark:text-red-400 text-xl mt-0.5">✗</span>
-                        <span className="text-gray-700 dark:text-gray-300 font-medium">
-                          {item}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
+                  <span 
+                    className="transition-transform duration-300 text-xl"
+                    style={{ 
+                      color: getAccordionStyles().headerIcon,
+                      transform: activePanel === 'incluye' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    ▼
+                  </span>
+                </button>
+                
+                {activePanel === 'incluye' && (
+                  <div 
+                    className="px-6 pb-6 animate-fade-in space-y-6"
+                    style={{
+                      background: getAccordionStyles().contentBackground,
+                      color: getAccordionStyles().contentText,
+                      fontFamily: getAccordionTypography().fontFamily,
+                      fontSize: getAccordionTypography().contentFontSize,
+                      lineHeight: getAccordionTypography().contentLineHeight,
+                    }}
+                  >
+                    {/* Grid de Incluye / No Incluye */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Lo que INCLUYE */}
+                      {servicio.incluye && servicio.incluye.length > 0 && (
+                        <div 
+                          className="rounded-xl p-6"
+                          style={{
+                            background: getCardStyles().background,
+                            borderColor: getCardStyles().borderColor,
+                            borderWidth: getCardStyles().borderWidth || '0',
+                            borderStyle: 'solid',
+                            borderRadius: getCardStyles().borderRadius,
+                          }}
+                        >
+                          <div className="flex items-center gap-3 mb-4">
+                            <div 
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
+                              style={{
+                                background: `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`,
+                              }}
+                            >
+                              ✓
+                            </div>
+                            <h4 className="text-lg font-bold" style={{ color: getAccordionStyles().contentText }}>Incluye</h4>
+                          </div>
+                          <ul className="space-y-2">
+                            {servicio.incluye.map((item, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span style={{ color: getAccordionStyles().headerIcon }} className="mt-0.5">✓</span>
+                                <span style={{ color: getAccordionStyles().contentText }}>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-      {/* FAQ - Preguntas Frecuentes */}
-      {servicio.faq && servicio.faq.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              ❓ Preguntas Frecuentes
-            </h2>
-            <div className="space-y-4">
-              {servicio.faq.map((item, index) => (
-                <details
-                  key={index}
-                  className="group bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-purple-400 dark:hover:border-purple-500 transition-colors"
-                >
-                  <summary className="cursor-pointer px-6 py-4 font-semibold text-gray-900 dark:text-white flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <span className="flex items-center gap-3">
-                      <span className="text-purple-600 dark:text-purple-400">Q:</span>
-                      {item.pregunta}
-                    </span>
-                    <span className="text-purple-600 dark:text-purple-400 group-open:rotate-180 transition-transform">
-                      ▼
-                    </span>
-                  </summary>
-                  <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      <span className="font-semibold text-purple-600 dark:text-purple-400 mr-2">A:</span>
-                      {item.respuesta}
-                    </p>
+                      {/* Lo que NO INCLUYE */}
+                      {servicio.noIncluye && servicio.noIncluye.length > 0 && (
+                        <div 
+                          className="rounded-xl p-6"
+                          style={{
+                            background: getCardStyles().background,
+                            borderColor: getCardStyles().borderColor,
+                            borderWidth: getCardStyles().borderWidth || '0',
+                            borderStyle: 'solid',
+                            borderRadius: getCardStyles().borderRadius,
+                          }}
+                        >
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white">✗</div>
+                            <h4 className="text-lg font-bold" style={{ color: getAccordionStyles().contentText }}>No Incluye</h4>
+                          </div>
+                          <ul className="space-y-2">
+                            {servicio.noIncluye.map((item, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span className="text-red-600 dark:text-red-400 mt-0.5">✗</span>
+                                <span style={{ color: getAccordionStyles().contentText }}>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tecnologías */}
+                    {servicio.tecnologias && servicio.tecnologias.length > 0 && (
+                      <div 
+                        className="rounded-xl p-6"
+                        style={{
+                          background: getCardStyles().background,
+                          borderColor: getCardStyles().borderColor,
+                          borderWidth: getCardStyles().borderWidth || '0',
+                          borderStyle: 'solid',
+                          borderRadius: getCardStyles().borderRadius,
+                        }}
+                      >
+                        <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: getAccordionStyles().contentText }}>
+                          🛠️ Tecnologías que utilizamos
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {servicio.tecnologias.map((tecnologia, index) => (
+                            <span
+                              key={index}
+                              className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium"
+                              style={{
+                                background: `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`,
+                                color: '#ffffff',
+                              }}
+                            >
+                              {tecnologia}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+                )}
+              </div>
+            )}
 
-      {/* Galería de imágenes adicionales */}
-      {servicio.imagenes && servicio.imagenes.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              🖼️ Galería del Proyecto
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {servicio.imagenes.map((imagen, index) => (
-                <div key={index} className="group overflow-hidden rounded-lg">
-                  <img
-                    src={imagen}
-                    alt={`${servicio.titulo} - Imagen ${index + 1}`}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Etiquetas */}
-      {servicio.etiquetas && servicio.etiquetas.length > 0 && (
-        <section className="py-16 bg-white/50 dark:bg-gray-900/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-              🏷️ Etiquetas
-            </h2>
-            <div className="flex flex-wrap justify-center gap-3">
-              {servicio.etiquetas.map((etiqueta, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm font-medium"
+            {/* ========== PANEL: INFORMACIÓN ADICIONAL ========== */}
+            {hasPanelContent(servicio, 'info') && (
+              <div 
+                className="accordion-panel rounded-xl overflow-hidden backdrop-blur-sm transition-all duration-300"
+                style={{
+                  background: getAccordionStyles().panelBackground,
+                  borderColor: getAccordionStyles().panelBorder,
+                  borderWidth: '1px',
+                }}
+              >
+                <button
+                  onClick={() => togglePanel('info')}
+                  className="w-full px-6 py-5 flex items-center justify-between transition-all duration-300"
+                  style={{
+                    background: activePanel === 'info'
+                      ? `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}15, ${getAccordionStyles().accentGradientTo}15)`
+                      : 'transparent',
+                  }}
                 >
-                  #{etiqueta}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      style={{
+                        background: activePanel === 'info'
+                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                          : 'rgb(243 244 246)',
+                        color: activePanel === 'info' ? '#ffffff' : getAccordionStyles().headerIcon,
+                      }}
+                    >
+                      💡
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-lg" style={{ 
+                        color: getAccordionStyles().headerText,
+                        fontFamily: getAccordionTypography().fontFamily,
+                        fontSize: getAccordionTypography().headerFontSize,
+                        fontWeight: getAccordionTypography().headerFontWeight,
+                      }}>Información Adicional</h3>
+                      <p className="text-sm opacity-70" style={{ color: getAccordionStyles().headerText }}>Detalles extras del servicio</p>
+                    </div>
+                  </div>
+                  <span 
+                    className="transition-transform duration-300 text-xl"
+                    style={{
+                      color: getAccordionStyles().headerIcon,
+                      transform: activePanel === 'info' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    ▼
+                  </span>
+                </button>
+                
+                {activePanel === 'info' && (
+                  <div 
+                    className="px-6 pb-6 animate-fade-in space-y-4"
+                    style={{
+                      background: getAccordionStyles().contentBackground,
+                      color: getAccordionStyles().contentText,
+                      fontFamily: getAccordionTypography().fontFamily,
+                      fontSize: getAccordionTypography().contentFontSize,
+                      lineHeight: getAccordionTypography().contentLineHeight,
+                    }}
+                  >
+                    {/* Contenido Adicional */}
+                    {servicio.contenidoAdicional?.trim() && (
+                      <div 
+                        className="rounded-xl p-6"
+                        style={{
+                          background: getCardStyles().background,
+                          borderColor: getCardStyles().borderColor,
+                          borderWidth: getCardStyles().borderWidth || '0',
+                          borderStyle: 'solid',
+                          borderRadius: getCardStyles().borderRadius,
+                        }}
+                      >
+                        <div 
+                          className="leading-relaxed whitespace-pre-line"
+                          style={{ color: getAccordionStyles().contentText }}
+                          dangerouslySetInnerHTML={{ __html: servicio.contenidoAdicional.replace(/\n/g, '<br>') }}
+                        />
+                      </div>
+                    )}
 
-      {/* CTA Final */}
-      <section className="py-20 bg-gradient-to-r from-purple-600 to-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    {/* Etiquetas */}
+                    {servicio.etiquetas && servicio.etiquetas.length > 0 && (
+                      <div 
+                        className="rounded-xl p-6"
+                        style={{
+                          background: getCardStyles().background,
+                          borderColor: getCardStyles().borderColor,
+                          borderWidth: getCardStyles().borderWidth || '0',
+                          borderStyle: 'solid',
+                          borderRadius: getCardStyles().borderRadius,
+                        }}
+                      >
+                        <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: getAccordionStyles().contentText }}>
+                          🏷️ Etiquetas
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {servicio.etiquetas.map((etiqueta, index) => (
+                            <span
+                              key={index}
+                              className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                              style={{
+                                background: `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`,
+                                color: '#ffffff',
+                              }}
+                            >
+                              #{etiqueta}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ========== PANEL: FAQ ========== */}
+            {hasPanelContent(servicio, 'faq') && (
+              <div 
+                className="accordion-panel rounded-xl overflow-hidden backdrop-blur-sm transition-all duration-300"
+                style={{
+                  background: getAccordionStyles().panelBackground,
+                  borderColor: getAccordionStyles().panelBorder,
+                  borderWidth: '1px',
+                }}
+              >
+                <button
+                  onClick={() => togglePanel('faq')}
+                  className="w-full px-6 py-5 flex items-center justify-between transition-all duration-300"
+                  style={{
+                    background: activePanel === 'faq'
+                      ? `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}15, ${getAccordionStyles().accentGradientTo}15)`
+                      : 'transparent',
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      style={{
+                        background: activePanel === 'faq'
+                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                          : 'rgb(243 244 246)',
+                        color: activePanel === 'faq' ? '#ffffff' : getAccordionStyles().headerIcon,
+                      }}
+                    >
+                      ❓
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-lg" style={{ 
+                        color: getAccordionStyles().headerText,
+                        fontFamily: getAccordionTypography().fontFamily,
+                        fontSize: getAccordionTypography().headerFontSize,
+                        fontWeight: getAccordionTypography().headerFontWeight,
+                      }}>Preguntas Frecuentes</h3>
+                      <p className="text-sm opacity-70" style={{ color: getAccordionStyles().headerText }}>{servicio.faq?.length || 0} preguntas respondidas</p>
+                    </div>
+                  </div>
+                  <span 
+                    className="transition-transform duration-300 text-xl"
+                    style={{
+                      color: getAccordionStyles().headerIcon,
+                      transform: activePanel === 'faq' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    ▼
+                  </span>
+                </button>
+                
+                {activePanel === 'faq' && (
+                  <div 
+                    className="px-6 pb-6 animate-fade-in"
+                    style={{
+                      background: getAccordionStyles().contentBackground,
+                      color: getAccordionStyles().contentText,
+                      fontFamily: getAccordionTypography().fontFamily,
+                      fontSize: getAccordionTypography().contentFontSize,
+                      lineHeight: getAccordionTypography().contentLineHeight,
+                    }}
+                  >
+                    <div className="space-y-3">
+                      {servicio.faq?.map((item, index) => (
+                        <details
+                          key={index}
+                          className="group overflow-hidden"
+                          style={{
+                            background: getCardStyles().background,
+                            borderColor: getCardStyles().borderColor,
+                            borderWidth: getCardStyles().borderWidth || '0',
+                            borderStyle: 'solid',
+                            borderRadius: getCardStyles().borderRadius,
+                          }}
+                        >
+                          <summary 
+                            className="cursor-pointer px-5 py-4 font-medium flex items-center justify-between transition-colors"
+                            style={{
+                              color: getAccordionStyles().contentText,
+                              background: 'transparent',
+                            }}
+                          >
+                            <span className="flex items-center gap-3">
+                              <span 
+                                className="font-bold"
+                                style={{ color: getAccordionStyles().headerIcon }}
+                              >
+                                Q{index + 1}:
+                              </span>
+                              {item.pregunta}
+                            </span>
+                            <span 
+                              className="group-open:rotate-180 transition-transform text-sm"
+                              style={{ color: getAccordionStyles().headerIcon }}
+                            >
+                              ▼
+                            </span>
+                          </summary>
+                          <div 
+                            className="px-5 py-4"
+                            style={{
+                              background: `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}10, ${getAccordionStyles().accentGradientTo}10)`,
+                            }}
+                          >
+                            <p className="leading-relaxed" style={{ color: getAccordionStyles().contentText }}>
+                              <span 
+                                className="font-semibold mr-2"
+                                style={{ color: getAccordionStyles().headerIcon }}
+                              >
+                                A:
+                              </span>
+                              {item.respuesta}
+                            </p>
+                          </div>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ========== PANEL: MULTIMEDIA ========== */}
+            {hasPanelContent(servicio, 'multimedia') && (
+              <div 
+                className="accordion-panel rounded-xl overflow-hidden backdrop-blur-sm transition-all duration-300"
+                style={{
+                  background: getAccordionStyles().panelBackground,
+                  borderColor: getAccordionStyles().panelBorder,
+                  borderWidth: '1px',
+                }}
+              >
+                <button
+                  onClick={() => togglePanel('multimedia')}
+                  className="w-full px-6 py-5 flex items-center justify-between transition-all duration-300"
+                  style={{
+                    background: activePanel === 'multimedia'
+                      ? `linear-gradient(to right, ${getAccordionStyles().accentGradientFrom}15, ${getAccordionStyles().accentGradientTo}15)`
+                      : 'transparent',
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      style={{
+                        background: activePanel === 'multimedia'
+                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                          : 'rgb(243 244 246)',
+                        color: activePanel === 'multimedia' ? '#ffffff' : getAccordionStyles().headerIcon,
+                      }}
+                    >
+                      🎥
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-lg" style={{ 
+                        color: getAccordionStyles().headerText,
+                        fontFamily: getAccordionTypography().fontFamily,
+                        fontSize: getAccordionTypography().headerFontSize,
+                        fontWeight: getAccordionTypography().headerFontWeight,
+                      }}>Multimedia</h3>
+                      <p className="text-sm opacity-70" style={{ color: getAccordionStyles().headerText }}>Videos y galería de imágenes</p>
+                    </div>
+                  </div>
+                  <span 
+                    className="transition-transform duration-300 text-xl"
+                    style={{
+                      color: getAccordionStyles().headerIcon,
+                      transform: activePanel === 'multimedia' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    ▼
+                  </span>
+                </button>
+                
+                {activePanel === 'multimedia' && (
+                  <div 
+                    className="px-6 pb-6 animate-fade-in space-y-6"
+                    style={{
+                      background: getAccordionStyles().contentBackground,
+                      color: getAccordionStyles().contentText,
+                      fontFamily: getAccordionTypography().fontFamily,
+                      fontSize: getAccordionTypography().contentFontSize,
+                      lineHeight: getAccordionTypography().contentLineHeight,
+                    }}
+                  >
+                    {/* Video */}
+                    {servicio.videoUrl?.trim() && (
+                      <div>
+                        <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: getAccordionStyles().contentText }}>
+                          🎬 Video del Servicio
+                        </h4>
+                        <div className="relative rounded-xl overflow-hidden shadow-lg" style={{ paddingBottom: '56.25%' }}>
+                          <iframe
+                            src={servicio.videoUrl.replace('watch?v=', 'embed/')}
+                            title="Video del servicio"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="absolute top-0 left-0 w-full h-full border-0"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Galería */}
+                    {((servicio.galeriaImagenes && servicio.galeriaImagenes.length > 0) || (servicio.imagenes && servicio.imagenes.length > 0)) && (
+                      <div>
+                        <h4 className="font-semibold mb-4 flex items-center gap-2" style={{ color: getAccordionStyles().contentText }}>
+                          🖼️ Galería de Imágenes
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          {servicio.galeriaImagenes?.map((imagen, index) => (
+                            <div 
+                              key={`galeria-${index}`} 
+                              className="group overflow-hidden rounded-lg shadow-md"
+                              style={{
+                                borderColor: getAccordionStyles().panelBorder,
+                                borderWidth: '1px',
+                              }}
+                            >
+                              <img
+                                src={imagen}
+                                alt={`${servicio.titulo} - Imagen ${index + 1}`}
+                                className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
+                              />
+                            </div>
+                          ))}
+                          {servicio.imagenes?.map((imagen, index) => (
+                            <div 
+                              key={`imagen-${index}`} 
+                              className="group overflow-hidden rounded-lg shadow-md"
+                              style={{
+                                borderColor: getAccordionStyles().panelBorder,
+                                borderWidth: '1px',
+                              }}
+                            >
+                              <img
+                                src={imagen}
+                                alt={`${servicio.titulo} - Imagen ${index + 1}`}
+                                className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
+      {/* SECCIÓN 3: CTA CON FONDO CONFIGURABLE */}
+      {/* ============================================ */}
+      <section 
+        className="py-20 relative"
+        style={getBackgroundStyle(ctaConfig.background)}
+      >
+        {/* Overlay configurable */}
+        {getOverlayStyle(ctaConfig.background) !== undefined && (
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={getOverlayStyle(ctaConfig.background)}
+          />
+        )}
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-4xl font-bold text-white mb-6">
             ¿Listo para comenzar tu proyecto?
           </h2>

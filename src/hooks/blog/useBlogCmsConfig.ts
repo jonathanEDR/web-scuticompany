@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { getPageBySlug } from '../../services/cmsApi';
+import { getPageBySlug, getCachedPageSync } from '../../services/cmsApi';
 
 // Configuración por defecto del Hero del Blog
 export const DEFAULT_BLOG_HERO_CONFIG = {
@@ -823,85 +823,117 @@ export interface BlogCmsConfig {
   };
 }
 
+// ⚡ Función helper para parsear datos del CMS a BlogCmsConfig
+const parsePageDataToConfig = (pageData: any): BlogCmsConfig => {
+  if (!pageData?.content) {
+    return {
+      blogHero: DEFAULT_BLOG_HERO_CONFIG,
+      featuredPosts: DEFAULT_FEATURED_POSTS_CONFIG,
+      allNews: DEFAULT_ALL_NEWS_CONFIG,
+      blogCta: DEFAULT_BLOG_CTA_CONFIG
+    };
+  }
+
+  return {
+    blogHero: {
+      ...DEFAULT_BLOG_HERO_CONFIG,
+      ...(pageData.content.blogHero || {}),
+      stats: {
+        ...DEFAULT_BLOG_HERO_CONFIG.stats,
+        ...(pageData.content.blogHero?.stats || {})
+      },
+      search: {
+        ...DEFAULT_BLOG_HERO_CONFIG.search,
+        ...(pageData.content.blogHero?.search || {})
+      },
+      styles: {
+        light: {
+          ...DEFAULT_BLOG_HERO_CONFIG.styles.light,
+          ...(pageData.content.blogHero?.styles?.light || {})
+        },
+        dark: {
+          ...DEFAULT_BLOG_HERO_CONFIG.styles.dark,
+          ...(pageData.content.blogHero?.styles?.dark || {})
+        }
+      }
+    },
+    featuredPosts: {
+      ...DEFAULT_FEATURED_POSTS_CONFIG,
+      ...(pageData.content.featuredPosts || {}),
+      heroCard: {
+        ...DEFAULT_FEATURED_POSTS_CONFIG.heroCard,
+        ...(pageData.content.featuredPosts?.heroCard || {})
+      },
+      smallCard: {
+        ...DEFAULT_FEATURED_POSTS_CONFIG.smallCard,
+        ...(pageData.content.featuredPosts?.smallCard || {})
+      }
+    },
+    allNews: {
+      ...DEFAULT_ALL_NEWS_CONFIG,
+      ...(pageData.content.allNews || {}),
+      imageCard: {
+        ...DEFAULT_ALL_NEWS_CONFIG.imageCard,
+        ...(pageData.content.allNews?.imageCard || {})
+      },
+      textCard: {
+        ...DEFAULT_ALL_NEWS_CONFIG.textCard,
+        ...(pageData.content.allNews?.textCard || {})
+      },
+      sidebar: {
+        ...DEFAULT_ALL_NEWS_CONFIG.sidebar,
+        ...(pageData.content.allNews?.sidebar || {})
+      }
+    },
+    blogCta: {
+      ...DEFAULT_BLOG_CTA_CONFIG,
+      ...(pageData.content.blogCta || {})
+    },
+    seo: pageData.seo
+  };
+};
+
+// ⚡ Función para obtener config inicial (síncrona desde cache)
+const getInitialConfig = (): { config: BlogCmsConfig; fromCache: boolean } => {
+  const cachedData = getCachedPageSync('blog');
+  if (cachedData) {
+    return { config: parsePageDataToConfig(cachedData), fromCache: true };
+  }
+  return {
+    config: {
+      blogHero: DEFAULT_BLOG_HERO_CONFIG,
+      featuredPosts: DEFAULT_FEATURED_POSTS_CONFIG,
+      allNews: DEFAULT_ALL_NEWS_CONFIG,
+      blogCta: DEFAULT_BLOG_CTA_CONFIG
+    },
+    fromCache: false
+  };
+};
+
 export const useBlogCmsConfig = () => {
-  const [config, setConfig] = useState<BlogCmsConfig>({
-    blogHero: DEFAULT_BLOG_HERO_CONFIG,
-    featuredPosts: DEFAULT_FEATURED_POSTS_CONFIG,
-    allNews: DEFAULT_ALL_NEWS_CONFIG,
-    blogCta: DEFAULT_BLOG_CTA_CONFIG
-  });
-  const [loading, setLoading] = useState(true);
+  // ⚡ Inicializar con datos del cache si existen (evita flash)
+  const initial = getInitialConfig();
+  const [config, setConfig] = useState<BlogCmsConfig>(initial.config);
+  const [loading, setLoading] = useState(!initial.fromCache);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadBlogConfig = async () => {
-      try {
+      // Si ya tenemos datos del cache, no mostrar loading
+      if (!initial.fromCache) {
         setLoading(true);
+      }
+      
+      try {
         const pageData = await getPageBySlug('blog');
         
         if (pageData?.content) {
-          setConfig({
-            blogHero: {
-              ...DEFAULT_BLOG_HERO_CONFIG,
-              ...(pageData.content.blogHero || {}),
-              stats: {
-                ...DEFAULT_BLOG_HERO_CONFIG.stats,
-                ...(pageData.content.blogHero?.stats || {})
-              },
-              search: {
-                ...DEFAULT_BLOG_HERO_CONFIG.search,
-                ...(pageData.content.blogHero?.search || {})
-              },
-              styles: {
-                light: {
-                  ...DEFAULT_BLOG_HERO_CONFIG.styles.light,
-                  ...(pageData.content.blogHero?.styles?.light || {})
-                },
-                dark: {
-                  ...DEFAULT_BLOG_HERO_CONFIG.styles.dark,
-                  ...(pageData.content.blogHero?.styles?.dark || {})
-                }
-              }
-            },
-            featuredPosts: {
-              ...DEFAULT_FEATURED_POSTS_CONFIG,
-              ...(pageData.content.featuredPosts || {}),
-              heroCard: {
-                ...DEFAULT_FEATURED_POSTS_CONFIG.heroCard,
-                ...(pageData.content.featuredPosts?.heroCard || {})
-              },
-              smallCard: {
-                ...DEFAULT_FEATURED_POSTS_CONFIG.smallCard,
-                ...(pageData.content.featuredPosts?.smallCard || {})
-              }
-            },
-            allNews: {
-              ...DEFAULT_ALL_NEWS_CONFIG,
-              ...(pageData.content.allNews || {}),
-              imageCard: {
-                ...DEFAULT_ALL_NEWS_CONFIG.imageCard,
-                ...(pageData.content.allNews?.imageCard || {})
-              },
-              textCard: {
-                ...DEFAULT_ALL_NEWS_CONFIG.textCard,
-                ...(pageData.content.allNews?.textCard || {})
-              },
-              sidebar: {
-                ...DEFAULT_ALL_NEWS_CONFIG.sidebar,
-                ...(pageData.content.allNews?.sidebar || {})
-              }
-            },
-            blogCta: {
-              ...DEFAULT_BLOG_CTA_CONFIG,
-              ...(pageData.content.blogCta || {})
-            },
-            seo: pageData.seo
-          });
+          setConfig(parsePageDataToConfig(pageData));
         }
       } catch (err) {
         console.warn('⚠️ No se pudo cargar la configuración del blog, usando valores por defecto');
         setError('Error cargando configuración');
-        // Mantener la configuración por defecto
+        // Mantener la configuración actual (cache o default)
       } finally {
         setLoading(false);
       }

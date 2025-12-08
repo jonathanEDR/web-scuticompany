@@ -2,12 +2,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Logo from '../Logo';
 import type { PageData } from '../../types/cms';
+import type { BlogPost } from '../../types/blog';
 import { getCmsApiUrl, logApiCall, testBackendConnection } from '../../utils/apiHelper';
 import { useClerkDetection } from '../../hooks/useClerkDetection';
+import { blogPostApi } from '../../services/blog/blogPostApi';
 
 const PublicFooter = () => {
   const navigate = useNavigate();
   const [pageData, setPageData] = useState<PageData | null>(null);
+  const [headerMenuPosts, setHeaderMenuPosts] = useState<BlogPost[]>([]);
   
   // Hook para detectar usuario autenticado (mejorado para producción)
   const { userData, getUserInitials, isLoading } = useClerkDetection();
@@ -68,8 +71,21 @@ const PublicFooter = () => {
       }
     };
 
+    // 🆕 Cargar posts del menú de soluciones
+    const loadHeaderMenuPosts = async () => {
+      try {
+        const response = await blogPostApi.getHeaderMenuPosts();
+        if (response.success && response.data && isMounted) {
+          setHeaderMenuPosts(response.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar posts del header menu:', error);
+      }
+    };
+
     testBackendConnection();
     fetchPageData();
+    loadHeaderMenuPosts();
     
     return () => {
       isMounted = false;
@@ -129,32 +145,39 @@ const PublicFooter = () => {
               </div>
             </div>
 
-            {/* Soluciones */}
+            {/* Soluciones - Posts dinámicos del menú */}
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-4">Soluciones</h3>
               <ul className="space-y-2">
-                <li><Link to="/soluciones/proyectos-tecnologicos" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Desarrollo de Software</Link></li>
-                <li><Link to="/soluciones/inteligencia-artificial" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Aplicaciones Web</Link></li>
-                <li><Link to="/soluciones/movilidad" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Apps Móviles</Link></li>
-                <li><Link to="/soluciones/cloud" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Software Empresarial</Link></li>
-                <li><Link to="/soluciones/iot" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Inteligencia Artificial</Link></li>
-                <li><Link to="/soluciones/consultoria-ti" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Consultoría TI</Link></li>
-                <li><Link to="/soluciones/marketing-digital" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Soporte y Mantenimiento</Link></li>
+                {headerMenuPosts.length > 0 ? (
+                  headerMenuPosts.map((post) => (
+                    <li key={post._id}>
+                      <Link 
+                        to={`/blog/${post.slug}`} 
+                        className="text-gray-200 hover:text-purple-400 transition-colors text-sm"
+                      >
+                        {post.title}
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  // Fallback mientras cargan los posts
+                  <>
+                    <li><Link to="/servicios" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Ver todos los servicios</Link></li>
+                  </>
+                )}
+                {/* Siempre mostrar link a todos los servicios */}
+                {headerMenuPosts.length > 0 && (
+                  <li className="pt-2 border-t border-gray-700">
+                    <Link to="/servicios" className="text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium">
+                      Ver todos →
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
 
-            {/* Industrias */}
-            <div className="flex-1">
-              <h3 className="text-white font-semibold mb-4">INDUSTRIAS</h3>
-              <ul className="space-y-2">
-                <li><Link to="/industrias/retail" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Retail y Comercio</Link></li>
-                <li><Link to="/industrias/finanzas" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Finanzas y Banca</Link></li>
-                <li><Link to="/industrias/salud" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Salud y Telemedicina</Link></li>
-                <li><Link to="/industrias/educacion" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Educación</Link></li>
-                <li><Link to="/industrias/manufactura" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Manufactura</Link></li>
-                <li><Link to="/industrias/logistica" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Logística y Transporte</Link></li>
-              </ul>
-            </div>
+          
 
             {/* Recursos */}
             <div className="flex-1">
@@ -168,7 +191,69 @@ const PublicFooter = () => {
               </ul>
             </div>
 
-           
+             {/* Acceso - Movido aquí en lugar de Industrias */}
+            <div className="flex-1">
+              <h3 className="text-white font-semibold mb-4">Acceso</h3>
+              <div className="space-y-3">
+                {isLoading ? (
+                  <div className="space-y-3">
+                    <div className="w-full px-4 py-2 bg-gray-700/50 rounded-lg animate-pulse">
+                      <div className="flex items-center justify-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-gray-300 text-sm">Verificando sesión...</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : userData ? (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => navigate('/dashboard')}
+                      className="w-full flex items-center justify-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg transition-all text-sm"
+                      title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
+                    >
+                      {userData.imageUrl ? (
+                        <img 
+                          src={userData.imageUrl} 
+                          alt={`Avatar de ${userData.firstName || 'Usuario'}`}
+                          className="w-4 h-4 rounded-full object-cover border border-white/20"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs ${
+                          userData.imageUrl ? 'hidden' : ''
+                        }`}
+                      >
+                        {getUserInitials()}
+                      </div>
+                      <span>Mi Dashboard</span>
+                    </button>
+                    <div className="text-center text-gray-400 text-xs">
+                      Hola, {userData.firstName || 'Usuario'} 👋
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="w-full px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
+                    >
+                      🔐 Iniciar Sesión
+                    </button>
+                    <button
+                      onClick={() => navigate('/signup')}
+                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
+                    >
+                      🚀 Crear Cuenta
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
 
             {/* Contáctanos */}
             <div className="flex-1">
@@ -286,84 +371,6 @@ const PublicFooter = () => {
                   </div>
                 </div>
               </div>
-               {/* Acceso */}
-            <div className="flex-1">
-              <h3 className="text-white font-semibold mb-4">Acceso</h3>
-              <div className="space-y-3">
-                {/* 🔥 MEJORA: Mostrar estado de carga mientras verifica autenticación */}
-                {isLoading ? (
-                  // Cargando estado de autenticación
-                  <div className="space-y-3">
-                    <div className="w-full px-4 py-2 bg-gray-700/50 rounded-lg animate-pulse">
-                      <div className="flex items-center justify-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-gray-300 text-sm">Verificando sesión...</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : userData ? (
-                  // Usuario autenticado - Mostrar botón al dashboard
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => navigate('/dashboard')}
-                      className="w-full flex items-center justify-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg transition-all text-sm"
-                      title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
-                    >
-                      {/* Avatar compacto */}
-                      {userData.imageUrl ? (
-                        <img 
-                          src={userData.imageUrl} 
-                          alt={`Avatar de ${userData.firstName || 'Usuario'}`}
-                          className="w-4 h-4 rounded-full object-cover border border-white/20"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            target.nextElementSibling?.classList.remove('hidden');
-                          }}
-                        />
-                      ) : null}
-                      
-                      {/* Fallback con iniciales */}
-                      <div 
-                        className={`w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs ${
-                          userData.imageUrl ? 'hidden' : ''
-                        }`}
-                      >
-                        {getUserInitials()}
-                      </div>
-                      
-                      <span>Mi Dashboard</span>
-                    </button>
-                    
-                    {/* Información del usuario compacta */}
-                    <div className="text-center text-gray-400 text-xs">
-                      Hola, {userData.firstName || 'Usuario'} 👋
-                    </div>
-                    
-
-                  </div>
-                ) : (
-                  // Usuario no autenticado - Mostrar botones de acceso
-                  <>
-                    <button
-                      onClick={() => navigate('/login')}
-                      className="w-full px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
-                    >
-                      🔐 Iniciar Sesión
-                    </button>
-                    
-                    <button
-                      onClick={() => navigate('/signup')}
-                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
-                    >
-                      🚀 Crear Cuenta
-                    </button>
-                    
-
-                  </>
-                )}
-              </div>
-            </div>
             </div>
           </div>
 
@@ -384,102 +391,73 @@ const PublicFooter = () => {
 
             {/* Contenido principal - Grid responsive */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Soluciones, Industrias y Recursos juntos en móvil */}
+              {/* Soluciones y Acceso juntos en móvil */}
               <div className="grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-0">
-                {/* Soluciones */}
+                {/* Soluciones - Posts dinámicos */}
                 <div>
                   <h3 className="text-white font-semibold mb-4">Soluciones</h3>
                   <ul className="space-y-2">
-                    <li><Link to="/soluciones/proyectos-tecnologicos" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Desarrollo de Software</Link></li>
-                    <li><Link to="/soluciones/inteligencia-artificial" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Aplicaciones Web</Link></li>
-                    <li><Link to="/soluciones/movilidad" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Apps Móviles</Link></li>
-                    <li><Link to="/soluciones/cloud" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Software Empresarial</Link></li>
-                    <li><Link to="/soluciones/iot" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Inteligencia Artificial</Link></li>
-                    <li><Link to="/soluciones/consultoria-ti" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Consultoría TI</Link></li>
-                    <li><Link to="/soluciones/marketing-digital" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Soporte y Mantenimiento</Link></li>
+                    {headerMenuPosts.length > 0 ? (
+                      headerMenuPosts.map((post) => (
+                        <li key={post._id}>
+                          <Link 
+                            to={`/blog/${post.slug}`} 
+                            className="text-gray-200 hover:text-purple-400 transition-colors text-sm"
+                          >
+                            {post.title}
+                          </Link>
+                        </li>
+                      ))
+                    ) : (
+                      <li><Link to="/servicios" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Ver todos los servicios</Link></li>
+                    )}
+                    {headerMenuPosts.length > 0 && (
+                      <li className="pt-2 border-t border-gray-700">
+                        <Link to="/servicios" className="text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium">
+                          Ver todos →
+                        </Link>
+                      </li>
+                    )}
                   </ul>
                 </div>
 
-                {/* Industrias */}
-                <div>
-                  <h3 className="text-white font-semibold mb-4">Industrias</h3>
-                  <ul className="space-y-2">
-                    <li><Link to="/industrias/retail" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Retail y Comercio</Link></li>
-                    <li><Link to="/industrias/finanzas" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Finanzas y Banca</Link></li>
-                    <li><Link to="/industrias/salud" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Salud y Telemedicina</Link></li>
-                    <li><Link to="/industrias/educacion" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Educación</Link></li>
-                    <li><Link to="/industrias/manufactura" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Manufactura</Link></li>
-                    <li><Link to="/industrias/logistica" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Logística y Transporte</Link></li>
-                  </ul>
-                </div>
-
-                {/* Recursos */}
-                <div>
-                  <h3 className="text-white font-semibold mb-4">Recursos</h3>
-                  <ul className="space-y-2">
-                    <li><Link to="/blog" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Blog de Tecnología</Link></li>
-                    <li><Link to="/recursos/casos-exito" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Casos de Éxito</Link></li>
-                    <li><Link to="/recursos/guias" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Guías y Tutoriales</Link></li>
-                    <li><Link to="/recursos/webinars" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Webinars</Link></li>
-                    <li><Link to="/nosotros" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Sobre Nosotros</Link></li>
-                  </ul>
-                </div>
-                                {/* Acceso */}
+                {/* Acceso - Movido aquí */}
                 <div>
                   <h3 className="text-white font-semibold mb-4">Acceso</h3>
                   <div className="space-y-3">
-                    {/* 🔥 MEJORA MÓVIL: Mostrar estado de carga mientras verifica autenticación */}
                     {isLoading ? (
-                      // Cargando estado de autenticación
                       <div className="space-y-3">
                         <div className="w-full px-4 py-2 bg-gray-700/50 rounded-lg animate-pulse">
                           <div className="flex items-center justify-center space-x-2">
                             <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-gray-300 text-sm">Verificando sesión...</span>
+                            <span className="text-gray-300 text-sm">Verificando...</span>
                           </div>
                         </div>
                       </div>
                     ) : userData ? (
-                      // Usuario autenticado - Mostrar botón al dashboard
                       <div className="space-y-3">
                         <button
                           onClick={() => navigate('/dashboard')}
                           className="w-full flex items-center justify-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg transition-all text-sm"
-                          title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
                         >
-                          {/* Avatar compacto */}
                           {userData.imageUrl ? (
                             <img 
                               src={userData.imageUrl} 
-                              alt={`Avatar de ${userData.firstName || 'Usuario'}`}
+                              alt="Avatar"
                               className="w-4 h-4 rounded-full object-cover border border-white/20"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                target.nextElementSibling?.classList.remove('hidden');
-                              }}
                             />
-                          ) : null}
-                          
-                          {/* Fallback con iniciales */}
-                          <div 
-                            className={`w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs ${
-                              userData.imageUrl ? 'hidden' : ''
-                            }`}
-                          >
-                            {getUserInitials()}
-                          </div>
-                          
+                          ) : (
+                            <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs">
+                              {getUserInitials()}
+                            </div>
+                          )}
                           <span>Mi Dashboard</span>
                         </button>
-                        
-                        {/* Información del usuario compacta */}
                         <div className="text-center text-gray-400 text-xs">
                           Hola, {userData.firstName || 'Usuario'} 👋
                         </div>
                       </div>
                     ) : (
-                      // Usuario no autenticado - Mostrar botones de acceso
                       <>
                         <button
                           onClick={() => navigate('/login')}
@@ -487,7 +465,6 @@ const PublicFooter = () => {
                         >
                           🔐 Iniciar Sesión
                         </button>
-                        
                         <button
                           onClick={() => navigate('/signup')}
                           className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
@@ -500,8 +477,19 @@ const PublicFooter = () => {
                 </div>
               </div>
 
-              {/* Acceso y Contáctanos juntos en móvil */}
+              {/* Recursos y Contáctanos juntos en móvil */}
               <div className="grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-0">
+                {/* Recursos */}
+                <div>
+                  <h3 className="text-white font-semibold mb-4">Recursos</h3>
+                  <ul className="space-y-2">
+                    <li><Link to="/blog" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Blog de Tecnología</Link></li>
+                    <li><Link to="/recursos/casos-exito" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Casos de Éxito</Link></li>
+                    <li><Link to="/recursos/guias" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Guías y Tutoriales</Link></li>
+                    <li><Link to="/recursos/webinars" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Webinars</Link></li>
+                    <li><Link to="/nosotros" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Sobre Nosotros</Link></li>
+                  </ul>
+                </div>
                 
                 {/* Contáctanos */}
                 <div>
