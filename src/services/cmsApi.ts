@@ -344,9 +344,17 @@ export const updatePage = async (slug: string, pageData: any) => {
       throw new Error(data.message || 'Error al actualizar página');
     }
 
-    // Invalidar caché de esta página
+    // Invalidar caché de esta página (memoria)
     cache.clear(`page-${slug}`);
     cache.clear('all-pages');
+
+    // 🔥 CRÍTICO: También limpiar localStorage para forzar recarga fresca
+    try {
+      localStorage.removeItem(`cmsCache_page-${slug}`);
+      console.log(`✅ [CMS] Cache de localStorage limpiado para "${slug}"`);
+    } catch (e) {
+      console.error('Error limpiando localStorage:', e);
+    }
 
     return data.data;
   } catch (error) {
@@ -413,9 +421,55 @@ export const clearCache = (pattern?: string) => {
 
 // ⚡ Exportar función para forzar recarga sin caché
 export const forceReload = async (slug: string) => {
+  // Limpiar cache de memoria
   cache.clear(`page-${slug}`);
+  // Limpiar localStorage también
+  try {
+    localStorage.removeItem(`cmsCache_page-${slug}`);
+    console.log(`✅ [forceReload] Cache limpiado para "${slug}"`);
+  } catch (e) {
+    console.error('Error limpiando localStorage:', e);
+  }
   return await getPageBySlug(slug, false);
 };
+
+// 🔧 DEBUG: Función para exponer en window para debugging
+export const debugCmsCache = () => {
+  const cacheKeys = Object.keys(localStorage).filter(k => k.startsWith('cmsCache_'));
+  console.log('📦 [DEBUG] Cache CMS en localStorage:', cacheKeys);
+  
+  cacheKeys.forEach(key => {
+    try {
+      const data = JSON.parse(localStorage.getItem(key) || '{}');
+      const age = Date.now() - (data.timestamp || 0);
+      const ageMinutes = Math.floor(age / 60000);
+      console.log(`  📄 ${key}:`, {
+        ageMinutes: `${ageMinutes} min`,
+        hasValues: !!data.data?.content?.values,
+        valuesKeys: data.data?.content?.values ? Object.keys(data.data.content.values) : [],
+        cardBgColor: data.data?.content?.values?.cardBgColor,
+        cardBgUseGradient: data.data?.content?.values?.cardBgUseGradient
+      });
+    } catch (e) {
+      console.log(`  ❌ ${key}: Error parseando`);
+    }
+  });
+  
+  return cacheKeys;
+};
+
+// Exponer funciones de debug en window (solo en desarrollo)
+if (typeof window !== 'undefined') {
+  (window as any).cmsDebug = {
+    clearCache,
+    forceReload,
+    debugCmsCache,
+    clearAll: () => {
+      clearCache();
+      console.log('✅ Todo el cache CMS limpiado. Recarga la página.');
+    }
+  };
+}
 
 // ⚡ Inicializar todas las páginas públicas (about, services, contact)
 export const initAllPages = async () => {

@@ -191,6 +191,22 @@ const About = () => {
       try {
         const data = await getPageBySlug('about');
         console.log('📄 Datos de About cargados:', data);
+        
+        // 🔍 DEBUG: Log específico para valores de tarjetas
+        if (data?.content?.values) {
+          console.log('🎨 [DEBUG] Configuración de tarjetas de valores:', {
+            cardBgColor: data.content.values.cardBgColor,
+            cardBgColorDark: data.content.values.cardBgColorDark,
+            cardBgUseGradient: data.content.values.cardBgUseGradient,
+            cardBgGradientFrom: data.content.values.cardBgGradientFrom,
+            cardBgGradientTo: data.content.values.cardBgGradientTo,
+            cardTitleColor: data.content.values.cardTitleColor,
+            cardTextColor: data.content.values.cardTextColor,
+            cardBorderColor: data.content.values.cardBorderColor,
+            allValuesKeys: Object.keys(data.content.values)
+          });
+        }
+        
         setPageData(data);
       } catch (error) {
         console.error('Error cargando página About:', error);
@@ -682,6 +698,17 @@ const About = () => {
                       : { backgroundColor: theme === 'dark' 
                           ? (values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)') 
                           : (values.cardBgColor || 'rgba(255, 255, 255, 0.8)') };
+                    
+                    // 🔍 DEBUG: Log de estilos aplicados a tarjetas
+                    console.log('🎨 [DEBUG] Estilos de tarjetas aplicados:', {
+                      theme,
+                      useGradient,
+                      cardBgStyle,
+                      rawCardBgColor: values.cardBgColor,
+                      rawCardBgColorDark: values.cardBgColorDark,
+                      gradientFrom,
+                      gradientTo
+                    });
                     
                     const cardBorderColor = theme === 'dark'
                       ? (values.cardBorderColorDark || 'rgba(75, 85, 99, 0.5)')
