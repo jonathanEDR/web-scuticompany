@@ -9,7 +9,7 @@ import BlogSection from '../../components/public/BlogSection';
 import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
-import { forceReload } from '../../services/cmsApi';
+import { getPageBySlug, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
 import { categoriasApi, type Categoria } from '../../services/categoriasApi';
@@ -271,11 +271,14 @@ const HomeOptimized = () => {
     };
   }, []);
 
-  const loadPageData = async (silent = false) => {
+  const loadPageData = async (forceRefresh = false) => {
     try {
-      if (!silent) setIsLoadingCMS(true);
+      if (!forceRefresh) setIsLoadingCMS(true);
       
-      const data = await forceReload('home');
+      // ✅ OPTIMIZACIÓN: Usar cache normalmente, forceReload solo cuando se pide explícitamente
+      const data = forceRefresh 
+        ? await forceReload('home')
+        : await getPageBySlug('home');
 
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
@@ -296,7 +299,7 @@ const HomeOptimized = () => {
     } catch (error) {
       console.error('Error cargando datos de página:', error);
     } finally {
-      if (!silent) setIsLoadingCMS(false);
+      if (!forceRefresh) setIsLoadingCMS(false);
     }
   };
 
