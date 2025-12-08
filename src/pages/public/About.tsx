@@ -24,6 +24,19 @@ const stripHtmlTags = (html: string): string => {
   return tmp.textContent || tmp.innerText || '';
 };
 
+/**
+ * Función para sanitizar HTML preservando estilos de gradiente
+ * Permite renderizar texto con gradientes del RichTextEditor
+ */
+const sanitizeHtmlWithStyles = (html: string): string => {
+  if (!html) return '';
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['span', 'strong', 'em', 'b', 'i', 'u', 's', 'br', 'p', 'h1', 'h2', 'h3'],
+    ALLOWED_ATTR: ['style', 'class', 'data-gradient'],
+    ALLOW_DATA_ATTR: true
+  });
+};
+
 // Tipos de alineación soportados
 type TextAlignment = 'left' | 'center' | 'right';
 
@@ -193,22 +206,6 @@ const About = () => {
     const loadPageData = async () => {
       try {
         const data = await getPageBySlug('about');
-        console.log('📄 Datos de About cargados:', data);
-        
-        // 🔍 DEBUG: Log específico para valores de tarjetas
-        if (data?.content?.values) {
-          console.log('🎨 [DEBUG] Configuración de tarjetas de valores:', {
-            cardBgColor: data.content.values.cardBgColor,
-            cardBgColorDark: data.content.values.cardBgColorDark,
-            cardBgUseGradient: data.content.values.cardBgUseGradient,
-            cardBgGradientFrom: data.content.values.cardBgGradientFrom,
-            cardBgGradientTo: data.content.values.cardBgGradientTo,
-            cardTitleColor: data.content.values.cardTitleColor,
-            cardTextColor: data.content.values.cardTextColor,
-            cardBorderColor: data.content.values.cardBorderColor,
-            allValuesKeys: Object.keys(data.content.values)
-          });
-        }
         
         setPageData(data);
       } catch (error) {
@@ -380,9 +377,8 @@ const About = () => {
                 fontFamily: "'Montserrat', sans-serif",
                 maxWidth: (hero?.textAlign || 'left') !== 'center' ? '800px' : undefined
               }}
-            >
-              {stripHtmlTags(hero?.title || 'Sobre Nosotros')}
-            </h1>
+              dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithStyles(hero?.title || 'Sobre Nosotros') }}
+            />
             
             {hero?.subtitle && (
               <h2 
@@ -394,9 +390,8 @@ const About = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   maxWidth: (hero?.textAlign || 'left') !== 'center' ? '700px' : undefined
                 }}
-              >
-                {stripHtmlTags(hero.subtitle)}
-              </h2>
+                dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithStyles(hero.subtitle) }}
+              />
             )}
             
             {hero?.description && (
@@ -408,9 +403,8 @@ const About = () => {
                   color: heroStyles.descriptionColor, 
                   fontFamily: "'Montserrat', sans-serif" 
                 }}
-              >
-                {stripHtmlTags(hero.description)}
-              </p>
+                dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithStyles(hero.description) }}
+              />
             )}
           </div>
         </section>
@@ -726,24 +720,10 @@ const About = () => {
                     
                     const cardBgStyle = getCardBgStyle();
                     
-                    // 🔧 CORRECCIÓN: Cuando es transparente, NO usar wrapper de borde gradiente
+                    // Cuando es transparente, NO usar wrapper de borde gradiente
                     // porque el wrapper tiene fondo que se ve a través de la transparencia.
                     // En su lugar, usar borde sólido con el primer color del gradiente.
                     const effectiveUseBorderGradient = useBorderGradient && !useTransparentBg;
-                    
-                    // 🔍 DEBUG: Log de estilos aplicados a tarjetas
-                    console.log('🎨 [DEBUG] Estilos de tarjetas aplicados:', {
-                      theme,
-                      useGradient,
-                      useTransparentBg,
-                      useBorderGradient,
-                      effectiveUseBorderGradient,
-                      cardBgStyle,
-                      rawCardBgColor: values.cardBgColor,
-                      rawCardBgColorDark: values.cardBgColorDark,
-                      gradientFrom,
-                      gradientTo
-                    });
                     
                     const cardBorderColor = theme === 'dark'
                       ? (values.cardBorderColorDark || 'rgba(75, 85, 99, 0.5)')

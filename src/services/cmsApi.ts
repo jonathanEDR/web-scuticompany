@@ -426,39 +426,34 @@ export const forceReload = async (slug: string) => {
   // Limpiar localStorage también
   try {
     localStorage.removeItem(`cmsCache_page-${slug}`);
-    console.log(`✅ [forceReload] Cache limpiado para "${slug}"`);
   } catch (e) {
-    console.error('Error limpiando localStorage:', e);
+    // Ignorar errores de localStorage
   }
   return await getPageBySlug(slug, false);
 };
 
-// 🔧 DEBUG: Función para exponer en window para debugging
+// Función auxiliar para debugging del cache (usar desde consola: cmsDebug.debugCmsCache())
 export const debugCmsCache = () => {
   const cacheKeys = Object.keys(localStorage).filter(k => k.startsWith('cmsCache_'));
-  console.log('📦 [DEBUG] Cache CMS en localStorage:', cacheKeys);
   
-  cacheKeys.forEach(key => {
+  const cacheInfo = cacheKeys.map(key => {
     try {
       const data = JSON.parse(localStorage.getItem(key) || '{}');
       const age = Date.now() - (data.timestamp || 0);
-      const ageMinutes = Math.floor(age / 60000);
-      console.log(`  📄 ${key}:`, {
-        ageMinutes: `${ageMinutes} min`,
-        hasValues: !!data.data?.content?.values,
-        valuesKeys: data.data?.content?.values ? Object.keys(data.data.content.values) : [],
-        cardBgColor: data.data?.content?.values?.cardBgColor,
-        cardBgUseGradient: data.data?.content?.values?.cardBgUseGradient
-      });
-    } catch (e) {
-      console.log(`  ❌ ${key}: Error parseando`);
+      return {
+        key,
+        ageMinutes: Math.floor(age / 60000),
+        hasData: !!data.data
+      };
+    } catch {
+      return { key, error: true };
     }
   });
   
-  return cacheKeys;
+  return cacheInfo;
 };
 
-// Exponer funciones de debug en window (solo en desarrollo)
+// Exponer funciones de utilidad en window para mantenimiento
 if (typeof window !== 'undefined') {
   (window as any).cmsDebug = {
     clearCache,
@@ -466,7 +461,6 @@ if (typeof window !== 'undefined') {
     debugCmsCache,
     clearAll: () => {
       clearCache();
-      console.log('✅ Todo el cache CMS limpiado. Recarga la página.');
     }
   };
 }
