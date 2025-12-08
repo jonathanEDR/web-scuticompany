@@ -59,6 +59,9 @@ interface ValuesContent {
   // Configuración de fondo transparente
   cardBgTransparent?: boolean;
   cardBgTransparentDark?: boolean;
+  // Color base para cuando transparente + borde gradiente
+  cardBgBase?: string;
+  cardBgBaseDark?: string;
   // Configuración de gradiente para fondo de tarjetas
   cardBgUseGradient?: boolean;
   cardBgGradientFrom?: string;
@@ -679,6 +682,61 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌙 Transparente (Oscuro)</span>
             </div>
           </div>
+          
+          {/* ⚠️ Nota sobre transparente + borde gradiente */}
+          {(values.cardBgTransparent || values.cardBgTransparentDark) && (values.cardBorderUseGradient || values.cardBorderUseGradientDark) && (
+            <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg">
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                ⚠️ <strong>Nota:</strong> Cuando usas fondo transparente con borde gradiente, se necesita un "color base" para que el borde se vea correctamente. Configura el color base abajo.
+              </p>
+            </div>
+          )}
+          
+          {/* Color Base (para transparente + borde gradiente) */}
+          {(values.cardBgTransparent || values.cardBgTransparentDark) && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  ☀️ Color Base (Claro) - para borde gradiente
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={values.cardBgBase || '#ffffff'}
+                    onChange={(e) => updateContent('values.cardBgBase', e.target.value)}
+                    className="w-10 h-8 rounded cursor-pointer border border-gray-300"
+                  />
+                  <input
+                    type="text"
+                    value={values.cardBgBase || '#ffffff'}
+                    onChange={(e) => updateContent('values.cardBgBase', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    placeholder="#ffffff"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  🌙 Color Base (Oscuro) - para borde gradiente
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={values.cardBgBaseDark || '#111827'}
+                    onChange={(e) => updateContent('values.cardBgBaseDark', e.target.value)}
+                    className="w-10 h-8 rounded cursor-pointer border border-gray-300"
+                  />
+                  <input
+                    type="text"
+                    value={values.cardBgBaseDark || '#111827'}
+                    onChange={(e) => updateContent('values.cardBgBaseDark', e.target.value)}
+                    className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
+                    placeholder="#111827"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Colores de fondo */}

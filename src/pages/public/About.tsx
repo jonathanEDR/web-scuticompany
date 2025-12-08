@@ -122,6 +122,9 @@ interface ValuesContent {
   // Configuración de fondo transparente
   cardBgTransparent?: boolean;
   cardBgTransparentDark?: boolean;
+  // Color base para cuando transparente + borde gradiente
+  cardBgBase?: string;
+  cardBgBaseDark?: string;
   // Configuración de gradiente para fondo de tarjetas
   cardBgUseGradient?: boolean;
   cardBgGradientFrom?: string;
@@ -701,19 +704,44 @@ const About = () => {
                       ? (values.cardBgTransparentDark || false)
                       : (values.cardBgTransparent || false);
                     
-                    const cardBgStyle = useTransparentBg
-                      ? { backgroundColor: 'transparent' }
-                      : useGradient 
-                        ? { background: getGradientCss() }
-                        : { backgroundColor: theme === 'dark' 
-                            ? (values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)') 
-                            : (values.cardBgColor || 'rgba(255, 255, 255, 0.8)') };
+                    // Configuración de gradiente para BORDE de tarjetas (movido aquí para usar en getCardBgStyle)
+                    const useBorderGradient = theme === 'dark'
+                      ? (values.cardBorderUseGradientDark || false)
+                      : (values.cardBorderUseGradient || false);
+                    
+                    // 🔧 CORRECCIÓN: Cuando fondo es transparente Y hay borde gradiente,
+                    // el div interno necesita un fondo que coincida con la sección
+                    // Se usa cardBgBaseColor para permitir personalización
+                    const getCardBgStyle = () => {
+                      if (useTransparentBg) {
+                        // Si hay borde gradiente, necesitamos un fondo sólido 
+                        if (useBorderGradient) {
+                          // Usar color base personalizable o default según tema
+                          const baseColor = theme === 'dark'
+                            ? (values.cardBgBaseDark || 'rgb(17, 24, 39)')
+                            : (values.cardBgBase || 'rgb(255, 255, 255)');
+                          return { backgroundColor: baseColor };
+                        }
+                        return { backgroundColor: 'transparent' };
+                      }
+                      if (useGradient) {
+                        return { background: getGradientCss() };
+                      }
+                      return { 
+                        backgroundColor: theme === 'dark' 
+                          ? (values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)') 
+                          : (values.cardBgColor || 'rgba(255, 255, 255, 0.8)') 
+                      };
+                    };
+                    
+                    const cardBgStyle = getCardBgStyle();
                     
                     // 🔍 DEBUG: Log de estilos aplicados a tarjetas
                     console.log('🎨 [DEBUG] Estilos de tarjetas aplicados:', {
                       theme,
                       useGradient,
                       useTransparentBg,
+                      useBorderGradient,
                       cardBgStyle,
                       rawCardBgColor: values.cardBgColor,
                       rawCardBgColorDark: values.cardBgColorDark,
@@ -734,10 +762,7 @@ const About = () => {
                     // Toggle para overlay oscuro en tarjetas con imagen (default: true para mantener legibilidad)
                     const showImageOverlay = values.cardImageOverlay !== false;
                     
-                    // Configuración de gradiente para BORDE de tarjetas
-                    const useBorderGradient = theme === 'dark'
-                      ? (values.cardBorderUseGradientDark || false)
-                      : (values.cardBorderUseGradient || false);
+                    // Configuración de colores del gradiente para BORDE de tarjetas
                     const borderGradientFrom = theme === 'dark'
                       ? (values.cardBorderGradientFromDark || '#8b5cf6')
                       : (values.cardBorderGradientFrom || '#667eea');
