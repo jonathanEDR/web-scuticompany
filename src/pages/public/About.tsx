@@ -122,9 +122,6 @@ interface ValuesContent {
   // Configuración de fondo transparente
   cardBgTransparent?: boolean;
   cardBgTransparentDark?: boolean;
-  // Color base para cuando transparente + borde gradiente
-  cardBgBase?: string;
-  cardBgBaseDark?: string;
   // Configuración de gradiente para fondo de tarjetas
   cardBgUseGradient?: boolean;
   cardBgGradientFrom?: string;
@@ -711,17 +708,10 @@ const About = () => {
                     
                     // 🔧 CORRECCIÓN: Cuando fondo es transparente Y hay borde gradiente,
                     // el div interno necesita un fondo que coincida con la sección
-                    // Se usa cardBgBaseColor para permitir personalización
+                    // 🔧 Función para obtener el estilo de fondo de la tarjeta
                     const getCardBgStyle = () => {
                       if (useTransparentBg) {
-                        // Si hay borde gradiente, necesitamos un fondo sólido 
-                        if (useBorderGradient) {
-                          // Usar color base personalizable o default según tema
-                          const baseColor = theme === 'dark'
-                            ? (values.cardBgBaseDark || 'rgb(17, 24, 39)')
-                            : (values.cardBgBase || 'rgb(255, 255, 255)');
-                          return { backgroundColor: baseColor };
-                        }
+                        // Fondo completamente transparente
                         return { backgroundColor: 'transparent' };
                       }
                       if (useGradient) {
@@ -736,12 +726,18 @@ const About = () => {
                     
                     const cardBgStyle = getCardBgStyle();
                     
+                    // 🔧 CORRECCIÓN: Cuando es transparente, NO usar wrapper de borde gradiente
+                    // porque el wrapper tiene fondo que se ve a través de la transparencia.
+                    // En su lugar, usar borde sólido con el primer color del gradiente.
+                    const effectiveUseBorderGradient = useBorderGradient && !useTransparentBg;
+                    
                     // 🔍 DEBUG: Log de estilos aplicados a tarjetas
                     console.log('🎨 [DEBUG] Estilos de tarjetas aplicados:', {
                       theme,
                       useGradient,
                       useTransparentBg,
                       useBorderGradient,
+                      effectiveUseBorderGradient,
                       cardBgStyle,
                       rawCardBgColor: values.cardBgColor,
                       rawCardBgColorDark: values.cardBgColorDark,
@@ -905,7 +901,7 @@ const About = () => {
                         // Opacidad individual o global
                         const imageOpacity = (value.imageOpacity ?? values.cardImageOpacity ?? 100) / 100;
 
-                        return useBorderGradient ? (
+                        return effectiveUseBorderGradient ? (
                           // Tarjeta con borde gradiente (usando wrapper)
                           <div
                             key={currentSlide * itemsPerView + index}
@@ -978,7 +974,7 @@ const About = () => {
                             </div>
                           </div>
                         ) : (
-                          // Tarjeta con borde sólido normal
+                          // Tarjeta con borde sólido normal (o transparente con borde del primer color del gradiente)
                           <div
                             key={currentSlide * itemsPerView + index}
                             className="group relative overflow-hidden rounded-3xl transition-all duration-500 transform hover:scale-[1.02] backdrop-blur-sm shadow-xl hover:shadow-2xl"
@@ -988,9 +984,12 @@ const About = () => {
                               width: cardWidth,
                               maxWidth: cardWidth === '100%' ? undefined : cardWidth,
                               ...cardBgStyle,
-                              borderWidth: '1px',
+                              borderWidth: useTransparentBg && useBorderGradient ? '2px' : '1px',
                               borderStyle: 'solid',
-                              borderColor: cardBorderColor
+                              // Si es transparente + borde gradiente, usar el primer color del gradiente como borde
+                              borderColor: useTransparentBg && useBorderGradient 
+                                ? borderGradientFrom 
+                                : cardBorderColor
                             }}
                           >
                             {/* Imagen de fondo (solo si hay imagen configurada) */}

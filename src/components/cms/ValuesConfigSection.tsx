@@ -59,9 +59,6 @@ interface ValuesContent {
   // Configuración de fondo transparente
   cardBgTransparent?: boolean;
   cardBgTransparentDark?: boolean;
-  // Color base para cuando transparente + borde gradiente
-  cardBgBase?: string;
-  cardBgBaseDark?: string;
   // Configuración de gradiente para fondo de tarjetas
   cardBgUseGradient?: boolean;
   cardBgGradientFrom?: string;
@@ -645,144 +642,109 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
           Personaliza los colores de fondo, borde, título y texto de las tarjetas.
         </p>
 
-        {/* 🔲 Opción de Fondo Transparente */}
+        {/* 🎨 Configuración de Fondo Unificada */}
         <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-700 dark:to-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
           <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-            🔲 Fondo Transparente
+            🖼️ Fondo de Tarjetas
           </h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-            Activa esta opción para que las tarjetas tengan fondo transparente. Esto desactivará los colores y gradientes de fondo.
-          </p>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Toggle Transparente - Tema Claro */}
-            <div className="flex items-center gap-3">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={values.cardBgTransparent || false}
-                  onChange={(e) => updateContent('values.cardBgTransparent', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 dark:peer-focus:ring-gray-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-gray-500"></div>
-              </label>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">☀️ Transparente (Claro)</span>
+            {/* Tema Claro */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">☀️ Tema Claro</span>
+                <div className="flex items-center gap-2">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={values.cardBgTransparent || false}
+                      onChange={(e) => updateContent('values.cardBgTransparent', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 dark:peer-focus:ring-gray-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-cyan-500"></div>
+                  </label>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Transparente</span>
+                </div>
+              </div>
+              
+              {/* Selector de color - solo si NO es transparente */}
+              {!values.cardBgTransparent && (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={values.cardBgColor || '#ffffff'}
+                    onChange={(e) => updateContent('values.cardBgColor', e.target.value)}
+                    className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                    disabled={values.cardBgUseGradient}
+                  />
+                  <input
+                    type="text"
+                    value={values.cardBgColor || 'rgba(255, 255, 255, 0.8)'}
+                    onChange={(e) => updateContent('values.cardBgColor', e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                    placeholder="rgba(255, 255, 255, 0.8)"
+                    disabled={values.cardBgUseGradient}
+                  />
+                </div>
+              )}
+              
+              {/* Mensaje cuando es transparente */}
+              {values.cardBgTransparent && (
+                <div className="p-3 bg-cyan-50 dark:bg-cyan-900/30 border border-cyan-200 dark:border-cyan-700 rounded-lg">
+                  <p className="text-xs text-cyan-700 dark:text-cyan-300">
+                    ✨ El fondo será completamente transparente, mostrando el fondo de la sección.
+                  </p>
+                </div>
+              )}
             </div>
             
-            {/* Toggle Transparente - Tema Oscuro */}
-            <div className="flex items-center gap-3">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={values.cardBgTransparentDark || false}
-                  onChange={(e) => updateContent('values.cardBgTransparentDark', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 dark:peer-focus:ring-gray-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-gray-500"></div>
-              </label>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌙 Transparente (Oscuro)</span>
-            </div>
-          </div>
-          
-          {/* ⚠️ Nota sobre transparente + borde gradiente */}
-          {(values.cardBgTransparent || values.cardBgTransparentDark) && (values.cardBorderUseGradient || values.cardBorderUseGradientDark) && (
-            <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg">
-              <p className="text-xs text-amber-700 dark:text-amber-300">
-                ⚠️ <strong>Nota:</strong> Cuando usas fondo transparente con borde gradiente, se necesita un "color base" para que el borde se vea correctamente. Configura el color base abajo.
-              </p>
-            </div>
-          )}
-          
-          {/* Color Base (para transparente + borde gradiente) */}
-          {(values.cardBgTransparent || values.cardBgTransparentDark) && (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  ☀️ Color Base (Claro) - para borde gradiente
-                </label>
+            {/* Tema Oscuro */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🌙 Tema Oscuro</span>
                 <div className="flex items-center gap-2">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={values.cardBgTransparentDark || false}
+                      onChange={(e) => updateContent('values.cardBgTransparentDark', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 dark:peer-focus:ring-gray-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-cyan-500"></div>
+                  </label>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Transparente</span>
+                </div>
+              </div>
+              
+              {/* Selector de color - solo si NO es transparente */}
+              {!values.cardBgTransparentDark && (
+                <div className="flex items-center gap-3">
                   <input
                     type="color"
-                    value={values.cardBgBase || '#ffffff'}
-                    onChange={(e) => updateContent('values.cardBgBase', e.target.value)}
-                    className="w-10 h-8 rounded cursor-pointer border border-gray-300"
+                    value={values.cardBgColorDark || '#1f2937'}
+                    onChange={(e) => updateContent('values.cardBgColorDark', e.target.value)}
+                    className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                    disabled={values.cardBgUseGradientDark}
                   />
                   <input
                     type="text"
-                    value={values.cardBgBase || '#ffffff'}
-                    onChange={(e) => updateContent('values.cardBgBase', e.target.value)}
-                    className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
-                    placeholder="#ffffff"
+                    value={values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)'}
+                    onChange={(e) => updateContent('values.cardBgColorDark', e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                    placeholder="rgba(31, 41, 55, 0.5)"
+                    disabled={values.cardBgUseGradientDark}
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  🌙 Color Base (Oscuro) - para borde gradiente
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={values.cardBgBaseDark || '#111827'}
-                    onChange={(e) => updateContent('values.cardBgBaseDark', e.target.value)}
-                    className="w-10 h-8 rounded cursor-pointer border border-gray-300"
-                  />
-                  <input
-                    type="text"
-                    value={values.cardBgBaseDark || '#111827'}
-                    onChange={(e) => updateContent('values.cardBgBaseDark', e.target.value)}
-                    className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
-                    placeholder="#111827"
-                  />
+              )}
+              
+              {/* Mensaje cuando es transparente */}
+              {values.cardBgTransparentDark && (
+                <div className="p-3 bg-cyan-50 dark:bg-cyan-900/30 border border-cyan-200 dark:border-cyan-700 rounded-lg">
+                  <p className="text-xs text-cyan-700 dark:text-cyan-300">
+                    ✨ El fondo será completamente transparente, mostrando el fondo de la sección.
+                  </p>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Colores de fondo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              ☀️ Fondo (Tema Claro)
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={values.cardBgColor || '#ffffff'}
-                onChange={(e) => updateContent('values.cardBgColor', e.target.value)}
-                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
-                disabled={values.cardBgUseGradient || values.cardBgTransparent}
-              />
-              <input
-                type="text"
-                value={values.cardBgColor || 'rgba(255, 255, 255, 0.8)'}
-                onChange={(e) => updateContent('values.cardBgColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
-                placeholder="rgba(255, 255, 255, 0.8)"
-                disabled={values.cardBgUseGradient || values.cardBgTransparent}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              🌙 Fondo (Tema Oscuro)
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={values.cardBgColorDark || '#1f2937'}
-                onChange={(e) => updateContent('values.cardBgColorDark', e.target.value)}
-                className="w-12 h-10 rounded cursor-pointer border border-gray-300"
-                disabled={values.cardBgUseGradientDark || values.cardBgTransparentDark}
-              />
-              <input
-                type="text"
-                value={values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)'}
-                onChange={(e) => updateContent('values.cardBgColorDark', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
-                placeholder="rgba(31, 41, 55, 0.5)"
-                disabled={values.cardBgUseGradientDark || values.cardBgTransparentDark}
-              />
+              )}
             </div>
           </div>
         </div>
