@@ -119,6 +119,9 @@ interface ValuesContent {
   cardTextColor?: string;
   cardTextColorDark?: string;
   cardImageOpacity?: number; // Opacidad global para imágenes (0-100)
+  // Configuración de fondo transparente
+  cardBgTransparent?: boolean;
+  cardBgTransparentDark?: boolean;
   // Configuración de gradiente para fondo de tarjetas
   cardBgUseGradient?: boolean;
   cardBgGradientFrom?: string;
@@ -693,16 +696,24 @@ const About = () => {
                       return `linear-gradient(${directionMap[gradientDirection] || 'to bottom right'}, ${gradientFrom}, ${gradientTo})`;
                     };
                     
-                    const cardBgStyle = useGradient 
-                      ? { background: getGradientCss() }
-                      : { backgroundColor: theme === 'dark' 
-                          ? (values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)') 
-                          : (values.cardBgColor || 'rgba(255, 255, 255, 0.8)') };
+                    // Soporte para fondo transparente
+                    const useTransparentBg = theme === 'dark'
+                      ? (values.cardBgTransparentDark || false)
+                      : (values.cardBgTransparent || false);
+                    
+                    const cardBgStyle = useTransparentBg
+                      ? { backgroundColor: 'transparent' }
+                      : useGradient 
+                        ? { background: getGradientCss() }
+                        : { backgroundColor: theme === 'dark' 
+                            ? (values.cardBgColorDark || 'rgba(31, 41, 55, 0.5)') 
+                            : (values.cardBgColor || 'rgba(255, 255, 255, 0.8)') };
                     
                     // 🔍 DEBUG: Log de estilos aplicados a tarjetas
                     console.log('🎨 [DEBUG] Estilos de tarjetas aplicados:', {
                       theme,
                       useGradient,
+                      useTransparentBg,
                       cardBgStyle,
                       rawCardBgColor: values.cardBgColor,
                       rawCardBgColorDark: values.cardBgColorDark,
@@ -890,23 +901,17 @@ const About = () => {
                                 minHeight: `calc(${cardHeight} - 4px)`
                               }}
                             >
-                              {/* Imagen de fondo o gradiente */}
-                              <div className="absolute inset-0 overflow-hidden rounded-3xl">
-                                {valueImage ? (
+                              {/* Imagen de fondo (solo si hay imagen configurada) */}
+                              {valueImage && (
+                                <div className="absolute inset-0 overflow-hidden rounded-3xl">
                                   <img
                                     src={valueImage}
                                     alt={value.imageAlt || value.title}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     style={{ opacity: imageOpacity }}
                                   />
-                                ) : (
-                                  <div className={`absolute inset-0 ${
-                                    theme === 'dark'
-                                      ? 'bg-gradient-to-br from-purple-900/40 via-gray-900/60 to-cyan-900/40'
-                                      : 'bg-gradient-to-br from-purple-50 via-white to-cyan-50'
-                                  }`} />
-                                )}
-                              </div>
+                                </div>
+                              )}
 
                               {/* Contenido de la tarjeta */}
                               <div className={`relative z-10 p-8 h-full flex flex-col justify-end ${
@@ -963,23 +968,17 @@ const About = () => {
                               borderColor: cardBorderColor
                             }}
                           >
-                            {/* Imagen de fondo o gradiente */}
-                            <div className="absolute inset-0 overflow-hidden rounded-3xl">
-                              {valueImage ? (
+                            {/* Imagen de fondo (solo si hay imagen configurada) */}
+                            {valueImage && (
+                              <div className="absolute inset-0 overflow-hidden rounded-3xl">
                                 <img
                                   src={valueImage}
                                   alt={value.imageAlt || value.title}
                                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                   style={{ opacity: imageOpacity }}
                                 />
-                              ) : (
-                                <div className={`absolute inset-0 ${
-                                  theme === 'dark'
-                                    ? 'bg-gradient-to-br from-purple-900/40 via-gray-900/60 to-cyan-900/40'
-                                    : 'bg-gradient-to-br from-purple-50 via-white to-cyan-50'
-                                }`} />
-                              )}
-                            </div>
+                              </div>
+                            )}
 
                             {/* Contenido de la tarjeta */}
                             <div className={`relative z-10 p-8 h-full flex flex-col justify-end ${
