@@ -12,7 +12,7 @@ import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidge
 import { getPageBySlug, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
-import { categoriasApi, type Categoria } from '../../services/categoriasApi';
+import { useCategoriasList, type Categoria } from '../../hooks/useCategoriasCache';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 import type { ClientLogosContent } from '../../types/cms';
 
@@ -185,8 +185,10 @@ const DEFAULT_PAGE_DATA: PageData = {
 const HomeOptimized = () => {
   const [pageData, setPageData] = useState<PageData>(DEFAULT_PAGE_DATA);
   const [isLoadingCMS, setIsLoadingCMS] = useState(false);
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const { setThemeConfig } = useTheme();
+  
+  // 🚀 Usar hook con cache para categorías
+  const { data: categorias } = useCategoriasList({ activas: true });
   
   // ✅ SOLUCIÓN: Usar SEO de pageData en lugar de hook separado (evita consulta duplicada)
   
@@ -198,7 +200,6 @@ const HomeOptimized = () => {
     const init = async () => {
       if (isMounted) {
         await loadPageData();
-        await loadCategorias();
       }
     };
 
@@ -209,18 +210,6 @@ const HomeOptimized = () => {
       controller.abort();
     };
   }, []);
-
-  // Función para cargar categorías desde el CMS
-  const loadCategorias = async () => {
-    try {
-      const response = await categoriasApi.getAll({ activas: true });
-      setCategorias(response.data);
-    } catch (error) {
-      console.error('Error cargando categorías:', error);
-      // En caso de error, usar array vacío (el selector se ocultará)
-      setCategorias([]);
-    }
-  };
 
   // 📍 Manejo de navegación a sección de contacto con cleanup
   useEffect(() => {

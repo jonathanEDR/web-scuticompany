@@ -13,7 +13,7 @@ import { ServicesAccordionList } from '../../components/public/ServicesAccordion
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSeo } from '../../hooks/useSeo';
 import { useServiciosList } from '../../hooks/useServiciosCache';
-import { categoriasApi, type Categoria } from '../../services/categoriasApi';
+import { useCategoriasList } from '../../hooks/useCategoriasCache';
 import { invalidateServiciosCache } from '../../utils/serviciosCache';
 import { getPageBySlug } from '../../services/cmsApi';
 import type { Servicio, ServicioFilters } from '../../types/servicios';
@@ -30,7 +30,9 @@ const ServicesPublicV2 = () => {
   const [busqueda, setBusqueda] = useState('');
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [ordenamiento, setOrdenamiento] = useState<string>('destacado');
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  
+  // 🚀 Usar hook con cache para categorías
+  const { data: categorias } = useCategoriasList({ activas: true });
   
   // 🆕 Estado para datos del CMS (hero, etc.)
   const [pageData, setPageData] = useState<any>(null);
@@ -53,21 +55,6 @@ const ServicesPublicV2 = () => {
       ? (bgImage.light || bgImage.dark) 
       : (bgImage.dark || bgImage.light);
   };
-
-  // 🔄 Cargar categorías dinámicamente desde la API
-  useEffect(() => {
-    const loadCategorias = async () => {
-      try {
-        const response = await categoriasApi.getAll({ activas: true });
-        setCategorias(response.data);
-      } catch (error) {
-        // Error al cargar categorías, usar fallback
-        setCategorias([]);
-      }
-    };
-
-    loadCategorias();
-  }, []);
 
   // 🆕 Cargar datos del CMS para la página de servicios
   useEffect(() => {
