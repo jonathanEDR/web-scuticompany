@@ -818,14 +818,57 @@ export const ServicioDetail: React.FC = () => {
         
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          {/* Título de la sección - Fuera de la tarjeta */}
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 flex items-center justify-center gap-3">
-              <span className="text-4xl">📚</span>
-              Información Completa
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">Haz clic en cada sección para ver más detalles</p>
-          </div>
+          {/* Título de la sección - Configurable desde CMS */}
+          {(accordionConfig.header?.showTitle !== false || accordionConfig.header?.showSubtitle !== false) && (
+            <div className={`mb-10 ${
+              accordionConfig.header?.alignment === 'left' ? 'text-left' :
+              accordionConfig.header?.alignment === 'right' ? 'text-right' : 'text-center'
+            }`}>
+              {accordionConfig.header?.showTitle !== false && (
+                <h2 
+                  className={`${accordionConfig.header?.title?.fontSize || 'text-3xl md:text-4xl'} ${accordionConfig.header?.title?.fontWeight || 'font-bold'} ${accordionConfig.header?.title?.lineHeight || 'leading-tight'} mb-3 flex items-center gap-3 ${
+                    accordionConfig.header?.alignment === 'left' ? 'justify-start' :
+                    accordionConfig.header?.alignment === 'right' ? 'justify-end' : 'justify-center'
+                  }`}
+                  style={{ 
+                    color: theme === 'dark' 
+                      ? (accordionConfig.header?.title?.colorDark || '#FFFFFF')
+                      : (accordionConfig.header?.title?.color || '#111827'),
+                    fontFamily: accordionConfig.header?.title?.fontFamily || 'Montserrat',
+                  }}
+                >
+                  {/* Renderizar Emoji o Icono Lucide según configuración */}
+                  {accordionConfig.header?.iconType === 'lucide' ? (
+                    <LucideIcon 
+                      name={accordionConfig.header?.iconName || 'BookOpen'} 
+                      size={36} 
+                      style={{ 
+                        color: theme === 'dark' 
+                          ? (accordionConfig.header?.iconColorDark || '#a78bfa')
+                          : (accordionConfig.header?.iconColor || '#7c3aed')
+                      }} 
+                    />
+                  ) : (
+                    <span className="text-4xl">{accordionConfig.header?.title?.icon || '📚'}</span>
+                  )}
+                  {accordionConfig.header?.title?.text || 'Información Completa'}
+                </h2>
+              )}
+              {accordionConfig.header?.showSubtitle !== false && (
+                <p 
+                  className={`${accordionConfig.header?.subtitle?.fontSize || 'text-lg'} ${accordionConfig.header?.subtitle?.fontWeight || 'font-normal'} ${accordionConfig.header?.subtitle?.lineHeight || 'leading-relaxed'}`}
+                  style={{ 
+                    color: theme === 'dark' 
+                      ? (accordionConfig.header?.subtitle?.colorDark || '#9CA3AF')
+                      : (accordionConfig.header?.subtitle?.color || '#4B5563'),
+                    fontFamily: accordionConfig.header?.subtitle?.fontFamily || 'Montserrat',
+                  }}
+                >
+                  {accordionConfig.header?.subtitle?.text || 'Haz clic en cada sección para ver más detalles'}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Paneles Acordeón - Sin tarjeta contenedora */}
           <div className="space-y-3">

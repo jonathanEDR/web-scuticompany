@@ -26,7 +26,9 @@ import type {
 import {
   DEFAULT_PANELS,
   DEFAULT_CONFIG,
+  DEFAULT_ACCORDION_HEADER,
 } from './types/servicioDetailConfig';
+import type { AccordionHeaderConfig } from './types/servicioDetailConfig';
 
 interface Props {
   config: ServicioDetailConfig;
@@ -34,7 +36,7 @@ interface Props {
 }
 
 const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
-  const [expandedSection, setExpandedSection] = useState<string | null>('accordion');
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   // Merge config con defaults
   const mergedConfig: ServicioDetailConfig = {
@@ -48,6 +50,14 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
         titleGradient: config.hero?.content?.titleGradient || DEFAULT_CONFIG.hero!.content!.titleGradient,
         showCategoryTag: config.hero?.content?.showCategoryTag ?? DEFAULT_CONFIG.hero!.content!.showCategoryTag,
         showPrice: config.hero?.content?.showPrice ?? DEFAULT_CONFIG.hero!.content!.showPrice,
+        title: {
+          ...DEFAULT_CONFIG.hero!.content!.title,
+          ...config.hero?.content?.title,
+        },
+        subtitle: {
+          ...DEFAULT_CONFIG.hero!.content!.subtitle,
+          ...config.hero?.content?.subtitle,
+        },
       },
       cards: config.hero?.cards || DEFAULT_CONFIG.hero!.cards,
       buttons: {
@@ -104,6 +114,23 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
             ...config.accordion?.styles?.sectionIcons?.noIncluye,
           },
         },
+      },
+      header: {
+        title: {
+          ...DEFAULT_ACCORDION_HEADER.title,
+          ...config.accordion?.header?.title,
+        },
+        subtitle: {
+          ...DEFAULT_ACCORDION_HEADER.subtitle,
+          ...config.accordion?.header?.subtitle,
+        },
+        alignment: config.accordion?.header?.alignment ?? DEFAULT_ACCORDION_HEADER.alignment,
+        showTitle: config.accordion?.header?.showTitle ?? DEFAULT_ACCORDION_HEADER.showTitle,
+        showSubtitle: config.accordion?.header?.showSubtitle ?? DEFAULT_ACCORDION_HEADER.showSubtitle,
+        iconType: config.accordion?.header?.iconType ?? DEFAULT_ACCORDION_HEADER.iconType,
+        iconName: config.accordion?.header?.iconName ?? DEFAULT_ACCORDION_HEADER.iconName,
+        iconColor: config.accordion?.header?.iconColor ?? DEFAULT_ACCORDION_HEADER.iconColor,
+        iconColorDark: config.accordion?.header?.iconColorDark ?? DEFAULT_ACCORDION_HEADER.iconColorDark,
       },
     },
     sidebar: { 
@@ -416,6 +443,46 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
     onChange(updatedConfig);
   };
 
+  // Funciones para actualizar el header del acordeón
+  const updateAccordionHeader = (field: keyof AccordionHeaderConfig, value: any) => {
+    const updatedConfig = {
+      ...mergedConfig,
+      accordion: {
+        ...mergedConfig.accordion!,
+        header: { ...mergedConfig.accordion!.header!, [field]: value },
+      },
+    };
+    onChange(updatedConfig);
+  };
+
+  const updateAccordionHeaderTitle = (field: string, value: any) => {
+    const updatedConfig = {
+      ...mergedConfig,
+      accordion: {
+        ...mergedConfig.accordion!,
+        header: {
+          ...mergedConfig.accordion!.header!,
+          title: { ...mergedConfig.accordion!.header!.title, [field]: value },
+        },
+      },
+    };
+    onChange(updatedConfig);
+  };
+
+  const updateAccordionHeaderSubtitle = (field: string, value: any) => {
+    const updatedConfig = {
+      ...mergedConfig,
+      accordion: {
+        ...mergedConfig.accordion!,
+        header: {
+          ...mergedConfig.accordion!.header!,
+          subtitle: { ...mergedConfig.accordion!.header!.subtitle, [field]: value },
+        },
+      },
+    };
+    onChange(updatedConfig);
+  };
+
   const updateCtaTitle = (field: string, value: any) => {
     const updatedConfig = {
       ...mergedConfig,
@@ -565,6 +632,9 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
         togglePanelEnabled={togglePanelEnabled}
         movePanelUp={movePanelUp}
         movePanelDown={movePanelDown}
+        updateAccordionHeader={updateAccordionHeader}
+        updateAccordionHeaderTitle={updateAccordionHeaderTitle}
+        updateAccordionHeaderSubtitle={updateAccordionHeaderSubtitle}
       />
       {/* 📊 Sidebar Config */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">

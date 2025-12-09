@@ -12,6 +12,7 @@ import type {
   BackgroundConfig,
   AccordionPanelConfig,
   ServicioDetailConfig,
+  AccordionHeaderConfig,
 } from '../types/servicioDetailConfig';
 import { DEFAULT_BACKGROUND, DEFAULT_CONFIG } from '../types/servicioDetailConfig';
 
@@ -79,6 +80,10 @@ interface AccordionConfigSectionProps {
   togglePanelEnabled: (panelId: string) => void;
   movePanelUp: (index: number) => void;
   movePanelDown: (index: number) => void;
+  // Nuevas props para header
+  updateAccordionHeader: (field: keyof AccordionHeaderConfig, value: any) => void;
+  updateAccordionHeaderTitle: (field: string, value: any) => void;
+  updateAccordionHeaderSubtitle: (field: string, value: any) => void;
 }
 
 export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
@@ -97,6 +102,9 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
   togglePanelEnabled,
   movePanelUp,
   movePanelDown,
+  updateAccordionHeader,
+  updateAccordionHeaderTitle,
+  updateAccordionHeaderSubtitle,
 }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -119,6 +127,539 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
 
       {isExpanded && (
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 space-y-6">
+          
+          {/* ========== SECCIÓN: TÍTULO Y DESCRIPCIÓN ========== */}
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-5 border border-purple-200 dark:border-purple-800">
+            <h5 className="font-semibold text-purple-800 dark:text-purple-300 mb-4 flex items-center gap-2">
+              📝 Título y Descripción de la Sección
+            </h5>
+            
+            {/* Mostrar/Ocultar */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <label className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                <input
+                  type="checkbox"
+                  checked={mergedConfig.accordion?.header?.showTitle ?? true}
+                  onChange={(e) => updateAccordionHeader('showTitle', e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                />
+                <div>
+                  <p className="font-medium text-gray-700 dark:text-gray-200">Mostrar Título</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Título principal de la sección</p>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                <input
+                  type="checkbox"
+                  checked={mergedConfig.accordion?.header?.showSubtitle ?? true}
+                  onChange={(e) => updateAccordionHeader('showSubtitle', e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                />
+                <div>
+                  <p className="font-medium text-gray-700 dark:text-gray-200">Mostrar Descripción</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Texto descriptivo debajo del título</p>
+                </div>
+              </label>
+            </div>
+
+            {/* Título */}
+            <div className="space-y-4">
+              {/* Tipo de Icono */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  🎨 Tipo de Icono
+                </label>
+                <div className="flex gap-3 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => updateAccordionHeader('iconType', 'emoji')}
+                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                      (mergedConfig.accordion?.header?.iconType ?? 'emoji') === 'emoji'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-700'
+                    }`}
+                  >
+                    <span className="text-2xl">😀</span>
+                    <span className="font-medium">Emoji</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateAccordionHeader('iconType', 'lucide')}
+                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                      mergedConfig.accordion?.header?.iconType === 'lucide'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-700'
+                    }`}
+                  >
+                    <LucideIcon name="Sparkles" size={24} />
+                    <span className="font-medium">Lucide Icon</span>
+                  </button>
+                </div>
+
+                {/* Selector de Emoji */}
+                {(mergedConfig.accordion?.header?.iconType ?? 'emoji') === 'emoji' && (
+                  <>
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 rounded-xl flex items-center justify-center text-4xl border-2 border-gray-200 dark:border-gray-700">
+                        {mergedConfig.accordion?.header?.title?.icon || '📚'}
+                      </div>
+                      <div className="flex-1 grid grid-cols-8 gap-2">
+                        {['📚', '📖', '📋', '📝', '✨', '🎯', '💡', '⚡', '🚀', '🔍', '📊', '🎨', '💼', '🏆', '⭐', '🌟'].map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => updateAccordionHeaderTitle('icon', emoji)}
+                            className={`w-10 h-10 flex items-center justify-center text-xl rounded-lg transition-all ${
+                              mergedConfig.accordion?.header?.title?.icon === emoji
+                                ? 'bg-purple-600 text-white ring-2 ring-purple-400'
+                                : 'bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/50'
+                            }`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      value={mergedConfig.accordion?.header?.title?.icon ?? '📚'}
+                      onChange={(e) => updateAccordionHeaderTitle('icon', e.target.value)}
+                      className="mt-3 w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 text-center text-2xl"
+                      placeholder="📚"
+                      maxLength={4}
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                      Selecciona un emoji o pega uno personalizado
+                    </p>
+                  </>
+                )}
+
+                {/* Selector de Icono Lucide */}
+                {mergedConfig.accordion?.header?.iconType === 'lucide' && (
+                  <>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div 
+                        className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 rounded-xl flex items-center justify-center border-2 border-gray-200 dark:border-gray-700"
+                      >
+                        <LucideIcon 
+                          name={mergedConfig.accordion?.header?.iconName || 'BookOpen'} 
+                          size={32} 
+                          style={{ 
+                            color: mergedConfig.accordion?.header?.iconColor || '#7c3aed'
+                          }} 
+                        />
+                      </div>
+                      <div className="flex-1 grid grid-cols-6 gap-2 max-h-32 overflow-y-auto">
+                        {AVAILABLE_ICONS.map((icon) => (
+                          <button
+                            key={icon.name}
+                            type="button"
+                            onClick={() => updateAccordionHeader('iconName', icon.name)}
+                            title={icon.label}
+                            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all ${
+                              mergedConfig.accordion?.header?.iconName === icon.name
+                                ? 'bg-purple-600 text-white ring-2 ring-purple-400'
+                                : 'bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-gray-700 dark:text-gray-300'
+                            }`}
+                          >
+                            <LucideIcon name={icon.name} size={20} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Colores del Icono por Tema */}
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        🎨 Colores del Icono por Tema
+                      </label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Tema Claro */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">☀️</span>
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tema Claro</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              value={mergedConfig.accordion?.header?.iconColor || '#7c3aed'}
+                              onChange={(e) => updateAccordionHeader('iconColor', e.target.value)}
+                              className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={mergedConfig.accordion?.header?.iconColor || '#7c3aed'}
+                              onChange={(e) => updateAccordionHeader('iconColor', e.target.value)}
+                              className="flex-1 px-3 py-2 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg text-sm"
+                              placeholder="#7c3aed"
+                            />
+                          </div>
+                        </div>
+                        {/* Tema Oscuro */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">🌙</span>
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tema Oscuro</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              value={mergedConfig.accordion?.header?.iconColorDark || '#a78bfa'}
+                              onChange={(e) => updateAccordionHeader('iconColorDark', e.target.value)}
+                              className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={mergedConfig.accordion?.header?.iconColorDark || '#a78bfa'}
+                              onChange={(e) => updateAccordionHeader('iconColorDark', e.target.value)}
+                              className="flex-1 px-3 py-2 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg text-sm"
+                              placeholder="#a78bfa"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Texto del título */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Texto del Título
+                </label>
+                <input
+                  type="text"
+                  value={mergedConfig.accordion?.header?.title?.text ?? 'Información Completa'}
+                  onChange={(e) => updateAccordionHeaderTitle('text', e.target.value)}
+                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500"
+                  placeholder="Información Completa"
+                />
+              </div>
+
+              {/* Colores del Título por Tema */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  🎨 Colores del Título por Tema
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Tema Claro */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">☀️</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tema Claro</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={mergedConfig.accordion?.header?.title?.color || '#111827'}
+                        onChange={(e) => updateAccordionHeaderTitle('color', e.target.value)}
+                        className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={mergedConfig.accordion?.header?.title?.color || '#111827'}
+                        onChange={(e) => updateAccordionHeaderTitle('color', e.target.value)}
+                        className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                        placeholder="#111827"
+                      />
+                    </div>
+                  </div>
+                  {/* Tema Oscuro */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🌙</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tema Oscuro</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={mergedConfig.accordion?.header?.title?.colorDark || '#FFFFFF'}
+                        onChange={(e) => updateAccordionHeaderTitle('colorDark', e.target.value)}
+                        className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={mergedConfig.accordion?.header?.title?.colorDark || '#FFFFFF'}
+                        onChange={(e) => updateAccordionHeaderTitle('colorDark', e.target.value)}
+                        className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                        placeholder="#FFFFFF"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tipografía del Título */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  ✏️ Tipografía del Título
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Familia de fuente */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Familia de fuente
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.title?.fontFamily || 'Montserrat'}
+                      onChange={(e) => updateAccordionHeaderTitle('fontFamily', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="Montserrat">Montserrat (Recomendado)</option>
+                      <option value="Inter">Inter</option>
+                      <option value="Poppins">Poppins</option>
+                      <option value="Roboto">Roboto</option>
+                      <option value="Open Sans">Open Sans</option>
+                      <option value="system-ui">Sistema</option>
+                    </select>
+                  </div>
+                  {/* Tamaño de fuente */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Tamaño de fuente
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.title?.fontSize || 'text-3xl md:text-4xl'}
+                      onChange={(e) => updateAccordionHeaderTitle('fontSize', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="text-2xl md:text-3xl">3XL (Mediano)</option>
+                      <option value="text-3xl md:text-4xl">4XL (Recomendado)</option>
+                      <option value="text-4xl md:text-5xl">5XL (Grande)</option>
+                      <option value="text-5xl md:text-6xl">6XL (Extra Grande)</option>
+                    </select>
+                  </div>
+                  {/* Peso de fuente */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Peso de fuente
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.title?.fontWeight || 'font-bold'}
+                      onChange={(e) => updateAccordionHeaderTitle('fontWeight', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="font-normal">Normal</option>
+                      <option value="font-medium">Medium</option>
+                      <option value="font-semibold">Semibold</option>
+                      <option value="font-bold">Bold (Recomendado)</option>
+                      <option value="font-extrabold">Extra Bold</option>
+                    </select>
+                  </div>
+                  {/* Altura de línea */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Altura de línea
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.title?.lineHeight || 'leading-tight'}
+                      onChange={(e) => updateAccordionHeaderTitle('lineHeight', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="leading-none">None</option>
+                      <option value="leading-tight">Tight (Recomendado)</option>
+                      <option value="leading-snug">Snug</option>
+                      <option value="leading-normal">Normal</option>
+                      <option value="leading-relaxed">Relaxed</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Descripción/Subtítulo */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Descripción
+                </label>
+                <input
+                  type="text"
+                  value={mergedConfig.accordion?.header?.subtitle?.text ?? 'Haz clic en cada sección para ver más detalles'}
+                  onChange={(e) => updateAccordionHeaderSubtitle('text', e.target.value)}
+                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500"
+                  placeholder="Haz clic en cada sección para ver más detalles"
+                />
+              </div>
+
+              {/* Colores de la Descripción por Tema */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  🎨 Colores de la Descripción por Tema
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Tema Claro */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">☀️</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tema Claro</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={mergedConfig.accordion?.header?.subtitle?.color || '#4B5563'}
+                        onChange={(e) => updateAccordionHeaderSubtitle('color', e.target.value)}
+                        className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={mergedConfig.accordion?.header?.subtitle?.color || '#4B5563'}
+                        onChange={(e) => updateAccordionHeaderSubtitle('color', e.target.value)}
+                        className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                        placeholder="#4B5563"
+                      />
+                    </div>
+                  </div>
+                  {/* Tema Oscuro */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🌙</span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tema Oscuro</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={mergedConfig.accordion?.header?.subtitle?.colorDark || '#9CA3AF'}
+                        onChange={(e) => updateAccordionHeaderSubtitle('colorDark', e.target.value)}
+                        className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={mergedConfig.accordion?.header?.subtitle?.colorDark || '#9CA3AF'}
+                        onChange={(e) => updateAccordionHeaderSubtitle('colorDark', e.target.value)}
+                        className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                        placeholder="#9CA3AF"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tipografía de la Descripción */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  ✏️ Tipografía de la Descripción
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Familia de fuente */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Familia de fuente
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.subtitle?.fontFamily || 'Montserrat'}
+                      onChange={(e) => updateAccordionHeaderSubtitle('fontFamily', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="Montserrat">Montserrat (Recomendado)</option>
+                      <option value="Inter">Inter</option>
+                      <option value="Poppins">Poppins</option>
+                      <option value="Roboto">Roboto</option>
+                      <option value="Open Sans">Open Sans</option>
+                      <option value="system-ui">Sistema</option>
+                    </select>
+                  </div>
+                  {/* Tamaño de fuente */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Tamaño de fuente
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.subtitle?.fontSize || 'text-lg'}
+                      onChange={(e) => updateAccordionHeaderSubtitle('fontSize', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="text-sm">SM (Pequeño)</option>
+                      <option value="text-base">Base (Normal)</option>
+                      <option value="text-lg">LG (Recomendado)</option>
+                      <option value="text-xl">XL (Grande)</option>
+                    </select>
+                  </div>
+                  {/* Peso de fuente */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Peso de fuente
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.subtitle?.fontWeight || 'font-normal'}
+                      onChange={(e) => updateAccordionHeaderSubtitle('fontWeight', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="font-light">Light</option>
+                      <option value="font-normal">Normal (Recomendado)</option>
+                      <option value="font-medium">Medium</option>
+                      <option value="font-semibold">Semibold</option>
+                    </select>
+                  </div>
+                  {/* Altura de línea */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Altura de línea
+                    </label>
+                    <select
+                      value={mergedConfig.accordion?.header?.subtitle?.lineHeight || 'leading-relaxed'}
+                      onChange={(e) => updateAccordionHeaderSubtitle('lineHeight', e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                    >
+                      <option value="leading-tight">Tight</option>
+                      <option value="leading-snug">Snug</option>
+                      <option value="leading-normal">Normal</option>
+                      <option value="leading-relaxed">Relaxed (Recomendado)</option>
+                      <option value="leading-loose">Loose</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alineación */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Alineación
+                </label>
+                <div className="flex gap-2">
+                  {(['left', 'center', 'right'] as const).map((align) => (
+                    <button
+                      key={align}
+                      type="button"
+                      onClick={() => updateAccordionHeader('alignment', align)}
+                      className={`flex-1 px-4 py-2 rounded-lg border transition-all ${
+                        mergedConfig.accordion?.header?.alignment === align
+                          ? 'bg-purple-600 text-white border-purple-600'
+                          : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {align === 'left' ? '⬅️ Izquierda' : align === 'center' ? '↔️ Centro' : '➡️ Derecha'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Vista Previa */}
+              <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 text-center">Vista Previa</p>
+                <div className={`${
+                  mergedConfig.accordion?.header?.alignment === 'left' ? 'text-left' :
+                  mergedConfig.accordion?.header?.alignment === 'right' ? 'text-right' : 'text-center'
+                }`}>
+                  <h3 
+                    className={`text-2xl font-bold mb-2 flex items-center gap-2 ${
+                      mergedConfig.accordion?.header?.alignment === 'left' ? 'justify-start' :
+                      mergedConfig.accordion?.header?.alignment === 'right' ? 'justify-end' : 'justify-center'
+                    }`}
+                    style={{ color: mergedConfig.accordion?.header?.title?.color || '#111827' }}
+                  >
+                    <span>{mergedConfig.accordion?.header?.title?.icon || '📚'}</span>
+                    {mergedConfig.accordion?.header?.title?.text || 'Información Completa'}
+                  </h3>
+                  <p style={{ color: mergedConfig.accordion?.header?.subtitle?.color || '#4B5563' }}>
+                    {mergedConfig.accordion?.header?.subtitle?.text || 'Haz clic en cada sección para ver más detalles'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Options */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">

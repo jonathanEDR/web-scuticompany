@@ -15,7 +15,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
   pageData,
   updateContent
 }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   // Obtener configuración actual o usar valores por defecto
   const filterConfig = (pageData?.content as any)?.servicesFilter || {

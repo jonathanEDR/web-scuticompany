@@ -30,7 +30,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
   onChange
 }) => {
   const [activeTab, setActiveTab] = useState<'general' | 'heroCard' | 'smallCard'>('general');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isUploadingLight, setIsUploadingLight] = useState(false);
   const [isUploadingDark, setIsUploadingDark] = useState(false);
   const fileInputLightRef = useRef<HTMLInputElement>(null);

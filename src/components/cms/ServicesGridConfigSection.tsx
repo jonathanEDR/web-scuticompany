@@ -16,7 +16,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
   pageData,
   updateContent
 }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   // Obtener configuración actual o usar valores por defecto
   const gridConfig = (pageData?.content as any)?.servicesGrid || {

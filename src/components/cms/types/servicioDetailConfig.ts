@@ -41,6 +41,36 @@ export interface ContentCardsIconConfig {
   noIncluye: SectionIconConfig;
 }
 
+// Configuración del encabezado/título de la sección del acordeón
+export interface AccordionHeaderConfig {
+  title: {
+    text: string;
+    iconType: 'emoji' | 'lucide';  // Tipo de icono
+    icon: string;                   // Emoji o nombre del icono Lucide
+    iconColor?: string;             // Color del icono Lucide (tema claro)
+    iconColorDark?: string;         // Color del icono Lucide (tema oscuro)
+    fontSize: string;
+    fontWeight: string;
+    fontFamily?: string;            // Familia de fuente
+    lineHeight?: string;            // Altura de línea
+    color?: string;
+    colorDark?: string;
+  };
+  subtitle: {
+    text: string;
+    fontSize: string;
+    fontWeight?: string;            // Peso de fuente
+    fontFamily?: string;            // Familia de fuente
+    lineHeight?: string;            // Altura de línea
+    color?: string;
+    colorDark?: string;
+  };
+  alignment: 'left' | 'center' | 'right';
+  showTitle: boolean;
+  showSubtitle: boolean;
+  showIcon: boolean;
+}
+
 export interface AccordionIconConfig {
   showBackground: boolean;
   iconColor: string;
@@ -183,6 +213,7 @@ export interface ServicioDetailConfig {
     panels: AccordionPanelConfig[];
     background?: BackgroundConfig;
     styles?: AccordionStyleConfig;
+    header?: AccordionHeaderConfig;
   };
   sidebar?: {
     showRelatedServices: boolean;
@@ -462,6 +493,35 @@ export const DEFAULT_HERO_CONFIG = {
   },
 };
 
+export const DEFAULT_ACCORDION_HEADER: AccordionHeaderConfig = {
+  title: {
+    text: 'Información Completa',
+    icon: '📚',
+    fontSize: 'text-3xl md:text-4xl',
+    fontWeight: 'font-bold',
+    fontFamily: 'Montserrat',
+    lineHeight: 'leading-tight',
+    color: '#111827',
+    colorDark: '#FFFFFF',
+  },
+  subtitle: {
+    text: 'Haz clic en cada sección para ver más detalles',
+    fontSize: 'text-lg',
+    fontWeight: 'font-normal',
+    fontFamily: 'Montserrat',
+    lineHeight: 'leading-relaxed',
+    color: '#4B5563',
+    colorDark: '#9CA3AF',
+  },
+  alignment: 'center',
+  showTitle: true,
+  showSubtitle: true,
+  iconType: 'emoji',
+  iconName: 'BookOpen',
+  iconColor: '#7c3aed',
+  iconColorDark: '#a78bfa',
+};
+
 export const DEFAULT_CONFIG: ServicioDetailConfig = {
   hero: DEFAULT_HERO_CONFIG,
   accordion: {
@@ -472,6 +532,7 @@ export const DEFAULT_CONFIG: ServicioDetailConfig = {
     panels: DEFAULT_PANELS,
     background: { ...DEFAULT_BACKGROUND, type: 'gradient', gradientFrom: '#f9fafb', gradientTo: '#ffffff' },
     styles: DEFAULT_ACCORDION_STYLES,
+    header: DEFAULT_ACCORDION_HEADER,
   },
   sidebar: {
     showRelatedServices: true,

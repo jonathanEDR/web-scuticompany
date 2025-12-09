@@ -34,7 +34,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
   const [activeTab, setActiveTab] = useState<'general' | 'imageCard' | 'textCard' | 'sidebar'>('general');
   const [isUploadingLight, setIsUploadingLight] = useState(false);
   const [isUploadingDark, setIsUploadingDark] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const fileInputLightRef = useRef<HTMLInputElement>(null);
   const fileInputDarkRef = useRef<HTMLInputElement>(null);
 

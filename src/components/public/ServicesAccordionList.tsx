@@ -437,14 +437,31 @@ const AccordionItem: React.FC<AccordionItemProps> = memo(({
           <div className="flex items-center justify-between mt-4">
             {/* Precio */}
             <div className="flex items-center gap-2">
-              <span className="text-lg" style={{ color: iconColor }}>$</span>
-              <span 
-                className="text-sm font-medium"
-                style={{ color: descriptionColor }}
-              >
+              <span className="text-lg font-semibold" style={{ color: iconColor }}>
                 {servicio.tipoPrecio === 'personalizado' 
-                  ? 'Consultar' 
-                  : servicio.moneda || 'PEN'}
+                  ? 'Consultar precio'
+                  : (() => {
+                      const getCurrencySymbol = (moneda?: string): string => {
+                        switch (moneda?.toUpperCase()) {
+                          case 'PEN': return 'S/.';
+                          case 'USD': return '$';
+                          case 'EUR': return '€';
+                          default: return 'S/.';
+                        }
+                      };
+                      const symbol = getCurrencySymbol(servicio.moneda);
+                      if (servicio.tipoPrecio === 'fijo' && servicio.precio) {
+                        return `${symbol} ${servicio.precio.toLocaleString()}`;
+                      }
+                      if (servicio.tipoPrecio === 'rango' && servicio.precioMin && servicio.precioMax) {
+                        return `${symbol} ${servicio.precioMin.toLocaleString()} - ${symbol} ${servicio.precioMax.toLocaleString()}`;
+                      }
+                      if (servicio.tipoPrecio === 'paquetes' && servicio.precioMin) {
+                        return `Desde ${symbol} ${servicio.precioMin.toLocaleString()}`;
+                      }
+                      return 'Consultar precio';
+                    })()
+                }
               </span>
             </div>
             

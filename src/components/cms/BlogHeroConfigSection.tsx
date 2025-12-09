@@ -18,7 +18,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
   pageData,
   updateContent
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'content' | 'background' | 'stats' | 'search'>('content');
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
