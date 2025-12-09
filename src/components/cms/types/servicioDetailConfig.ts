@@ -45,10 +45,7 @@ export interface ContentCardsIconConfig {
 export interface AccordionHeaderConfig {
   title: {
     text: string;
-    iconType: 'emoji' | 'lucide';  // Tipo de icono
-    icon: string;                   // Emoji o nombre del icono Lucide
-    iconColor?: string;             // Color del icono Lucide (tema claro)
-    iconColorDark?: string;         // Color del icono Lucide (tema oscuro)
+    icon: string;                   // Emoji (cuando iconType es 'emoji')
     fontSize: string;
     fontWeight: string;
     fontFamily?: string;            // Familia de fuente
@@ -68,7 +65,12 @@ export interface AccordionHeaderConfig {
   alignment: 'left' | 'center' | 'right';
   showTitle: boolean;
   showSubtitle: boolean;
-  showIcon: boolean;
+  showIcon?: boolean;
+  // Configuración del icono del título (nivel raíz)
+  iconType?: 'emoji' | 'lucide';    // Tipo de icono
+  iconName?: string;                // Nombre del icono Lucide (ej: 'BookOpen')
+  iconColor?: string;               // Color del icono Lucide (tema claro)
+  iconColorDark?: string;           // Color del icono Lucide (tema oscuro)
 }
 
 export interface AccordionIconConfig {

@@ -278,7 +278,7 @@ export const ServiciosManagementOptimized = () => {
   const handleResetFilters = () => {
     setFilters({});
     setSearchTerm('');
-    goToPage(1);
+    resetLoadMore();
   };
 
   const handleRefresh = () => {
