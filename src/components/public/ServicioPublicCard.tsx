@@ -126,26 +126,35 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
   const formatPrice = () => {
     if (!showPrice) return null;
     
+    // Determinar el símbolo de moneda correcto
+    const getCurrencySymbol = (moneda?: string): string => {
+      switch (moneda?.toUpperCase()) {
+        case 'PEN': return 'S/.';
+        case 'USD': return '$';
+        case 'EUR': return '€';
+        default: return 'S/.';
+      }
+    };
+    
+    const symbol = getCurrencySymbol(servicio.moneda);
+    
     switch (servicio.tipoPrecio) {
       case 'fijo':
         return (
           <div className="text-2xl font-bold text-purple-600">
-            ${servicio.precio?.toLocaleString()}
-            <span className="text-sm text-gray-500 ml-1">{servicio.moneda}</span>
+            {symbol} {servicio.precio?.toLocaleString()}
           </div>
         );
       case 'rango':
         return (
           <div className="text-lg font-semibold text-purple-600">
-            ${servicio.precioMin?.toLocaleString()} - ${servicio.precioMax?.toLocaleString()}
-            <span className="text-sm text-gray-500 ml-1">{servicio.moneda}</span>
+            {symbol} {servicio.precioMin?.toLocaleString()} - {symbol} {servicio.precioMax?.toLocaleString()}
           </div>
         );
       case 'paquetes':
         return (
           <div className="text-lg font-semibold text-purple-600">
-            Desde ${servicio.precioMin?.toLocaleString()}
-            <span className="text-sm text-gray-500 ml-1">{servicio.moneda}</span>
+            Desde {symbol} {servicio.precioMin?.toLocaleString()}
           </div>
         );
       case 'personalizado':

@@ -421,17 +421,29 @@ export const ServicioDetail: React.FC = () => {
   }, [slug]);
 
   const formatPrice = (servicio: Servicio) => {
+    // Determinar el símbolo de moneda correcto
+    const getCurrencySymbol = (moneda?: string): string => {
+      switch (moneda?.toUpperCase()) {
+        case 'PEN': return 'S/.';
+        case 'USD': return '$';
+        case 'EUR': return '€';
+        default: return 'S/.';
+      }
+    };
+    
+    const symbol = getCurrencySymbol(servicio.moneda);
+    
     if (servicio.tipoPrecio === 'personalizado') {
       return 'Precio personalizado';
     }
     if (servicio.tipoPrecio === 'rango' && servicio.precioMin && servicio.precioMax) {
-      return `$${servicio.precioMin} - $${servicio.precioMax} USD`;
+      return `${symbol} ${servicio.precioMin.toLocaleString()} - ${symbol} ${servicio.precioMax.toLocaleString()}`;
     }
     if (servicio.tipoPrecio === 'fijo' && servicio.precio) {
-      return `$${servicio.precio} USD`;
+      return `${symbol} ${servicio.precio.toLocaleString()}`;
     }
     if (servicio.tipoPrecio === 'rango' && servicio.precioMin) {
-      return `Desde $${servicio.precioMin} USD`;
+      return `Desde ${symbol} ${servicio.precioMin.toLocaleString()}`;
     }
     return 'Consultar precio';
   };
@@ -1880,7 +1892,7 @@ export const ServicioDetail: React.FC = () => {
         servicioInfo={servicio ? {
           titulo: servicio.titulo,
           descripcionCorta: servicio.descripcionCorta,
-          precio: servicio.precio ? `$${servicio.precio} ${servicio.moneda}` : undefined,
+          precio: servicio.precio ? `${servicio.moneda === 'PEN' ? 'S/.' : servicio.moneda === 'USD' ? '$' : '€'} ${servicio.precio.toLocaleString()}` : undefined,
           duracion: servicio.duracion ? `${servicio.duracion.valor} ${servicio.duracion.unidad}` : undefined,
           categoria: typeof servicio.categoria === 'string' ? servicio.categoria : servicio.categoria?.nombre || 'Sin categoría'
         } : undefined}

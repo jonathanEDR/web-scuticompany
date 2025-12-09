@@ -69,20 +69,32 @@ export const ServicioCard: React.FC<ServicioCardProps> = ({
    * Formatear precio según el tipo
    */
   const formatPrice = (): string => {
+    // Determinar el símbolo de moneda correcto
+    const getCurrencySymbol = (moneda: string): string => {
+      switch (moneda?.toUpperCase()) {
+        case 'PEN': return 'S/.';
+        case 'USD': return '$';
+        case 'EUR': return '€';
+        default: return moneda || 'S/.';
+      }
+    };
+    
+    const symbol = getCurrencySymbol(servicio.moneda);
+    
     if (servicio.tipoPrecio === 'paquetes' && servicio.precioMin && servicio.precioMax) {
-      return `${servicio.moneda} $${servicio.precioMin.toLocaleString()} - $${servicio.precioMax.toLocaleString()}`;
+      return `${symbol} ${servicio.precioMin.toLocaleString()} - ${symbol} ${servicio.precioMax.toLocaleString()}`;
     }
     if (servicio.tipoPrecio === 'fijo' && servicio.precio) {
-      return `${servicio.moneda} $${servicio.precio.toLocaleString()}`;
+      return `${symbol} ${servicio.precio.toLocaleString()}`;
     }
     if (servicio.tipoPrecio === 'rango' && servicio.precioMin && servicio.precioMax) {
-      return `${servicio.moneda} $${servicio.precioMin.toLocaleString()} - $${servicio.precioMax.toLocaleString()}`;
+      return `${symbol} ${servicio.precioMin.toLocaleString()} - ${symbol} ${servicio.precioMax.toLocaleString()}`;
     }
     if (servicio.tipoPrecio === 'personalizado') {
       return 'Precio personalizado';
     }
     if (servicio.tipoPrecio === 'suscripcion') {
-      return `Desde ${servicio.moneda} $${servicio.precioMin?.toLocaleString() || 0}/mes`;
+      return `Desde ${symbol} ${servicio.precioMin?.toLocaleString() || 0}/mes`;
     }
     return 'Consultar precio';
   };
