@@ -451,14 +451,14 @@ const CmsManager: React.FC = () => {
                   onChange={(config) => handleUpdateContent('blogCta', config)}
                 />
               </>
-            ) : (
-              /* 🏠 Hero genérico para otras páginas */
+            ) : selectedPage !== 'servicio-detail' ? (
+              /* 🏠 Hero genérico para otras páginas (NO para servicio-detail que tiene su propia configuración) */
               <HeroConfigSection
                 pageData={pageData}
                 updateContent={handleUpdateContent}
                 updateTextStyle={handleUpdateTextStyle}
               />
-            )}
+            ) : null}
             
             {/* 🏠 SECCIONES ESPECÍFICAS PARA HOME */}
             {selectedPage === 'home' && (

@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import * as LucideIcons from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
@@ -15,6 +16,24 @@ import { useServicioDetail } from '../../hooks/useServiciosCache';
 import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useTheme } from '../../contexts/ThemeContext';
 import type { Servicio } from '../../types/servicios';
+
+// Helper para renderizar iconos de Lucide dinámicamente
+const LucideIcon: React.FC<{ name: string; size?: number; className?: string; style?: React.CSSProperties }> = ({ 
+  name, 
+  size = 24, 
+  className = '',
+  style = {}
+}) => {
+  const IconComponent = (LucideIcons as any)[name];
+  if (!IconComponent) {
+    // Fallback: si no se encuentra el icono, mostrar un placeholder o emoji si es un emoji
+    if (name && name.length <= 2) {
+      return <span className={className} style={style}>{name}</span>;
+    }
+    return <LucideIcons.HelpCircle size={size} className={className} style={style} />;
+  }
+  return <IconComponent size={size} className={className} style={style} />;
+};
 
 // Tipos para el sistema de paneles acordeón
 type PanelType = 'descripcion' | 'caracteristicas' | 'beneficios' | 'incluye' | 'info' | 'faq' | 'multimedia';
@@ -93,6 +112,9 @@ export const ServicioDetail: React.FC = () => {
   const accordionConfig = servicioDetailConfig.accordion || {};
   const ctaConfig = servicioDetailConfig.cta || {};
 
+  // 🔍 DEBUG: Ver qué configuración llega al frontend
+  console.log('🎨 [ServicioDetail] heroConfig.content:', heroConfig.content);
+
   // Función para toggle del panel acordeón
   const togglePanel = (panelId: PanelType) => {
     setActivePanel(prev => prev === panelId ? null : panelId);
@@ -156,6 +178,7 @@ export const ServicioDetail: React.FC = () => {
       borderRadius: '0.5rem',
       iconBackground: 'linear-gradient(to bottom right, #8b5cf6, #06b6d4)',
       iconColor: '#ffffff',
+      iconGradientFrom: '#8b5cf6',
     };
     
     const defaultDark = {
@@ -166,6 +189,7 @@ export const ServicioDetail: React.FC = () => {
       borderRadius: '0.5rem',
       iconBackground: 'linear-gradient(to bottom right, #a78bfa, #22d3ee)',
       iconColor: '#ffffff',
+      iconGradientFrom: '#a78bfa',
     };
 
     if (!contentCards) {
@@ -195,6 +219,87 @@ export const ServicioDetail: React.FC = () => {
       borderRadius: themeStyles?.borderRadius || defaults.borderRadius,
       iconBackground,
       iconColor: themeStyles?.iconColor || defaults.iconColor,
+      iconGradientFrom: themeStyles?.iconGradientFrom || (theme === 'dark' ? '#a78bfa' : '#8b5cf6'),
+    };
+  };
+
+  // Función helper para obtener configuración de iconos del header del acordeón
+  const getIconConfig = () => {
+    const iconConfig = accordionConfig.styles?.iconConfig;
+    
+    // Valores por defecto - SIN fondo para un look más limpio
+    const defaultLight = {
+      showBackground: false,
+      iconColor: '#8b5cf6',
+      iconActiveColor: '#7c3aed',
+      backgroundColor: '#f3f4f6',
+      backgroundActiveColor: '#8b5cf6',
+    };
+    
+    const defaultDark = {
+      showBackground: false,
+      iconColor: '#a78bfa',
+      iconActiveColor: '#c4b5fd',
+      backgroundColor: '#374151',
+      backgroundActiveColor: '#a78bfa',
+    };
+
+    if (!iconConfig) {
+      return theme === 'dark' ? defaultDark : defaultLight;
+    }
+
+    const themeConfig = theme === 'dark' ? iconConfig.dark : iconConfig.light;
+    const defaults = theme === 'dark' ? defaultDark : defaultLight;
+
+    return {
+      showBackground: themeConfig?.showBackground ?? defaults.showBackground,
+      iconColor: themeConfig?.iconColor || defaults.iconColor,
+      iconActiveColor: themeConfig?.iconActiveColor || defaults.iconActiveColor,
+      backgroundColor: themeConfig?.backgroundColor || defaults.backgroundColor,
+      backgroundActiveColor: themeConfig?.backgroundActiveColor || defaults.backgroundActiveColor,
+    };
+  };
+
+  // Helper para obtener el icono de un panel desde la configuración del CMS
+  const getPanelIcon = (panelId: string): string => {
+    const cmsPanel = accordionConfig.panels?.find((p: any) => p.id === panelId);
+    if (cmsPanel?.icon) {
+      return cmsPanel.icon;
+    }
+    // Fallback a iconos por defecto
+    const defaultIcons: Record<string, string> = {
+      descripcion: 'FileText',
+      caracteristicas: 'Sparkles',
+      beneficios: 'Target',
+      incluye: 'CheckCircle',
+      info: 'Lightbulb',
+      faq: 'HelpCircle',
+      multimedia: 'Video',
+    };
+    return defaultIcons[panelId] || 'HelpCircle';
+  };
+
+  // Helper para obtener configuración de iconos de secciones de tarjetas (características, beneficios, incluye, noIncluye)
+  const getSectionIconConfig = (sectionId: 'caracteristicas' | 'beneficios' | 'incluye' | 'noIncluye') => {
+    const sectionIcons = accordionConfig.styles?.sectionIcons;
+    
+    // Valores por defecto para cada sección - SIN FONDO
+    const defaults: Record<string, { type: 'number' | 'icon' | 'none'; icon: string; showBackground: boolean }> = {
+      caracteristicas: { type: 'number', icon: 'Hash', showBackground: false },
+      beneficios: { type: 'icon', icon: 'Star', showBackground: false },
+      incluye: { type: 'icon', icon: 'Check', showBackground: false },
+      noIncluye: { type: 'icon', icon: 'X', showBackground: false },
+    };
+
+    if (!sectionIcons || !sectionIcons[sectionId]) {
+      return defaults[sectionId];
+    }
+
+    const config = sectionIcons[sectionId];
+    return {
+      type: config.type || defaults[sectionId].type,
+      icon: config.icon || defaults[sectionId].icon,
+      showBackground: config.showBackground ?? defaults[sectionId].showBackground,
     };
   };
 
@@ -444,24 +549,43 @@ export const ServicioDetail: React.FC = () => {
 
               {/* Título con animación y gradiente opcional */}
               <h1 
-                className="text-4xl lg:text-5xl font-bold mb-6 animate-fade-in delay-200"
-                style={
-                  heroConfig.content?.titleGradient?.enabled
+                className={`mb-6 animate-fade-in delay-200 ${
+                  heroConfig.content?.title?.fontSize || 'text-4xl lg:text-5xl'
+                } ${
+                  heroConfig.content?.title?.fontWeight || 'font-bold'
+                } ${
+                  heroConfig.content?.title?.lineHeight || 'leading-tight'
+                }`}
+                style={{
+                  fontFamily: heroConfig.content?.title?.fontFamily || 'Montserrat',
+                  ...(heroConfig.content?.titleGradient?.enabled
                     ? {
                         backgroundImage: `linear-gradient(to right, ${heroConfig.content.titleGradient.from}, ${heroConfig.content.titleGradient.to})`,
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text',
                       }
-                    : { color: undefined } // Usa el color por defecto del tema
-                }
+                    : {})
+                }}
               >
                 {servicio.titulo}
               </h1>
 
               {/* Descripción corta con animación */}
               {servicio.descripcionCorta && (
-                <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 animate-fade-in delay-300">
+                <p 
+                  className={`mb-8 animate-fade-in delay-300 ${
+                    heroConfig.content?.subtitle?.fontSize || 'text-xl'
+                  } ${
+                    heroConfig.content?.subtitle?.fontWeight || 'font-normal'
+                  } ${
+                    heroConfig.content?.subtitle?.lineHeight || 'leading-relaxed'
+                  }`}
+                  style={{
+                    fontFamily: heroConfig.content?.subtitle?.fontFamily || 'Montserrat',
+                    color: heroConfig.content?.subtitle?.color || (theme === 'dark' ? '#d1d5db' : '#374151')
+                  }}
+                >
                   {servicio.descripcionCorta}
                 </p>
               )}
@@ -714,15 +838,17 @@ export const ServicioDetail: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      className={`flex items-center justify-center transition-all duration-300 ${getIconConfig().showBackground ? 'w-12 h-12 rounded-xl shadow-lg' : 'w-8 h-8'}`}
                       style={{
-                        background: activePanel === 'descripcion'
-                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
-                          : '#9ca3af',
-                        color: '#ffffff',
+                        background: getIconConfig().showBackground 
+                          ? (activePanel === 'descripcion' ? getIconConfig().backgroundActiveColor : getIconConfig().backgroundColor)
+                          : 'transparent',
+                        color: getIconConfig().showBackground && activePanel === 'descripcion'
+                          ? '#ffffff'
+                          : (activePanel === 'descripcion' ? getIconConfig().iconActiveColor : getIconConfig().iconColor),
                       }}
                     >
-                      📋
+                      <LucideIcon name={getPanelIcon('descripcion')} size={getIconConfig().showBackground ? 24 : 26} />
                     </div>
                     <div className="text-left">
                       <h3 
@@ -838,15 +964,17 @@ export const ServicioDetail: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      className={`flex items-center justify-center transition-all duration-300 ${getIconConfig().showBackground ? 'w-12 h-12 rounded-xl shadow-lg' : 'w-8 h-8'}`}
                       style={{
-                        background: activePanel === 'caracteristicas'
-                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
-                          : '#9ca3af',
-                        color: '#ffffff',
+                        background: getIconConfig().showBackground 
+                          ? (activePanel === 'caracteristicas' ? getIconConfig().backgroundActiveColor : getIconConfig().backgroundColor)
+                          : 'transparent',
+                        color: getIconConfig().showBackground && activePanel === 'caracteristicas'
+                          ? '#ffffff'
+                          : (activePanel === 'caracteristicas' ? getIconConfig().iconActiveColor : getIconConfig().iconColor),
                       }}
                     >
-                      ✨
+                      <LucideIcon name={getPanelIcon('caracteristicas')} size={getIconConfig().showBackground ? 24 : 26} />
                     </div>
                     <div className="text-left">
                       <h3 
@@ -886,30 +1014,41 @@ export const ServicioDetail: React.FC = () => {
                     }}
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {servicio.caracteristicas?.map((caracteristica, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start gap-3 p-4 hover:opacity-90 transition-colors"
-                          style={{
-                            background: getCardStyles().background,
-                            borderColor: getCardStyles().borderColor,
-                            borderWidth: getCardStyles().borderWidth || '0',
-                            borderStyle: 'solid',
-                            borderRadius: getCardStyles().borderRadius,
-                          }}
-                        >
-                          <div 
-                            className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                      {servicio.caracteristicas?.map((caracteristica, index) => {
+                        const iconConfig = getSectionIconConfig('caracteristicas');
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-start gap-3 p-4 hover:opacity-90 transition-colors"
                             style={{
-                              background: getCardStyles().iconBackground,
-                              color: getCardStyles().iconColor,
+                              background: getCardStyles().background,
+                              borderColor: getCardStyles().borderColor,
+                              borderWidth: getCardStyles().borderWidth || '0',
+                              borderStyle: 'solid',
+                              borderRadius: getCardStyles().borderRadius,
                             }}
                           >
-                            {index + 1}
+                            {iconConfig.type !== 'none' && (
+                              <div 
+                                className={`flex-shrink-0 flex items-center justify-center text-xs font-bold ${
+                                  iconConfig.showBackground ? 'w-7 h-7 rounded-full' : 'w-5 h-5'
+                                }`}
+                                style={{
+                                  background: iconConfig.showBackground ? getCardStyles().iconBackground : 'transparent',
+                                  color: iconConfig.showBackground ? getCardStyles().iconColor : getCardStyles().iconGradientFrom || '#8b5cf6',
+                                }}
+                              >
+                                {iconConfig.type === 'number' ? (
+                                  index + 1
+                                ) : (
+                                  <LucideIcon name={iconConfig.icon} size={iconConfig.showBackground ? 14 : 18} />
+                                )}
+                              </div>
+                            )}
+                            <p className="font-medium" style={{ color: getCardStyles().textColor }}>{caracteristica}</p>
                           </div>
-                          <p className="font-medium" style={{ color: getCardStyles().textColor }}>{caracteristica}</p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -936,15 +1075,17 @@ export const ServicioDetail: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      className={`flex items-center justify-center transition-all duration-300 ${getIconConfig().showBackground ? 'w-12 h-12 rounded-xl shadow-lg' : 'w-8 h-8'}`}
                       style={{
-                        background: activePanel === 'beneficios'
-                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
-                          : '#9ca3af',
-                        color: '#ffffff',
+                        background: getIconConfig().showBackground 
+                          ? (activePanel === 'beneficios' ? getIconConfig().backgroundActiveColor : getIconConfig().backgroundColor)
+                          : 'transparent',
+                        color: getIconConfig().showBackground && activePanel === 'beneficios'
+                          ? '#ffffff'
+                          : (activePanel === 'beneficios' ? getIconConfig().iconActiveColor : getIconConfig().iconColor),
                       }}
                     >
-                      🎯
+                      <LucideIcon name={getPanelIcon('beneficios')} size={getIconConfig().showBackground ? 24 : 26} />
                     </div>
                     <div className="text-left">
                       <h3 
@@ -984,30 +1125,37 @@ export const ServicioDetail: React.FC = () => {
                     }}
                   >
                     <div className="space-y-3">
-                      {servicio.beneficios?.map((beneficio, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start gap-4 p-4"
-                          style={{
-                            background: getCardStyles().background,
-                            borderColor: getCardStyles().borderColor,
-                            borderWidth: getCardStyles().borderWidth || '0',
-                            borderStyle: 'solid',
-                            borderRadius: getCardStyles().borderRadius,
-                          }}
-                        >
-                          <div 
-                            className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg"
+                      {servicio.beneficios?.map((beneficio, index) => {
+                        const iconConfig = getSectionIconConfig('beneficios');
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-start gap-4 p-4"
                             style={{
-                              background: getCardStyles().iconBackground,
-                              color: getCardStyles().iconColor,
+                              background: getCardStyles().background,
+                              borderColor: getCardStyles().borderColor,
+                              borderWidth: getCardStyles().borderWidth || '0',
+                              borderStyle: 'solid',
+                              borderRadius: getCardStyles().borderRadius,
                             }}
                           >
-                            ★
+                            {iconConfig.type !== 'none' && (
+                              <div 
+                                className={`flex-shrink-0 flex items-center justify-center ${
+                                  iconConfig.showBackground ? 'w-10 h-10 rounded-lg' : 'w-6 h-6'
+                                }`}
+                                style={{
+                                  background: iconConfig.showBackground ? getCardStyles().iconBackground : 'transparent',
+                                  color: iconConfig.showBackground ? getCardStyles().iconColor : getCardStyles().iconGradientFrom || '#8b5cf6',
+                                }}
+                              >
+                                <LucideIcon name={iconConfig.icon} size={iconConfig.showBackground ? 20 : 22} />
+                              </div>
+                            )}
+                            <p className="font-medium flex-1" style={{ color: getCardStyles().textColor }}>{beneficio}</p>
                           </div>
-                          <p className="font-medium flex-1" style={{ color: getCardStyles().textColor }}>{beneficio}</p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -1034,15 +1182,17 @@ export const ServicioDetail: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      className={`flex items-center justify-center transition-all duration-300 ${getIconConfig().showBackground ? 'w-12 h-12 rounded-xl shadow-lg' : 'w-8 h-8'}`}
                       style={{
-                        background: activePanel === 'incluye'
-                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
-                          : '#9ca3af',
-                        color: '#ffffff',
+                        background: getIconConfig().showBackground 
+                          ? (activePanel === 'incluye' ? getIconConfig().backgroundActiveColor : getIconConfig().backgroundColor)
+                          : 'transparent',
+                        color: getIconConfig().showBackground && activePanel === 'incluye'
+                          ? '#ffffff'
+                          : (activePanel === 'incluye' ? getIconConfig().iconActiveColor : getIconConfig().iconColor),
                       }}
                     >
-                      ✅
+                      <LucideIcon name={getPanelIcon('incluye')} size={getIconConfig().showBackground ? 24 : 26} />
                     </div>
                     <div className="text-left">
                       <h3 
@@ -1096,23 +1246,40 @@ export const ServicioDetail: React.FC = () => {
                           }}
                         >
                           <div className="flex items-center gap-3 mb-4">
-                            <div 
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
-                              style={{
-                                background: `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`,
-                              }}
-                            >
-                              ✓
-                            </div>
+                            {(() => {
+                              const iconConfig = getSectionIconConfig('incluye');
+                              return iconConfig.type !== 'none' ? (
+                                <div 
+                                  className={`flex items-center justify-center text-white ${
+                                    iconConfig.showBackground ? 'w-8 h-8 rounded-lg' : 'w-5 h-5'
+                                  }`}
+                                  style={{
+                                    background: iconConfig.showBackground 
+                                      ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
+                                      : 'transparent',
+                                    color: iconConfig.showBackground ? '#ffffff' : getAccordionStyles().accentGradientFrom,
+                                  }}
+                                >
+                                  <LucideIcon name={iconConfig.icon} size={iconConfig.showBackground ? 16 : 20} />
+                                </div>
+                              ) : null;
+                            })()}
                             <h4 className="text-lg font-bold" style={{ color: getAccordionStyles().contentText }}>Incluye</h4>
                           </div>
                           <ul className="space-y-2">
-                            {servicio.incluye.map((item, index) => (
-                              <li key={index} className="flex items-start gap-2">
-                                <span style={{ color: getAccordionStyles().headerIcon }} className="mt-0.5">✓</span>
-                                <span style={{ color: getAccordionStyles().contentText }}>{item}</span>
-                              </li>
-                            ))}
+                            {servicio.incluye.map((item, index) => {
+                              const iconConfig = getSectionIconConfig('incluye');
+                              return (
+                                <li key={index} className="flex items-start gap-2">
+                                  {iconConfig.type !== 'none' && (
+                                    <span style={{ color: getAccordionStyles().headerIcon }} className="mt-0.5">
+                                      <LucideIcon name={iconConfig.icon} size={16} />
+                                    </span>
+                                  )}
+                                  <span style={{ color: getAccordionStyles().contentText }}>{item}</span>
+                                </li>
+                              );
+                            })}
                           </ul>
                         </div>
                       )}
@@ -1130,16 +1297,37 @@ export const ServicioDetail: React.FC = () => {
                           }}
                         >
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white">✗</div>
+                            {(() => {
+                              const iconConfig = getSectionIconConfig('noIncluye');
+                              return iconConfig.type !== 'none' ? (
+                                <div 
+                                  className={`flex items-center justify-center ${
+                                    iconConfig.showBackground ? 'w-8 h-8 bg-red-500 rounded-lg' : 'w-5 h-5'
+                                  }`}
+                                  style={{
+                                    color: iconConfig.showBackground ? '#ffffff' : '#ef4444',
+                                  }}
+                                >
+                                  <LucideIcon name={iconConfig.icon} size={iconConfig.showBackground ? 16 : 20} />
+                                </div>
+                              ) : null;
+                            })()}
                             <h4 className="text-lg font-bold" style={{ color: getAccordionStyles().contentText }}>No Incluye</h4>
                           </div>
                           <ul className="space-y-2">
-                            {servicio.noIncluye.map((item, index) => (
-                              <li key={index} className="flex items-start gap-2">
-                                <span className="text-red-600 dark:text-red-400 mt-0.5">✗</span>
-                                <span style={{ color: getAccordionStyles().contentText }}>{item}</span>
-                              </li>
-                            ))}
+                            {servicio.noIncluye.map((item, index) => {
+                              const iconConfig = getSectionIconConfig('noIncluye');
+                              return (
+                                <li key={index} className="flex items-start gap-2">
+                                  {iconConfig.type !== 'none' && (
+                                    <span className="text-red-600 dark:text-red-400 mt-0.5">
+                                      <LucideIcon name={iconConfig.icon} size={16} />
+                                    </span>
+                                  )}
+                                  <span style={{ color: getAccordionStyles().contentText }}>{item}</span>
+                                </li>
+                              );
+                            })}
                           </ul>
                         </div>
                       )}
@@ -1202,15 +1390,17 @@ export const ServicioDetail: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      className={`flex items-center justify-center transition-all duration-300 ${getIconConfig().showBackground ? 'w-12 h-12 rounded-xl shadow-lg' : 'w-8 h-8'}`}
                       style={{
-                        background: activePanel === 'info'
-                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
-                          : 'rgb(243 244 246)',
-                        color: activePanel === 'info' ? '#ffffff' : getAccordionStyles().headerIcon,
+                        background: getIconConfig().showBackground 
+                          ? (activePanel === 'info' ? getIconConfig().backgroundActiveColor : getIconConfig().backgroundColor)
+                          : 'transparent',
+                        color: getIconConfig().showBackground && activePanel === 'info'
+                          ? '#ffffff'
+                          : (activePanel === 'info' ? getIconConfig().iconActiveColor : getIconConfig().iconColor),
                       }}
                     >
-                      💡
+                      <LucideIcon name={getPanelIcon('info')} size={getIconConfig().showBackground ? 24 : 26} />
                     </div>
                     <div className="text-left">
                       <h3 className="font-semibold text-lg" style={{ 
@@ -1321,15 +1511,17 @@ export const ServicioDetail: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      className={`flex items-center justify-center transition-all duration-300 ${getIconConfig().showBackground ? 'w-12 h-12 rounded-xl shadow-lg' : 'w-8 h-8'}`}
                       style={{
-                        background: activePanel === 'faq'
-                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
-                          : 'rgb(243 244 246)',
-                        color: activePanel === 'faq' ? '#ffffff' : getAccordionStyles().headerIcon,
+                        background: getIconConfig().showBackground 
+                          ? (activePanel === 'faq' ? getIconConfig().backgroundActiveColor : getIconConfig().backgroundColor)
+                          : 'transparent',
+                        color: getIconConfig().showBackground && activePanel === 'faq'
+                          ? '#ffffff'
+                          : (activePanel === 'faq' ? getIconConfig().iconActiveColor : getIconConfig().iconColor),
                       }}
                     >
-                      ❓
+                      <LucideIcon name={getPanelIcon('faq')} size={getIconConfig().showBackground ? 24 : 26} />
                     </div>
                     <div className="text-left">
                       <h3 className="font-semibold text-lg" style={{ 
@@ -1444,15 +1636,17 @@ export const ServicioDetail: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg"
+                      className={`flex items-center justify-center transition-all duration-300 ${getIconConfig().showBackground ? 'w-12 h-12 rounded-xl shadow-lg' : 'w-8 h-8'}`}
                       style={{
-                        background: activePanel === 'multimedia'
-                          ? `linear-gradient(to br, ${getAccordionStyles().accentGradientFrom}, ${getAccordionStyles().accentGradientTo})`
-                          : 'rgb(243 244 246)',
-                        color: activePanel === 'multimedia' ? '#ffffff' : getAccordionStyles().headerIcon,
+                        background: getIconConfig().showBackground 
+                          ? (activePanel === 'multimedia' ? getIconConfig().backgroundActiveColor : getIconConfig().backgroundColor)
+                          : 'transparent',
+                        color: getIconConfig().showBackground && activePanel === 'multimedia'
+                          ? '#ffffff'
+                          : (activePanel === 'multimedia' ? getIconConfig().iconActiveColor : getIconConfig().iconColor),
                       }}
                     >
-                      🎥
+                      <LucideIcon name={getPanelIcon('multimedia')} size={getIconConfig().showBackground ? 24 : 26} />
                     </div>
                     <div className="text-left">
                       <h3 className="font-semibold text-lg" style={{ 
@@ -1560,35 +1754,115 @@ export const ServicioDetail: React.FC = () => {
       {/* ============================================ */}
       <section 
         className="py-20 relative"
-        style={getBackgroundStyle(ctaConfig.background)}
+        style={{
+          backgroundImage: ctaConfig.background?.imageUrl 
+            ? `url(${ctaConfig.background.imageUrl})` 
+            : 'linear-gradient(135deg, #9333ea 0%, #2563eb 100%)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
       >
-        {/* Overlay configurable */}
-        {getOverlayStyle(ctaConfig.background) !== undefined && (
+        {/* Overlay oscuro sobre la imagen */}
+        {ctaConfig.background?.imageUrl && (
           <div 
-            className="absolute inset-0 pointer-events-none"
-            style={getOverlayStyle(ctaConfig.background)}
+            className="absolute inset-0 bg-black pointer-events-none"
+            style={{ opacity: ctaConfig.background?.overlay ?? 0.5 }}
           />
         )}
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            ¿Listo para comenzar tu proyecto?
+          <h2 
+            className={`${ctaConfig.title?.fontSize || 'text-4xl'} ${ctaConfig.title?.fontWeight || 'font-bold'} mb-6`}
+            style={{ 
+              ...(ctaConfig.title?.useGradient ? {
+                background: `linear-gradient(${ctaConfig.title.gradientDirection || 'to right'}, ${ctaConfig.title.gradientFrom || '#FFFFFF'}, ${ctaConfig.title.gradientTo || '#E9D5FF'})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              } : {
+                color: ctaConfig.title?.color || '#FFFFFF',
+              }),
+              fontFamily: ctaConfig.title?.fontFamily || 'Montserrat'
+            }}
+          >
+            {ctaConfig.title?.text || '¿Listo para comenzar tu proyecto?'}
           </h2>
-          <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-            Nuestro equipo de expertos está listo para ayudarte a llevar tu idea al siguiente nivel.
+          <p 
+            className={`${ctaConfig.subtitle?.fontSize || 'text-xl'} ${ctaConfig.subtitle?.fontWeight || 'font-normal'} mb-8 max-w-2xl mx-auto`}
+            style={{ 
+              color: ctaConfig.subtitle?.color || '#E9D5FF',
+              fontFamily: ctaConfig.subtitle?.fontFamily || 'Montserrat'
+            }}
+          >
+            {ctaConfig.subtitle?.text || 'Nuestro equipo de expertos está listo para ayudarte a llevar tu idea al siguiente nivel.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => setIsContactModalOpen(true)}
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
+              className={`inline-flex items-center justify-center px-8 py-4 font-semibold ${ctaConfig.buttons?.primary?.borderRadius || 'rounded-lg'} transition-all transform hover:scale-105 shadow-lg`}
+              style={{
+                ...(ctaConfig.buttons?.primary?.useBorderGradient ? {
+                  background: ctaConfig.buttons?.primary?.useTransparentBg ? 'transparent' : ctaConfig.buttons?.primary?.bgColor || '#FFFFFF',
+                  color: ctaConfig.buttons?.primary?.textColor || '#7C3AED',
+                  border: `${ctaConfig.buttons?.primary?.borderWidth || '2px'} solid transparent`,
+                  backgroundImage: ctaConfig.buttons?.primary?.useTransparentBg 
+                    ? 'none'
+                    : `linear-gradient(${ctaConfig.buttons?.primary?.bgColor || '#FFFFFF'}, ${ctaConfig.buttons?.primary?.bgColor || '#FFFFFF'}), linear-gradient(${ctaConfig.buttons?.primary?.borderGradientDirection || 'to right'}, ${ctaConfig.buttons?.primary?.borderGradientFrom || '#9333ea'}, ${ctaConfig.buttons?.primary?.borderGradientTo || '#2563eb'})`,
+                  backgroundOrigin: 'border-box',
+                  backgroundClip: 'padding-box, border-box',
+                } : {
+                  backgroundColor: ctaConfig.buttons?.primary?.useTransparentBg ? 'transparent' : (ctaConfig.buttons?.primary?.bgColor || '#FFFFFF'),
+                  color: ctaConfig.buttons?.primary?.textColor || '#7C3AED',
+                  border: ctaConfig.buttons?.primary?.useTransparentBg ? `2px solid ${ctaConfig.buttons?.primary?.borderColor || ctaConfig.buttons?.primary?.textColor}` : 'none',
+                }),
+              }}
+              onMouseEnter={(e) => {
+                if (!ctaConfig.buttons?.primary?.useBorderGradient) {
+                  e.currentTarget.style.backgroundColor = ctaConfig.buttons?.primary?.useTransparentBg ? 'transparent' : (ctaConfig.buttons?.primary?.hoverBgColor || '#F3F4F6');
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!ctaConfig.buttons?.primary?.useBorderGradient) {
+                  e.currentTarget.style.backgroundColor = ctaConfig.buttons?.primary?.useTransparentBg ? 'transparent' : (ctaConfig.buttons?.primary?.bgColor || '#FFFFFF');
+                }
+              }}
             >
-              💬 Solicitar Cotización Gratuita
+              {ctaConfig.buttons?.primary?.text || '💬 Solicitar Cotización Gratuita'}
             </button>
             <Link
               to="/servicios"
-              className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-purple-600 transition-colors"
+              className={`inline-flex items-center justify-center px-8 py-4 font-semibold ${ctaConfig.buttons?.secondary?.borderRadius || 'rounded-lg'} transition-colors`}
+              style={{
+                ...(ctaConfig.buttons?.secondary?.useBorderGradient ? {
+                  background: ctaConfig.buttons?.secondary?.useTransparentBg ? 'transparent' : (ctaConfig.buttons?.secondary?.bgColor || 'transparent'),
+                  color: ctaConfig.buttons?.secondary?.textColor || '#FFFFFF',
+                  border: `${ctaConfig.buttons?.secondary?.borderWidth || '2px'} solid transparent`,
+                  backgroundImage: ctaConfig.buttons?.secondary?.useTransparentBg 
+                    ? 'none'
+                    : `linear-gradient(${ctaConfig.buttons?.secondary?.bgColor || 'transparent'}, ${ctaConfig.buttons?.secondary?.bgColor || 'transparent'}), linear-gradient(${ctaConfig.buttons?.secondary?.borderGradientDirection || 'to right'}, ${ctaConfig.buttons?.secondary?.borderGradientFrom || '#FFFFFF'}, ${ctaConfig.buttons?.secondary?.borderGradientTo || '#E9D5FF'})`,
+                  backgroundOrigin: 'border-box',
+                  backgroundClip: 'padding-box, border-box',
+                } : {
+                  backgroundColor: ctaConfig.buttons?.secondary?.useTransparentBg ? 'transparent' : (ctaConfig.buttons?.secondary?.bgColor || 'transparent'),
+                  color: ctaConfig.buttons?.secondary?.textColor || '#FFFFFF',
+                  border: `2px solid ${ctaConfig.buttons?.secondary?.borderColor || '#FFFFFF'}`,
+                }),
+              }}
+              onMouseEnter={(e) => {
+                if (!ctaConfig.buttons?.secondary?.useBorderGradient) {
+                  e.currentTarget.style.backgroundColor = ctaConfig.buttons?.secondary?.hoverBgColor || '#FFFFFF';
+                  e.currentTarget.style.color = ctaConfig.buttons?.secondary?.hoverTextColor || '#7C3AED';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!ctaConfig.buttons?.secondary?.useBorderGradient) {
+                  e.currentTarget.style.backgroundColor = ctaConfig.buttons?.secondary?.useTransparentBg ? 'transparent' : (ctaConfig.buttons?.secondary?.bgColor || 'transparent');
+                  e.currentTarget.style.color = ctaConfig.buttons?.secondary?.textColor || '#FFFFFF';
+                }
+              }}
             >
-              Ver todos los servicios
+              {ctaConfig.buttons?.secondary?.text || 'Ver todos los servicios'}
             </Link>
           </div>
         </div>
