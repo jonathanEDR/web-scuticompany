@@ -69,7 +69,7 @@ export default function CategoryBadge({
   if (clickable) {
     return (
       <Link
-        to={`/blog/categoria/${category.slug}`}
+        to="/blog"
         className={badgeClass}
         style={colorStyle}
         title={category.description}

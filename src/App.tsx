@@ -72,7 +72,6 @@ const MySolicitudes = lazy(() => import('./pages/client/MySolicitudes'));
 // Módulo de Blog - Páginas Públicas
 const BlogHome = lazy(() => import('./pages/public/blog/BlogHome'));
 const BlogPost = lazy(() => import('./pages/public/blog/BlogPost'));
-const BlogCategory = lazy(() => import('./pages/public/blog/BlogCategory'));
 
 // Módulo de Blog - Páginas Administrativas
 const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
@@ -174,7 +173,6 @@ function AppContent() {
               
               {/* 📰 BLOG - Páginas Públicas */}
               <Route path="/blog" element={<BlogHome />} />
-              <Route path="/blog/categoria/:slug" element={<BlogCategory />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               
               {/* �🔐 RUTAS DE AUTENTICACIÓN - Clerk ya disponible globalmente */}

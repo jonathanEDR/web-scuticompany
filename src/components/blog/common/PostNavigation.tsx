@@ -12,6 +12,7 @@ import type { BlogPost } from '../../../types/blog';
 interface PostNavigationProps {
   currentPost: BlogPost;
   className?: string;
+  showEmptyCard?: boolean;
 }
 
 interface NavigationPost {
@@ -26,7 +27,8 @@ interface NavigationPost {
 
 export default function PostNavigation({
   currentPost,
-  className = ''
+  className = '',
+  showEmptyCard = false
 }: PostNavigationProps) {
   
   const [previousPost, setPreviousPost] = useState<NavigationPost | null>(null);
@@ -132,11 +134,11 @@ export default function PostNavigation({
                 </div>
               )}
             </Link>
-          ) : (
+          ) : showEmptyCard ? (
             <div className="flex items-center justify-center p-5 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
               <p className="text-sm text-gray-500 dark:text-gray-400">No hay artículo anterior</p>
             </div>
-          )}
+          ) : null}
 
           {/* Post Siguiente */}
           {nextPost ? (
@@ -178,11 +180,11 @@ export default function PostNavigation({
                 <ChevronRight className="text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" size={20} />
               </div>
             </Link>
-          ) : (
+          ) : showEmptyCard ? (
             <div className="flex items-center justify-center p-5 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
               <p className="text-sm text-gray-500 dark:text-gray-400">No hay artículo siguiente</p>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </nav>

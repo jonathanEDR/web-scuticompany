@@ -923,6 +923,8 @@ export interface PageContent {
   contactPage?: ContactPageContent;
   // 🆕 CONTENIDO PARA PÁGINA DE SERVICIO DETALLE
   servicioDetailConfig?: any; // Configuración de la página ServicioDetail con acordeón
+  // 🆕 CONTENIDO PARA PÁGINA DE DETALLE DE BLOG POST
+  blogPostDetailConfig?: any; // Configuración de la página de detalle del post
 }
 
 export interface PageSeo {

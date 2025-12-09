@@ -28,6 +28,14 @@ export function useBlogPosts(filters?: BlogFilters): UseBlogPostsReturn {
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
 
   const fetchPosts = useCallback(async () => {
+    // ✅ No hacer petición si limit es 0 o si tags está vacío cuando se requiere
+    if (filters?.limit === 0) {
+      setPosts([]);
+      setPagination(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);

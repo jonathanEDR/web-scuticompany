@@ -57,6 +57,8 @@ export const useCmsData = (pageSlug: string = 'home') => {
             case 'services': return 'Servicios';
             case 'contact': return 'Contacto';
             case 'blog': return 'Blog - Noticias';
+            case 'blog-post-detail': return 'Detalle de Post del Blog';
+            case 'servicio-detail': return 'Detalle de Servicio';
             default: return 'Página';
           }
         };
@@ -111,6 +113,16 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 keywords: ['blog', 'noticias tecnológicas', 'tendencias tech', 'desarrollo web', 'programación', 'AI'],
                 ogTitle: 'Blog Web Scuti - Noticias Tecnológicas',
                 ogDescription: 'Las últimas noticias y tendencias del sector tecnológico',
+                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                twitterCard: 'summary_large_image'
+              };
+            case 'blog-post-detail':
+              return {
+                metaTitle: 'Artículo del Blog - SCUTI Company',
+                metaDescription: 'Lee nuestros artículos sobre tecnología, desarrollo de software e inteligencia artificial.',
+                keywords: ['blog', 'artículo', 'tecnología', 'software', 'inteligencia artificial'],
+                ogTitle: 'Blog - SCUTI Company',
+                ogDescription: 'Contenido educativo sobre tecnología y desarrollo',
                 ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
                 twitterCard: 'summary_large_image'
               };

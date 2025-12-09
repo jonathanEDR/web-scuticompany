@@ -6,18 +6,54 @@ import CommentItem from './CommentItem';
 import CommentForm from './CommentForm';
 import type { CommentFormData } from '../../../types/blog';
 
+// Estilos configurables desde CMS
+export interface CommentsStyles {
+  sectionBackground?: { light?: string; dark?: string };
+  sectionBorder?: { light?: string; dark?: string };
+  cardBackground?: { light?: string; dark?: string };
+  cardBorder?: { light?: string; dark?: string };
+  authorColor?: { light?: string; dark?: string };
+  textColor?: { light?: string; dark?: string };
+  dateColor?: { light?: string; dark?: string };
+  formBackground?: { light?: string; dark?: string };
+  formBorder?: { light?: string; dark?: string };
+  buttonBackground?: { light?: string; dark?: string };
+  buttonText?: { light?: string; dark?: string };
+}
+
 interface CommentsListProps {
   postSlug: string;
   className?: string;
+  styles?: CommentsStyles;
+  theme?: 'light' | 'dark';
+  avatarShape?: 'circle' | 'square';
 }
 
 type SortOption = 'newest' | 'oldest' | 'top';
 
 export default function CommentsList({
   postSlug,
-  className = ''
+  className = '',
+  styles,
+  theme = 'light',
+  avatarShape = 'circle'
 }: CommentsListProps) {
   
+  // Calcular estilos dinámicos desde CMS
+  const currentStyles = {
+    sectionBackground: theme === 'dark' ? styles?.sectionBackground?.dark : styles?.sectionBackground?.light,
+    sectionBorder: theme === 'dark' ? styles?.sectionBorder?.dark : styles?.sectionBorder?.light,
+    cardBackground: theme === 'dark' ? styles?.cardBackground?.dark : styles?.cardBackground?.light,
+    cardBorder: theme === 'dark' ? styles?.cardBorder?.dark : styles?.cardBorder?.light,
+    authorColor: theme === 'dark' ? styles?.authorColor?.dark : styles?.authorColor?.light,
+    textColor: theme === 'dark' ? styles?.textColor?.dark : styles?.textColor?.light,
+    dateColor: theme === 'dark' ? styles?.dateColor?.dark : styles?.dateColor?.light,
+    formBackground: theme === 'dark' ? styles?.formBackground?.dark : styles?.formBackground?.light,
+    formBorder: theme === 'dark' ? styles?.formBorder?.dark : styles?.formBorder?.light,
+    buttonBackground: theme === 'dark' ? styles?.buttonBackground?.dark : styles?.buttonBackground?.light,
+    buttonText: theme === 'dark' ? styles?.buttonText?.dark : styles?.buttonText?.light,
+  };
+
   // Obtener usuario autenticado del contexto
   const { user } = useAuth();
   const isSignedIn = !!user;
@@ -89,8 +125,19 @@ export default function CommentsList({
 
   const topLevelComments = sortedComments.filter(c => !c.parentComment);
 
+  // Estilos del contenedor de la sección
+  const sectionStyle = {
+    backgroundColor: currentStyles.sectionBackground || undefined,
+    borderColor: currentStyles.sectionBorder || undefined,
+    borderWidth: currentStyles.sectionBorder ? '1px' : undefined,
+    borderStyle: currentStyles.sectionBorder ? 'solid' : undefined,
+  };
+
   return (
-    <div className={`comments-section ${className}`}>
+    <div 
+      className={`comments-section ${className} ${!currentStyles.sectionBackground ? '' : ''}`}
+      style={sectionStyle as React.CSSProperties}
+    >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <MessageCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -118,6 +165,12 @@ export default function CommentsList({
             postId={postSlug}
             onSubmit={handleAddComment}
             placeholder="Comparte tu opinión sobre este artículo..."
+            styles={{
+              formBackground: currentStyles.formBackground,
+              formBorder: currentStyles.formBorder,
+              buttonBackground: currentStyles.buttonBackground,
+              buttonText: currentStyles.buttonText,
+            }}
           />
         </div>
       )}
@@ -128,6 +181,12 @@ export default function CommentsList({
             postId={postSlug}
             onSubmit={handleAddComment}
             placeholder="Comparte tu opinión sobre este artículo..."
+            styles={{
+              formBackground: currentStyles.formBackground,
+              formBorder: currentStyles.formBorder,
+              buttonBackground: currentStyles.buttonBackground,
+              buttonText: currentStyles.buttonText,
+            }}
           />
         </div>
       )}
@@ -178,6 +237,14 @@ export default function CommentsList({
               onDelete={() => alert('Funcionalidad de eliminación próximamente')}
               onVote={handleVote}
               onReport={handleReport}
+              avatarShape={avatarShape}
+              styles={{
+                cardBackground: currentStyles.cardBackground,
+                cardBorder: currentStyles.cardBorder,
+                authorColor: currentStyles.authorColor,
+                textColor: currentStyles.textColor,
+                dateColor: currentStyles.dateColor,
+              }}
             />
 
             {replyingTo === comment._id && (
@@ -189,6 +256,12 @@ export default function CommentsList({
                   onSubmit={handleAddComment}
                   onCancel={() => setReplyingTo(null)}
                   placeholder="Escribe tu respuesta..."
+                  styles={{
+                    formBackground: currentStyles.formBackground,
+                    formBorder: currentStyles.formBorder,
+                    buttonBackground: currentStyles.buttonBackground,
+                    buttonText: currentStyles.buttonText,
+                  }}
                 />
               </div>
             )}

@@ -8,6 +8,14 @@ import { Send, X, AlertCircle, User, Mail } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { CommentFormData } from '../../../types/blog';
 
+// Estilos configurables desde CMS
+export interface CommentFormStyles {
+  formBackground?: string;
+  formBorder?: string;
+  buttonBackground?: string;
+  buttonText?: string;
+}
+
 interface CommentFormProps {
   postId?: string; // Opcional, solo para compatibilidad
   parentId?: string;
@@ -18,6 +26,7 @@ interface CommentFormProps {
   onCancel?: () => void;
   placeholder?: string;
   className?: string;
+  styles?: CommentFormStyles;
 }
 
 export default function CommentForm({
@@ -28,7 +37,8 @@ export default function CommentForm({
   onSubmit,
   onCancel,
   placeholder = 'Escribe tu comentario...',
-  className = ''
+  className = '',
+  styles
 }: CommentFormProps) {
   
   // Obtener usuario autenticado del contexto
@@ -147,11 +157,18 @@ export default function CommentForm({
 
   return (
     <form onSubmit={handleSubmit} className={`comment-form ${className}`}>
-      <div className={`
-        bg-white dark:bg-gray-800 rounded-lg border-2 transition-colors
-        ${error ? 'border-red-300 dark:border-red-600' : 'border-gray-200 dark:border-gray-600 focus-within:border-blue-500 dark:focus-within:border-blue-400'}
-        ${isReply ? 'shadow-sm' : 'shadow-md'}
-      `}>
+      <div 
+        className={`
+          rounded-lg border-2 transition-colors
+          ${!styles?.formBackground ? 'bg-white dark:bg-gray-800' : ''}
+          ${error ? 'border-red-300 dark:border-red-600' : !styles?.formBorder ? 'border-gray-200 dark:border-gray-600 focus-within:border-blue-500 dark:focus-within:border-blue-400' : ''}
+          ${isReply ? 'shadow-sm' : 'shadow-md'}
+        `}
+        style={{
+          backgroundColor: styles?.formBackground || undefined,
+          borderColor: error ? undefined : styles?.formBorder || undefined,
+        }}
+      >
         {/* Header (si es respuesta o edición) */}
         {(isReply || isEditing) && (
           <div className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
@@ -265,10 +282,14 @@ export default function CommentForm({
                 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg
                 transition-all duration-200
                 ${canSubmit
-                  ? 'bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-md'
+                  ? !styles?.buttonBackground ? 'bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-md' : 'hover:opacity-90 hover:shadow-md'
                   : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                 }
               `}
+              style={canSubmit ? {
+                background: styles?.buttonBackground || undefined,
+                color: styles?.buttonText || undefined,
+              } : undefined}
             >
               {isSubmitting ? (
                 <>

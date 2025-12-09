@@ -25,6 +25,7 @@ import FeaturedPostsConfigSection from './FeaturedPostsConfigSection';
 import AllNewsConfigSection from './AllNewsConfigSection';
 import BlogCtaConfigSection from './BlogCtaConfigSection';
 import ServicioDetailConfigSection from './ServicioDetailConfigSection';
+import BlogPostDetailConfigSection from './BlogPostDetailConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -33,7 +34,7 @@ const CmsManager: React.FC = () => {
   const { theme: currentTheme } = useTheme(); // 🆕 Obtener tema actual
   
   // 🆕 Estado para manejar qué página se está editando
-  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog' | 'servicio-detail'>('home');
+  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog' | 'servicio-detail' | 'blog-post-detail'>('home');
   
   // Determinar tab activo desde la URL
   const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' => {
@@ -352,6 +353,7 @@ const CmsManager: React.FC = () => {
                 <option value="servicio-detail">📄 Servicio Detalle (Página Individual)</option>
                 <option value="contact">📞 Contact (Contacto)</option>
                 <option value="blog">📰 Blog (Noticias)</option>
+                <option value="blog-post-detail">📝 Blog Post Detalle (Artículo Individual)</option>
               </select>
               
               {/* 🔄 Botón para limpiar cache y recargar */}
@@ -625,6 +627,16 @@ const CmsManager: React.FC = () => {
                     <li>🔜 <strong>Sidebar:</strong> Categorías y trending (próximamente)</li>
                   </ul>
                 </div>
+              </>
+            )}
+
+            {/* 📝 SECCIONES ESPECÍFICAS PARA BLOG POST DETAIL */}
+            {selectedPage === 'blog-post-detail' && (
+              <>
+                <BlogPostDetailConfigSection
+                  config={pageData?.content?.blogPostDetailConfig || {}}
+                  onChange={(newConfig) => handleUpdateContent('blogPostDetailConfig', newConfig)}
+                />
               </>
             )}
           </>
