@@ -214,14 +214,18 @@ export default function PostHero({
                 {showAuthor && post.author && (
                   <div className="flex items-center gap-2">
                     {post.author.avatar ? (
-                      <LazyImage
-                        src={getImageUrl(post.author.avatar)}
-                        alt={`${post.author.firstName || ''} ${post.author.lastName || ''}`}
-                        className="w-7 h-7 rounded-full object-cover"
+                      <div 
+                        className="w-7 h-7 rounded-full overflow-hidden"
                         style={{ border: `2px solid ${avatarBorderColor}` }}
-                        width={28}
-                        height={28}
-                      />
+                      >
+                        <LazyImage
+                          src={getImageUrl(post.author.avatar)}
+                          alt={`${post.author.firstName || ''} ${post.author.lastName || ''}`}
+                          className="w-full h-full object-cover"
+                          width={28}
+                          height={28}
+                        />
+                      </div>
                     ) : (
                       <div 
                         className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center"
