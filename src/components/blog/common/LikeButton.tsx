@@ -13,13 +13,18 @@ interface LikeButtonProps {
   size?: 'sm' | 'md' | 'lg';
   showText?: boolean;
   className?: string;
+  // Colores personalizables desde CMS
+  iconColor?: string;
+  bgColor?: string;
 }
 
 export default function LikeButton({
   postId,
   size = 'md',
   showText = false,
-  className = ''
+  className = '',
+  iconColor,
+  bgColor
 }: LikeButtonProps) {
   
   const { getToken, isSignedIn, userId } = useAuth();
@@ -96,14 +101,19 @@ export default function LikeButton({
         rounded-lg font-medium
         transition-all duration-200
         ${sizeConfig.padding}
-        ${localIsLiked
-          ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30'
-          : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
-        }
+        ${!iconColor && !bgColor ? (
+          localIsLiked
+            ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30'
+            : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+        ) : ''}
         disabled:opacity-50 disabled:cursor-not-allowed
         ${isAnimating ? 'scale-110' : 'scale-100'}
         ${className}
       `}
+      style={{
+        ...(bgColor ? { backgroundColor: bgColor } : {}),
+        ...(iconColor ? { color: iconColor } : {})
+      }}
       aria-label={localIsLiked ? 'Quitar me gusta' : 'Dar me gusta'}
       title={localIsLiked ? 'Quitar me gusta' : 'Dar me gusta'}
     >

@@ -22,6 +22,8 @@ interface TOCStyles {
     activeColor?: string;
     textColor?: string;
     progressColor?: string;
+    progressBarFrom?: string;
+    progressBarTo?: string;
   };
   dark?: {
     background?: string;
@@ -29,6 +31,8 @@ interface TOCStyles {
     activeColor?: string;
     textColor?: string;
     progressColor?: string;
+    progressBarFrom?: string;
+    progressBarTo?: string;
   };
 }
 
@@ -71,6 +75,8 @@ export default function TableOfContents({
       panelBorder: themeStyles?.border || (theme === 'dark' ? '#374151' : '#e5e7eb'),
       textColor: themeStyles?.textColor || (theme === 'dark' ? '#d1d5db' : '#374151'),
       activeColor: themeStyles?.activeColor || (theme === 'dark' ? '#a855f7' : '#9333ea'),
+      progressBarFrom: themeStyles?.progressBarFrom || themeStyles?.activeColor || (theme === 'dark' ? '#a855f7' : '#9333ea'),
+      progressBarTo: themeStyles?.progressBarTo || themeStyles?.progressColor || (theme === 'dark' ? '#3b82f6' : '#2563eb'),
     };
   }, [styles, theme]);
 
@@ -280,7 +286,7 @@ export default function TableOfContents({
               className="h-full transition-all duration-300"
               style={{ 
                 width: `${readProgress}%`,
-                background: `linear-gradient(to right, ${currentStyles.buttonGradientFrom}, ${currentStyles.buttonGradientTo})`
+                background: `linear-gradient(to right, ${currentStyles.progressBarFrom}, ${currentStyles.progressBarTo})`
               }}
             />
           </div>

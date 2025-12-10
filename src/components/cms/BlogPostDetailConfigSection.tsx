@@ -50,8 +50,87 @@ interface BlogPostDetailConfig {
       overlayColor?: string;
     };
     styles?: {
-      light?: { titleColor?: string; subtitleColor?: string; metaColor?: string };
-      dark?: { titleColor?: string; subtitleColor?: string; metaColor?: string };
+      light?: { 
+        titleColor?: string; 
+        subtitleColor?: string; 
+        metaColor?: string; 
+        titleFont?: string;
+        // Botón Volver
+        backButtonTextColor?: string;
+        backButtonIconColor?: string;
+        backButtonBgColor?: string;
+        backButtonBorderColor?: string;
+        backButtonBorderUseGradient?: boolean;
+        backButtonBorderGradientFrom?: string;
+        backButtonBorderGradientTo?: string;
+        // Badge Categoría
+        categoryUseCategoryColors?: string; // 'true' | 'false'
+        categoryBgColor?: string;
+        categoryTextColor?: string;
+        categoryBorderColor?: string;
+        categoryBorderUseGradient?: boolean;
+        categoryBorderGradientFrom?: string;
+        categoryBorderGradientTo?: string;
+        // Iconos
+        iconsColor?: string;
+        // Tiempo de lectura
+        readingTimeColor?: string;
+        // Avatar
+        avatarBorderColor?: string;
+      };
+      dark?: { 
+        titleColor?: string; 
+        subtitleColor?: string; 
+        metaColor?: string; 
+        titleFont?: string;
+        // Botón Volver
+        backButtonTextColor?: string;
+        backButtonIconColor?: string;
+        backButtonBgColor?: string;
+        backButtonBorderColor?: string;
+        backButtonBorderUseGradient?: boolean;
+        backButtonBorderGradientFrom?: string;
+        backButtonBorderGradientTo?: string;
+        // Badge Categoría
+        categoryUseCategoryColors?: string; // 'true' | 'false'
+        categoryBgColor?: string;
+        categoryTextColor?: string;
+        categoryBorderColor?: string;
+        categoryBorderUseGradient?: boolean;
+        categoryBorderGradientFrom?: string;
+        categoryBorderGradientTo?: string;
+        // Iconos
+        iconsColor?: string;
+        // Tiempo de lectura
+        readingTimeColor?: string;
+        // Avatar
+        avatarBorderColor?: string;
+      };
+    };
+  };
+  // Barra de resumen (excerpt + botones like/save)
+  summaryBar?: {
+    enabled?: boolean;
+    showExcerpt?: boolean;
+    showLikeButton?: boolean;
+    showSaveButton?: boolean;
+    showShareButton?: boolean;
+    excerptMaxLines?: number;
+    styles?: {
+      light?: { 
+        background?: string; 
+        borderColor?: string; 
+        textColor?: string;
+        buttonBgColor?: string;
+        buttonIconColor?: string;
+      };
+      dark?: { 
+        background?: string; 
+        borderColor?: string; 
+        textColor?: string;
+        buttonBgColor?: string;
+        buttonIconColor?: string;
+      };
     };
   };
   content?: {
@@ -78,15 +157,18 @@ interface BlogPostDetailConfig {
     maxDepth?: number;
     width?: string;
     styles?: {
-      light?: { background?: string; border?: string; activeColor?: string; textColor?: string; progressColor?: string };
-      dark?: { background?: string; border?: string; activeColor?: string; textColor?: string; progressColor?: string };
+      light?: { background?: string; border?: string; activeColor?: string; textColor?: string; progressColor?: string; progressBarFrom?: string; progressBarTo?: string };
+      dark?: { background?: string; border?: string; activeColor?: string; textColor?: string; progressColor?: string; progressBarFrom?: string; progressBarTo?: string };
     };
   };
   readingProgress?: {
     enabled?: boolean;
     position?: 'top' | 'bottom';
     height?: string;
-    color?: { light?: string; dark?: string };
+    barColor?: { light?: string; dark?: string };
+    barGradientFrom?: { light?: string; dark?: string };
+    barGradientTo?: { light?: string; dark?: string };
+    backgroundColor?: { light?: string; dark?: string };
   };
   author?: {
     showCard?: boolean;
@@ -215,6 +297,8 @@ interface BlogPostDetailConfig {
         selectorBorder?: string;
         selectorText?: string;
         selectorIconColor?: string;
+        selectorDropdownBg?: string;
+        selectorOptionHover?: string;
         cardBackground?: string; 
         cardBorder?: string; 
         authorColor?: string; 
@@ -222,6 +306,7 @@ interface BlogPostDetailConfig {
         dateColor?: string;
         formBackground?: string;
         formBorder?: string;
+        formFocusBorder?: string;
         textareaBackground?: string;
         textareaText?: string;
         footerBackground?: string;
@@ -239,6 +324,8 @@ interface BlogPostDetailConfig {
         selectorBorder?: string;
         selectorText?: string;
         selectorIconColor?: string;
+        selectorDropdownBg?: string;
+        selectorOptionHover?: string;
         cardBackground?: string; 
         cardBorder?: string; 
         authorColor?: string; 
@@ -246,6 +333,7 @@ interface BlogPostDetailConfig {
         dateColor?: string;
         formBackground?: string;
         formBorder?: string;
+        formFocusBorder?: string;
         textareaBackground?: string;
         textareaText?: string;
         footerBackground?: string;
@@ -973,8 +1061,603 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                 onChange={(v) => updateConfig('readingProgress', 'height', v)}
                 placeholder="3px"
               />
+
+              {/* Colores de la barra de progreso */}
+              <div className="space-y-4 mt-4">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  🎨 Colores de la barra
+                </h4>
+                
+                {/* Opción: Gradiente o Color Sólido */}
+                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800 mb-4">
+                  <p className="text-xs text-purple-700 dark:text-purple-300 mb-2">
+                    💡 <strong>Tip:</strong> Si configuras los colores de gradiente, se usará un degradado. De lo contrario, se usará el color sólido.
+                  </p>
+                </div>
+
+                {/* Gradiente */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-800 dark:to-gray-700">
+                  <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    🌈 Gradiente de la barra
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">☀️ Tema Claro</p>
+                      <ColorInput
+                        label="Gradiente desde"
+                        value={config.readingProgress?.barGradientFrom?.light || ''}
+                        onChange={(v) => {
+                          const current = config.readingProgress?.barGradientFrom || {};
+                          onChange({
+                            ...config,
+                            readingProgress: {
+                              ...config.readingProgress,
+                              barGradientFrom: { ...current, light: v }
+                            }
+                          });
+                        }}
+                      />
+                      <ColorInput
+                        label="Gradiente hasta"
+                        value={config.readingProgress?.barGradientTo?.light || ''}
+                        onChange={(v) => {
+                          const current = config.readingProgress?.barGradientTo || {};
+                          onChange({
+                            ...config,
+                            readingProgress: {
+                              ...config.readingProgress,
+                              barGradientTo: { ...current, light: v }
+                            }
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">🌙 Tema Oscuro</p>
+                      <ColorInput
+                        label="Gradiente desde"
+                        value={config.readingProgress?.barGradientFrom?.dark || ''}
+                        onChange={(v) => {
+                          const current = config.readingProgress?.barGradientFrom || {};
+                          onChange({
+                            ...config,
+                            readingProgress: {
+                              ...config.readingProgress,
+                              barGradientFrom: { ...current, dark: v }
+                            }
+                          });
+                        }}
+                      />
+                      <ColorInput
+                        label="Gradiente hasta"
+                        value={config.readingProgress?.barGradientTo?.dark || ''}
+                        onChange={(v) => {
+                          const current = config.readingProgress?.barGradientTo || {};
+                          onChange({
+                            ...config,
+                            readingProgress: {
+                              ...config.readingProgress,
+                              barGradientTo: { ...current, dark: v }
+                            }
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Color Sólido (alternativo) */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                  <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    🎨 Color sólido (si no usas gradiente)
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <ColorInput
+                      label="Color de la barra (Light)"
+                      value={config.readingProgress?.barColor?.light || '#8b5cf6'}
+                      onChange={(v) => {
+                        const currentBarColor = config.readingProgress?.barColor || {};
+                        onChange({
+                          ...config,
+                          readingProgress: {
+                            ...config.readingProgress,
+                            barColor: { ...currentBarColor, light: v }
+                          }
+                        });
+                      }}
+                    />
+                    <ColorInput
+                      label="Color de la barra (Dark)"
+                      value={config.readingProgress?.barColor?.dark || '#a78bfa'}
+                      onChange={(v) => {
+                        const currentBarColor = config.readingProgress?.barColor || {};
+                        onChange({
+                          ...config,
+                          readingProgress: {
+                            ...config.readingProgress,
+                            barColor: { ...currentBarColor, dark: v }
+                          }
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Color del fondo/track */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <ColorInput
+                    label="Color del fondo (Light)"
+                    value={config.readingProgress?.backgroundColor?.light || '#e5e7eb'}
+                    onChange={(v) => {
+                      const currentBgColor = config.readingProgress?.backgroundColor || {};
+                      onChange({
+                        ...config,
+                        readingProgress: {
+                          ...config.readingProgress,
+                          backgroundColor: { ...currentBgColor, light: v }
+                        }
+                      });
+                    }}
+                  />
+                  <ColorInput
+                    label="Color del fondo (Dark)"
+                    value={config.readingProgress?.backgroundColor?.dark || '#374151'}
+                    onChange={(v) => {
+                      const currentBgColor = config.readingProgress?.backgroundColor || {};
+                      onChange({
+                        ...config,
+                        readingProgress: {
+                          ...config.readingProgress,
+                          backgroundColor: { ...currentBgColor, dark: v }
+                        }
+                      });
+                    }}
+                  />
+                </div>
+              </div>
             </>
           )}
+        </SubSection>
+
+        {/* 🎨 Estilos y Colores del Hero */}
+        <SubSection title="Estilos y Colores del Hero" icon={<Palette size={18} />} defaultOpen={false}>
+          <div className="space-y-6">
+            {/* Tipo de Fondo */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🖼️ Configuración del Fondo
+              </h4>
+              <SelectField
+                label="Tipo de fondo"
+                value={config.hero?.background?.type || 'image'}
+                options={[
+                  { value: 'image', label: '🖼️ Imagen destacada del post' },
+                  { value: 'gradient', label: '🌈 Gradiente de colores' },
+                  { value: 'solid', label: '🎨 Color sólido' }
+                ]}
+                onChange={(v) => {
+                  const currentBg = config.hero?.background || {};
+                  onChange({
+                    ...config,
+                    hero: {
+                      ...config.hero,
+                      background: { ...currentBg, type: v as 'image' | 'gradient' | 'solid' }
+                    }
+                  });
+                }}
+              />
+
+              {/* Colores del gradiente (solo si tipo = gradient) */}
+              {config.hero?.background?.type === 'gradient' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-lg">
+                  <ColorInput
+                    label="Color inicial del gradiente"
+                    value={config.hero?.background?.gradientFrom || '#0f0f0f'}
+                    onChange={(v) => {
+                      const currentBg = config.hero?.background || {};
+                      onChange({
+                        ...config,
+                        hero: {
+                          ...config.hero,
+                          background: { ...currentBg, gradientFrom: v }
+                        }
+                      });
+                    }}
+                  />
+                  <ColorInput
+                    label="Color final del gradiente"
+                    value={config.hero?.background?.gradientTo || '#1a1a1a'}
+                    onChange={(v) => {
+                      const currentBg = config.hero?.background || {};
+                      onChange({
+                        ...config,
+                        hero: {
+                          ...config.hero,
+                          background: { ...currentBg, gradientTo: v }
+                        }
+                      });
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Color sólido (solo si tipo = solid) */}
+              {config.hero?.background?.type === 'solid' && (
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <ColorInput
+                    label="Color de fondo"
+                    value={config.hero?.background?.overlayColor || '#1f2937'}
+                    onChange={(v) => {
+                      const currentBg = config.hero?.background || {};
+                      onChange({
+                        ...config,
+                        hero: {
+                          ...config.hero,
+                          background: { ...currentBg, overlayColor: v }
+                        }
+                      });
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Colores del texto por tema */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                ✏️ Colores del Texto
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tema Claro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-yellow-500" />
+                    Tema Claro
+                  </h5>
+                  <div className="space-y-3">
+                    <ColorInput
+                      label="Color del título"
+                      value={config.hero?.styles?.light?.titleColor || '#ffffff'}
+                      onChange={(v) => updateStyles('hero', 'light', 'titleColor', v)}
+                    />
+                    <ColorInput
+                      label="Color de metadatos"
+                      value={config.hero?.styles?.light?.metaColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'light', 'metaColor', v)}
+                    />
+                  </div>
+                </div>
+
+                {/* Tema Oscuro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-100 to-slate-100 dark:from-slate-800 dark:to-gray-900">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Moon className="w-4 h-4 text-purple-400" />
+                    Tema Oscuro
+                  </h5>
+                  <div className="space-y-3">
+                    <ColorInput
+                      label="Color del título"
+                      value={config.hero?.styles?.dark?.titleColor || '#ffffff'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'titleColor', v)}
+                    />
+                    <ColorInput
+                      label="Color de metadatos"
+                      value={config.hero?.styles?.dark?.metaColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'metaColor', v)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tipografía del Hero */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🔤 Tipografía
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <SelectField
+                  label="Fuente del título"
+                  value={config.hero?.styles?.light?.titleFont || 'inherit'}
+                  options={[
+                    { value: 'inherit', label: 'Por defecto (del tema)' },
+                    { value: 'Montserrat', label: 'Montserrat' },
+                    { value: 'Inter', label: 'Inter' },
+                    { value: 'Poppins', label: 'Poppins' },
+                    { value: 'Roboto', label: 'Roboto' },
+                    { value: 'Playfair Display', label: 'Playfair Display' },
+                    { value: 'Lora', label: 'Lora' }
+                  ]}
+                  onChange={(v) => {
+                    updateStyles('hero', 'light', 'titleFont', v);
+                    updateStyles('hero', 'dark', 'titleFont', v);
+                  }}
+                />
+                <SelectField
+                  label="Tamaño del título"
+                  value={config.hero?.height || 'default'}
+                  options={[
+                    { value: 'compact', label: 'Compacto (más pequeño)' },
+                    { value: 'default', label: 'Normal' },
+                    { value: 'large', label: 'Grande' }
+                  ]}
+                  onChange={(v) => updateConfig('hero', 'height', v)}
+                />
+              </div>
+            </div>
+
+            {/* Botón "Volver al blog" */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                ⬅️ Botón "Volver al blog"
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tema Claro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-yellow-500" />
+                    Tema Claro
+                  </h5>
+                  <div className="space-y-3">
+                    <ColorInput
+                      label="Color del texto"
+                      value={config.hero?.styles?.light?.backButtonTextColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'light', 'backButtonTextColor', v)}
+                    />
+                    <ColorInput
+                      label="Color del icono"
+                      value={config.hero?.styles?.light?.backButtonIconColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'light', 'backButtonIconColor', v)}
+                    />
+                  </div>
+                </div>
+
+                {/* Tema Oscuro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-100 to-slate-100 dark:from-slate-800 dark:to-gray-900">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Moon className="w-4 h-4 text-purple-400" />
+                    Tema Oscuro
+                  </h5>
+                  <div className="space-y-3">
+                    <ColorInput
+                      label="Color del texto"
+                      value={config.hero?.styles?.dark?.backButtonTextColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'backButtonTextColor', v)}
+                    />
+                    <ColorInput
+                      label="Color del icono"
+                      value={config.hero?.styles?.dark?.backButtonIconColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'backButtonIconColor', v)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Badge de Categoría */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🏷️ Badge de Categoría
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tema Claro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-yellow-500" />
+                    Tema Claro
+                  </h5>
+                  <div className="space-y-3">
+                    <Toggle
+                      label="Usar colores de la categoría"
+                      checked={config.hero?.styles?.light?.categoryUseCategoryColors !== 'false'}
+                      onChange={(v) => updateStyles('hero', 'light', 'categoryUseCategoryColors', v ? 'true' : 'false')}
+                      description="Si está activo, usa los colores definidos en cada categoría"
+                    />
+                    {config.hero?.styles?.light?.categoryUseCategoryColors === 'false' && (
+                      <>
+                        <ColorInput
+                          label="Color del texto"
+                          value={config.hero?.styles?.light?.categoryTextColor || '#ffffff'}
+                          onChange={(v) => updateStyles('hero', 'light', 'categoryTextColor', v)}
+                        />
+                        <BackgroundColorInput
+                          label="Fondo del badge"
+                          value={config.hero?.styles?.light?.categoryBgColor || '#8b5cf6'}
+                          onChange={(v) => updateStyles('hero', 'light', 'categoryBgColor', v)}
+                        />
+                        <GradientColorInput
+                          label="Borde del badge"
+                          value={config.hero?.styles?.light?.categoryBorderColor || 'transparent'}
+                          onChange={(v) => updateStyles('hero', 'light', 'categoryBorderColor', v)}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tema Oscuro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-100 to-slate-100 dark:from-slate-800 dark:to-gray-900">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Moon className="w-4 h-4 text-purple-400" />
+                    Tema Oscuro
+                  </h5>
+                  <div className="space-y-3">
+                    <Toggle
+                      label="Usar colores de la categoría"
+                      checked={config.hero?.styles?.dark?.categoryUseCategoryColors !== 'false'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'categoryUseCategoryColors', v ? 'true' : 'false')}
+                      description="Si está activo, usa los colores definidos en cada categoría"
+                    />
+                    {config.hero?.styles?.dark?.categoryUseCategoryColors === 'false' && (
+                      <>
+                        <ColorInput
+                          label="Color del texto"
+                          value={config.hero?.styles?.dark?.categoryTextColor || '#ffffff'}
+                          onChange={(v) => updateStyles('hero', 'dark', 'categoryTextColor', v)}
+                        />
+                        <BackgroundColorInput
+                          label="Fondo del badge"
+                          value={config.hero?.styles?.dark?.categoryBgColor || '#a855f7'}
+                          onChange={(v) => updateStyles('hero', 'dark', 'categoryBgColor', v)}
+                        />
+                        <GradientColorInput
+                          label="Borde del badge"
+                          value={config.hero?.styles?.dark?.categoryBorderColor || 'transparent'}
+                          onChange={(v) => updateStyles('hero', 'dark', 'categoryBorderColor', v)}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Iconos y Avatar */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                🎨 Iconos, Tiempo de Lectura y Avatar
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tema Claro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-yellow-500" />
+                    Tema Claro
+                  </h5>
+                  <div className="space-y-3">
+                    <ColorInput
+                      label="Color de iconos (calendario, reloj, vistas)"
+                      value={config.hero?.styles?.light?.iconsColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'light', 'iconsColor', v)}
+                    />
+                    <ColorInput
+                      label="Color del texto de tiempo de lectura"
+                      value={config.hero?.styles?.light?.readingTimeColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'light', 'readingTimeColor', v)}
+                    />
+                    <ColorInput
+                      label="Color del borde del avatar"
+                      value={config.hero?.styles?.light?.avatarBorderColor || 'rgba(255,255,255,0.3)'}
+                      onChange={(v) => updateStyles('hero', 'light', 'avatarBorderColor', v)}
+                    />
+                  </div>
+                </div>
+
+                {/* Tema Oscuro */}
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-100 to-slate-100 dark:from-slate-800 dark:to-gray-900">
+                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Moon className="w-4 h-4 text-purple-400" />
+                    Tema Oscuro
+                  </h5>
+                  <div className="space-y-3">
+                    <ColorInput
+                      label="Color de iconos (calendario, reloj, vistas)"
+                      value={config.hero?.styles?.dark?.iconsColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'iconsColor', v)}
+                    />
+                    <ColorInput
+                      label="Color del texto de tiempo de lectura"
+                      value={config.hero?.styles?.dark?.readingTimeColor || 'rgba(255,255,255,0.8)'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'readingTimeColor', v)}
+                    />
+                    <ColorInput
+                      label="Color del borde del avatar"
+                      value={config.hero?.styles?.dark?.avatarBorderColor || 'rgba(255,255,255,0.3)'}
+                      onChange={(v) => updateStyles('hero', 'dark', 'avatarBorderColor', v)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                👁️ Vista Previa
+              </h4>
+              <div 
+                className="relative rounded-xl overflow-hidden h-48"
+                style={{
+                  background: config.hero?.background?.type === 'gradient'
+                    ? `linear-gradient(135deg, ${config.hero?.background?.gradientFrom || '#0f0f0f'}, ${config.hero?.background?.gradientTo || '#1a1a1a'})`
+                    : config.hero?.background?.type === 'solid'
+                    ? config.hero?.background?.overlayColor || '#1f2937'
+                    : 'linear-gradient(135deg, #374151, #1f2937)'
+                }}
+              >
+                {/* Overlay */}
+                <div 
+                  className="absolute inset-0"
+                  style={{ backgroundColor: `rgba(0,0,0,${(config.hero?.overlayOpacity ?? 60) / 100})` }}
+                />
+                {/* Contenido */}
+                <div className="absolute inset-0 flex flex-col justify-end p-6">
+                  {/* Botón Volver */}
+                  <div 
+                    className="inline-flex items-center gap-2 text-xs font-medium mb-2 px-2 py-1 rounded w-fit"
+                    style={{ 
+                      color: config.hero?.styles?.light?.backButtonTextColor || 'rgba(255,255,255,0.8)',
+                      backgroundColor: config.hero?.styles?.light?.backButtonBgColor || 'transparent',
+                      border: config.hero?.styles?.light?.backButtonBorderColor && config.hero?.styles?.light?.backButtonBorderColor !== 'transparent'
+                        ? `1px solid ${config.hero?.styles?.light?.backButtonBorderColor}`
+                        : 'none'
+                    }}
+                  >
+                    <span style={{ color: config.hero?.styles?.light?.backButtonIconColor || 'rgba(255,255,255,0.8)' }}>←</span>
+                    Volver al blog
+                  </div>
+                  
+                  {/* Badge Categoría */}
+                  <span 
+                    className="text-xs px-2 py-1 rounded-full w-fit mb-2"
+                    style={
+                      config.hero?.styles?.light?.categoryUseCategoryColors !== 'false'
+                        ? { backgroundColor: '#8b5cf615', color: '#8b5cf6', border: '1px solid #8b5cf640' }
+                        : { 
+                            backgroundColor: config.hero?.styles?.light?.categoryBgColor || '#8b5cf6',
+                            color: config.hero?.styles?.light?.categoryTextColor || '#ffffff',
+                            border: config.hero?.styles?.light?.categoryBorderColor && config.hero?.styles?.light?.categoryBorderColor !== 'transparent'
+                              ? `1px solid ${config.hero?.styles?.light?.categoryBorderColor}`
+                              : 'none'
+                          }
+                    }
+                  >
+                    🏷️ Categoría
+                  </span>
+                  
+                  <h3 
+                    className="text-xl font-bold mb-2"
+                    style={{ 
+                      color: config.hero?.styles?.light?.titleColor || '#ffffff',
+                      fontFamily: config.hero?.styles?.light?.titleFont || 'inherit'
+                    }}
+                  >
+                    Título del artículo de ejemplo
+                  </h3>
+                  <div 
+                    className="flex items-center gap-3 text-sm"
+                    style={{ color: config.hero?.styles?.light?.metaColor || 'rgba(255,255,255,0.8)' }}
+                  >
+                    <span 
+                      className="flex items-center gap-1"
+                      style={{ borderColor: config.hero?.styles?.light?.avatarBorderColor || 'rgba(255,255,255,0.3)' }}
+                    >
+                      <span className="w-5 h-5 rounded-full bg-gray-400 inline-block" style={{ border: `2px solid ${config.hero?.styles?.light?.avatarBorderColor || 'rgba(255,255,255,0.3)'}` }}></span>
+                      Autor
+                    </span>
+                    <span>•</span>
+                    <span style={{ color: config.hero?.styles?.light?.iconsColor || 'rgba(255,255,255,0.8)' }}>📅</span> 10 dic 2025
+                    <span>•</span>
+                    <span style={{ color: config.hero?.styles?.light?.iconsColor || 'rgba(255,255,255,0.8)' }}>⏱️</span> 5 min
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </SubSection>
       </MainSection>
 
@@ -988,6 +1671,144 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
           icon={<Type size={24} />}
           color="purple"
         >
+        {/* Barra de Resumen (Excerpt + Botones) */}
+        <SubSection title="Barra de Resumen" icon={<Layout size={18} />}>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+            Barra que aparece debajo del hero con el extracto del post y botones de interacción
+          </p>
+          
+          <Toggle
+            label="Mostrar barra de resumen"
+            checked={config.summaryBar?.enabled ?? true}
+            onChange={(v) => updateConfig('summaryBar', 'enabled', v)}
+            description="Muestra el extracto del post y botones de interacción"
+          />
+
+          {config.summaryBar?.enabled !== false && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                <Toggle
+                  label="Mostrar extracto"
+                  checked={config.summaryBar?.showExcerpt ?? true}
+                  onChange={(v) => updateConfig('summaryBar', 'showExcerpt', v)}
+                />
+                <Toggle
+                  label="Botón Me gusta"
+                  checked={config.summaryBar?.showLikeButton ?? true}
+                  onChange={(v) => updateConfig('summaryBar', 'showLikeButton', v)}
+                />
+                <Toggle
+                  label="Botón Guardar"
+                  checked={config.summaryBar?.showSaveButton ?? true}
+                  onChange={(v) => updateConfig('summaryBar', 'showSaveButton', v)}
+                />
+                <Toggle
+                  label="Botón Compartir"
+                  checked={config.summaryBar?.showShareButton ?? false}
+                  onChange={(v) => updateConfig('summaryBar', 'showShareButton', v)}
+                />
+              </div>
+
+              <SelectField
+                label="Líneas máximas del extracto"
+                value={String(config.summaryBar?.excerptMaxLines || 2)}
+                options={[
+                  { value: '1', label: '1 línea' },
+                  { value: '2', label: '2 líneas' },
+                  { value: '3', label: '3 líneas' },
+                  { value: 'none', label: 'Sin límite' }
+                ]}
+                onChange={(v) => updateConfig('summaryBar', 'excerptMaxLines', v === 'none' ? 0 : Number(v))}
+              />
+
+              {/* Estilos de la barra */}
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                  🎨 Estilos de la Barra
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Tema Claro */}
+                  <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
+                    <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                      <Sun className="w-4 h-4 text-yellow-500" />
+                      Tema Claro
+                    </h5>
+                    <div className="space-y-3">
+                      <ColorInput
+                        label="Color del texto"
+                        value={config.summaryBar?.styles?.light?.textColor || '#4b5563'}
+                        onChange={(v) => updateStyles('summaryBar', 'light', 'textColor', v)}
+                      />
+                      <ColorInput
+                        label="Color del borde"
+                        value={config.summaryBar?.styles?.light?.borderColor || '#e5e7eb'}
+                        onChange={(v) => updateStyles('summaryBar', 'light', 'borderColor', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo de la barra"
+                        value={config.summaryBar?.styles?.light?.background || 'transparent'}
+                        onChange={(v) => updateStyles('summaryBar', 'light', 'background', v)}
+                      />
+                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs text-gray-500 mb-2">Botones de interacción</p>
+                        <ColorInput
+                          label="Color del icono de los botones"
+                          value={config.summaryBar?.styles?.light?.buttonIconColor || '#6b7280'}
+                          onChange={(v) => updateStyles('summaryBar', 'light', 'buttonIconColor', v)}
+                        />
+                        <BackgroundColorInput
+                          label="Fondo de los botones"
+                          value={config.summaryBar?.styles?.light?.buttonBgColor || '#f3f4f6'}
+                          onChange={(v) => updateStyles('summaryBar', 'light', 'buttonBgColor', v)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tema Oscuro */}
+                  <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-100 to-slate-100 dark:from-slate-800 dark:to-gray-900">
+                    <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                      <Moon className="w-4 h-4 text-purple-400" />
+                      Tema Oscuro
+                    </h5>
+                    <div className="space-y-3">
+                      <ColorInput
+                        label="Color del texto"
+                        value={config.summaryBar?.styles?.dark?.textColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('summaryBar', 'dark', 'textColor', v)}
+                      />
+                      <ColorInput
+                        label="Color del borde"
+                        value={config.summaryBar?.styles?.dark?.borderColor || '#374151'}
+                        onChange={(v) => updateStyles('summaryBar', 'dark', 'borderColor', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo de la barra"
+                        value={config.summaryBar?.styles?.dark?.background || 'transparent'}
+                        onChange={(v) => updateStyles('summaryBar', 'dark', 'background', v)}
+                      />
+                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs text-gray-500 mb-2">Botones de interacción</p>
+                        <ColorInput
+                          label="Color del icono de los botones"
+                          value={config.summaryBar?.styles?.dark?.buttonIconColor || '#9ca3af'}
+                          onChange={(v) => updateStyles('summaryBar', 'dark', 'buttonIconColor', v)}
+                        />
+                        <BackgroundColorInput
+                          label="Fondo de los botones"
+                          value={config.summaryBar?.styles?.dark?.buttonBgColor || '#374151'}
+                          onChange={(v) => updateStyles('summaryBar', 'dark', 'buttonBgColor', v)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </SubSection>
+
         {/* Tabla de Contenidos */}
         <SubSection title="Tabla de Contenidos (TOC)" icon={<List size={18} />}>
           <Toggle
@@ -1068,6 +1889,19 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         value={config.tableOfContents?.styles?.light?.progressColor || '#2563eb'}
                         onChange={(v) => updateStyles('tableOfContents', 'light', 'progressColor', v)}
                       />
+                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">📊 Barra de progreso del panel:</p>
+                        <ColorInput
+                          label="Barra progreso (gradiente desde)"
+                          value={config.tableOfContents?.styles?.light?.progressBarFrom || '#9333ea'}
+                          onChange={(v) => updateStyles('tableOfContents', 'light', 'progressBarFrom', v)}
+                        />
+                        <ColorInput
+                          label="Barra progreso (gradiente hasta)"
+                          value={config.tableOfContents?.styles?.light?.progressBarTo || '#2563eb'}
+                          onChange={(v) => updateStyles('tableOfContents', 'light', 'progressBarTo', v)}
+                        />
+                      </div>
                       <ColorInput
                         label="Fondo del panel"
                         value={config.tableOfContents?.styles?.light?.background || '#ffffff'}
@@ -1103,6 +1937,19 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         value={config.tableOfContents?.styles?.dark?.progressColor || '#3b82f6'}
                         onChange={(v) => updateStyles('tableOfContents', 'dark', 'progressColor', v)}
                       />
+                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">📊 Barra de progreso del panel:</p>
+                        <ColorInput
+                          label="Barra progreso (gradiente desde)"
+                          value={config.tableOfContents?.styles?.dark?.progressBarFrom || '#a855f7'}
+                          onChange={(v) => updateStyles('tableOfContents', 'dark', 'progressBarFrom', v)}
+                        />
+                        <ColorInput
+                          label="Barra progreso (gradiente hasta)"
+                          value={config.tableOfContents?.styles?.dark?.progressBarTo || '#3b82f6'}
+                          onChange={(v) => updateStyles('tableOfContents', 'dark', 'progressBarTo', v)}
+                        />
+                      </div>
                       <ColorInput
                         label="Fondo del panel"
                         value={config.tableOfContents?.styles?.dark?.background || '#111827'}
@@ -1801,6 +2648,16 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         onChange={(v) => updateStyles('comments', 'light', 'selectorIconColor', v)}
                       />
                       <BackgroundColorInput
+                        label="Fondo dropdown"
+                        value={config.comments?.styles?.light?.selectorDropdownBg || '#ffffff'}
+                        onChange={(v) => updateStyles('comments', 'light', 'selectorDropdownBg', v)}
+                      />
+                      <ColorInput
+                        label="Hover opciones"
+                        value={config.comments?.styles?.light?.selectorOptionHover || '#f3f4f6'}
+                        onChange={(v) => updateStyles('comments', 'light', 'selectorOptionHover', v)}
+                      />
+                      <BackgroundColorInput
                         label="Fondo tarjeta"
                         value={config.comments?.styles?.light?.cardBackground || '#f9fafb'}
                         onChange={(v) => updateStyles('comments', 'light', 'cardBackground', v)}
@@ -1829,6 +2686,16 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         label="Fondo formulario"
                         value={config.comments?.styles?.light?.formBackground || '#ffffff'}
                         onChange={(v) => updateStyles('comments', 'light', 'formBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde formulario"
+                        value={config.comments?.styles?.light?.formBorder || '#e5e7eb'}
+                        onChange={(v) => updateStyles('comments', 'light', 'formBorder', v)}
+                      />
+                      <ColorInput
+                        label="Borde formulario (focus)"
+                        value={config.comments?.styles?.light?.formFocusBorder || '#3b82f6'}
+                        onChange={(v) => updateStyles('comments', 'light', 'formFocusBorder', v)}
                       />
                       <BackgroundColorInput
                         label="Fondo textarea"
@@ -1915,6 +2782,16 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         onChange={(v) => updateStyles('comments', 'dark', 'selectorIconColor', v)}
                       />
                       <BackgroundColorInput
+                        label="Fondo dropdown"
+                        value={config.comments?.styles?.dark?.selectorDropdownBg || '#374151'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'selectorDropdownBg', v)}
+                      />
+                      <ColorInput
+                        label="Hover opciones"
+                        value={config.comments?.styles?.dark?.selectorOptionHover || '#4b5563'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'selectorOptionHover', v)}
+                      />
+                      <BackgroundColorInput
                         label="Fondo tarjeta"
                         value={config.comments?.styles?.dark?.cardBackground || '#111827'}
                         onChange={(v) => updateStyles('comments', 'dark', 'cardBackground', v)}
@@ -1943,6 +2820,16 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         label="Fondo formulario"
                         value={config.comments?.styles?.dark?.formBackground || '#1f2937'}
                         onChange={(v) => updateStyles('comments', 'dark', 'formBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde formulario"
+                        value={config.comments?.styles?.dark?.formBorder || '#374151'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'formBorder', v)}
+                      />
+                      <ColorInput
+                        label="Borde formulario (focus)"
+                        value={config.comments?.styles?.dark?.formFocusBorder || '#3b82f6'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'formFocusBorder', v)}
                       />
                       <BackgroundColorInput
                         label="Fondo textarea"

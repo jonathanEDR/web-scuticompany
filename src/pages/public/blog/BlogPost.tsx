@@ -21,7 +21,9 @@ import {
   PostNavigation, 
   PostHero,
   AuthorCard,
-  ReadingProgress
+  ReadingProgress,
+  LikeButton,
+  FavoriteButton
 } from '../../../components/blog/common';
 import { CommentsList } from '../../../components/blog/comments';
 import { sanitizeHTML } from '../../../utils/blog';
@@ -30,7 +32,7 @@ import PublicFooter from '../../../components/public/PublicFooter';
 
 const BlogPostEnhanced: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { post, loading, error } = useBlogPost(slug || '');
+  const { post, relatedPosts, loading, error } = useBlogPost(slug || '');
   const { theme } = useTheme();
   
   // ✅ Obtener configuración del CMS para blog-post-detail
@@ -40,6 +42,7 @@ const BlogPostEnhanced: React.FC = () => {
   // Extraer configuraciones específicas
   const heroConfig = blogPostConfig.hero || {};
   const contentConfig = blogPostConfig.content || {};
+  const summaryBarConfig = blogPostConfig.summaryBar || {};
   const tocConfig = blogPostConfig.tableOfContents || {};
   const progressConfig = blogPostConfig.readingProgress || {};
   const authorConfig = blogPostConfig.author || {};
@@ -102,7 +105,28 @@ const BlogPostEnhanced: React.FC = () => {
       }}
     >
       {/* Barra de progreso de lectura */}
-      {progressConfig.enabled !== false && <ReadingProgress />}
+      {progressConfig.enabled !== false && (
+        <ReadingProgress 
+          barColor={theme === 'dark' 
+            ? (progressConfig.barColor?.dark || '#a78bfa')
+            : (progressConfig.barColor?.light || '#8b5cf6')
+          }
+          barGradientFrom={theme === 'dark'
+            ? progressConfig.barGradientFrom?.dark
+            : progressConfig.barGradientFrom?.light
+          }
+          barGradientTo={theme === 'dark'
+            ? progressConfig.barGradientTo?.dark
+            : progressConfig.barGradientTo?.light
+          }
+          trackColor={theme === 'dark'
+            ? (progressConfig.backgroundColor?.dark || '#374151')
+            : (progressConfig.backgroundColor?.light || '#e5e7eb')
+          }
+          height={progressConfig.height || '3px'}
+          position={progressConfig.position || 'top'}
+        />
+      )}
       
       {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
       <Helmet>
@@ -156,7 +180,84 @@ const BlogPostEnhanced: React.FC = () => {
         showPublishDate={heroConfig.showPublishDate}
         showAuthor={heroConfig.showAuthor}
         overlayOpacity={heroConfig.overlayOpacity}
+        // Nuevos props de estilos del CMS
+        styles={heroConfig.styles}
+        background={heroConfig.background}
+        height={heroConfig.height}
       />
+
+      {/* Barra de Resumen - Configurable desde CMS Sección 2 */}
+      {summaryBarConfig.enabled !== false && (
+        <div 
+          className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl"
+          style={{
+            backgroundColor: theme === 'dark' 
+              ? (summaryBarConfig.styles?.dark?.background || 'transparent')
+              : (summaryBarConfig.styles?.light?.background || 'transparent')
+          }}
+        >
+          <div 
+            className="flex items-center justify-between py-4"
+            style={{
+              borderBottom: `1px solid ${
+                theme === 'dark' 
+                  ? (summaryBarConfig.styles?.dark?.borderColor || '#374151')
+                  : (summaryBarConfig.styles?.light?.borderColor || '#e5e7eb')
+              }`
+            }}
+          >
+            {/* Excerpt */}
+            {summaryBarConfig.showExcerpt !== false && post.excerpt && (
+              <p 
+                className={`text-sm sm:text-base max-w-2xl ${
+                  summaryBarConfig.excerptMaxLines === 1 ? 'line-clamp-1' :
+                  summaryBarConfig.excerptMaxLines === 3 ? 'line-clamp-3' :
+                  summaryBarConfig.excerptMaxLines === 0 ? '' : 'line-clamp-2'
+                }`}
+                style={{
+                  color: theme === 'dark'
+                    ? (summaryBarConfig.styles?.dark?.textColor || '#9ca3af')
+                    : (summaryBarConfig.styles?.light?.textColor || '#4b5563')
+                }}
+              >
+                {post.excerpt}
+              </p>
+            )}
+            
+            {/* Botones */}
+            <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+              {summaryBarConfig.showLikeButton !== false && (
+                <LikeButton 
+                  postId={post._id} 
+                  size="sm" 
+                  iconColor={theme === 'dark' 
+                    ? summaryBarConfig.styles?.dark?.buttonIconColor 
+                    : summaryBarConfig.styles?.light?.buttonIconColor
+                  }
+                  bgColor={theme === 'dark' 
+                    ? summaryBarConfig.styles?.dark?.buttonBgColor 
+                    : summaryBarConfig.styles?.light?.buttonBgColor
+                  }
+                />
+              )}
+              {summaryBarConfig.showSaveButton !== false && (
+                <FavoriteButton 
+                  postId={post._id} 
+                  size="sm"
+                  iconColor={theme === 'dark' 
+                    ? summaryBarConfig.styles?.dark?.buttonIconColor 
+                    : summaryBarConfig.styles?.light?.buttonIconColor
+                  }
+                  bgColor={theme === 'dark' 
+                    ? summaryBarConfig.styles?.dark?.buttonBgColor 
+                    : summaryBarConfig.styles?.light?.buttonBgColor
+                  }
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content Section with Background Image */}
       <div 
@@ -300,6 +401,8 @@ const BlogPostEnhanced: React.FC = () => {
                     selectorBorder: { light: commentsConfig.styles.light?.selectorBorder, dark: commentsConfig.styles.dark?.selectorBorder },
                     selectorText: { light: commentsConfig.styles.light?.selectorText, dark: commentsConfig.styles.dark?.selectorText },
                     selectorIconColor: { light: commentsConfig.styles.light?.selectorIconColor, dark: commentsConfig.styles.dark?.selectorIconColor },
+                    selectorDropdownBg: { light: commentsConfig.styles.light?.selectorDropdownBg, dark: commentsConfig.styles.dark?.selectorDropdownBg },
+                    selectorOptionHover: { light: commentsConfig.styles.light?.selectorOptionHover, dark: commentsConfig.styles.dark?.selectorOptionHover },
                     cardBackground: { light: commentsConfig.styles.light?.cardBackground, dark: commentsConfig.styles.dark?.cardBackground },
                     cardBorder: { light: commentsConfig.styles.light?.cardBorder, dark: commentsConfig.styles.dark?.cardBorder },
                     authorColor: { light: commentsConfig.styles.light?.authorColor, dark: commentsConfig.styles.dark?.authorColor },
@@ -307,6 +410,7 @@ const BlogPostEnhanced: React.FC = () => {
                     dateColor: { light: commentsConfig.styles.light?.dateColor, dark: commentsConfig.styles.dark?.dateColor },
                     formBackground: { light: commentsConfig.styles.light?.formBackground, dark: commentsConfig.styles.dark?.formBackground },
                     formBorder: { light: commentsConfig.styles.light?.formBorder, dark: commentsConfig.styles.dark?.formBorder },
+                    formFocusBorder: { light: commentsConfig.styles.light?.formFocusBorder, dark: commentsConfig.styles.dark?.formFocusBorder },
                     textareaBackground: { light: commentsConfig.styles.light?.textareaBackground, dark: commentsConfig.styles.dark?.textareaBackground },
                     textareaText: { light: commentsConfig.styles.light?.textareaText, dark: commentsConfig.styles.dark?.textareaText },
                     footerBackground: { light: commentsConfig.styles.light?.footerBackground, dark: commentsConfig.styles.dark?.footerBackground },
@@ -322,6 +426,7 @@ const BlogPostEnhanced: React.FC = () => {
             {relatedConfig.enabled !== false && (
               <RelatedPosts 
                 currentPost={post}
+                preloadedPosts={relatedPosts}
                 maxPosts={relatedConfig.maxPosts}
                 title={relatedConfig.title || 'Artículos Relacionados'}
                 theme={theme as 'light' | 'dark'}

@@ -12,6 +12,7 @@ import type { CommentFormData } from '../../../types/blog';
 export interface CommentFormStyles {
   formBackground?: string;
   formBorder?: string;
+  formFocusBorder?: string;
   textareaBackground?: string;
   textareaText?: string;
   footerBackground?: string;
@@ -55,6 +56,7 @@ export default function CommentForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [charCount, setCharCount] = useState(initialContent.length);
+  const [isFocused, setIsFocused] = useState(false);
 
   const MIN_LENGTH = 10;
   const MAX_LENGTH = 2000;
@@ -165,13 +167,19 @@ export default function CommentForm({
         className={`
           rounded-lg border-2 transition-colors
           ${!styles?.formBackground ? 'bg-white dark:bg-gray-800' : ''}
-          ${error ? 'border-red-300 dark:border-red-600' : !styles?.formBorder ? 'border-gray-200 dark:border-gray-600 focus-within:border-blue-500 dark:focus-within:border-blue-400' : ''}
+          ${error ? 'border-red-300 dark:border-red-600' : ''}
           ${isReply ? 'shadow-sm' : 'shadow-md'}
         `}
         style={{
           background: styles?.formBackground || undefined,
-          borderColor: error ? undefined : styles?.formBorder || undefined,
+          borderColor: error 
+            ? undefined 
+            : isFocused 
+              ? (styles?.formFocusBorder || '#3b82f6')
+              : (styles?.formBorder || undefined),
         }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       >
         {/* Header (si es respuesta o edición) */}
         {(isReply || isEditing) && (

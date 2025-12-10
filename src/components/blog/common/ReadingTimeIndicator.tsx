@@ -1,6 +1,7 @@
 /**
  * ⏱️ ReadingTimeIndicator Component
  * Indicador visual del tiempo de lectura estimado
+ * Soporta estilos personalizados desde CMS
  */
 
 import { Clock, BookOpen } from 'lucide-react';
@@ -12,6 +13,9 @@ interface ReadingTimeIndicatorProps {
   showIcon?: boolean;
   showLabel?: boolean;
   className?: string;
+  // Nuevos props para estilos personalizados desde CMS
+  textColor?: string;
+  iconColor?: string;
 }
 
 export default function ReadingTimeIndicator({
@@ -19,7 +23,9 @@ export default function ReadingTimeIndicator({
   variant = 'default',
   showIcon = true,
   showLabel = false,
-  className = ''
+  className = '',
+  textColor,
+  iconColor
 }: ReadingTimeIndicatorProps) {
   
   const readingTime = formatReadingTime(minutes);
@@ -54,12 +60,15 @@ export default function ReadingTimeIndicator({
   }
 
   // ============================================
-  // VARIANTE MINIMAL
+  // VARIANTE MINIMAL - Con soporte para colores personalizados
   // ============================================
   if (variant === 'minimal') {
     return (
-      <span className={`inline-flex items-center gap-1 text-sm text-gray-600 ${className}`}>
-        {showIcon && <Clock className="w-3.5 h-3.5" />}
+      <span 
+        className={`inline-flex items-center gap-1 text-sm ${!textColor ? 'text-gray-600' : ''} ${className}`}
+        style={textColor ? { color: textColor } : undefined}
+      >
+        {showIcon && <Clock className="w-3.5 h-3.5" style={iconColor ? { color: iconColor } : undefined} />}
         <span>{readingTime}</span>
       </span>
     );

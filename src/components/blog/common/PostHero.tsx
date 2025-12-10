@@ -1,7 +1,7 @@
 /**
  * 📸 PostHero Component - Hero compacto para posts
  * Combina imagen destacada con título y metadata de forma elegante
- * Soporta tema claro y oscuro
+ * Soporta tema claro y oscuro con estilos configurables desde CMS
  */
 
 import { Link } from 'react-router-dom';
@@ -10,6 +10,39 @@ import { CategoryBadge, ReadingTimeIndicator, LikeButton, FavoriteButton } from 
 import { getImageUrl } from '../../../utils/imageUtils';
 import LazyImage from './LazyImage';
 import type { BlogPost } from '../../../types/blog';
+import { useTheme } from '../../../contexts/ThemeContext';
+
+// Tipos para estilos del Hero
+interface HeroStyleTheme {
+  titleColor?: string;
+  subtitleColor?: string;
+  metaColor?: string;
+  titleFont?: string;
+  // Botón Volver (solo texto e icono)
+  backButtonTextColor?: string;
+  backButtonIconColor?: string;
+  // Badge Categoría
+  categoryUseCategoryColors?: string;
+  categoryBgColor?: string;
+  categoryTextColor?: string;
+  categoryBorderColor?: string;
+  // Iconos, Tiempo de lectura y Avatar
+  iconsColor?: string;
+  readingTimeColor?: string;
+  avatarBorderColor?: string;
+}
+
+interface HeroStyles {
+  light?: HeroStyleTheme;
+  dark?: HeroStyleTheme;
+}
+
+interface HeroBackground {
+  type?: 'image' | 'gradient' | 'solid';
+  gradientFrom?: string;
+  gradientTo?: string;
+  overlayColor?: string;
+}
 
 interface PostHeroProps {
   post: BlogPost;
@@ -23,6 +56,10 @@ interface PostHeroProps {
   showPublishDate?: boolean;
   showAuthor?: boolean;
   overlayOpacity?: number;
+  // Nuevas props de estilos desde CMS
+  styles?: HeroStyles;
+  background?: HeroBackground;
+  height?: string;
 }
 
 export default function PostHero({ 
@@ -36,23 +73,89 @@ export default function PostHero({
   showReadingTime = true,
   showPublishDate = true,
   showAuthor = true,
-  overlayOpacity = 60
+  overlayOpacity = 60,
+  // Nuevos props de estilos
+  styles,
+  background,
+  height = 'default'
 }: PostHeroProps) {
+  
+  // Obtener tema actual
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+  
+  // Obtener estilos según el tema actual
+  const currentStyles = isDarkMode ? styles?.dark : styles?.light;
+  const titleColor = currentStyles?.titleColor || '#ffffff';
+  const metaColor = currentStyles?.metaColor || 'rgba(255,255,255,0.8)';
+  const titleFont = currentStyles?.titleFont || 'inherit';
+  
+  // Estilos del botón volver (solo texto e icono)
+  const backButtonTextColor = currentStyles?.backButtonTextColor || metaColor;
+  const backButtonIconColor = currentStyles?.backButtonIconColor || metaColor;
+  
+  // Estilos del badge de categoría
+  const useCategoryColors = currentStyles?.categoryUseCategoryColors !== 'false';
+  const categoryBgColor = currentStyles?.categoryBgColor || '#8b5cf6';
+  const categoryTextColor = currentStyles?.categoryTextColor || '#ffffff';
+  const categoryBorderColor = currentStyles?.categoryBorderColor || 'transparent';
+  
+  // Estilos de iconos y avatar
+  const iconsColor = currentStyles?.iconsColor || metaColor;
+  const avatarBorderColor = currentStyles?.avatarBorderColor || 'rgba(255,255,255,0.3)';
+  
+  // Estilos del tiempo de lectura
+  const readingTimeColor = currentStyles?.readingTimeColor || metaColor;
   
   // Calcular opacidad del overlay
   const overlayOpacityValue = overlayOpacity / 100;
   
+  // Calcular altura del hero según configuración
+  const getHeroHeight = () => {
+    switch (height) {
+      case 'compact': return 'h-[220px] sm:h-[260px] lg:h-[300px]';
+      case 'large': return 'h-[350px] sm:h-[400px] lg:h-[480px]';
+      default: return 'h-[280px] sm:h-[320px] lg:h-[380px]';
+    }
+  };
+  
+  // Generar estilo de fondo según configuración
+  const getBackgroundStyle = (): React.CSSProperties => {
+    if (!background || background.type === 'image') {
+      return {}; // La imagen se maneja con el componente LazyImage
+    }
+    if (background.type === 'gradient') {
+      return {
+        background: `linear-gradient(135deg, ${background.gradientFrom || '#0f0f0f'}, ${background.gradientTo || '#1a1a1a'})`
+      };
+    }
+    if (background.type === 'solid') {
+      return {
+        backgroundColor: background.overlayColor || '#1f2937'
+      };
+    }
+    return {};
+  };
+  
   // Variante Overlay: Imagen con título superpuesto
-  if (variant === 'overlay' && post.featuredImage) {
+  if (variant === 'overlay' && (post.featuredImage || background?.type !== 'image')) {
+    const showImage = background?.type === 'image' || !background?.type;
+    
     return (
       <header className={`post-hero relative ${className}`}>
-        {/* Imagen de fondo */}
-        <div className="relative h-[280px] sm:h-[320px] lg:h-[380px] overflow-hidden">
-          <LazyImage
-            src={post.featuredImage}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
+        {/* Fondo (imagen o color/gradiente) */}
+        <div 
+          className={`relative ${getHeroHeight()} overflow-hidden`}
+          style={!showImage ? getBackgroundStyle() : undefined}
+        >
+          {/* Imagen de fondo (solo si el tipo es 'image' o no está configurado) */}
+          {showImage && post.featuredImage && (
+            <LazyImage
+              src={post.featuredImage}
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+          )}
           {/* Overlay oscuro gradiente - Opacidad configurable */}
           <div 
             className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" 
@@ -62,59 +165,83 @@ export default function PostHero({
           {/* Contenido superpuesto */}
           <div className="absolute inset-0 flex flex-col justify-end">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pb-8">
-              {/* Breadcrumb */}
+              {/* Breadcrumb - Con estilos configurables */}
               {(showBreadcrumb || showBackButton) && (
                 <Link
                   to="/blog"
-                  className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white font-medium mb-4 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-medium mb-4 transition-colors hover:opacity-80"
+                  style={{ 
+                    color: backButtonTextColor
+                  }}
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} style={{ color: backButtonIconColor }} />
                   Volver al blog
                 </Link>
               )}
 
-              {/* Category */}
+              {/* Category - Con estilos configurables */}
               {showCategory && post.category && (
                 <div className="mb-3">
-                  <CategoryBadge category={post.category} />
+                  <CategoryBadge 
+                    category={post.category}
+                    customStyles={{
+                      useCategoryColors: useCategoryColors,
+                      bgColor: categoryBgColor,
+                      textColor: categoryTextColor,
+                      borderColor: categoryBorderColor
+                    }}
+                  />
                 </div>
               )}
 
-              {/* Title */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4 leading-tight max-w-4xl">
+              {/* Title - Con colores dinámicos del CMS */}
+              <h1 
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 leading-tight max-w-4xl"
+                style={{ 
+                  color: titleColor,
+                  fontFamily: titleFont !== 'inherit' ? `'${titleFont}', sans-serif` : undefined
+                }}
+              >
                 {post.title}
               </h1>
 
-              {/* Meta compacto */}
-              <div className="flex flex-wrap items-center gap-3 text-sm text-white/80">
-                {/* Author */}
+              {/* Meta compacto - Con colores dinámicos del CMS */}
+              <div 
+                className="flex flex-wrap items-center gap-3 text-sm"
+                style={{ color: metaColor }}
+              >
+                {/* Author - Con estilos configurables */}
                 {showAuthor && post.author && (
                   <div className="flex items-center gap-2">
                     {post.author.avatar ? (
                       <LazyImage
                         src={getImageUrl(post.author.avatar)}
                         alt={`${post.author.firstName || ''} ${post.author.lastName || ''}`}
-                        className="w-7 h-7 rounded-full object-cover border-2 border-white/30"
+                        className="w-7 h-7 rounded-full object-cover"
+                        style={{ border: `2px solid ${avatarBorderColor}` }}
                         width={28}
                         height={28}
                       />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                        <User className="text-white" size={14} />
+                      <div 
+                        className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center"
+                        style={{ border: `2px solid ${avatarBorderColor}` }}
+                      >
+                        <User style={{ color: titleColor }} size={14} />
                       </div>
                     )}
-                    <span className="font-medium text-white">
+                    <span className="font-medium" style={{ color: titleColor }}>
                       {post.author.firstName || ''} {post.author.lastName || ''}
                     </span>
                   </div>
                 )}
                 
-                {showAuthor && post.author && showPublishDate && <span className="text-white/40">•</span>}
+                {showAuthor && post.author && showPublishDate && <span style={{ opacity: 0.4 }}>•</span>}
                 
-                {/* Date */}
+                {/* Date - Con color de icono configurable */}
                 {showPublishDate && (
                   <div className="flex items-center gap-1.5">
-                    <Calendar size={14} />
+                    <Calendar size={14} style={{ color: iconsColor }} />
                     <time dateTime={post.publishedAt}>
                       {new Date(post.publishedAt).toLocaleDateString('es-ES', {
                         month: 'short',
@@ -125,45 +252,30 @@ export default function PostHero({
                   </div>
                 )}
                 
-                {showPublishDate && showReadingTime && <span className="text-white/40">•</span>}
+                {showPublishDate && showReadingTime && <span style={{ opacity: 0.4 }}>•</span>}
                 
-                {/* Reading Time */}
+                {/* Reading Time - Con colores configurables */}
                 {showReadingTime && (
-                  <div className="flex items-center gap-1.5">
-                    <Clock size={14} />
-                    <ReadingTimeIndicator minutes={post.readingTime} variant="minimal" />
-                  </div>
+                  <ReadingTimeIndicator 
+                    minutes={post.readingTime} 
+                    variant="minimal" 
+                    showIcon={false}
+                    textColor={readingTimeColor}
+                    iconColor={iconsColor}
+                  />
                 )}
 
-                {/* Views */}
+                {/* Views - Con color de icono configurable */}
                 {post.stats?.views && (
                   <>
-                    <span className="hidden sm:inline text-white/40">•</span>
+                    <span className="hidden sm:inline" style={{ opacity: 0.4 }}>•</span>
                     <div className="hidden sm:flex items-center gap-1.5">
-                      <Eye size={14} />
+                      <Eye size={14} style={{ color: iconsColor }} />
                       <span>{post.stats.views.toLocaleString()}</span>
                     </div>
                   </>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Acciones debajo de la imagen */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700">
-            {/* Excerpt */}
-            {post.excerpt && (
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-2xl line-clamp-2">
-                {post.excerpt}
-              </p>
-            )}
-            
-            {/* Botones */}
-            <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-              <LikeButton postId={post._id} size="sm" />
-              <FavoriteButton postId={post._id} size="sm" />
             </div>
           </div>
         </div>
@@ -204,7 +316,15 @@ export default function PostHero({
               {/* Category */}
               {post.category && (
                 <div className="mb-3">
-                  <CategoryBadge category={post.category} />
+                  <CategoryBadge 
+                    category={post.category}
+                    customStyles={{
+                      useCategoryColors: useCategoryColors,
+                      bgColor: categoryBgColor,
+                      textColor: categoryTextColor,
+                      borderColor: categoryBorderColor
+                    }}
+                  />
                 </div>
               )}
 
@@ -261,8 +381,13 @@ export default function PostHero({
                 
                 {/* Reading Time */}
                 <div className="flex items-center gap-1.5">
-                  <Clock size={14} className="text-gray-400" />
-                  <ReadingTimeIndicator minutes={post.readingTime} variant="minimal" />
+                  <Clock size={14} style={{ color: iconsColor }} />
+                  <ReadingTimeIndicator 
+                    minutes={post.readingTime} 
+                    variant="minimal" 
+                    textColor={readingTimeColor}
+                    iconColor={iconsColor}
+                  />
                 </div>
 
                 {/* Spacer */}

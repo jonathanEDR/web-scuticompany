@@ -1,10 +1,19 @@
 /**
  * 🏷️ CategoryBadge Component
  * Badge visual para mostrar categorías del blog
+ * Soporta estilos personalizados desde CMS
  */
 
 import { Link } from 'react-router-dom';
 import type { BlogCategory } from '../../../types/blog';
+
+// Estilos personalizados opcionales desde CMS
+interface CustomStyles {
+  useCategoryColors?: boolean;
+  bgColor?: string;
+  textColor?: string;
+  borderColor?: string;
+}
 
 interface CategoryBadgeProps {
   category: BlogCategory;
@@ -12,6 +21,8 @@ interface CategoryBadgeProps {
   showIcon?: boolean;
   clickable?: boolean;
   className?: string;
+  // Nuevos props para estilos personalizados
+  customStyles?: CustomStyles;
 }
 
 export default function CategoryBadge({
@@ -19,7 +30,8 @@ export default function CategoryBadge({
   size = 'md',
   showIcon = true,
   clickable = true,
-  className = ''
+  className = '',
+  customStyles
 }: CategoryBadgeProps) {
   
   // Estilos por tamaño
@@ -47,12 +59,51 @@ export default function CategoryBadge({
     ${className}
   `;
 
-  // Estilos de color basados en el color de la categoría
-  const colorStyle = {
-    backgroundColor: category.color + '15', // 15 = ~8% opacity
-    color: category.color,
-    borderColor: category.color + '40', // 40 = ~25% opacity
+  // Determinar si usar colores de la categoría o personalizados
+  const useCategoryColors = customStyles?.useCategoryColors !== false;
+
+  // Estilos de color - personalizados o de la categoría
+  const getColorStyle = (): React.CSSProperties => {
+    if (useCategoryColors) {
+      // Usar colores de la categoría (comportamiento original)
+      return {
+        backgroundColor: category.color + '15', // 15 = ~8% opacity
+        color: category.color,
+        borderColor: category.color + '40', // 40 = ~25% opacity
+      };
+    }
+    
+    // Usar estilos personalizados del CMS
+    const bgColor = customStyles?.bgColor || '#8b5cf6';
+    const textColor = customStyles?.textColor || '#ffffff';
+    const borderColor = customStyles?.borderColor || 'transparent';
+    
+    // Detectar si es gradiente
+    const isGradientBg = bgColor?.startsWith('linear-gradient');
+    const isGradientBorder = borderColor?.startsWith('linear-gradient');
+    
+    const style: React.CSSProperties = {
+      color: textColor,
+    };
+    
+    if (isGradientBg) {
+      style.background = bgColor;
+    } else {
+      style.backgroundColor = bgColor;
+    }
+    
+    if (isGradientBorder) {
+      // Para bordes con gradiente, usamos un wrapper o pseudo-elemento
+      style.border = 'none';
+      style.position = 'relative';
+    } else if (borderColor !== 'transparent') {
+      style.border = `1px solid ${borderColor}`;
+    }
+    
+    return style;
   };
+
+  const colorStyle = getColorStyle();
 
   const content = (
     <>

@@ -1,5 +1,5 @@
-﻿import { useState } from 'react';
-import { MessageCircle, Filter } from 'lucide-react';
+﻿import { useState, useRef, useEffect } from 'react';
+import { MessageCircle, Filter, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useComments } from '../../../hooks/blog';
 import CommentItem from './CommentItem';
@@ -17,6 +17,8 @@ export interface CommentsStyles {
   selectorBorder?: { light?: string; dark?: string };
   selectorText?: { light?: string; dark?: string };
   selectorIconColor?: { light?: string; dark?: string };
+  selectorDropdownBg?: { light?: string; dark?: string };
+  selectorOptionHover?: { light?: string; dark?: string };
   cardBackground?: { light?: string; dark?: string };
   cardBorder?: { light?: string; dark?: string };
   authorColor?: { light?: string; dark?: string };
@@ -24,6 +26,7 @@ export interface CommentsStyles {
   dateColor?: { light?: string; dark?: string };
   formBackground?: { light?: string; dark?: string };
   formBorder?: { light?: string; dark?: string };
+  formFocusBorder?: { light?: string; dark?: string };
   textareaBackground?: { light?: string; dark?: string };
   textareaText?: { light?: string; dark?: string };
   footerBackground?: { light?: string; dark?: string };
@@ -65,6 +68,8 @@ export default function CommentsList({
     selectorBorder: theme === 'dark' ? styles?.selectorBorder?.dark : styles?.selectorBorder?.light,
     selectorText: theme === 'dark' ? styles?.selectorText?.dark : styles?.selectorText?.light,
     selectorIconColor: theme === 'dark' ? styles?.selectorIconColor?.dark : styles?.selectorIconColor?.light,
+    selectorDropdownBg: theme === 'dark' ? styles?.selectorDropdownBg?.dark : styles?.selectorDropdownBg?.light,
+    selectorOptionHover: theme === 'dark' ? styles?.selectorOptionHover?.dark : styles?.selectorOptionHover?.light,
     cardBackground: theme === 'dark' ? styles?.cardBackground?.dark : styles?.cardBackground?.light,
     cardBorder: theme === 'dark' ? styles?.cardBorder?.dark : styles?.cardBorder?.light,
     authorColor: theme === 'dark' ? styles?.authorColor?.dark : styles?.authorColor?.light,
@@ -72,6 +77,7 @@ export default function CommentsList({
     dateColor: theme === 'dark' ? styles?.dateColor?.dark : styles?.dateColor?.light,
     formBackground: theme === 'dark' ? styles?.formBackground?.dark : styles?.formBackground?.light,
     formBorder: theme === 'dark' ? styles?.formBorder?.dark : styles?.formBorder?.light,
+    formFocusBorder: theme === 'dark' ? styles?.formFocusBorder?.dark : styles?.formFocusBorder?.light,
     textareaBackground: theme === 'dark' ? styles?.textareaBackground?.dark : styles?.textareaBackground?.light,
     textareaText: theme === 'dark' ? styles?.textareaText?.dark : styles?.textareaText?.light,
     footerBackground: theme === 'dark' ? styles?.footerBackground?.dark : styles?.footerBackground?.light,
@@ -87,6 +93,27 @@ export default function CommentsList({
   
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Opciones del selector
+  const sortOptions = [
+    { value: 'newest', label: 'Más recientes' },
+    { value: 'oldest', label: 'Más antiguos' },
+    { value: 'top', label: 'Más votados' }
+  ];
 
   const {
     comments,
@@ -184,22 +211,64 @@ export default function CommentsList({
           <Filter className="w-4 h-4" style={{
             color: currentStyles.selectorIconColor || undefined
           }} />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className={`text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!currentStyles.selectorBackground ? 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white' : ''}`}
-            style={{
-              backgroundColor: currentStyles.selectorBackground || undefined,
-              borderColor: currentStyles.selectorBorder || undefined,
-              borderWidth: currentStyles.selectorBorder ? '1px' : undefined,
-              borderStyle: currentStyles.selectorBorder ? 'solid' : undefined,
-              color: currentStyles.selectorText || undefined
-            }}
-          >
-            <option value="newest">Más recientes</option>
-            <option value="oldest">Más antiguos</option>
-            <option value="top">Más votados</option>
-          </select>
+          
+          {/* Selector personalizado */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="text-sm rounded-lg px-3 py-1.5 flex items-center gap-2 transition-colors"
+              style={{
+                backgroundColor: currentStyles.selectorBackground || undefined,
+                borderColor: currentStyles.selectorBorder || undefined,
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                color: currentStyles.selectorText || undefined
+              }}
+            >
+              {sortOptions.find(opt => opt.value === sortBy)?.label}
+              <ChevronDown 
+                className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                style={{ color: currentStyles.selectorIconColor || undefined }}
+              />
+            </button>
+            
+            {/* Dropdown */}
+            {isDropdownOpen && (
+              <div 
+                className="absolute right-0 mt-1 min-w-[150px] rounded-lg shadow-lg z-50 overflow-hidden"
+                style={{
+                  backgroundColor: currentStyles.selectorDropdownBg || currentStyles.selectorBackground || '#ffffff',
+                  borderColor: currentStyles.selectorBorder || '#e5e7eb',
+                  borderWidth: '1px',
+                  borderStyle: 'solid'
+                }}
+              >
+                {sortOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setSortBy(option.value as SortOption);
+                      setIsDropdownOpen(false);
+                    }}
+                    onMouseEnter={() => setHoveredOption(option.value)}
+                    onMouseLeave={() => setHoveredOption(null)}
+                    className="w-full text-left px-3 py-2 text-sm transition-colors"
+                    style={{
+                      backgroundColor: hoveredOption === option.value 
+                        ? (currentStyles.selectorOptionHover || '#f3f4f6')
+                        : 'transparent',
+                      color: currentStyles.selectorText || undefined,
+                      fontWeight: sortBy === option.value ? 600 : 400
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -212,6 +281,7 @@ export default function CommentsList({
             styles={{
               formBackground: currentStyles.formBackground,
               formBorder: currentStyles.formBorder,
+              formFocusBorder: currentStyles.formFocusBorder,
               textareaBackground: currentStyles.textareaBackground,
               textareaText: currentStyles.textareaText,
               footerBackground: currentStyles.footerBackground,
@@ -232,6 +302,7 @@ export default function CommentsList({
             styles={{
               formBackground: currentStyles.formBackground,
               formBorder: currentStyles.formBorder,
+              formFocusBorder: currentStyles.formFocusBorder,
               textareaBackground: currentStyles.textareaBackground,
               textareaText: currentStyles.textareaText,
               footerBackground: currentStyles.footerBackground,

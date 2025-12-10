@@ -1,6 +1,7 @@
 /**
  * 📰 RelatedPosts Component
  * Muestra posts relacionados basados en categoría y tags
+ * ✅ Optimizado: ahora acepta posts pre-cargados del backend para evitar llamadas API extra
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -30,6 +31,7 @@ export interface RelatedPostsStyles {
 
 interface RelatedPostsProps {
   currentPost: BlogPost;
+  preloadedPosts?: BlogPost[];  // ✅ Posts pre-cargados del backend (evita llamadas API)
   maxPosts?: number;
   className?: string;
   styles?: RelatedPostsStyles;
@@ -41,6 +43,7 @@ interface RelatedPostsProps {
 
 export default function RelatedPosts({
   currentPost,
+  preloadedPosts,  // ✅ Nuevo prop
   maxPosts = 4,
   className = '',
   styles,
@@ -71,8 +74,14 @@ export default function RelatedPosts({
 
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   
+  // ✅ Si hay posts pre-cargados del backend, usarlos directamente (evita 2 llamadas API)
+  const shouldFetchFromAPI = !preloadedPosts || preloadedPosts.length === 0;
+  
   // Extraer nombres de tags válidos (solo si están populated como objetos con name)
   const validTagNames = useMemo(() => {
+    // Si ya tenemos posts pre-cargados, no necesitamos los tags para buscar
+    if (!shouldFetchFromAPI) return [];
+    
     if (!currentPost.tags || currentPost.tags.length === 0) return [];
     
     return currentPost.tags
@@ -99,27 +108,42 @@ export default function RelatedPosts({
         return null;
       })
       .filter((name): name is string => name !== null && name.length > 0);
-  }, [currentPost.tags]);
+  }, [currentPost.tags, shouldFetchFromAPI]);
   
-  // Buscar posts de la misma categoría (siempre funciona)
-  const { posts: categoryPosts } = useBlogPosts({
-    limit: maxPosts + 2,
-    categoria: currentPost.category?._id,
-    isPublished: true
-  });
+  // ✅ Solo hacer llamadas API si NO tenemos posts pre-cargados
+  const { posts: categoryPosts } = useBlogPosts(
+    shouldFetchFromAPI 
+      ? {
+          limit: maxPosts + 2,
+          categoria: currentPost.category?._id,
+          isPublished: true
+        }
+      : { limit: 0 } // No hacer la petición si tenemos posts pre-cargados
+  );
 
-  // Solo buscar por tags si tenemos nombres válidos
+  // Solo buscar por tags si tenemos nombres válidos Y no tenemos posts pre-cargados
   const { posts: tagPosts } = useBlogPosts(
-    validTagNames.length > 0 
+    shouldFetchFromAPI && validTagNames.length > 0 
       ? {
           limit: maxPosts,
           tags: validTagNames,
           isPublished: true
         }
-      : { limit: 0 } // No hacer la petición si no hay tags válidos
+      : { limit: 0 } // No hacer la petición
   );
 
   useEffect(() => {
+    // ✅ Prioridad 1: Usar posts pre-cargados del backend
+    if (preloadedPosts && preloadedPosts.length > 0) {
+      const filteredPosts = preloadedPosts
+        .filter(post => post._id !== currentPost._id)
+        .filter(post => post.featuredImage && post.title && post.slug)
+        .slice(0, maxPosts);
+      setRelatedPosts(filteredPosts);
+      return;
+    }
+    
+    // Prioridad 2: Usar posts de llamadas API (fallback)
     if (categoryPosts || tagPosts) {
       // Combinar y filtrar posts
       const allRelated = [
@@ -142,7 +166,7 @@ export default function RelatedPosts({
 
       setRelatedPosts(uniquePosts);
     }
-  }, [categoryPosts, tagPosts, currentPost._id, maxPosts]);
+  }, [preloadedPosts, categoryPosts, tagPosts, currentPost._id, maxPosts]);
 
   if (!relatedPosts.length) {
     return null;

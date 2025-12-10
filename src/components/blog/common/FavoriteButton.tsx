@@ -12,13 +12,18 @@ interface FavoriteButtonProps {
   size?: 'sm' | 'md' | 'lg';
   showText?: boolean;
   className?: string;
+  // Colores personalizables desde CMS
+  iconColor?: string;
+  bgColor?: string;
 }
 
 export default function FavoriteButton({
   postId,
   size = 'md',
   showText = false,
-  className = ''
+  className = '',
+  iconColor,
+  bgColor
 }: FavoriteButtonProps) {
   
   const { isFavorite, toggleFavorite, loading } = useFavorites();
@@ -60,14 +65,19 @@ export default function FavoriteButton({
         rounded-lg font-medium
         transition-all duration-200
         ${sizeConfig.padding}
-        ${localIsFavorite
-          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30'
-          : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
-        }
+        ${!iconColor && !bgColor ? (
+          localIsFavorite
+            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30'
+            : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+        ) : ''}
         disabled:opacity-50 disabled:cursor-not-allowed
         ${isAnimating ? 'scale-110' : 'scale-100'}
         ${className}
       `}
+      style={{
+        ...(bgColor ? { backgroundColor: bgColor } : {}),
+        ...(iconColor ? { color: iconColor } : {})
+      }}
       aria-label={localIsFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
       title={localIsFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
     >
