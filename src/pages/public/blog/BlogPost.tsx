@@ -266,25 +266,40 @@ const BlogPostEnhanced: React.FC = () => {
             {/* Comments Section */}
             {commentsConfig.enabled !== false && post.allowComments && (
               <div 
-                className={`rounded-xl shadow-sm p-6 sm:p-8 ${!commentsConfig.styles ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' : ''}`}
+                className={`rounded-xl shadow-sm p-6 sm:p-8 ${
+                  !commentsConfig.styles?.light?.sectionBackground && !commentsConfig.styles?.dark?.sectionBackground 
+                    ? 'bg-white dark:bg-gray-800' 
+                    : ''
+                } ${
+                  !commentsConfig.styles?.light?.sectionBorder && !commentsConfig.styles?.dark?.sectionBorder 
+                    ? 'border border-gray-200 dark:border-gray-700' 
+                    : ''
+                }`}
                 style={{
-                  backgroundColor: theme === 'dark' 
+                  background: theme === 'dark' 
                     ? commentsConfig.styles?.dark?.sectionBackground 
                     : commentsConfig.styles?.light?.sectionBackground,
                   borderColor: theme === 'dark' 
                     ? commentsConfig.styles?.dark?.sectionBorder 
                     : commentsConfig.styles?.light?.sectionBorder,
-                  borderWidth: commentsConfig.styles ? '1px' : undefined,
-                  borderStyle: commentsConfig.styles ? 'solid' : undefined,
+                  borderWidth: (commentsConfig.styles?.light?.sectionBorder || commentsConfig.styles?.dark?.sectionBorder) ? '1px' : undefined,
+                  borderStyle: (commentsConfig.styles?.light?.sectionBorder || commentsConfig.styles?.dark?.sectionBorder) ? 'solid' : undefined,
                 }}
               >
                 <CommentsList 
                   postSlug={slug!}
+                  title={commentsConfig.title || 'Comentarios'}
+                  fontFamily={commentsConfig.fontFamily ? `${commentsConfig.fontFamily}, sans-serif` : 'Montserrat, sans-serif'}
                   theme={theme as 'light' | 'dark'}
                   avatarShape={commentsConfig.avatarShape || 'circle'}
                   styles={commentsConfig.styles ? {
-                    sectionBackground: { light: commentsConfig.styles.light?.sectionBackground, dark: commentsConfig.styles.dark?.sectionBackground },
-                    sectionBorder: { light: commentsConfig.styles.light?.sectionBorder, dark: commentsConfig.styles.dark?.sectionBorder },
+                    titleColor: { light: commentsConfig.styles.light?.titleColor, dark: commentsConfig.styles.dark?.titleColor },
+                    iconColor: { light: commentsConfig.styles.light?.iconColor, dark: commentsConfig.styles.dark?.iconColor },
+                    countColor: { light: commentsConfig.styles.light?.countColor, dark: commentsConfig.styles.dark?.countColor },
+                    selectorBackground: { light: commentsConfig.styles.light?.selectorBackground, dark: commentsConfig.styles.dark?.selectorBackground },
+                    selectorBorder: { light: commentsConfig.styles.light?.selectorBorder, dark: commentsConfig.styles.dark?.selectorBorder },
+                    selectorText: { light: commentsConfig.styles.light?.selectorText, dark: commentsConfig.styles.dark?.selectorText },
+                    selectorIconColor: { light: commentsConfig.styles.light?.selectorIconColor, dark: commentsConfig.styles.dark?.selectorIconColor },
                     cardBackground: { light: commentsConfig.styles.light?.cardBackground, dark: commentsConfig.styles.dark?.cardBackground },
                     cardBorder: { light: commentsConfig.styles.light?.cardBorder, dark: commentsConfig.styles.dark?.cardBorder },
                     authorColor: { light: commentsConfig.styles.light?.authorColor, dark: commentsConfig.styles.dark?.authorColor },
@@ -292,7 +307,11 @@ const BlogPostEnhanced: React.FC = () => {
                     dateColor: { light: commentsConfig.styles.light?.dateColor, dark: commentsConfig.styles.dark?.dateColor },
                     formBackground: { light: commentsConfig.styles.light?.formBackground, dark: commentsConfig.styles.dark?.formBackground },
                     formBorder: { light: commentsConfig.styles.light?.formBorder, dark: commentsConfig.styles.dark?.formBorder },
+                    textareaBackground: { light: commentsConfig.styles.light?.textareaBackground, dark: commentsConfig.styles.dark?.textareaBackground },
+                    textareaText: { light: commentsConfig.styles.light?.textareaText, dark: commentsConfig.styles.dark?.textareaText },
+                    footerBackground: { light: commentsConfig.styles.light?.footerBackground, dark: commentsConfig.styles.dark?.footerBackground },
                     buttonBackground: { light: commentsConfig.styles.light?.buttonBackground, dark: commentsConfig.styles.dark?.buttonBackground },
+                    buttonBorder: { light: commentsConfig.styles.light?.buttonBorder, dark: commentsConfig.styles.dark?.buttonBorder },
                     buttonText: { light: commentsConfig.styles.light?.buttonText, dark: commentsConfig.styles.dark?.buttonText },
                   } : undefined}
                 />
@@ -311,10 +330,17 @@ const BlogPostEnhanced: React.FC = () => {
                 styles={relatedConfig.styles ? {
                   sectionBackground: { light: relatedConfig.styles.light?.sectionBackground, dark: relatedConfig.styles.dark?.sectionBackground },
                   sectionBorder: { light: relatedConfig.styles.light?.sectionBorder, dark: relatedConfig.styles.dark?.sectionBorder },
+                  iconColor: { light: relatedConfig.styles.light?.iconColor, dark: relatedConfig.styles.dark?.iconColor },
                   cardBackground: { light: relatedConfig.styles.light?.cardBackground, dark: relatedConfig.styles.dark?.cardBackground },
                   cardBorder: { light: relatedConfig.styles.light?.cardBorder, dark: relatedConfig.styles.dark?.cardBorder },
+                  cardTitleColor: { light: relatedConfig.styles.light?.cardTitleColor, dark: relatedConfig.styles.dark?.cardTitleColor },
+                  cardCategoryBackground: { light: relatedConfig.styles.light?.cardCategoryBackground, dark: relatedConfig.styles.dark?.cardCategoryBackground },
+                  cardCategoryBorder: { light: relatedConfig.styles.light?.cardCategoryBorder, dark: relatedConfig.styles.dark?.cardCategoryBorder },
+                  cardCategoryText: { light: relatedConfig.styles.light?.cardCategoryText, dark: relatedConfig.styles.dark?.cardCategoryText },
+                  cardDateColor: { light: relatedConfig.styles.light?.cardDateColor, dark: relatedConfig.styles.dark?.cardDateColor },
                   titleColor: { light: relatedConfig.styles.light?.titleColor, dark: relatedConfig.styles.dark?.titleColor },
                   buttonBackground: { light: relatedConfig.styles.light?.buttonBackground, dark: relatedConfig.styles.dark?.buttonBackground },
+                  buttonBorder: { light: relatedConfig.styles.light?.buttonBorder, dark: relatedConfig.styles.dark?.buttonBorder },
                   buttonText: { light: relatedConfig.styles.light?.buttonText, dark: relatedConfig.styles.dark?.buttonText },
                   linkColor: { light: relatedConfig.styles.light?.linkColor, dark: relatedConfig.styles.dark?.linkColor },
                 } : undefined}
@@ -326,6 +352,22 @@ const BlogPostEnhanced: React.FC = () => {
               <PostNavigation 
                 currentPost={post}
                 showEmptyCard={navConfig.showEmptyCard ?? false}
+                styles={navConfig.styles ? {
+                  sectionBackground: theme === 'dark' ? navConfig.styles.dark?.sectionBackground : navConfig.styles.light?.sectionBackground,
+                  sectionBorder: theme === 'dark' ? navConfig.styles.dark?.sectionBorder : navConfig.styles.light?.sectionBorder,
+                  titleColor: theme === 'dark' ? navConfig.styles.dark?.titleColor : navConfig.styles.light?.titleColor,
+                  indicatorColor: theme === 'dark' ? navConfig.styles.dark?.indicatorColor : navConfig.styles.light?.indicatorColor,
+                  cardBackground: theme === 'dark' ? navConfig.styles.dark?.cardBackground : navConfig.styles.light?.cardBackground,
+                  cardBorder: theme === 'dark' ? navConfig.styles.dark?.cardBorder : navConfig.styles.light?.cardBorder,
+                  cardHoverBorder: theme === 'dark' ? navConfig.styles.dark?.cardHoverBorder : navConfig.styles.light?.cardHoverBorder,
+                  cardHoverBackground: theme === 'dark' ? navConfig.styles.dark?.cardHoverBackground : navConfig.styles.light?.cardHoverBackground,
+                  labelColor: theme === 'dark' ? navConfig.styles.dark?.labelColor : navConfig.styles.light?.labelColor,
+                  postTitleColor: theme === 'dark' ? navConfig.styles.dark?.postTitleColor : navConfig.styles.light?.postTitleColor,
+                  excerptColor: theme === 'dark' ? navConfig.styles.dark?.excerptColor : navConfig.styles.light?.excerptColor,
+                  metaColor: theme === 'dark' ? navConfig.styles.dark?.metaColor : navConfig.styles.light?.metaColor,
+                  iconColor: theme === 'dark' ? navConfig.styles.dark?.iconColor : navConfig.styles.light?.iconColor,
+                  imageBorder: theme === 'dark' ? navConfig.styles.dark?.imageBorder : navConfig.styles.light?.imageBorder,
+                } : undefined}
               />
             )}
           </article>

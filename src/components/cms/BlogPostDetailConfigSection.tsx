@@ -122,20 +122,34 @@ interface BlogPostDetailConfig {
       light?: { 
         sectionBackground?: string; 
         sectionBorder?: string;
+        iconColor?: string;
         cardBackground?: string; 
         cardBorder?: string;
+        cardTitleColor?: string;
+        cardCategoryBackground?: string;
+        cardCategoryBorder?: string;
+        cardCategoryText?: string;
+        cardDateColor?: string;
         titleColor?: string;
         buttonBackground?: string;
+        buttonBorder?: string;
         buttonText?: string;
         linkColor?: string;
       };
       dark?: { 
         sectionBackground?: string; 
         sectionBorder?: string;
+        iconColor?: string;
         cardBackground?: string; 
         cardBorder?: string;
+        cardTitleColor?: string;
+        cardCategoryBackground?: string;
+        cardCategoryBorder?: string;
+        cardCategoryText?: string;
+        cardDateColor?: string;
         titleColor?: string;
         buttonBackground?: string;
+        buttonBorder?: string;
         buttonText?: string;
         linkColor?: string;
       };
@@ -147,12 +161,44 @@ interface BlogPostDetailConfig {
     showThumbnails?: boolean;
     showEmptyCard?: boolean;
     styles?: {
-      light?: { background?: string; border?: string; textColor?: string; hoverBackground?: string };
-      dark?: { background?: string; border?: string; textColor?: string; hoverBackground?: string };
+      light?: { 
+        sectionBackground?: string; 
+        sectionBorder?: string; 
+        titleColor?: string;
+        indicatorColor?: string;
+        cardBackground?: string;
+        cardBorder?: string;
+        cardHoverBorder?: string;
+        cardHoverBackground?: string;
+        labelColor?: string;
+        postTitleColor?: string;
+        excerptColor?: string;
+        metaColor?: string;
+        iconColor?: string;
+        imageBorder?: string;
+      };
+      dark?: { 
+        sectionBackground?: string; 
+        sectionBorder?: string; 
+        titleColor?: string;
+        indicatorColor?: string;
+        cardBackground?: string;
+        cardBorder?: string;
+        cardHoverBorder?: string;
+        cardHoverBackground?: string;
+        labelColor?: string;
+        postTitleColor?: string;
+        excerptColor?: string;
+        metaColor?: string;
+        iconColor?: string;
+        imageBorder?: string;
+      };
     };
   };
   comments?: {
     enabled?: boolean;
+    title?: string;
+    fontFamily?: string;
     allowAnonymous?: boolean;
     moderationRequired?: boolean;
     maxDepth?: number;
@@ -162,6 +208,13 @@ interface BlogPostDetailConfig {
       light?: { 
         sectionBackground?: string;
         sectionBorder?: string;
+        titleColor?: string;
+        iconColor?: string;
+        countColor?: string;
+        selectorBackground?: string;
+        selectorBorder?: string;
+        selectorText?: string;
+        selectorIconColor?: string;
         cardBackground?: string; 
         cardBorder?: string; 
         authorColor?: string; 
@@ -169,12 +222,23 @@ interface BlogPostDetailConfig {
         dateColor?: string;
         formBackground?: string;
         formBorder?: string;
+        textareaBackground?: string;
+        textareaText?: string;
+        footerBackground?: string;
         buttonBackground?: string;
+        buttonBorder?: string;
         buttonText?: string;
       };
       dark?: { 
         sectionBackground?: string;
         sectionBorder?: string;
+        titleColor?: string;
+        iconColor?: string;
+        countColor?: string;
+        selectorBackground?: string;
+        selectorBorder?: string;
+        selectorText?: string;
+        selectorIconColor?: string;
         cardBackground?: string; 
         cardBorder?: string; 
         authorColor?: string; 
@@ -182,7 +246,11 @@ interface BlogPostDetailConfig {
         dateColor?: string;
         formBackground?: string;
         formBorder?: string;
+        textareaBackground?: string;
+        textareaText?: string;
+        footerBackground?: string;
         buttonBackground?: string;
+        buttonBorder?: string;
         buttonText?: string;
       };
     };
@@ -1406,7 +1474,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                       <Sun className="w-3 h-3" /> Tema Claro
                     </p>
                     <div className="space-y-2">
-                      <ColorInput
+                      <BackgroundColorInput
                         label="Fondo"
                         value={config.author?.styles?.light?.background || '#f3f4f6'}
                         onChange={(v) => updateStyles('author', 'light', 'background', v)}
@@ -1434,7 +1502,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                       <Moon className="w-3 h-3" /> Tema Oscuro
                     </p>
                     <div className="space-y-2">
-                      <ColorInput
+                      <BackgroundColorInput
                         label="Fondo"
                         value={config.author?.styles?.dark?.background || '#1f2937'}
                         onChange={(v) => updateStyles('author', 'dark', 'background', v)}
@@ -1494,7 +1562,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         <Sun className="w-3 h-3" /> Tema Claro
                       </p>
                       <div className="space-y-2">
-                        <ColorInput
+                        <BackgroundColorInput
                           label="Fondo"
                           value={config.tags?.styles?.light?.background || '#e5e7eb'}
                           onChange={(v) => updateStyles('tags', 'light', 'background', v)}
@@ -1517,7 +1585,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         <Moon className="w-3 h-3" /> Tema Oscuro
                       </p>
                       <div className="space-y-2">
-                        <ColorInput
+                        <BackgroundColorInput
                           label="Fondo"
                           value={config.tags?.styles?.dark?.background || '#374151'}
                           onChange={(v) => updateStyles('tags', 'dark', 'background', v)}
@@ -1649,6 +1717,34 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                 onChange={(v) => updateConfig('comments', 'avatarShape', v)}
               />
 
+              <InputField
+                label="Título de la sección"
+                value={config.comments?.title || 'Comentarios'}
+                onChange={(v) => updateConfig('comments', 'title', v)}
+              />
+
+              <SelectField
+                label="Tipografía"
+                value={config.comments?.fontFamily || 'Montserrat'}
+                options={[
+                  { value: 'Montserrat', label: 'Montserrat (por defecto)' },
+                  { value: 'Inter', label: 'Inter' },
+                  { value: 'Roboto', label: 'Roboto' },
+                  { value: 'Open Sans', label: 'Open Sans' },
+                  { value: 'Lato', label: 'Lato' },
+                  { value: 'Poppins', label: 'Poppins' },
+                  { value: 'Raleway', label: 'Raleway' },
+                  { value: 'Nunito', label: 'Nunito' },
+                  { value: 'PT Sans', label: 'PT Sans' },
+                  { value: 'Merriweather', label: 'Merriweather' },
+                  { value: 'Playfair Display', label: 'Playfair Display' },
+                  { value: 'Georgia', label: 'Georgia' },
+                  { value: 'Arial', label: 'Arial' },
+                  { value: 'system-ui', label: 'System UI' }
+                ]}
+                onChange={(v) => updateConfig('comments', 'fontFamily', v)}
+              />
+
               {/* Estilos de la sección de comentarios */}
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">🎨 Estilos de la sección</p>
@@ -1659,7 +1755,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                       <Sun className="w-3 h-3" /> Tema Claro
                     </p>
                     <div className="space-y-2">
-                      <ColorInput
+                      <BackgroundColorInput
                         label="Fondo sección"
                         value={config.comments?.styles?.light?.sectionBackground || '#ffffff'}
                         onChange={(v) => updateStyles('comments', 'light', 'sectionBackground', v)}
@@ -1668,6 +1764,41 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         label="Borde sección"
                         value={config.comments?.styles?.light?.sectionBorder || '#e5e7eb'}
                         onChange={(v) => updateStyles('comments', 'light', 'sectionBorder', v)}
+                      />
+                      <ColorInput
+                        label="Color título"
+                        value={config.comments?.styles?.light?.titleColor || '#111827'}
+                        onChange={(v) => updateStyles('comments', 'light', 'titleColor', v)}
+                      />
+                      <ColorInput
+                        label="Color icono título"
+                        value={config.comments?.styles?.light?.iconColor || '#2563eb'}
+                        onChange={(v) => updateStyles('comments', 'light', 'iconColor', v)}
+                      />
+                      <ColorInput
+                        label="Color contador"
+                        value={config.comments?.styles?.light?.countColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('comments', 'light', 'countColor', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo selector"
+                        value={config.comments?.styles?.light?.selectorBackground || '#ffffff'}
+                        onChange={(v) => updateStyles('comments', 'light', 'selectorBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde selector"
+                        value={config.comments?.styles?.light?.selectorBorder || '#d1d5db'}
+                        onChange={(v) => updateStyles('comments', 'light', 'selectorBorder', v)}
+                      />
+                      <ColorInput
+                        label="Texto selector"
+                        value={config.comments?.styles?.light?.selectorText || '#111827'}
+                        onChange={(v) => updateStyles('comments', 'light', 'selectorText', v)}
+                      />
+                      <ColorInput
+                        label="Icono selector"
+                        value={config.comments?.styles?.light?.selectorIconColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('comments', 'light', 'selectorIconColor', v)}
                       />
                       <BackgroundColorInput
                         label="Fondo tarjeta"
@@ -1694,15 +1825,40 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         value={config.comments?.styles?.light?.dateColor || '#9ca3af'}
                         onChange={(v) => updateStyles('comments', 'light', 'dateColor', v)}
                       />
-                      <ColorInput
+                      <BackgroundColorInput
                         label="Fondo formulario"
                         value={config.comments?.styles?.light?.formBackground || '#ffffff'}
                         onChange={(v) => updateStyles('comments', 'light', 'formBackground', v)}
                       />
-                      <GradientColorInput
-                        label="Botón enviar"
+                      <BackgroundColorInput
+                        label="Fondo textarea"
+                        value={config.comments?.styles?.light?.textareaBackground || 'transparent'}
+                        onChange={(v) => updateStyles('comments', 'light', 'textareaBackground', v)}
+                      />
+                      <ColorInput
+                        label="Color texto textarea"
+                        value={config.comments?.styles?.light?.textareaText || '#111827'}
+                        onChange={(v) => updateStyles('comments', 'light', 'textareaText', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo barra inferior"
+                        value={config.comments?.styles?.light?.footerBackground || '#f9fafb'}
+                        onChange={(v) => updateStyles('comments', 'light', 'footerBackground', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Botón fondo"
                         value={config.comments?.styles?.light?.buttonBackground || '#3b82f6'}
                         onChange={(v) => updateStyles('comments', 'light', 'buttonBackground', v)}
+                      />
+                      <GradientColorInput
+                        label="Botón borde"
+                        value={config.comments?.styles?.light?.buttonBorder || ''}
+                        onChange={(v) => updateStyles('comments', 'light', 'buttonBorder', v)}
+                      />
+                      <ColorInput
+                        label="Botón texto"
+                        value={config.comments?.styles?.light?.buttonText || '#ffffff'}
+                        onChange={(v) => updateStyles('comments', 'light', 'buttonText', v)}
                       />
                     </div>
                   </div>
@@ -1713,7 +1869,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                       <Moon className="w-3 h-3" /> Tema Oscuro
                     </p>
                     <div className="space-y-2">
-                      <ColorInput
+                      <BackgroundColorInput
                         label="Fondo sección"
                         value={config.comments?.styles?.dark?.sectionBackground || '#1f2937'}
                         onChange={(v) => updateStyles('comments', 'dark', 'sectionBackground', v)}
@@ -1722,6 +1878,41 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         label="Borde sección"
                         value={config.comments?.styles?.dark?.sectionBorder || '#374151'}
                         onChange={(v) => updateStyles('comments', 'dark', 'sectionBorder', v)}
+                      />
+                      <ColorInput
+                        label="Color título"
+                        value={config.comments?.styles?.dark?.titleColor || '#f9fafb'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'titleColor', v)}
+                      />
+                      <ColorInput
+                        label="Color icono título"
+                        value={config.comments?.styles?.dark?.iconColor || '#60a5fa'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'iconColor', v)}
+                      />
+                      <ColorInput
+                        label="Color contador"
+                        value={config.comments?.styles?.dark?.countColor || '#6b7280'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'countColor', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo selector"
+                        value={config.comments?.styles?.dark?.selectorBackground || '#374151'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'selectorBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde selector"
+                        value={config.comments?.styles?.dark?.selectorBorder || '#4b5563'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'selectorBorder', v)}
+                      />
+                      <ColorInput
+                        label="Texto selector"
+                        value={config.comments?.styles?.dark?.selectorText || '#f9fafb'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'selectorText', v)}
+                      />
+                      <ColorInput
+                        label="Icono selector"
+                        value={config.comments?.styles?.dark?.selectorIconColor || '#6b7280'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'selectorIconColor', v)}
                       />
                       <BackgroundColorInput
                         label="Fondo tarjeta"
@@ -1748,15 +1939,40 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         value={config.comments?.styles?.dark?.dateColor || '#6b7280'}
                         onChange={(v) => updateStyles('comments', 'dark', 'dateColor', v)}
                       />
-                      <ColorInput
+                      <BackgroundColorInput
                         label="Fondo formulario"
                         value={config.comments?.styles?.dark?.formBackground || '#1f2937'}
                         onChange={(v) => updateStyles('comments', 'dark', 'formBackground', v)}
                       />
-                      <GradientColorInput
-                        label="Botón enviar"
+                      <BackgroundColorInput
+                        label="Fondo textarea"
+                        value={config.comments?.styles?.dark?.textareaBackground || 'transparent'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'textareaBackground', v)}
+                      />
+                      <ColorInput
+                        label="Color texto textarea"
+                        value={config.comments?.styles?.dark?.textareaText || '#f9fafb'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'textareaText', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo barra inferior"
+                        value={config.comments?.styles?.dark?.footerBackground || '#374151'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'footerBackground', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Botón fondo"
                         value={config.comments?.styles?.dark?.buttonBackground || '#2563eb'}
                         onChange={(v) => updateStyles('comments', 'dark', 'buttonBackground', v)}
+                      />
+                      <GradientColorInput
+                        label="Botón borde"
+                        value={config.comments?.styles?.dark?.buttonBorder || ''}
+                        onChange={(v) => updateStyles('comments', 'dark', 'buttonBorder', v)}
+                      />
+                      <ColorInput
+                        label="Botón texto"
+                        value={config.comments?.styles?.dark?.buttonText || '#ffffff'}
+                        onChange={(v) => updateStyles('comments', 'dark', 'buttonText', v)}
                       />
                     </div>
                   </div>
@@ -1874,20 +2090,65 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         value={config.relatedPosts?.styles?.light?.sectionBorder || '#e5e7eb'}
                         onChange={(v) => updateStyles('relatedPosts', 'light', 'sectionBorder', v)}
                       />
+                      <ColorInput
+                        label="Color icono"
+                        value={config.relatedPosts?.styles?.light?.iconColor || '#2563eb'}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'iconColor', v)}
+                      />
                       <BackgroundColorInput
                         label="Fondo tarjeta"
                         value={config.relatedPosts?.styles?.light?.cardBackground || '#f9fafb'}
                         onChange={(v) => updateStyles('relatedPosts', 'light', 'cardBackground', v)}
                       />
                       <ColorInput
+                        label="Borde tarjeta"
+                        value={config.relatedPosts?.styles?.light?.cardBorder || '#e5e7eb'}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'cardBorder', v)}
+                      />
+                      <ColorInput
+                        label="Título tarjeta"
+                        value={config.relatedPosts?.styles?.light?.cardTitleColor || '#ffffff'}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'cardTitleColor', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo categoría"
+                        value={config.relatedPosts?.styles?.light?.cardCategoryBackground || '#2563eb'}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'cardCategoryBackground', v)}
+                      />
+                      <GradientColorInput
+                        label="Borde categoría"
+                        value={config.relatedPosts?.styles?.light?.cardCategoryBorder || ''}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'cardCategoryBorder', v)}
+                      />
+                      <ColorInput
+                        label="Texto categoría"
+                        value={config.relatedPosts?.styles?.light?.cardCategoryText || '#ffffff'}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'cardCategoryText', v)}
+                      />
+                      <ColorInput
+                        label="Color fecha"
+                        value={config.relatedPosts?.styles?.light?.cardDateColor || '#d1d5db'}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'cardDateColor', v)}
+                      />
+                      <ColorInput
                         label="Color título"
                         value={config.relatedPosts?.styles?.light?.titleColor || '#1f2937'}
                         onChange={(v) => updateStyles('relatedPosts', 'light', 'titleColor', v)}
                       />
-                      <GradientColorInput
+                      <BackgroundColorInput
                         label="Botón fondo"
                         value={config.relatedPosts?.styles?.light?.buttonBackground || '#2563eb'}
                         onChange={(v) => updateStyles('relatedPosts', 'light', 'buttonBackground', v)}
+                      />
+                      <GradientColorInput
+                        label="Botón borde"
+                        value={config.relatedPosts?.styles?.light?.buttonBorder || ''}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'buttonBorder', v)}
+                      />
+                      <ColorInput
+                        label="Botón texto"
+                        value={config.relatedPosts?.styles?.light?.buttonText || '#ffffff'}
+                        onChange={(v) => updateStyles('relatedPosts', 'light', 'buttonText', v)}
                       />
                       <ColorInput
                         label="Color enlaces"
@@ -1913,20 +2174,65 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                         value={config.relatedPosts?.styles?.dark?.sectionBorder || '#374151'}
                         onChange={(v) => updateStyles('relatedPosts', 'dark', 'sectionBorder', v)}
                       />
+                      <ColorInput
+                        label="Color icono"
+                        value={config.relatedPosts?.styles?.dark?.iconColor || '#60a5fa'}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'iconColor', v)}
+                      />
                       <BackgroundColorInput
                         label="Fondo tarjeta"
                         value={config.relatedPosts?.styles?.dark?.cardBackground || '#111827'}
                         onChange={(v) => updateStyles('relatedPosts', 'dark', 'cardBackground', v)}
                       />
                       <ColorInput
+                        label="Borde tarjeta"
+                        value={config.relatedPosts?.styles?.dark?.cardBorder || '#374151'}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'cardBorder', v)}
+                      />
+                      <ColorInput
+                        label="Título tarjeta"
+                        value={config.relatedPosts?.styles?.dark?.cardTitleColor || '#ffffff'}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'cardTitleColor', v)}
+                      />
+                      <BackgroundColorInput
+                        label="Fondo categoría"
+                        value={config.relatedPosts?.styles?.dark?.cardCategoryBackground || '#3b82f6'}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'cardCategoryBackground', v)}
+                      />
+                      <GradientColorInput
+                        label="Borde categoría"
+                        value={config.relatedPosts?.styles?.dark?.cardCategoryBorder || ''}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'cardCategoryBorder', v)}
+                      />
+                      <ColorInput
+                        label="Texto categoría"
+                        value={config.relatedPosts?.styles?.dark?.cardCategoryText || '#ffffff'}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'cardCategoryText', v)}
+                      />
+                      <ColorInput
+                        label="Color fecha"
+                        value={config.relatedPosts?.styles?.dark?.cardDateColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'cardDateColor', v)}
+                      />
+                      <ColorInput
                         label="Color título"
                         value={config.relatedPosts?.styles?.dark?.titleColor || '#f9fafb'}
                         onChange={(v) => updateStyles('relatedPosts', 'dark', 'titleColor', v)}
                       />
-                      <GradientColorInput
+                      <BackgroundColorInput
                         label="Botón fondo"
                         value={config.relatedPosts?.styles?.dark?.buttonBackground || '#1d4ed8'}
                         onChange={(v) => updateStyles('relatedPosts', 'dark', 'buttonBackground', v)}
+                      />
+                      <GradientColorInput
+                        label="Botón borde"
+                        value={config.relatedPosts?.styles?.dark?.buttonBorder || ''}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'buttonBorder', v)}
+                      />
+                      <ColorInput
+                        label="Botón texto"
+                        value={config.relatedPosts?.styles?.dark?.buttonText || '#ffffff'}
+                        onChange={(v) => updateStyles('relatedPosts', 'dark', 'buttonText', v)}
                       />
                       <ColorInput
                         label="Color enlaces"
@@ -1951,24 +2257,190 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
           />
 
           {config.navigation?.enabled !== false && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-              <Toggle
-                label="Mostrar Anterior/Siguiente"
-                checked={config.navigation?.showPrevNext ?? true}
-                onChange={(v) => updateConfig('navigation', 'showPrevNext', v)}
-              />
-              <Toggle
-                label="Mostrar miniaturas"
-                checked={config.navigation?.showThumbnails ?? false}
-                onChange={(v) => updateConfig('navigation', 'showThumbnails', v)}
-              />
-              <Toggle
-                label="Mostrar tarjeta vacía"
-                checked={config.navigation?.showEmptyCard ?? false}
-                onChange={(v) => updateConfig('navigation', 'showEmptyCard', v)}
-                description="Mostrar cuando no hay artículo"
-              />
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                <Toggle
+                  label="Mostrar Anterior/Siguiente"
+                  checked={config.navigation?.showPrevNext ?? true}
+                  onChange={(v) => updateConfig('navigation', 'showPrevNext', v)}
+                />
+                <Toggle
+                  label="Mostrar miniaturas"
+                  checked={config.navigation?.showThumbnails ?? false}
+                  onChange={(v) => updateConfig('navigation', 'showThumbnails', v)}
+                />
+                <Toggle
+                  label="Mostrar tarjeta vacía"
+                  checked={config.navigation?.showEmptyCard ?? false}
+                  onChange={(v) => updateConfig('navigation', 'showEmptyCard', v)}
+                  description="Mostrar cuando no hay artículo"
+                />
+              </div>
+
+              {/* Estilos de navegación */}
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">🎨 Estilos de la sección</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Tema Claro */}
+                  <div className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-yellow-50/50 dark:bg-gray-800/50">
+                    <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
+                      <Sun className="w-3 h-3" /> Tema Claro
+                    </p>
+                    <div className="space-y-2">
+                      <ColorInput
+                        label="Fondo sección"
+                        value={config.navigation?.styles?.light?.sectionBackground || '#ffffff'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'sectionBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde sección"
+                        value={config.navigation?.styles?.light?.sectionBorder || '#e5e7eb'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'sectionBorder', v)}
+                      />
+                      <ColorInput
+                        label="Color título"
+                        value={config.navigation?.styles?.light?.titleColor || '#111827'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'titleColor', v)}
+                      />
+                      <GradientColorInput
+                        label="Indicador título"
+                        value={config.navigation?.styles?.light?.indicatorColor || '#2563eb'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'indicatorColor', v)}
+                      />
+                      <ColorInput
+                        label="Fondo tarjeta"
+                        value={config.navigation?.styles?.light?.cardBackground || '#ffffff'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'cardBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde tarjeta"
+                        value={config.navigation?.styles?.light?.cardBorder || '#e5e7eb'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'cardBorder', v)}
+                      />
+                      <ColorInput
+                        label="Borde hover"
+                        value={config.navigation?.styles?.light?.cardHoverBorder || '#93c5fd'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'cardHoverBorder', v)}
+                      />
+                      <ColorInput
+                        label="Fondo hover"
+                        value={config.navigation?.styles?.light?.cardHoverBackground || '#eff6ff'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'cardHoverBackground', v)}
+                      />
+                      <ColorInput
+                        label="Etiqueta (Anterior/Siguiente)"
+                        value={config.navigation?.styles?.light?.labelColor || '#2563eb'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'labelColor', v)}
+                      />
+                      <ColorInput
+                        label="Título del post"
+                        value={config.navigation?.styles?.light?.postTitleColor || '#111827'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'postTitleColor', v)}
+                      />
+                      <ColorInput
+                        label="Extracto"
+                        value={config.navigation?.styles?.light?.excerptColor || '#4b5563'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'excerptColor', v)}
+                      />
+                      <ColorInput
+                        label="Metadatos"
+                        value={config.navigation?.styles?.light?.metaColor || '#6b7280'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'metaColor', v)}
+                      />
+                      <ColorInput
+                        label="Color iconos"
+                        value={config.navigation?.styles?.light?.iconColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'iconColor', v)}
+                      />
+                      <ColorInput
+                        label="Borde imagen"
+                        value={config.navigation?.styles?.light?.imageBorder || '#e5e7eb'}
+                        onChange={(v) => updateStyles('navigation', 'light', 'imageBorder', v)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tema Oscuro */}
+                  <div className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-900/50 dark:bg-gray-900/80">
+                    <p className="text-xs font-semibold text-gray-400 mb-2 flex items-center gap-1">
+                      <Moon className="w-3 h-3" /> Tema Oscuro
+                    </p>
+                    <div className="space-y-2">
+                      <ColorInput
+                        label="Fondo sección"
+                        value={config.navigation?.styles?.dark?.sectionBackground || '#1f2937'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'sectionBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde sección"
+                        value={config.navigation?.styles?.dark?.sectionBorder || '#374151'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'sectionBorder', v)}
+                      />
+                      <ColorInput
+                        label="Color título"
+                        value={config.navigation?.styles?.dark?.titleColor || '#ffffff'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'titleColor', v)}
+                      />
+                      <GradientColorInput
+                        label="Indicador título"
+                        value={config.navigation?.styles?.dark?.indicatorColor || '#3b82f6'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'indicatorColor', v)}
+                      />
+                      <ColorInput
+                        label="Fondo tarjeta"
+                        value={config.navigation?.styles?.dark?.cardBackground || '#1f2937'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'cardBackground', v)}
+                      />
+                      <ColorInput
+                        label="Borde tarjeta"
+                        value={config.navigation?.styles?.dark?.cardBorder || '#4b5563'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'cardBorder', v)}
+                      />
+                      <ColorInput
+                        label="Borde hover"
+                        value={config.navigation?.styles?.dark?.cardHoverBorder || '#2563eb'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'cardHoverBorder', v)}
+                      />
+                      <ColorInput
+                        label="Fondo hover"
+                        value={config.navigation?.styles?.dark?.cardHoverBackground || 'rgba(30, 58, 138, 0.1)'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'cardHoverBackground', v)}
+                      />
+                      <ColorInput
+                        label="Etiqueta (Anterior/Siguiente)"
+                        value={config.navigation?.styles?.dark?.labelColor || '#60a5fa'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'labelColor', v)}
+                      />
+                      <ColorInput
+                        label="Título del post"
+                        value={config.navigation?.styles?.dark?.postTitleColor || '#ffffff'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'postTitleColor', v)}
+                      />
+                      <ColorInput
+                        label="Extracto"
+                        value={config.navigation?.styles?.dark?.excerptColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'excerptColor', v)}
+                      />
+                      <ColorInput
+                        label="Metadatos"
+                        value={config.navigation?.styles?.dark?.metaColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'metaColor', v)}
+                      />
+                      <ColorInput
+                        label="Color iconos"
+                        value={config.navigation?.styles?.dark?.iconColor || '#9ca3af'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'iconColor', v)}
+                      />
+                      <ColorInput
+                        label="Borde imagen"
+                        value={config.navigation?.styles?.dark?.imageBorder || '#4b5563'}
+                        onChange={(v) => updateStyles('navigation', 'dark', 'imageBorder', v)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </SubSection>
       </MainSection>

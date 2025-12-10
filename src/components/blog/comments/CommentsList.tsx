@@ -10,6 +10,13 @@ import type { CommentFormData } from '../../../types/blog';
 export interface CommentsStyles {
   sectionBackground?: { light?: string; dark?: string };
   sectionBorder?: { light?: string; dark?: string };
+  titleColor?: { light?: string; dark?: string };
+  iconColor?: { light?: string; dark?: string };
+  countColor?: { light?: string; dark?: string };
+  selectorBackground?: { light?: string; dark?: string };
+  selectorBorder?: { light?: string; dark?: string };
+  selectorText?: { light?: string; dark?: string };
+  selectorIconColor?: { light?: string; dark?: string };
   cardBackground?: { light?: string; dark?: string };
   cardBorder?: { light?: string; dark?: string };
   authorColor?: { light?: string; dark?: string };
@@ -17,13 +24,19 @@ export interface CommentsStyles {
   dateColor?: { light?: string; dark?: string };
   formBackground?: { light?: string; dark?: string };
   formBorder?: { light?: string; dark?: string };
+  textareaBackground?: { light?: string; dark?: string };
+  textareaText?: { light?: string; dark?: string };
+  footerBackground?: { light?: string; dark?: string };
   buttonBackground?: { light?: string; dark?: string };
+  buttonBorder?: { light?: string; dark?: string };
   buttonText?: { light?: string; dark?: string };
 }
 
 interface CommentsListProps {
   postSlug: string;
   className?: string;
+  title?: string;
+  fontFamily?: string;
   styles?: CommentsStyles;
   theme?: 'light' | 'dark';
   avatarShape?: 'circle' | 'square';
@@ -34,6 +47,8 @@ type SortOption = 'newest' | 'oldest' | 'top';
 export default function CommentsList({
   postSlug,
   className = '',
+  title = 'Comentarios',
+  fontFamily = 'Montserrat, sans-serif',
   styles,
   theme = 'light',
   avatarShape = 'circle'
@@ -43,6 +58,13 @@ export default function CommentsList({
   const currentStyles = {
     sectionBackground: theme === 'dark' ? styles?.sectionBackground?.dark : styles?.sectionBackground?.light,
     sectionBorder: theme === 'dark' ? styles?.sectionBorder?.dark : styles?.sectionBorder?.light,
+    titleColor: theme === 'dark' ? styles?.titleColor?.dark : styles?.titleColor?.light,
+    iconColor: theme === 'dark' ? styles?.iconColor?.dark : styles?.iconColor?.light,
+    countColor: theme === 'dark' ? styles?.countColor?.dark : styles?.countColor?.light,
+    selectorBackground: theme === 'dark' ? styles?.selectorBackground?.dark : styles?.selectorBackground?.light,
+    selectorBorder: theme === 'dark' ? styles?.selectorBorder?.dark : styles?.selectorBorder?.light,
+    selectorText: theme === 'dark' ? styles?.selectorText?.dark : styles?.selectorText?.light,
+    selectorIconColor: theme === 'dark' ? styles?.selectorIconColor?.dark : styles?.selectorIconColor?.light,
     cardBackground: theme === 'dark' ? styles?.cardBackground?.dark : styles?.cardBackground?.light,
     cardBorder: theme === 'dark' ? styles?.cardBorder?.dark : styles?.cardBorder?.light,
     authorColor: theme === 'dark' ? styles?.authorColor?.dark : styles?.authorColor?.light,
@@ -50,7 +72,11 @@ export default function CommentsList({
     dateColor: theme === 'dark' ? styles?.dateColor?.dark : styles?.dateColor?.light,
     formBackground: theme === 'dark' ? styles?.formBackground?.dark : styles?.formBackground?.light,
     formBorder: theme === 'dark' ? styles?.formBorder?.dark : styles?.formBorder?.light,
+    textareaBackground: theme === 'dark' ? styles?.textareaBackground?.dark : styles?.textareaBackground?.light,
+    textareaText: theme === 'dark' ? styles?.textareaText?.dark : styles?.textareaText?.light,
+    footerBackground: theme === 'dark' ? styles?.footerBackground?.dark : styles?.footerBackground?.light,
     buttonBackground: theme === 'dark' ? styles?.buttonBackground?.dark : styles?.buttonBackground?.light,
+    buttonBorder: theme === 'dark' ? styles?.buttonBorder?.dark : styles?.buttonBorder?.light,
     buttonText: theme === 'dark' ? styles?.buttonText?.dark : styles?.buttonText?.light,
   };
 
@@ -136,21 +162,39 @@ export default function CommentsList({
   return (
     <div 
       className={`comments-section ${className} ${!currentStyles.sectionBackground ? '' : ''}`}
-      style={sectionStyle as React.CSSProperties}
+      style={{
+        ...sectionStyle,
+        fontFamily: fontFamily
+      } as React.CSSProperties}
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <MessageCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-          <span>Comentarios</span>
-          <span className="text-gray-400 dark:text-gray-500">({pagination?.total || 0})</span>
+        <h2 className="text-2xl font-bold flex items-center gap-2" style={{
+          color: currentStyles.titleColor || undefined
+        }}>
+          <MessageCircle className="w-6 h-6" style={{
+            color: currentStyles.iconColor || undefined
+          }} />
+          <span>{title}</span>
+          <span style={{
+            color: currentStyles.countColor || undefined
+          }}>({pagination?.total || 0})</span>
         </h2>
 
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <Filter className="w-4 h-4" style={{
+            color: currentStyles.selectorIconColor || undefined
+          }} />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={`text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!currentStyles.selectorBackground ? 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white' : ''}`}
+            style={{
+              backgroundColor: currentStyles.selectorBackground || undefined,
+              borderColor: currentStyles.selectorBorder || undefined,
+              borderWidth: currentStyles.selectorBorder ? '1px' : undefined,
+              borderStyle: currentStyles.selectorBorder ? 'solid' : undefined,
+              color: currentStyles.selectorText || undefined
+            }}
           >
             <option value="newest">Más recientes</option>
             <option value="oldest">Más antiguos</option>
@@ -168,7 +212,11 @@ export default function CommentsList({
             styles={{
               formBackground: currentStyles.formBackground,
               formBorder: currentStyles.formBorder,
+              textareaBackground: currentStyles.textareaBackground,
+              textareaText: currentStyles.textareaText,
+              footerBackground: currentStyles.footerBackground,
               buttonBackground: currentStyles.buttonBackground,
+              buttonBorder: currentStyles.buttonBorder,
               buttonText: currentStyles.buttonText,
             }}
           />
@@ -184,7 +232,11 @@ export default function CommentsList({
             styles={{
               formBackground: currentStyles.formBackground,
               formBorder: currentStyles.formBorder,
+              textareaBackground: currentStyles.textareaBackground,
+              textareaText: currentStyles.textareaText,
+              footerBackground: currentStyles.footerBackground,
               buttonBackground: currentStyles.buttonBackground,
+              buttonBorder: currentStyles.buttonBorder,
               buttonText: currentStyles.buttonText,
             }}
           />
@@ -259,7 +311,11 @@ export default function CommentsList({
                   styles={{
                     formBackground: currentStyles.formBackground,
                     formBorder: currentStyles.formBorder,
+                    textareaBackground: currentStyles.textareaBackground,
+                    textareaText: currentStyles.textareaText,
+                    footerBackground: currentStyles.footerBackground,
                     buttonBackground: currentStyles.buttonBackground,
+                    buttonBorder: currentStyles.buttonBorder,
                     buttonText: currentStyles.buttonText,
                   }}
                 />

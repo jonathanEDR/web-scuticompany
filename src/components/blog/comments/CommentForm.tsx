@@ -12,7 +12,11 @@ import type { CommentFormData } from '../../../types/blog';
 export interface CommentFormStyles {
   formBackground?: string;
   formBorder?: string;
+  textareaBackground?: string;
+  textareaText?: string;
+  footerBackground?: string;
   buttonBackground?: string;
+  buttonBorder?: string;
   buttonText?: string;
 }
 
@@ -165,7 +169,7 @@ export default function CommentForm({
           ${isReply ? 'shadow-sm' : 'shadow-md'}
         `}
         style={{
-          backgroundColor: styles?.formBackground || undefined,
+          background: styles?.formBackground || undefined,
           borderColor: error ? undefined : styles?.formBorder || undefined,
         }}
       >
@@ -230,20 +234,27 @@ export default function CommentForm({
         )}
 
         {/* Textarea */}
-        <div className="p-4">
+        <div 
+          className={`p-4 ${!styles?.textareaBackground ? '' : ''}`}
+          style={{ background: styles?.textareaBackground || undefined }}
+        >
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={placeholder}
             rows={isReply ? 3 : 4}
             maxLength={MAX_LENGTH}
-            className="w-full resize-none border-0 focus:ring-0 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            className="w-full resize-none border-0 focus:ring-0 bg-transparent placeholder-gray-400 dark:placeholder-gray-500"
+            style={{ color: styles?.textareaText || undefined }}
             disabled={isSubmitting}
           />
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+        <div 
+          className={`flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-600 ${!styles?.footerBackground ? 'bg-gray-50 dark:bg-gray-700' : ''}`}
+          style={{ background: styles?.footerBackground || undefined }}
+        >
           {/* Contador de caracteres */}
           <div className="text-sm">
             <span className={`
@@ -282,12 +293,23 @@ export default function CommentForm({
                 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg
                 transition-all duration-200
                 ${canSubmit
-                  ? !styles?.buttonBackground ? 'bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-md' : 'hover:opacity-90 hover:shadow-md'
+                  ? !styles?.buttonBackground && !styles?.buttonBorder 
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-md' 
+                    : 'hover:opacity-90 hover:shadow-md'
                   : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                 }
+                ${styles?.buttonBorder && !styles?.buttonBackground ? 'border-2' : ''}
               `}
               style={canSubmit ? {
-                background: styles?.buttonBackground || undefined,
+                background: styles?.buttonBackground || (styles?.buttonBorder ? 'transparent' : undefined),
+                borderImage: styles?.buttonBorder?.startsWith('linear-gradient') 
+                  ? `${styles.buttonBorder} 1` 
+                  : undefined,
+                borderColor: styles?.buttonBorder && !styles.buttonBorder.startsWith('linear-gradient') 
+                  ? styles.buttonBorder 
+                  : undefined,
+                borderWidth: styles?.buttonBorder ? '2px' : undefined,
+                borderStyle: styles?.buttonBorder ? 'solid' : undefined,
                 color: styles?.buttonText || undefined,
               } : undefined}
             >
