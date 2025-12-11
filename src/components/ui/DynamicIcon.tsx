@@ -116,6 +116,22 @@ export const AVAILABLE_SIDEBAR_ICONS = [
   { name: 'SunMoon', label: 'Sol y Luna' },
   { name: 'CloudSun', label: 'Nube Sol' },
   { name: 'CloudMoon', label: 'Nube Luna' },
+  
+  // Dashboard y Blog
+  { name: 'Newspaper', label: 'Periódico' },
+  { name: 'BookOpen', label: 'Libro Abierto' },
+  { name: 'FileStack', label: 'Archivos Apilados' },
+  { name: 'RefreshCw', label: 'Actualizar' },
+  { name: 'ArrowRight', label: 'Flecha Derecha' },
+  { name: 'ArrowLeft', label: 'Flecha Izquierda' },
+  { name: 'ChevronRight', label: 'Chevron Derecha' },
+  { name: 'ChevronLeft', label: 'Chevron Izquierda' },
+  { name: 'MailX', label: 'Correo X' },
+  { name: 'Inbox', label: 'Bandeja' },
+  { name: 'Eye', label: 'Ojo' },
+  { name: 'EyeOff', label: 'Ojo Cerrado' },
+  { name: 'ThumbsUp', label: 'Pulgar Arriba' },
+  { name: 'MessageSquareMore', label: 'Mensaje Más' },
 ] as const;
 
 // Tipo para los nombres de iconos disponibles
@@ -127,6 +143,7 @@ interface DynamicIconProps {
   color?: string;
   className?: string;
   strokeWidth?: number;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -138,6 +155,7 @@ const DynamicIcon: React.FC<DynamicIconProps> = ({
   color, 
   className = '',
   strokeWidth = 2,
+  style,
 }) => {
   // Obtener el componente del icono de Lucide
   const IconComponent = (LucideIcons as any)[name] as React.ComponentType<LucideIcons.LucideProps> | undefined;
@@ -151,6 +169,7 @@ const DynamicIcon: React.FC<DynamicIconProps> = ({
         color={color} 
         className={className}
         strokeWidth={strokeWidth}
+        style={style}
       />
     );
   }
@@ -161,6 +180,7 @@ const DynamicIcon: React.FC<DynamicIconProps> = ({
       color={color} 
       className={className}
       strokeWidth={strokeWidth}
+      style={style}
     />
   );
 };

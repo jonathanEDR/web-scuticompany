@@ -927,6 +927,8 @@ export interface PageContent {
   blogPostDetailConfig?: any; // Configuración de la página de detalle del post
   // 🆕 CONFIGURACIÓN DEL SIDEBAR DEL DASHBOARD
   dashboardSidebar?: DashboardSidebarConfig;
+  // 🆕 CONFIGURACIÓN DEL BLOQUE DE POSTS DESTACADOS DEL DASHBOARD
+  dashboardFeaturedPosts?: DashboardFeaturedPostsConfig;
 }
 
 // ============================================
@@ -1056,6 +1058,154 @@ export interface DashboardSidebarConfig {
       iconColorLight: string;    // Color del icono en tema claro (hex)
       iconColorDark: string;     // Color del icono en tema oscuro (hex)
     };
+  };
+}
+
+// ============================================
+// 📰 CONFIGURACIÓN DEL BLOQUE DE POSTS DESTACADOS DEL DASHBOARD
+// ============================================
+
+// ============================================
+// 📰 CONFIGURACIÓN DEL BLOQUE DE POSTS DESTACADOS DEL DASHBOARD
+// ============================================
+
+/**
+ * Configuración de un botón con fondo, borde y texto personalizables
+ */
+export interface ButtonConfig {
+  text: string;
+  iconName: string;
+  iconColorLight: string;
+  iconColorDark: string;
+  // Fondo
+  bgType: 'solid' | 'gradient' | 'transparent';
+  bgColorLight: string;
+  bgColorDark: string;
+  bgGradientFrom: string;
+  bgGradientTo: string;
+  // Borde
+  borderEnabled: boolean;
+  borderWidth: number;
+  borderType: 'solid' | 'gradient';
+  borderColorLight: string;
+  borderColorDark: string;
+  borderGradientFrom: string;
+  borderGradientTo: string;
+  // Texto
+  textColorLight: string;
+  textColorDark: string;
+}
+
+/**
+ * Configuración de estilos para el bloque de Posts Destacados del Dashboard
+ */
+export interface DashboardFeaturedPostsConfig {
+  // === HEADER DEL BLOQUE ===
+  header: {
+    title: string;
+    iconName: string;
+    iconColorLight: string;
+    iconColorDark: string;
+    titleColorLight: string;
+    titleColorDark: string;
+    showRefreshButton: boolean;
+  };
+  
+  // === BOTÓN ACTUALIZAR ===
+  refreshButton: ButtonConfig;
+  
+  // === PANEL CONTENEDOR ===
+  panel: {
+    bgColorLight: string;
+    bgColorDark: string;
+    borderRadius: string;
+    shadowSize: string;
+    padding: string;
+  };
+  
+  // === TARJETA DEL POST ===
+  card: {
+    bgGradientFromLight: string;
+    bgGradientToLight: string;
+    bgGradientFromDark: string;
+    bgGradientToDark: string;
+    borderRadius: string;
+    hoverScale: string;
+  };
+  
+  // === BADGE DE CATEGORÍA ===
+  categoryBadge: {
+    gradientFrom: string;
+    gradientTo: string;
+    textColor: string;
+    showIcon: boolean;
+    iconName: string;
+    iconColor: string;
+  };
+  
+  // === TEXTOS ===
+  typography: {
+    titleColorLight: string;
+    titleColorDark: string;
+    titleHoverColorLight: string;
+    titleHoverColorDark: string;
+    excerptColorLight: string;
+    excerptColorDark: string;
+    fontFamily: string;
+  };
+  
+  // === TAGS ===
+  tags: {
+    bgColorLight: string;
+    bgColorDark: string;
+    textColorLight: string;
+    textColorDark: string;
+    maxTags: number;
+  };
+  
+  // === AUTOR Y METADATA ===
+  author: {
+    avatarGradientFrom: string;
+    avatarGradientTo: string;
+    nameColorLight: string;
+    nameColorDark: string;
+    dateColorLight: string;
+    dateColorDark: string;
+  };
+  
+  // === CTA (CALL TO ACTION) ===
+  cta: ButtonConfig;
+  
+  // === IMAGEN DESTACADA ===
+  image: {
+    fallbackGradientFrom: string;
+    fallbackGradientVia: string;
+    fallbackGradientTo: string;
+    fallbackIconName: string;
+    fallbackIconColor: string;
+  };
+  
+  // === CONTROLES DEL CARRUSEL ===
+  carousel: {
+    autoRotateInterval: number;
+    controlsBgLight: string;
+    controlsBgDark: string;
+    controlsIconColorLight: string;
+    controlsIconColorDark: string;
+    indicatorActiveColor: string;
+    indicatorInactiveColorLight: string;
+    indicatorInactiveColorDark: string;
+  };
+  
+  // === ESTADO VACÍO ===
+  emptyState: {
+    iconName: string;
+    iconColorLight: string;
+    iconColorDark: string;
+    messageLight: string;
+    messageDark: string;
+    textColorLight: string;
+    textColorDark: string;
   };
 }
 

@@ -79,7 +79,11 @@ type TabType = 'basic' | 'social' | 'privacy';
 // COMPONENTE PRINCIPAL
 // ============================================
 
-const ProfileEditor: React.FC = () => {
+interface ProfileEditorProps {
+  compactMode?: boolean; // Si es true, oculta el header grande
+}
+
+const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) => {
   const { getToken } = useAuth();
   const { user } = useUser();
   const navigate = useNavigate();
@@ -488,41 +492,70 @@ const ProfileEditor: React.FC = () => {
 
   return (
     <div className="w-full space-y-6">
-      {/* Header con Completeness */}
-      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-6 text-white">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-bold">Editar Perfil</h2>
-            <p className="text-indigo-100">Completa tu perfil para conectar mejor con la comunidad</p>
+      {/* Header con Completeness - Solo si NO está en modo compacto */}
+      {!compactMode && (
+        <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">Editar Perfil</h2>
+              <p className="text-indigo-100">Completa tu perfil para conectar mejor con la comunidad</p>
+            </div>
+            <div className="text-right">
+              <div className={`text-2xl font-bold ${getCompletenessColor(completeness.score)} bg-white dark:bg-gray-800 rounded-lg px-3 py-2`}>
+                {completeness.score}%
+              </div>
+              <p className="text-sm text-indigo-100 mt-1">Completado</p>
+            </div>
           </div>
-          <div className="text-right">
-            <div className={`text-2xl font-bold ${getCompletenessColor(completeness.score)} bg-white dark:bg-gray-800 rounded-lg px-3 py-2`}>
+          
+          {/* Barra de Progreso */}
+          <div className="w-full bg-white/20 rounded-full h-3">
+            <div 
+              className={`h-3 rounded-full transition-all duration-500 ${getCompletenessBarColor(completeness.score)}`}
+              style={{ width: `${completeness.score}%` }}
+            />
+          </div>
+
+          {/* Sugerencias */}
+          {completeness.suggestions.length > 0 && (
+            <div className="mt-4 text-sm">
+              <p className="font-medium mb-2">💡 Sugerencias para mejorar:</p>
+              <ul className="list-disc list-inside space-y-1 text-indigo-100">
+                {completeness.suggestions.slice(0, 2).map((suggestion, index) => (
+                  <li key={index}>{suggestion}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Indicador de completeness compacto - Solo en modo compacto */}
+      {compactMode && (
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+          <div className="flex items-center">
+            <div className={`text-xl font-bold ${getCompletenessColor(completeness.score)} mr-3`}>
               {completeness.score}%
             </div>
-            <p className="text-sm text-indigo-100 mt-1">Completado</p>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                Completitud del perfil
+              </p>
+              {completeness.suggestions.length > 0 && (
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {completeness.suggestions[0]}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div 
+              className={`h-2 rounded-full transition-all duration-500 ${getCompletenessBarColor(completeness.score)}`}
+              style={{ width: `${completeness.score}%` }}
+            />
           </div>
         </div>
-        
-        {/* Barra de Progreso */}
-        <div className="w-full bg-white/20 rounded-full h-3">
-          <div 
-            className={`h-3 rounded-full transition-all duration-500 ${getCompletenessBarColor(completeness.score)}`}
-            style={{ width: `${completeness.score}%` }}
-          />
-        </div>
-
-        {/* Sugerencias */}
-        {completeness.suggestions.length > 0 && (
-          <div className="mt-4 text-sm">
-            <p className="font-medium mb-2">💡 Sugerencias para mejorar:</p>
-            <ul className="list-disc list-inside space-y-1 text-indigo-100">
-              {completeness.suggestions.slice(0, 2).map((suggestion, index) => (
-                <li key={index}>{suggestion}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Notificación de Éxito */}
       {showSuccess && (

@@ -27,6 +27,7 @@ import BlogCtaConfigSection from './BlogCtaConfigSection';
 import ServicioDetailConfigSection from './ServicioDetailConfigSection';
 import BlogPostDetailConfigSection from './BlogPostDetailConfigSection';
 import SidebarConfigSection from './SidebarConfigSection';
+import DashboardFeaturedPostsConfigSection from './DashboardFeaturedPostsConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -745,10 +746,32 @@ const CmsManager: React.FC = () => {
           />
         )}
         {activeTab === 'sidebar' && (
-          <SidebarConfigSection
-            onSave={() => setSaveStatus('saved')}
-            onChangePending={() => setHasGlobalChanges(true)}
-          />
+          <div className="space-y-8">
+            {/* Configuración del Sidebar */}
+            <SidebarConfigSection
+              onSave={() => setSaveStatus('saved')}
+              onChangePending={() => setHasGlobalChanges(true)}
+            />
+            
+            {/* Separador */}
+            <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-8">
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span className="text-2xl">📰</span>
+                  Bloque de Posts Destacados
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Configura el diseño del carrusel de noticias en el Dashboard del Cliente
+                </p>
+              </div>
+              
+              {/* Configuración de Posts Destacados */}
+              <DashboardFeaturedPostsConfigSection
+                onSave={() => setSaveStatus('saved')}
+                onChangePending={() => setHasGlobalChanges(true)}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>
