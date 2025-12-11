@@ -349,12 +349,70 @@ const HomeOptimized = () => {
         {/* 💬 Chatbot de Ventas Flotante */}
         <FloatingChatWidget />
         
-        {/* Indicador sutil de carga del CMS (opcional) */}
+        {/* Indicador de carga del CMS con logo - ¡Escapa del cursor! */}
         {isLoadingCMS && (
-          <div className="fixed bottom-4 right-4 bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg text-sm z-50">
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              Actualizando contenido...
+          <div 
+            className="fixed z-50 pointer-events-auto select-none"
+            style={{ bottom: '16px', right: '16px' }}
+            onMouseEnter={(e) => {
+              const element = e.currentTarget;
+              
+              // Calcular nueva posición aleatoria para escapar
+              const positions = [
+                { bottom: '16px', right: '80px' },
+                { bottom: '80px', right: '16px' },
+                { bottom: '80px', right: '80px' },
+                { bottom: '16px', right: '150px' },
+                { bottom: '150px', right: '16px' },
+                { bottom: '120px', right: '120px' },
+                { bottom: '50px', right: '200px' },
+                { bottom: '200px', right: '50px' },
+              ];
+              
+              const randomPos = positions[Math.floor(Math.random() * positions.length)];
+              element.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+              element.style.bottom = randomPos.bottom;
+              element.style.right = randomPos.right;
+            }}
+          >
+            <div className="relative flex items-center justify-center cursor-not-allowed w-16 h-16">
+              {/* Efecto de brillo pulsante de fondo */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 opacity-30 animate-ping"></div>
+              
+              {/* Círculo de carga giratorio principal - MÁS RÁPIDO */}
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  border: '3px solid transparent',
+                  borderTopColor: '#8B5CF6',
+                  borderRightColor: '#06B6D4',
+                  animation: 'spin 0.6s linear infinite'
+                }}
+              ></div>
+              
+              {/* Segundo anillo más sutil girando en dirección opuesta - MÁS RÁPIDO */}
+              <div 
+                className="absolute rounded-full"
+                style={{
+                  inset: '4px',
+                  border: '2px solid transparent',
+                  borderBottomColor: '#A78BFA',
+                  borderLeftColor: '#22D3EE',
+                  animation: 'spin 0.8s linear infinite reverse'
+                }}
+              ></div>
+              
+              {/* Logo favicon en el centro */}
+              <div className="absolute inset-2 rounded-full bg-white shadow-xl flex items-center justify-center overflow-hidden">
+                <img 
+                  src="https://res.cloudinary.com/ds54wlchi/image/upload/v1761502909/web-scuti/uze3gepsrrjpe43uobxj.png" 
+                  alt="Cargando..." 
+                  className="w-3/4 h-3/4 object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/FAVICON.png';
+                  }}
+                />
+              </div>
             </div>
           </div>
         )}
