@@ -89,6 +89,7 @@ export interface DefaultValueAddedConfig {
     gradient?: string;
   }>;
   logos?: Array<{
+    _id: string;
     name: string;
     imageUrl: string;
     alt: string;
@@ -409,6 +410,7 @@ export const DEFAULT_VALUE_ADDED_CONFIG: DefaultValueAddedConfig = {
   ],
   logos: [
     {
+      _id: '1',
       name: 'PYTHON',
       imageUrl: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761085769/web-scuti/iaff59yybfs9aghosfhd.png',
       alt: 'PYTHON',
@@ -416,6 +418,7 @@ export const DEFAULT_VALUE_ADDED_CONFIG: DefaultValueAddedConfig = {
       order: 0
     },
     {
+      _id: '2',
       name: 'Scala',
       imageUrl: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761085817/web-scuti/h7curekyfgubgutzbgna.png',
       alt: 'Logo Scala',
@@ -423,6 +426,7 @@ export const DEFAULT_VALUE_ADDED_CONFIG: DefaultValueAddedConfig = {
       order: 1
     },
     {
+      _id: '3',
       name: 'Java',
       imageUrl: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761086233/web-scuti/drnoaprhbxmuis4ydir9.png',
       alt: 'Logo Java',
@@ -430,6 +434,7 @@ export const DEFAULT_VALUE_ADDED_CONFIG: DefaultValueAddedConfig = {
       order: 4
     },
     {
+      _id: '4',
       name: 'Logo 13',
       imageUrl: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761086446/web-scuti/ck7eilb1rtucj2sjedik.png',
       alt: 'Logo 13',
@@ -437,6 +442,7 @@ export const DEFAULT_VALUE_ADDED_CONFIG: DefaultValueAddedConfig = {
       order: 12
     },
     {
+      _id: '5',
       name: 'Logo 14',
       imageUrl: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761086462/web-scuti/us6ljarn9ad1hxyazdax.png',
       alt: 'Logo 14',
