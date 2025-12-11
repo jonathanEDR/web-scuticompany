@@ -124,64 +124,53 @@ export const ServicioCard: React.FC<ServicioCardProps> = ({
         ${className}
       `}
     >
-      {/* Header con imagen/icono y badges */}
-      <div
-        className={`p-5 border-b ${viewMode === 'admin' ? 'border-gray-200 dark:border-gray-700' : 'border-gray-700/50'}`}
-        style={{
-          background: viewMode === 'admin' 
-            ? `linear-gradient(135deg, ${servicio.colorFondo}08 0%, transparent 100%)`
-            : `linear-gradient(135deg, ${servicio.colorFondo}15 0%, transparent 100%)`
-        }}
-      >
-        <div className="flex gap-4">
-          {/* Columna de Icono/Imagen con badge destacado */}
-          <div className="flex flex-col items-center gap-2 flex-shrink-0">
-            {/* Imagen o Icono */}
-            {(() => {
-              if (servicio.imagen) {
-                return (
-                  <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-md">
-                    <img
-                      src={servicio.imagen}
-                      alt={servicio.titulo}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                );
-              }
-              
-              return (
-                <div
-                  className="text-5xl w-24 h-24 flex items-center justify-center rounded-xl shadow-md"
-                  style={{
-                    backgroundColor: `${servicio.colorIcono}${viewMode === 'admin' ? '15' : '20'}`,
-                    border: `2px solid ${servicio.colorIcono}${viewMode === 'admin' ? '30' : '40'}`
-                  }}
-                >
-                  {servicio.icono}
-                </div>
-              );
-            })()}
-
-            {/* Badge destacado - Debajo del icono */}
-            {servicio.destacado && (
-              <span className="text-xs bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1 rounded-full font-semibold shadow-sm whitespace-nowrap">
-                ★ Destacado
-              </span>
-            )}
+      {/* Header con imagen de fondo y overlay con título/badges */}
+      <div className="relative h-44 overflow-hidden">
+        {/* Imagen de fondo o gradiente con icono */}
+        {servicio.imagen ? (
+          <img
+            src={servicio.imagen}
+            alt={servicio.titulo}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 w-full h-full flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${servicio.colorFondo || '#6366f1'}40 0%, ${servicio.colorIcono || '#8b5cf6'}60 100%)`
+            }}
+          >
+            <span className="text-7xl opacity-50">{servicio.icono}</span>
           </div>
-
-          {/* Columna de Título y badges */}
-          <div className="flex-1 min-w-0">
-            <h3 className={`text-lg font-bold mb-2 line-clamp-2 leading-snug ${viewMode === 'admin' ? 'text-gray-900 dark:text-white' : 'text-white'}`}>
-              {servicio.titulo}
-            </h3>
+        )}
+        
+        {/* Overlay oscuro para legibilidad */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        
+        {/* Contenido superpuesto */}
+        <div className="absolute inset-0 flex flex-col justify-between p-4">
+          {/* Top: Badges */}
+          <div className="flex items-start justify-between gap-2">
             <div className="flex flex-wrap gap-2">
               <CategoriaBadge categoria={servicio.categoria} size="sm" />
               {viewMode === 'admin' && (
                 <EstadoBadge estado={servicio.estado} size="sm" />
               )}
             </div>
+            
+            {/* Badge destacado */}
+            {servicio.destacado && (
+              <span className="text-xs bg-yellow-500/90 text-white px-2.5 py-1 rounded-full font-semibold shadow-lg whitespace-nowrap backdrop-blur-sm">
+                ★ Destacado
+              </span>
+            )}
+          </div>
+          
+          {/* Bottom: Título */}
+          <div>
+            <h3 className="text-lg font-bold text-white line-clamp-2 leading-snug drop-shadow-lg">
+              {servicio.titulo}
+            </h3>
           </div>
         </div>
       </div>

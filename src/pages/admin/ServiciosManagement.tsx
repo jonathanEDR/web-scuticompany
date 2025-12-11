@@ -148,7 +148,13 @@ export const ServiciosManagementOptimized = () => {
 
     // Aplicar filtros
     if (filters.categorias?.length) {
-      filtered = filtered.filter(s => filters.categorias?.includes(s.categoria));
+      filtered = filtered.filter(s => {
+        // Manejar ambos casos: categoría poblada (objeto) o no poblada (string/ObjectId)
+        const categoriaSlug = typeof s.categoria === 'object' && s.categoria !== null
+          ? s.categoria.slug
+          : s.categoria;
+        return filters.categorias?.includes(categoriaSlug);
+      });
     }
 
     if (filters.precioMin !== undefined) {
