@@ -29,7 +29,6 @@ const PublicHeaderOptimized = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
   const [showSolutionsDropdown, setShowSolutionsDropdown] = useState(false);
   const [headerMenuPosts, setHeaderMenuPosts] = useState<BlogPost[]>([]);
   
@@ -113,7 +112,6 @@ const PublicHeaderOptimized = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
       if (!target.closest('.dropdown-container')) {
-        setShowResourcesDropdown(false);
         setShowSolutionsDropdown(false);
       }
     };
@@ -140,12 +138,22 @@ const PublicHeaderOptimized = () => {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 theme-transition transition-all duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 right-0 z-50 theme-transition transition-all duration-500 ease-in-out ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`} 
       style={{
-        backgroundColor: lastScrollY > 50 ? 'rgba(15, 23, 42, 0.95)' : 'transparent',
-        backdropFilter: lastScrollY > 50 ? 'blur(10px)' : 'none'
+        backgroundColor: lastScrollY > 50 
+          ? (theme === 'dark' ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.95)') 
+          : 'transparent',
+        backdropFilter: lastScrollY > 50 ? 'blur(12px) saturate(180%)' : 'none',
+        boxShadow: lastScrollY > 50 
+          ? (theme === 'dark' 
+            ? '0 4px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.1)' 
+            : '0 4px 20px rgba(0, 0, 0, 0.08), 0 0 40px rgba(139, 92, 246, 0.05)')
+          : 'none',
+        borderBottom: lastScrollY > 50 
+          ? `1px solid ${theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.15)'}` 
+          : 'none'
       }}
     >
       <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 w-full">
@@ -167,7 +175,10 @@ const PublicHeaderOptimized = () => {
             <div className="sm:hidden flex-shrink-0">
               <button
                 onClick={toggleTheme}
-                className="p-1.5 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
+                className="p-1.5 rounded-lg transition-all duration-200 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/30"
+                style={{
+                  color: theme === 'dark' ? '#A78BFA' : '#6B21A8'
+                }}
                 aria-label="Cambiar tema"
               >
                 {theme === 'light' ? (
@@ -184,41 +195,78 @@ const PublicHeaderOptimized = () => {
           </div>
 
           {/* Navegación - Mobile: fila separada | Desktop: centrada entre logo y acciones */}
-          <nav className="flex flex-wrap justify-center items-center gap-x-2 gap-y-1 py-2 sm:py-0 sm:space-x-4 lg:space-x-6 sm:flex-1 sm:justify-center w-full sm:w-auto" role="navigation" aria-label="Navegación principal">
+          <nav className="flex flex-wrap justify-center items-center gap-x-2 gap-y-1 py-2 sm:py-0 sm:space-x-4 lg:space-x-6 sm:flex-1 sm:justify-center w-full sm:w-auto" role="navigation" aria-label="Navegación principal" style={{ fontFamily: "'Montserrat', sans-serif" }}>
             <Link 
               to="/" 
-              className="theme-text-primary font-medium theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-              onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text)'}
+              className="relative theme-text-primary font-medium theme-transition px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
+                (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.color = '';
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+              }}
               aria-current="page"
             >
-              Inicio
+              <span className="relative z-10">Inicio</span>
             </Link>
             <Link 
               to="/nosotros" 
-              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-              onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
+              className="relative theme-text-secondary theme-transition px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
+                (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.color = '';
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+              }}
             >
-              Nosotros
+              <span className="relative z-10">Nosotros</span>
             </Link>
             <Link 
               to="/servicios" 
-              className="theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-              onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
+              className="relative theme-text-secondary theme-transition px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
+                (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.color = '';
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+              }}
               aria-label="Servicios"
             >
-              Servicios
+              <span className="relative z-10">Servicios</span>
+            </Link>
+            <Link 
+              to="/blog" 
+              className="relative theme-text-secondary theme-transition px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
+                (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.color = '';
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+              }}
+              aria-label="Blog"
+            >
+              <span className="relative z-10">Blog</span>
             </Link>
             <div className="relative group dropdown-container">
               <button 
-                className="theme-text-secondary theme-transition flex items-center px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
+                className="relative theme-text-secondary theme-transition flex items-center px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"
                 onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                  (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
+                  (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)';
                   setShowSolutionsDropdown(true);
                 }}
-                onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
+                onMouseLeave={(e) => {
+                  (e.target as HTMLElement).style.color = '';
+                  (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                }}
                 onClick={() => setShowSolutionsDropdown(!showSolutionsDropdown)}
                 aria-label="Menú de soluciones"
               >
@@ -231,9 +279,14 @@ const PublicHeaderOptimized = () => {
               {/* Dropdown Menu */}
               {headerMenuPosts.length > 0 && (
                 <div 
-                  className={`absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
+                  className={`absolute top-full left-0 mt-1 w-64 rounded-lg shadow-lg border z-50 transition-all duration-200 ${
                     showSolutionsDropdown ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
                   }`}
+                  style={{
+                    backgroundColor: theme === 'dark' ? 'rgba(31, 41, 55, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                    borderColor: theme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(209, 213, 219, 1)',
+                    backdropFilter: 'blur(12px)'
+                  }}
                   onMouseEnter={() => setShowSolutionsDropdown(true)}
                   onMouseLeave={() => setShowSolutionsDropdown(false)}
                 >
@@ -242,8 +295,18 @@ const PublicHeaderOptimized = () => {
                       <Link
                         key={post._id}
                         to={`/blog/${post.slug}`}
-                        className="block px-4 py-2 text-sm theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 theme-transition"
+                        className="block px-4 py-2.5 text-sm theme-text-secondary theme-transition rounded-md mx-1"
                         onClick={() => setShowSolutionsDropdown(false)}
+                        onMouseEnter={(e) => {
+                          (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.08)';
+                          (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
+                          (e.target as HTMLElement).style.paddingLeft = '1.25rem';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                          (e.target as HTMLElement).style.color = '';
+                          (e.target as HTMLElement).style.paddingLeft = '1rem';
+                        }}
                       >
                         📄 {post.title}
                       </Link>
@@ -252,61 +315,6 @@ const PublicHeaderOptimized = () => {
                 </div>
               )}
             </div>
-            <div className="relative group dropdown-container">
-              <button 
-                className="theme-text-secondary theme-transition flex items-center px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--color-primary)';
-                  setShowResourcesDropdown(true);
-                }}
-                onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
-                onClick={() => setShowResourcesDropdown(!showResourcesDropdown)}
-                aria-label="Menú de recursos"
-              >
-                Recursos
-                <svg className="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {/* Dropdown Menu */}
-              <div 
-                className={`absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
-                  showResourcesDropdown ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
-                }`}
-                onMouseEnter={() => setShowResourcesDropdown(true)}
-                onMouseLeave={() => setShowResourcesDropdown(false)}
-              >
-                <div className="py-2">
-                  <Link
-                    to="/blog"
-                    className="block px-4 py-2 text-sm theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 theme-transition"
-                    onClick={() => setShowResourcesDropdown(false)}
-                  >
-                    📖 Blog de Tecnología
-                  </Link>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 theme-transition opacity-60 cursor-not-allowed"
-                    disabled
-                    title="Próximamente - Portafolio de proyectos"
-                  >
-                    🚀 Proyectos Destacados
-                    <span className="text-xs text-gray-400 ml-2">(Próximamente)</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Blog - Solo visible en móvil */}
-            <Link 
-              to="/blog" 
-              className="sm:hidden theme-text-secondary theme-transition px-1.5 py-0.5 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 hover:bg-white/5"
-              onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--color-primary)'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--color-text-secondary)'}
-              aria-label="Blog de tecnología"
-            >
-              📖 Blog
-            </Link>
 
             {/* CONTÁCTANOS en navegación - Solo visible en móvil */}
             <button 
@@ -315,7 +323,8 @@ const PublicHeaderOptimized = () => {
               style={{
                 borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
                 color: theme === 'light' ? '#7528ee' : '#7528ee',
-                backgroundColor: 'transparent'
+                backgroundColor: 'transparent',
+                fontFamily: "'Montserrat', sans-serif"
               }}
               onMouseEnter={(e) => {
                 const element = e.target as HTMLElement;
@@ -337,7 +346,10 @@ const PublicHeaderOptimized = () => {
             {/* Theme Toggle - Solo visible en desktop */}
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg theme-text-secondary theme-transition hover:bg-white/5"
+              className="p-1.5 rounded-lg transition-all duration-200 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/30"
+              style={{
+                color: theme === 'dark' ? '#A78BFA' : '#6B21A8'
+              }}
               aria-label="Cambiar tema"
             >
               {theme === 'light' ? (
@@ -354,21 +366,27 @@ const PublicHeaderOptimized = () => {
             {/* CONTÁCTANOS - Color rosado en tema blanco */}
             <button 
               onClick={scrollToContact}
-              className="px-3 py-1.5 rounded-full transition-all duration-300 font-medium text-xs border-2"
+              className="px-4 py-2 rounded-full transition-all duration-300 font-semibold text-xs border-2 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
               style={{
-                borderColor: theme === 'light' ? '#7528ee' : '#7528ee',
-                color: theme === 'light' ? '#7528ee' : '#7528ee',
-                backgroundColor: 'transparent'
+                borderColor: '#7528ee',
+                color: theme === 'dark' ? '#A78BFA' : '#7528ee',
+                backgroundColor: 'transparent',
+                boxShadow: theme === 'dark' ? '0 4px 12px rgba(139, 92, 246, 0.2)' : '0 4px 12px rgba(117, 40, 238, 0.15)',
+                fontFamily: "'Montserrat', sans-serif"
               }}
               onMouseEnter={(e) => {
                 const element = e.target as HTMLElement;
-                element.style.backgroundColor = theme === 'light' ? '#7528ee' : '#7528ee';
+                element.style.backgroundColor = '#7528ee';
                 element.style.color = '#FFFFFF';
+                element.style.borderColor = '#7528ee';
+                element.style.boxShadow = theme === 'dark' ? '0 8px 20px rgba(139, 92, 246, 0.4)' : '0 8px 20px rgba(117, 40, 238, 0.3)';
               }}
               onMouseLeave={(e) => {
                 const element = e.target as HTMLElement;
                 element.style.backgroundColor = 'transparent';
-                element.style.color = theme === 'light' ? '#7528ee' : '#7528ee';
+                element.style.color = theme === 'dark' ? '#A78BFA' : '#7528ee';
+                element.style.borderColor = '#7528ee';
+                element.style.boxShadow = theme === 'dark' ? '0 4px 12px rgba(139, 92, 246, 0.2)' : '0 4px 12px rgba(117, 40, 238, 0.15)';
               }}
             >
               CONTÁCTANOS
@@ -378,7 +396,20 @@ const PublicHeaderOptimized = () => {
             {userData ? (
               <button
                 onClick={() => navigate('/dashboard')}
-                className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg theme-bg-card border theme-border hover:bg-white/5 transition-all duration-200 group"
+                className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg transition-all duration-200 group border"
+                style={{
+                  backgroundColor: theme === 'dark' ? 'rgba(31, 41, 55, 0.8)' : 'rgba(255, 255, 255, 0.1)',
+                  borderColor: theme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)',
+                  backdropFilter: 'blur(8px)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)';
+                  e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.5)' : 'rgba(139, 92, 246, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(31, 41, 55, 0.8)' : 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)';
+                }}
                 aria-label={`Dashboard de ${userData.firstName || 'Usuario'}`}
                 title={`Ir al dashboard - ${userData.firstName || 'Usuario'}`}
               >
@@ -387,7 +418,10 @@ const PublicHeaderOptimized = () => {
                   <img 
                     src={userData.imageUrl} 
                     alt={`Avatar de ${userData.firstName || 'Usuario'}`}
-                    className="w-6 h-6 rounded-full object-cover border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200"
+                    className="w-6 h-6 rounded-full object-cover border-2 transition-all duration-200"
+                    style={{
+                      borderColor: theme === 'dark' ? 'rgba(139, 92, 246, 0.4)' : 'rgba(139, 92, 246, 0.3)'
+                    }}
                     onError={(e) => {
                       // Si falla la imagen, mostrar iniciales
                       const target = e.target as HTMLImageElement;
@@ -399,15 +433,26 @@ const PublicHeaderOptimized = () => {
                 
                 {/* Fallback con iniciales */}
                 <div 
-                  className={`w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-white font-medium text-xs border-2 border-purple-500/20 group-hover:border-purple-500/40 transition-all duration-200 ${
+                  className={`w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-white font-medium text-xs border-2 transition-all duration-200 ${
                     userData.imageUrl ? 'hidden' : ''
                   }`}
+                  style={{
+                    borderColor: theme === 'dark' ? 'rgba(139, 92, 246, 0.4)' : 'rgba(139, 92, 246, 0.3)'
+                  }}
                 >
                   {getUserInitials()}
                 </div>
                 
                 {/* Flecha indicadora */}
-                <svg className="w-3 h-3 theme-text-secondary group-hover:text-purple-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg 
+                  className="w-3 h-3 transition-colors duration-200" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  style={{
+                    color: theme === 'dark' ? '#A78BFA' : '#8B5CF6'
+                  }}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>

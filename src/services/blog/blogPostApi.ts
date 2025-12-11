@@ -111,7 +111,41 @@ setupAuthInterceptor(blogApiClient);
 const getAllPosts = async (
   filters?: BlogFilters
 ): Promise<ApiResponse<PaginatedResponse<BlogPost>>> => {
-  const response = await publicBlogApiClient.get('/posts', { params: filters });
+  // Limpiar filtros vacíos para evitar errores en la API
+  const cleanFilters: Record<string, any> = {};
+  
+  // Regex para detectar strings que son solo caracteres hexadecimales (posibles IDs)
+  const hexOnlyRegex = /^[a-f0-9]+$/i;
+  
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      // Ignorar valores undefined, null, arrays vacíos o strings vacíos
+      if (value === undefined || value === null) return;
+      if (Array.isArray(value)) {
+        // Filtrar valores undefined/null del array y solo incluir si tiene elementos
+        const cleanArray = value.filter(v => {
+          if (v === undefined || v === null || v === '') return false;
+          // Para tags, filtrar valores que parecen IDs (solo hex)
+          if (key === 'tags' && typeof v === 'string' && hexOnlyRegex.test(v)) {
+            return false;
+          }
+          return true;
+        });
+        if (cleanArray.length > 0) {
+          // Convertir array a string separado por comas para evitar tags[]=
+          cleanFilters[key] = cleanArray.join(',');
+        }
+      } else if (value !== '') {
+        // Para tags individuales, también filtrar IDs hex
+        if (key === 'tags' && typeof value === 'string' && hexOnlyRegex.test(value)) {
+          return;
+        }
+        cleanFilters[key] = value;
+      }
+    });
+  }
+  
+  const response = await publicBlogApiClient.get('/posts', { params: cleanFilters });
   return response.data;
 };
 

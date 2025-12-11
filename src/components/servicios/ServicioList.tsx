@@ -174,7 +174,7 @@ export const ServicioList: React.FC<ServicioListProps> = ({
                     <div>
                       <div className="text-white font-medium">{servicio.titulo}</div>
                       {servicio.destacado && (
-                        <span className="text-xs text-yellow-400">⭐ Destacado</span>
+                        <span className="text-xs text-yellow-400">★ Destacado</span>
                       )}
                     </div>
                   </div>

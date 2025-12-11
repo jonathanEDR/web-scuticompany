@@ -225,7 +225,11 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
     const data = await response.json();
 
     if (!data.success) {
-      throw new Error(data.message || 'Error al obtener página');
+      // 🔥 NUEVO: Distinguir entre 404 (página no existe) y otros errores
+      // Si es 404, NO usar cache - propagar el error para que useCmsData use el fallback específico
+      const error = new Error(data.message || 'Error al obtener página');
+      (error as any).isNotFound = data.message?.includes('no encontrada') || response.status === 404;
+      throw error;
     }
 
     // Guardar en RequestCache (memoria)
@@ -242,28 +246,42 @@ export const getPageBySlug = async (slug: string, useCache = true) => {
     }
 
     return data.data;
-  } catch (error) {
+  } catch (error: any) {
     // Solo loguear errores en desarrollo
     if (import.meta.env.DEV) {
       console.error('Error obteniendo página:', error);
     }
     
-    // ⚡ Intentar usar datos en caché aunque estén expirados
+    // 🔥 NUEVO: Si es un error 404 (página no existe), NO usar cache
+    // Propagar el error para que useCmsData use el fallback específico de la página
+    if (error?.isNotFound) {
+      console.log(`🚫 [CMS API] Página "${slug}" no existe en la base de datos, propagando error para usar fallback`);
+      // Limpiar cualquier cache corrupto para esta página
+      try {
+        localStorage.removeItem(localStorageKey);
+        cache.clear(cacheKey);
+      } catch (e) {
+        // Ignorar errores de limpieza
+      }
+      throw error;
+    }
+    
+    // ⚡ Solo para errores de RED (no 404): Intentar usar datos en caché aunque estén expirados
     const staleData = cache.getStale(cacheKey);
     if (staleData) {
       if (import.meta.env.DEV) {
-        console.warn('Usando datos expirados del RequestCache como fallback');
+        console.warn('Usando datos expirados del RequestCache como fallback (error de red)');
       }
       return staleData;
     }
 
-    // ⚡ Último recurso: localStorage aunque esté expirado
+    // ⚡ Último recurso para errores de RED: localStorage aunque esté expirado
     try {
       const localData = localStorage.getItem(localStorageKey);
       if (localData) {
         const { data } = JSON.parse(localData);
         if (import.meta.env.DEV) {
-          console.warn('Usando datos expirados del localStorage como fallback');
+          console.warn('Usando datos expirados del localStorage como fallback (error de red)');
         }
         return data;
       }
@@ -326,9 +344,17 @@ export const updatePage = async (slug: string, pageData: any) => {
       throw new Error(data.message || 'Error al actualizar página');
     }
 
-    // Invalidar caché de esta página
+    // Invalidar caché de esta página (memoria)
     cache.clear(`page-${slug}`);
     cache.clear('all-pages');
+
+    // 🔥 CRÍTICO: También limpiar localStorage para forzar recarga fresca
+    try {
+      localStorage.removeItem(`cmsCache_page-${slug}`);
+      console.log(`✅ [CMS] Cache de localStorage limpiado para "${slug}"`);
+    } catch (e) {
+      console.error('Error limpiando localStorage:', e);
+    }
 
     return data.data;
   } catch (error) {
@@ -364,6 +390,73 @@ export const initHomePage = async () => {
   }
 };
 
+// Actualizar contenido parcial de una página por slug (merge de contenido)
+export const updatePageBySlug = async (slug: string, partialData: { content?: Record<string, any> }) => {
+  try {
+    const headers = await getAuthHeaders();
+    
+    console.log('🔵 [updatePageBySlug] ========== INICIO ==========');
+    console.log('🔵 [updatePageBySlug] Slug:', slug);
+    console.log('🔵 [updatePageBySlug] partialData recibido:', JSON.stringify(partialData, null, 2));
+    
+    // Primero obtener la página actual para hacer merge
+    console.log('🔵 [updatePageBySlug] Obteniendo página actual...');
+    const currentPage = await getPageBySlug(slug, false);
+    console.log('🔵 [updatePageBySlug] Página actual content:', currentPage?.content ? Object.keys(currentPage.content) : 'null');
+    
+    if (!currentPage) {
+      throw new Error(`Página "${slug}" no encontrada`);
+    }
+    
+    // Hacer merge del contenido existente con el nuevo
+    const mergedContent = {
+      ...currentPage.content,
+      ...partialData.content
+    };
+    
+    console.log('🔵 [updatePageBySlug] mergedContent keys:', Object.keys(mergedContent));
+    console.log('🔵 [updatePageBySlug] dashboardSidebar en merged:', mergedContent.dashboardSidebar ? 'SÍ' : 'NO');
+    if (mergedContent.dashboardSidebar) {
+      console.log('🔵 [updatePageBySlug] Admin headerGradientFrom:', mergedContent.dashboardSidebar.admin?.headerGradientFrom);
+    }
+    
+    console.log('🔵 [updatePageBySlug] Enviando PUT a:', `${API_URL}/cms/pages/${slug}`);
+    const response = await fetchWithRetry(
+      `${API_URL}/cms/pages/${slug}`,
+      {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ content: mergedContent }),
+      },
+      { maxRetries: 2 }
+    );
+
+    const data = await response.json();
+    console.log('🔵 [updatePageBySlug] Respuesta del servidor:', data.success ? 'SUCCESS' : 'FAILED', data.message || '');
+
+    if (!data.success) {
+      throw new Error(data.message || 'Error al actualizar página');
+    }
+
+    // Invalidar caché
+    cache.clear(`page-${slug}`);
+    cache.clear('all-pages');
+    
+    try {
+      localStorage.removeItem(`cmsCache_page-${slug}`);
+      console.log(`✅ [updatePageBySlug] Cache limpiado para "${slug}"`);
+    } catch (e) {
+      console.error('Error limpiando localStorage:', e);
+    }
+
+    console.log('🔵 [updatePageBySlug] ========== FIN ==========');
+    return data.data;
+  } catch (error) {
+    console.error(`❌ [updatePageBySlug] Error (${slug}):`, error);
+    throw error;
+  }
+};
+
 // ⚡ Exportar función para limpiar caché manualmente
 export const clearCache = (pattern?: string) => {
   console.log('🗑️ [clearCache] Limpiando caché:', { pattern: pattern || 'TODO' });
@@ -395,9 +488,49 @@ export const clearCache = (pattern?: string) => {
 
 // ⚡ Exportar función para forzar recarga sin caché
 export const forceReload = async (slug: string) => {
+  // Limpiar cache de memoria
   cache.clear(`page-${slug}`);
+  // Limpiar localStorage también
+  try {
+    localStorage.removeItem(`cmsCache_page-${slug}`);
+  } catch (e) {
+    // Ignorar errores de localStorage
+  }
   return await getPageBySlug(slug, false);
 };
+
+// Función auxiliar para debugging del cache (usar desde consola: cmsDebug.debugCmsCache())
+export const debugCmsCache = () => {
+  const cacheKeys = Object.keys(localStorage).filter(k => k.startsWith('cmsCache_'));
+  
+  const cacheInfo = cacheKeys.map(key => {
+    try {
+      const data = JSON.parse(localStorage.getItem(key) || '{}');
+      const age = Date.now() - (data.timestamp || 0);
+      return {
+        key,
+        ageMinutes: Math.floor(age / 60000),
+        hasData: !!data.data
+      };
+    } catch {
+      return { key, error: true };
+    }
+  });
+  
+  return cacheInfo;
+};
+
+// Exponer funciones de utilidad en window para mantenimiento
+if (typeof window !== 'undefined') {
+  (window as any).cmsDebug = {
+    clearCache,
+    forceReload,
+    debugCmsCache,
+    clearAll: () => {
+      clearCache();
+    }
+  };
+}
 
 // ⚡ Inicializar todas las páginas públicas (about, services, contact)
 export const initAllPages = async () => {
@@ -425,9 +558,39 @@ export const initAllPages = async () => {
   }
 };
 
+// ⚡ NUEVA FUNCIÓN: Obtener página del cache de forma SÍNCRONA
+// Útil para evitar flash de contenido default -> CMS
+export const getCachedPageSync = (slug: string): any | null => {
+  const cacheKey = `page-${slug}`;
+  const localStorageKey = `cmsCache_${cacheKey}`;
+  const CACHE_DURATION = CACHE_DURATIONS.PUBLIC_PAGES;
+
+  // 1. Intentar localStorage
+  try {
+    const localData = localStorage.getItem(localStorageKey);
+    if (localData) {
+      const { data, timestamp } = JSON.parse(localData);
+      const age = Date.now() - timestamp;
+      
+      if (age < CACHE_DURATION) {
+        return data;
+      }
+    }
+  } catch (e) {
+    // Silenciar errores
+  }
+
+  // 2. Intentar memoria
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
+  return null;
+};
+
 export default {
   getAllPages,
   getPageBySlug,
+  getCachedPageSync,
   updatePage,
   initHomePage,
   initAllPages,

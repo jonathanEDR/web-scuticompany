@@ -317,7 +317,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
                 {...register('destacado')}
                 className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500"
               />
-              <span className="text-gray-900 dark:text-white">⭐ Servicio Destacado</span>
+              <span className="text-gray-900 dark:text-white">★ Servicio Destacado</span>
             </label>
 
             <label className="flex items-center gap-3 cursor-pointer">

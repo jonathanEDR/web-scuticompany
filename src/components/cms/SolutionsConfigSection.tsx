@@ -14,7 +14,10 @@ const SolutionsConfigSection: React.FC<SolutionsConfigSectionProps> = ({
   updateContent,
   updateTextStyle
 }) => {
-
+  // Si no hay solutions, no renderizar nada
+  if (!pageData.content.solutions) {
+    return null;
+  }
 
   const [collapsed, setCollapsed] = useState(true);
 

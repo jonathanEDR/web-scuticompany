@@ -5,6 +5,7 @@ import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useCmsUpdaters } from '../../hooks/cms/useCmsUpdaters';
 import HeroConfigSection from './HeroConfigSection';
 import MissionVisionConfigSection from './MissionVisionConfigSection';
+import ValuesConfigSection from './ValuesConfigSection';
 import SolutionsConfigSection from './SolutionsConfigSection';
 import ValueAddedConfigSection from './ValueAddedConfigSection';
 import ClientLogosConfigSection from './ClientLogosConfigSection';
@@ -16,6 +17,17 @@ import CardsDesignConfigSection from './CardsDesignConfigSection';
 import ContactConfigSection from './ContactConfigSection';
 import ContactFormEditor from './ContactFormEditor';
 import ChatbotConfigSection from './ChatbotConfigSection';
+import ServicesFilterConfigSection from './ServicesFilterConfigSection';
+import ServicesGridConfigSection from './ServicesGridConfigSection';
+import ServicesAccordionConfigSection from './ServicesAccordionConfigSection';
+import BlogHeroConfigSection from './BlogHeroConfigSection';
+import FeaturedPostsConfigSection from './FeaturedPostsConfigSection';
+import AllNewsConfigSection from './AllNewsConfigSection';
+import BlogCtaConfigSection from './BlogCtaConfigSection';
+import ServicioDetailConfigSection from './ServicioDetailConfigSection';
+import BlogPostDetailConfigSection from './BlogPostDetailConfigSection';
+import SidebarConfigSection from './SidebarConfigSection';
+import DashboardFeaturedPostsConfigSection from './DashboardFeaturedPostsConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -24,20 +36,21 @@ const CmsManager: React.FC = () => {
   const { theme: currentTheme } = useTheme(); // 🆕 Obtener tema actual
   
   // 🆕 Estado para manejar qué página se está editando
-  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact'>('home');
+  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog' | 'servicio-detail' | 'blog-post-detail'>('home');
   
   // Determinar tab activo desde la URL
-  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' => {
+  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' | 'sidebar' => {
     const path = location.pathname;
     if (path.includes('/seo')) return 'seo';
     if (path.includes('/theme')) return 'theme';
     if (path.includes('/cards')) return 'cards';
     if (path.includes('/contact')) return 'contact';
     if (path.includes('/chatbot')) return 'chatbot';
+    if (path.includes('/sidebar')) return 'sidebar';
     return 'content';
   };
 
-  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot'>(getInitialTab());
+  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' | 'sidebar'>(getInitialTab());
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [hasGlobalChanges, setHasGlobalChanges] = useState(false); // 🔥 Estado para detectar cambios globales
@@ -53,7 +66,7 @@ const CmsManager: React.FC = () => {
   }, [location.pathname]);
 
   // Actualizar URL cuando cambia el tab
-  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot') => {
+  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' | 'sidebar') => {
     setActiveTab(tab);
     const baseUrl = '/dashboard/cms';
     if (tab === 'content') {
@@ -225,6 +238,7 @@ const CmsManager: React.FC = () => {
     { id: 'cards' as const, label: 'Diseño de Tarjetas', icon: '🎴' },
     { id: 'contact' as const, label: 'Contacto', icon: '📞' },
     { id: 'chatbot' as const, label: 'Chatbot', icon: '🤖' },
+    { id: 'sidebar' as const, label: 'Sidebar', icon: '📊' },
     { id: 'seo' as const, label: 'SEO', icon: '🔍' },
     { id: 'theme' as const, label: 'Tema', icon: '🎨' }
   ];
@@ -340,8 +354,26 @@ const CmsManager: React.FC = () => {
                 <option value="home">🏠 Home (Inicio)</option>
                 <option value="about">👥 About (Nosotros)</option>
                 <option value="services">🚀 Services (Servicios)</option>
+                <option value="servicio-detail">📄 Servicio Detalle (Página Individual)</option>
                 <option value="contact">📞 Contact (Contacto)</option>
+                <option value="blog">📰 Blog (Noticias)</option>
+                <option value="blog-post-detail">📝 Blog Post Detalle (Artículo Individual)</option>
               </select>
+              
+              {/* 🔄 Botón para limpiar cache y recargar */}
+              <button
+                onClick={() => {
+                  // Limpiar cache de localStorage para esta página
+                  localStorage.removeItem(`cmsCache_page-${selectedPage}`);
+                  console.log(`🗑️ Cache limpiado para ${selectedPage}`);
+                  // Recargar datos
+                  loadPageData();
+                }}
+                className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors flex items-center gap-1"
+                title="Limpiar cache y recargar datos"
+              >
+                🔄 Recargar
+              </button>
             </div>
           </div>
           <div className="flex flex-row flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -401,12 +433,38 @@ const CmsManager: React.FC = () => {
       <div className="w-full space-y-6">
         {activeTab === 'content' && (
           <>
-            {/* 🎯 SIEMPRE mostrar Hero Section (común para todas las páginas) */}
-            <HeroConfigSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-              updateTextStyle={handleUpdateTextStyle}
-            />
+            {/* 🎯 Hero Section - Diferente para Blog vs otras páginas */}
+            {selectedPage === 'blog' ? (
+              <>
+                {/* 📰 Hero específico para Blog */}
+                <BlogHeroConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                {/* 📰 Sección de Noticias Destacadas */}
+                <FeaturedPostsConfigSection
+                  config={pageData.content?.featuredPosts || {}}
+                  onChange={(config) => handleUpdateContent('featuredPosts', config)}
+                />
+                {/* 📰 Sección de Todas las Noticias */}
+                <AllNewsConfigSection
+                  config={pageData.content?.allNews || {}}
+                  onChange={(config) => handleUpdateContent('allNews', config)}
+                />
+                {/* 📢 Sección CTA (Último Llamado) */}
+                <BlogCtaConfigSection
+                  config={pageData.content?.blogCta || {}}
+                  onChange={(config) => handleUpdateContent('blogCta', config)}
+                />
+              </>
+            ) : selectedPage !== 'servicio-detail' ? (
+              /* 🏠 Hero genérico para otras páginas (NO para servicio-detail que tiene su propia configuración) */
+              <HeroConfigSection
+                pageData={pageData}
+                updateContent={handleUpdateContent}
+                updateTextStyle={handleUpdateTextStyle}
+              />
+            ) : null}
             
             {/* 🏠 SECCIONES ESPECÍFICAS PARA HOME */}
             {selectedPage === 'home' && (
@@ -459,6 +517,12 @@ const CmsManager: React.FC = () => {
                   updateContent={handleUpdateContent}
                 />
                 
+                {/* 🆕 Configuración de Valores */}
+                <ValuesConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
                   <h3 className="text-xl font-bold text-blue-800 dark:text-blue-200 mb-3">
                     📝 Configuración de Página "Nosotros"
@@ -470,6 +534,7 @@ const CmsManager: React.FC = () => {
                     <li>✅ <strong>Título Principal:</strong> Configura en "Hero Section" arriba</li>
                     <li>✅ <strong>Misión:</strong> Configura arriba en la sección correspondiente</li>
                     <li>✅ <strong>Visión:</strong> Configura arriba en la sección correspondiente</li>
+                    <li>✅ <strong>Valores:</strong> Configura arriba con carrusel e imágenes</li>
                     <li>✅ <strong>SEO:</strong> Configura en la pestaña "SEO"</li>
                   </ul>
                 </div>
@@ -478,19 +543,55 @@ const CmsManager: React.FC = () => {
 
             {/* 🛠️ SECCIONES ESPECÍFICAS PARA SERVICES */}
             {selectedPage === 'services' && (
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
-                  🛠️ Configuración de Página "Servicios"
-                </h3>
-                <p className="text-green-700 dark:text-green-300 mb-4">
-                  Esta página mostrará la lista de servicios disponibles desde el módulo de servicios.
-                </p>
-                <ul className="text-green-600 dark:text-green-400 space-y-2">
-                  <li>✅ <strong>Hero Section:</strong> Introducción a los servicios</li>
-                  <li>✅ <strong>Servicios:</strong> Se cargan automáticamente desde la base de datos</li>
-                  <li>✅ <strong>SEO:</strong> Optimización para búsquedas de servicios</li>
-                </ul>
-              </div>
+              <>
+                {/* Configuración de Filtros de Servicios */}
+                <ServicesFilterConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                
+                {/* Configuración de Sección y Tarjetas de Servicios */}
+                <ServicesGridConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                />
+                
+                {/* 🆕 Configuración de Acordeón de Servicios */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+                  <ServicesAccordionConfigSection
+                    config={pageData?.content?.servicesAccordion || {}}
+                    onChange={(newConfig) => handleUpdateContent('servicesAccordion', newConfig)}
+                  />
+                </div>
+                
+                {/* Panel informativo */}
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
+                    🛠️ Configuración de Página "Servicios"
+                  </h3>
+                  <p className="text-green-700 dark:text-green-300 mb-4">
+                    Esta página muestra la lista de servicios con filtros personalizables.
+                  </p>
+                  <ul className="text-green-600 dark:text-green-400 space-y-2">
+                    <li>✅ <strong>Hero Section:</strong> Introducción a los servicios</li>
+                    <li>✅ <strong>Filtros:</strong> Panel de búsqueda y categorías</li>
+                    <li>✅ <strong>Sección Destacados:</strong> Título e imagen de fondo</li>
+                    <li>✅ <strong>Tarjetas:</strong> Diseño visual de las tarjetas de servicio</li>
+                    <li>✅ <strong>Acordeón:</strong> Lista expandible de todos los servicios</li>
+                    <li>✅ <strong>SEO:</strong> Optimización para búsquedas de servicios</li>
+                  </ul>
+                </div>
+              </>
+            )}
+
+            {/* 📄 SECCIONES ESPECÍFICAS PARA SERVICIO DETALLE */}
+            {selectedPage === 'servicio-detail' && (
+              <>
+                <ServicioDetailConfigSection
+                  config={pageData?.content?.servicioDetailConfig || {}}
+                  onChange={(newConfig) => handleUpdateContent('servicioDetailConfig', newConfig)}
+                />
+              </>
             )}
 
             {/* 📞 SECCIONES ESPECÍFICAS PARA CONTACT */}
@@ -508,6 +609,39 @@ const CmsManager: React.FC = () => {
                   <li>✅ <strong>Información:</strong> Teléfono, email, dirección</li>
                 </ul>
               </div>
+            )}
+
+            {/* 📰 SECCIONES ESPECÍFICAS PARA BLOG */}
+            {selectedPage === 'blog' && (
+              <>
+                {/* Panel informativo */}
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-indigo-800 dark:text-indigo-200 mb-3">
+                    📰 Configuración de Página "Blog"
+                  </h3>
+                  <p className="text-indigo-700 dark:text-indigo-300 mb-4">
+                    Configura la portada y apariencia del blog de noticias.
+                  </p>
+                  <ul className="text-indigo-600 dark:text-indigo-400 space-y-2">
+                    <li>✅ <strong>Hero Section:</strong> Título, colores y gradiente</li>
+                    <li>✅ <strong>Estadísticas:</strong> Contador de artículos y lectores</li>
+                    <li>✅ <strong>Búsqueda:</strong> Configuración del buscador</li>
+                    <li>🔜 <strong>SEO:</strong> Optimización para buscadores (pestaña SEO)</li>
+                    <li>🔜 <strong>Tarjetas:</strong> Diseño de tarjetas de posts (próximamente)</li>
+                    <li>🔜 <strong>Sidebar:</strong> Categorías y trending (próximamente)</li>
+                  </ul>
+                </div>
+              </>
+            )}
+
+            {/* 📝 SECCIONES ESPECÍFICAS PARA BLOG POST DETAIL */}
+            {selectedPage === 'blog-post-detail' && (
+              <>
+                <BlogPostDetailConfigSection
+                  config={pageData?.content?.blogPostDetailConfig || {}}
+                  onChange={(newConfig) => handleUpdateContent('blogPostDetailConfig', newConfig)}
+                />
+              </>
             )}
           </>
         )}
@@ -531,11 +665,49 @@ const CmsManager: React.FC = () => {
             </p>
           </div>
         )}
-        {activeTab === 'contact' && (
+        {activeTab === 'contact' && selectedPage === 'contact' && (
           <div className="space-y-8">
+            {/* Configuración específica de la PÁGINA de Contacto */}
+            <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-teal-200 dark:border-gray-700/50">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">📄</span>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                    Configuración de la Página Pública de Contacto
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Esta configuración afecta a la página <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/contacto</code>
+                  </p>
+                </div>
+              </div>
+            </div>
             <ContactConfigSection
               pageData={pageData}
               updateContent={handleUpdateContent}
+              isContactPage={true}
+            />
+          </div>
+        )}
+        {activeTab === 'contact' && selectedPage !== 'contact' && (
+          <div className="space-y-8">
+            {/* Configuración de contacto general (para Home y otras páginas) */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-blue-200 dark:border-gray-700/50">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">📞</span>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                    Información de Contacto General
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Datos de contacto mostrados en el footer y secciones de contacto de la página <strong>{selectedPage}</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <ContactConfigSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
+              isContactPage={false}
             />
             <ContactFormEditor
               pageData={pageData}
@@ -572,6 +744,34 @@ const CmsManager: React.FC = () => {
             onUpdate={(field, value) => handleUpdateContent(field, value)}
             theme={currentTheme}
           />
+        )}
+        {activeTab === 'sidebar' && (
+          <div className="space-y-8">
+            {/* Configuración del Sidebar */}
+            <SidebarConfigSection
+              onSave={() => setSaveStatus('saved')}
+              onChangePending={() => setHasGlobalChanges(true)}
+            />
+            
+            {/* Separador */}
+            <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-8">
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span className="text-2xl">📰</span>
+                  Bloque de Posts Destacados
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Configura el diseño del carrusel de noticias en el Dashboard del Cliente
+                </p>
+              </div>
+              
+              {/* Configuración de Posts Destacados */}
+              <DashboardFeaturedPostsConfigSection
+                onSave={() => setSaveStatus('saved')}
+                onChangePending={() => setHasGlobalChanges(true)}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>

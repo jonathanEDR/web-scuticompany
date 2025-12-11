@@ -1,23 +1,91 @@
-﻿import { useState } from 'react';
-import { MessageCircle, Filter } from 'lucide-react';
+﻿import { useState, useRef, useEffect } from 'react';
+import { MessageCircle, Filter, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useComments } from '../../../hooks/blog';
 import CommentItem from './CommentItem';
 import CommentForm from './CommentForm';
 import type { CommentFormData } from '../../../types/blog';
 
+// Estilos configurables desde CMS
+export interface CommentsStyles {
+  sectionBackground?: { light?: string; dark?: string };
+  sectionBorder?: { light?: string; dark?: string };
+  titleColor?: { light?: string; dark?: string };
+  iconColor?: { light?: string; dark?: string };
+  countColor?: { light?: string; dark?: string };
+  selectorBackground?: { light?: string; dark?: string };
+  selectorBorder?: { light?: string; dark?: string };
+  selectorText?: { light?: string; dark?: string };
+  selectorIconColor?: { light?: string; dark?: string };
+  selectorDropdownBg?: { light?: string; dark?: string };
+  selectorOptionHover?: { light?: string; dark?: string };
+  cardBackground?: { light?: string; dark?: string };
+  cardBorder?: { light?: string; dark?: string };
+  authorColor?: { light?: string; dark?: string };
+  textColor?: { light?: string; dark?: string };
+  dateColor?: { light?: string; dark?: string };
+  formBackground?: { light?: string; dark?: string };
+  formBorder?: { light?: string; dark?: string };
+  formFocusBorder?: { light?: string; dark?: string };
+  textareaBackground?: { light?: string; dark?: string };
+  textareaText?: { light?: string; dark?: string };
+  footerBackground?: { light?: string; dark?: string };
+  buttonBackground?: { light?: string; dark?: string };
+  buttonBorder?: { light?: string; dark?: string };
+  buttonText?: { light?: string; dark?: string };
+}
+
 interface CommentsListProps {
   postSlug: string;
   className?: string;
+  title?: string;
+  fontFamily?: string;
+  styles?: CommentsStyles;
+  theme?: 'light' | 'dark';
+  avatarShape?: 'circle' | 'square';
 }
 
 type SortOption = 'newest' | 'oldest' | 'top';
 
 export default function CommentsList({
   postSlug,
-  className = ''
+  className = '',
+  title = 'Comentarios',
+  fontFamily = 'Montserrat, sans-serif',
+  styles,
+  theme = 'light',
+  avatarShape = 'circle'
 }: CommentsListProps) {
   
+  // Calcular estilos dinámicos desde CMS
+  const currentStyles = {
+    sectionBackground: theme === 'dark' ? styles?.sectionBackground?.dark : styles?.sectionBackground?.light,
+    sectionBorder: theme === 'dark' ? styles?.sectionBorder?.dark : styles?.sectionBorder?.light,
+    titleColor: theme === 'dark' ? styles?.titleColor?.dark : styles?.titleColor?.light,
+    iconColor: theme === 'dark' ? styles?.iconColor?.dark : styles?.iconColor?.light,
+    countColor: theme === 'dark' ? styles?.countColor?.dark : styles?.countColor?.light,
+    selectorBackground: theme === 'dark' ? styles?.selectorBackground?.dark : styles?.selectorBackground?.light,
+    selectorBorder: theme === 'dark' ? styles?.selectorBorder?.dark : styles?.selectorBorder?.light,
+    selectorText: theme === 'dark' ? styles?.selectorText?.dark : styles?.selectorText?.light,
+    selectorIconColor: theme === 'dark' ? styles?.selectorIconColor?.dark : styles?.selectorIconColor?.light,
+    selectorDropdownBg: theme === 'dark' ? styles?.selectorDropdownBg?.dark : styles?.selectorDropdownBg?.light,
+    selectorOptionHover: theme === 'dark' ? styles?.selectorOptionHover?.dark : styles?.selectorOptionHover?.light,
+    cardBackground: theme === 'dark' ? styles?.cardBackground?.dark : styles?.cardBackground?.light,
+    cardBorder: theme === 'dark' ? styles?.cardBorder?.dark : styles?.cardBorder?.light,
+    authorColor: theme === 'dark' ? styles?.authorColor?.dark : styles?.authorColor?.light,
+    textColor: theme === 'dark' ? styles?.textColor?.dark : styles?.textColor?.light,
+    dateColor: theme === 'dark' ? styles?.dateColor?.dark : styles?.dateColor?.light,
+    formBackground: theme === 'dark' ? styles?.formBackground?.dark : styles?.formBackground?.light,
+    formBorder: theme === 'dark' ? styles?.formBorder?.dark : styles?.formBorder?.light,
+    formFocusBorder: theme === 'dark' ? styles?.formFocusBorder?.dark : styles?.formFocusBorder?.light,
+    textareaBackground: theme === 'dark' ? styles?.textareaBackground?.dark : styles?.textareaBackground?.light,
+    textareaText: theme === 'dark' ? styles?.textareaText?.dark : styles?.textareaText?.light,
+    footerBackground: theme === 'dark' ? styles?.footerBackground?.dark : styles?.footerBackground?.light,
+    buttonBackground: theme === 'dark' ? styles?.buttonBackground?.dark : styles?.buttonBackground?.light,
+    buttonBorder: theme === 'dark' ? styles?.buttonBorder?.dark : styles?.buttonBorder?.light,
+    buttonText: theme === 'dark' ? styles?.buttonText?.dark : styles?.buttonText?.light,
+  };
+
   // Obtener usuario autenticado del contexto
   const { user } = useAuth();
   const isSignedIn = !!user;
@@ -25,6 +93,27 @@ export default function CommentsList({
   
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Opciones del selector
+  const sortOptions = [
+    { value: 'newest', label: 'Más recientes' },
+    { value: 'oldest', label: 'Más antiguos' },
+    { value: 'top', label: 'Más votados' }
+  ];
 
   const {
     comments,
@@ -89,26 +178,97 @@ export default function CommentsList({
 
   const topLevelComments = sortedComments.filter(c => !c.parentComment);
 
+  // Estilos del contenedor de la sección
+  const sectionStyle = {
+    backgroundColor: currentStyles.sectionBackground || undefined,
+    borderColor: currentStyles.sectionBorder || undefined,
+    borderWidth: currentStyles.sectionBorder ? '1px' : undefined,
+    borderStyle: currentStyles.sectionBorder ? 'solid' : undefined,
+  };
+
   return (
-    <div className={`comments-section ${className}`}>
+    <div 
+      className={`comments-section ${className} ${!currentStyles.sectionBackground ? '' : ''}`}
+      style={{
+        ...sectionStyle,
+        fontFamily: fontFamily
+      } as React.CSSProperties}
+    >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <MessageCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-          <span>Comentarios</span>
-          <span className="text-gray-400 dark:text-gray-500">({pagination?.total || 0})</span>
+        <h2 className="text-2xl font-bold flex items-center gap-2" style={{
+          color: currentStyles.titleColor || undefined
+        }}>
+          <MessageCircle className="w-6 h-6" style={{
+            color: currentStyles.iconColor || undefined
+          }} />
+          <span>{title}</span>
+          <span style={{
+            color: currentStyles.countColor || undefined
+          }}>({pagination?.total || 0})</span>
         </h2>
 
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="newest">Más recientes</option>
-            <option value="oldest">Más antiguos</option>
-            <option value="top">Más votados</option>
-          </select>
+          <Filter className="w-4 h-4" style={{
+            color: currentStyles.selectorIconColor || undefined
+          }} />
+          
+          {/* Selector personalizado */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="text-sm rounded-lg px-3 py-1.5 flex items-center gap-2 transition-colors"
+              style={{
+                backgroundColor: currentStyles.selectorBackground || undefined,
+                borderColor: currentStyles.selectorBorder || undefined,
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                color: currentStyles.selectorText || undefined
+              }}
+            >
+              {sortOptions.find(opt => opt.value === sortBy)?.label}
+              <ChevronDown 
+                className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                style={{ color: currentStyles.selectorIconColor || undefined }}
+              />
+            </button>
+            
+            {/* Dropdown */}
+            {isDropdownOpen && (
+              <div 
+                className="absolute right-0 mt-1 min-w-[150px] rounded-lg shadow-lg z-50 overflow-hidden"
+                style={{
+                  backgroundColor: currentStyles.selectorDropdownBg || currentStyles.selectorBackground || '#ffffff',
+                  borderColor: currentStyles.selectorBorder || '#e5e7eb',
+                  borderWidth: '1px',
+                  borderStyle: 'solid'
+                }}
+              >
+                {sortOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setSortBy(option.value as SortOption);
+                      setIsDropdownOpen(false);
+                    }}
+                    onMouseEnter={() => setHoveredOption(option.value)}
+                    onMouseLeave={() => setHoveredOption(null)}
+                    className="w-full text-left px-3 py-2 text-sm transition-colors"
+                    style={{
+                      backgroundColor: hoveredOption === option.value 
+                        ? (currentStyles.selectorOptionHover || '#f3f4f6')
+                        : 'transparent',
+                      color: currentStyles.selectorText || undefined,
+                      fontWeight: sortBy === option.value ? 600 : 400
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -118,6 +278,17 @@ export default function CommentsList({
             postId={postSlug}
             onSubmit={handleAddComment}
             placeholder="Comparte tu opinión sobre este artículo..."
+            styles={{
+              formBackground: currentStyles.formBackground,
+              formBorder: currentStyles.formBorder,
+              formFocusBorder: currentStyles.formFocusBorder,
+              textareaBackground: currentStyles.textareaBackground,
+              textareaText: currentStyles.textareaText,
+              footerBackground: currentStyles.footerBackground,
+              buttonBackground: currentStyles.buttonBackground,
+              buttonBorder: currentStyles.buttonBorder,
+              buttonText: currentStyles.buttonText,
+            }}
           />
         </div>
       )}
@@ -128,6 +299,17 @@ export default function CommentsList({
             postId={postSlug}
             onSubmit={handleAddComment}
             placeholder="Comparte tu opinión sobre este artículo..."
+            styles={{
+              formBackground: currentStyles.formBackground,
+              formBorder: currentStyles.formBorder,
+              formFocusBorder: currentStyles.formFocusBorder,
+              textareaBackground: currentStyles.textareaBackground,
+              textareaText: currentStyles.textareaText,
+              footerBackground: currentStyles.footerBackground,
+              buttonBackground: currentStyles.buttonBackground,
+              buttonBorder: currentStyles.buttonBorder,
+              buttonText: currentStyles.buttonText,
+            }}
           />
         </div>
       )}
@@ -178,6 +360,14 @@ export default function CommentsList({
               onDelete={() => alert('Funcionalidad de eliminación próximamente')}
               onVote={handleVote}
               onReport={handleReport}
+              avatarShape={avatarShape}
+              styles={{
+                cardBackground: currentStyles.cardBackground,
+                cardBorder: currentStyles.cardBorder,
+                authorColor: currentStyles.authorColor,
+                textColor: currentStyles.textColor,
+                dateColor: currentStyles.dateColor,
+              }}
             />
 
             {replyingTo === comment._id && (
@@ -189,6 +379,16 @@ export default function CommentsList({
                   onSubmit={handleAddComment}
                   onCancel={() => setReplyingTo(null)}
                   placeholder="Escribe tu respuesta..."
+                  styles={{
+                    formBackground: currentStyles.formBackground,
+                    formBorder: currentStyles.formBorder,
+                    textareaBackground: currentStyles.textareaBackground,
+                    textareaText: currentStyles.textareaText,
+                    footerBackground: currentStyles.footerBackground,
+                    buttonBackground: currentStyles.buttonBackground,
+                    buttonBorder: currentStyles.buttonBorder,
+                    buttonText: currentStyles.buttonText,
+                  }}
                 />
               </div>
             )}

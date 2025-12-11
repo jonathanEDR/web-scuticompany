@@ -2,6 +2,7 @@
  * 🎣 Hook para obtener un Post Individual
  * Maneja la carga de un post específico por slug
  * ✅ Optimizado con cache para evitar recargas innecesarias
+ * ✅ Ahora expone relatedPosts del backend para evitar llamadas extra
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -11,6 +12,7 @@ import type { BlogPost } from '../../types/blog';
 
 interface UseBlogPostReturn {
   post: BlogPost | null;
+  relatedPosts: BlogPost[];  // ✅ Ahora se exponen los posts relacionados
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -19,15 +21,18 @@ interface UseBlogPostReturn {
 
 /**
  * Hook para obtener un post por su slug
+ * ✅ Devuelve también relatedPosts del backend (evita llamadas API extra)
  */
 export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
   const [post, setPost] = useState<BlogPost | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPost = useCallback(async () => {
     if (!slug) {
       setPost(null);
+      setRelatedPosts([]);
       setLoading(false);
       return;
     }
@@ -41,6 +46,7 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
       
       if (cached) {
         setPost(cached.post);
+        setRelatedPosts(cached.relatedPosts || []);
         setLoading(false);
         return;
       }
@@ -52,6 +58,7 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
         // El backend devuelve { success: true, data: { post, relatedPosts } }
         const responseData = response.data as any;
         setPost(responseData.post);
+        setRelatedPosts(responseData.relatedPosts || []);
         
         // ✅ Guardar en cache
         blogCache.set('POST_DETAIL', slug, responseData);
@@ -61,6 +68,7 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
     } catch (err: any) {
       setError(err.message || 'Error al cargar el post');
       setPost(null);
+      setRelatedPosts([]);
     } finally {
       setLoading(false);
     }
@@ -77,6 +85,7 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
 
   return {
     post,
+    relatedPosts,
     loading,
     error,
     refetch: fetchPost,

@@ -17,5 +17,6 @@ export { default as LazyImage } from './LazyImage';
 export { default as FavoriteButton } from './FavoriteButton';
 export { default as LikeButton } from './LikeButton';
 export { default as PostHeader } from './PostHeader';
+export { default as PostHero } from './PostHero';
 export { default as AuthorCard } from './AuthorCard';
 

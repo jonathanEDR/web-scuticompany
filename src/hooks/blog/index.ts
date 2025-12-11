@@ -39,6 +39,14 @@ export {
   useActiveCategoriesWithCount,
 } from './useCategories';
 
+// Tags
+export {
+  useTags,
+  usePopularTags,
+  useTag,
+  useTagPosts,
+} from './useTags';
+
 // Moderación (Admin)
 export {
   useModerationQueue,
@@ -61,6 +69,13 @@ export {
   useBlogDebug,
   useBlogDebugConsole,
 } from './useBlogDebug';
+
+// CMS Configuration
+export { 
+  useBlogCmsConfig,
+  DEFAULT_BLOG_HERO_CONFIG,
+} from './useBlogCmsConfig';
+export type { BlogHeroConfig, BlogCmsConfig } from './useBlogCmsConfig';
 
 // Exports por defecto
 export { default as useBlogPostsDefault } from './useBlogPosts';

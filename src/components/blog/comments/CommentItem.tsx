@@ -9,6 +9,15 @@ import { ThumbsUp, ThumbsDown, Reply, Flag, Edit2, Trash2, MoreVertical } from '
 import { getImageUrl } from '../../../utils/imageUtils';
 import type { BlogComment } from '../../../types/blog';
 
+// Estilos configurables desde CMS
+export interface CommentItemStyles {
+  cardBackground?: string;
+  cardBorder?: string;
+  authorColor?: string;
+  textColor?: string;
+  dateColor?: string;
+}
+
 interface CommentItemProps {
   comment: BlogComment;
   level?: number;
@@ -21,6 +30,8 @@ interface CommentItemProps {
   onVote?: (commentId: string, voteType: 'like' | 'dislike') => Promise<void>;
   onReport?: (commentId: string) => void;
   className?: string;
+  styles?: CommentItemStyles;
+  avatarShape?: 'circle' | 'square';
 }
 
 export default function CommentItem({
@@ -34,9 +45,14 @@ export default function CommentItem({
   onDelete,
   onVote,
   onReport,
-  className = ''
+  className = '',
+  styles,
+  avatarShape = 'circle'
 }: CommentItemProps) {
   
+  // Clase de forma del avatar
+  const avatarShapeClass = avatarShape === 'circle' ? 'rounded-full' : 'rounded-lg';
+
   const [showMenu, setShowMenu] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [localVotes, setLocalVotes] = useState(comment.votes);
@@ -90,23 +106,31 @@ export default function CommentItem({
 
   // Estilos según el estado
   const statusColors: Record<string, string> = {
-    approved: 'bg-white dark:bg-gray-800',
+    approved: '',
     pending: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800',
     rejected: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
     spam: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600',
     hidden: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600'
   };
 
+  // Estilos dinámicos del contenedor
+  const containerStyle: React.CSSProperties = comment.status === 'approved' ? {
+    backgroundColor: styles?.cardBackground || undefined,
+    borderColor: styles?.cardBorder || undefined,
+  } : {};
+
   const containerClass = `
     comment-item
-    ${statusColors[comment.status] || statusColors.approved}
+    ${comment.status !== 'approved' ? statusColors[comment.status] : ''}
+    ${comment.status === 'approved' && !styles?.cardBackground ? 'bg-white dark:bg-gray-800' : ''}
+    ${comment.status === 'approved' && !styles?.cardBorder ? 'border-gray-200 dark:border-gray-700' : ''}
     border rounded-lg p-4
     ${level > 0 ? 'ml-8 mt-3' : 'mt-4'}
     ${className}
   `;
 
   return (
-    <div className={containerClass}>
+    <div className={containerClass} style={containerStyle}>
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -123,7 +147,7 @@ export default function CommentItem({
               <img 
                 src={getImageUrl(profileImg)} 
                 alt={authorName} 
-                className="w-10 h-10 rounded-full object-cover"
+                className={`w-10 h-10 ${avatarShapeClass} object-cover`}
                 onError={(e) => {
                   // Si la imagen falla, mostrar iniciales
                   e.currentTarget.style.display = 'none';
@@ -135,7 +159,7 @@ export default function CommentItem({
             
             const fallbackAvatar = (
               <div 
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+                className={`w-10 h-10 ${avatarShapeClass} bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center`}
                 style={{ display: profileImg ? 'none' : 'flex' }}
               >
                 <span className="text-white font-semibold text-sm">{authorName.charAt(0).toUpperCase()}</span>
@@ -173,13 +197,25 @@ export default function CommentItem({
           <div>
             {/* Nombre del autor - solo enlazar si el perfil es público */}
             {isPublicProfile ? (
-              <Link to={`/perfil/${(comment.author.userId as any).username}`} className="font-semibold text-gray-900 dark:text-white hover:underline">
+              <Link 
+                to={`/perfil/${(comment.author.userId as any).username}`} 
+                className={`font-semibold hover:underline ${!styles?.authorColor ? 'text-gray-900 dark:text-white' : ''}`}
+                style={{ color: styles?.authorColor || undefined }}
+              >
                 {authorName}
               </Link>
             ) : (
-              <p className="font-semibold text-gray-900 dark:text-white">{authorName}</p>
+              <p 
+                className={`font-semibold ${!styles?.authorColor ? 'text-gray-900 dark:text-white' : ''}`}
+                style={{ color: styles?.authorColor || undefined }}
+              >
+                {authorName}
+              </p>
             )}
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <div 
+              className={`flex items-center gap-2 text-xs ${!styles?.dateColor ? 'text-gray-500 dark:text-gray-400' : ''}`}
+              style={{ color: styles?.dateColor || undefined }}
+            >
               <span>{formattedDate}</span>
               {comment.editedAt && (
                 <>
@@ -261,7 +297,12 @@ export default function CommentItem({
 
       {/* Contenido del comentario */}
       <div className="prose prose-sm max-w-none mb-3">
-        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{comment.content}</p>
+        <p 
+          className={`whitespace-pre-wrap ${!styles?.textColor ? 'text-gray-700 dark:text-gray-300' : ''}`}
+          style={{ color: styles?.textColor || undefined }}
+        >
+          {comment.content}
+        </p>
       </div>
 
       {/* Footer con acciones */}

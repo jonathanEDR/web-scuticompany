@@ -11,14 +11,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServicios } from '../../hooks/useServicios';
 import { useNotification } from '../../hooks/useNotification';
-import { useVirtualPagination } from '../../hooks/useVirtualPagination';
+import { useLoadMore } from '../../hooks/useLoadMore';
 import { useAuth } from '../../contexts/AuthContext';
 import { useServicesManagementCache } from '../../hooks/useServicesManagementCache';
 import { FiltersPanel } from '../../components/servicios/FiltersPanel';
 import { SortSelector } from '../../components/servicios/SortSelector';
 import { ServicioCard } from '../../components/servicios/ServicioCard';
 import { SearchWithAutocomplete } from '../../components/common/SearchWithAutocomplete';
-import { PaginationControls } from '../../components/common/PaginationControls';
 import { SkeletonGrid } from '../../components/common/Skeleton';
 import { CreateServicioModal } from '../../components/servicios/CreateServicioModal';
 import GestionCategoriasModal from '../../components/servicios/GestionCategoriasModal';
@@ -112,7 +111,7 @@ export const ServiciosManagementOptimized = () => {
     deleteServicio: deleteServicioHook,
     duplicateServicio: duplicateServicioHook,
     refresh
-  } = useServicios({ autoFetch: true });
+  } = useServicios({ autoFetch: true, fetchAll: true });
 
   // 🎨 Hook para cache de servicios
   const { invalidateAllCache } = useServicesManagementCache();
@@ -149,7 +148,13 @@ export const ServiciosManagementOptimized = () => {
 
     // Aplicar filtros
     if (filters.categorias?.length) {
-      filtered = filtered.filter(s => filters.categorias?.includes(s.categoria));
+      filtered = filtered.filter(s => {
+        // Manejar ambos casos: categoría poblada (objeto) o no poblada (string/ObjectId)
+        const categoriaSlug = typeof s.categoria === 'object' && s.categoria !== null
+          ? s.categoria.slug
+          : s.categoria;
+        return filters.categorias?.includes(categoriaSlug);
+      });
     }
 
     if (filters.precioMin !== undefined) {
@@ -205,26 +210,27 @@ export const ServiciosManagementOptimized = () => {
   }, [servicios, searchTerm, filters, currentSort]);
 
   // ============================================
-  // PAGINACIÓN VIRTUAL
+  // LOAD MORE - Sistema "Ver más"
   // ============================================
 
   const {
-    pageData,
-    currentPage,
-    totalPages,
-    hasNextPage,
-    hasPreviousPage,
-    goToPage,
-    itemsPerPage,
-    setItemsPerPage,
-    startIndex,
-    endIndex,
-    totalItems
-  } = useVirtualPagination({
+    visibleData,
+    hasMore,
+    loadMore,
+    reset: resetLoadMore,
+    visibleCount,
+    totalItems,
+    remainingItems
+  } = useLoadMore({
     data: serviciosFiltrados,
-    itemsPerPage: 12,
-    initialPage: 1
+    initialItems: 10,
+    increment: 10
   });
+
+  // Resetear "Ver más" cuando cambian los filtros o búsqueda
+  useEffect(() => {
+    resetLoadMore();
+  }, [searchTerm, filters, currentSort, resetLoadMore]);
 
   // ============================================
   // CONTADOR DE FILTROS ACTIVOS
@@ -278,7 +284,7 @@ export const ServiciosManagementOptimized = () => {
   const handleResetFilters = () => {
     setFilters({});
     setSearchTerm('');
-    goToPage(1);
+    resetLoadMore();
   };
 
   const handleRefresh = () => {
@@ -471,7 +477,7 @@ export const ServiciosManagementOptimized = () => {
 
             {loading ? (
               <SkeletonGrid items={12} columns={viewMode === 'grid' ? 3 : 1} />
-            ) : pageData.length === 0 ? (
+            ) : visibleData.length === 0 ? (
               <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
@@ -508,7 +514,7 @@ export const ServiciosManagementOptimized = () => {
                       : 'repeat(auto-fit, minmax(300px, 1fr))'
                     : undefined
                 }}>
-                  {pageData.map((servicio) => (
+                  {visibleData.map((servicio) => (
                     <ServicioCard
                       key={servicio._id}
                       servicio={servicio}
@@ -521,21 +527,31 @@ export const ServiciosManagementOptimized = () => {
                   ))}
                 </div>
 
-                {/* Paginación */}
-                {totalPages > 1 && (
-                  <PaginationControls
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={goToPage}
-                    hasNextPage={hasNextPage}
-                    hasPreviousPage={hasPreviousPage}
-                    startIndex={startIndex}
-                    endIndex={endIndex}
-                    totalItems={totalItems}
-                    itemsPerPage={itemsPerPage}
-                    onItemsPerPageChange={setItemsPerPage}
-                    className="mt-6"
-                  />
+                {/* Botón Ver Más */}
+                {hasMore && (
+                  <div className="flex flex-col items-center gap-3 mt-6 mb-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Mostrando {visibleCount} de {totalItems} servicios
+                    </p>
+                    <button
+                      onClick={loadMore}
+                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                      Ver más ({remainingItems} restantes)
+                    </button>
+                  </div>
+                )}
+
+                {/* Indicador cuando se muestran todos */}
+                {!hasMore && totalItems > 0 && (
+                  <div className="flex justify-center mt-6 mb-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full">
+                      ✓ Mostrando todos los {totalItems} servicios
+                    </p>
+                  </div>
                 )}
               </>
             )}

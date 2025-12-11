@@ -352,7 +352,7 @@ export const FiltersPanel = ({
                   className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                  ⭐ Solo destacados
+                  ★ Solo destacados
                 </span>
               </label>
 

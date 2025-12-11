@@ -189,6 +189,10 @@ export interface ServicioFilters {
   responsable?: string;
   search?: string;
   includeDeleted?: boolean;
+  // Parámetros de paginación opcionales
+  page?: number;
+  limit?: number;
+  sort?: string;
 }
 
 /**

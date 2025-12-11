@@ -6,6 +6,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { UserRole, Permission } from '../types/roles';
 import RoleBadge from './RoleBadge';
 import { messageService } from '../services/messageService';
+import { useDashboardSidebarConfig } from '../hooks/cms/useDashboardSidebarConfig';
+import { useTheme } from '../contexts/ThemeContext';
+import DynamicIcon from './ui/DynamicIcon';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -15,6 +18,7 @@ interface SidebarProps {
 interface MenuItem {
   name: string;
   icon: string;
+  menuKey: string; // Clave para buscar el icono en la configuración CMS
   path: string;
   description: string;
   // Control de acceso
@@ -28,6 +32,31 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const location = useLocation();
   const { user, role, hasPermission, canAccessAdmin, shouldUseClientDashboard: isClientUser } = useAuth();
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  
+  // 🎨 Configuración dinámica del sidebar desde CMS
+  const { adminConfig, globalConfig, getMenuIcon } = useDashboardSidebarConfig();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+  
+  // Estilos dinámicos basados en la configuración del CMS
+  const styles = {
+    headerGradient: isDarkMode
+      ? `linear-gradient(to right, ${adminConfig.headerGradientFromDark}, ${adminConfig.headerGradientViaDark}, ${adminConfig.headerGradientToDark})`
+      : `linear-gradient(to right, ${adminConfig.headerGradientFrom}, ${adminConfig.headerGradientVia}, ${adminConfig.headerGradientTo})`,
+    activeItemGradient: isDarkMode
+      ? `linear-gradient(to right, ${adminConfig.activeItemGradientFromDark}, ${adminConfig.activeItemGradientToDark})`
+      : `linear-gradient(to right, ${adminConfig.activeItemGradientFrom}, ${adminConfig.activeItemGradientTo})`,
+    sidebarBg: isDarkMode ? adminConfig.sidebarBgDark : adminConfig.sidebarBgLight,
+    navBg: adminConfig.navBgTransparent ? 'transparent' : (isDarkMode ? adminConfig.navBgDark : adminConfig.navBgLight),
+    navTextColor: isDarkMode ? adminConfig.navTextColorDark : adminConfig.navTextColor,
+    navHoverBg: adminConfig.navHoverBgTransparent ? 'transparent' : (isDarkMode ? adminConfig.navHoverBgDark : adminConfig.navHoverBgLight),
+    navHoverBgTransparent: adminConfig.navHoverBgTransparent || false,
+    hoverBorderGradientEnabled: adminConfig.hoverBorderGradientEnabled || false,
+    hoverBorderGradient: `linear-gradient(to right, ${adminConfig.hoverBorderGradientFrom || '#3b82f6'}, ${adminConfig.hoverBorderGradientTo || '#a855f7'})`,
+    footerBg: isDarkMode ? adminConfig.footerBgDark : adminConfig.footerBgLight,
+    logoutGradient: `linear-gradient(to right, ${adminConfig.logoutButtonGradientFrom}, ${adminConfig.logoutButtonGradientTo})`,
+    borderColor: isDarkMode ? globalConfig.borderColorDark : globalConfig.borderColorLight,
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -57,6 +86,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Dashboard',
       icon: '🏠',
+      menuKey: 'dashboard',
       path: isClientUser ? '/dashboard/client' : '/dashboard/admin',
       description: 'Panel principal',
       // Todos pueden ver el dashboard
@@ -64,6 +94,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Perfil',
       icon: '👤',
+      menuKey: 'profile',
       path: '/dashboard/profile',
       description: 'Tu información personal',
       // Todos pueden ver su perfil
@@ -71,6 +102,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Módulo Servicios',
       icon: '🚀',
+      menuKey: 'servicios',
       path: '/dashboard/servicios/management',
       description: 'Gestión avanzada de servicios',
       permission: Permission.MANAGE_CONTENT,
@@ -80,6 +112,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'CMS',
       icon: '📝',
+      menuKey: 'cms',
       path: '/dashboard/cms',
       description: 'Gestor de contenido',
       permission: Permission.MANAGE_CONTENT,
@@ -88,7 +121,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     },
     {
       name: 'Solicitudes',
-      icon: '📝',
+      icon: '📋',
+      menuKey: 'solicitudes',
       path: '/dashboard/crm',
       description: 'Gestión de solicitudes',
       permission: Permission.MANAGE_CONTENT,
@@ -98,6 +132,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Mensajes',
       icon: '💬',
+      menuKey: 'mensajes',
       path: '/dashboard/crm/messages',
       description: 'Mensajes de solicitudes',
       permission: Permission.MANAGE_CONTENT,
@@ -106,6 +141,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Agenda',
       icon: '📅',
+      menuKey: 'agenda',
       path: '/dashboard/agenda',
       description: 'Calendario y eventos',
       permission: Permission.MANAGE_CONTENT,
@@ -115,6 +151,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Media Library',
       icon: '🖼️',
+      menuKey: 'media',
       path: '/dashboard/media',
       description: 'Gestión de imágenes',
       permission: Permission.MANAGE_UPLOADS,
@@ -124,6 +161,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Blog',
       icon: '📝',
+      menuKey: 'blog',
       path: '/dashboard/blog',
       description: 'Gestión del blog',
       permission: Permission.MANAGE_CONTENT,
@@ -133,6 +171,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Agentes IA',
       icon: '🤖',
+      menuKey: 'agentesIA',
       path: '/dashboard/ai-agents',
       description: 'Sistema de agentes inteligentes',
       permission: Permission.MANAGE_SYSTEM,
@@ -141,7 +180,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     },
     {
       name: 'SCUTI AI',
-      icon: '🚀',
+      icon: '✨',
+      menuKey: 'scutiAI',
       path: '/dashboard/scuti-ai',
       description: 'Chat inteligente con asistente IA',
       permission: Permission.MANAGE_SYSTEM,
@@ -151,6 +191,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       name: 'Gestión de Usuarios',
       icon: '👥',
+      menuKey: 'usuarios',
       path: '/dashboard/admin/users',
       description: 'Administrar usuarios y roles',
       permission: Permission.MANAGE_USERS,
@@ -159,7 +200,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     },
     {
       name: 'Configuración',
-      icon: '🔧',
+      icon: '⚙️',
+      menuKey: 'configuracion',
       path: '/dashboard/settings',
       description: 'Ajustes de la cuenta',
       // Todos pueden configurar su cuenta
@@ -211,14 +253,21 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-full bg-white/80 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl z-30
-          transition-all duration-300 ease-in-out flex flex-col border-r border-slate-200/60 dark:border-gray-700/60 overflow-hidden
+          fixed top-0 left-0 h-full backdrop-blur-xl shadow-2xl z-30
+          transition-all duration-300 ease-in-out flex flex-col overflow-hidden
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           ${isOpen ? 'w-72' : 'w-0 md:w-16'}
         `}
+        style={{
+          backgroundColor: styles.sidebarBg,
+          borderRight: `1px solid ${styles.borderColor}`,
+        }}
       >
         {/* Header del Sidebar */}
-        <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-purple-600 dark:via-blue-600 dark:to-indigo-600 relative overflow-hidden">
+        <div 
+          className="relative overflow-hidden"
+          style={{ background: styles.headerGradient }}
+        >
           {/* Efecto de fondo */}
           <div className="absolute inset-0 bg-white/10 dark:bg-black/10"></div>
           
@@ -230,24 +279,30 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                   <div className="flex items-center gap-2">
                     <div className="flex-shrink-0">
                       <img 
-                        src="/logos/logo-white.svg" 
-                        alt="Web Scuti" 
+                        src={globalConfig.logoUrl} 
+                        alt={globalConfig.logoAlt} 
                         className="h-8 w-auto filter brightness-0 invert"
                       />
                     </div>
                   </div>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="text-white hover:bg-white/20 rounded-lg p-1.5 transition-colors"
-                    title="Contraer sidebar"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                    </svg>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {/* Theme Toggle */}
+                    <div className="bg-white/20 rounded-lg">
+                      <ThemeToggle />
+                    </div>
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="text-white hover:bg-white/20 rounded-lg p-1.5 transition-colors"
+                      title="Contraer sidebar"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Indicador de sesión activa + Badge de Rol */}
+                {/* Indicador de sesión activa + Badge de Rol + Botón Cerrar Sesión */}
                 <div className="bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-lg p-3 border border-white/30 dark:border-white/20 shadow-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
@@ -259,6 +314,17 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                         Sesión Activa
                       </p>
                     </div>
+                    {/* Botón Cerrar Sesión compacto */}
+                    <SignOutButton>
+                      <button
+                        className="flex items-center justify-center p-1.5 rounded-lg text-white/90 hover:text-white hover:bg-white/20 transition-all duration-200"
+                        title="Cerrar Sesión"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                      </button>
+                    </SignOutButton>
                   </div>
                   {/* Badge de Rol */}
                   {role && (
@@ -271,24 +337,42 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               </div>
             ) : (
               // Sidebar colapsado
-              <div className="p-2 flex flex-col items-center">
+              <div className="p-2 flex flex-col items-center gap-2">
                 <button
                   onClick={() => setIsOpen(true)}
-                  className="text-white hover:bg-white/20 rounded-lg p-1.5 transition-colors mb-2"
+                  className="text-white hover:bg-white/20 rounded-lg p-1.5 transition-colors"
                   title="Expandir sidebar"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                   </svg>
                 </button>
+                {/* Theme Toggle colapsado */}
+                <div className="bg-white/20 rounded-lg">
+                  <ThemeToggle />
+                </div>
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+                {/* Botón Cerrar Sesión colapsado */}
+                <SignOutButton>
+                  <button
+                    className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-1.5 transition-colors"
+                    title="Cerrar Sesión"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </button>
+                </SignOutButton>
               </div>
             )}
           </div>
         </div>
 
         {/* Navegación */}
-        <nav className="flex-1 overflow-y-auto bg-slate-50/80 dark:bg-gray-900/80 backdrop-blur-sm transition-colors duration-300">
+        <nav 
+          className="flex-1 overflow-y-auto backdrop-blur-sm transition-colors duration-300"
+          style={{ backgroundColor: styles.navBg }}
+        >
           {isOpen ? (
             // Navegación expandida
             <div className="p-3">
@@ -307,33 +391,73 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       className={`
                         group w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200
                         ${isActive
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 dark:from-purple-600 dark:to-pink-600 text-white shadow-lg shadow-blue-500/20 dark:shadow-purple-500/20 scale-[1.01]'
-                          : 'text-slate-700 dark:text-gray-200 hover:bg-slate-100/80 dark:hover:bg-gray-800/80 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5'
+                          ? 'text-white shadow-lg scale-[1.01]'
+                          : 'hover:translate-x-0.5'
                         }
                       `}
+                      style={{
+                        background: isActive ? styles.activeItemGradient : 'transparent',
+                        color: isActive ? 'white' : styles.navTextColor,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          if (styles.navHoverBgTransparent && styles.hoverBorderGradientEnabled) {
+                            // Borde gradiente con fondo transparente
+                            e.currentTarget.style.background = styles.hoverBorderGradient;
+                            e.currentTarget.style.padding = '1px';
+                            const inner = e.currentTarget.querySelector('.menu-item-inner') as HTMLElement;
+                            if (inner) {
+                              inner.style.background = styles.sidebarBg;
+                              inner.style.borderRadius = '7px';
+                              inner.style.padding = '7px 11px';
+                            }
+                          } else {
+                            e.currentTarget.style.backgroundColor = styles.navHoverBg;
+                          }
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.padding = '';
+                          const inner = e.currentTarget.querySelector('.menu-item-inner') as HTMLElement;
+                          if (inner) {
+                            inner.style.background = '';
+                            inner.style.padding = '';
+                          }
+                        }
+                      }}
                     >
-                      <span className={`text-lg transition-transform ${isActive ? 'scale-105' : 'group-hover:scale-105'}`}>
-                        {item.icon}
-                      </span>
-                      <div className="flex-1 text-left">
-                        <div className={`font-medium text-sm ${isActive ? 'text-white' : ''}`}>
-                          {item.name}
+                      <div className="menu-item-inner flex items-center gap-2 w-full rounded-lg transition-all">
+                        <span className={`transition-transform ${isActive ? 'scale-105' : 'group-hover:scale-105'}`}>
+                          <DynamicIcon 
+                            name={getMenuIcon(item.menuKey, isDarkMode).iconName}
+                            size={18}
+                            color={isActive ? 'white' : getMenuIcon(item.menuKey, isDarkMode).color}
+                            strokeWidth={1.5}
+                          />
+                        </span>
+                        <div className="flex-1 text-left">
+                          <div className={`font-medium text-sm ${isActive ? 'text-white' : ''}`}>
+                            {item.name}
+                          </div>
+                          <div className={`text-xs leading-tight ${isActive ? 'text-white/80' : 'opacity-70'}`}>
+                            {item.description}
+                          </div>
                         </div>
-                        <div className={`text-xs leading-tight ${isActive ? 'text-blue-50 dark:text-purple-50' : 'text-slate-500 dark:text-gray-400 group-hover:text-slate-600 dark:group-hover:text-gray-300'}`}>
-                          {item.description}
-                        </div>
+                        {/* Badge de no leídos para Mensajería */}
+                        {item.path === '/dashboard/crm/messages' && unreadCount > 0 && (
+                          <div className="ml-2">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-600 text-white">
+                              {unreadCount}
+                            </span>
+                          </div>
+                        )}
+                        {isActive && (
+                          <div className="w-1.5 h-1.5 bg-white rounded-full shadow-lg shadow-white/50 animate-pulse"></div>
+                        )}
                       </div>
-                      {/* Badge de no leídos para Mensajería */}
-                      {item.path === '/dashboard/crm/messages' && unreadCount > 0 && (
-                        <div className="ml-2">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-600 text-white">
-                            {unreadCount}
-                          </span>
-                        </div>
-                      )}
-                      {isActive && (
-                        <div className="w-1.5 h-1.5 bg-white rounded-full shadow-lg shadow-white/50 animate-pulse"></div>
-                      )}
                     </button>
                   );
                 })}
@@ -352,15 +476,52 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       className={`
                         relative group w-full flex items-center justify-center p-2.5 rounded-lg transition-all duration-200
                         ${isActive
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 dark:from-purple-600 dark:to-pink-600 text-white shadow-lg scale-105'
-                          : 'text-slate-700 dark:text-gray-200 hover:bg-slate-100/80 dark:hover:bg-gray-800/80 hover:text-slate-900 dark:hover:text-white hover:scale-105'
+                          ? 'text-white shadow-lg scale-105'
+                          : 'hover:scale-105'
                         }
                       `}
+                      style={{
+                        background: isActive ? styles.activeItemGradient : 'transparent',
+                        color: isActive ? 'white' : styles.navTextColor,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          if (styles.navHoverBgTransparent && styles.hoverBorderGradientEnabled) {
+                            e.currentTarget.style.background = styles.hoverBorderGradient;
+                            e.currentTarget.style.padding = '1px';
+                            const inner = e.currentTarget.querySelector('.menu-icon-inner') as HTMLElement;
+                            if (inner) {
+                              inner.style.background = styles.sidebarBg;
+                              inner.style.borderRadius = '7px';
+                              inner.style.padding = '9px';
+                            }
+                          } else {
+                            e.currentTarget.style.backgroundColor = styles.navHoverBg;
+                          }
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.padding = '';
+                          const inner = e.currentTarget.querySelector('.menu-icon-inner') as HTMLElement;
+                          if (inner) {
+                            inner.style.background = '';
+                            inner.style.padding = '';
+                          }
+                        }
+                      }}
                       title={item.name}
                     >
-                      <span className="text-lg">
-                        {item.icon}
-                      </span>
+                      <div className="menu-icon-inner flex items-center justify-center rounded-lg transition-all">
+                        <DynamicIcon 
+                          name={getMenuIcon(item.menuKey, isDarkMode).iconName}
+                          size={18}
+                          color={isActive ? 'white' : getMenuIcon(item.menuKey, isDarkMode).color}
+                          strokeWidth={1.5}
+                        />
+                      </div>
                       {item.path === '/dashboard/crm/messages' && unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-semibold bg-red-600 text-white rounded-full">
                           {unreadCount}
@@ -374,51 +535,24 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           )}
         </nav>
 
-        {/* Footer con botón de cerrar sesión */}
-        <div className="bg-slate-100/80 dark:bg-gray-950/80 backdrop-blur-sm border-t border-slate-200/80 dark:border-gray-700/80 transition-colors duration-300">
+        {/* Footer con versión */}
+        <div 
+          className="backdrop-blur-sm transition-colors duration-300 p-3"
+          style={{ 
+            backgroundColor: styles.navBg,
+            borderTop: `1px solid ${styles.borderColor}`,
+          }}
+        >
           {isOpen ? (
             // Footer expandido
-            <div className="p-3 space-y-2">
-              {/* Theme Toggle */}
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-medium text-slate-600 dark:text-gray-400">Apariencia</span>
-                <ThemeToggle />
-              </div>
-
-              <SignOutButton>
-                <button
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white hover:from-red-600 hover:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800 transition-all duration-200 font-medium shadow-lg shadow-red-500/20 hover:shadow-red-500/40 hover:scale-[1.01]"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  <span className="text-sm">Cerrar Sesión</span>
-                </button>
-              </SignOutButton>
-
-              <div className="text-center">
-                <p className="text-xs text-slate-500 dark:text-gray-400 font-medium">Web Scuti v1.0.0</p>
-                <p className="text-xs text-slate-400 dark:text-gray-500">© 2025</p>
-              </div>
+            <div className="text-center">
+              <p className="text-xs text-slate-500 dark:text-gray-400 font-medium">Web Scuti v1.0.0</p>
+              <p className="text-xs text-slate-400 dark:text-gray-500">© 2025</p>
             </div>
           ) : (
-            // Footer colapsado
-            <div className="p-1.5 space-y-1.5">
-              {/* Theme Toggle */}
-              <div className="flex justify-center">
-                <ThemeToggle />
-              </div>
-
-              <SignOutButton>
-                <button
-                  className="w-full flex items-center justify-center p-2.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white hover:from-red-600 hover:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800 transition-all duration-200 shadow-lg hover:scale-105"
-                  title="Cerrar Sesión"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </button>
-              </SignOutButton>
+            // Footer colapsado - vacío o mínimo
+            <div className="text-center">
+              <p className="text-xs text-slate-400 dark:text-gray-500">v1.0</p>
             </div>
           )}
         </div>

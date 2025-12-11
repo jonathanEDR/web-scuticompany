@@ -6,8 +6,71 @@ import { Color } from '@tiptap/extension-color';
 import { TextAlign } from '@tiptap/extension-text-align';
 import { Underline } from '@tiptap/extension-underline';
 import { Link } from '@tiptap/extension-link';
-import { useEffect } from 'react';
+import { Mark, mergeAttributes } from '@tiptap/core';
+import { useEffect, useState, useRef } from 'react';
 import '../styles/editor.css';
+
+// Extensión personalizada para gradientes de texto
+const TextGradient = Mark.create({
+  name: 'textGradient',
+
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+    };
+  },
+
+  addAttributes() {
+    return {
+      gradient: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-gradient'),
+        renderHTML: attributes => {
+          if (!attributes.gradient) {
+            return {};
+          }
+          return {
+            'data-gradient': attributes.gradient,
+            style: `background: ${attributes.gradient}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent;`,
+          };
+        },
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'span[data-gradient]',
+      },
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ['span', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+  },
+
+  addCommands() {
+    return {
+      setTextGradient: (gradient: string) => ({ commands }) => {
+        return commands.setMark(this.name, { gradient });
+      },
+      unsetTextGradient: () => ({ commands }) => {
+        return commands.unsetMark(this.name);
+      },
+    };
+  },
+});
+
+// Declarar los tipos para los comandos personalizados
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    textGradient: {
+      setTextGradient: (gradient: string) => ReturnType;
+      unsetTextGradient: () => ReturnType;
+    };
+  }
+}
 
 interface RichTextEditorProps {
   value: string;
@@ -15,6 +78,234 @@ interface RichTextEditorProps {
   placeholder?: string;
   label?: string;
 }
+
+// Componente para el selector de color/gradiente
+interface ColorGradientPickerProps {
+  editor: any;
+}
+
+const ColorGradientPicker: React.FC<ColorGradientPickerProps> = ({ editor }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<'solid' | 'gradient'>('solid');
+  const [solidColor, setSolidColor] = useState('#000000');
+  const [gradientFrom, setGradientFrom] = useState('#8B5CF6');
+  const [gradientTo, setGradientTo] = useState('#06B6D4');
+  const [gradientDirection, setGradientDirection] = useState('90deg');
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar popover al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const applyColor = () => {
+    if (mode === 'solid') {
+      // Primero quitar cualquier gradiente existente
+      editor.chain().focus().unsetTextGradient().setColor(solidColor).run();
+    } else {
+      // Verificar que hay texto seleccionado
+      const { from, to } = editor.state.selection;
+      if (from === to) {
+        alert('Selecciona texto primero para aplicar el gradiente');
+        return;
+      }
+      
+      // Crear el gradiente CSS
+      const gradient = `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`;
+      
+      // Aplicar el gradiente usando la extensión personalizada
+      editor.chain().focus().unsetColor().setTextGradient(gradient).run();
+    }
+    setIsOpen(false);
+  };
+
+  const resetColor = () => {
+    editor.chain().focus().unsetColor().unsetTextGradient().run();
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative flex items-center" ref={popoverRef}>
+      <label className="text-xs text-gray-600 dark:text-gray-300 mr-1">Color:</label>
+      
+      {/* Botón para abrir el popover */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-8 h-8 rounded border-2 border-gray-300 dark:border-gray-500 cursor-pointer flex items-center justify-center overflow-hidden"
+        style={{
+          background: mode === 'gradient' 
+            ? `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`
+            : solidColor
+        }}
+        title="Selector de color/gradiente"
+      >
+        {mode === 'gradient' && <span className="text-white text-xs font-bold drop-shadow">G</span>}
+      </button>
+
+      {/* Popover */}
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 p-4 min-w-[280px]">
+          {/* Tabs para cambiar entre sólido y gradiente */}
+          <div className="flex mb-4 border-b border-gray-200 dark:border-gray-600">
+            <button
+              type="button"
+              onClick={() => setMode('solid')}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                mode === 'solid'
+                  ? 'text-purple-600 border-b-2 border-purple-600'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+              }`}
+            >
+              🎨 Color Sólido
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('gradient')}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                mode === 'gradient'
+                  ? 'text-purple-600 border-b-2 border-purple-600'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+              }`}
+            >
+              ✨ Gradiente
+            </button>
+          </div>
+
+          {mode === 'solid' ? (
+            /* Modo color sólido */
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color</label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={solidColor}
+                    onChange={(e) => setSolidColor(e.target.value)}
+                    className="w-12 h-10 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={solidColor}
+                    onChange={(e) => setSolidColor(e.target.value)}
+                    placeholder="#000000"
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+              
+              {/* Vista previa */}
+              <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded">
+                <span style={{ color: solidColor }} className="text-lg font-semibold">
+                  Vista previa
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Modo gradiente */
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color Inicio</label>
+                  <div className="flex gap-1">
+                    <input
+                      type="color"
+                      value={gradientFrom}
+                      onChange={(e) => setGradientFrom(e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={gradientFrom}
+                      onChange={(e) => setGradientFrom(e.target.value)}
+                      className="flex-1 px-1 py-0.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Color Fin</label>
+                  <div className="flex gap-1">
+                    <input
+                      type="color"
+                      value={gradientTo}
+                      onChange={(e) => setGradientTo(e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={gradientTo}
+                      onChange={(e) => setGradientTo(e.target.value)}
+                      className="flex-1 px-1 py-0.5 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-0"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Dirección</label>
+                <select
+                  value={gradientDirection}
+                  onChange={(e) => setGradientDirection(e.target.value)}
+                  className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="90deg">Horizontal →</option>
+                  <option value="180deg">Vertical ↓</option>
+                  <option value="135deg">Diagonal ↘</option>
+                  <option value="45deg">Diagonal ↗</option>
+                  <option value="270deg">Izquierda ←</option>
+                  <option value="0deg">Arriba ↑</option>
+                </select>
+              </div>
+              
+              {/* Vista previa del gradiente */}
+              <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded">
+                <span 
+                  className="text-lg font-semibold"
+                  style={{ 
+                    background: `linear-gradient(${gradientDirection}, ${gradientFrom}, ${gradientTo})`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}
+                >
+                  Vista previa gradiente
+                </span>
+              </div>
+              
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                ⚠️ Selecciona texto antes de aplicar el gradiente
+              </p>
+            </div>
+          )}
+
+          {/* Botones de acción */}
+          <div className="flex gap-2 mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+            <button
+              type="button"
+              onClick={applyColor}
+              className="flex-1 px-3 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
+            >
+              ✓ Aplicar
+            </button>
+            <button
+              type="button"
+              onClick={resetColor}
+              className="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorProps) => {
   const editor = useEditor({
@@ -32,6 +323,7 @@ const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorP
         types: ['textStyle'],
       }),
       Color,
+      TextGradient, // Extensión personalizada para gradientes de texto
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
@@ -297,25 +589,8 @@ const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorP
           )}
         </div>
 
-        {/* Text Color */}
-        <div className="flex items-center">
-          <label className="text-xs text-gray-600 dark:text-gray-300 mr-1">Color:</label>
-          <input
-            type="color"
-            onInput={(e) => editor.chain().focus().setColor((e.target as HTMLInputElement).value).run()}
-            value={editor.getAttributes('textStyle').color || '#000000'}
-            className="w-8 h-8 rounded cursor-pointer"
-            title="Color de texto"
-          />
-          <button
-            onClick={() => editor.chain().focus().unsetColor().run()}
-            className="ml-1 px-2 py-1 rounded text-xs bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200"
-            title="Resetear color"
-            type="button"
-          >
-            Reset
-          </button>
-        </div>
+        {/* Text Color - Selector mejorado con gradientes */}
+        <ColorGradientPicker editor={editor} />
 
         {/* Clear Formatting */}
         <div className="flex ml-auto">

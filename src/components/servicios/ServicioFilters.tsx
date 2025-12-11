@@ -247,7 +247,7 @@ export const ServicioFiltersPanel: React.FC<ServicioFiltersPanelProps> = ({
                 className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 focus:ring-offset-gray-800"
               />
               <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                ⭐ Solo destacados
+                ★ Solo destacados
               </span>
             </label>
 

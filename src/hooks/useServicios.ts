@@ -21,6 +21,7 @@ interface UseServiciosOptions {
   initialFilters?: ServicioFilters;
   initialPagination?: PaginationParams;
   autoFetch?: boolean; // Si debe cargar automáticamente al montar
+  fetchAll?: boolean; // Si debe cargar TODOS los servicios (sin paginación del servidor)
 }
 
 interface UseServiciosReturn {
@@ -81,7 +82,8 @@ export const useServicios = (options: UseServiciosOptions = {}): UseServiciosRet
   const {
     initialFilters = {},
     initialPagination = { page: 1, limit: 10 },
-    autoFetch = true
+    autoFetch = true,
+    fetchAll = false // Nueva opción para traer todos los servicios
   } = options;
 
   // ============================================
@@ -111,11 +113,12 @@ export const useServicios = (options: UseServiciosOptions = {}): UseServiciosRet
       setLoading(true);
       setError(null);
 
-      const response = await serviciosApi.getAll(filters, {
-        page: pagination.page,
-        limit: pagination.limit,
-        sort: initialPagination.sort
-      });
+      // Si fetchAll es true, traer todos los servicios con un límite alto
+      const paginationParams = fetchAll 
+        ? { page: 1, limit: 1000, sort: initialPagination.sort } // Traer todos
+        : { page: pagination.page, limit: pagination.limit, sort: initialPagination.sort };
+
+      const response = await serviciosApi.getAll(filters, paginationParams);
 
       setServicios(response.data || []);
       
@@ -150,7 +153,7 @@ export const useServicios = (options: UseServiciosOptions = {}): UseServiciosRet
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.page, pagination.limit, initialPagination.sort]);
+  }, [filters, pagination.page, pagination.limit, initialPagination.sort, fetchAll]);
 
   /**
    * Efecto para cargar datos cuando cambien filtros o paginación

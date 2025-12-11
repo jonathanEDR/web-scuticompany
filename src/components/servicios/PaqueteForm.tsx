@@ -317,7 +317,7 @@ export const PaqueteForm: React.FC<PaqueteFormProps> = ({
           />
           <div>
             <div className="text-white group-hover:text-purple-300 transition-colors">
-              ⭐ Paquete Destacado
+              ★ Paquete Destacado
             </div>
             <div className="text-sm text-gray-400">
               Se mostrará con énfasis especial
