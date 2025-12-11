@@ -925,6 +925,138 @@ export interface PageContent {
   servicioDetailConfig?: any; // Configuración de la página ServicioDetail con acordeón
   // 🆕 CONTENIDO PARA PÁGINA DE DETALLE DE BLOG POST
   blogPostDetailConfig?: any; // Configuración de la página de detalle del post
+  // 🆕 CONFIGURACIÓN DEL SIDEBAR DEL DASHBOARD
+  dashboardSidebar?: DashboardSidebarConfig;
+}
+
+// ============================================
+// 🎨 CONFIGURACIÓN DEL SIDEBAR DEL DASHBOARD
+// ============================================
+
+/**
+ * Configuración de colores y estilos para el Sidebar del Dashboard
+ * Aplica tanto al sidebar de Admin como al de Cliente
+ */
+export interface DashboardSidebarConfig {
+  // === SIDEBAR ADMIN ===
+  admin: {
+    // Header gradiente
+    headerGradientFrom: string;
+    headerGradientVia: string;
+    headerGradientTo: string;
+    headerGradientFromDark: string;
+    headerGradientViaDark: string;
+    headerGradientToDark: string;
+    
+    // Items activos gradiente
+    activeItemGradientFrom: string;
+    activeItemGradientTo: string;
+    activeItemGradientFromDark: string;
+    activeItemGradientToDark: string;
+    
+    // Fondo del sidebar
+    sidebarBgLight: string;
+    sidebarBgDark: string;
+    
+    // Navegación
+    navBgLight: string;
+    navBgDark: string;
+    navBgTransparent?: boolean; // Si es true, el fondo de navegación es transparente
+    navTextColor: string;
+    navTextColorDark: string;
+    navHoverBgLight: string;
+    navHoverBgDark: string;
+    navHoverBgTransparent?: boolean; // Si es true, el hover es transparente
+    // Borde gradiente en hover (solo aplica si navHoverBgTransparent es true)
+    hoverBorderGradientEnabled?: boolean;
+    hoverBorderGradientFrom?: string;
+    hoverBorderGradientTo?: string;
+    
+    // Footer
+    footerBgLight: string;
+    footerBgDark: string;
+    logoutButtonGradientFrom: string;
+    logoutButtonGradientTo: string;
+  };
+  
+  // === SIDEBAR CLIENTE ===
+  client: {
+    // Header gradiente
+    headerGradientFrom: string;
+    headerGradientVia: string;
+    headerGradientTo: string;
+    headerGradientFromDark: string;
+    headerGradientViaDark: string;
+    headerGradientToDark: string;
+    
+    // Items activos gradiente
+    activeItemGradientFrom: string;
+    activeItemGradientTo: string;
+    activeItemGradientFromDark: string;
+    activeItemGradientToDark: string;
+    
+    // Fondo del sidebar
+    sidebarBgLight: string;
+    sidebarBgDark: string;
+    
+    // Navegación
+    navBgLight: string;
+    navBgDark: string;
+    navBgTransparent?: boolean; // Si es true, el fondo de navegación es transparente
+    navTextColor: string;
+    navTextColorDark: string;
+    navHoverBgLight: string;
+    navHoverBgDark: string;
+    navHoverBgTransparent?: boolean; // Si es true, el hover es transparente
+    // Borde gradiente en hover (solo aplica si navHoverBgTransparent es true)
+    hoverBorderGradientEnabled?: boolean;
+    hoverBorderGradientFrom?: string;
+    hoverBorderGradientTo?: string;
+    
+    // Footer
+    footerBgLight: string;
+    footerBgDark: string;
+    logoutButtonGradientFrom: string;
+    logoutButtonGradientTo: string;
+  };
+  
+  // === CONFIGURACIÓN GLOBAL ===
+  global: {
+    // Logo
+    logoUrl: string;
+    logoAlt: string;
+    
+    // Bordes
+    borderColorLight: string;
+    borderColorDark: string;
+    
+    // Ancho del sidebar
+    expandedWidth: string;
+    collapsedWidth: string;
+    
+    // Icono de cambio de tema
+    themeToggleIconLight?: string;      // Icono a mostrar en modo claro (para cambiar a oscuro)
+    themeToggleIconDark?: string;       // Icono a mostrar en modo oscuro (para cambiar a claro)
+    themeToggleColorLight?: string;     // Color del icono en modo claro
+    themeToggleColorDark?: string;      // Color del icono en modo oscuro
+    
+    // Tipografía
+    fontFamily?: string;                // Fuente principal (ej: 'Montserrat', 'Inter', 'Roboto')
+    fontSizeBase?: string;              // Tamaño base del texto (ej: '14px', '0.875rem')
+    fontSizeMenu?: string;              // Tamaño del texto de menú (ej: '15px')
+    fontSizeHeader?: string;            // Tamaño del texto del header (ej: '16px')
+    fontWeightNormal?: string;          // Peso normal del texto (ej: '400', '500')
+    fontWeightBold?: string;            // Peso en negrita (ej: '600', '700')
+  };
+
+  // === CONFIGURACIÓN DE ICONOS DEL MENÚ ===
+  menuIcons?: {
+    [menuKey: string]: {
+      iconName: string;          // Nombre del icono de Lucide (ej: 'Home', 'User', 'Settings')
+      iconColorLight: string;    // Color del icono en tema claro (hex)
+      iconColorDark: string;     // Color del icono en tema oscuro (hex)
+    };
+  };
 }
 
 export interface PageSeo {

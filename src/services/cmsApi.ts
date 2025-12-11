@@ -390,6 +390,73 @@ export const initHomePage = async () => {
   }
 };
 
+// Actualizar contenido parcial de una página por slug (merge de contenido)
+export const updatePageBySlug = async (slug: string, partialData: { content?: Record<string, any> }) => {
+  try {
+    const headers = await getAuthHeaders();
+    
+    console.log('🔵 [updatePageBySlug] ========== INICIO ==========');
+    console.log('🔵 [updatePageBySlug] Slug:', slug);
+    console.log('🔵 [updatePageBySlug] partialData recibido:', JSON.stringify(partialData, null, 2));
+    
+    // Primero obtener la página actual para hacer merge
+    console.log('🔵 [updatePageBySlug] Obteniendo página actual...');
+    const currentPage = await getPageBySlug(slug, false);
+    console.log('🔵 [updatePageBySlug] Página actual content:', currentPage?.content ? Object.keys(currentPage.content) : 'null');
+    
+    if (!currentPage) {
+      throw new Error(`Página "${slug}" no encontrada`);
+    }
+    
+    // Hacer merge del contenido existente con el nuevo
+    const mergedContent = {
+      ...currentPage.content,
+      ...partialData.content
+    };
+    
+    console.log('🔵 [updatePageBySlug] mergedContent keys:', Object.keys(mergedContent));
+    console.log('🔵 [updatePageBySlug] dashboardSidebar en merged:', mergedContent.dashboardSidebar ? 'SÍ' : 'NO');
+    if (mergedContent.dashboardSidebar) {
+      console.log('🔵 [updatePageBySlug] Admin headerGradientFrom:', mergedContent.dashboardSidebar.admin?.headerGradientFrom);
+    }
+    
+    console.log('🔵 [updatePageBySlug] Enviando PUT a:', `${API_URL}/cms/pages/${slug}`);
+    const response = await fetchWithRetry(
+      `${API_URL}/cms/pages/${slug}`,
+      {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ content: mergedContent }),
+      },
+      { maxRetries: 2 }
+    );
+
+    const data = await response.json();
+    console.log('🔵 [updatePageBySlug] Respuesta del servidor:', data.success ? 'SUCCESS' : 'FAILED', data.message || '');
+
+    if (!data.success) {
+      throw new Error(data.message || 'Error al actualizar página');
+    }
+
+    // Invalidar caché
+    cache.clear(`page-${slug}`);
+    cache.clear('all-pages');
+    
+    try {
+      localStorage.removeItem(`cmsCache_page-${slug}`);
+      console.log(`✅ [updatePageBySlug] Cache limpiado para "${slug}"`);
+    } catch (e) {
+      console.error('Error limpiando localStorage:', e);
+    }
+
+    console.log('🔵 [updatePageBySlug] ========== FIN ==========');
+    return data.data;
+  } catch (error) {
+    console.error(`❌ [updatePageBySlug] Error (${slug}):`, error);
+    throw error;
+  }
+};
+
 // ⚡ Exportar función para limpiar caché manualmente
 export const clearCache = (pattern?: string) => {
   console.log('🗑️ [clearCache] Limpiando caché:', { pattern: pattern || 'TODO' });

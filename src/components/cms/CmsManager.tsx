@@ -26,6 +26,7 @@ import AllNewsConfigSection from './AllNewsConfigSection';
 import BlogCtaConfigSection from './BlogCtaConfigSection';
 import ServicioDetailConfigSection from './ServicioDetailConfigSection';
 import BlogPostDetailConfigSection from './BlogPostDetailConfigSection';
+import SidebarConfigSection from './SidebarConfigSection';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -37,17 +38,18 @@ const CmsManager: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog' | 'servicio-detail' | 'blog-post-detail'>('home');
   
   // Determinar tab activo desde la URL
-  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' => {
+  const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' | 'sidebar' => {
     const path = location.pathname;
     if (path.includes('/seo')) return 'seo';
     if (path.includes('/theme')) return 'theme';
     if (path.includes('/cards')) return 'cards';
     if (path.includes('/contact')) return 'contact';
     if (path.includes('/chatbot')) return 'chatbot';
+    if (path.includes('/sidebar')) return 'sidebar';
     return 'content';
   };
 
-  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot'>(getInitialTab());
+  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' | 'sidebar'>(getInitialTab());
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [hasGlobalChanges, setHasGlobalChanges] = useState(false); // 🔥 Estado para detectar cambios globales
@@ -63,7 +65,7 @@ const CmsManager: React.FC = () => {
   }, [location.pathname]);
 
   // Actualizar URL cuando cambia el tab
-  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot') => {
+  const handleTabChange = (tab: 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' | 'sidebar') => {
     setActiveTab(tab);
     const baseUrl = '/dashboard/cms';
     if (tab === 'content') {
@@ -235,6 +237,7 @@ const CmsManager: React.FC = () => {
     { id: 'cards' as const, label: 'Diseño de Tarjetas', icon: '🎴' },
     { id: 'contact' as const, label: 'Contacto', icon: '📞' },
     { id: 'chatbot' as const, label: 'Chatbot', icon: '🤖' },
+    { id: 'sidebar' as const, label: 'Sidebar', icon: '📊' },
     { id: 'seo' as const, label: 'SEO', icon: '🔍' },
     { id: 'theme' as const, label: 'Tema', icon: '🎨' }
   ];
@@ -739,6 +742,12 @@ const CmsManager: React.FC = () => {
             config={pageData?.content?.chatbotConfig || defaultChatbotConfig}
             onUpdate={(field, value) => handleUpdateContent(field, value)}
             theme={currentTheme}
+          />
+        )}
+        {activeTab === 'sidebar' && (
+          <SidebarConfigSection
+            onSave={() => setSaveStatus('saved')}
+            onChangePending={() => setHasGlobalChanges(true)}
           />
         )}
       </div>

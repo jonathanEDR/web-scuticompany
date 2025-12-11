@@ -1,20 +1,37 @@
 import { useTheme } from '../contexts/ThemeContext';
+import { useDashboardSidebarConfig } from '../hooks/cms/useDashboardSidebarConfig';
+import DynamicIcon from './ui/DynamicIcon';
 
-export default function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string;
+}
+
+export default function ThemeToggle({ className = '' }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
+  const { globalConfig } = useDashboardSidebarConfig();
+  const isDarkMode = theme === 'dark';
+
+  // Obtener configuración del icono de tema
+  const iconName = isDarkMode 
+    ? (globalConfig.themeToggleIconDark || 'Sun') 
+    : (globalConfig.themeToggleIconLight || 'Moon');
+  const iconColor = isDarkMode 
+    ? (globalConfig.themeToggleColorDark || '#fbbf24') 
+    : (globalConfig.themeToggleColorLight || '#f59e0b');
 
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
-      title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-      aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      className={`p-1.5 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200 ${className}`}
+      title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      aria-label={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
     >
-      {theme === 'dark' ? (
-        <span className="text-xl" role="img" aria-label="Sol">☀️</span>
-      ) : (
-        <span className="text-xl" role="img" aria-label="Luna">🌙</span>
-      )}
+      <DynamicIcon 
+        name={iconName}
+        color={iconColor}
+        size={22}
+        strokeWidth={1.5}
+      />
     </button>
   );
 }
