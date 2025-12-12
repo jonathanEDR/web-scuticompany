@@ -177,6 +177,8 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
               alt={post.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               loading="lazy"
+              decoding="async"
+              fetchPriority="low"
             />
           ) : (
             <div 
@@ -652,6 +654,8 @@ export const AllNewsCard: React.FC<AllNewsCardProps> = ({
             alt={post.title}
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
+            fetchPriority="low"
           />
           {post.category && (
             <div className="absolute top-3 left-3">

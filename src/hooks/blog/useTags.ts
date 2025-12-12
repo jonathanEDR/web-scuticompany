@@ -1,10 +1,12 @@
 /**
  * 🏷️ Hook para Tags del Blog
  * Maneja la obtención y gestión de tags
+ * ✅ Optimizado con cache para evitar recargas innecesarias
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { blogTagApi } from '../../services/blog';
+import blogCache from '../../utils/blogCache';
 import type { BlogTag, BlogPost, PaginationInfo } from '../../types/blog';
 
 interface UseTagsReturn {
@@ -16,6 +18,7 @@ interface UseTagsReturn {
 
 /**
  * Hook para obtener todos los tags
+ * ✅ Con sistema de cache (TTL: 6 horas)
  */
 export function useTags(): UseTagsReturn {
   const [tags, setTags] = useState<BlogTag[]>([]);
@@ -27,6 +30,17 @@ export function useTags(): UseTagsReturn {
       setLoading(true);
       setError(null);
       
+      // ✅ Intentar obtener del cache primero
+      const cacheKey = 'all-tags';
+      const cached = blogCache.get<BlogTag[]>('TAGS', cacheKey);
+      
+      if (cached) {
+        setTags(cached);
+        setLoading(false);
+        return;
+      }
+      
+      // Si no está en cache, hacer petición al servidor
       const response = await blogTagApi.getAllTags();
       
       if (response.success && response.data) {
@@ -38,6 +52,9 @@ export function useTags(): UseTagsReturn {
           return a.name.localeCompare(b.name);
         });
         setTags(sorted);
+        
+        // ✅ Guardar en cache
+        blogCache.set('TAGS', cacheKey, sorted);
       }
     } catch (err: any) {
       console.error('[useTags] Error:', err);

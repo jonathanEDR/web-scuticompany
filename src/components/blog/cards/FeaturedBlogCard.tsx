@@ -65,6 +65,8 @@ export const FeaturedBlogCard: React.FC<FeaturedBlogCardProps> = ({
               alt={post.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
+              decoding="async"
+              fetchPriority="low"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800" />

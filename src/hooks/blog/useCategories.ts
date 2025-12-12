@@ -1,10 +1,12 @@
 /**
  * 🎣 Hook para Categorías del Blog
  * Maneja la obtención y gestión de categorías
+ * ✅ Optimizado con cache para evitar recargas innecesarias
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { blogCategoryApi } from '../../services/blog';
+import blogCache from '../../utils/blogCache';
 import type { BlogCategory, BlogPost, PaginationInfo } from '../../types/blog';
 
 interface UseCategoriesReturn {
@@ -16,6 +18,7 @@ interface UseCategoriesReturn {
 
 /**
  * Hook para obtener todas las categorías
+ * ✅ Con sistema de cache (TTL: 6 horas)
  */
 export function useCategories(): UseCategoriesReturn {
   const [categories, setCategories] = useState<BlogCategory[]>([]);
@@ -27,6 +30,17 @@ export function useCategories(): UseCategoriesReturn {
       setLoading(true);
       setError(null);
       
+      // ✅ Intentar obtener del cache primero
+      const cacheKey = 'all-categories';
+      const cached = blogCache.get<BlogCategory[]>('CATEGORIES', cacheKey);
+      
+      if (cached) {
+        setCategories(cached);
+        setLoading(false);
+        return;
+      }
+      
+      // Si no está en cache, hacer petición al servidor
       const response = await blogCategoryApi.getAllCategories();
       
       if (response.success && response.data) {
@@ -36,6 +50,9 @@ export function useCategories(): UseCategoriesReturn {
           return a.name.localeCompare(b.name);
         });
         setCategories(sorted);
+        
+        // ✅ Guardar en cache
+        blogCache.set('CATEGORIES', cacheKey, sorted);
       }
     } catch (err: any) {
       console.error('[useCategories] Error:', err);

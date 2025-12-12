@@ -34,6 +34,7 @@ const CACHE_TTL = {
   FEATURED: 4 * 60 * 60 * 1000,         // 4 horas - Posts destacados
   POPULAR: 2 * 60 * 60 * 1000,          // 2 horas - Posts populares
   CATEGORIES: 6 * 60 * 60 * 1000,       // 6 horas - Categorías
+  TAGS: 6 * 60 * 60 * 1000,             // 6 horas - Tags
   SEARCH: 30 * 60 * 1000,               // 30 minutos - Búsqueda
   COMMENTS: 5 * 60 * 1000,              // 5 minutos - Comentarios (dinámicos)
 } as const;

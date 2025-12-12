@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Newspaper } from 'lucide-react';
-import { useBlogPosts } from '../../../hooks/blog';
-import { useCategories } from '../../../hooks/blog';
-import { useTags } from '../../../hooks/blog';
-import { useBlogDebugConsole } from '../../../hooks/blog';
+import { useBlogPosts, useCategories, useTags } from '../../../hooks/blog';
 import { useBlogCmsConfig } from '../../../hooks/blog/useBlogCmsConfig';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { SimpleHeroSection } from '../../../components/blog/hero/SimpleHeroSection';
@@ -20,9 +17,6 @@ const BlogHome: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null); // 🏷️ Estado para tag seleccionado
   const [searchQuery, setSearchQuery] = useState(''); // 🔍 Estado para búsqueda
   const postsPerPage = 9;
-
-  // Debug info (solo en desarrollo)
-  useBlogDebugConsole();
 
   // 🆕 Cargar configuración del CMS y tema actual
   const { config: cmsConfig } = useBlogCmsConfig();
@@ -82,10 +76,62 @@ const BlogHome: React.FC = () => {
     setCurrentPage(1); // Reset to first page
   };
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, selectedTag, searchQuery]);
+  // ⚡ Memoizar JSON-LD para evitar regenerarlo en cada render
+  const jsonLdData = useMemo(() => JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Blog Web Scuti - Tech News',
+    description: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico',
+    url: 'https://webscuti.com/blog',
+    publisher: {
+      '@type': 'Organization',
+      name: 'WebScuti',
+      url: 'https://webscuti.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://webscuti.com/logo.png'
+      }
+    },
+    inLanguage: 'es-ES',
+    keywords: 'noticias tecnológicas, tendencias tech, desarrollo web, programación, AI, cloud computing, cybersecurity'
+  }), []);
+
+  // ⚡ Memoizar estilos de la sección featured posts
+  const featuredStyles = useMemo(() => {
+    const bgImage = isDarkMode 
+      ? featuredPostsConfig?.sectionBgImageDark 
+      : featuredPostsConfig?.sectionBgImageLight;
+    const bgOverlay = isDarkMode 
+      ? (featuredPostsConfig?.sectionBgOverlayDark ?? 0)
+      : (featuredPostsConfig?.sectionBgOverlayLight ?? 0);
+    const bgColor = isDarkMode
+      ? (featuredPostsConfig?.sectionBgColorDark || '#111827')
+      : (featuredPostsConfig?.sectionBgColorLight || '#f3f4f6');
+    const hasImage = !!bgImage;
+
+    const titleColor = isDarkMode
+      ? (featuredPostsConfig?.sectionTitleColorDark || '#ffffff')
+      : (featuredPostsConfig?.sectionTitleColorLight || '#111827');
+    const iconColor = isDarkMode
+      ? (featuredPostsConfig?.sectionIconColorDark || '#60a5fa')
+      : (featuredPostsConfig?.sectionIconColorLight || '#2563eb');
+    const iconBgColor = isDarkMode
+      ? (featuredPostsConfig?.sectionIconBgDark || 'rgba(37, 99, 235, 0.2)')
+      : (featuredPostsConfig?.sectionIconBgLight || '#dbeafe');
+
+    const sectionStyle = hasImage ? {
+      backgroundImage: bgOverlay > 0 
+        ? `linear-gradient(rgba(0,0,0,${bgOverlay}), rgba(0,0,0,${bgOverlay})), url(${bgImage})`
+        : `url(${bgImage})`,
+      backgroundSize: 'cover' as const,
+      backgroundPosition: 'center' as const,
+      backgroundAttachment: 'fixed' as const
+    } : {
+      backgroundColor: bgColor
+    };
+
+    return { sectionStyle, titleColor, iconColor, iconBgColor };
+  }, [isDarkMode, featuredPostsConfig]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -128,26 +174,9 @@ const BlogHome: React.FC = () => {
         <link rel="canonical" content="https://webscuti.com/blog" />
       </Helmet>
       
-      {/* JSON-LD para el sitio del blog */}
+      {/* JSON-LD para el sitio del blog - Memoizado */}
       <script type="application/ld+json">
-        {JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Blog',
-          name: 'Blog Web Scuti - Tech News',
-          description: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico',
-          url: 'https://webscuti.com/blog',
-          publisher: {
-            '@type': 'Organization',
-            name: 'WebScuti',
-            url: 'https://webscuti.com',
-            logo: {
-              '@type': 'ImageObject',
-              url: 'https://webscuti.com/logo.png'
-            }
-          },
-          inLanguage: 'es-ES',
-          keywords: 'noticias tecnológicas, tendencias tech, desarrollo web, programación, AI, cloud computing, cybersecurity'
-        })}
+        {jsonLdData}
       </script>
 
       {/* Header de navegación */}
@@ -161,77 +190,44 @@ const BlogHome: React.FC = () => {
       />
 
       {/* Featured Posts Section - Noticias Destacadas */}
-      {featuredPosts && featuredPosts.length > 0 && (() => {
-        // Determinar imagen y overlay según el tema
-        const bgImage = isDarkMode 
-          ? featuredPostsConfig?.sectionBgImageDark 
-          : featuredPostsConfig?.sectionBgImageLight;
-        const bgOverlay = isDarkMode 
-          ? (featuredPostsConfig?.sectionBgOverlayDark ?? 0)
-          : (featuredPostsConfig?.sectionBgOverlayLight ?? 0);
-        const bgColor = isDarkMode
-          ? (featuredPostsConfig?.sectionBgColorDark || '#111827')
-          : (featuredPostsConfig?.sectionBgColorLight || '#f3f4f6');
-        const hasImage = !!bgImage;
-
-        // Colores de texto e icono según el tema
-        const titleColor = isDarkMode
-          ? (featuredPostsConfig?.sectionTitleColorDark || '#ffffff')
-          : (featuredPostsConfig?.sectionTitleColorLight || '#111827');
-        const iconColor = isDarkMode
-          ? (featuredPostsConfig?.sectionIconColorDark || '#60a5fa')
-          : (featuredPostsConfig?.sectionIconColorLight || '#2563eb');
-        const iconBgColor = isDarkMode
-          ? (featuredPostsConfig?.sectionIconBgDark || 'rgba(37, 99, 235, 0.2)')
-          : (featuredPostsConfig?.sectionIconBgLight || '#dbeafe');
-
-        return (
-          <section 
-            className="relative py-12 transition-colors duration-300"
-            style={hasImage ? {
-              backgroundImage: bgOverlay > 0 
-                ? `linear-gradient(rgba(0,0,0,${bgOverlay}), rgba(0,0,0,${bgOverlay})), url(${bgImage})`
-                : `url(${bgImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundAttachment: 'fixed'
-            } : {
-              backgroundColor: bgColor
-            }}
-          >
-            <div className="container mx-auto px-4">
-              <div className="flex items-center gap-3 mb-8">
-                {featuredPostsConfig?.showIcon !== false && (
-                  <div 
-                    className="p-2 rounded-lg"
-                    style={{ backgroundColor: iconBgColor }}
-                  >
-                    <Newspaper style={{ color: iconColor }} size={24} />
-                  </div>
-                )}
-                <h2 
-                  className="text-3xl font-bold"
-                  style={{ color: titleColor }}
+      {featuredPosts && featuredPosts.length > 0 && (
+        <section 
+          className="relative py-12 transition-colors duration-300"
+          style={featuredStyles.sectionStyle}
+        >
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-3 mb-8">
+              {featuredPostsConfig?.showIcon !== false && (
+                <div 
+                  className="p-2 rounded-lg"
+                  style={{ backgroundColor: featuredStyles.iconBgColor }}
                 >
-                  {featuredPostsConfig?.sectionTitle || 'Noticias Destacadas'}
-                </h2>
-              </div>
-          
-            {/* Layout dinámico según configuración */}
-            {featuredPostsConfig?.layout === 'stacked' ? (
-              // Layout Apilado: Una tarjeta por fila - Centrado con ancho máximo
-              <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-                {featuredPosts.slice(0, featuredPostsConfig?.maxFeaturedPosts || 3).map((post) => (
-                  <FeaturedBlogCard
-                    key={post._id}
-                    post={post}
-                    variant="hero"
-                    config={featuredPostsConfig}
-                  />
-                ))}
-              </div>
-            ) : featuredPostsConfig?.layout === 'grid' ? (
-              // Layout Grid: 3 columnas
+                  <Newspaper style={{ color: featuredStyles.iconColor }} size={24} />
+                </div>
+              )}
+              <h2 
+                className="text-3xl font-bold"
+                style={{ color: featuredStyles.titleColor }}
+              >
+                {featuredPostsConfig?.sectionTitle || 'Noticias Destacadas'}
+              </h2>
+            </div>
+        
+          {/* Layout dinámico según configuración */}
+          {featuredPostsConfig?.layout === 'stacked' ? (
+            // Layout Apilado: Una tarjeta por fila - Centrado con ancho máximo
+            <div className="flex flex-col gap-6 max-w-4xl mx-auto">
+              {featuredPosts.slice(0, featuredPostsConfig?.maxFeaturedPosts || 3).map((post) => (
+                <FeaturedBlogCard
+                  key={post._id}
+                  post={post}
+                  variant="hero"
+                  config={featuredPostsConfig}
+                />
+              ))}
+            </div>
+          ) : featuredPostsConfig?.layout === 'grid' ? (
+            // Layout Grid: 3 columnas
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {featuredPosts.slice(0, featuredPostsConfig?.maxFeaturedPosts || 3).map((post) => (
                   <FeaturedBlogCard
@@ -275,10 +271,9 @@ const BlogHome: React.FC = () => {
                 )}
               </div>
             )}
-            </div>
-          </section>
-        );
-      })()}
+          </div>
+        </section>
+      )}
 
       {/* All News Section - Todas las Noticias (Nuevo diseño maqueta) */}
       <AllNewsSection
