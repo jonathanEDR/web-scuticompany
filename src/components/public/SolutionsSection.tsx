@@ -24,6 +24,10 @@ interface SolutionItem {
       descriptionColor?: string;
     };
   };
+  // Configuración del botón "Conocer más"
+  showButton?: boolean;    // Mostrar/ocultar el botón (default: true)
+  buttonText?: string;     // Texto del botón (default: "Conocer más")
+  buttonLink?: string;     // Enlace del botón (default: "/servicios")
 }
 
 interface SolutionsData {
@@ -91,7 +95,11 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
           iconDark: item.iconDark,
           gradient: item.gradient,
           styles: item.styles, // ✅ Preservar estilos individuales
-          _id: item._id // Preservar _id para compatibilidad
+          _id: item._id, // Preservar _id para compatibilidad
+          // ✅ Nuevos campos del botón
+          showButton: item.showButton,
+          buttonText: item.buttonText,
+          buttonLink: item.buttonLink
         }))
       };
     }
@@ -483,16 +491,19 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                 />
               </div>
 
-              {/* Arrow Indicator */}
-              <div
-                className="relative mt-6 flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ color: cardStyles.linkColor }}
-              >
-                <span className="text-sm font-medium mr-2">Conocer más</span>
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+              {/* Arrow Indicator - Configurable desde CMS */}
+              {solution.showButton !== false && (
+                <Link
+                  to={solution.buttonLink || '/servicios'}
+                  className="relative mt-6 flex items-center opacity-0 group-hover:opacity-100 transition-opacity hover:underline"
+                  style={{ color: cardStyles.linkColor }}
+                >
+                  <span className="text-sm font-medium mr-2">{solution.buttonText || 'Conocer más'}</span>
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              )}
             </div>
           ))}
         </div>

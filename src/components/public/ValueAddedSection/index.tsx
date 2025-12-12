@@ -59,22 +59,35 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
           isVisible={isVisible}
         />
 
-        {/* Contenedor del carrusel */}
+        {/* Contenedor del carrusel con espacio para animación de escape */}
         <div 
           ref={carouselRef}
-          className="relative overflow-hidden"
+          className="relative"
+          style={{
+            overflow: 'visible',
+            margin: '-80px -80px',
+            padding: '80px 80px'
+          }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onMouseEnter={pauseAutoPlay}
           onMouseLeave={resumeAutoPlay}
         >
+          {/* Clip container para ocultar slides fuera del viewport */}
           <div 
-            className="flex transition-transform duration-700 ease-in-out gap-8"
+            className="overflow-hidden"
             style={{
-              transform: `translateX(-${currentSlide * (100 / slidesToShow)}%)`,
+              margin: '0 -80px',
+              padding: '80px 80px'
             }}
           >
+            <div 
+              className="flex transition-transform duration-700 ease-in-out gap-8"
+              style={{
+                transform: `translateX(-${currentSlide * (100 / slidesToShow)}%)`,
+              }}
+            >
             {valueItems.map((valueItem, index) => {
               // Generar key única robusta - manejar MongoDB ObjectId
               let itemId: string | null = null;
@@ -135,6 +148,7 @@ const ValueAddedSection = ({ data }: ValueAddedSectionProps) => {
                 </div>
               );
             })}
+          </div>
           </div>
         </div>
 

@@ -96,6 +96,10 @@ export interface SolutionItem {
   description: string;
   gradient: string;
   styles?: SolutionTextStyles; // Estilos de texto por tema
+  // Configuración del botón "Conocer más"
+  showButton?: boolean;    // Mostrar/ocultar el botón (default: true)
+  buttonText?: string;     // Texto del botón (default: "Conocer más")
+  buttonLink?: string;     // Enlace del botón (default: "/servicios")
 }
 
 export interface HeroContent {

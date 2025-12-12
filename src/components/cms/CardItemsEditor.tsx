@@ -69,6 +69,10 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
       title: defaultTitles[index] || `Solución ${index + 1}`,
       description: defaultDescriptions[index] || `Descripción de la solución ${index + 1}`,
       gradient: defaultGradients[index] || 'from-gray-500 to-gray-700',
+      // Configuración del botón por defecto
+      showButton: true,
+      buttonText: 'Conocer más',
+      buttonLink: '/servicios',
       styles: {
         light: {
           titleColor: '',
@@ -106,7 +110,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
   }, [items]);
 
   // Actualizar un item específico
-  const updateItem = (index: number, field: keyof SolutionItem, value: string) => {
+  const updateItem = (index: number, field: keyof SolutionItem, value: string | boolean) => {
     setLocalItems(prev => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
@@ -305,6 +309,59 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         placeholder="from-purple-500 to-purple-700"
                       />
+                    </div>
+
+                    {/* Configuración del Botón "Conocer más" */}
+                    <div className="bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700/50">
+                      <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                        🔗 Botón "Conocer más"
+                      </h4>
+                      
+                      {/* Toggle mostrar/ocultar */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={item.showButton !== false}
+                            onChange={(e) => updateItem(index, 'showButton', e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {item.showButton !== false ? 'Botón visible' : 'Botón oculto'}
+                        </span>
+                      </div>
+
+                      {/* Campos del botón (solo si está visible) */}
+                      {item.showButton !== false && (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                              Texto del botón
+                            </label>
+                            <input
+                              type="text"
+                              value={item.buttonText || 'Conocer más'}
+                              onChange={(e) => updateItem(index, 'buttonText', e.target.value)}
+                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              placeholder="Conocer más"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                              Enlace del botón
+                            </label>
+                            <input
+                              type="text"
+                              value={item.buttonLink || '/servicios'}
+                              onChange={(e) => updateItem(index, 'buttonLink', e.target.value)}
+                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              placeholder="/servicios o https://..."
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
                   </div>
