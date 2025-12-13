@@ -6,10 +6,10 @@
   "rewrites": [
     {
       "source": "/sitemap-blog.xml",
-      "destination": "https://api.scuticompany.com/api/blog/sitemap.xml"
+      "destination": "https://web-scuticompany-back.onrender.com/api/blog/sitemap.xml"
     },
     {
-      "source": "/((?!.*\\.(?:xml|txt|html)$).*)",
+      "source": "/:path((?!.*\\.).*)",
       "destination": "/index.html"
     }
   ],

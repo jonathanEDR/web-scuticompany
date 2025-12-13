@@ -6,15 +6,7 @@ Allow: /
 
 # Bloquear rutas de admin y API privadas
 Disallow: /admin/
-Disallow: /api/
 Disallow: /dashboard/
-
-# Permitir archivos SEO del API
-Allow: /api/blog/sitemap.xml
-Allow: /api/blog/sitemap-images.xml
-Allow: /api/blog/sitemap-news.xml
-Allow: /api/blog/feed.xml
-Allow: /api/blog/feed.atom
 
 # Sitemaps
 Sitemap: https://scuticompany.com/sitemap.xml
