@@ -17,6 +17,7 @@ import { ContextPatternHelper } from '../../../components/blog/components/Contex
 import AIPreviewModal from '../../../components/blog/editor/AIPreviewModal';
 import { selectionAIService, type AIActionRequest } from '../../../components/blog/services/selectionAIService';
 import { useContextAwareAutoComplete } from '../../../components/blog/hooks/useContextAwareAutoComplete';
+import ImageSelectorModal from '../../../components/ImageSelectorModal';
 
 import { useCursorAwareAutoComplete } from '../../../hooks/ai/useCursorAwareAutoComplete';
 import { useAITracking } from '../../../hooks/ai/useAITracking';
@@ -82,6 +83,9 @@ export default function PostEditor() {
     expandedText: '', 
     actionLabel: ''
   });
+
+  // 🖼️ Estado para el modal de galería de imágenes
+  const [showImageGallery, setShowImageGallery] = useState(false);
 
   // Hook para obtener configuraciones de sugerencias automáticas
   const { settings: suggestionSettings } = useAutoSuggestionSettings('blog');
@@ -835,16 +839,48 @@ export default function PostEditor() {
                   alt="Featured"
                   className="w-full h-52 object-cover rounded-xl shadow-md transition-transform duration-200 group-hover:scale-[1.02]"
                 />
-                <button
-                  onClick={() => handleChange('featuredImage', '')}
-                  className="absolute top-3 right-3 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 text-sm font-medium shadow-lg opacity-0 group-hover:opacity-100"
-                >
-                  Eliminar
-                </button>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setShowImageGallery(true)}
+                    className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 text-sm font-medium shadow-lg"
+                    title="Cambiar imagen"
+                  >
+                    <ImageIcon className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleChange('featuredImage', '')}
+                    className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 text-sm font-medium shadow-lg"
+                    title="Eliminar imagen"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                <label className="block border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+              <div className="space-y-4">
+                {/* 🖼️ OPCIÓN PRINCIPAL: Seleccionar de Galería */}
+                <button
+                  onClick={() => setShowImageGallery(true)}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                >
+                  <ImageIcon className="w-5 h-5" />
+                  <span>📚 Seleccionar de Galería</span>
+                </button>
+
+                {/* Separador */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium">
+                      o sube una nueva
+                    </span>
+                  </div>
+                </div>
+
+                {/* 📤 OPCIÓN SECUNDARIA: Subir archivo local */}
+                <label className="block border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-200">
                   <input
                     type="file"
                     accept="image/*"
@@ -854,28 +890,28 @@ export default function PostEditor() {
                   />
                   {isUploading ? (
                     <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 border-4 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin mb-2" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Subiendo imagen...</p>
+                      <div className="w-6 h-6 border-3 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Subiendo...</p>
                     </div>
                   ) : (
-                    <>
-                      <Upload className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
-                      <p className="text-sm text-gray-900 dark:text-white font-medium mb-1">
-                        Haz clic para subir
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        PNG, JPG, WEBP (max. 5MB)
-                      </p>
-                    </>
+                    <div className="flex items-center justify-center gap-2">
+                      <Upload className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Subir desde dispositivo
+                      </span>
+                    </div>
                   )}
                 </label>
-                
+
+                {/* 🔗 OPCIÓN TERCIARIA: URL externa */}
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">o ingresa URL</span>
+                    <span className="px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                      o ingresa URL
+                    </span>
                   </div>
                 </div>
                 
@@ -884,7 +920,7 @@ export default function PostEditor() {
                   value={formData.featuredImage || ''}
                   onChange={(e) => handleChange('featuredImage', e.target.value)}
                   placeholder="https://ejemplo.com/imagen.jpg"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200"
                 />
               </div>
             )}
@@ -1108,6 +1144,18 @@ export default function PostEditor() {
         actionLabel={previewState.actionLabel}
         onAccept={handleAcceptPreview}
         onCancel={handleCancelPreview}
+      />
+
+      {/* 🖼️ Modal de Galería de Imágenes */}
+      <ImageSelectorModal
+        isOpen={showImageGallery}
+        onClose={() => setShowImageGallery(false)}
+        onSelect={(imageUrl) => {
+          handleChange('featuredImage', imageUrl);
+          setShowImageGallery(false);
+        }}
+        currentImage={formData.featuredImage}
+        title="Seleccionar Imagen Destacada"
       />
     </div>
   );
