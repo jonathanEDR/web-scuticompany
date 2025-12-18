@@ -75,16 +75,16 @@ const BlogHome: React.FC = () => {
   const jsonLdData = useMemo(() => JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    name: 'Blog Web Scuti - Tech News',
+    name: 'Blog SCUTI Company - Tech News',
     description: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico',
-    url: 'https://webscuti.com/blog',
+    url: 'https://scuticompany.com/blog',
     publisher: {
       '@type': 'Organization',
-      name: 'WebScuti',
-      url: 'https://webscuti.com',
+      name: 'SCUTI Company',
+      url: 'https://scuticompany.com',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://webscuti.com/logo.png'
+        url: 'https://scuticompany.com/logo.png'
       }
     },
     inLanguage: 'es-ES',
@@ -132,7 +132,7 @@ const BlogHome: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* SEO Head optimizado para IA - Página principal del blog */}
       <Helmet>
-        <title>Blog Web Scuti - Noticias y Tendencias Tecnológicas | Contenido Curado</title>
+        <title>Blog SCUTI Company - Noticias y Tendencias Tecnológicas | Contenido Curado</title>
         <meta name="description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado y validado por expertos en desarrollo y tecnología." />
         <meta name="keywords" content="noticias tecnológicas, tendencias tech, desarrollo web, programación, innovación, JavaScript, React, AI, cloud computing" />
         
@@ -140,7 +140,7 @@ const BlogHome: React.FC = () => {
         <meta name="ai:content-type" content="tech-news-blog" />
         <meta name="ai:site-purpose" content="curated tech news, industry insights, technology trends analysis" />
         <meta name="ai:topics" content="technology news, industry trends, web development, programming, AI/ML, cloud computing, cybersecurity" />
-        <meta name="ai:company" content="WebScuti" />
+        <meta name="ai:company" content="SCUTI Company" />
         <meta name="ai:industry" content="Technology, Web Development, Software" />
         <meta name="ai:authority-score" content="90" />
         <meta name="ai:content-quality" content="high" />
@@ -151,22 +151,22 @@ const BlogHome: React.FC = () => {
         <meta name="ai:content-quality" content="curated-professional" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="Blog Web Scuti - Noticias y Tendencias Tecnológicas" />
+        <meta property="og:title" content="Blog SCUTI Company - Noticias y Tendencias Tecnológicas" />
         <meta property="og:description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico." />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="WebScuti Blog" />
-        <meta property="og:url" content="https://webscuti.com/blog" />
+        <meta property="og:site_name" content="SCUTI Company Blog" />
+        <meta property="og:url" content="https://scuticompany.com/blog" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Blog Web Scuti - Noticias y Tendencias Tecnológicas" />
+        <meta name="twitter:title" content="Blog SCUTI Company - Noticias y Tendencias Tecnológicas" />
         <meta name="twitter:description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico." />
-        <meta name="twitter:site" content="@webscuti" />
+        <meta name="twitter:site" content="@scuticompany" />
         
         {/* Para crawlers y bots IA */}
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
-        <link rel="canonical" content="https://webscuti.com/blog" />
+        <link rel="canonical" content="https://scuticompany.com/blog" />
       </Helmet>
       
       {/* JSON-LD para el sitio del blog - Memoizado */}

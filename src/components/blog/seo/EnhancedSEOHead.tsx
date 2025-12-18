@@ -264,7 +264,7 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
       <meta property="og:description" content={optimizedMeta?.openGraph?.description || description} />
       <meta property="og:image" content={optimizedMeta?.openGraph?.image || image} />
       <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:site_name" content="Web Scuti Blog" />
+      <meta property="og:site_name" content="SCUTI Company Blog" />
       <meta property="og:locale" content="es_ES" />
 
       {/* Twitter Cards optimizado */}
@@ -272,14 +272,14 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
       <meta name="twitter:title" content={optimizedMeta?.twitter?.title || title} />
       <meta name="twitter:description" content={optimizedMeta?.twitter?.description || description} />
       <meta name="twitter:image" content={optimizedMeta?.twitter?.image || image} />
-      <meta name="twitter:site" content="@webscuti" />
+      <meta name="twitter:site" content="@scuticompany" />
 
       {/* Meta tags adicionales para artículos */}
       {post && type === 'article' && (
         <>
           <meta property="article:published_time" content={post.publishedAt} />
           <meta property="article:modified_time" content={post.updatedAt} />
-          <meta property="article:author" content={post.author ? `${post.author.firstName} ${post.author.lastName}` : 'Web Scuti Team'} />
+          <meta property="article:author" content={post.author ? `${post.author.firstName} ${post.author.lastName}` : 'SCUTI Company Team'} />
           <meta property="article:section" content={post.category?.name || 'Tecnología'} />
           {post.tags?.map((tag, index) => (
             <meta key={index} property="article:tag" content={typeof tag === 'string' ? tag : tag.name} />

@@ -108,10 +108,10 @@ export const useCmsData = (pageSlug: string = 'home') => {
               };
             case 'blog':
               return {
-                metaTitle: 'Blog Web Scuti - Noticias y Tendencias Tecnológicas',
+                metaTitle: 'Blog SCUTI Company - Noticias y Tendencias Tecnológicas',
                 metaDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos.',
                 keywords: ['blog', 'noticias tecnológicas', 'tendencias tech', 'desarrollo web', 'programación', 'AI'],
-                ogTitle: 'Blog Web Scuti - Noticias Tecnológicas',
+                ogTitle: 'Blog SCUTI Company - Noticias Tecnológicas',
                 ogDescription: 'Las últimas noticias y tendencias del sector tecnológico',
                 ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
                 twitterCard: 'summary_large_image'

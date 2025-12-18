@@ -248,7 +248,7 @@ export const generateSchemaMarkup = async (_slug: string): Promise<SchemaMarkup>
       article: {
         '@type': 'Article',
         headline: 'Artículo de ejemplo',
-        author: { '@type': 'Person', name: 'Web Scuti Team' },
+        author: { '@type': 'Person', name: 'SCUTI Company Team' },
         datePublished: new Date().toISOString()
       },
       breadcrumb: {
@@ -257,11 +257,11 @@ export const generateSchemaMarkup = async (_slug: string): Promise<SchemaMarkup>
       },
       organization: {
         '@type': 'Organization',
-        name: 'Web Scuti'
+        name: 'SCUTI Company'
       },
       website: {
         '@type': 'WebSite',
-        name: 'Web Scuti Blog'
+        name: 'SCUTI Company Blog'
       }
     };
 

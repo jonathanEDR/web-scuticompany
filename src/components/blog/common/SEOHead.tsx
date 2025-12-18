@@ -77,21 +77,21 @@ export default function SEOHead({
     updateMetaTag('description', seoDescription || 'Blog de desarrollo web, diseño y tecnología');
     
     // Open Graph
-    updateMetaProperty('og:title', seoTitle || 'Blog Web Scuti');
+    updateMetaProperty('og:title', seoTitle || 'Blog SCUTI Company');
     updateMetaProperty('og:description', seoDescription || 'Blog de desarrollo web, diseño y tecnología');
     updateMetaProperty('og:type', seoType);
     updateMetaProperty('og:url', seoUrl);
     updateMetaProperty('og:image', seoImage || '/images/blog-default.jpg');
-    updateMetaProperty('og:site_name', 'Web Scuti');
+    updateMetaProperty('og:site_name', 'SCUTI Company');
     updateMetaProperty('og:locale', 'es_ES');
 
     // Twitter Cards
     updateMetaProperty('twitter:card', 'summary_large_image');
-    updateMetaProperty('twitter:title', seoTitle || 'Blog Web Scuti');
+    updateMetaProperty('twitter:title', seoTitle || 'Blog SCUTI Company');
     updateMetaProperty('twitter:description', seoDescription || 'Blog de desarrollo web, diseño y tecnología');
     updateMetaProperty('twitter:image', seoImage || '/images/blog-default.jpg');
-    updateMetaProperty('twitter:site', '@webscuti');
-    updateMetaProperty('twitter:creator', '@webscuti');
+    updateMetaProperty('twitter:site', '@scuticompany');
+    updateMetaProperty('twitter:creator', '@scuticompany');
 
     // Canonical URL
     updateLinkTag('canonical', seoUrl);
@@ -113,7 +113,7 @@ export default function SEOHead({
         },
         publisher: {
           '@type': 'Organization',
-          name: 'Web Scuti',
+          name: 'SCUTI Company',
           logo: {
             '@type': 'ImageObject',
             url: '/logo.png'

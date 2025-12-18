@@ -131,7 +131,7 @@ const BlogPostEnhanced: React.FC = () => {
       
       {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
       <Helmet>
-        <title>{post.title} | WebScuti Blog</title>
+        <title>{post.title} | SCUTI Company Blog</title>
         <meta name="description" content={post.excerpt} />
         <meta name="keywords" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ')} />
         
@@ -147,14 +147,14 @@ const BlogPostEnhanced: React.FC = () => {
         <meta name="ai:source-quality" content="high" />
         <meta name="ai:content-length" content={String(post.content?.replace(/<[^>]*>/g, '').length || 0)} />
         <meta name="ai:reading-time" content={String(Math.ceil((post.content?.replace(/<[^>]*>/g, '').split(' ').length || 0) / 200))} />
-        <meta name="ai:company" content="WebScuti" />
+        <meta name="ai:company" content="SCUTI Company" />
         <meta name="ai:industry" content="Technology, Web Development" />
         
         {/* Open Graph */}
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="WebScuti Blog" />
+        <meta property="og:site_name" content="SCUTI Company Blog" />
         {post.featuredImage && <meta property="og:image" content={getImageUrl(post.featuredImage)} />}
         
         {/* Twitter Card */}

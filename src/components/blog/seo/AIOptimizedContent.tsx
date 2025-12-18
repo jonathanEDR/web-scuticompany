@@ -47,7 +47,7 @@ export const AIOptimizedContent: React.FC<AIOptimizedContentProps> = ({ post }) 
           // Autor estructurado
           author: {
             '@type': 'Person',
-            name: post.author ? `${post.author.firstName || ''} ${post.author.lastName || ''}`.trim() : 'Web Scuti Team',
+            name: post.author ? `${post.author.firstName || ''} ${post.author.lastName || ''}`.trim() : 'SCUTI Company Team',
             jobTitle: post.author?.expertise?.[0] || 'Expert',
             description: post.author?.bio || 'Technology expert'
           },
@@ -55,10 +55,10 @@ export const AIOptimizedContent: React.FC<AIOptimizedContentProps> = ({ post }) 
           // Publisher info
           publisher: {
             '@type': 'Organization',
-            name: 'Web Scuti',
+            name: 'SCUTI Company',
             logo: {
               '@type': 'ImageObject',
-              url: 'https://webscuti.com/logo.png'
+              url: 'https://scuticompany.com/logo.png'
             }
           },
           
@@ -67,7 +67,7 @@ export const AIOptimizedContent: React.FC<AIOptimizedContentProps> = ({ post }) 
           dateModified: post.updatedAt,
           
           // Imagen principal
-          image: post.featuredImage ? getImageUrl(post.featuredImage) : 'https://webscuti.com/default-image.jpg',
+          image: post.featuredImage ? getImageUrl(post.featuredImage) : 'https://scuticompany.com/default-image.jpg',
           
           // Palabras clave
           keywords: post.tags.map(tag => typeof tag === 'string' ? tag : tag.name).join(', '),
@@ -131,25 +131,25 @@ export const AIOptimizedContent: React.FC<AIOptimizedContentProps> = ({ post }) 
               '@type': 'ListItem',
               position: 1,
               name: 'Inicio',
-              item: 'https://webscuti.com'
+              item: 'https://scuticompany.com'
             },
             {
               '@type': 'ListItem',
               position: 2,
               name: 'Blog',
-              item: 'https://webscuti.com/blog'
+              item: 'https://scuticompany.com/blog'
             },
             {
               '@type': 'ListItem',
               position: 3,
               name: typeof post.category === 'string' ? post.category : post.category.name,
-              item: `https://webscuti.com/blog/category/${typeof post.category === 'string' ? post.category : post.category.slug}`
+              item: `https://scuticompany.com/blog/category/${typeof post.category === 'string' ? post.category : post.category.slug}`
             },
             {
               '@type': 'ListItem',
               position: 4,
               name: post.title,
-              item: `https://webscuti.com/blog/${post.slug}`
+              item: `https://scuticompany.com/blog/${post.slug}`
             }
           ]
         })}
