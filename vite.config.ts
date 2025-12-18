@@ -22,23 +22,52 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    // ⚡ Optimización de CSS
+    cssCodeSplit: true,
+    // ⚡ Target moderno para mejor tree-shaking
+    target: 'es2020',
     rollupOptions: {
       output: {
+        // ⚡ Code splitting optimizado
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'vendor';
+            // React core - carga crítica
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-core';
             }
+            // Router - carga crítica
+            if (id.includes('react-router')) {
+              return 'router';
+            }
+            // Clerk - carga diferida
             if (id.includes('@clerk')) {
               return 'clerk';
             }
-            if (id.includes('@tiptap')) {
+            // Editor TipTap - carga diferida (solo en /dashboard)
+            if (id.includes('@tiptap') || id.includes('prosemirror')) {
               return 'editor';
             }
+            // Iconos - carga diferida
+            if (id.includes('lucide-react')) {
+              return 'icons';
+            }
+            // Utilidades
+            if (id.includes('date-fns') || id.includes('lodash')) {
+              return 'utils';
+            }
           }
-        }
+        },
+        // ⚡ Nombres de archivo con hash para cache busting
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       }
     },
-    chunkSizeWarningLimit: 1000,
-  }
+    chunkSizeWarningLimit: 500,
+  },
+  // ⚡ Optimización de dependencias
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: ['@tiptap/react', '@tiptap/starter-kit'],
+  },
 })

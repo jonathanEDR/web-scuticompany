@@ -100,12 +100,12 @@ const ServicesAgentTraining = lazy(() => import('./pages/admin/ServicesAgentTrai
 const ScutiAIChatPage = lazy(() => import('./pages/admin/ScutiAIChatPage'));
 const AIAnalytics = lazy(() => import('./pages/admin/AIAnalytics'));
 
-// Componente de loading minimalista
+// ⚡ Componente de loading minimalista - Optimizado para LCP
 const LoadingSpinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-900">
+  <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
     <div className="text-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-      <p className="text-gray-400 text-lg">Cargando...</p>
+      <div className="w-12 h-12 border-4 border-purple-600/30 border-t-purple-600 rounded-full animate-spin mx-auto mb-3"></div>
+      <p className="text-gray-500 text-sm">Cargando...</p>
     </div>
   </div>
 );

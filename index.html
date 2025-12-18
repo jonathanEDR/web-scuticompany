@@ -6,6 +6,16 @@
     <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="google96cb30ebe99b22ed" />
 
+    <!-- ⚡ PRECONNECT - Establecer conexiones tempranas (máximo 4 críticos) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://light-dolphin-42.clerk.accounts.dev" crossorigin />
+    <link rel="preconnect" href="https://web-scuticompany-back.onrender.com" crossorigin />
+    
+    <!-- DNS Prefetch para recursos secundarios -->
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
     <!-- Favicon - Múltiples tamaños para compatibilidad con Google y navegadores -->
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -20,15 +30,17 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Google Fonts - Fuentes disponibles para personalización -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Lato:wght@300;400;700;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Ubuntu:wght@300;400;500;700&family=Oswald:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- ⚡ Google Fonts OPTIMIZADO - Solo fuentes esenciales con display=swap -->
+    <!-- Reducido de 14 familias a 3 esenciales para mejorar LCP -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    </noscript>
     
     <!-- Preload de logos para performance óptima -->
     <link rel="preload" href="/LOGO VECTOR VERSION BLANCA.svg" as="image" type="image/svg+xml" />
     <link rel="preload" href="/LOGO VECTOR VERSION NEGRA.svg" as="image" type="image/svg+xml" />
-    <link rel="preload" href="/FAVICON.png" as="image" type="image/png" />
     
     <!-- SEO Básico - Sincronizado con CMS -->
     <meta name="description" content="Transformamos procesos con soluciones digitales innovadoras | La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido" />
@@ -63,6 +75,17 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     
     <title>Desarrollo de Software e IA para PYMES | SCUTI Company Perú</title>
+    
+    <!-- ⚡ Critical CSS inline para evitar bloqueo de render -->
+    <style>
+      /* Critical CSS - Estilos mínimos para First Paint */
+      *,*::before,*::after{box-sizing:border-box}
+      html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:Inter,system-ui,-apple-system,sans-serif}
+      body{margin:0;background:#0a0a0a;color:#fff}
+      #root{min-height:100vh}
+      .loading-skeleton{background:linear-gradient(90deg,#1a1a1a 25%,#2a2a2a 50%,#1a1a1a 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+      @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    </style>
   </head>
   <body>
     <div id="root"></div>
