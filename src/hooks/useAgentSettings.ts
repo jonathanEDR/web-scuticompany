@@ -53,7 +53,7 @@ export const useAgentSettings = (agentName: string): AgentSettings => {
       try {
         const result = await pendingRequests.get(agentName);
         if (isMounted.current) {
-          setConfig(result);
+          setConfig(result ?? null); // ✅ Convertir undefined a null
           setLoading(false);
         }
         return;
