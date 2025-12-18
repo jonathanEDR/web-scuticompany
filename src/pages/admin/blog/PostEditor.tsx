@@ -22,7 +22,6 @@ import ImageSelectorModal from '../../../components/ImageSelectorModal';
 import { useCursorAwareAutoComplete } from '../../../hooks/ai/useCursorAwareAutoComplete';
 import { useAITracking } from '../../../hooks/ai/useAITracking';
 import { useCategories } from '../../../hooks/blog';
-import { useAutoSuggestionSettings } from '../../../hooks/useAgentSettings';
 import { useQuickSuggestionControl } from '../../../hooks/useQuickSuggestionControl';
 import { generateSlug } from '../../../utils/blog';
 import { blogPostApi } from '../../../services/blog';
@@ -88,12 +87,16 @@ export default function PostEditor() {
 
   // 🖼️ Estado para el modal de galería de imágenes
   const [showImageGallery, setShowImageGallery] = useState(false);
-
-  // Hook para obtener configuraciones de sugerencias automáticas
-  const { settings: suggestionSettings } = useAutoSuggestionSettings('blog');
   
-  // Hook para control directo de sugerencias
-  const { effectiveEnabled, isOverridden } = useQuickSuggestionControl();
+  // Hook para control directo de sugerencias (incluye configuración global)
+  const { effectiveEnabled, isOverridden, globalSettings } = useQuickSuggestionControl();
+  
+  // Usar configuración de sugerencias del hook unificado
+  const suggestionSettings = {
+    debounceMs: globalSettings?.debounceMs || 800,
+    minLength: globalSettings?.minLength || 10,
+    contextLength: globalSettings?.contextLength || 200
+  };
 
   // Hook de autocompletado contextual (como Copilot) - ✅ Controlado por toggle
   const {
@@ -127,18 +130,24 @@ export default function PostEditor() {
     enabled: effectiveEnabled // ✅ Controlado por el botón de toggle
   });
 
-  // Crear sesión de tracking al montar el componente
+  // Crear sesión de tracking solo UNA VEZ al montar el componente
+  const sessionCreatedRef = React.useRef(false);
   React.useEffect(() => {
+    // Evitar múltiples creaciones de sesión
+    if (sessionCreatedRef.current) return;
+    sessionCreatedRef.current = true;
+    
     try {
       createSession(id || 'new-post', {
-        postTitle: formData.title,
-        postCategory: formData.category
+        postTitle: formData.title || 'Nuevo Post',
+        postCategory: formData.category || 'Sin categoría'
       });
     } catch (error) {
       // Silenciar errores de tracking para no interrumpir la funcionalidad
       console.warn('⚠️ [PostEditor] Error creando sesión de tracking:', error);
     }
-  }, [createSession, id, formData.title, formData.category]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ✅ NUEVO: Limpiar sugerencias cuando el usuario hace click en la toolbar
   React.useEffect(() => {

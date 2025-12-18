@@ -1,6 +1,7 @@
 /**
  * 📊 AI Tracking Hook
  * Hook para trackear interacciones con IA en el frontend
+ * ✅ Optimizado para evitar creación de sesiones duplicadas
  */
 
 import { useCallback, useRef } from 'react';
@@ -11,45 +12,78 @@ interface TrackingSession {
   sessionId: string;
   userId: string;
   startTime: Date;
+  postId?: string;
 }
+
+// ✅ Caché de sesiones a nivel de módulo para evitar duplicados
+const sessionCache: Map<string, TrackingSession> = new Map();
+const pendingSessionCreation: Map<string, Promise<string | null>> = new Map();
 
 export const useAITracking = () => {
   const { getToken, userId } = useAuth();
   const sessionRef = useRef<TrackingSession | null>(null);
 
-  // Crear sesión de tracking
+  // Crear sesión de tracking (con protección contra duplicados)
   const createSession = useCallback(async (postId?: string, metadata = {}) => {
-    try {
-      const token = await getToken();
-      
-      const response = await fetch(`${getApiUrl()}/ai/session/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          postId,
-          metadata
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        sessionRef.current = {
-          sessionId: data.data.sessionId,
-          userId: data.data.userId,
-          startTime: new Date()
-        };
-        
-        return data.data.sessionId;
-      }
-    } catch (error) {
-      console.error('Error creando sesión de tracking:', error);
+    const cacheKey = `${userId || 'anonymous'}-${postId || 'new'}`;
+    
+    // ✅ Verificar si ya existe una sesión para este post/usuario
+    const existingSession = sessionCache.get(cacheKey);
+    if (existingSession) {
+      sessionRef.current = existingSession;
+      return existingSession.sessionId;
     }
     
-    return null;
-  }, [getToken]);
+    // ✅ Evitar creaciones duplicadas en paralelo
+    if (pendingSessionCreation.has(cacheKey)) {
+      return pendingSessionCreation.get(cacheKey);
+    }
+    
+    const createPromise = (async () => {
+      try {
+        const token = await getToken();
+        
+        const response = await fetch(`${getApiUrl()}/ai/session/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            postId,
+            metadata
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const session: TrackingSession = {
+            sessionId: data.data.sessionId,
+            userId: data.data.userId,
+            startTime: new Date(),
+            postId
+          };
+          
+          sessionRef.current = session;
+          sessionCache.set(cacheKey, session);
+          
+          return data.data.sessionId;
+        }
+      } catch (error) {
+        console.error('Error creando sesión de tracking:', error);
+      }
+      
+      return null;
+    })();
+    
+    pendingSessionCreation.set(cacheKey, createPromise);
+    
+    try {
+      return await createPromise;
+    } finally {
+      pendingSessionCreation.delete(cacheKey);
+    }
+  }, [getToken, userId]);
 
   // Trackear nueva sugerencia (alias para compatibilidad)
   const trackSuggestion = useCallback(async (_data: {

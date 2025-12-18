@@ -22,7 +22,7 @@ interface EffectiveState {
 }
 
 const LOCAL_STORAGE_KEY = 'webscuti_quick_suggestions';
-const SYNC_INTERVAL = 30000; // 30 segundos
+const SYNC_INTERVAL = 60000; // 60 segundos
 const OVERRIDE_TIMEOUT = 300000; // 5 minutos para override temporal
 
 export const useQuickSuggestionControl = () => {
@@ -30,15 +30,16 @@ export const useQuickSuggestionControl = () => {
   const { settings: globalSettings, loading: globalLoading, refetch } = useAutoSuggestionSettings('blog');
 
   // Estado local del componente
+  // ✅ Por defecto DESACTIVADO (localEnabled: false) para evitar llamadas innecesarias
   const [localState, setLocalState] = useState<QuickSuggestionState>({
-    localEnabled: null,
+    localEnabled: false, // ✅ Desactivado por defecto al abrir el editor
     globalEnabled: false,
-    isOverridden: false,
+    isOverridden: true, // ✅ Override activo desde el inicio
     isLoading: true,
     lastSync: null
   });
 
-  // Cargar estado desde localStorage al inicializar
+  // Cargar estado desde localStorage al inicializar (solo si el usuario lo activó manualmente)
   useEffect(() => {
     const loadLocalState = () => {
       try {
@@ -51,21 +52,22 @@ export const useQuickSuggestionControl = () => {
           const hasExpired = parsed.timestamp && (now - parsed.timestamp > OVERRIDE_TIMEOUT);
           
           if (hasExpired) {
-            // Override expirado, limpiar
+            // Override expirado, volver a desactivado por defecto
             localStorage.removeItem(LOCAL_STORAGE_KEY);
-            return { localEnabled: null, isOverridden: false };
+            return { localEnabled: false, isOverridden: true };
           }
           
           return {
             localEnabled: parsed.localEnabled,
-            isOverridden: parsed.localEnabled !== null
+            isOverridden: true
           };
         }
       } catch (error) {
         console.error('Error loading local suggestion state:', error);
       }
       
-      return { localEnabled: null, isOverridden: false };
+      // ✅ Por defecto desactivado
+      return { localEnabled: false, isOverridden: true };
     };
 
     const { localEnabled, isOverridden } = loadLocalState();
@@ -161,21 +163,13 @@ export const useQuickSuggestionControl = () => {
   }, [saveLocalState, refetch]);
 
   // Obtener estado efectivo (combinando local + global) - REACTIVO
+  // ✅ Siempre usa el estado local ya que por defecto está desactivado
   const getEffectiveState = useCallback((): EffectiveState => {
-    // Si hay override local, usar ese
-    if (localState.localEnabled !== null) {
-      return {
-        enabled: localState.localEnabled,
-        source: 'local',
-        canToggle: true
-      };
-    }
-    
-    // Usar configuración global
+    // Siempre usamos el estado local (que por defecto es false)
     return {
-      enabled: localState.globalEnabled,
-      source: 'global',
-      canToggle: true // Siempre se puede hacer toggle local
+      enabled: localState.localEnabled ?? false,
+      source: 'local',
+      canToggle: true
     };
   }, [localState]);
 
@@ -226,7 +220,10 @@ export const useQuickSuggestionControl = () => {
     // Utilidades
     canToggle: effectiveState.canToggle,
     effectiveEnabled: effectiveState.enabled,
-    source: effectiveState.source
+    source: effectiveState.source,
+    
+    // ✅ Exponer configuración global para evitar llamadas duplicadas
+    globalSettings
   };
 };
 
