@@ -40,6 +40,7 @@ interface PostFormData {
   isPublished: boolean;
   allowComments: boolean;
   isPinned: boolean;
+  isFeatured: boolean;
   showInHeaderMenu: boolean;
 }
 
@@ -61,6 +62,7 @@ export default function PostEditor() {
     isPublished: false,
     allowComments: true,
     isPinned: false,
+    isFeatured: false,
     showInHeaderMenu: false
   });
 
@@ -206,6 +208,7 @@ export default function PostEditor() {
           isPublished: post.isPublished || false,
           allowComments: post.allowComments !== undefined ? post.allowComments : true,
           isPinned: post.isPinned || false,
+          isFeatured: post.isFeatured || false,
           showInHeaderMenu: post.showInHeaderMenu || false
         });
       }
@@ -487,6 +490,7 @@ export default function PostEditor() {
         isPublished: false,
         allowComments: formData.allowComments,
         isPinned: formData.isPinned,
+        isFeatured: formData.isFeatured,
         showInHeaderMenu: formData.showInHeaderMenu
       };
 
@@ -546,6 +550,7 @@ export default function PostEditor() {
         isPublished: true,
         allowComments: formData.allowComments,
         isPinned: formData.isPinned,
+        isFeatured: formData.isFeatured,
         showInHeaderMenu: formData.showInHeaderMenu
       };
 
@@ -1037,12 +1042,12 @@ export default function PostEditor() {
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
-                  checked={formData.isPinned}
-                  onChange={(e) => handleChange('isPinned', e.target.checked)}
-                  className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+                  checked={formData.isFeatured}
+                  onChange={(e) => handleChange('isFeatured', e.target.checked)}
+                  className="w-5 h-5 text-yellow-600 dark:text-yellow-400 rounded-md focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300 font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                  📌 Fijar post (destacado)
+                  ⭐ Noticias Destacadas
                 </span>
               </label>
 

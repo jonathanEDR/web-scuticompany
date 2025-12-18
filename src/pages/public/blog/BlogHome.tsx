@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Newspaper } from 'lucide-react';
-import { useBlogPosts, useCategories, useTags } from '../../../hooks/blog';
+import { useBlogPosts, useFeaturedPosts, useCategories, useTags } from '../../../hooks/blog';
 import { useBlogCmsConfig } from '../../../hooks/blog/useBlogCmsConfig';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { SimpleHeroSection } from '../../../components/blog/hero/SimpleHeroSection';
@@ -37,15 +37,10 @@ const BlogHome: React.FC = () => {
     search: searchQuery || undefined // 🔍 Agregar búsqueda
   });
 
-  // Fetch featured posts (latest 3 published)
+  // Fetch featured posts (posts marked as isFeatured: true)
   const { 
     posts: featuredPosts
-  } = useBlogPosts({
-    page: 1,
-    limit: featuredPostsConfig?.maxFeaturedPosts || 3,
-    isPublished: true,
-    isPinned: true
-  });
+  } = useFeaturedPosts();
 
   // Fetch categories
   const { 
