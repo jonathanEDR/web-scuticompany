@@ -9,6 +9,7 @@ import BlogSection from '../../components/public/BlogSection';
 import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
+import { HomePageSchema } from '../../components/seo/SchemaOrg';
 import { getPageBySlug, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
@@ -305,13 +306,22 @@ const HomeOptimized = () => {
         <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || 'Transformamos empresas con tecnología'} />
         {pageData.seo?.ogImage && <meta property="og:image" content={pageData.seo.ogImage} />}
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://scuticompany.com/" />
+        <meta property="og:site_name" content="SCUTI Company" />
+        <meta property="og:locale" content="es_PE" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || 'SCUTI Company'} />
         <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || 'Transformamos empresas'} />
         {pageData.seo?.ogImage && <meta name="twitter:image" content={pageData.seo.ogImage} />}
+        
+        {/* Canonical */}
+        <link rel="canonical" href="https://scuticompany.com/" />
       </Helmet>
+      
+      {/* ✅ Schema.org - Datos estructurados para Google Rich Results */}
+      <HomePageSchema />
 
       <div className="min-h-screen w-full overflow-x-hidden bg-transparent">
         <PublicHeader />

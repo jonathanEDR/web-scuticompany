@@ -14,6 +14,7 @@ import { useBlogPost } from '../../../hooks/blog';
 import { usePostContent } from '../../../hooks/blog/usePostContent';
 import { useCmsData } from '../../../hooks/cms/useCmsData';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { BlogArticleSchema, BreadcrumbSchema } from '../../../components/seo/SchemaOrg';
 import { 
   TagList, 
   RelatedPosts, 
@@ -160,14 +161,32 @@ const BlogPostEnhanced: React.FC = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.excerpt} />
-        <meta name="twitter:site" content="@webscuti" />
+        <meta name="twitter:site" content="@scuticompany" />
         {post.featuredImage && <meta name="twitter:image" content={getImageUrl(post.featuredImage)} />}
         
         {/* Para GPT y otros crawlers */}
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
-        <link rel="canonical" content={`https://webscuti.com/blog/${post.slug}`} />
+        <link rel="canonical" content={`https://scuticompany.com/blog/${post.slug}`} />
       </Helmet>
+      
+      {/* ✅ Schema.org - Datos estructurados para Google Rich Results */}
+      <BlogArticleSchema
+        title={post.title}
+        description={post.excerpt}
+        image={post.featuredImage ? getImageUrl(post.featuredImage) : undefined}
+        datePublished={post.publishedAt || post.createdAt}
+        dateModified={post.updatedAt}
+        authorName={typeof post.author === 'string' ? post.author : (post.author?.displayName || post.author?.firstName || 'SCUTI Company')}
+        url={`https://scuticompany.com/blog/${post.slug}`}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Inicio', url: 'https://scuticompany.com/' },
+          { name: 'Blog', url: 'https://scuticompany.com/blog' },
+          { name: post.title, url: `https://scuticompany.com/blog/${post.slug}` }
+        ]}
+      />
       
       {/* Hero compacto: combina imagen + título + metadata */}
       <PostHero 
