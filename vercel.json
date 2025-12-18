@@ -9,11 +9,41 @@
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/sitemap.xml"
     },
     {
-      "source": "/(.*)",
+      "source": "/api/blog/(.*)",
+      "destination": "https://web-scuticompany-back.onrender.com/api/blog/$1"
+    },
+    {
+      "source": "/((?!sitemap|robots|favicon|assets).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/sitemap(.*).xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
     {
       "source": "/assets/(.*)",
       "headers": [
