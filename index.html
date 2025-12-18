@@ -2,11 +2,9 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-
-    <!-- Google Search Console Verification -->
-    <meta name="google-site-verification" content="google96cb30ebe99b22ed" />
-
-    <!-- ⚡ PRECONNECT - Establecer conexiones tempranas (máximo 4 críticos) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- ⚡ PRECONNECT PRIMERO - Deben ir antes que cualquier otro recurso -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://light-dolphin-42.clerk.accounts.dev" crossorigin />
@@ -14,82 +12,76 @@
     
     <!-- DNS Prefetch para recursos secundarios -->
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://maps.googleapis.com" />
 
-    <!-- Favicon - Múltiples tamaños para compatibilidad con Google y navegadores -->
-    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="google96cb30ebe99b22ed" />
+
+    <!-- ⚡ Critical CSS inline - RENDER INMEDIATO sin bloqueo -->
+    <style>
+      /* Critical CSS - Estilos mínimos para First Contentful Paint */
+      :root{--bg-primary:#0a0a0a;--text-primary:#ffffff;--accent:#7c3aed}
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      html{line-height:1.5;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+      body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh}
+      #root{min-height:100vh;display:flex;flex-direction:column}
+      /* Loading state */
+      .loading-spinner{display:flex;align-items:center;justify-content:center;min-height:100vh}
+      .loading-spinner::after{content:'';width:40px;height:40px;border:3px solid rgba(124,58,237,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      /* Above the fold - Header placeholder */
+      header{height:64px;background:rgba(10,10,10,.95);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
+      /* Hero section placeholder */
+      .hero-placeholder{min-height:80vh;display:flex;align-items:center;justify-content:center}
+    </style>
+
+    <!-- Favicon - Solo los esenciales -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png" />
     
-    <!-- Web App Manifest - Para Google y PWA -->
+    <!-- Web App Manifest -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#7c3aed" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- ⚡ Google Fonts OPTIMIZADO - Solo fuentes esenciales con display=swap -->
-    <!-- Reducido de 14 familias a 3 esenciales para mejorar LCP -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    </noscript>
+    <!-- ⚡ Google Fonts - Carga NO bloqueante con fallback del sistema -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" /></noscript>
     
-    <!-- Preload de logos para performance óptima -->
-    <link rel="preload" href="/LOGO VECTOR VERSION BLANCA.svg" as="image" type="image/svg+xml" />
-    <link rel="preload" href="/LOGO VECTOR VERSION NEGRA.svg" as="image" type="image/svg+xml" />
-    
-    <!-- SEO Básico - Sincronizado con CMS -->
+    <!-- SEO Básico -->
     <meta name="description" content="Transformamos procesos con soluciones digitales innovadoras | La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido" />
-    <meta name="keywords" content="desarrollo de software, inteligencia artificial, IA, PYMES, automatización, software a medida, Perú, transformación digital, soluciones digitales, tecnología empresarial" />
+    <meta name="keywords" content="desarrollo de software, inteligencia artificial, IA, PYMES, automatización, software a medida, Perú, transformación digital" />
     <meta name="author" content="SCUTI Company" />
-    
-    <!-- Canonical URL -->
     <link rel="canonical" href="https://scuticompany.com/" />
     
-    <!-- Open Graph / Facebook / LinkedIn -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://scuticompany.com/" />
     <meta property="og:title" content="Desarrollo de Software e IA para PYMES | SCUTI Company Perú" />
-    <meta property="og:description" content="Transformamos procesos con soluciones digitales innovadoras | La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido" />
+    <meta property="og:description" content="Transformamos procesos con soluciones digitales innovadoras | Software, IA y Automatización para PYMES" />
     <meta property="og:image" content="https://scuticompany.com/favicon-512x512.png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:image:alt" content="SCUTI Company - Desarrollo de Software e IA" />
     <meta property="og:site_name" content="SCUTI Company" />
     <meta property="og:locale" content="es_PE" />
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://scuticompany.com/" />
     <meta name="twitter:title" content="Desarrollo de Software e IA para PYMES | SCUTI Company Perú" />
-    <meta name="twitter:description" content="Transformamos procesos con soluciones digitales innovadoras | La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido" />
+    <meta name="twitter:description" content="Software, IA y Automatización para PYMES en Perú" />
     <meta name="twitter:image" content="https://scuticompany.com/favicon-512x512.png" />
-    <meta name="twitter:image:alt" content="SCUTI Company - Desarrollo de Software e IA" />
     
     <!-- Robots -->
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     
     <title>Desarrollo de Software e IA para PYMES | SCUTI Company Perú</title>
-    
-    <!-- ⚡ Critical CSS inline para evitar bloqueo de render -->
-    <style>
-      /* Critical CSS - Estilos mínimos para First Paint */
-      *,*::before,*::after{box-sizing:border-box}
-      html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:Inter,system-ui,-apple-system,sans-serif}
-      body{margin:0;background:#0a0a0a;color:#fff}
-      #root{min-height:100vh}
-      .loading-skeleton{background:linear-gradient(90deg,#1a1a1a 25%,#2a2a2a 50%,#1a1a1a 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
-      @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Placeholder mientras carga React - Mejora LCP -->
+    <div id="root">
+      <div class="loading-spinner" aria-label="Cargando..."></div>
+    </div>
     <div id="modal-root"></div>
+    
+    <!-- ⚡ Script principal con modulepreload para cargar dependencias en paralelo -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
