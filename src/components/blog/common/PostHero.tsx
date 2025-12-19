@@ -142,19 +142,21 @@ export default function PostHero({
     const showImage = background?.type === 'image' || !background?.type;
     
     return (
-      <header className={`post-hero relative ${className}`}>
+      <header className={`post-hero relative z-10 ${getHeroHeight()} overflow-hidden ${className}`}>
         {/* Fondo (imagen o color/gradiente) */}
         <div 
-          className={`relative ${getHeroHeight()} overflow-hidden`}
+          className="absolute inset-0 bg-gray-900"
           style={!showImage ? getBackgroundStyle() : undefined}
         >
           {/* Imagen de fondo (solo si el tipo es 'image' o no está configurado) */}
           {showImage && post.featuredImage && (
-            <LazyImage
-              src={post.featuredImage}
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
+            <div className="absolute inset-0 w-full h-full overflow-hidden">
+              <LazyImage
+                src={post.featuredImage}
+                alt={post.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
           )}
           {/* Overlay oscuro gradiente - Opacidad configurable */}
           <div 

@@ -68,6 +68,5 @@ export default defineConfig({
   // ⚡ Optimización de dependencias
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
-    exclude: ['@tiptap/react', '@tiptap/starter-kit'],
   },
 })

@@ -78,7 +78,7 @@ export default function LazyImage({
   return (
     <div 
       ref={placeholderRef}
-      className={`lazy-image-container relative overflow-hidden ${className}`}
+      className="lazy-image-container relative overflow-hidden w-full h-full"
     >
       {/* Placeholder mientras carga */}
       {!isLoaded && (

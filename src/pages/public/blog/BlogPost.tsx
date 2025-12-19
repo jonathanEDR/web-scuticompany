@@ -98,7 +98,7 @@ const BlogPostEnhanced: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen"
+      className="min-h-screen flex flex-col"
       style={{
         backgroundColor: theme === 'dark' 
           ? (contentConfig.background?.dark || '#0f0f0f')
@@ -208,23 +208,24 @@ const BlogPostEnhanced: React.FC = () => {
       {/* Barra de Resumen - Configurable desde CMS Sección 2 */}
       {summaryBarConfig.enabled !== false && (
         <div 
-          className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl"
+          className="relative z-[5]"
           style={{
             backgroundColor: theme === 'dark' 
-              ? (summaryBarConfig.styles?.dark?.background || 'transparent')
-              : (summaryBarConfig.styles?.light?.background || 'transparent')
+              ? (summaryBarConfig.styles?.dark?.background || contentConfig.background?.dark || '#0f0f0f')
+              : (summaryBarConfig.styles?.light?.background || contentConfig.background?.light || '#f9fafb')
           }}
         >
-          <div 
-            className="flex items-center justify-between py-4"
-            style={{
-              borderBottom: `1px solid ${
-                theme === 'dark' 
-                  ? (summaryBarConfig.styles?.dark?.borderColor || '#374151')
-                  : (summaryBarConfig.styles?.light?.borderColor || '#e5e7eb')
-              }`
-            }}
-          >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+            <div 
+              className="flex items-center justify-between py-4"
+              style={{
+                borderBottom: `1px solid ${
+                  theme === 'dark' 
+                    ? (summaryBarConfig.styles?.dark?.borderColor || '#374151')
+                    : (summaryBarConfig.styles?.light?.borderColor || '#e5e7eb')
+                }`
+              }}
+            >
             {/* Excerpt */}
             {summaryBarConfig.showExcerpt !== false && post.excerpt && (
               <p 
@@ -274,35 +275,20 @@ const BlogPostEnhanced: React.FC = () => {
                 />
               )}
             </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Main Content Section with Background Image */}
       <div 
-        className="relative"
+        className="relative flex-1"
         style={{
-          backgroundImage: theme === 'dark' 
-            ? (contentConfig.backgroundImage?.dark ? `url(${contentConfig.backgroundImage.dark})` : 'none')
-            : (contentConfig.backgroundImage?.light ? `url(${contentConfig.backgroundImage.light})` : 'none'),
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
+          backgroundColor: theme === 'dark' 
+            ? (contentConfig.background?.dark || '#0f0f0f')
+            : (contentConfig.background?.light || '#f9fafb')
         }}
       >
-        {/* Overlay sobre la imagen de fondo */}
-        {((theme === 'dark' && contentConfig.backgroundImage?.dark) || 
-          (theme === 'light' && contentConfig.backgroundImage?.light)) && (
-          <div 
-            className="absolute inset-0"
-            style={{
-              backgroundColor: theme === 'dark' 
-                ? `rgba(15, 15, 15, ${(contentConfig.backgroundOverlay?.dark ?? 90) / 100})`
-                : `rgba(255, 255, 255, ${(contentConfig.backgroundOverlay?.light ?? 80) / 100})`
-            }}
-          />
-        )}
-
         {/* Contenido principal */}
         <section className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl py-8 lg:py-12">
           {/* Main Article - Layout centrado sin sidebar */}
