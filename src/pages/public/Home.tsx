@@ -5,17 +5,18 @@ import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import ValueAddedSection from '../../components/public/ValueAddedSection';
 import ClientLogosSection from '../../components/public/ClientLogosSection';
-import BlogSection from '../../components/public/BlogSection';
+import FeaturedBlogSection from '../../components/public/FeaturedBlogSection';
 import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { HomePageSchema } from '../../components/seo/SchemaOrg';
 import { getPageBySlug, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
-import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG, DEFAULT_SEO_CONFIG } from '../../utils/defaultConfig';
+import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG, DEFAULT_FEATURED_BLOG_CONFIG, DEFAULT_SEO_CONFIG } from '../../utils/defaultConfig';
 import { useCategoriasList, type Categoria } from '../../hooks/useCategoriasCache';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 import type { ClientLogosContent } from '../../types/cms';
+import type { DefaultFeaturedBlogConfig } from '../../utils/defaultConfig';
 
 
 interface ButtonTheme {
@@ -129,6 +130,7 @@ interface PageData {
       };
     };
     clientLogos?: ClientLogosContent;
+    featuredBlog?: DefaultFeaturedBlogConfig;
     contactForm?: any;
   };
   seo: {
@@ -165,6 +167,7 @@ const DEFAULT_PAGE_DATA: PageData = {
     hero: DEFAULT_HERO_CONFIG,
     solutions: DEFAULT_SOLUTIONS_CONFIG,
     valueAdded: DEFAULT_VALUE_ADDED_CONFIG,
+    featuredBlog: DEFAULT_FEATURED_BLOG_CONFIG,
     contactForm: DEFAULT_CONTACT_CONFIG
   },
   seo: DEFAULT_SEO_CONFIG  // ✅ Importado de defaultConfig.ts (una sola fuente de verdad)
@@ -332,7 +335,10 @@ const HomeOptimized = () => {
             data={pageData.content.clientLogos}
           />
 
-          <BlogSection />
+          <FeaturedBlogSection 
+            data={pageData.content.featuredBlog}
+            themeConfig={pageData.theme}
+          />
 
           <ContactSection 
             data={addCategoriasToConfig(pageData.content.contactForm, categorias)}

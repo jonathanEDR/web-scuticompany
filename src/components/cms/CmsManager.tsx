@@ -9,6 +9,7 @@ import ValuesConfigSection from './ValuesConfigSection';
 import SolutionsConfigSection from './SolutionsConfigSection';
 import ValueAddedConfigSection from './ValueAddedConfigSection';
 import ClientLogosConfigSection from './ClientLogosConfigSection';
+import FeaturedBlogConfigSection from './FeaturedBlogConfigSection';
 import CardItemsEditor from './CardItemsEditor';
 import ValueAddedItemsEditor from './ValueAddedItemsEditor';
 import SeoConfigSection from './SeoConfigSection';
@@ -114,7 +115,7 @@ const CmsManager: React.FC = () => {
   };
 
   // Update text style without auto-save (manual save only)
-  const handleUpdateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos', field: string, mode: 'light' | 'dark', color: string) => {
+  const handleUpdateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos' | 'featuredBlog', field: string, mode: 'light' | 'dark', color: string) => {
     updateTextStyle(section, field, mode, color);
     // 🔥 Marcar como cambios pendientes GLOBALMENTE
     if (!hasGlobalChanges) {
@@ -124,7 +125,7 @@ const CmsManager: React.FC = () => {
   };
 
   // Update button style without auto-save (manual save only)
-  const handleUpdateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: any) => {
+  const handleUpdateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore' | 'featuredBlogCta', style: any) => {
     updateSimpleButtonStyle(mode, buttonType, style);
     // 🔥 Marcar como cambios pendientes GLOBALMENTE
     if (!hasGlobalChanges) {
@@ -501,6 +502,13 @@ const CmsManager: React.FC = () => {
                 />
                 {/* Configuración de Logos de Clientes */}
                 <ClientLogosConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                  updateTextStyle={handleUpdateTextStyle}
+                />
+                
+                {/* Configuración de Sección de Blog Destacado */}
+                <FeaturedBlogConfigSection
                   pageData={pageData}
                   updateContent={handleUpdateContent}
                   updateTextStyle={handleUpdateTextStyle}

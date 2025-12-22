@@ -5,7 +5,7 @@ import type { PageData, ThemeColors, ButtonStyle } from '../../types/cms';
 interface ThemeConfigSectionProps {
   pageData: PageData;
   updateContent: (field: string, value: any) => void;
-  updateSimpleButtonStyle: (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: ButtonStyle) => void;
+  updateSimpleButtonStyle: (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore' | 'featuredBlogCta', style: ButtonStyle) => void;
 }
 
 const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
@@ -263,6 +263,12 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                 value={pageData.theme?.lightMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #01c2cc 0%, #7528ee 100%)', textColor: '#FFFFFF', borderColor: 'transparent' }}
                 onChange={(style) => updateSimpleButtonStyle('lightMode', 'viewMore', style)}
               />
+              <SimpleButtonConfig
+                title="📰 Botón Blog (Ver todos)"
+                icon="📰"
+                value={pageData.theme?.lightMode?.buttons?.featuredBlogCta || { text: 'Ver todos los artículos', background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)', textColor: '#FFFFFF', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('lightMode', 'featuredBlogCta', style)}
+              />
             </div>
           </div>
           {/* Tema Oscuro */}
@@ -302,6 +308,12 @@ const ThemeConfigSection: React.FC<ThemeConfigSectionProps> = ({
                 icon="👁️"
                 value={pageData.theme?.darkMode?.buttons?.viewMore || { text: 'Ver más...', background: 'linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%)', textColor: '#111827', borderColor: 'transparent' }}
                 onChange={(style) => updateSimpleButtonStyle('darkMode', 'viewMore', style)}
+              />
+              <SimpleButtonConfig
+                title="📰 Botón Blog (Ver todos)"
+                icon="📰"
+                value={pageData.theme?.darkMode?.buttons?.featuredBlogCta || { text: 'Ver todos los artículos', background: 'linear-gradient(135deg, #A78BFA, #22D3EE)', textColor: '#111827', borderColor: 'transparent' }}
+                onChange={(style) => updateSimpleButtonStyle('darkMode', 'featuredBlogCta', style)}
               />
             </div>
           </div>

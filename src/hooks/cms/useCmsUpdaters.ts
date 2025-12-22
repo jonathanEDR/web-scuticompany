@@ -80,10 +80,10 @@ export const useCmsUpdaters = (
     setPageData(newData);
   };
 
-  const updateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos', field: string, mode: 'light' | 'dark', color: string) => {
+const updateTextStyle = (section: 'hero' | 'solutions' | 'valueAdded' | 'clientLogos' | 'featuredBlog', field: string, mode: 'light' | 'dark', color: string) => {
     if (!pageData) return;
 
-    const currentSection = pageData.content[section];
+    const currentSection = pageData.content[section as keyof typeof pageData.content];
     if (!currentSection) return;
 
     // 🎯 Manejar estilos de items individuales (e.g., "items.0.titleColor")
@@ -200,7 +200,7 @@ export const useCmsUpdaters = (
     }
   };
 
-  const updateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore', style: ButtonStyle) => {
+  const updateSimpleButtonStyle = (mode: 'lightMode' | 'darkMode', buttonType: 'ctaPrimary' | 'contact' | 'dashboard' | 'viewMore' | 'featuredBlogCta', style: ButtonStyle) => {
     if (!pageData || !pageData.theme) return;
 
     // Asegurar que la estructura existe

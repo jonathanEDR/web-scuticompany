@@ -72,6 +72,7 @@ export interface ThemeButtons {
   contact: ButtonStyle;
   dashboard: ButtonStyle;
   viewMore?: ButtonStyle;
+  featuredBlogCta?: ButtonStyle;
 }
 
 export interface ThemeColors {
@@ -913,6 +914,7 @@ export interface PageContent {
   contact?: ContactContent;
   contactForm?: ContactFormContent;
   chatbotConfig?: ChatbotConfig;
+  featuredBlog?: any; // Configuración de Featured Blog Section
   // 🆕 CONTENIDO PARA PÁGINA DE SERVICIOS
   servicesFilter?: ServicesFilterConfig;
   servicesGrid?: ServicesGridConfig;

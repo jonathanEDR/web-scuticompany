@@ -16,7 +16,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   setHasGlobalChanges
 }) => {
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
-  const [activeSection, setActiveSection] = useState<'solutions' | 'valueAdded' | 'contact'>('solutions');
+  const [activeSection, setActiveSection] = useState<'solutions' | 'valueAdded' | 'contact' | 'featuredBlog'>('solutions');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -161,6 +161,53 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
     iconAlignment: 'center'
   };
 
+  // Valores por defecto para Featured Blog
+  const defaultFeaturedBlogLightStyles: CardDesignStyles = {
+    background: 'rgba(255, 255, 255, 0.95)',
+    border: 'rgba(229, 231, 235, 1)',
+    borderWidth: '1px',
+    shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    hoverBackground: 'rgba(255, 255, 255, 1)',
+    hoverBorder: 'rgba(139, 92, 246, 0.3)',
+    hoverShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.2)',
+    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    iconBackground: 'rgba(255, 255, 255, 0.9)',
+    iconColor: '#8B5CF6',
+    titleColor: '#1f2937',
+    descriptionColor: '#4b5563',
+    linkColor: '#8B5CF6',
+    cardMinWidth: '320px',
+    cardMaxWidth: '100%',
+    cardMinHeight: 'auto',
+    cardPadding: '1.5rem',
+    cardsAlignment: 'left',
+    iconBorderEnabled: false,
+    iconAlignment: 'left'
+  };
+
+  const defaultFeaturedBlogDarkStyles: CardDesignStyles = {
+    background: 'rgba(31, 41, 55, 0.95)',
+    border: 'rgba(55, 65, 81, 1)',
+    borderWidth: '1px',
+    shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+    hoverBackground: 'rgba(31, 41, 55, 1)',
+    hoverBorder: 'rgba(139, 92, 246, 0.4)',
+    hoverShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.3)',
+    iconGradient: 'linear-gradient(135deg, #A78BFA, #22D3EE)',
+    iconBackground: 'rgba(31, 41, 55, 0.8)',
+    iconColor: '#A78BFA',
+    titleColor: '#f9fafb',
+    descriptionColor: '#d1d5db',
+    linkColor: '#A78BFA',
+    cardMinWidth: '320px',
+    cardMaxWidth: '100%',
+    cardMinHeight: 'auto',
+    cardPadding: '1.5rem',
+    cardsAlignment: 'left',
+    iconBorderEnabled: false,
+    iconAlignment: 'left'
+  };
+
   // Data loader unificado para todas las secciones
   const initialData = useMemo(() => {
     let cardData;
@@ -170,6 +217,8 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
       cardData = pageData.content.valueAdded?.cardsDesign;
     } else if (activeSection === 'contact') {
       cardData = pageData.content.contactForm?.cardsDesign;
+    } else if (activeSection === 'featuredBlog') {
+      cardData = pageData.content.featuredBlog?.cardsDesign;
     }
     return cardData;
   }, [pageData.content, activeSection]);
@@ -182,13 +231,16 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
       return { light: defaultValueAddedLightStyles, dark: defaultValueAddedDarkStyles };
     } else if (activeSection === 'contact') {
       return { light: defaultContactLightStyles, dark: defaultContactDarkStyles };
+    } else if (activeSection === 'featuredBlog') {
+      return { light: defaultFeaturedBlogLightStyles, dark: defaultFeaturedBlogDarkStyles };
     }
     return { light: defaultSolutionsLightStyles, dark: defaultSolutionsDarkStyles }; // Fallback
   }, [
     activeSection, 
     defaultSolutionsLightStyles, defaultSolutionsDarkStyles,
     defaultValueAddedLightStyles, defaultValueAddedDarkStyles,
-    defaultContactLightStyles, defaultContactDarkStyles
+    defaultContactLightStyles, defaultContactDarkStyles,
+    defaultFeaturedBlogLightStyles, defaultFeaturedBlogDarkStyles
   ]);
 
   // Estados unificados con inicialización simple
@@ -368,6 +420,19 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 }`}
               >
                 📧 Contact
+              </button>
+              <button
+                onClick={() => {
+                  console.log('🔄 Cambiando a sección: featuredBlog');
+                  setActiveSection('featuredBlog');
+                }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  activeSection === 'featuredBlog'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                📰 Blog
               </button>
             </div>
           </div>

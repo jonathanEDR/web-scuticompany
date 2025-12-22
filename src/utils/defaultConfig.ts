@@ -106,6 +106,61 @@ export interface DefaultValueAddedConfig {
   };
 }
 
+export interface DefaultFeaturedBlogConfig {
+  title: string;
+  subtitle: string;
+  description?: string;
+  backgroundImage: DefaultImageConfig;
+  backgroundImageAlt: string;
+  limit: number; // Cantidad de posts a mostrar
+  buttonText: string; // Texto del botón "Ver todos"
+  buttonLink: string; // Link del botón
+  styles?: {
+    light?: {
+      titleColor?: string;
+      subtitleColor?: string;
+      descriptionColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      subtitleColor?: string;
+      descriptionColor?: string;
+    };
+  };
+  cardsDesign?: {
+    light: {
+      background?: string;
+      border?: string;
+      borderWidth?: string;
+      shadow?: string;
+      hoverBackground?: string;
+      hoverShadow?: string;
+      titleColor?: string;
+      excerptColor?: string;
+      metaColor?: string;
+      badgeBackground?: string;
+      badgeTextColor?: string;
+      ctaColor?: string;
+      ctaHoverColor?: string;
+    };
+    dark: {
+      background?: string;
+      border?: string;
+      borderWidth?: string;
+      shadow?: string;
+      hoverBackground?: string;
+      hoverShadow?: string;
+      titleColor?: string;
+      excerptColor?: string;
+      metaColor?: string;
+      badgeBackground?: string;
+      badgeTextColor?: string;
+      ctaColor?: string;
+      ctaHoverColor?: string;
+    };
+  };
+}
+
 export interface DefaultContactConfig {
   title: string;
   subtitle: string;
@@ -215,6 +270,11 @@ export const getValueAddedBackgroundImages = (): DefaultImageConfig => ({
 export const getContactBackgroundImages = (): DefaultImageConfig => ({
   light: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761434292/web-scuti/auuwn7de87f1t2xgw7jq.webp',
   dark: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761434292/web-scuti/auuwn7de87f1t2xgw7jq.webp'
+});
+
+export const getFeaturedBlogBackgroundImages = (): DefaultImageConfig => ({
+  light: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761055090/web-scuti/pzq7y8hig1oli9hpjzqf.webp',
+  dark: 'https://res.cloudinary.com/ds54wlchi/image/upload/v1761055090/web-scuti/pzq7y8hig1oli9hpjzqf.webp'
 });
 
 // =====================================================
@@ -701,6 +761,64 @@ export const DEFAULT_CONTACT_CONFIG: DefaultContactConfig = {
 };
 
 // =====================================================
+// FEATURED BLOG SECTION - Configuración por defecto
+// =====================================================
+export const DEFAULT_FEATURED_BLOG_CONFIG: DefaultFeaturedBlogConfig = {
+  title: 'Webinars y blogs',
+  subtitle: 'Accede a nuestros webinars y blogs para conocer más sobre nuestras soluciones y servicios',
+  description: '',
+  backgroundImage: getFeaturedBlogBackgroundImages(),
+  backgroundImageAlt: 'Featured blog background',
+  limit: 3,
+  buttonText: 'Ver todos los artículos',
+  buttonLink: '/blog',
+  styles: {
+    light: {
+      titleColor: '#1f2937',
+      subtitleColor: '#4b5563',
+      descriptionColor: '#6b7280'
+    },
+    dark: {
+      titleColor: '#ffffff',
+      subtitleColor: '#d1d5db',
+      descriptionColor: '#9ca3af'
+    }
+  },
+  cardsDesign: {
+    light: {
+      background: 'rgba(255, 255, 255, 0.95)',
+      border: 'rgba(229, 231, 235, 1)',
+      borderWidth: '1px',
+      shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      hoverBackground: 'rgba(255, 255, 255, 1)',
+      hoverShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.2), 0 10px 10px -5px rgba(139, 92, 246, 0.1)',
+      titleColor: '#1f2937',
+      excerptColor: '#4b5563',
+      metaColor: '#6b7280',
+      badgeBackground: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+      badgeTextColor: '#ffffff',
+      ctaColor: '#8B5CF6',
+      ctaHoverColor: '#06B6D4'
+    },
+    dark: {
+      background: 'rgba(31, 41, 55, 0.95)',
+      border: 'rgba(55, 65, 81, 1)',
+      borderWidth: '1px',
+      shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
+      hoverBackground: 'rgba(55, 65, 81, 1)',
+      hoverShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.3), 0 10px 10px -5px rgba(139, 92, 246, 0.2)',
+      titleColor: '#ffffff',
+      excerptColor: '#d1d5db',
+      metaColor: '#9ca3af',
+      badgeBackground: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+      badgeTextColor: '#ffffff',
+      ctaColor: '#a78bfa',
+      ctaHoverColor: '#22d3ee'
+    }
+  }
+};
+
+// =====================================================
 // THEME - Configuración por defecto
 // =====================================================
 export const DEFAULT_THEME_CONFIG: DefaultThemeConfig = {
@@ -892,6 +1010,7 @@ export const DEFAULT_PAGE_CONFIG = {
   hero: DEFAULT_HERO_CONFIG,
   solutions: DEFAULT_SOLUTIONS_CONFIG,
   valueAdded: DEFAULT_VALUE_ADDED_CONFIG,
+  featuredBlog: DEFAULT_FEATURED_BLOG_CONFIG,
   contactForm: DEFAULT_CONTACT_CONFIG,
   theme: DEFAULT_THEME_CONFIG,
   chatbot: DEFAULT_CHATBOT_CONFIG,
