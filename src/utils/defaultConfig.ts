@@ -851,7 +851,7 @@ export const DEFAULT_SEO_CONFIG = {
   ],
   ogTitle: 'Desarrollo de Software e IA para PYMES | SCUTI Company Perú',
   ogDescription: 'Transformamos procesos con soluciones digitales innovadoras | La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido',
-  ogImage: 'https://www.facebook.com/photo?fbid=122174544728477291&set=a.122097631790477291',
+  ogImage: '/FAVICON.png', // ⚠️ Imagen por defecto - Configurar imagen OG 1200x630px desde CMS
   twitterCard: 'summary_large_image'
 };
 

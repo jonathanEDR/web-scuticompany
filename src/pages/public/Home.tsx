@@ -12,7 +12,7 @@ import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidge
 import { HomePageSchema } from '../../components/seo/SchemaOrg';
 import { getPageBySlug, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
-import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG } from '../../utils/defaultConfig';
+import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG, DEFAULT_SEO_CONFIG } from '../../utils/defaultConfig';
 import { useCategoriasList, type Categoria } from '../../hooks/useCategoriasCache';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 import type { ClientLogosContent } from '../../types/cms';
@@ -167,14 +167,7 @@ const DEFAULT_PAGE_DATA: PageData = {
     valueAdded: DEFAULT_VALUE_ADDED_CONFIG,
     contactForm: DEFAULT_CONTACT_CONFIG
   },
-  seo: {
-    metaTitle: 'Scuti Company - Transformamos tu empresa con tecnología inteligente',
-    metaDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.',
-    keywords: ['tecnología', 'software', 'inteligencia artificial', 'desarrollo web', 'transformación digital'],
-    ogTitle: 'Scuti Company - Tecnología Inteligente',
-    ogDescription: 'Transformamos procesos con soluciones digitales y modelos de IA',
-    ogImage: ''
-  }
+  seo: DEFAULT_SEO_CONFIG  // ✅ Importado de defaultConfig.ts (una sola fuente de verdad)
 };
 
 /**
@@ -297,14 +290,14 @@ const HomeOptimized = () => {
     <>
       {/* ✅ SEO Manual desde pageData (sin hook duplicado) */}
       <Helmet>
-        <title>{pageData.seo?.metaTitle || 'SCUTI Company - Transformamos tu empresa con tecnología inteligente'}</title>
-        <meta name="description" content={pageData.seo?.metaDescription || 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio.'} />
-        <meta name="keywords" content={(pageData.seo?.keywords || []).join(', ')} />
+        <title>{pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.metaTitle}</title>
+        <meta name="description" content={pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.metaDescription} />
+        <meta name="keywords" content={(pageData.seo?.keywords || DEFAULT_SEO_CONFIG.keywords).join(', ')} />
         
         {/* Open Graph */}
-        <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || 'SCUTI Company'} />
-        <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || 'Transformamos empresas con tecnología'} />
-        {pageData.seo?.ogImage && <meta property="og:image" content={pageData.seo.ogImage} />}
+        <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.ogTitle} />
+        <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.ogDescription} />
+        {(pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage) && <meta property="og:image" content={pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage} />}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://scuticompany.com/" />
         <meta property="og:site_name" content="SCUTI Company" />
@@ -312,9 +305,9 @@ const HomeOptimized = () => {
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || 'SCUTI Company'} />
-        <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || 'Transformamos empresas'} />
-        {pageData.seo?.ogImage && <meta name="twitter:image" content={pageData.seo.ogImage} />}
+        <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.ogTitle} />
+        <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.ogDescription} />
+        {(pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage) && <meta name="twitter:image" content={pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage} />}
         
         {/* Canonical */}
         <link rel="canonical" href="https://scuticompany.com/" />

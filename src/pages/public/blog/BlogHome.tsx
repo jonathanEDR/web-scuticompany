@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Newspaper } from 'lucide-react';
 import { useBlogPosts, useFeaturedPosts, useCategories, useTags } from '../../../hooks/blog';
 import { useBlogCmsConfig } from '../../../hooks/blog/useBlogCmsConfig';
+import { useSeo } from '../../../hooks/useSeo';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { SimpleHeroSection } from '../../../components/blog/hero/SimpleHeroSection';
 import { FeaturedBlogCard } from '../../../components/blog/cards/FeaturedBlogCard';
@@ -23,6 +23,13 @@ const BlogHome: React.FC = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const featuredPostsConfig = cmsConfig.featuredPosts;
+
+  // 🎯 SEO dinámico con fallbacks
+  const { SeoHelmet } = useSeo({
+    pageName: 'blog',
+    fallbackTitle: 'Blog SCUTI Company - Noticias y Tendencias Tecnológicas | Contenido Curado',
+    fallbackDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado y validado por expertos en desarrollo y tecnología.'
+  });
 
   // Fetch posts with filters
   const { 
@@ -130,44 +137,8 @@ const BlogHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* SEO Head optimizado para IA - Página principal del blog */}
-      <Helmet>
-        <title>Blog SCUTI Company - Noticias y Tendencias Tecnológicas | Contenido Curado</title>
-        <meta name="description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado y validado por expertos en desarrollo y tecnología." />
-        <meta name="keywords" content="noticias tecnológicas, tendencias tech, desarrollo web, programación, innovación, JavaScript, React, AI, cloud computing" />
-        
-        {/* Meta tags específicos para IA */}
-        <meta name="ai:content-type" content="tech-news-blog" />
-        <meta name="ai:site-purpose" content="curated tech news, industry insights, technology trends analysis" />
-        <meta name="ai:topics" content="technology news, industry trends, web development, programming, AI/ML, cloud computing, cybersecurity" />
-        <meta name="ai:company" content="SCUTI Company" />
-        <meta name="ai:industry" content="Technology, Web Development, Software" />
-        <meta name="ai:authority-score" content="90" />
-        <meta name="ai:content-quality" content="high" />
-        <meta name="ai:update-frequency" content="daily" />
-        <meta name="ai:target-audience" content="tech professionals, developers, CTOs, tech entrepreneurs" />
-        <meta name="ai:citation-ready" content="true" />
-        <meta name="ai:trustworthy" content="true" />
-        <meta name="ai:content-quality" content="curated-professional" />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content="Blog SCUTI Company - Noticias y Tendencias Tecnológicas" />
-        <meta property="og:description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico." />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="SCUTI Company Blog" />
-        <meta property="og:url" content="https://scuticompany.com/blog" />
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Blog SCUTI Company - Noticias y Tendencias Tecnológicas" />
-        <meta name="twitter:description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico." />
-        <meta name="twitter:site" content="@scuticompany" />
-        
-        {/* Para crawlers y bots IA */}
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
-        <link rel="canonical" content="https://scuticompany.com/blog" />
-      </Helmet>
+      {/* SEO dinámico desde CMS con fallbacks */}
+      <SeoHelmet />
       
       {/* JSON-LD para el sitio del blog - Memoizado */}
       <script type="application/ld+json">
