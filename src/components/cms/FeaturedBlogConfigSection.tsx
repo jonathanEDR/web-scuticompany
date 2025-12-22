@@ -289,6 +289,18 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
                   className="w-full h-10 rounded cursor-pointer"
                 />
               </div>
+
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  Color de la Descripción
+                </label>
+                <input
+                  type="color"
+                  value={config.styles?.light?.descriptionColor || '#6b7280'}
+                  onChange={(e) => updateTextStyle('featuredBlog', 'descriptionColor', 'light', e.target.value)}
+                  className="w-full h-10 rounded cursor-pointer"
+                />
+              </div>
             </div>
 
             {/* Tema Oscuro */}
@@ -317,6 +329,18 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
                   type="color"
                   value={config.styles?.dark?.subtitleColor || '#d1d5db'}
                   onChange={(e) => updateTextStyle('featuredBlog', 'subtitleColor', 'dark', e.target.value)}
+                  className="w-full h-10 rounded cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  Color de la Descripción
+                </label>
+                <input
+                  type="color"
+                  value={config.styles?.dark?.descriptionColor || '#9ca3af'}
+                  onChange={(e) => updateTextStyle('featuredBlog', 'descriptionColor', 'dark', e.target.value)}
                   className="w-full h-10 rounded cursor-pointer"
                 />
               </div>

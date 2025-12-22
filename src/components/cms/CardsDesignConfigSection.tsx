@@ -278,6 +278,12 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   }, [initialData, activeSection, justSaved]);
 
   const currentStyles = activeTheme === 'light' ? lightStyles : darkStyles;
+  
+  // 🔥 Estilos seguros con fallback a defaults para evitar undefined
+  const safeCurrentStyles = {
+    ...(activeTheme === 'light' ? currentDefaults.light : currentDefaults.dark),
+    ...currentStyles
+  };
 
   const updateCardStyle = (field: keyof CardDesignStyles, value: string | boolean) => {
     if (activeTheme === 'light') {
@@ -609,7 +615,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-1">
             <ColorWithOpacity
               label="Fondo de Tarjeta"
-              value={currentStyles.background}
+              value={safeCurrentStyles.background}
               onChange={(value) => updateCardStyle('background', value)}
             />
           </div>
@@ -619,7 +625,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             <div className="w-full min-w-0">
               <GradientPicker
                 label="Borde de Tarjeta"
-                value={currentStyles.border}
+                value={safeCurrentStyles.border}
                 onChange={(value) => updateCardStyle('border', value)}
               />
               <div className="mt-4">
@@ -627,7 +633,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                   Grosor del Borde
                 </label>
                 <select
-                  value={currentStyles.borderWidth}
+                  value={safeCurrentStyles.borderWidth}
                   onChange={(e) => updateCardStyle('borderWidth', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 >
@@ -702,7 +708,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             <div>
               <GradientPicker
                 label="Gradiente del Borde del Icono"
-                value={currentStyles.iconGradient}
+                value={safeCurrentStyles.iconGradient}
                 onChange={(value) => updateCardStyle('iconGradient', value)}
               />
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -711,13 +717,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={currentStyles.iconColor}
+                  value={safeCurrentStyles.iconColor}
                   onChange={(e) => updateCardStyle('iconColor', e.target.value)}
                   className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                 />
                 <input
                   type="text"
-                  value={currentStyles.iconColor}
+                  value={safeCurrentStyles.iconColor}
                   onChange={(e) => updateCardStyle('iconColor', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
@@ -743,13 +749,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                   <div className="flex gap-2 w-full min-w-0">
                     <input
                       type="color"
-                      value={currentStyles.titleColor}
+                      value={safeCurrentStyles.titleColor}
                       onChange={(e) => updateCardStyle('titleColor', e.target.value)}
                       className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                     />
                     <input
                       type="text"
-                      value={currentStyles.titleColor}
+                      value={safeCurrentStyles.titleColor}
                       onChange={(e) => updateCardStyle('titleColor', e.target.value)}
                       className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                     />
@@ -765,13 +771,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                   <div className="flex gap-2 w-full min-w-0">
                     <input
                       type="color"
-                      value={currentStyles.descriptionColor}
+                      value={safeCurrentStyles.descriptionColor}
                       onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
                       className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                     />
                     <input
                       type="text"
-                      value={currentStyles.descriptionColor}
+                      value={safeCurrentStyles.descriptionColor}
                       onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
                       className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                     />
@@ -787,13 +793,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                   <div className="flex gap-2 w-full min-w-0">
                     <input
                       type="color"
-                      value={currentStyles.linkColor}
+                      value={safeCurrentStyles.linkColor}
                       onChange={(e) => updateCardStyle('linkColor', e.target.value)}
                       className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                     />
                     <input
                       type="text"
-                      value={currentStyles.linkColor}
+                      value={safeCurrentStyles.linkColor}
                       onChange={(e) => updateCardStyle('linkColor', e.target.value)}
                       className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                     />
@@ -810,7 +816,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               </label>
               <input
                 type="text"
-                value={currentStyles.iconBackground}
+                value={safeCurrentStyles.iconBackground}
                 onChange={(e) => updateCardStyle('iconBackground', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 placeholder="rgba(255, 255, 255, 0.9)"
@@ -996,7 +1002,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                     ↔️ Ancho Máximo
                   </label>
                   <select
-                    value={currentStyles.cardMaxWidth || '100%'}
+                    value={safeCurrentStyles.cardMaxWidth || '100%'}
                     onChange={(e) => updateCardStyle('cardMaxWidth', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   >
@@ -1055,7 +1061,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               </h4>
               <ShadowControl
                 label="Sombra Normal"
-                value={currentStyles.shadow}
+                value={safeCurrentStyles.shadow}
                 onChange={(value) => updateCardStyle('shadow', value)}
               />
             </div>
@@ -1071,13 +1077,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               <div className="space-y-6">
                 <ColorWithOpacity
                   label="Fondo (Hover)"
-                  value={currentStyles.hoverBackground}
+                  value={safeCurrentStyles.hoverBackground}
                   onChange={(value) => updateCardStyle('hoverBackground', value)}
                 />
 
                 <GradientPicker
                   label="Borde (Hover)"
-                  value={currentStyles.hoverBorder}
+                  value={safeCurrentStyles.hoverBorder}
                   onChange={(value) => updateCardStyle('hoverBorder', value)}
                 />
               </div>
@@ -1086,7 +1092,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               <div>
                 <ShadowControl
                   label="Sombra (Hover)"
-                  value={currentStyles.hoverShadow}
+                  value={safeCurrentStyles.hoverShadow}
                   onChange={(value) => updateCardStyle('hoverShadow', value)}
                 />
               </div>

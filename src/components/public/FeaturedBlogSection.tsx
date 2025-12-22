@@ -145,17 +145,6 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
         backgroundImage: currentBackgroundImage ? `url(${currentBackgroundImage})` : 'none'
       }}
     >
-      {/* Overlay opcional para mejorar legibilidad */}
-      {currentBackgroundImage && (
-        <div className="absolute inset-0 bg-black/40 dark:bg-black/60"></div>
-      )}
-
-      {/* Decoración de fondo sutil */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500 rounded-full blur-3xl"></div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
@@ -215,26 +204,22 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
               {/* Image Container */}
               <div className="relative h-56 overflow-hidden bg-gradient-to-br from-purple-500 to-cyan-500">
                 {post.featuredImage ? (
-                  <>
-                    <img
-                      src={post.featuredImage}
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                    />
-                    {/* Overlay gradient on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </>
+                  <img
+                    src={post.featuredImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen className="w-20 h-20 text-white opacity-60" />
+                    <BookOpen className="w-20 h-20 text-gray-400 dark:text-gray-600" />
                   </div>
                 )}
 
                 {/* Category Badge - Floating */}
                 <div className="absolute top-4 left-4 z-10">
                   <span 
-                    className="px-4 py-1.5 text-xs font-bold rounded-full shadow-lg backdrop-blur-sm transition-transform group-hover:scale-110"
+                    className="px-4 py-1.5 text-xs font-bold rounded-full shadow-lg transition-transform group-hover:scale-110"
                     style={{
                       background: post.category.color 
                         ? `linear-gradient(135deg, ${post.category.color}, ${post.category.color}dd)`

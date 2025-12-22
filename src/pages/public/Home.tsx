@@ -335,14 +335,14 @@ const HomeOptimized = () => {
             data={pageData.content.clientLogos}
           />
 
-          <FeaturedBlogSection 
-            data={pageData.content.featuredBlog}
-            themeConfig={pageData.theme}
-          />
-
           <ContactSection 
             data={addCategoriasToConfig(pageData.content.contactForm, categorias)}
             categorias={categorias}
+          />
+
+          <FeaturedBlogSection 
+            data={pageData.content.featuredBlog}
+            themeConfig={pageData.theme}
           />
         </main>
         <PublicFooter />
