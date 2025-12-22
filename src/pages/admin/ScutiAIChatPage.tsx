@@ -80,10 +80,14 @@ const ScutiAIChatPage: React.FC = () => {
     showCanvas: _showCanvas // No usado directamente, el canvas se abre automáticamente
   } = useScutiAI();
 
-  // Cargar estado del sistema al montar
+  // Cargar estado del sistema al montar (solo una vez)
   useEffect(() => {
-    loadSystemStatus();
-  }, [loadSystemStatus]);
+    // 🆕 Solo cargar si no hay status activo (evita duplicados)
+    if (!systemStatus) {
+      loadSystemStatus();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 🆕 Sin dependencias - solo al montar
 
   // Auto-scroll al final cuando hay nuevos mensajes
   useEffect(() => {

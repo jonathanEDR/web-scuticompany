@@ -60,13 +60,25 @@ export const useScutiAI = () => {
   const [blogCreationSessionId, setBlogCreationSessionId] = useState<string | null>(null);
   const [conversationMode, setConversationMode] = useState<string | null>(null);
 
+  // 🆕 Cache para evitar múltiples llamadas
+  const [lastSessionsLoad, setLastSessionsLoad] = useState<number>(0);
+  const [lastStatusLoad, setLastStatusLoad] = useState<number>(0);
+  const CACHE_TTL = 30000; // 30 segundos
+
   // ============================================
-  // CARGAR SESIONES
+  // CARGAR SESIONES (con debounce y caché)
   // ============================================
 
   const loadSessions = useCallback(async () => {
     if (!userId) {
       console.warn('⚠️ No userId available');
+      return;
+    }
+
+    // 🆕 Evitar llamadas duplicadas con caché
+    const now = Date.now();
+    if (now - lastSessionsLoad < CACHE_TTL) {
+      console.log('💾 Usando sesiones cacheadas');
       return;
     }
 
@@ -78,6 +90,7 @@ export const useScutiAI = () => {
 
       if (result.success && result.data) {
         setSessions(result.data.sessions);
+        setLastSessionsLoad(now);
         console.log('✅ Sesiones cargadas:', result.data.sessions.length);
       } else {
         throw new Error(result.error || 'Error cargando sesiones');
@@ -89,14 +102,14 @@ export const useScutiAI = () => {
     } finally {
       setLoadingSessions(false);
     }
-  }, [userId]);
+  }, [userId, lastSessionsLoad]);
 
-  // Cargar sesiones al montar
+  // Cargar sesiones al montar (solo una vez por TTL)
   useEffect(() => {
     if (userId) {
       loadSessions();
     }
-  }, [userId, loadSessions]);
+  }, [userId]); // 🆕 Eliminado loadSessions de dependencias para evitar loops
 
   // ============================================
   // CARGAR SESIÓN ESPECÍFICA
@@ -376,20 +389,28 @@ export const useScutiAI = () => {
   }, [activeSession]);
 
   // ============================================
-  // CARGAR ESTADO DEL SISTEMA
+  // CARGAR ESTADO DEL SISTEMA (con caché)
   // ============================================
 
   const loadSystemStatus = useCallback(async () => {
+    // 🆕 Evitar llamadas duplicadas con caché
+    const now = Date.now();
+    if (now - lastStatusLoad < CACHE_TTL) {
+      console.log('💾 Usando estado del sistema cacheado');
+      return;
+    }
+
     try {
       const result = await scutiAIService.getStatus();
 
       if (result.success && result.data) {
         setSystemStatus(result.data);
+        setLastStatusLoad(now);
       }
     } catch (err) {
       console.error('❌ Error cargando estado del sistema:', err);
     }
-  }, []);
+  }, [lastStatusLoad]);
 
   // ============================================
   // LIMPIAR ERROR
