@@ -358,20 +358,20 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
               } as React.CSSProperties}
               onMouseEnter={(e) => {
                 const card = e.currentTarget;
-                card.style.background = cardStyles.hoverBackground;
-                card.style.boxShadow = cardStyles.hoverShadow;
+                card.style.background = cardStyles.hoverBackground ?? 'rgba(255, 255, 255, 0.95)';
+                card.style.boxShadow = cardStyles.hoverShadow ?? '0 20px 60px rgba(0, 0, 0, 0.12)';
                 const borderEl = card.querySelector('.card-border') as HTMLElement;
                 if (borderEl) {
-                  borderEl.style.background = cardStyles.hoverBorder;
+                  borderEl.style.background = cardStyles.hoverBorder ?? cardStyles.border ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                 }
               }}
               onMouseLeave={(e) => {
                 const card = e.currentTarget;
-                card.style.background = cardStyles.background;
-                card.style.boxShadow = cardStyles.shadow;
+                card.style.background = cardStyles.background ?? 'rgba(255, 255, 255, 0.8)';
+                card.style.boxShadow = cardStyles.shadow ?? '0 8px 32px rgba(0, 0, 0, 0.1)';
                 const borderEl = card.querySelector('.card-border') as HTMLElement;
                 if (borderEl) {
-                  borderEl.style.background = cardStyles.border;
+                  borderEl.style.background = cardStyles.border ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                 }
               }}
             >
@@ -472,7 +472,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                   style={{
                     color: getSafeStyle(
                       solution.styles?.[theme]?.titleColor,
-                      cardStyles.titleColor
+                      cardStyles.titleColor ?? '#1f2937'
                     ),
                     fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
@@ -483,7 +483,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                   style={{
                     color: getSafeStyle(
                       solution.styles?.[theme]?.descriptionColor,
-                      cardStyles.descriptionColor
+                      cardStyles.descriptionColor ?? '#6b7280'
                     ),
                     fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}

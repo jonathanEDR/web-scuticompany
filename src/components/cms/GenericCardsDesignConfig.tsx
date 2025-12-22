@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { PageData, CardDesignStyles } from '../../types/cms';
+import type { PageData, CardDesignStyles, StrictCardDesignStyles } from '../../types/cms';
 import ColorWithOpacity from './ColorWithOpacity';
 import GradientPicker from './GradientPicker';
 import ShadowControl from './ShadowControl';
@@ -161,6 +161,9 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
 
   // Obtener estilos actuales del estado local según el tema activo
   const currentStyles = activeTheme === 'light' ? localLightStyles : localDarkStyles;
+  
+  // Asegurar tipos correctos para evitar errores de undefined
+  const safeCurrentStyles = currentStyles as StrictCardDesignStyles;
 
   const updateCardStyle = (field: keyof CardDesignStyles, value: string | boolean) => {
     // Actualizar estado local inmediatamente (para vista previa)
@@ -288,33 +291,33 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
         <div 
           className="relative rounded-2xl overflow-hidden transition-all duration-300 hover:transform hover:-translate-y-1 max-w-xs mx-auto"
           style={{
-            background: currentStyles.background,
-            boxShadow: currentStyles.shadow,
-            padding: currentStyles.cardPadding,
-            minWidth: currentStyles.cardMinWidth,
-            minHeight: currentStyles.cardMinHeight
+            background: safeCurrentStyles.background,
+            boxShadow: safeCurrentStyles.shadow,
+            padding: safeCurrentStyles.cardPadding,
+            minWidth: safeCurrentStyles.cardMinWidth,
+            minHeight: safeCurrentStyles.cardMinHeight
           }}
         >
           {/* Border gradient */}
           <div 
             className="absolute inset-0 rounded-2xl pointer-events-none"
             style={{
-              background: currentStyles.border,
+              background: safeCurrentStyles.border,
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
               maskComposite: 'exclude',
-              padding: currentStyles.borderWidth
+              padding: safeCurrentStyles.borderWidth
             }}
           />
           
           {/* Icon preview */}
-          {currentStyles.iconBorderEnabled && (
-            <div className={`mb-4 flex ${currentStyles.iconAlignment === 'center' ? 'justify-center' : currentStyles.iconAlignment === 'right' ? 'justify-end' : 'justify-start'}`}>
+          {safeCurrentStyles.iconBorderEnabled && (
+            <div className={`mb-4 flex ${safeCurrentStyles.iconAlignment === 'center' ? 'justify-center' : safeCurrentStyles.iconAlignment === 'right' ? 'justify-end' : 'justify-start'}`}>
               <div 
                 className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
                 style={{
-                  background: currentStyles.iconBackground,
-                  border: `2px solid ${currentStyles.iconColor}`
+                  background: safeCurrentStyles.iconBackground,
+                  border: `2px solid ${safeCurrentStyles.iconColor}`
                 }}
               >
                 💡
@@ -326,8 +329,8 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
           <h3 
             className="text-lg font-bold mb-2"
             style={{ 
-              color: currentStyles.titleColor,
-              textAlign: currentStyles.iconAlignment || 'left'
+              color: safeCurrentStyles.titleColor,
+              textAlign: safeCurrentStyles.iconAlignment || 'left'
             }}
           >
             Título de Ejemplo
@@ -337,8 +340,8 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
           <p 
             className="text-sm"
             style={{ 
-              color: currentStyles.descriptionColor,
-              textAlign: currentStyles.iconAlignment || 'left'
+              color: safeCurrentStyles.descriptionColor,
+              textAlign: safeCurrentStyles.iconAlignment || 'left'
             }}
           >
             Esta es una descripción de ejemplo para mostrar cómo se verá el diseño de la tarjeta.
@@ -357,7 +360,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
             </label>
             <ColorWithOpacity
               label="Fondo de Tarjeta"
-              value={currentStyles.background}
+              value={safeCurrentStyles.background}
               onChange={(value) => updateCardStyle('background', value)}
             />
           </div>
@@ -369,7 +372,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
             </label>
             <GradientPicker
               label="Borde"
-              value={currentStyles.border}
+              value={safeCurrentStyles.border}
               onChange={(value) => updateCardStyle('border', value)}
             />
           </div>
@@ -380,7 +383,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
               📏 Grosor del Borde
             </label>
             <select
-              value={currentStyles.borderWidth}
+              value={safeCurrentStyles.borderWidth}
               onChange={(e) => updateCardStyle('borderWidth', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
@@ -399,7 +402,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
             </label>
             <ShadowControl
               label="Sombra"
-              value={currentStyles.shadow}
+              value={safeCurrentStyles.shadow}
               onChange={(value) => updateCardStyle('shadow', value)}
             />
           </div>
@@ -414,7 +417,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
             </label>
             <ColorWithOpacity
               label="Color del Título"
-              value={currentStyles.titleColor}
+              value={safeCurrentStyles.titleColor}
               onChange={(value) => updateCardStyle('titleColor', value)}
             />
           </div>
@@ -426,7 +429,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
             </label>
             <ColorWithOpacity
               label="Color de Descripción"
-              value={currentStyles.descriptionColor}
+              value={safeCurrentStyles.descriptionColor || 'rgba(107, 114, 128, 1)'}
               onChange={(value) => updateCardStyle('descriptionColor', value)}
             />
           </div>
@@ -437,7 +440,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
               🔀 Alineación de Tarjetas
             </label>
             <select
-              value={currentStyles.cardsAlignment}
+              value={safeCurrentStyles.cardsAlignment}
               onChange={(e) => updateCardStyle('cardsAlignment', e.target.value as 'left' | 'center' | 'right')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
@@ -453,7 +456,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
               🎯 Alineación de Contenido
             </label>
             <select
-              value={currentStyles.iconAlignment}
+              value={safeCurrentStyles.iconAlignment}
               onChange={(e) => updateCardStyle('iconAlignment', e.target.value as 'left' | 'center' | 'right')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
@@ -486,7 +489,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
               </label>
               <input
                 type="text"
-                value={currentStyles.cardMinWidth}
+                value={safeCurrentStyles.cardMinWidth}
                 onChange={(e) => updateCardStyle('cardMinWidth', e.target.value)}
                 placeholder="280px"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -499,7 +502,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
               </label>
               <input
                 type="text"
-                value={currentStyles.cardMaxWidth}
+                value={safeCurrentStyles.cardMaxWidth}
                 onChange={(e) => updateCardStyle('cardMaxWidth', e.target.value)}
                 placeholder="100%"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -512,7 +515,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
               </label>
               <input
                 type="text"
-                value={currentStyles.cardPadding}
+                value={safeCurrentStyles.cardPadding}
                 onChange={(e) => updateCardStyle('cardPadding', e.target.value)}
                 placeholder="2rem"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -524,7 +527,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
               <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={currentStyles.iconBorderEnabled}
+                  checked={safeCurrentStyles.iconBorderEnabled}
                   onChange={(e) => updateCardStyle('iconBorderEnabled', e.target.checked)}
                   className="mr-2 w-4 h-4 text-purple-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500 focus:ring-2"
                 />

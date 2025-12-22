@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import type { PageData, CardDesignStyles } from '../../types/cms';
+import type { PageData, CardDesignStyles, StrictCardDesignStyles } from '../../types/cms';
 import ColorWithOpacity from './ColorWithOpacity';
 import GradientPicker from './GradientPicker';
 import ShadowControl from './ShadowControl';
@@ -245,11 +245,11 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
   // Estados unificados con inicialización simple
   const [lightStyles, setLightStyles] = useState<CardDesignStyles>(() => {
-    return initialData?.light || {} as CardDesignStyles;
+    return initialData?.light || ({} as CardDesignStyles);
   });
   
   const [darkStyles, setDarkStyles] = useState<CardDesignStyles>(() => {
-    return initialData?.dark || {} as CardDesignStyles;
+    return initialData?.dark || ({} as CardDesignStyles);
   });
 
   // Solo cargar datos reales de BD, NO defaults automáticos
@@ -283,7 +283,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   const safeCurrentStyles = {
     ...(activeTheme === 'light' ? currentDefaults.light : currentDefaults.dark),
     ...currentStyles
-  };
+  } as StrictCardDesignStyles;
 
   const updateCardStyle = (field: keyof CardDesignStyles, value: string | boolean) => {
     if (activeTheme === 'light') {
@@ -495,32 +495,32 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
       {/* Preview Card */}
       <div className="mb-8 px-2 sm:px-4 md:px-8 py-4 sm:py-6 flex justify-center">
         <div
-          key={`preview-${activeTheme}-${currentStyles.cardMinWidth}-${currentStyles.cardPadding}-${currentStyles.cardsAlignment}`}
+          key={`preview-${activeTheme}-${safeCurrentStyles.cardMinWidth}-${safeCurrentStyles.cardPadding}-${safeCurrentStyles.cardsAlignment}`}
           className="group relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
           style={{
-            background: currentStyles.background,
+            background: safeCurrentStyles.background,
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            boxShadow: currentStyles.shadow,
-            minHeight: currentStyles.cardMinHeight || 'auto',
-            padding: currentStyles.cardPadding || '2rem'
+            boxShadow: safeCurrentStyles.shadow,
+            minHeight: safeCurrentStyles.cardMinHeight || 'auto',
+            padding: safeCurrentStyles.cardPadding || '2rem'
           }}
           onMouseEnter={(e) => {
             const card = e.currentTarget;
-            card.style.background = currentStyles.hoverBackground;
-            card.style.boxShadow = currentStyles.hoverShadow;
+            card.style.background = safeCurrentStyles.hoverBackground;
+            card.style.boxShadow = safeCurrentStyles.hoverShadow;
             const borderEl = card.querySelector('.card-border') as HTMLElement;
             if (borderEl) {
-              borderEl.style.background = currentStyles.hoverBorder;
+              borderEl.style.background = safeCurrentStyles.hoverBorder || safeCurrentStyles.border;
             }
           }}
           onMouseLeave={(e) => {
             const card = e.currentTarget;
-            card.style.background = currentStyles.background;
-            card.style.boxShadow = currentStyles.shadow;
+            card.style.background = safeCurrentStyles.background;
+            card.style.boxShadow = safeCurrentStyles.shadow;
             const borderEl = card.querySelector('.card-border') as HTMLElement;
             if (borderEl) {
-              borderEl.style.background = currentStyles.border;
+              borderEl.style.background = safeCurrentStyles.border;
             }
           }}
         >
@@ -528,24 +528,24 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           <div 
             className="card-border absolute inset-0 rounded-2xl pointer-events-none transition-all duration-300"
             style={{
-              background: currentStyles.border,
+              background: safeCurrentStyles.border,
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
               maskComposite: 'exclude',
-              padding: currentStyles.borderWidth
+              padding: safeCurrentStyles.borderWidth
             }}
           />
           {/* Icon Preview */}
-          {currentStyles.iconBorderEnabled !== false ? (
+          {safeCurrentStyles.iconBorderEnabled !== false ? (
             <div
               className="relative mb-6 w-16 h-16 rounded-xl p-0.5"
-              style={{ background: currentStyles.iconGradient }}
+              style={{ background: safeCurrentStyles.iconGradient }}
             >
               <div
                 className="w-full h-full rounded-xl flex items-center justify-center text-3xl"
                 style={{
-                  background: currentStyles.iconBackground,
-                  color: currentStyles.iconColor
+                  background: safeCurrentStyles.iconBackground,
+                  color: safeCurrentStyles.iconColor
                 }}
               >
                 {activeSection === 'contact' ? '📧' : '💡'}
@@ -553,7 +553,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             </div>
           ) : (
             <div className="relative mb-6 w-16 h-16 flex items-center justify-center text-3xl"
-                 style={{ color: currentStyles.iconColor }}>
+                 style={{ color: safeCurrentStyles.iconColor }}>
               {activeSection === 'contact' ? '📧' : '💡'}
             </div>
           )}
@@ -567,13 +567,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
         </div>
           <h4
             className="text-2xl font-bold mb-4"
-            style={{ color: currentStyles.titleColor }}
+            style={{ color: safeCurrentStyles.titleColor }}
           >
             {activeSection === 'contact' ? 'Contáctanos' : 'Título de Ejemplo'}
           </h4>
           <p
             className="leading-relaxed mb-4"
-            style={{ color: currentStyles.descriptionColor }}
+            style={{ color: safeCurrentStyles.descriptionColor }}
           >
             {activeSection === 'contact' 
               ? '¿Tienes un proyecto en mente? Cuéntanos sobre él y te responderemos pronto.'
@@ -585,7 +585,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
             <span
               className="text-sm font-medium mr-2"
-              style={{ color: currentStyles.linkColor }}
+              style={{ color: safeCurrentStyles.linkColor }}
             >
               {activeSection === 'contact' ? 'Contactar ahora' : 'Conocer más'}
             </span>
@@ -594,7 +594,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              style={{ color: currentStyles.linkColor }}
+              style={{ color: safeCurrentStyles.linkColor }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
@@ -608,6 +608,217 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           🎨 Configuración Simple
         </h3>
 
+        {/* Renderizado condicional para Blog vs Otras secciones */}
+        {activeSection === 'featuredBlog' ? (
+          /* 📰 CONFIGURACIÓN SIMPLIFICADA PARA BLOG */
+          <div className="space-y-4">
+            {/* Fondo y Borde */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Fondo de Tarjeta */}
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                <ColorWithOpacity
+                  label="Fondo de Tarjeta"
+                  value={safeCurrentStyles.background}
+                  onChange={(value) => updateCardStyle('background', value)}
+                />
+              </div>
+
+              {/* Borde y Grosor */}
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Color del Borde
+                </label>
+                <div className="flex gap-2 mb-4">
+                  <input
+                    type="color"
+                    value={safeCurrentStyles.border?.replace('rgba', '').replace('rgb', '').match(/#[0-9a-fA-F]{6}/)?.[0] || '#e5e7eb'}
+                    onChange={(e) => updateCardStyle('border', e.target.value)}
+                    className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                  />
+                  <input
+                    type="text"
+                    value={safeCurrentStyles.border}
+                    onChange={(e) => updateCardStyle('border', e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Grosor del Borde
+                </label>
+                <select
+                  value={safeCurrentStyles.borderWidth}
+                  onChange={(e) => updateCardStyle('borderWidth', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                >
+                  <option value="0px">Sin borde</option>
+                  <option value="1px">Fino (1px)</option>
+                  <option value="2px">Medio (2px)</option>
+                  <option value="3px">Grueso (3px)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Sombras */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+              <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                🌑 Sombras
+              </h4>
+              <ShadowControl
+                label="Sombra Normal"
+                value={safeCurrentStyles.shadow}
+                onChange={(value) => updateCardStyle('shadow', value)}
+              />
+              <div className="mt-4">
+                <ShadowControl
+                  label="Sombra (Hover)"
+                  value={safeCurrentStyles.hoverShadow}
+                  onChange={(value) => updateCardStyle('hoverShadow', value)}
+                />
+              </div>
+            </div>
+
+            {/* Colores de Texto */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+              <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                ✏️ Colores de Texto
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Título */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del Título
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={safeCurrentStyles.titleColor}
+                      onChange={(e) => updateCardStyle('titleColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={safeCurrentStyles.titleColor}
+                      onChange={(e) => updateCardStyle('titleColor', e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Extracto */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del Extracto
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={safeCurrentStyles.excerptColor || safeCurrentStyles.descriptionColor}
+                      onChange={(e) => updateCardStyle('excerptColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={safeCurrentStyles.excerptColor || safeCurrentStyles.descriptionColor}
+                      onChange={(e) => updateCardStyle('excerptColor', e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Metadata */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color de Metadata
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={safeCurrentStyles.metaColor || '#6b7280'}
+                      onChange={(e) => updateCardStyle('metaColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={safeCurrentStyles.metaColor || '#6b7280'}
+                      onChange={(e) => updateCardStyle('metaColor', e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+
+                {/* CTA Color */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del CTA
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={safeCurrentStyles.ctaColor || safeCurrentStyles.linkColor}
+                      onChange={(e) => updateCardStyle('ctaColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={safeCurrentStyles.ctaColor || safeCurrentStyles.linkColor}
+                      onChange={(e) => updateCardStyle('ctaColor', e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Badge */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+              <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                🏷️ Estilos del Badge
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <GradientPicker
+                    label="Fondo del Badge"
+                    value={safeCurrentStyles.badgeBackground || 'linear-gradient(135deg, #8B5CF6, #06B6D4)'}
+                    onChange={(value) => updateCardStyle('badgeBackground', value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Color del Texto
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={safeCurrentStyles.badgeTextColor || '#ffffff'}
+                      onChange={(e) => updateCardStyle('badgeTextColor', e.target.value)}
+                      className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={safeCurrentStyles.badgeTextColor || '#ffffff'}
+                      onChange={(e) => updateCardStyle('badgeTextColor', e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fondo Hover */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+              <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                🖱️ Efecto Hover
+              </h4>
+              <ColorWithOpacity
+                label="Fondo (Hover)"
+                value={safeCurrentStyles.hoverBackground}
+                onChange={(value) => updateCardStyle('hoverBackground', value)}
+              />
+            </div>
+          </div>
+        ) : (
+          /* 🎯 CONFIGURACIÓN COMPLETA PARA OTRAS SECCIONES */
+          <>
     {/* Fondo y Borde - Responsive grid: 1 columna en móvil, 2 en md+ */}
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
 
@@ -708,7 +919,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             <div>
               <GradientPicker
                 label="Gradiente del Borde del Icono"
-                value={safeCurrentStyles.iconGradient}
+                value={safeCurrentStyles.iconGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}
                 onChange={(value) => updateCardStyle('iconGradient', value)}
               />
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -717,13 +928,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={safeCurrentStyles.iconColor}
+                  value={safeCurrentStyles.iconColor || '#ffffff'}
                   onChange={(e) => updateCardStyle('iconColor', e.target.value)}
                   className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                 />
                 <input
                   type="text"
-                  value={safeCurrentStyles.iconColor}
+                  value={safeCurrentStyles.iconColor || '#ffffff'}
                   onChange={(e) => updateCardStyle('iconColor', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
@@ -824,6 +1035,8 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             </div>
           </div>
         </div>
+          </>
+        )}
       </div>
 
       {/* Advanced Mode Toggle */}
@@ -1077,13 +1290,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               <div className="space-y-6">
                 <ColorWithOpacity
                   label="Fondo (Hover)"
-                  value={safeCurrentStyles.hoverBackground}
+                  value={safeCurrentStyles.hoverBackground || 'rgba(255, 255, 255, 0.95)'}
                   onChange={(value) => updateCardStyle('hoverBackground', value)}
                 />
 
                 <GradientPicker
                   label="Borde (Hover)"
-                  value={safeCurrentStyles.hoverBorder}
+                  value={safeCurrentStyles.hoverBorder || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}
                   onChange={(value) => updateCardStyle('hoverBorder', value)}
                 />
               </div>

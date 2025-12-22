@@ -107,6 +107,9 @@ export interface DefaultValueAddedConfig {
 }
 
 export interface DefaultFeaturedBlogConfig {
+  headerIcon: string;
+  headerIconColor: string;
+  fontFamily: string;
   title: string;
   subtitle: string;
   description?: string;
@@ -764,6 +767,9 @@ export const DEFAULT_CONTACT_CONFIG: DefaultContactConfig = {
 // FEATURED BLOG SECTION - Configuración por defecto
 // =====================================================
 export const DEFAULT_FEATURED_BLOG_CONFIG: DefaultFeaturedBlogConfig = {
+  headerIcon: 'Newspaper',
+  headerIconColor: '#8B5CF6',
+  fontFamily: 'Montserrat',
   title: 'Webinars y blogs',
   subtitle: 'Accede a nuestros webinars y blogs para conocer más sobre nuestras soluciones y servicios',
   description: '',

@@ -30,19 +30,26 @@ export interface SolutionTextStyles {
 }
 
 export interface CardDesignStyles {
-  background: string;
-  border: string;
-  borderWidth: string;
-  shadow: string;
-  hoverBackground: string;
-  hoverBorder: string;
-  hoverShadow: string;
-  iconGradient: string;
-  iconBackground: string;
-  iconColor: string;
-  titleColor: string;
-  descriptionColor: string;
-  linkColor: string;
+  background?: string;
+  border?: string;
+  borderWidth?: string;
+  shadow?: string;
+  hoverBackground?: string;
+  hoverBorder?: string;
+  hoverShadow?: string;
+  iconGradient?: string;
+  iconBackground?: string;
+  iconColor?: string;
+  titleColor?: string;
+  descriptionColor?: string;
+  linkColor?: string;
+  // Propiedades específicas del blog
+  excerptColor?: string;
+  metaColor?: string;
+  badgeBackground?: string;
+  badgeTextColor?: string;
+  ctaColor?: string;
+  ctaHoverColor?: string;
   // Tamaño de tarjetas
   cardMinWidth?: string;
   cardMaxWidth?: string;
@@ -53,6 +60,17 @@ export interface CardDesignStyles {
   // Configuración de iconos
   iconBorderEnabled?: boolean;
   iconAlignment?: 'left' | 'center' | 'right';
+}
+
+// Tipo estricto para garantizar propiedades requeridas
+export interface StrictCardDesignStyles extends CardDesignStyles {
+  background: string;
+  border: string;
+  borderWidth: string;
+  shadow: string;
+  hoverBackground: string;
+  hoverShadow: string;
+  titleColor: string;
 }
 
 export interface CardsDesign {
@@ -244,6 +262,43 @@ export interface ClientLogosContent {
 export interface LogosBarDesign {
   light: LogosBarDesignStyles;
   dark: LogosBarDesignStyles;
+}
+
+export interface FeaturedBlogCardStyles {
+  background: string;
+  border: string;
+  borderWidth: string;
+  shadow: string;
+  hoverBackground: string;
+  hoverShadow: string;
+  titleColor: string;
+  excerptColor: string;
+  metaColor: string;
+  badgeBackground: string;
+  badgeTextColor: string;
+  ctaColor: string;
+  ctaHoverColor: string;
+}
+
+export interface FeaturedBlogCardsDesign {
+  light: FeaturedBlogCardStyles;
+  dark: FeaturedBlogCardStyles;
+}
+
+export interface FeaturedBlogContent {
+  headerIcon: string;
+  headerIconColor: string;
+  fontFamily: string;
+  title: string;
+  subtitle: string;
+  description?: string;
+  limit: number;
+  buttonText: string;
+  buttonLink: string;
+  backgroundImage?: BackgroundImage;
+  backgroundImageAlt?: string;
+  styles?: TextStyles;
+  cardsDesign?: FeaturedBlogCardsDesign;
 }
 
 export interface ValueAddedContent {
@@ -914,7 +969,7 @@ export interface PageContent {
   contact?: ContactContent;
   contactForm?: ContactFormContent;
   chatbotConfig?: ChatbotConfig;
-  featuredBlog?: any; // Configuración de Featured Blog Section
+  featuredBlog?: FeaturedBlogContent;
   // 🆕 CONTENIDO PARA PÁGINA DE SERVICIOS
   servicesFilter?: ServicesFilterConfig;
   servicesGrid?: ServicesGridConfig;

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import type { PageData, CardDesignStyles } from '../../types/cms';
+import type { PageData, CardDesignStyles, StrictCardDesignStyles } from '../../types/cms';
 import ColorWithOpacity from './ColorWithOpacity';
 import GradientPicker from './GradientPicker';
 import ShadowControl from './ShadowControl';
@@ -82,6 +82,9 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
   const [localDarkStyles, setLocalDarkStyles] = useState<CardDesignStyles>(initialDarkStyles);
 
   const currentStyles = activeTheme === 'light' ? localLightStyles : localDarkStyles;
+  
+  // Asegurar tipos correctos para evitar errores de undefined
+  const safeCurrentStyles = currentStyles as StrictCardDesignStyles;
 
   const updateCardStyle = (field: keyof CardDesignStyles, value: string | boolean) => {
     if (activeTheme === 'light') {
@@ -269,8 +272,8 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
             className="group relative rounded-xl cursor-pointer transition-all duration-300 hover:scale-[1.02] overflow-hidden"
             style={{
               background: 'transparent',
-              boxShadow: currentStyles.shadow,
-              minWidth: currentStyles.cardMinWidth,
+              boxShadow: safeCurrentStyles.shadow,
+              minWidth: safeCurrentStyles.cardMinWidth,
               maxWidth: '400px',
               minHeight: '200px'
             }}
@@ -279,26 +282,26 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
             <div 
               className="absolute inset-0 rounded-xl"
               style={{
-                background: currentStyles.border,
+                background: safeCurrentStyles.border,
                 borderRadius: '0.75rem',
-                padding: currentStyles.borderWidth || '2px'
+                padding: safeCurrentStyles.borderWidth || '2px'
               }}
             >
               <div 
                 className="w-full h-full rounded-xl"
                 style={{
-                  background: currentStyles.background,
-                  borderRadius: `calc(0.75rem - ${currentStyles.borderWidth || '2px'})`,
-                  padding: currentStyles.cardPadding || '2rem',
+                  background: safeCurrentStyles.background,
+                  borderRadius: `calc(0.75rem - ${safeCurrentStyles.borderWidth || '2px'})`,
+                  padding: safeCurrentStyles.cardPadding || '2rem',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center'
                 }}
               >
                 {/* Icon Preview - Solo si iconBorderEnabled está activado */}
-                {currentStyles.iconBorderEnabled && (
+                {safeCurrentStyles.iconBorderEnabled && (
                   <div className="relative mb-6 w-16 h-16 flex items-center justify-center text-3xl"
-                       style={{ color: currentStyles.iconColor }}>
+                       style={{ color: safeCurrentStyles.iconColor }}>
                     ⭐
                   </div>
                 )}
@@ -306,13 +309,13 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                 {/* Content Preview */}
                 <h4
                   className="text-2xl font-bold mb-4"
-                  style={{ color: currentStyles.titleColor }}
+                  style={{ color: safeCurrentStyles.titleColor }}
                 >
                   Servicio de Valor Agregado
                 </h4>
                 <p
                   className="leading-relaxed mb-4"
-                  style={{ color: currentStyles.descriptionColor }}
+                  style={{ color: safeCurrentStyles.descriptionColor }}
                 >
                   Esta es una descripción de ejemplo para mostrar cómo se verá el diseño de las tarjetas de valor agregado.
                 </p>
@@ -321,7 +324,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                 <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <span
                     className="text-sm font-medium mr-2"
-                    style={{ color: currentStyles.linkColor }}
+                    style={{ color: safeCurrentStyles.linkColor }}
                   >
                     Conocer más
                   </span>
@@ -330,7 +333,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    style={{ color: currentStyles.linkColor }}
+                    style={{ color: safeCurrentStyles.linkColor }}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -353,7 +356,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <ColorWithOpacity
               label="Fondo de Tarjeta"
-              value={currentStyles.background}
+              value={safeCurrentStyles.background}
               onChange={(value) => updateCardStyle('background', value)}
             />
           </div>
@@ -362,7 +365,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <GradientPicker
               label="Borde de Tarjeta"
-              value={currentStyles.border}
+              value={safeCurrentStyles.border}
               onChange={(value) => updateCardStyle('border', value)}
             />
             <div className="mt-4">
@@ -370,7 +373,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                 Grosor del Borde
               </label>
               <select
-                value={currentStyles.borderWidth}
+                value={safeCurrentStyles.borderWidth}
                 onChange={(e) => updateCardStyle('borderWidth', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               >
@@ -398,13 +401,13 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={currentStyles.titleColor}
+                  value={safeCurrentStyles.titleColor}
                   onChange={(e) => updateCardStyle('titleColor', e.target.value)}
                   className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                 />
                 <input
                   type="text"
-                  value={currentStyles.titleColor}
+                  value={safeCurrentStyles.titleColor}
                   onChange={(e) => updateCardStyle('titleColor', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
@@ -419,13 +422,13 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={currentStyles.descriptionColor}
+                  value={safeCurrentStyles.descriptionColor}
                   onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
                   className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                 />
                 <input
                   type="text"
-                  value={currentStyles.descriptionColor}
+                  value={safeCurrentStyles.descriptionColor}
                   onChange={(e) => updateCardStyle('descriptionColor', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
@@ -440,13 +443,13 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={currentStyles.linkColor}
+                  value={safeCurrentStyles.linkColor}
                   onChange={(e) => updateCardStyle('linkColor', e.target.value)}
                   className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                 />
                 <input
                   type="text"
-                  value={currentStyles.linkColor}
+                  value={safeCurrentStyles.linkColor}
                   onChange={(e) => updateCardStyle('linkColor', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
@@ -474,7 +477,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={currentStyles.iconBorderEnabled === true}
+                checked={safeCurrentStyles.iconBorderEnabled === true}
                 onChange={(e) => updateCardStyle('iconBorderEnabled', e.target.checked)}
                 className="sr-only peer"
               />
@@ -497,7 +500,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                   key={value}
                   onClick={() => updateCardStyle('iconAlignment', value)}
                   className={`flex-1 px-3 py-2 text-sm rounded-lg border transition-all duration-200 ${
-                    (currentStyles.iconAlignment || 'left') === value
+                    (safeCurrentStyles.iconAlignment || 'left') === value
                       ? 'bg-purple-600 text-white border-purple-600 shadow-md'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
@@ -514,7 +517,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
             <div>
               <GradientPicker
                 label="Gradiente del Borde del Icono"
-                value={currentStyles.iconGradient}
+                value={safeCurrentStyles.iconGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}
                 onChange={(value) => updateCardStyle('iconGradient', value)}
               />
             </div>
@@ -527,13 +530,13 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={currentStyles.iconColor}
+                  value={safeCurrentStyles.iconColor}
                   onChange={(e) => updateCardStyle('iconColor', e.target.value)}
                   className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
                 />
                 <input
                   type="text"
-                  value={currentStyles.iconColor}
+                  value={safeCurrentStyles.iconColor}
                   onChange={(e) => updateCardStyle('iconColor', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
@@ -547,7 +550,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               </label>
               <input
                 type="text"
-                value={currentStyles.iconBackground}
+                value={safeCurrentStyles.iconBackground}
                 onChange={(e) => updateCardStyle('iconBackground', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 placeholder="rgba(255, 255, 255, 0.9)"
@@ -623,7 +626,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                 {/* Ancho de Tarjetas - Slider */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    📐 Ancho Mínimo: <span className="font-mono text-blue-600 dark:text-blue-400">{currentStyles.cardMinWidth || '280px'}</span>
+                    📐 Ancho Mínimo: <span className="font-mono text-blue-600 dark:text-blue-400">{safeCurrentStyles.cardMinWidth || '280px'}</span>
                   </label>
                   <div className="space-y-2">
                     <input
@@ -631,7 +634,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                       min="200"
                       max="500"
                       step="10"
-                      value={parseInt(currentStyles.cardMinWidth?.replace('px', '') || '280')}
+                      value={parseInt(safeCurrentStyles.cardMinWidth?.replace('px', '') || '280')}
                       onChange={(e) => updateCardStyle('cardMinWidth', `${e.target.value}px`)}
                       className="w-full h-2 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-lg appearance-none cursor-pointer hover:from-purple-600 hover:to-cyan-600 transition-all duration-200"
                       style={{
@@ -657,7 +660,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                       <button
                         onClick={() => updateCardStyle('cardMinHeight', 'auto')}
                         className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                          currentStyles.cardMinHeight === 'auto'
+                          safeCurrentStyles.cardMinHeight === 'auto'
                             ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
                             : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                         }`}
@@ -667,24 +670,24 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                       <button
                         onClick={() => updateCardStyle('cardMinHeight', '300px')}
                         className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                          currentStyles.cardMinHeight !== 'auto'
+                          safeCurrentStyles.cardMinHeight !== 'auto'
                             ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                             : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                         }`}
                       >
-                        📏 Manual: <span className="font-mono">{currentStyles.cardMinHeight !== 'auto' ? currentStyles.cardMinHeight : '300px'}</span>
+                        📏 Manual: <span className="font-mono">{safeCurrentStyles.cardMinHeight !== 'auto' ? safeCurrentStyles.cardMinHeight : '300px'}</span>
                       </button>
                     </div>
                     
                     {/* Slider para altura manual */}
-                    {currentStyles.cardMinHeight !== 'auto' && (
+                    {safeCurrentStyles.cardMinHeight !== 'auto' && (
                       <div className="ml-4">
                         <input
                           type="range"
                           min="250"
                           max="600"
                           step="25"
-                          value={parseInt(currentStyles.cardMinHeight?.replace('px', '') || '300')}
+                          value={parseInt(safeCurrentStyles.cardMinHeight?.replace('px', '') || '300')}
                           onChange={(e) => updateCardStyle('cardMinHeight', `${e.target.value}px`)}
                           className="w-full h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg appearance-none cursor-pointer hover:from-blue-600 hover:to-green-600 transition-all duration-200"
                           style={{
@@ -704,7 +707,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                 {/* Espaciado Interno - Slider */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    📦 Espaciado Interno: <span className="font-mono text-purple-600 dark:text-purple-400">{currentStyles.cardPadding || '2rem'}</span>
+                    📦 Espaciado Interno: <span className="font-mono text-purple-600 dark:text-purple-400">{safeCurrentStyles.cardPadding || '2rem'}</span>
                   </label>
                   <div className="space-y-2">
                     <input
@@ -712,7 +715,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                       min="1"
                       max="4"
                       step="0.25"
-                      value={parseFloat(currentStyles.cardPadding?.replace('rem', '') || '2')}
+                      value={parseFloat(safeCurrentStyles.cardPadding?.replace('rem', '') || '2')}
                       onChange={(e) => updateCardStyle('cardPadding', `${e.target.value}rem`)}
                       className="w-full h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg appearance-none cursor-pointer hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
                       style={{
@@ -733,7 +736,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                     ↔️ Ancho Máximo
                   </label>
                   <select
-                    value={currentStyles.cardMaxWidth || '100%'}
+                    value={safeCurrentStyles.cardMaxWidth || '100%'}
                     onChange={(e) => updateCardStyle('cardMaxWidth', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   >
@@ -753,7 +756,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                     <button
                       onClick={() => updateCardStyle('cardsAlignment', 'left')}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        currentStyles.cardsAlignment === 'left'
+                        safeCurrentStyles.cardsAlignment === 'left'
                           ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 ring-2 ring-blue-500'
                           : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                       }`}
@@ -763,7 +766,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                     <button
                       onClick={() => updateCardStyle('cardsAlignment', 'center')}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        currentStyles.cardsAlignment === 'center'
+                        safeCurrentStyles.cardsAlignment === 'center'
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 ring-2 ring-green-500'
                           : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                       }`}
@@ -773,7 +776,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                     <button
                       onClick={() => updateCardStyle('cardsAlignment', 'right')}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        currentStyles.cardsAlignment === 'right'
+                        safeCurrentStyles.cardsAlignment === 'right'
                           ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 ring-2 ring-purple-500'
                           : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                       }`}
@@ -792,7 +795,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               </h4>
               <ShadowControl
                 label="Sombra Normal"
-                value={currentStyles.shadow}
+                value={safeCurrentStyles.shadow}
                 onChange={(value) => updateCardStyle('shadow', value)}
               />
             </div>
@@ -808,13 +811,13 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               <div className="space-y-6">
                 <ColorWithOpacity
                   label="Fondo (Hover)"
-                  value={currentStyles.hoverBackground}
+                  value={safeCurrentStyles.hoverBackground}
                   onChange={(value) => updateCardStyle('hoverBackground', value)}
                 />
 
                 <GradientPicker
                   label="Borde (Hover)"
-                  value={currentStyles.hoverBorder}
+                  value={safeCurrentStyles.hoverBorder || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}
                   onChange={(value) => updateCardStyle('hoverBorder', value)}
                 />
               </div>
@@ -823,7 +826,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               <div>
                 <ShadowControl
                   label="Sombra (Hover)"
-                  value={currentStyles.hoverShadow}
+                  value={safeCurrentStyles.hoverShadow}
                   onChange={(value) => updateCardStyle('hoverShadow', value)}
                 />
               </div>

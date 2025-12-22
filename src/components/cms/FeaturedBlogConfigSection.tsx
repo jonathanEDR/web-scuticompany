@@ -1,6 +1,7 @@
-import React from 'react';
-import { Sparkles, Image as ImageIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import ManagedImageSelector from '../ManagedImageSelector';
+import DynamicIcon, { AVAILABLE_SIDEBAR_ICONS } from '../ui/DynamicIcon';
 
 interface FeaturedBlogConfigSectionProps {
   pageData: any;
@@ -34,6 +35,58 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
 
       {/* Contenido */}
       <div className="space-y-6">
+        {/* Configuración del Encabezado */}
+        <HeaderIconSelector
+          config={config}
+          updateContent={updateContent}
+        />
+
+        {/* Configuración de Tipografía */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+            🅰️ Configuración de Tipografía
+          </h3>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Fuente Tipográfica
+            </label>
+            <select
+              value={config.fontFamily || 'Montserrat'}
+              onChange={(e) => updateContent('featuredBlog.fontFamily', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="Montserrat">Montserrat (Por defecto)</option>
+              <option value="Inter">Inter</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Roboto">Roboto</option>
+              <option value="Open Sans">Open Sans</option>
+              <option value="Lato">Lato</option>
+              <option value="Raleway">Raleway</option>
+              <option value="Nunito">Nunito</option>
+              <option value="Playfair Display">Playfair Display</option>
+              <option value="Merriweather">Merriweather</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Arial">Arial</option>
+              <option value="system-ui">System UI</option>
+            </select>
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              Esta fuente se aplicará al título y contenido de la sección de blog en el home.
+            </p>
+            <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                Vista previa:
+              </p>
+              <p 
+                className="text-2xl font-bold text-gray-800 dark:text-white"
+                style={{ fontFamily: config.fontFamily || 'Montserrat' }}
+              >
+                {config.title || 'Webinars y blogs'}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Textos Principales */}
         <div className="grid grid-cols-1 gap-4">
           <div>
@@ -354,6 +407,170 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
             <strong>💡 Nota:</strong> Esta sección muestra automáticamente los posts marcados como "destacados" en el blog. 
             Para cambiar los colores de las tarjetas, ve a la pestaña <strong>"Diseño de Tarjetas"</strong>.
           </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente para seleccionar icono del encabezado
+interface HeaderIconSelectorProps {
+  config: any;
+  updateContent: (path: string, value: any) => void;
+}
+
+const HeaderIconSelector: React.FC<HeaderIconSelectorProps> = ({ config, updateContent }) => {
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  
+  // Iconos recomendados para blog
+  const recommendedIcons = [
+    'Newspaper', 'BookOpen', 'FileText', 'Sparkles', 'Rocket',
+    'Target', 'Zap', 'Brain', 'Award', 'Star'
+  ];
+
+  const currentIcon = config.headerIcon || 'Newspaper';
+  const currentIconColor = config.headerIconColor || '#8B5CF6';
+
+  return (
+    <div className="bg-gradient-to-br from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-lg p-5 border border-purple-200 dark:border-purple-700">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+        ✨ Configuración del Encabezado
+      </h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Selector de Icono */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Icono del Encabezado
+          </label>
+          
+          {/* Preview y botón para abrir selector */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-16 h-16 rounded-xl border-2 border-purple-500 bg-white dark:bg-gray-800 shadow-sm">
+              <DynamicIcon 
+                name={currentIcon} 
+                size={32} 
+                color={currentIconColor}
+              />
+            </div>
+            <div className="flex-1">
+              <button
+                onClick={() => setShowIconPicker(!showIconPicker)}
+                className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between shadow-sm"
+              >
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {AVAILABLE_SIDEBAR_ICONS.find(i => i.name === currentIcon)?.label || currentIcon}
+                </span>
+                {showIconPicker ? 
+                  <ChevronUp size={16} className="text-gray-500 dark:text-gray-400" /> : 
+                  <ChevronDown size={16} className="text-gray-500 dark:text-gray-400" />
+                }
+              </button>
+            </div>
+          </div>
+
+          {/* Iconos recomendados (siempre visibles) */}
+          <div className="mb-3">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+              Iconos recomendados:
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {recommendedIcons.map(iconName => (
+                <button
+                  key={iconName}
+                  onClick={() => updateContent('featuredBlog.headerIcon', iconName)}
+                  className={`p-2 rounded-lg border-2 transition-all hover:scale-105 bg-white dark:bg-gray-800 shadow-sm ${
+                    currentIcon === iconName
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
+                      : 'border-gray-300 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500'
+                  }`}
+                  title={AVAILABLE_SIDEBAR_ICONS.find(i => i.name === iconName)?.label}
+                >
+                  <DynamicIcon name={iconName} size={20} color={currentIconColor} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Lista completa de iconos (colapsable) */}
+          {showIconPicker && (
+            <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-800 max-h-64 overflow-y-auto shadow-inner">
+              <div className="grid grid-cols-6 gap-2">
+                {AVAILABLE_SIDEBAR_ICONS.map(({ name, label }) => (
+                  <button
+                    key={name}
+                    onClick={() => {
+                      updateContent('featuredBlog.headerIcon', name);
+                      setShowIconPicker(false);
+                    }}
+                    className={`p-2 rounded-lg border transition-all hover:scale-110 ${
+                      currentIcon === name
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500 bg-gray-50 dark:bg-gray-900'
+                    }`}
+                    title={label}
+                  >
+                    <DynamicIcon name={name} size={18} color={currentIconColor} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Configuración de Color */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Color del Icono
+          </label>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                type="color"
+                value={currentIconColor}
+                onChange={(e) => updateContent('featuredBlog.headerIconColor', e.target.value)}
+                className="w-16 h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
+              />
+              <input
+                type="text"
+                value={currentIconColor}
+                onChange={(e) => updateContent('featuredBlog.headerIconColor', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white font-mono text-sm"
+                placeholder="#8B5CF6"
+              />
+            </div>
+            
+            {/* Colores predefinidos */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                Colores predefinidos:
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { color: '#8B5CF6', label: 'Púrpura' },
+                  { color: '#06B6D4', label: 'Cyan' },
+                  { color: '#10B981', label: 'Verde' },
+                  { color: '#F59E0B', label: 'Naranja' },
+                  { color: '#EF4444', label: 'Rojo' },
+                  { color: '#3B82F6', label: 'Azul' },
+                  { color: '#6366F1', label: 'Índigo' },
+                  { color: '#EC4899', label: 'Rosa' },
+                ].map(({ color, label }) => (
+                  <button
+                    key={color}
+                    onClick={() => updateContent('featuredBlog.headerIconColor', color)}
+                    className={`w-8 h-8 rounded-lg border-2 transition-all hover:scale-110 ${
+                      currentIconColor === color
+                        ? 'border-gray-800 dark:border-white scale-110'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                    style={{ backgroundColor: color }}
+                    title={label}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

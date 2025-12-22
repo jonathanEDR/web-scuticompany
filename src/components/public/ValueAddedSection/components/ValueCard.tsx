@@ -71,12 +71,12 @@ export const ValueCard = ({
     // Animación suave de regreso
     card.style.transition = 'transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.8s ease';
     card.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
-    card.style.boxShadow = cardStyles.shadow;
+    card.style.boxShadow = cardStyles.shadow ?? '0 8px 32px rgba(0, 0, 0, 0.1)';
     
     const border = card.querySelector('.card-border') as HTMLElement;
     if (border) {
       border.style.transition = 'background 0.8s ease, box-shadow 0.8s ease';
-      border.style.background = cardStyles.border;
+      border.style.background = cardStyles.border ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
       border.style.boxShadow = 'none';
     }
     
@@ -236,7 +236,7 @@ export const ValueCard = ({
       if (border) {
         border.style.background = needsInwardEscape 
           ? 'linear-gradient(135deg, #06b6d4, #8b5cf6, #06b6d4)' // Gradiente especial
-          : cardStyles.hoverBorder;
+          : (cardStyles.hoverBorder ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
         border.style.boxShadow = `0 0 ${18 + escapeCount.current * 3}px ${primaryColor}`;
       }
       
@@ -285,11 +285,11 @@ export const ValueCard = ({
     // 🏠 Animación de "regreso a casa" suave y elástica
     card.style.transition = 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease';
     card.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
-    card.style.boxShadow = cardStyles.shadow;
+    card.style.boxShadow = cardStyles.shadow ?? '0 8px 32px rgba(0, 0, 0, 0.1)';
     
     const border = card.querySelector('.card-border') as HTMLElement;
     if (border) {
-      border.style.background = cardStyles.border;
+      border.style.background = cardStyles.border ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
       border.style.boxShadow = 'none';
     }
     
@@ -379,7 +379,7 @@ export const ValueCard = ({
           style={{ 
             color: getSafeStyle(
               valueItem.styles?.[theme]?.titleColor,
-              cardStyles.titleColor
+              cardStyles.titleColor ?? '#1f2937'
             ),
             textAlign: cardStyles.iconAlignment || 'left'
           }}
@@ -393,7 +393,7 @@ export const ValueCard = ({
           style={{ 
             color: getSafeStyle(
               valueItem.styles?.[theme]?.descriptionColor,
-              cardStyles.descriptionColor
+              cardStyles.descriptionColor ?? '#6b7280'
             ),
             textAlign: cardStyles.iconAlignment || 'left',
             lineHeight: '1.6'

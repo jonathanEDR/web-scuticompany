@@ -4,6 +4,7 @@ import { Calendar, User, Clock, ArrowRight, BookOpen, Sparkles } from 'lucide-re
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_FEATURED_BLOG_CONFIG } from '../../utils/defaultConfig';
 import type { DefaultFeaturedBlogConfig } from '../../utils/defaultConfig';
+import DynamicIcon from '../ui/DynamicIcon';
 
 interface BlogPost {
   _id: string;
@@ -148,25 +149,40 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center space-x-2 mb-4">
-            <Sparkles className="w-8 h-8" style={{ color: currentStyles?.titleColor || (isDarkMode ? '#a78bfa' : '#8B5CF6') }} />
+          <div className="inline-flex items-center justify-center space-x-3 mb-4">
+            <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14">
+              <DynamicIcon 
+                name={data.headerIcon || 'Newspaper'} 
+                size={window.innerWidth >= 768 ? 40 : 32}
+                color={data.headerIconColor || '#8B5CF6'}
+              />
+            </div>
             <h2 
               className="text-3xl md:text-4xl font-bold"
-              style={{ color: currentStyles?.titleColor || undefined }}
+              style={{ 
+                color: currentStyles?.titleColor || undefined,
+                fontFamily: data.fontFamily || 'Montserrat'
+              }}
             >
               {data.title}
             </h2>
           </div>
           <p 
             className="text-lg max-w-2xl mx-auto"
-            style={{ color: currentStyles?.subtitleColor || undefined }}
+            style={{ 
+              color: currentStyles?.subtitleColor || undefined,
+              fontFamily: data.fontFamily || 'Montserrat'
+            }}
           >
             {data.subtitle}
           </p>
           {data.description && (
             <p 
               className="text-base max-w-2xl mx-auto mt-2"
-              style={{ color: currentStyles?.descriptionColor || undefined }}
+              style={{ 
+                color: currentStyles?.descriptionColor || undefined,
+                fontFamily: data.fontFamily || 'Montserrat'
+              }}
               dangerouslySetInnerHTML={{ __html: data.description }}
             />
           )}
