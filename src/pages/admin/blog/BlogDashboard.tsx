@@ -49,7 +49,7 @@ export default function BlogDashboard() {
   // Calcular estadísticas con cache
   useEffect(() => {
     if (posts && posts.length > 0) {
-      console.log('📊 [Blog] Actualizando estadísticas desde posts');
+      // console.log('📊 [Blog] Actualizando estadísticas desde posts');
       loadStats(posts);
     }
   }, [posts, loadStats]);

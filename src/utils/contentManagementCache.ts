@@ -117,7 +117,7 @@ export const setCacheItem = <T>(
     };
 
     localStorage.setItem(key, JSON.stringify(cacheEntry));
-    console.log(`✅ [Cache] Guardado: ${key} (expira en ${Math.round(duration! / 60000)}min)`);
+    // console.log(`✅ [Cache] Guardado: ${key} (expira en ${Math.round(duration! / 60000)}min)`);
   } catch (error) {
     console.error(`❌ [Cache] Error al guardar ${key}:`, error);
   }

@@ -116,8 +116,8 @@ export function useProfileCache(
     duration: DASHBOARD_CACHE_DURATIONS.PROFILE, // 4 horas
     fetchFn: getProfileFn,
     enabled,
-    onSuccess: (data) => {
-      console.log('✅ [Profile Cache] Datos cargados:', data);
+    onSuccess: () => {
+      // console.log('✅ [Profile Cache] Datos cargados:', data);
     },
     onError: (error) => {
       console.error('❌ [Profile Cache] Error:', error);
@@ -141,8 +141,8 @@ export function useUsersCache(
     fetchFn: getUsersFn,
     dependencies: [filters],
     enabled,
-    onSuccess: (data) => {
-      console.log('✅ [Users Cache] Lista cargada:', data);
+    onSuccess: () => {
+      // console.log('✅ [Users Cache] Lista cargada:', data);
     }
   });
 }
@@ -159,8 +159,8 @@ export function useAIAgentsCache(
     duration: DASHBOARD_CACHE_DURATIONS.AI_AGENTS, // 2 horas
     fetchFn: getAgentsFn,
     enabled,
-    onSuccess: (data) => {
-      console.log('✅ [AI Agents Cache] Configuración cargada:', data);
+    onSuccess: () => {
+      // console.log('✅ [AI Agents Cache] Configuración cargada:', data);
     }
   });
 }

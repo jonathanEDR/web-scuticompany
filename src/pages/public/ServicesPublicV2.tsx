@@ -61,10 +61,10 @@ const ServicesPublicV2 = () => {
     const loadPageData = async () => {
       try {
         const data = await getPageBySlug('services');
-        console.log('📄 [Services] Datos del CMS cargados:', data);
+        // console.log('📄 [Services] Datos del CMS cargados:', data);
         setPageData(data);
       } catch (error) {
-        console.warn('⚠️ [Services] No se pudieron cargar datos del CMS:', error);
+        // console.warn('⚠️ [Services] No se pudieron cargar datos del CMS:', error);
         // Usar valores por defecto si no hay datos
         setPageData(null);
       }

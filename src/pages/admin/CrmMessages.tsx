@@ -8,6 +8,7 @@ import { MessageFiltersComponent } from '../../components/crm/messages/MessageFi
 import { TemplateEditor } from '../../components/crm/templates/TemplateEditor';
 import { MessageComposer } from '../../components/crm/messages/MessageComposer';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import type { 
   LeadMessage, 
   MessageTemplate, 
@@ -29,6 +30,9 @@ type TemplateModalMode = 'selector' | 'editor' | null;
  * 🎨 Componente Principal CrmMessages
  */
 export const CrmMessages: React.FC = () => {
+  // 🎨 Obtener gradiente del header del sidebar para consistencia visual
+  const { headerGradient } = useDashboardHeaderGradient();
+  
   // ========================================
   // 📊 STATE
   // ========================================
@@ -419,15 +423,18 @@ export const CrmMessages: React.FC = () => {
   return (
     <SmartDashboardLayout>
       <div className="w-full">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 dark:from-purple-700 dark:via-pink-700 dark:to-red-700 rounded-2xl p-6 md:p-8 mb-8 text-white shadow-xl">
+        {/* Header - 🎨 Usando gradiente dinámico del sidebar */}
+        <div 
+          className="rounded-2xl p-6 md:p-8 mb-8 text-white shadow-xl"
+          style={{ background: headerGradient }}
+        >
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
                 <span className="text-4xl">💬</span>
                 Gestión de Mensajes
               </h1>
-              <p className="text-purple-100 dark:text-pink-100 text-lg">
+              <p className="text-white/90 text-lg">
                 Administra todos los mensajes y plantillas del sistema
               </p>
             </div>

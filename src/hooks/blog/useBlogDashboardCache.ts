@@ -109,7 +109,7 @@ export const useBlogDashboardCache = (): UseBlogDashboardCacheReturn => {
         avgReadingTime: Math.round(avgReading),
       };
 
-      console.log('📊 [Blog Cache] Estadísticas calculadas:', newStats);
+      // console.log('📊 [Blog Cache] Estadísticas calculadas:', newStats);
       setStats(newStats);
       setPosts(postsData);
     } catch (err) {

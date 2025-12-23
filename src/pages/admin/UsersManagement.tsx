@@ -19,6 +19,7 @@ import { adminService } from '../../services/adminService';
 import { useUsersCache } from '../../hooks/useDashboardCache';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import RoleBadge from '../../components/RoleBadge';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import {
   UserRole,
   Permission,
@@ -42,6 +43,7 @@ interface UsersManagementData {
 export default function UsersManagement() {
   const { user: currentUser, role: currentRole, hasPermission } = useAuth();
   const { getToken } = useClerkAuth();
+  const { headerGradient } = useDashboardHeaderGradient();
   
   // Filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState('');
@@ -248,13 +250,16 @@ export default function UsersManagement() {
   return (
     <SmartDashboardLayout>
       <div className="w-full space-y-6">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-purple-600 dark:via-blue-600 dark:to-indigo-600 rounded-xl p-6 text-white shadow-xl">
+        {/* Header - 🎨 Usando gradiente dinámico del sidebar */}
+        <div 
+          className="rounded-xl p-6 text-white shadow-xl"
+          style={{ background: headerGradient }}
+        >
           <div className="flex items-center gap-3 mb-2">
             <span className="text-4xl">👥</span>
             <div>
               <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
-              <p className="text-blue-100 dark:text-purple-100">
+              <p className="text-white/90">
                 Administra usuarios y roles del sistema
               </p>
             </div>

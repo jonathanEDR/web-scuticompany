@@ -303,7 +303,7 @@ if (import.meta.env.DEV) {
     clear: () => blogCache.clear(),
   };
   
-  console.log('💡 Blog Cache Debug: Usa __blogCache.stats() o __blogCache.clear()');
+  // console.log('💡 Blog Cache Debug: Usa __blogCache.stats() o __blogCache.clear()');
 }
 
 export default blogCache;

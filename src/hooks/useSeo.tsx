@@ -123,7 +123,7 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
           
           // 📊 Log transparente en desarrollo
           if (import.meta.env.DEV) {
-            console.log(`🎯 [useSeo] "${pageName}" - Origen: ${staticSeoData._source?.toUpperCase()}`);
+            // console.log(`🎯 [useSeo] "${pageName}" - Origen: ${staticSeoData._source?.toUpperCase()}`);
           }
           
           return;
@@ -158,9 +158,9 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
               
               // 📊 Log transparente en desarrollo
               if (import.meta.env.DEV) {
-                console.log(`✅ [useSeo] "${pageName}" - Origen: CMS (Database)`);
-                console.log(`   Title: ${cmsSeoData.metaTitle}`);
-                console.log(`   Description: ${cmsSeoData.metaDescription.substring(0, 50)}...`);
+                // console.log(`✅ [useSeo] "${pageName}" - Origen: CMS (Database)`);
+                // console.log(`   Title: ${cmsSeoData.metaTitle}`);
+                // console.log(`   Description: ${cmsSeoData.metaDescription.substring(0, 50)}...`);
               }
               
               return;
@@ -184,8 +184,8 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
               
               // 📊 Log transparente en desarrollo
               if (import.meta.env.DEV) {
-                console.log(`⚙️ [useSeo] "${pageName}" - Origen: HARDCODED (seoConfig.ts)`);
-                console.log(`   Razón: CMS no disponible o sin datos`);
+                // console.log(`⚙️ [useSeo] "${pageName}" - Origen: HARDCODED (seoConfig.ts)`);
+                // console.log(`   Razón: CMS no disponible o sin datos`);
               }
               
               return;
@@ -207,8 +207,8 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
             
             // 📊 Log transparente en desarrollo
             if (import.meta.env.DEV) {
-              console.warn(`⚠️ [useSeo] "${pageName}" - Origen: FALLBACK`);
-              console.warn(`   Razón: Sin CMS ni configuración hardcodeada`);
+              // console.warn(`⚠️ [useSeo] "${pageName}" - Origen: FALLBACK`);
+              // console.warn(`   Razón: Sin CMS ni configuración hardcodeada`);
             }
           }
         }

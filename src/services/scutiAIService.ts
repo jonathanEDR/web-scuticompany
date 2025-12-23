@@ -184,7 +184,7 @@ class ScutiAIService {
     error?: string;
   }> {
     try {
-      console.log('📋 [ScutiAI] Obteniendo sesiones para usuario:', userId);
+      // console.log('📋 [ScutiAI] Obteniendo sesiones para usuario:', userId);
 
       const response = await this.fetchWithAuth(
         `/gerente/sessions/user/${userId}?limit=${limit}`,
@@ -196,7 +196,7 @@ class ScutiAIService {
       }
 
       const result = await response.json();
-      console.log('📥 [ScutiAI] Sesiones recibidas:', result);
+      // console.log('📥 [ScutiAI] Sesiones recibidas:', result);
 
       // Transformar las sesiones al formato de ChatSession
       const sessions: ChatSession[] = result.data?.sessions?.map((session: any) => {

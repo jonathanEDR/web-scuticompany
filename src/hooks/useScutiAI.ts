@@ -91,7 +91,7 @@ export const useScutiAI = () => {
       if (result.success && result.data) {
         setSessions(result.data.sessions);
         setLastSessionsLoad(now);
-        console.log('✅ Sesiones cargadas:', result.data.sessions.length);
+        // console.log('✅ Sesiones cargadas:', result.data.sessions.length);
       } else {
         throw new Error(result.error || 'Error cargando sesiones');
       }

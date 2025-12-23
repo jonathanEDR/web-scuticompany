@@ -11,12 +11,16 @@ import EventFormModal from '../../components/agenda/EventFormModal';
 import EventDetailModal from '../../components/agenda/EventDetailModal';
 import CalendarView from '../../components/agenda/CalendarView';
 import DayView from '../../components/agenda/DayView';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import type { Event, CreateEventData, UpdateEventData } from '../../types/event';
 
 /**
  * 📅 Página principal de gestión de Agenda
  */
 const AgendaManagement: React.FC = () => {
+  // Hook para gradiente dinámico del header
+  const { headerGradient } = useDashboardHeaderGradient();
+
   const {
     events,
     loading,
@@ -159,7 +163,10 @@ const AgendaManagement: React.FC = () => {
     <SmartDashboardLayout>
       <div className="space-y-4 md:space-y-6">
         {/* Header con diseño moderno y responsive */}
-        <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl md:rounded-2xl p-4 md:p-8 shadow-xl">
+        <div 
+          className="rounded-xl md:rounded-2xl p-4 md:p-8 shadow-xl"
+          style={{ background: headerGradient }}
+        >
           {/* Mobile Layout */}
           <div className="md:hidden space-y-4">
             {/* Título compacto */}

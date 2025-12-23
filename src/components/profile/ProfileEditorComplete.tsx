@@ -144,7 +144,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
   useEffect(() => {
     if (profileData && profileData.blogProfile) {
       const bp = profileData.blogProfile;
-      console.log('✅ [ProfileEditor] Cargando datos de cache/API:', bp);
+      // console.log('✅ [ProfileEditor] Cargando datos de cache/API:', bp);
       
       // Usar avatar de Clerk como fallback si no hay avatar guardado
       const avatarFallback = bp.avatar || user?.imageUrl || '';

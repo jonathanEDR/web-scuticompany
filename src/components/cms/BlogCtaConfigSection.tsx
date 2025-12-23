@@ -3,7 +3,7 @@
  * Panel de configuración CMS para la sección CTA (Call to Action) del blog
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
   ChevronDown, 
   ChevronUp, 
@@ -14,13 +14,12 @@ import {
   MousePointer,
   Eye,
   EyeOff,
-  Upload,
   Trash2,
   Image
 } from 'lucide-react';
 import type { BlogCtaConfig } from '../../hooks/blog/useBlogCmsConfig';
 import { DEFAULT_BLOG_CTA_CONFIG } from '../../hooks/blog/useBlogCmsConfig';
-import { uploadImage } from '../../services/imageService';
+import ImageSelectorModal from '../ImageSelectorModal';
 
 interface BlogCtaConfigSectionProps {
   config: BlogCtaConfig;
@@ -30,8 +29,7 @@ interface BlogCtaConfigSectionProps {
 const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onChange }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'content' | 'background' | 'title' | 'buttons' | 'card'>('content');
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImageSelectorOpen, setIsImageSelectorOpen] = useState(false);
 
   // Merge config with defaults
   const ctaConfig = {
@@ -55,49 +53,15 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
     { id: 'card', label: 'Tarjeta', icon: Eye }
   ];
 
-  // Manejar subida de imagen
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  // Abrir el modal de selección de imágenes
+  const handleOpenImageSelector = () => {
+    setIsImageSelectorOpen(true);
+  };
 
-    // Validar tipo de archivo
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      alert('Por favor selecciona una imagen válida (JPG, PNG, GIF o WebP)');
-      return;
-    }
-
-    // Validar tamaño (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('La imagen no debe superar los 5MB');
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const imageData = await uploadImage({
-        file,
-        category: 'banner',
-        title: 'Blog CTA Background',
-        alt: 'Fondo de la sección CTA del blog'
-      });
-
-      if (imageData?.url) {
-        handleChange('bgImage', imageData.url);
-        console.log('✅ Imagen subida correctamente:', imageData.url);
-      } else {
-        throw new Error('No se recibió la URL de la imagen');
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert(error instanceof Error ? error.message : 'Error al subir la imagen. Inténtalo de nuevo.');
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
+  // Manejar selección de imagen desde el modal
+  const handleImageSelect = (imageUrl: string) => {
+    handleChange('bgImage', imageUrl);
+    setIsImageSelectorOpen(false);
   };
 
   // Eliminar imagen
@@ -106,7 +70,16 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <>
+      <ImageSelectorModal
+        isOpen={isImageSelectorOpen}
+        onClose={() => setIsImageSelectorOpen(false)}
+        onSelect={handleImageSelect}
+        currentImage={ctaConfig.bgImage}
+        title="Seleccionar imagen de fondo para Blog CTA"
+      />
+
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -479,15 +452,6 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                 {/* Imagen de fondo */}
                 {ctaConfig.bgType === 'image' && (
                   <div className="space-y-4">
-                    {/* Input oculto para subir archivo */}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/gif,image/webp"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-
                     {/* Área de carga o vista previa */}
                     {ctaConfig.bgImage ? (
                       // Vista previa de la imagen
@@ -508,37 +472,34 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
+                        <button
+                          onClick={handleOpenImageSelector}
+                          className="absolute top-2 left-2 p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors"
+                          title="Cambiar imagen"
+                        >
+                          <Image className="w-4 h-4" />
+                        </button>
                         <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
                           📷 Imagen cargada
                         </div>
                       </div>
                     ) : (
-                      // Área de carga
+                      // Botón para abrir el selector de imágenes
                       <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                        className="w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center gap-3 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleOpenImageSelector}
+                        className="w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center gap-3 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors cursor-pointer"
                       >
-                        {isUploading ? (
-                          <>
-                            <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                            <span className="text-sm text-gray-500">Subiendo imagen...</span>
-                          </>
-                        ) : (
-                          <>
-                            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                              <Upload className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                            </div>
-                            <div className="text-center">
-                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Haz clic para subir una imagen
-                              </span>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                JPG, PNG, GIF o WebP (máx. 5MB)
-                              </p>
-                            </div>
-                          </>
-                        )}
+                        <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                          <Image className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="text-center">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Haz clic para seleccionar una imagen
+                          </span>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Desde la biblioteca o subir una nueva
+                          </p>
+                        </div>
                       </button>
                     )}
 
@@ -1637,7 +1598,8 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

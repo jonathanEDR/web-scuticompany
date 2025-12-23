@@ -113,7 +113,7 @@ export const ServicioDetail: React.FC = () => {
   const ctaConfig = servicioDetailConfig.cta || {};
 
   // 🔍 DEBUG: Ver qué configuración llega al frontend
-  console.log('🎨 [ServicioDetail] heroConfig.content:', heroConfig.content);
+  // console.log('🎨 [ServicioDetail] heroConfig.content:', heroConfig.content);
 
   // Función para toggle del panel acordeón
   const togglePanel = (panelId: PanelType) => {
@@ -323,7 +323,7 @@ export const ServicioDetail: React.FC = () => {
       const fallbackUrl = theme === 'dark' ? bgConfig.imageLight : bgConfig.imageDark;
       const finalImageUrl = imageUrl || fallbackUrl || bgConfig.imageUrl; // imageUrl para compatibilidad con versión anterior
       
-      console.log(`🎨 [getBackgroundStyle] Tema: ${theme}, imageLight: ${bgConfig.imageLight}, imageDark: ${bgConfig.imageDark}, final: ${finalImageUrl}`);
+      // console.log(`🎨 [getBackgroundStyle] Tema: ${theme}, imageLight: ${bgConfig.imageLight}, imageDark: ${bgConfig.imageDark}, final: ${finalImageUrl}`);
       
       if (finalImageUrl) {
         style.backgroundImage = `url(${finalImageUrl})`;
@@ -331,7 +331,7 @@ export const ServicioDetail: React.FC = () => {
         style.backgroundPosition = 'center';
         style.backgroundRepeat = 'no-repeat';
       } else {
-        console.warn('⚠️ [getBackgroundStyle] No se encontró URL de imagen válida');
+        // console.warn('⚠️ [getBackgroundStyle] No se encontró URL de imagen válida');
       }
     }
 
@@ -379,20 +379,20 @@ export const ServicioDetail: React.FC = () => {
   // DEBUG: Mostrar datos del servicio en consola (remover en producción)
   useEffect(() => {
     if (servicio) {
-      console.log('📦 Servicio cargado:', {
-        titulo: servicio.titulo,
-        caracteristicas: servicio.caracteristicas,
-        beneficios: servicio.beneficios,
-        incluye: servicio.incluye,
-        noIncluye: servicio.noIncluye,
-        tecnologias: servicio.tecnologias,
-        faq: servicio.faq,
-        etiquetas: servicio.etiquetas,
-        videoUrl: servicio.videoUrl,
-        galeriaImagenes: servicio.galeriaImagenes,
-        imagenes: servicio.imagenes,
-      });
-      console.log('📑 Paneles disponibles:', availablePanels.map(p => p.label));
+      // console.log('📦 Servicio cargado:', {
+      //   titulo: servicio.titulo,
+      //   caracteristicas: servicio.caracteristicas,
+      //   beneficios: servicio.beneficios,
+      //   incluye: servicio.incluye,
+      //   noIncluye: servicio.noIncluye,
+      //   tecnologias: servicio.tecnologias,
+      //   faq: servicio.faq,
+      //   etiquetas: servicio.etiquetas,
+      //   videoUrl: servicio.videoUrl,
+      //   galeriaImagenes: servicio.galeriaImagenes,
+      //   imagenes: servicio.imagenes,
+      // });
+      // console.log('📑 Paneles disponibles:', availablePanels.map(p => p.label));
     }
   }, [servicio, availablePanels]);
 
@@ -779,7 +779,7 @@ export const ServicioDetail: React.FC = () => {
             </div>
 
             {/* Imagen principal */}
-            <div className="lg:order-first lg:order-none">
+            <div>
               {servicio.imagen ? (
                 <img
                   src={servicio.imagen}

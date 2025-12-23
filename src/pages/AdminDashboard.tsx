@@ -5,18 +5,21 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { useAuth } from '../contexts/AuthContext';
 import { adminService } from '../services/adminService';
 import SmartDashboardLayout from '../components/SmartDashboardLayout';
 import RoleBadge from '../components/RoleBadge';
-import EventStats from '../components/agenda/EventStats';
 import { Permission, type UserStats, formatUserName } from '../types/roles';
 import { LoadingSpinner } from '../components/UI';
+import { useDashboardHeaderGradient } from '../hooks/cms/useDashboardHeaderGradient';
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { user, role, hasPermission } = useAuth();
   const { getToken } = useClerkAuth();
+  const { headerGradient } = useDashboardHeaderGradient();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
@@ -86,15 +89,18 @@ export default function AdminDashboard() {
   return (
     <SmartDashboardLayout>
       <div className="max-w-7xl mx-auto">
-        {/* Header de Bienvenida Administrativo */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 dark:from-purple-700 dark:via-pink-700 dark:to-red-700 rounded-2xl p-8 mb-8 text-white shadow-xl">
+        {/* Header de Bienvenida Administrativo - 🎨 Usando gradiente dinámico del sidebar */}
+        <div 
+          className="rounded-2xl p-8 mb-8 text-white shadow-xl"
+          style={{ background: headerGradient }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
                 <span className="text-4xl">⚡</span>
                 Panel Administrativo
               </h1>
-              <p className="text-purple-100 dark:text-pink-100 text-lg">
+              <p className="text-white/90 text-lg">
                 Bienvenido, {userName} - Gestiona el sistema desde aquí
               </p>
             </div>
@@ -204,9 +210,9 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Gestión de Usuarios */}
             {canManageUsers && (
-              <a
-                href="/dashboard/admin/users"
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
+              <button
+                onClick={() => navigate('/dashboard/admin/users')}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group text-left w-full"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -224,14 +230,14 @@ export default function AdminDashboard() {
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Visualiza, edita y asigna roles a los usuarios del sistema.
                 </p>
-              </a>
+              </button>
             )}
 
             {/* CMS */}
             {canManageContent && (
-              <a
-                href="/dashboard/cms"
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
+              <button
+                onClick={() => navigate('/dashboard/cms')}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group text-left w-full"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -249,14 +255,14 @@ export default function AdminDashboard() {
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Edita el contenido, SEO, temas y tarjetas del sitio.
                 </p>
-              </a>
+              </button>
             )}
 
             {/* Media Library */}
             {canManageUploads && (
-              <a
-                href="/dashboard/media"
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
+              <button
+                onClick={() => navigate('/dashboard/media')}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group text-left w-full"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -274,14 +280,14 @@ export default function AdminDashboard() {
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Sube, organiza y gestiona imágenes del sistema.
                 </p>
-              </a>
+              </button>
             )}
 
             {/* Sistema de Agentes IA */}
             {canManageSystem && (
-              <a
-                href="/dashboard/ai-agents"
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group border-2 border-purple-300 dark:border-purple-600"
+              <button
+                onClick={() => navigate('/dashboard/ai-agents')}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group border-2 border-purple-300 dark:border-purple-600 text-left w-full"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -299,13 +305,13 @@ export default function AdminDashboard() {
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Configura y monitorea el sistema de análisis AI, métricas y recomendaciones inteligentes.
                 </p>
-              </a>
+              </button>
             )}
 
             {/* Perfil */}
-            <a
-              href="/dashboard/profile"
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
+            <button
+              onClick={() => navigate('/dashboard/profile')}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group text-left w-full"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -323,12 +329,12 @@ export default function AdminDashboard() {
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Gestiona tu información personal y preferencias.
               </p>
-            </a>
+            </button>
 
             {/* Configuración */}
-            <a
-              href="/dashboard/settings"
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group"
+            <button
+              onClick={() => navigate('/dashboard/settings')}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group text-left w-full"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -346,23 +352,9 @@ export default function AdminDashboard() {
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Configura las preferencias de tu cuenta.
               </p>
-            </a>
+            </button>
           </div>
         </div>
-
-        {/* Widget de Agenda/Eventos */}
-        {canManageContent && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <EventStats onEventClick={(filter) => {
-              // Redirigir a la página de agenda con el filtro aplicado
-              if (filter === 'create') {
-                window.location.href = '/dashboard/agenda?action=create';
-              } else {
-                window.location.href = `/dashboard/agenda${filter !== 'all' ? '?filter=' + filter : ''}`;
-              }
-            }} />
-          </div>
-        )}
 
         {/* Información del Administrador */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
