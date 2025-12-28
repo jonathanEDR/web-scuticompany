@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import DOMPurify from 'dompurify';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
-import { useSeo } from '../../hooks/useSeo';
 import { useTheme } from '../../contexts/ThemeContext';
 import { getPageBySlug } from '../../services/cmsApi';
 
@@ -194,13 +194,6 @@ const About = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { theme } = useTheme();
 
-  // 🎯 SEO dinámico con fallbacks
-  const { SeoHelmet } = useSeo({
-    pageName: 'about',
-    fallbackTitle: 'Nosotros - SCUTI Company',
-    fallbackDescription: 'Conoce más sobre SCUTI Company, nuestra historia, misión y el equipo de expertos en desarrollo de software.'
-  });
-
   // Cargar datos de la página About desde CMS
   useEffect(() => {
     const loadPageData = async () => {
@@ -322,8 +315,30 @@ const About = () => {
 
   return (
     <>
-      {/* 🎯 SEO automático */}
-      <SeoHelmet />
+      {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
+      <Helmet>
+        <title>Sobre Nosotros - SCUTI Company</title>
+        <meta name="description" content="Conoce más sobre SCUTI Company, nuestra misión, visión y el equipo de expertos en tecnología dedicados a transformar empresas con software inteligente." />
+        <meta name="keywords" content="sobre nosotros, equipo, misión, visión, SCUTI, empresa de software, desarrollo tecnológico" />
+
+        {/* Open Graph */}
+        <meta property="og:title" content="Sobre Nosotros - SCUTI Company" />
+        <meta property="og:description" content="Conoce más sobre SCUTI Company y nuestro equipo de expertos en desarrollo de software" />
+        <meta property="og:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://scuticompany.com/nosotros" />
+        <meta property="og:site_name" content="SCUTI Company" />
+        <meta property="og:locale" content="es_PE" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Sobre Nosotros - SCUTI Company" />
+        <meta name="twitter:description" content="Conoce más sobre SCUTI Company y nuestro equipo" />
+        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.png" />
+
+        {/* Canonical */}
+        <link rel="canonical" href="https://scuticompany.com/nosotros" />
+      </Helmet>
 
       <div className={`min-h-screen w-full overflow-x-hidden ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <PublicHeader />

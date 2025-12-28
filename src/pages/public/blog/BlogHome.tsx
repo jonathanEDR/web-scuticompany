@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Newspaper } from 'lucide-react';
 import { useBlogPosts, useFeaturedPosts, useCategories, useTags } from '../../../hooks/blog';
 import { useBlogCmsConfig } from '../../../hooks/blog/useBlogCmsConfig';
-import { useSeo } from '../../../hooks/useSeo';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { SimpleHeroSection } from '../../../components/blog/hero/SimpleHeroSection';
 import { FeaturedBlogCard } from '../../../components/blog/cards/FeaturedBlogCard';
@@ -23,13 +23,6 @@ const BlogHome: React.FC = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const featuredPostsConfig = cmsConfig.featuredPosts;
-
-  // 🎯 SEO dinámico con fallbacks
-  const { SeoHelmet } = useSeo({
-    pageName: 'blog',
-    fallbackTitle: 'Blog SCUTI Company - Noticias y Tendencias Tecnológicas | Contenido Curado',
-    fallbackDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado y validado por expertos en desarrollo y tecnología.'
-  });
 
   // Fetch posts with filters
   const { 
@@ -137,9 +130,31 @@ const BlogHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* SEO dinámico desde CMS con fallbacks */}
-      <SeoHelmet />
-      
+      {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
+      <Helmet>
+        <title>Blog SCUTI Company - Noticias y Tendencias Tecnológicas</title>
+        <meta name="description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos en desarrollo web, programación y tecnología." />
+        <meta name="keywords" content="blog, noticias tecnológicas, tendencias tech, desarrollo web, programación, AI, cloud computing, cybersecurity" />
+
+        {/* Open Graph */}
+        <meta property="og:title" content="Blog SCUTI Company - Noticias Tecnológicas" />
+        <meta property="og:description" content="Las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos." />
+        <meta property="og:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://scuticompany.com/blog" />
+        <meta property="og:site_name" content="SCUTI Company" />
+        <meta property="og:locale" content="es_PE" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Blog SCUTI Company - Noticias Tecnológicas" />
+        <meta name="twitter:description" content="Las últimas noticias y tendencias del sector tecnológico" />
+        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.png" />
+
+        {/* Canonical */}
+        <link rel="canonical" href="https://scuticompany.com/blog" />
+      </Helmet>
+
       {/* JSON-LD para el sitio del blog - Memoizado */}
       <script type="application/ld+json">
         {jsonLdData}

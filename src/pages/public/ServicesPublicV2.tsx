@@ -5,13 +5,13 @@
  */
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { ServicioPublicCard } from '../../components/public/ServicioPublicCard';
 import { ServicesAccordionList } from '../../components/public/ServicesAccordionList';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useSeo } from '../../hooks/useSeo';
 import { useServiciosList } from '../../hooks/useServiciosCache';
 import { useCategoriasList } from '../../hooks/useCategoriasCache';
 import { invalidateServiciosCache } from '../../utils/serviciosCache';
@@ -188,14 +188,8 @@ const ServicesPublicV2 = () => {
   };
 
   // ============================================
-  // SEO
+  // SEO - Hardcoded para indexación inmediata
   // ============================================
-
-  const { SeoHelmet } = useSeo({
-    pageName: 'services',
-    fallbackTitle: 'Servicios Profesionales - SCUTI Company',
-    fallbackDescription: 'Descubre nuestros servicios de desarrollo de software, aplicaciones móviles, inteligencia artificial y soluciones digitales personalizadas.'
-  });
 
   // ============================================
   // FUNCIONES OPTIMIZADAS CON MEMOIZATION
@@ -213,8 +207,31 @@ const ServicesPublicV2 = () => {
 
   return (
     <>
-      <SeoHelmet />
-      
+      {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
+      <Helmet>
+        <title>Nuestros Servicios - SCUTI Company</title>
+        <meta name="description" content="Consultoría IT, Proyectos Tecnológicos e Inteligencia Artificial para impulsar tu negocio. Soluciones de desarrollo de software a medida." />
+        <meta name="keywords" content="servicios, consultoría, tecnología, software, inteligencia artificial, desarrollo web, aplicaciones móviles, soluciones digitales" />
+
+        {/* Open Graph */}
+        <meta property="og:title" content="Servicios - SCUTI Company" />
+        <meta property="og:description" content="Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa" />
+        <meta property="og:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://scuticompany.com/servicios" />
+        <meta property="og:site_name" content="SCUTI Company" />
+        <meta property="og:locale" content="es_PE" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Servicios - SCUTI Company" />
+        <meta name="twitter:description" content="Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa" />
+        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.png" />
+
+        {/* Canonical */}
+        <link rel="canonical" href="https://scuticompany.com/servicios" />
+      </Helmet>
+
       <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
         <PublicHeader />
         
