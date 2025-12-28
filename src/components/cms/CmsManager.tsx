@@ -234,13 +234,16 @@ const CmsManager: React.FC = () => {
     }
   };
 
+  // ❌ Ocultar pestaña SEO para páginas de detalle (el SEO se genera automáticamente)
+  const shouldShowSeoTab = selectedPage !== 'servicio-detail' && selectedPage !== 'blog-post-detail';
+
   const tabs = [
     { id: 'content' as const, label: 'Contenido', icon: '📝' },
     { id: 'cards' as const, label: 'Diseño de Tarjetas', icon: '🎴' },
     { id: 'contact' as const, label: 'Contacto', icon: '📞' },
     { id: 'chatbot' as const, label: 'Chatbot', icon: '🤖' },
     { id: 'sidebar' as const, label: 'Sidebar', icon: '📊' },
-    { id: 'seo' as const, label: 'SEO', icon: '🔍' },
+    ...(shouldShowSeoTab ? [{ id: 'seo' as const, label: 'SEO', icon: '🔍' }] : []),
     { id: 'theme' as const, label: 'Tema', icon: '🎨' }
   ];
 
@@ -723,11 +726,43 @@ const CmsManager: React.FC = () => {
             />
           </div>
         )}
-        {activeTab === 'seo' && (
+        {activeTab === 'seo' && shouldShowSeoTab && (
           <SeoConfigSection
             pageData={pageData}
             updateContent={handleUpdateSeo}
           />
+        )}
+        {activeTab === 'seo' && !shouldShowSeoTab && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-8 text-center">
+            <div className="max-w-2xl mx-auto">
+              <div className="text-6xl mb-4">🎯</div>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">
+                SEO Automático Activado
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Esta página genera el SEO automáticamente desde los datos individuales:
+              </p>
+              <ul className="text-left bg-white dark:bg-gray-800 rounded-lg p-6 mb-4 space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✅</span>
+                  <span className="text-gray-700 dark:text-gray-300">
+                    <strong>Servicio Detail:</strong> El SEO viene del servicio individual (título, descripción, etiquetas)
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-1">✅</span>
+                  <span className="text-gray-700 dark:text-gray-300">
+                    <strong>Blog Post Detail:</strong> El SEO viene del post individual (title, excerpt, tags, featured image)
+                  </span>
+                </li>
+              </ul>
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  💡 <strong>Tip:</strong> Para editar el SEO de un servicio o post específico, ve a la sección de Servicios o Blog en el panel administrativo.
+                </p>
+              </div>
+            </div>
+          </div>
         )}
         {activeTab === 'theme' && selectedPage === 'home' && (
           <ThemeConfigSection

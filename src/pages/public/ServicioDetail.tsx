@@ -6,12 +6,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import * as LucideIcons from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import ContactModal from '../../components/public/ContactModal';
-import { useSeo } from '../../hooks/useSeo';
 import { useServicioDetail } from '../../hooks/useServiciosCache';
 import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -403,12 +403,9 @@ export const ServicioDetail: React.FC = () => {
     }
   }, [servicio, availablePanels]);
 
-  // SEO dinámico
-  const { SeoHelmet } = useSeo({
-    pageName: 'servicio-detalle',
-    fallbackTitle: servicio ? `${servicio.titulo} - Scuti Company` : 'Servicio - Scuti Company',
-    fallbackDescription: servicio?.descripcionCorta || 'Servicios profesionales de desarrollo de software'
-  });
+  // ============================================
+  // SEO: Ahora usa los datos del servicio directamente
+  // ============================================
 
   // Ensure scroll to top when component mounts or slug changes
   useEffect(() => {
@@ -512,7 +509,31 @@ export const ServicioDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 animate-fade-in">
-      <SeoHelmet />
+      {/* ✅ SEO directo del servicio (NO del CMS genérico) */}
+      <Helmet>
+        <title>{servicio.titulo} - SCUTI Company</title>
+        <meta name="description" content={servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo} - SCUTI Company`} />
+        <meta name="keywords" content={servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicio, desarrollo, tecnología`} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={`${servicio.titulo} - SCUTI Company`} />
+        <meta property="og:description" content={servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
+        {servicio.imagenPrincipal && <meta property="og:image" content={servicio.imagenPrincipal} />}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://scuticompany.com/servicios/${servicio.slug}`} />
+        <meta property="og:site_name" content="SCUTI Company" />
+        <meta property="og:locale" content="es_PE" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${servicio.titulo} - SCUTI Company`} />
+        <meta name="twitter:description" content={servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
+        {servicio.imagenPrincipal && <meta name="twitter:image" content={servicio.imagenPrincipal} />}
+
+        {/* Canonical */}
+        <link rel="canonical" href={`https://scuticompany.com/servicios/${servicio.slug}`} />
+      </Helmet>
+
       <PublicHeader />
       
       {/* ============================================ */}
