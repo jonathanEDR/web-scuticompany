@@ -219,9 +219,9 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
           }`}
         >
           {/* Título y descripción - Solo se muestran si showText es true */}
-          {data.showText !== false && (
+          {(data.showText === undefined || data.showText === true) && (
             <div className="text-center mb-12">
-              <h2 
+              <h2
                 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
                 style={{ color: textStyles.titleColor }}
                 dangerouslySetInnerHTML={{
@@ -229,7 +229,7 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
                 }}
               />
               {data.description && (
-                <p 
+                <p
                   className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
                   style={{ color: textStyles.descriptionColor }}
                   dangerouslySetInnerHTML={{
