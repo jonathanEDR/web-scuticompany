@@ -517,8 +517,11 @@ export default function PostEditor() {
         }
       }
     } catch (error: any) {
-      console.error('Error al guardar:', error);
-      alert(`❌ Error al guardar el borrador: ${error.message || 'Error desconocido'}`);
+      console.error('❌ Error completo:', error);
+      console.error('📡 Respuesta del servidor:', error.response?.data);
+
+      const backendMessage = error.response?.data?.message || error.message || 'Error desconocido';
+      alert(`❌ Error al guardar el borrador: ${backendMessage}`);
     } finally {
       setIsSaving(false);
     }
@@ -575,8 +578,11 @@ export default function PostEditor() {
       
       navigate('/dashboard/blog');
     } catch (error: any) {
-      console.error('❌ [handlePublish] Error al publicar:', error);
-      alert(`❌ Error al publicar el post: ${error.message || 'Error desconocido'}`);
+      console.error('❌ Error completo:', error);
+      console.error('📡 Respuesta del servidor:', error.response?.data);
+
+      const backendMessage = error.response?.data?.message || error.message || 'Error desconocido';
+      alert(`❌ Error al publicar el post: ${backendMessage}`);
     } finally {
       setIsSaving(false);
     }

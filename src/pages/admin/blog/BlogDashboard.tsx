@@ -29,15 +29,32 @@ export default function BlogDashboard() {
   
   // Estado para eliminación de posts
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
-  
+
+  // Estado para paginación "Ver Más"
+  const [currentPage, setCurrentPage] = useState(1);
+  const [displayedPosts, setDisplayedPosts] = useState<any[]>([]);
+  const POSTS_PER_PAGE = 10;
+
   // Hook de autenticación para verificar permisos
   const { role } = useAuth();
   
   // Usar useAdminPosts para obtener TODOS los posts (incluye borradores)
-  const { posts, loading: postsLoading, refetch } = useAdminPosts({ 
-    limit: 100 // Cargar más posts para estadísticas precisas
+  const { posts, loading: postsLoading, refetch, pagination } = useAdminPosts({
+    page: currentPage,
+    limit: POSTS_PER_PAGE
   });
-  
+
+  // Acumular posts cuando lleguen nuevos
+  useEffect(() => {
+    if (posts.length > 0) {
+      if (currentPage === 1) {
+        setDisplayedPosts(posts);
+      } else {
+        setDisplayedPosts(prev => [...prev, ...posts]);
+      }
+    }
+  }, [posts, currentPage]);
+
   // Cargar estadísticas de moderación para comentarios pendientes
   const { stats: moderationStats } = useModerationStats();
   
@@ -81,6 +98,13 @@ export default function BlogDashboard() {
       alert(`❌ Error al eliminar el post: ${error.message || 'Error desconocido'}`);
     } finally {
       setDeletingPostId(null);
+    }
+  };
+
+  // Handler para cargar más posts
+  const handleLoadMore = () => {
+    if (!postsLoading && pagination?.hasNext) {
+      setCurrentPage(prev => prev + 1);
     }
   };
 
@@ -297,7 +321,7 @@ export default function BlogDashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {posts.slice(0, 5).map((post) => (
+                {displayedPosts.map((post) => (
                   <div
                     key={post._id}
                     className="flex items-start gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-100 dark:border-gray-600"
@@ -378,6 +402,25 @@ export default function BlogDashboard() {
                     </div>
                   </div>
                 ))}
+
+                {/* Botón Ver Más */}
+                {pagination && pagination.hasNext && !postsLoading && (
+                  <button
+                    onClick={handleLoadMore}
+                    className="w-full mt-4 py-3 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    Ver Más Posts ({pagination.total - displayedPosts.length} restantes)
+                  </button>
+                )}
+
+                {/* Indicador de carga */}
+                {postsLoading && currentPage > 1 && (
+                  <div className="w-full mt-4 py-3 text-center text-gray-600 dark:text-gray-400">
+                    <Clock className="w-5 h-5 animate-spin mx-auto mb-2" />
+                    Cargando más posts...
+                  </div>
+                )}
               </div>
             )}
           </div>
