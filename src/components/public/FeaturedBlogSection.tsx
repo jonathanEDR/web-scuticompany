@@ -64,15 +64,17 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
 
     const fetchFeaturedPosts = async () => {
       try {
+        setLoading(true);
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
         const response = await fetch(
           `${apiUrl}/blog/posts/featured?limit=${data.limit || 3}`,
           { signal: controller.signal }
         );
-        
+
         if (response.ok && isMounted) {
-          const data = await response.json();
-          setPosts(data.data || []);
+          const responseData = await response.json();
+          setPosts(responseData.data || []);
+          setError(false);
         } else {
           if (isMounted) setError(true);
         }
@@ -94,7 +96,7 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
       isMounted = false;
       controller.abort();
     };
-  }, []);
+  }, [data.limit]);
 
   // No renderizar nada si hay error o no hay posts
   if (error || (!loading && posts.length === 0)) {
