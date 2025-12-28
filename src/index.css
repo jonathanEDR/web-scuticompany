@@ -865,6 +865,13 @@ html {
   color: #d4d4d4 !important;
 }
 
+/* Texto oscuro para modo claro (legibilidad óptima) */
+.prose p,
+.prose li,
+.prose span {
+  color: #374151 !important; /* gray-700 de Tailwind */
+}
+
 /* Line-height mejorado para lectura */
 .prose p {
   line-height: 1.8 !important;
