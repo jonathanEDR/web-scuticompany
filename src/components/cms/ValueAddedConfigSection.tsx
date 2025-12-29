@@ -97,45 +97,6 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                 </p>
               </div>
 
-              {/* Toggle para mostrar/ocultar iconos */}
-              <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      👁️ Mostrar Iconos en Tarjetas
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Controla si se muestran los iconos en las tarjetas de valor agregado
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => updateContent('valueAdded.showIcons', !(pageData.content.valueAdded?.showIcons ?? true))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-                      pageData.content.valueAdded?.showIcons !== false
-                        ? 'bg-purple-600'
-                        : 'bg-gray-300 dark:bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out ${
-                        pageData.content.valueAdded?.showIcons !== false
-                          ? 'translate-x-6'
-                          : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-                <div className="mt-2 text-xs">
-                  <span className={`px-2 py-1 rounded ${
-                    pageData.content.valueAdded?.showIcons !== false
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
-                  }`}>
-                    {pageData.content.valueAdded?.showIcons !== false ? '✅ Iconos visibles' : '🚫 Iconos ocultos'}
-                  </span>
-                </div>
-              </div>
             </div>
 
             {/* Columna derecha: Imágenes de Fondo (1/3) */}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { PageData, CardDesignStyles, StrictCardDesignStyles } from '../../types/cms';
 import ColorWithOpacity from './ColorWithOpacity';
 import GradientPicker from './GradientPicker';
@@ -17,7 +17,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
 
   // 🎨 Valores por defecto CORREGIDOS para Value Added (con contraste adecuado)
   const defaultLightStyles: CardDesignStyles = {
@@ -28,9 +27,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
     hoverBackground: 'rgba(255, 255, 255, 0.95)',
     hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
     hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.2)',
-    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
-    iconBackground: 'rgba(255, 255, 255, 0.9)',
-    iconColor: '#7528ee',
     titleColor: '#1F2937',      // ✅ Gris muy oscuro (contraste 12.63:1)
     descriptionColor: '#4B5563', // ✅ Gris oscuro (contraste 7.27:1)
     linkColor: '#06B6D4',        // ✅ Cyan (contraste 3.84:1)
@@ -38,9 +34,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
     cardMaxWidth: '350px',
     cardMinHeight: '200px',
     cardPadding: '2rem',
-    cardsAlignment: 'center',
-    iconBorderEnabled: false,
-    iconAlignment: 'center'
+    cardsAlignment: 'center'
   };
 
   const defaultDarkStyles: CardDesignStyles = {
@@ -51,9 +45,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
     hoverBackground: 'rgba(31, 41, 55, 0.95)',
     hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
     hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.3)',
-    iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
-    iconBackground: 'rgba(17, 24, 39, 0.8)',
-    iconColor: '#ffffff',
     titleColor: '#FFFFFF',       // ✅ Blanco (contraste 15.52:1)
     descriptionColor: '#D1D5DB', // ✅ Gris muy claro (contraste 11.89:1)
     linkColor: '#a78bfa',        // ✅ Púrpura claro (contraste 6.14:1)
@@ -61,9 +52,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
     cardMaxWidth: '350px',
     cardMinHeight: '200px',
     cardPadding: '2rem',
-    cardsAlignment: 'center',
-    iconBorderEnabled: false,
-    iconAlignment: 'center'
+    cardsAlignment: 'center'
   };
 
   // 🔥 SOLUCIÓN: Memoizar con dependencia de pageData (como en CardsDesignConfigSection)
@@ -80,6 +69,19 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
   // Estado local temporal para los estilos que se están editando
   const [localLightStyles, setLocalLightStyles] = useState<CardDesignStyles>(initialLightStyles);
   const [localDarkStyles, setLocalDarkStyles] = useState<CardDesignStyles>(initialDarkStyles);
+
+  // 🔧 SOLUCIÓN: Sincronizar estados locales cuando pageData cambie
+  useEffect(() => {
+    const dbLightData = pageData.content.valueAdded?.cardsDesign?.light;
+    const dbDarkData = pageData.content.valueAdded?.cardsDesign?.dark;
+
+    if (dbLightData) {
+      setLocalLightStyles(dbLightData);
+    }
+    if (dbDarkData) {
+      setLocalDarkStyles(dbDarkData);
+    }
+  }, [pageData.content.valueAdded?.cardsDesign]);
 
   const currentStyles = activeTheme === 'light' ? localLightStyles : localDarkStyles;
   
@@ -143,33 +145,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
     setHasUnsavedChanges(true);
   };
 
-  // Función para recargar datos desde la DB
-  const reloadFromDB = () => {
-    const dbLightData = pageData.content.valueAdded?.cardsDesign?.light;
-    const dbDarkData = pageData.content.valueAdded?.cardsDesign?.dark;
-    setLocalLightStyles(dbLightData || defaultLightStyles);
-    setLocalDarkStyles(dbDarkData || defaultDarkStyles);
-    setHasUnsavedChanges(false);
-  };
-
-  // Función para aplicar los valores transparentes a AMBOS temas
-  const applyTransparentDefaults = () => {
-    // Aplicar valores transparentes a ambos temas
-    setLocalLightStyles(defaultLightStyles);
-    setLocalDarkStyles(defaultDarkStyles);
-    // Marcar como cambios pendientes
-    setHasUnsavedChanges(true);
-  };
-
-  // Cleanup del timeout al desmontar
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
     <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
       {/* Header */}
@@ -185,29 +160,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           )}
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => {
-              updateCardStyle('background', 'rgba(255, 0, 0, 0.5)');
-            }}
-            className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
-            title="BOTÓN DE PRUEBA - Cambiar fondo a rojo"
-          >
-            🚨 TEST
-          </button>
-          <button
-            onClick={reloadFromDB}
-            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
-            title="Recargar datos desde la base de datos"
-          >
-            🔄 Recargar DB
-          </button>
-          <button
-            onClick={applyTransparentDefaults}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
-            title="Aplicar diseño transparente a ambos temas y guardar"
-          >
-            ✨ Aplicar Transparencia
-          </button>
           <button
             onClick={resetToDefaults}
             className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
@@ -264,48 +216,34 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           👀 Vista Previa - {activeTheme === 'light' ? 'Tema Claro' : 'Tema Oscuro'}
         </h3>
         
-        <div className={`p-8 rounded-xl ${activeTheme === 'light' 
-          ? 'bg-gradient-to-br from-gray-50 to-white' 
+        <div className={`p-8 rounded-xl ${activeTheme === 'light'
+          ? 'bg-gradient-to-br from-gray-50 to-white'
           : 'bg-gradient-to-br from-gray-900 to-gray-800'
         }`}>
-          <div 
-            className="group relative rounded-xl cursor-pointer transition-all duration-300 hover:scale-[1.02] overflow-hidden"
+          {/* 🎨 Vista previa - Misma técnica exacta que ValueCard.tsx */}
+          <div
+            className="group relative rounded-2xl overflow-hidden cursor-pointer"
             style={{
-              background: 'transparent',
+              background: safeCurrentStyles.border,  // ✅ El gradiente ES el background del contenedor
+              padding: safeCurrentStyles.borderWidth || '2px',  // ✅ El padding crea el "borde"
               boxShadow: safeCurrentStyles.shadow,
               minWidth: safeCurrentStyles.cardMinWidth,
               maxWidth: '400px',
-              minHeight: '200px'
+              transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease'
             }}
           >
-            {/* Border gradient - Misma técnica que en la página pública */}
-            <div 
-              className="absolute inset-0 rounded-xl"
+            <div
+              className="relative rounded-xl h-full overflow-hidden"
               style={{
-                background: safeCurrentStyles.border,
-                borderRadius: '0.75rem',
-                padding: safeCurrentStyles.borderWidth || '2px'
+                background: safeCurrentStyles.background,  // ✅ El fondo real de la tarjeta
+                borderRadius: `calc(1rem - ${safeCurrentStyles.borderWidth || '2px'})`,
+                padding: safeCurrentStyles.cardPadding || '2rem',
+                minHeight: '200px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
               }}
             >
-              <div 
-                className="w-full h-full rounded-xl"
-                style={{
-                  background: safeCurrentStyles.background,
-                  borderRadius: `calc(0.75rem - ${safeCurrentStyles.borderWidth || '2px'})`,
-                  padding: safeCurrentStyles.cardPadding || '2rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center'
-                }}
-              >
-                {/* Icon Preview - Solo si iconBorderEnabled está activado */}
-                {safeCurrentStyles.iconBorderEnabled && (
-                  <div className="relative mb-6 w-16 h-16 flex items-center justify-center text-3xl"
-                       style={{ color: safeCurrentStyles.iconColor }}>
-                    ⭐
-                  </div>
-                )}
-
                 {/* Content Preview */}
                 <h4
                   className="text-2xl font-bold mb-4"
@@ -342,7 +280,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
             </div>
           </div>
         </div>
-      </div>
 
       {/* Simple Mode Configuration */}
       <div className="space-y-6">
@@ -458,106 +395,6 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           </div>
         </div>
 
-        {/* Estilos del Icono - Grid de 2 columnas */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-          <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            🎯 Estilos del Icono
-          </h4>
-
-          {/* Toggle para Mostrar/Ocultar Borde */}
-          <div className="mb-4 flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                🖼️ Mostrar Borde del Icono
-              </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                (contenedor con gradiente)
-              </span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={safeCurrentStyles.iconBorderEnabled === true}
-                onChange={(e) => updateCardStyle('iconBorderEnabled', e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-            </label>
-          </div>
-
-          {/* Alineación del Icono */}
-          <div className="mb-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              📍 Alineación del Icono
-            </label>
-            <div className="flex gap-2">
-              {[
-                { value: 'left', label: '⬅️ Izquierda', icon: '⬅️' },
-                { value: 'center', label: '⚡ Centro', icon: '⚡' },
-                { value: 'right', label: '➡️ Derecha', icon: '➡️' }
-              ].map(({ value, icon }) => (
-                <button
-                  key={value}
-                  onClick={() => updateCardStyle('iconAlignment', value)}
-                  className={`flex-1 px-3 py-2 text-sm rounded-lg border transition-all duration-200 ${
-                    (safeCurrentStyles.iconAlignment || 'left') === value
-                      ? 'bg-purple-600 text-white border-purple-600 shadow-md'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  <span className="text-xs">{icon}</span>
-                  <div className="text-xs font-medium mt-1">{value.charAt(0).toUpperCase() + value.slice(1)}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Gradiente del Borde */}
-            <div>
-              <GradientPicker
-                label="Gradiente del Borde del Icono"
-                value={safeCurrentStyles.iconGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}
-                onChange={(value) => updateCardStyle('iconGradient', value)}
-              />
-            </div>
-
-            {/* Color del Icono */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Color del Icono
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={safeCurrentStyles.iconColor}
-                  onChange={(e) => updateCardStyle('iconColor', e.target.value)}
-                  className="w-12 h-10 rounded border border-gray-300 dark:border-gray-600"
-                />
-                <input
-                  type="text"
-                  value={safeCurrentStyles.iconColor}
-                  onChange={(e) => updateCardStyle('iconColor', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                />
-              </div>
-            </div>
-
-            {/* Fondo del Contenedor - Ancho completo */}
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Fondo del Contenedor del Icono
-              </label>
-              <input
-                type="text"
-                value={safeCurrentStyles.iconBackground}
-                onChange={(e) => updateCardStyle('iconBackground', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                placeholder="rgba(255, 255, 255, 0.9)"
-              />
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Advanced Mode Toggle */}
@@ -836,17 +673,10 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
       )}
 
       {/* Help Text */}
-      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-        <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
-          ⭐ Consejos de Uso - Valor Agregado
-        </h4>
-        <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
-          <li><strong>Vista Previa en Tiempo Real:</strong> Los cambios se reflejan instantáneamente en la tarjeta de arriba</li>
-          <li><strong>Guardado Manual:</strong> Los cambios NO se guardan automáticamente, debes hacer click en el botón "💾 Guardar"</li>
-          <li><strong>Configuración Independiente:</strong> Estas configuraciones solo afectan las tarjetas de Valor Agregado</li>
-          <li><strong>Sliders Interactivos:</strong> Usa los sliders de colores para ajustar tamaños con precisión</li>
-          <li><strong>Presets Rápidos:</strong> Los botones de tamaño predefinido cambian varios valores a la vez</li>
-        </ul>
+      <div className="mt-6 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <p className="text-xs text-blue-700 dark:text-blue-300">
+          💡 Los cambios se reflejan en tiempo real. Recuerda hacer click en "💾 Guardar" para persistir los cambios.
+        </p>
       </div>
     </div>
   );

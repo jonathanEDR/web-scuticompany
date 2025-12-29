@@ -147,15 +147,19 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
   const saveChanges = async () => {
     try {
       setIsSaving(true);
-      
+
       // Primero actualizar el estado local
       onUpdate(localItems);
-      
+
+      // 🔧 SOLUCIÓN: Esperar 1 tick del event loop para que React actualice el estado
+      // Esto evita la race condition donde onSave() leía valores antiguos
+      await new Promise(resolve => setTimeout(resolve, 0));
+
       // Luego hacer el save si se proporciona la función
       if (onSave) {
         await onSave();
       }
-      
+
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Error saving changes:', error);

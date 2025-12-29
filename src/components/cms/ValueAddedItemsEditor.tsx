@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import type { ValueAddedItem, PageData } from '../../types/cms';
-import ManagedImageSelector from '../ManagedImageSelector';
 import RichTextEditor from '../RichTextEditor';
 import RichTextEditorCompact from '../RichTextEditorCompact';
 
@@ -64,8 +63,6 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
     
     return {
       // No incluir _id para nuevos items, dejar que el backend lo genere
-      iconLight: '',
-      iconDark: '',
       title: defaultTitles[index] || `Valor ${index + 1}`,
       description: defaultDescriptions[index] || `Descripción del valor agregado ${index + 1}`,
       gradient: defaultGradients[index] || 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
@@ -143,15 +140,19 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
   const saveChanges = async () => {
     try {
       setIsSaving(true);
-      
+
       // Actualizar estado padre
       onUpdate(localItems);
-      
+
+      // 🔧 SOLUCIÓN: Esperar 1 tick del event loop para que React actualice el estado
+      // Esto evita la race condition donde onSave() leía valores antiguos
+      await new Promise(resolve => setTimeout(resolve, 0));
+
       // Si hay función de save manual, ejecutarla
       if (onSave) {
         await onSave();
       }
-      
+
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Error guardando tarjetas:', error);
@@ -271,9 +272,7 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
             {/* Contenido expandido */}
             {expandedCard === index && (
               <div className="p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600">
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                  {/* Columna izquierda: Texto (2/3 del espacio) */}
-                  <div className="xl:col-span-2 space-y-4">
+                <div className="space-y-4">
                     {/* Título con colores por tema */}
                     <div>
                       {pageData && updateTextStyle ? (
@@ -338,8 +337,6 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                       )}
                     </div>
 
-                    {/* Nota: Eliminado campo de emoji. Solo se usan imágenes (tema claro/oscuro). */}
-
                     {/* Gradiente */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -353,70 +350,12 @@ const ValueAddedItemsEditor: React.FC<ValueAddedItemsEditorProps> = ({
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                       {item.gradient && (
-                        <div 
+                        <div
                           className="mt-2 h-8 rounded-lg"
                           style={{ background: item.gradient }}
                         />
                       )}
                     </div>
-                  </div>
-
-                  {/* Columna derecha: Iconos (1/3 del espacio) */}
-                  <div className="xl:col-span-1 space-y-4">
-                    {/* Icono tema claro */}
-                    <div>
-                      <ManagedImageSelector
-                        label="🌞 Icono para Tema Claro"
-                        description="Imagen PNG recomendada: 64x64px"
-                        currentImage={item.iconLight}
-                        onImageSelect={(url: string) => updateItem(index, 'iconLight', url)}
-                        hideButtonArea={!!item.iconLight}
-                      />
-                    </div>
-
-                    {/* Icono tema oscuro */}
-                    <div>
-                      <ManagedImageSelector
-                        label="🌙 Icono para Tema Oscuro"
-                        description="Imagen PNG recomendada: 64x64px"
-                        currentImage={item.iconDark}
-                        onImageSelect={(url: string) => updateItem(index, 'iconDark', url)}
-                        hideButtonArea={!!item.iconDark}
-                      />
-                    </div>
-
-                    {/* Vista previa del icono */}
-                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        👀 Vista Previa
-                      </h5>
-                      <div className="flex items-center space-x-4">
-                        {/* Tema claro */}
-                        <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center mb-1">
-                            {item.iconLight ? (
-                              <img src={item.iconLight} alt="Icon light" className="w-8 h-8 object-contain" />
-                            ) : (
-                              <div className="w-8 h-8 bg-gray-200 rounded" />
-                            )}
-                          </div>
-                          <span className="text-xs text-gray-500">Claro</span>
-                        </div>
-                        
-                        {/* Tema oscuro */}
-                        <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 bg-gray-800 border border-gray-600 rounded-lg flex items-center justify-center mb-1">
-                            {item.iconDark ? (
-                              <img src={item.iconDark} alt="Icon dark" className="w-8 h-8 object-contain" />
-                            ) : (
-                              <div className="w-8 h-8 bg-gray-700 rounded" />
-                            )}
-                          </div>
-                          <span className="text-xs text-gray-400">Oscuro</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}

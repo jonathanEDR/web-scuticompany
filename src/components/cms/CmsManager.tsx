@@ -15,6 +15,7 @@ import ValueAddedItemsEditor from './ValueAddedItemsEditor';
 import SeoConfigSection from './SeoConfigSection';
 import ThemeConfigSection from './ThemeConfigSection';
 import CardsDesignConfigSection from './CardsDesignConfigSection';
+import ValueAddedCardsDesignSection from './ValueAddedCardsDesignSection';
 import ContactConfigSection from './ContactConfigSection';
 import ContactFormEditor from './ContactFormEditor';
 import ChatbotConfigSection from './ChatbotConfigSection';
@@ -202,6 +203,10 @@ const CmsManager: React.FC = () => {
         // 🔥 NUEVO: Usar el componente unificado de cards design
         if ((window as any).__cardsDesignSave) {
           await (window as any).__cardsDesignSave();  // ← Esperar a que termine
+        }
+        // 🔥 FIX: Guardar también el diseño de ValueAdded cards
+        if ((window as any).__valueAddedCardDesignSave) {
+          await (window as any).__valueAddedCardDesignSave();  // ← Esperar a que termine
         }
         // ⚠️ NO llamar a handleSave() aquí - __cardsDesignSave ya guarda todo
       } else if (activeTab === 'content') {
@@ -658,11 +663,17 @@ const CmsManager: React.FC = () => {
         )}
         {activeTab === 'cards' && selectedPage === 'home' && (
           <div className="space-y-8">
-            {/* 🔥 NUEVO: Configuración Unificada para Solutions y Value Added Cards */}
+            {/* 🔥 Configuración de Tarjetas de Soluciones (Solutions) */}
             <CardsDesignConfigSection
               pageData={pageData}
               updateContent={handleUpdateContent}
               setHasGlobalChanges={setHasGlobalChanges} // 🔥 PASAR LA FUNCIÓN
+            />
+
+            {/* 🔥 Configuración de Tarjetas de Valor Agregado */}
+            <ValueAddedCardsDesignSection
+              pageData={pageData}
+              updateContent={handleUpdateContent}
             />
           </div>
         )}
