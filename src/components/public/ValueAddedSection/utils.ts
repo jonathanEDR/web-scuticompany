@@ -87,13 +87,15 @@ export const getMappedValueAddedData = (data: ValueAddedData): ValueAddedData =>
         iconLight: item.iconLight,
         iconDark: item.iconDark,
         gradient: item.gradient || 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+        buttonText: item.buttonText,  // Texto personalizado del botón
+        buttonUrl: item.buttonUrl,    // URL de destino del botón
         styles: item.styles,
         _id: item._id
       })),
       logos: data.logos || []
     };
   }
-  
+
   return {
     ...data,
     subtitle: data.subtitle || '',

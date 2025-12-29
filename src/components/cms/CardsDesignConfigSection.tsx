@@ -860,7 +860,8 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           
         </div>
 
-        {/* Estilos del Icono - Grid de 2 columnas */}
+        {/* Estilos del Icono - Solo para secciones que usan iconos (NO Value Added) */}
+        {activeSection !== 'valueAdded' && (
         <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
           <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
             🎯 Estilos del Icono
@@ -944,7 +945,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
             {/* Color del Icono */}
             <div>
-  
+
             {/* Colores de Texto - Grid de 2 columnas */}
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-1">
               <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
@@ -1035,6 +1036,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             </div>
           </div>
         </div>
+        )}
           </>
         )}
       </div>

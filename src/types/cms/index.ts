@@ -150,6 +150,8 @@ export interface ValueAddedItem {
   iconLight?: string;
   iconDark?: string;
   gradient?: string;
+  buttonText?: string;  // Texto del botón "Conocer más"
+  buttonUrl?: string;   // URL a donde dirige el botón
   styles?: SolutionTextStyles; // Estilos de texto por tema (reutilizamos la interface)
 }
 

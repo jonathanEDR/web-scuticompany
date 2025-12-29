@@ -11,11 +11,9 @@ import ValueAddedConfigSection from './ValueAddedConfigSection';
 import ClientLogosConfigSection from './ClientLogosConfigSection';
 import FeaturedBlogConfigSection from './FeaturedBlogConfigSection';
 import CardItemsEditor from './CardItemsEditor';
-import ValueAddedItemsEditor from './ValueAddedItemsEditor';
 import SeoConfigSection from './SeoConfigSection';
 import ThemeConfigSection from './ThemeConfigSection';
 import CardsDesignConfigSection from './CardsDesignConfigSection';
-import ValueAddedCardsDesignSection from './ValueAddedCardsDesignSection';
 import ContactConfigSection from './ContactConfigSection';
 import ContactFormEditor from './ContactFormEditor';
 import ChatbotConfigSection from './ChatbotConfigSection';
@@ -493,20 +491,12 @@ const CmsManager: React.FC = () => {
                   updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
                   className="mt-6"
                 />
-                {/* Configuración General de Valor Agregado */}
+                {/* Configuración General de Valor Agregado (incluye editor de tarjetas) */}
                 <ValueAddedConfigSection
                   pageData={pageData}
                   updateContent={handleUpdateContent}
                   updateTextStyle={handleUpdateTextStyle}
-                />
-                {/* Editor de Tarjetas de Valor Agregado */}
-                <ValueAddedItemsEditor
-                  items={pageData.content.valueAdded?.items || []}
-                  onUpdate={(updatedItems) => handleUpdateContent('valueAdded.items', updatedItems)}
-                  onSave={handleSave} // Función de save manual
-                  pageData={pageData} // Para obtener estilos actuales
-                  updateTextStyle={handleUpdateTextStyle} // Para manejar colores por tema
-                  className="mt-6"
+                  onSave={handleSave}
                 />
                 {/* Configuración de Logos de Clientes */}
                 <ClientLogosConfigSection
@@ -669,12 +659,7 @@ const CmsManager: React.FC = () => {
               updateContent={handleUpdateContent}
               setHasGlobalChanges={setHasGlobalChanges} // 🔥 PASAR LA FUNCIÓN
             />
-
-            {/* 🔥 Configuración de Tarjetas de Valor Agregado */}
-            <ValueAddedCardsDesignSection
-              pageData={pageData}
-              updateContent={handleUpdateContent}
-            />
+            {/* Nota: Las tarjetas de Valor Agregado se configuran en el tab Content dentro de ValueAddedConfigSection */}
           </div>
         )}
         {activeTab === 'cards' && selectedPage !== 'home' && (

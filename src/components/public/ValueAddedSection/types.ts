@@ -7,6 +7,8 @@ export interface ValueAddedItem {
   iconLight?: string;
   iconDark?: string;
   gradient?: string;
+  buttonText?: string;  // Texto del botón "Conocer más"
+  buttonUrl?: string;   // URL a donde dirige el botón
   _id?: any;
   styles?: {
     light?: {
