@@ -6,6 +6,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
@@ -27,9 +28,23 @@ const ServicesPublicV2 = () => {
   // ESTADO
   // ============================================
 
+  // Obtener query params de la URL
+  const [searchParams] = useSearchParams();
+
   const [busqueda, setBusqueda] = useState('');
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
+  // Inicializar categoría desde query param si existe
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>(
+    searchParams.get('categoria') || ''
+  );
   const [ordenamiento, setOrdenamiento] = useState<string>('destacado');
+
+  // Sincronizar categoría cuando cambia la URL
+  useEffect(() => {
+    const categoriaFromUrl = searchParams.get('categoria');
+    if (categoriaFromUrl !== null && categoriaFromUrl !== categoriaSeleccionada) {
+      setCategoriaSeleccionada(categoriaFromUrl);
+    }
+  }, [searchParams]);
   
   // 🚀 Usar hook con cache para categorías
   const { data: categorias } = useCategoriasList({ activas: true });

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useClerkDetection } from '../../hooks/useClerkDetection';
-import { blogPostApi } from '../../services/blog';
-import type { BlogPost } from '../../types/blog';
+import { useCategoriasList } from '../../hooks/useCategoriasCache';
 import Logo from '../Logo';
 import '../../styles/gradient-borders.css';
 
@@ -30,8 +29,10 @@ const PublicHeaderOptimized = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showSolutionsDropdown, setShowSolutionsDropdown] = useState(false);
-  const [headerMenuPosts, setHeaderMenuPosts] = useState<BlogPost[]>([]);
-  
+
+  // Hook para obtener categorías de servicios para el menú Soluciones
+  const { data: categorias = [] } = useCategoriasList({ activas: true });
+
   // Hook personalizado para detectar usuario de Clerk
   const { userData, getUserInitials } = useClerkDetection();
 
@@ -120,21 +121,6 @@ const PublicHeaderOptimized = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 📡 Efecto para cargar posts del header menu
-  useEffect(() => {
-    const loadHeaderMenuPosts = async () => {
-      try {
-        const response = await blogPostApi.getHeaderMenuPosts();
-        if (response.success && response.data) {
-          setHeaderMenuPosts(response.data);
-        }
-      } catch (error) {
-        console.error('Error al cargar posts del header menu:', error);
-      }
-    };
-
-    loadHeaderMenuPosts();
-  }, []);
 
   return (
     <header 
@@ -276,9 +262,9 @@ const PublicHeaderOptimized = () => {
                 </svg>
               </button>
               
-              {/* Dropdown Menu */}
-              {headerMenuPosts.length > 0 && (
-                <div 
+              {/* Dropdown Menu - Categorías de Servicios */}
+              {categorias.length > 0 && (
+                <div
                   className={`absolute top-full left-0 mt-1 w-64 rounded-lg shadow-lg border z-50 transition-all duration-200 ${
                     showSolutionsDropdown ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
                   }`}
@@ -291,10 +277,10 @@ const PublicHeaderOptimized = () => {
                   onMouseLeave={() => setShowSolutionsDropdown(false)}
                 >
                   <div className="py-2">
-                    {headerMenuPosts.map((post) => (
+                    {categorias.map((categoria) => (
                       <Link
-                        key={post._id}
-                        to={`/blog/${post.slug}`}
+                        key={categoria._id}
+                        to={`/servicios?categoria=${categoria.slug}`}
                         className="block px-4 py-2.5 text-sm theme-text-secondary theme-transition rounded-md mx-1"
                         onClick={() => setShowSolutionsDropdown(false)}
                         onMouseEnter={(e) => {
@@ -308,7 +294,7 @@ const PublicHeaderOptimized = () => {
                           (e.target as HTMLElement).style.paddingLeft = '1rem';
                         }}
                       >
-                        📄 {post.title}
+                        {categoria.icono} {categoria.nombre}
                       </Link>
                     ))}
                   </div>

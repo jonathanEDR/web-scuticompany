@@ -2,18 +2,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Logo from '../Logo';
 import type { PageData } from '../../types/cms';
-import type { BlogPost } from '../../types/blog';
 import { getCmsApiUrl, logApiCall, testBackendConnection } from '../../utils/apiHelper';
 import { useClerkDetection } from '../../hooks/useClerkDetection';
-import { blogPostApi } from '../../services/blog/blogPostApi';
+import { useCategoriasList } from '../../hooks/useCategoriasCache';
 
 const PublicFooter = () => {
   const navigate = useNavigate();
   const [pageData, setPageData] = useState<PageData | null>(null);
-  const [headerMenuPosts, setHeaderMenuPosts] = useState<BlogPost[]>([]);
-  
+
   // Hook para detectar usuario autenticado (mejorado para producción)
   const { userData, getUserInitials, isLoading } = useClerkDetection();
+
+  // Hook para obtener categorías de servicios
+  const { data: categorias = [] } = useCategoriasList({ activas: true });
   
   useEffect(() => {
     let isMounted = true;
@@ -71,21 +72,8 @@ const PublicFooter = () => {
       }
     };
 
-    // 🆕 Cargar posts del menú de soluciones
-    const loadHeaderMenuPosts = async () => {
-      try {
-        const response = await blogPostApi.getHeaderMenuPosts();
-        if (response.success && response.data && isMounted) {
-          setHeaderMenuPosts(response.data);
-        }
-      } catch (error) {
-        console.error('Error al cargar posts del header menu:', error);
-      }
-    };
-
     testBackendConnection();
     fetchPageData();
-    loadHeaderMenuPosts();
     
     return () => {
       isMounted = false;
@@ -145,29 +133,29 @@ const PublicFooter = () => {
               </div>
             </div>
 
-            {/* Soluciones - Posts dinámicos del menú */}
+            {/* Soluciones - Categorías de servicios */}
             <div className="flex-1">
               <h3 className="text-white font-semibold mb-4">Soluciones</h3>
               <ul className="space-y-2">
-                {headerMenuPosts.length > 0 ? (
-                  headerMenuPosts.map((post) => (
-                    <li key={post._id}>
-                      <Link 
-                        to={`/blog/${post.slug}`} 
+                {categorias.length > 0 ? (
+                  categorias.slice(0, 5).map((categoria) => (
+                    <li key={categoria._id}>
+                      <Link
+                        to={`/servicios?categoria=${categoria.slug}`}
                         className="text-gray-200 hover:text-purple-400 transition-colors text-sm"
                       >
-                        {post.title}
+                        {categoria.icono} {categoria.nombre}
                       </Link>
                     </li>
                   ))
                 ) : (
-                  // Fallback mientras cargan los posts
+                  // Fallback mientras cargan las categorías
                   <>
                     <li><Link to="/servicios" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Ver todos los servicios</Link></li>
                   </>
                 )}
                 {/* Siempre mostrar link a todos los servicios */}
-                {headerMenuPosts.length > 0 && (
+                {categorias.length > 0 && (
                   <li className="pt-2 border-t border-gray-700">
                     <Link to="/servicios" className="text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium">
                       Ver todos →
@@ -393,25 +381,25 @@ const PublicFooter = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Soluciones y Acceso juntos en móvil */}
               <div className="grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-0">
-                {/* Soluciones - Posts dinámicos */}
+                {/* Soluciones - Categorías de servicios */}
                 <div>
                   <h3 className="text-white font-semibold mb-4">Soluciones</h3>
                   <ul className="space-y-2">
-                    {headerMenuPosts.length > 0 ? (
-                      headerMenuPosts.map((post) => (
-                        <li key={post._id}>
-                          <Link 
-                            to={`/blog/${post.slug}`} 
+                    {categorias.length > 0 ? (
+                      categorias.slice(0, 5).map((categoria) => (
+                        <li key={categoria._id}>
+                          <Link
+                            to={`/servicios?categoria=${categoria.slug}`}
                             className="text-gray-200 hover:text-purple-400 transition-colors text-sm"
                           >
-                            {post.title}
+                            {categoria.icono} {categoria.nombre}
                           </Link>
                         </li>
                       ))
                     ) : (
                       <li><Link to="/servicios" className="text-gray-200 hover:text-purple-400 transition-colors text-sm">Ver todos los servicios</Link></li>
                     )}
-                    {headerMenuPosts.length > 0 && (
+                    {categorias.length > 0 && (
                       <li className="pt-2 border-t border-gray-700">
                         <Link to="/servicios" className="text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium">
                           Ver todos →

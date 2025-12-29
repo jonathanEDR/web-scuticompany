@@ -40,7 +40,6 @@ interface PostFormData {
   allowComments: boolean;
   isPinned: boolean;
   isFeatured: boolean;
-  showInHeaderMenu: boolean;
 }
 
 export default function PostEditor() {
@@ -61,8 +60,7 @@ export default function PostEditor() {
     isPublished: false,
     allowComments: true,
     isPinned: false,
-    isFeatured: false,
-    showInHeaderMenu: false
+    isFeatured: false
   });
 
   const [showPreview, setShowPreview] = useState(false);
@@ -217,8 +215,7 @@ export default function PostEditor() {
           isPublished: post.isPublished || false,
           allowComments: post.allowComments !== undefined ? post.allowComments : true,
           isPinned: post.isPinned || false,
-          isFeatured: post.isFeatured || false,
-          showInHeaderMenu: post.showInHeaderMenu || false
+          isFeatured: post.isFeatured || false
         });
       }
     } catch (error) {
@@ -499,8 +496,7 @@ export default function PostEditor() {
         isPublished: false,
         allowComments: formData.allowComments,
         isPinned: formData.isPinned,
-        isFeatured: formData.isFeatured,
-        showInHeaderMenu: formData.showInHeaderMenu
+        isFeatured: formData.isFeatured
       };
 
       if (isEditing && id) {
@@ -562,8 +558,7 @@ export default function PostEditor() {
         isPublished: true,
         allowComments: formData.allowComments,
         isPinned: formData.isPinned,
-        isFeatured: formData.isFeatured,
-        showInHeaderMenu: formData.showInHeaderMenu
+        isFeatured: formData.isFeatured
       };
 
       if (isEditing && id) {
@@ -1066,17 +1061,6 @@ export default function PostEditor() {
                 </span>
               </label>
 
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={formData.showInHeaderMenu}
-                  onChange={(e) => handleChange('showInHeaderMenu', e.target.checked)}
-                  className="w-5 h-5 text-purple-600 dark:text-purple-400 rounded-md focus:ring-purple-500 dark:focus:ring-purple-400 transition-all duration-200"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                  🏠 Mostrar en Header (Soluciones)
-                </span>
-              </label>
             </div>
           </div>
         </div>
