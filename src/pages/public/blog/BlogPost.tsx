@@ -30,6 +30,7 @@ import { CommentsList } from '../../../components/blog/comments';
 import { sanitizeHTML } from '../../../utils/blog';
 import { getImageUrl } from '../../../utils/imageUtils';
 import PublicFooter from '../../../components/public/PublicFooter';
+import PublicHeader from '../../../components/public/PublicHeader';
 
 const BlogPostEnhanced: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -107,8 +108,8 @@ const BlogPostEnhanced: React.FC = () => {
     >
       {/* Barra de progreso de lectura */}
       {progressConfig.enabled !== false && (
-        <ReadingProgress 
-          barColor={theme === 'dark' 
+        <ReadingProgress
+          barColor={theme === 'dark'
             ? (progressConfig.barColor?.dark || '#a78bfa')
             : (progressConfig.barColor?.light || '#8b5cf6')
           }
@@ -128,7 +129,10 @@ const BlogPostEnhanced: React.FC = () => {
           position={progressConfig.position || 'top'}
         />
       )}
-      
+
+      {/* Header de navegación */}
+      <PublicHeader />
+
       {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
       <Helmet>
         <title>{post.title} | SCUTI Company Blog</title>
