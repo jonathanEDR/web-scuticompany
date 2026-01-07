@@ -17,18 +17,29 @@ const Signup = () => {
 
   // Configuración dinámica de apariencia según el tema
   const appearance = {
+    baseTheme: theme === 'dark' ? undefined : undefined,
+    variables: {
+      colorPrimary: '#8B5CF6',
+      colorBackground: theme === 'dark' ? '#1a1a1a' : '#FFFFFF',
+      colorText: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+      colorTextSecondary: theme === 'dark' ? '#a1a1aa' : '#6B7280',
+      colorInputBackground: theme === 'dark' ? '#27272a' : '#FFFFFF',
+      colorInputText: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+      borderRadius: '8px',
+    },
     elements: {
       rootBox: {
         width: '100%',
-        maxWidth: '400px'
+        maxWidth: '420px'
       },
       card: {
-        backgroundColor: theme === 'dark' ? '#0A0A0A' : '#FFFFFF',
-        border: theme === 'dark' ? '1px solid #1F1F1F' : '1px solid #E5E7EB',
-        boxShadow: theme === 'dark' 
-          ? '0 25px 50px -12px rgba(0, 0, 0, 0.8)' 
+        backgroundColor: theme === 'dark' ? '#18181b' : '#FFFFFF',
+        border: theme === 'dark' ? '1px solid #27272a' : '1px solid #E5E7EB',
+        boxShadow: theme === 'dark'
+          ? '0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(139, 92, 246, 0.1)'
           : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        borderRadius: '12px'
+        borderRadius: '16px',
+        padding: '32px'
       },
       headerTitle: {
         color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
@@ -36,28 +47,76 @@ const Signup = () => {
         fontWeight: '700'
       },
       headerSubtitle: {
-        color: theme === 'dark' ? '#E5E7EB' : '#6B7280'
+        color: theme === 'dark' ? '#a1a1aa' : '#6B7280'
+      },
+      socialButtonsBlockButton: {
+        backgroundColor: theme === 'dark' ? '#27272a' : '#F3F4F6',
+        border: theme === 'dark' ? '1px solid #3f3f46' : '1px solid #E5E7EB',
+        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+        '&:hover': {
+          backgroundColor: theme === 'dark' ? '#3f3f46' : '#E5E7EB'
+        }
+      },
+      formFieldLabel: {
+        color: theme === 'dark' ? '#a1a1aa' : '#374151'
+      },
+      formFieldInput: {
+        backgroundColor: theme === 'dark' ? '#27272a' : '#FFFFFF',
+        border: theme === 'dark' ? '1px solid #3f3f46' : '1px solid #D1D5DB',
+        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+        '&:focus': {
+          borderColor: '#8B5CF6',
+          boxShadow: '0 0 0 2px rgba(139, 92, 246, 0.2)'
+        },
+        '&::placeholder': {
+          color: theme === 'dark' ? '#71717a' : '#9CA3AF'
+        }
       },
       formButtonPrimary: {
         backgroundColor: '#8B5CF6',
+        color: '#FFFFFF',
+        fontWeight: '600',
         '&:hover': {
           backgroundColor: '#7C3AED'
         }
       },
       dividerLine: {
-        backgroundColor: theme === 'dark' ? '#1F1F1F' : '#E5E7EB'
+        backgroundColor: theme === 'dark' ? '#3f3f46' : '#E5E7EB'
       },
       dividerText: {
-        color: theme === 'dark' ? '#E5E7EB' : '#6B7280'
+        color: theme === 'dark' ? '#71717a' : '#6B7280'
+      },
+      identityPreviewText: {
+        color: theme === 'dark' ? '#FFFFFF' : '#1F2937'
+      },
+      identityPreviewEditButton: {
+        color: '#8B5CF6'
+      },
+      formFieldInputShowPasswordButton: {
+        color: theme === 'dark' ? '#a1a1aa' : '#6B7280'
+      },
+      otpCodeFieldInput: {
+        backgroundColor: theme === 'dark' ? '#27272a' : '#FFFFFF',
+        border: theme === 'dark' ? '1px solid #3f3f46' : '1px solid #D1D5DB',
+        color: theme === 'dark' ? '#FFFFFF' : '#1F2937'
+      },
+      formResendCodeLink: {
+        color: '#8B5CF6'
+      },
+      alertText: {
+        color: theme === 'dark' ? '#fca5a5' : '#DC2626'
       },
       // ⚡ OCULTAR elementos que no queremos
       footer: {
-        display: 'none' // Esto oculta el "Already have an account? Sign in"
+        display: 'none'
       },
       footerAction: {
         display: 'none'
       },
       footerActionText: {
+        display: 'none'
+      },
+      footerActionLink: {
         display: 'none'
       }
     },
