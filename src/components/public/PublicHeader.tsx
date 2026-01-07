@@ -123,9 +123,9 @@ const PublicHeaderOptimized = () => {
 
 
   return (
-    <header 
+    <header
       className={`fixed top-0 left-0 right-0 z-50 theme-transition transition-all duration-500 ease-in-out ${
-        isVisible ? 'translate-y-0' : '-translate-y-full'
+        isVisible ? 'translate-y-0 opacity-100' : '-translate-y-[150%] opacity-0 pointer-events-none'
       }`} 
       style={{
         backgroundColor: lastScrollY > 50 
