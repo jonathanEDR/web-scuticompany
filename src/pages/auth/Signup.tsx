@@ -1,10 +1,16 @@
 import { SignUp } from '@clerk/clerk-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Signup = () => {
   const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
+
+  // Logo según el tema
+  const logoSrc = theme === 'dark'
+    ? '/LOGO VECTOR VERSION NEGRA.svg'
+    : '/LOGO VECTOR VERSION BLANCA.svg';
 
   // Asegurar que el tema se haya cargado antes de renderizar
   useEffect(() => {
@@ -141,17 +147,63 @@ const Signup = () => {
   }
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 transition-colors duration-300"
+    <div
+      className="min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 relative overflow-hidden"
       style={{
         backgroundColor: theme === 'dark' ? '#000000' : '#F9FAFB'
       }}
     >
-      <SignUp 
-        appearance={appearance}
-        redirectUrl="/dashboard"
-        afterSignUpUrl="/dashboard"
+      {/* Efecto de fondo con gradiente */}
+      <div
+        className="absolute inset-0 opacity-30"
+        style={{
+          background: theme === 'dark'
+            ? 'radial-gradient(ellipse at top, rgba(117, 40, 238, 0.15) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(1, 194, 204, 0.1) 0%, transparent 50%)'
+            : 'radial-gradient(ellipse at top, rgba(117, 40, 238, 0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(1, 194, 204, 0.05) 0%, transparent 50%)'
+        }}
       />
+
+      {/* Contenedor principal */}
+      <div className="relative z-10 flex flex-col items-center w-full max-w-md">
+        {/* Logo y enlace al Home */}
+        <Link
+          to="/"
+          className="mb-8 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-lg"
+          title="Volver al inicio"
+        >
+          <img
+            src={logoSrc}
+            alt="SCUTI Company"
+            className="h-12 w-auto"
+          />
+        </Link>
+
+        {/* Formulario de Clerk */}
+        <SignUp
+          appearance={appearance}
+          redirectUrl="/dashboard"
+          afterSignUpUrl="/dashboard"
+        />
+
+        {/* Enlace para volver */}
+        <Link
+          to="/"
+          className="mt-6 text-sm transition-colors duration-200 flex items-center gap-2 group"
+          style={{
+            color: theme === 'dark' ? '#a1a1aa' : '#6B7280'
+          }}
+        >
+          <svg
+            className="w-4 h-4 transition-transform group-hover:-translate-x-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span className="group-hover:underline">Volver al sitio web</span>
+        </Link>
+      </div>
     </div>
   );
 };
