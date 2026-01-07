@@ -133,6 +133,9 @@ const BlogPostEnhanced: React.FC = () => {
       {/* Header de navegación */}
       <PublicHeader />
 
+      {/* Espaciador para el header fijo - más alto en móvil por las dos filas */}
+      <div className="h-24 sm:h-14" />
+
       {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
       <Helmet>
         <title>{post.title} | SCUTI Company Blog</title>
