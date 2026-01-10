@@ -58,7 +58,7 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Blog SCUTI - Innovación y Tecnología',
     ogDescription: 'Lee las últimas noticias del mundo tecnológico y mantente actualizado',
-    ogImage: '/FAVICON.png', // ⚠️ Configurar imagen ideal 1200x630px desde CMS
+    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
     twitterCard: 'summary_large_image'
   },
 
@@ -78,7 +78,7 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Nuestros Servicios - SCUTI Company',
     ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa',
-    ogImage: '/FAVICON.png', // ⚠️ Configurar imagen ideal 1200x630px desde CMS
+    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
     twitterCard: 'summary_large_image'
   },
 
@@ -98,7 +98,7 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Nuestros Servicios - SCUTI Company',
     ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa',
-    ogImage: '/FAVICON.png', // ⚠️ Configurar imagen ideal 1200x630px desde CMS
+    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
     twitterCard: 'summary_large_image'
   },
 
@@ -118,7 +118,7 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Sobre SCUTI Company - Nuestro Equipo y Visión',
     ogDescription: 'Conoce quiénes somos, qué nos motiva y cómo transformamos negocios',
-    ogImage: '/FAVICON.png', // ⚠️ Configurar imagen ideal 1200x630px desde CMS
+    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
     twitterCard: 'summary_large_image'
   },
 
@@ -138,7 +138,7 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Sobre SCUTI Company - Nuestro Equipo y Visión',
     ogDescription: 'Conoce quiénes somos, qué nos motiva y cómo transformamos negocios',
-    ogImage: '/FAVICON.png', // ⚠️ Configurar imagen ideal 1200x630px desde CMS
+    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
     twitterCard: 'summary_large_image'
   },
 
@@ -156,7 +156,7 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Contáctanos - SCUTI Company',
     ogDescription: 'Agenda una consulta gratuita y llevemos tu proyecto al siguiente nivel',
-    ogImage: '/FAVICON.png', // ⚠️ Configurar imagen ideal 1200x630px desde CMS
+    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
     twitterCard: 'summary_large_image'
   },
 
@@ -174,7 +174,7 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Contáctanos - SCUTI Company',
     ogDescription: 'Agenda una consulta gratuita y llevemos tu proyecto al siguiente nivel',
-    ogImage: '/FAVICON.png', // ⚠️ Configurar imagen ideal 1200x630px desde CMS
+    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
     twitterCard: 'summary_large_image'
   }
 };
