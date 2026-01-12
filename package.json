@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/prerender.js",
-    "build:prod": "tsc -b && vite build --mode production && node scripts/prerender.js",
+    "build": "tsc -b && vite build && node scripts/prerender.js && node scripts/prerender-blog.js && node scripts/generate-sitemap.js",
+    "build:prod": "tsc -b && vite build --mode production && node scripts/prerender.js && node scripts/prerender-blog.js && node scripts/generate-sitemap.js",
+    "prerender:blog": "node scripts/prerender-blog.js",
+    "generate:sitemap": "node scripts/generate-sitemap.js",
     "generate:favicon": "node scripts/generate-favicon.js",
     "build:debug": "tsc -b && VITE_DEBUG_API=true vite build --mode development",
     "lint": "eslint .",
