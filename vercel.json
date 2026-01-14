@@ -3,31 +3,25 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "routes": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
     {
-      "src": "/sitemap-blog.xml",
-      "dest": "https://web-scuticompany-back.onrender.com/api/blog/sitemap.xml"
+      "source": "/sitemap-blog.xml",
+      "destination": "https://web-scuticompany-back.onrender.com/api/blog/sitemap.xml"
     },
     {
-      "src": "/api/blog/(.*)",
-      "dest": "https://web-scuticompany-back.onrender.com/api/blog/$1"
+      "source": "/api/blog/(.*)",
+      "destination": "https://web-scuticompany-back.onrender.com/api/blog/$1"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/blog/([^/]+)$",
-      "dest": "/blog/$1/index.html",
-      "check": true
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/blog/(.*)/index.html",
+      "source": "/blog/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
