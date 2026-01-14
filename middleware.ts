@@ -207,7 +207,7 @@ export default async function middleware(request: Request) {
 
   // Verificar User-Agent para detectar crawlers
   const userAgent = request.headers.get('user-agent') || '';
-  const isCrawler = /facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Googlebot|bingbot|Slackbot|TelegramBot/i.test(userAgent);
+  const isCrawler = /facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Googlebot|bingbot|Slackbot|TelegramBot|Discordbot|Applebot|PetalBot|SemrushBot|AhrefsBot/i.test(userAgent);
 
   // Si no es un crawler, dejar pasar la request normal
   if (!isCrawler) {
@@ -224,8 +224,20 @@ export default async function middleware(request: Request) {
     return next();
   }
 
-  // Obtener el HTML original
-  const response = await fetch(request);
+  // Obtener el HTML original desde /index.html (no desde la URL actual que da 404)
+  const indexUrl = new URL('/', request.url);
+  const response = await fetch(indexUrl.toString(), {
+    headers: {
+      'Accept': 'text/html',
+      'User-Agent': 'Vercel-Edge-Middleware-Internal'
+    }
+  });
+  
+  if (!response.ok) {
+    console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
+    return next();
+  }
+  
   let html = await response.text();
 
   // Generar meta tags del post
