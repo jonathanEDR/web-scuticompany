@@ -13,11 +13,32 @@
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/$1"
     },
     {
-      "source": "/((?!sitemap|robots|favicon|assets).*)",
+      "source": "/blog/:slug",
+      "destination": "/blog/:slug/index.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!sitemap|robots|favicon|assets|blog).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/blog/:slug/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "index, follow"
+        }
+      ]
+    },
     {
       "source": "/sitemap(.*).xml",
       "headers": [
