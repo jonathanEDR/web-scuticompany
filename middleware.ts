@@ -107,6 +107,69 @@ function escapeHtml(text: string): string {
 }
 
 /**
+ * Generar meta tags para la página del listado del blog
+ */
+function generateBlogListMetaTags(): string {
+  const title = 'Blog de Tecnología y Software';
+  const description = 'Artículos sobre desarrollo de software, inteligencia artificial, automatización y transformación digital para PYMES. Consejos, guías y casos de éxito.';
+  const blogUrl = `${CONFIG.siteUrl}/blog`;
+  // Imagen específica para el blog - Logo horizontal con fondo blanco
+  const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
+
+  return `
+    <!-- Primary Meta Tags - Blog Listing - Generado por Edge Middleware -->
+    <title>${title} | ${CONFIG.siteName}</title>
+    <meta name="title" content="${title} | ${CONFIG.siteName}" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="blog tecnología, desarrollo software, inteligencia artificial, IA para PYMES, transformación digital, automatización empresarial, software a medida" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${blogUrl}" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${blogUrl}" />
+    <meta property="og:title" content="${title} | ${CONFIG.siteName}" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="${CONFIG.siteName}" />
+    <meta property="og:locale" content="es_PE" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${blogUrl}" />
+    <meta name="twitter:title" content="${title} | ${CONFIG.siteName}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "${title}",
+      "description": "${description}",
+      "url": "${blogUrl}",
+      "publisher": {
+        "@type": "Organization",
+        "name": "SCUTI Company",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "${CONFIG.defaultImage}"
+        }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "${blogUrl}"
+      }
+    }
+    </script>
+  `;
+}
+
+/**
  * Generar meta tags para el post
  */
 function generateMetaTags(post: any): string {
@@ -191,17 +254,14 @@ export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
-  // Solo procesar rutas de blog posts
+  // Verificar si es la página del listado del blog (/blog o /blog/)
+  const isBlogListPage = /^\/blog\/?$/.test(pathname);
+  
+  // Verificar si es un post individual (/blog/slug)
   const blogPostMatch = pathname.match(/^\/blog\/([^\/]+)$/);
   
-  if (!blogPostMatch) {
-    return next();
-  }
-
-  const slug = blogPostMatch[1];
-  
-  // No procesar archivos estáticos
-  if (slug.includes('.') || slug === 'index') {
+  // Si no es ni el listado ni un post, continuar normal
+  if (!isBlogListPage && !blogPostMatch) {
     return next();
   }
 
@@ -211,6 +271,60 @@ export default async function middleware(request: Request) {
 
   // Si no es un crawler, dejar pasar la request normal
   if (!isCrawler) {
+    return next();
+  }
+
+  // === CASO 1: Página del listado del blog ===
+  if (isBlogListPage) {
+    console.log(`[Edge Middleware] Crawler detected for /blog: ${userAgent.substring(0, 50)}`);
+    
+    // Obtener el HTML original desde /index.html
+    const indexUrl = new URL('/', request.url);
+    const response = await fetch(indexUrl.toString(), {
+      headers: {
+        'Accept': 'text/html',
+        'User-Agent': 'Vercel-Edge-Middleware-Internal'
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
+      return next();
+    }
+    
+    let html = await response.text();
+
+    // Generar meta tags para el listado del blog
+    const metaTags = generateBlogListMetaTags();
+
+    // Reemplazar el contenido del <head>
+    html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
+    html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+
+    // Insertar los nuevos meta tags después de <head>
+    html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // Retornar el HTML modificado
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'X-Robots-Tag': 'index, follow',
+        'X-Edge-Middleware': 'blog-list-seo'
+      }
+    });
+  }
+
+  // === CASO 2: Post individual del blog ===
+  const slug = blogPostMatch![1];
+  
+  // No procesar archivos estáticos
+  if (slug.includes('.') || slug === 'index') {
     return next();
   }
 
