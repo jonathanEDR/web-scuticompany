@@ -170,6 +170,187 @@ function generateBlogListMetaTags(): string {
 }
 
 /**
+ * Generar meta tags para la página Home
+ */
+function generateHomeMetaTags(): string {
+  const title = 'Desarrollo de Software e IA para PYMES';
+  const description = 'Transformamos procesos con soluciones digitales innovadoras. La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido.';
+  const homeUrl = CONFIG.siteUrl;
+  const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
+
+  return `
+    <!-- Primary Meta Tags - Home - Generado por Edge Middleware -->
+    <title>${title} | SCUTI Company Perú</title>
+    <meta name="title" content="${title} | SCUTI Company Perú" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="desarrollo software, inteligencia artificial, IA, PYMES, automatización, software a medida, Perú, transformación digital" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${homeUrl}" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${homeUrl}" />
+    <meta property="og:title" content="${title} | SCUTI Company Perú" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${homeUrl}" />
+    <meta name="twitter:title" content="${title} | SCUTI Company Perú" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SCUTI Company",
+      "alternateName": "Scuti",
+      "url": "${homeUrl}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "${imageUrl}"
+      },
+      "description": "${description}",
+      "foundingDate": "2024",
+      "areaServed": {
+        "@type": "Country",
+        "name": "Perú"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/company/scuticompany",
+        "https://twitter.com/scuticompany"
+      ]
+    }
+    </script>
+  `;
+}
+
+/**
+ * Generar meta tags para la página Servicios
+ */
+function generateServiciosMetaTags(): string {
+  const title = 'Servicios de Desarrollo de Software e IA';
+  const description = 'Soluciones tecnológicas para PYMES: Desarrollo de Software a Medida, Inteligencia Artificial, Automatización de Procesos, Integración de Sistemas y Consultoría Tecnológica.';
+  const serviciosUrl = `${CONFIG.siteUrl}/servicios`;
+  const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
+
+  return `
+    <!-- Primary Meta Tags - Servicios - Generado por Edge Middleware -->
+    <title>${title} | SCUTI Company Perú</title>
+    <meta name="title" content="${title} | SCUTI Company Perú" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="servicios software, desarrollo a medida, inteligencia artificial, automatización, integración sistemas, consultoría tecnológica, PYMES Perú" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${serviciosUrl}" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${serviciosUrl}" />
+    <meta property="og:title" content="${title} | SCUTI Company Perú" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${serviciosUrl}" />
+    <meta name="twitter:title" content="${title} | SCUTI Company Perú" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "${title}",
+      "description": "${description}",
+      "url": "${serviciosUrl}",
+      "provider": {
+        "@type": "Organization",
+        "name": "SCUTI Company",
+        "url": "${CONFIG.siteUrl}"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Perú"
+      },
+      "serviceType": ["Desarrollo de Software", "Inteligencia Artificial", "Automatización", "Consultoría Tecnológica"]
+    }
+    </script>
+  `;
+}
+
+/**
+ * Generar meta tags para la página Nosotros
+ */
+function generateNosotrosMetaTags(): string {
+  const title = 'Sobre Nosotros - Conoce a SCUTI Company';
+  const description = 'Somos una empresa peruana especializada en desarrollo de software e inteligencia artificial para PYMES. Conoce nuestra misión, visión y equipo de expertos.';
+  const nosotrosUrl = `${CONFIG.siteUrl}/nosotros`;
+  const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
+
+  return `
+    <!-- Primary Meta Tags - Nosotros - Generado por Edge Middleware -->
+    <title>${title} | SCUTI Company Perú</title>
+    <meta name="title" content="${title} | SCUTI Company Perú" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="SCUTI Company, empresa software Perú, equipo desarrollo, IA PYMES, quiénes somos, misión visión" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${nosotrosUrl}" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${nosotrosUrl}" />
+    <meta property="og:title" content="${title} | SCUTI Company Perú" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${nosotrosUrl}" />
+    <meta name="twitter:title" content="${title} | SCUTI Company Perú" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "${title}",
+      "description": "${description}",
+      "url": "${nosotrosUrl}",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "SCUTI Company",
+        "url": "${CONFIG.siteUrl}",
+        "foundingDate": "2024",
+        "areaServed": "Perú"
+      }
+    }
+    </script>
+  `;
+}
+
+/**
  * Generar meta tags para el post
  */
 function generateMetaTags(post: any): string {
@@ -254,14 +435,15 @@ export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
-  // Verificar si es la página del listado del blog (/blog o /blog/)
+  // Detectar tipo de página
+  const isHomePage = /^\/?$/.test(pathname);
+  const isServiciosPage = /^\/servicios\/?$/.test(pathname);
+  const isNosotrosPage = /^\/nosotros\/?$/.test(pathname);
   const isBlogListPage = /^\/blog\/?$/.test(pathname);
-  
-  // Verificar si es un post individual (/blog/slug)
   const blogPostMatch = pathname.match(/^\/blog\/([^\/]+)$/);
   
-  // Si no es ni el listado ni un post, continuar normal
-  if (!isBlogListPage && !blogPostMatch) {
+  // Si no es ninguna página que manejamos, continuar normal
+  if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isBlogListPage && !blogPostMatch) {
     return next();
   }
 
@@ -272,6 +454,60 @@ export default async function middleware(request: Request) {
   // Si no es un crawler, dejar pasar la request normal
   if (!isCrawler) {
     return next();
+  }
+
+  // === CASO 0: Páginas estáticas (Home, Servicios, Nosotros) ===
+  if (isHomePage || isServiciosPage || isNosotrosPage) {
+    const pageName = isHomePage ? 'home' : isServiciosPage ? 'servicios' : 'nosotros';
+    console.log(`[Edge Middleware] Crawler detected for /${pageName}: ${userAgent.substring(0, 50)}`);
+    
+    // Obtener el HTML original desde /index.html
+    const indexUrl = new URL('/', request.url);
+    const response = await fetch(indexUrl.toString(), {
+      headers: {
+        'Accept': 'text/html',
+        'User-Agent': 'Vercel-Edge-Middleware-Internal'
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
+      return next();
+    }
+    
+    let html = await response.text();
+
+    // Generar meta tags según la página
+    let metaTags: string;
+    if (isHomePage) {
+      metaTags = generateHomeMetaTags();
+    } else if (isServiciosPage) {
+      metaTags = generateServiciosMetaTags();
+    } else {
+      metaTags = generateNosotrosMetaTags();
+    }
+
+    // Reemplazar el contenido del <head>
+    html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
+    html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+
+    // Insertar los nuevos meta tags después de <head>
+    html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // Retornar el HTML modificado
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'X-Robots-Tag': 'index, follow',
+        'X-Edge-Middleware': `${pageName}-seo`
+      }
+    });
   }
 
   // === CASO 1: Página del listado del blog ===
@@ -386,5 +622,5 @@ export default async function middleware(request: Request) {
  * Solo se ejecuta para rutas de blog
  */
 export const config = {
-  matcher: '/blog/:path*'
+  matcher: ['/', '/servicios', '/nosotros', '/blog', '/blog/:path*']
 };
