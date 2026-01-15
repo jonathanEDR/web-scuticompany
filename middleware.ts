@@ -16,8 +16,27 @@ const CONFIG = {
   siteUrl: 'https://scuticompany.com',
   siteName: 'SCUTI Company Blog',
   defaultImage: 'https://scuticompany.com/Logo.png',
-  twitterHandle: '@scuticompany'
+  twitterHandle: '@scuticompany',
+  // Imagen para Google Search Results (favicon grande)
+  googleFavicon: 'https://scuticompany.com/logoiconoresultadosgoogle.jpeg'
 };
+
+/**
+ * Generar favicons para Google Search Results
+ */
+function generateFavicons(): string {
+  return `
+    <!-- Favicons optimizados para Google Search -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="/logoiconoresultadosgoogle.jpeg" type="image/jpeg" />
+  `;
+}
 
 // Cache en memoria para evitar llamadas repetidas a la API
 const postCache = new Map<string, { data: any; timestamp: number }>();
@@ -117,6 +136,7 @@ function generateBlogListMetaTags(): string {
   const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
 
   return `
+    ${generateFavicons()}
     <!-- Primary Meta Tags - Blog Listing - Generado por Edge Middleware -->
     <title>${title} | ${CONFIG.siteName}</title>
     <meta name="title" content="${title} | ${CONFIG.siteName}" />
@@ -179,6 +199,7 @@ function generateHomeMetaTags(): string {
   const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
 
   return `
+    ${generateFavicons()}
     <!-- Primary Meta Tags - Home - Generado por Edge Middleware -->
     <title>${title} | SCUTI Company Perú</title>
     <meta name="title" content="${title} | SCUTI Company Perú" />
@@ -243,6 +264,7 @@ function generateServiciosMetaTags(): string {
   const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
 
   return `
+    ${generateFavicons()}
     <!-- Primary Meta Tags - Servicios - Generado por Edge Middleware -->
     <title>${title} | SCUTI Company Perú</title>
     <meta name="title" content="${title} | SCUTI Company Perú" />
@@ -303,6 +325,7 @@ function generateNosotrosMetaTags(): string {
   const imageUrl = `${CONFIG.siteUrl}/logohorizontal.jpeg`;
 
   return `
+    ${generateFavicons()}
     <!-- Primary Meta Tags - Nosotros - Generado por Edge Middleware -->
     <title>${title} | SCUTI Company Perú</title>
     <meta name="title" content="${title} | SCUTI Company Perú" />
@@ -364,6 +387,7 @@ function generateMetaTags(post: any): string {
   const modifiedTime = post.updatedAt || publishedTime;
 
   return `
+    ${generateFavicons()}
     <!-- Primary Meta Tags - Generado por Edge Middleware -->
     <title>${title} | ${CONFIG.siteName}</title>
     <meta name="title" content="${title} | ${CONFIG.siteName}" />
@@ -494,6 +518,10 @@ export default async function middleware(request: Request) {
     html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
     html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
     html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+    // Limpiar favicons existentes para evitar duplicados
+    html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
 
     // Insertar los nuevos meta tags después de <head>
     html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
@@ -540,6 +568,10 @@ export default async function middleware(request: Request) {
     html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
     html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
     html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+    // Limpiar favicons existentes para evitar duplicados
+    html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
 
     // Insertar los nuevos meta tags después de <head>
     html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
@@ -601,6 +633,10 @@ export default async function middleware(request: Request) {
   html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
   html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
   html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+  // Limpiar favicons existentes para evitar duplicados
+  html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+  html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+  html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
 
   // Insertar los nuevos meta tags después de <head>
   html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
