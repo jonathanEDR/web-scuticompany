@@ -204,7 +204,7 @@ function generateBlogListMetaTags(): string {
     <title>${title} | ${CONFIG.siteName}</title>
     <meta name="title" content="${title} | ${CONFIG.siteName}" />
     <meta name="description" content="${description}" />
-    <meta name="keywords" content="blog tecnología, desarrollo software, inteligencia artificial, IA para PYMES, transformación digital, automatización empresarial, software a medida" />
+    <meta name="keywords" content="blog tecnología, desarrollo software, inteligencia artificial, IA para PYMES, transformación digital, automatización empresarial, software a medida, artículos tecnología, noticias digitales Perú, tutoriales desarrollo, guías programación, tendencias tech" />
     <meta name="author" content="SCUTI Company" />
     <link rel="canonical" href="${blogUrl}" />
     
@@ -267,7 +267,7 @@ function generateHomeMetaTags(): string {
     <title>${title} | SCUTI Company Perú</title>
     <meta name="title" content="${title} | SCUTI Company Perú" />
     <meta name="description" content="${description}" />
-    <meta name="keywords" content="desarrollo software, inteligencia artificial, IA, PYMES, automatización, software a medida, Perú, transformación digital" />
+    <meta name="keywords" content="desarrollo software, inteligencia artificial, IA, PYMES, automatización, software a medida, Perú, transformación digital, empresa tecnología Lima, sistemas empresariales, soluciones digitales Perú, desarrollo web Lima, apps empresariales" />
     <meta name="author" content="SCUTI Company" />
     <link rel="canonical" href="${homeUrl}" />
     
@@ -332,7 +332,7 @@ function generateServiciosMetaTags(): string {
     <title>${title} | SCUTI Company Perú</title>
     <meta name="title" content="${title} | SCUTI Company Perú" />
     <meta name="description" content="${description}" />
-    <meta name="keywords" content="servicios software, desarrollo a medida, inteligencia artificial, automatización, integración sistemas, consultoría tecnológica, PYMES Perú" />
+    <meta name="keywords" content="servicios software, desarrollo a medida, inteligencia artificial, automatización, integración sistemas, consultoría tecnológica, PYMES Perú, cotización software, apps empresariales Lima, sistemas web Perú, desarrollo aplicaciones, soluciones cloud" />
     <meta name="author" content="SCUTI Company" />
     <link rel="canonical" href="${serviciosUrl}" />
     
@@ -393,7 +393,7 @@ function generateNosotrosMetaTags(): string {
     <title>${title} | SCUTI Company Perú</title>
     <meta name="title" content="${title} | SCUTI Company Perú" />
     <meta name="description" content="${description}" />
-    <meta name="keywords" content="SCUTI Company, empresa software Perú, equipo desarrollo, IA PYMES, quiénes somos, misión visión" />
+    <meta name="keywords" content="SCUTI Company, empresa software Perú, equipo desarrollo, IA PYMES, quiénes somos, misión visión, startup tecnología Lima, desarrolladores peruanos, empresa innovación digital, equipo tech Perú" />
     <meta name="author" content="SCUTI Company" />
     <link rel="canonical" href="${nosotrosUrl}" />
     
