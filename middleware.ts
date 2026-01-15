@@ -40,6 +40,7 @@ function generateFavicons(): string {
 
 // Cache en memoria para evitar llamadas repetidas a la API
 const postCache = new Map<string, { data: any; timestamp: number }>();
+const servicioCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
 /**
@@ -84,6 +85,68 @@ async function getPostData(slug: string): Promise<any | null> {
     console.error(`Error fetching post ${slug}:`, error);
     return null;
   }
+}
+
+/**
+ * Obtener datos del servicio desde la API
+ */
+async function getServicioData(slug: string): Promise<any | null> {
+  // Verificar cache
+  const cached = servicioCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  try {
+    const response = await fetch(
+      `${CONFIG.apiUrl}/api/servicios/${slug}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Vercel-Edge-Middleware'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`Error fetching servicio ${slug}: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    
+    if (!data.success || !data.data) {
+      return null;
+    }
+
+    const servicio = data.data;
+    
+    // Guardar en cache
+    servicioCache.set(slug, { data: servicio, timestamp: Date.now() });
+    
+    return servicio;
+  } catch (error) {
+    console.error(`Error fetching servicio ${slug}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Obtener URL de imagen del servicio
+ */
+function getServicioImageUrl(servicio: any): string {
+  // Prioridad: imagen principal > primera imagen de galería > logo horizontal
+  if (servicio.imagen) {
+    if (servicio.imagen.startsWith('http')) return servicio.imagen;
+    return `https://res.cloudinary.com/ds54wlchi/image/upload/${servicio.imagen}`;
+  }
+  if (servicio.galeriaImagenes && servicio.galeriaImagenes.length > 0) {
+    const img = servicio.galeriaImagenes[0];
+    if (img.startsWith('http')) return img;
+    return `https://res.cloudinary.com/ds54wlchi/image/upload/${img}`;
+  }
+  // Fallback al logo horizontal
+  return `${CONFIG.siteUrl}/logohorizontal.jpeg`;
 }
 
 /**
@@ -374,6 +437,111 @@ function generateNosotrosMetaTags(): string {
 }
 
 /**
+ * Generar meta tags para un servicio individual (detalle)
+ */
+function generateServicioDetailMetaTags(servicio: any): string {
+  // Prioridad para título: seo.titulo > metaTitle > titulo
+  const title = escapeHtml(
+    servicio.seo?.titulo || 
+    servicio.metaTitle || 
+    servicio.titulo || 
+    'Servicio'
+  );
+  
+  // Prioridad para descripción: seo.descripcion > metaDescription > descripcionCorta > descripcion
+  const description = escapeHtml(
+    servicio.seo?.descripcion || 
+    servicio.metaDescription || 
+    servicio.descripcionCorta || 
+    (servicio.descripcion ? servicio.descripcion.substring(0, 160) : 'Servicio profesional de SCUTI Company')
+  );
+  
+  const servicioUrl = `${CONFIG.siteUrl}/servicios/${servicio.slug}`;
+  const imageUrl = getServicioImageUrl(servicio);
+  
+  // Keywords del servicio
+  const keywords = [
+    ...(servicio.etiquetas || []),
+    servicio.categoria?.nombre || '',
+    servicio.seo?.palabrasClave || ''
+  ].filter(Boolean).join(', ');
+
+  // Información de precio
+  let priceInfo = '';
+  if (servicio.precio && servicio.tipoPrecio === 'fijo') {
+    priceInfo = `Precio: ${servicio.moneda || 'PEN'} ${servicio.precio}`;
+  } else if (servicio.precioMin && servicio.precioMax && servicio.tipoPrecio === 'rango') {
+    priceInfo = `Precio desde ${servicio.moneda || 'PEN'} ${servicio.precioMin}`;
+  }
+
+  return `
+    ${generateFavicons()}
+    <!-- Primary Meta Tags - Servicio Detail - Generado por Edge Middleware -->
+    <title>${title} | SCUTI Company Perú</title>
+    <meta name="title" content="${title} | SCUTI Company Perú" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="${escapeHtml(keywords)}" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${servicioUrl}" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="product" />
+    <meta property="og:url" content="${servicioUrl}" />
+    <meta property="og:title" content="${title} | SCUTI Company Perú" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+    ${servicio.precio ? `<meta property="product:price:amount" content="${servicio.precio}" />` : ''}
+    ${servicio.moneda ? `<meta property="product:price:currency" content="${servicio.moneda}" />` : ''}
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${servicioUrl}" />
+    <meta name="twitter:title" content="${title} | SCUTI Company Perú" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+    
+    <!-- Schema.org JSON-LD - Service -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "${title}",
+      "description": "${description}",
+      "url": "${servicioUrl}",
+      "image": "${imageUrl}",
+      "provider": {
+        "@type": "Organization",
+        "name": "SCUTI Company",
+        "url": "${CONFIG.siteUrl}",
+        "logo": "${CONFIG.siteUrl}/logohorizontal.jpeg"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Perú"
+      }${servicio.categoria?.nombre ? `,
+      "category": "${escapeHtml(servicio.categoria.nombre)}"` : ''}${servicio.precio && servicio.tipoPrecio === 'fijo' ? `,
+      "offers": {
+        "@type": "Offer",
+        "price": "${servicio.precio}",
+        "priceCurrency": "${servicio.moneda || 'PEN'}",
+        "availability": "https://schema.org/InStock"
+      }` : ''}${servicio.rating ? `,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "${servicio.rating}",
+        "reviewCount": "${servicio.numeroReviews || 1}"
+      }` : ''}
+    }
+    </script>
+  `;
+}
+
+/**
  * Generar meta tags para el post
  */
 function generateMetaTags(post: any): string {
@@ -465,9 +633,10 @@ export default async function middleware(request: Request) {
   const isNosotrosPage = /^\/nosotros\/?$/.test(pathname);
   const isBlogListPage = /^\/blog\/?$/.test(pathname);
   const blogPostMatch = pathname.match(/^\/blog\/([^\/]+)$/);
+  const servicioDetailMatch = pathname.match(/^\/servicios\/([^\/]+)$/);
   
   // Si no es ninguna página que manejamos, continuar normal
-  if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isBlogListPage && !blogPostMatch) {
+  if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isBlogListPage && !blogPostMatch && !servicioDetailMatch) {
     return next();
   }
 
@@ -588,75 +757,145 @@ export default async function middleware(request: Request) {
     });
   }
 
-  // === CASO 2: Post individual del blog ===
-  const slug = blogPostMatch![1];
-  
-  // No procesar archivos estáticos
-  if (slug.includes('.') || slug === 'index') {
-    return next();
-  }
-
-  console.log(`[Edge Middleware] Crawler detected for /blog/${slug}: ${userAgent.substring(0, 50)}`);
-
-  // Obtener datos del post
-  const post = await getPostData(slug);
-
-  if (!post) {
-    console.log(`[Edge Middleware] Post not found: ${slug}`);
-    return next();
-  }
-
-  // Obtener el HTML original desde /index.html (no desde la URL actual que da 404)
-  const indexUrl = new URL('/', request.url);
-  const response = await fetch(indexUrl.toString(), {
-    headers: {
-      'Accept': 'text/html',
-      'User-Agent': 'Vercel-Edge-Middleware-Internal'
+  // === CASO 2: Servicio individual (detalle) ===
+  if (servicioDetailMatch) {
+    const servicioSlug = servicioDetailMatch[1];
+    
+    // No procesar archivos estáticos
+    if (servicioSlug.includes('.') || servicioSlug === 'index') {
+      return next();
     }
-  });
-  
-  if (!response.ok) {
-    console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
-    return next();
-  }
-  
-  let html = await response.text();
 
-  // Generar meta tags del post
-  const metaTags = generateMetaTags(post);
+    console.log(`[Edge Middleware] Crawler detected for /servicios/${servicioSlug}: ${userAgent.substring(0, 50)}`);
 
-  // Reemplazar el contenido del <head>
-  // Eliminar meta tags existentes que vamos a reemplazar
-  html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
-  html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
-  html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
-  html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
-  html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
-  html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
-  // Limpiar favicons existentes para evitar duplicados
-  html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
-  html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
-  html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
+    // Obtener datos del servicio
+    const servicio = await getServicioData(servicioSlug);
 
-  // Insertar los nuevos meta tags después de <head>
-  html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
-
-  // Retornar el HTML modificado
-  return new Response(html, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600, s-maxage=86400',
-      'X-Robots-Tag': 'index, follow',
-      'X-Edge-Middleware': 'blog-seo'
+    if (!servicio) {
+      console.log(`[Edge Middleware] Servicio not found: ${servicioSlug}`);
+      return next();
     }
-  });
+
+    // Obtener el HTML original desde /index.html
+    const indexUrl = new URL('/', request.url);
+    const response = await fetch(indexUrl.toString(), {
+      headers: {
+        'Accept': 'text/html',
+        'User-Agent': 'Vercel-Edge-Middleware-Internal'
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
+      return next();
+    }
+    
+    let html = await response.text();
+
+    // Generar meta tags del servicio
+    const metaTags = generateServicioDetailMetaTags(servicio);
+
+    // Reemplazar el contenido del <head>
+    html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
+    html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+    // Limpiar favicons existentes para evitar duplicados
+    html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
+
+    // Insertar los nuevos meta tags después de <head>
+    html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // Retornar el HTML modificado
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'X-Robots-Tag': 'index, follow',
+        'X-Edge-Middleware': 'servicio-detail-seo'
+      }
+    });
+  }
+
+  // === CASO 3: Post individual del blog ===
+  if (blogPostMatch) {
+    const slug = blogPostMatch[1];
+    
+    // No procesar archivos estáticos
+    if (slug.includes('.') || slug === 'index') {
+      return next();
+    }
+
+    console.log(`[Edge Middleware] Crawler detected for /blog/${slug}: ${userAgent.substring(0, 50)}`);
+
+    // Obtener datos del post
+    const post = await getPostData(slug);
+
+    if (!post) {
+      console.log(`[Edge Middleware] Post not found: ${slug}`);
+      return next();
+    }
+
+    // Obtener el HTML original desde /index.html (no desde la URL actual que da 404)
+    const indexUrl = new URL('/', request.url);
+    const response = await fetch(indexUrl.toString(), {
+      headers: {
+        'Accept': 'text/html',
+        'User-Agent': 'Vercel-Edge-Middleware-Internal'
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
+      return next();
+    }
+    
+    let html = await response.text();
+
+    // Generar meta tags del post
+    const metaTags = generateMetaTags(post);
+
+    // Reemplazar el contenido del <head>
+    // Eliminar meta tags existentes que vamos a reemplazar
+    html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
+    html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+    // Limpiar favicons existentes para evitar duplicados
+    html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
+
+    // Insertar los nuevos meta tags después de <head>
+    html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // Retornar el HTML modificado
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'X-Robots-Tag': 'index, follow',
+        'X-Edge-Middleware': 'blog-seo'
+      }
+    });
+  }
+
+  // Si llegamos aquí, continuar normalmente
+  return next();
 }
 
 /**
  * Configuración del middleware
- * Solo se ejecuta para rutas de blog
+ * Se ejecuta para rutas de blog y servicios
  */
 export const config = {
-  matcher: ['/', '/servicios', '/nosotros', '/blog', '/blog/:path*']
+  matcher: ['/', '/servicios', '/servicios/:path*', '/nosotros', '/blog', '/blog/:path*']
 };
