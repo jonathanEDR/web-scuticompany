@@ -236,24 +236,7 @@
 /* KEYFRAMES DE ENGRANAJE ELIMINADOS */
 
 /* CARRUSEL INFINITO ELIMINADO - Solo animaciones individuales */
-
-/* Animación para logos individuales en carrusel infinito */
-@keyframes logoFadeScroll {
-  0% { 
-    transform: translateX(0px);
-    opacity: 0;
-  }
-  10% { 
-    opacity: 1;
-  }
-  90% { 
-    opacity: 1;
-  }
-  100% { 
-    transform: translateX(-200px);
-    opacity: 0;
-  }
-}
+/* logoFadeScroll eliminado - no se usa en ningún componente */
 
 /* Estilos personalizados para Web Scuti */
 .btn-primary {
@@ -428,19 +411,7 @@ html {
   }
 }
 
-/* Floating animation */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
+/* float ya definido arriba en línea 228 - eliminado duplicado */
 
 /* Ocultar scrollbar pero mantener funcionalidad */
 @layer utilities {

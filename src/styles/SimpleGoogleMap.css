@@ -358,3 +358,24 @@
   animation: none !important;
   transition: none !important;
 }
+
+/* ⚡ OPTIMIZACIÓN: Respetar preferencias del usuario para animaciones reducidas */
+@media (prefers-reduced-motion: reduce) {
+  .map-container,
+  .map-container * {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .radar-ring {
+    animation: none !important;
+    opacity: 0.4;
+  }
+
+  .hover-thunder:hover,
+  .hover-rainbow:hover,
+  .hover-shake:hover,
+  .hover-glow:hover {
+    animation: none !important;
+  }
+}

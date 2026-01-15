@@ -264,21 +264,7 @@
    ANIMACIONES ADICIONALES PARA LA UI
    ============================================ */
 
-/* Fade in general */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.8s ease-out;
-}
+/* fadeIn ya definido en index.css - usar esa versión */
 
 /* Slide in desde la izquierda */
 @keyframes slideInLeft {

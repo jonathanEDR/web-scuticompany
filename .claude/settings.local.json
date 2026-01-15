@@ -5,7 +5,10 @@
       "Bash(npm install)",
       "Bash(npm run build:*)",
       "Bash(dir:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(npm run build:simple:*)",
+      "Bash(wc -l:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
