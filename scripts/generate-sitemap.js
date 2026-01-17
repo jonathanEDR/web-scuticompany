@@ -26,12 +26,13 @@ const CONFIG = {
 
 /**
  * Fetch wrapper con timeout y retry
+ * Aumentado timeout a 60s y reintentos a 5 para manejar cold starts de Render
  */
-async function fetchWithRetry(url, options = {}, retries = 3) {
+async function fetchWithRetry(url, options = {}, retries = 5) {
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000);
+      const timeout = setTimeout(() => controller.abort(), 60000); // 60s para cold start
 
       const response = await fetch(url, {
         ...options,
@@ -48,7 +49,7 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
     } catch (error) {
       console.warn(`   ⚠️ Intento ${i + 1}/${retries} fallido: ${error.message}`);
       if (i === retries - 1) throw error;
-      await new Promise(r => setTimeout(r, 2000 * (i + 1)));
+      await new Promise(r => setTimeout(r, 3000 * (i + 1))); // Más tiempo entre reintentos
     }
   }
 }
