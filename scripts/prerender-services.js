@@ -25,16 +25,23 @@ const distPath = path.join(__dirname, '../dist');
 console.log('═'.repeat(60));
 console.log('🔧 PRERENDER-SERVICES: CONFIGURACIÓN');
 console.log('═'.repeat(60));
-console.log(`   VITE_API_URL: ${process.env.VITE_API_URL || '(not set)'}`);
-console.log(`   API_URL: ${process.env.API_URL || '(not set)'}`);
+console.log(`   VITE_API_URL (raw): ${process.env.VITE_API_URL || '(not set)'}`);
+console.log(`   API_URL (raw): ${process.env.API_URL || '(not set)'}`);
 console.log(`   NODE_ENV: ${process.env.NODE_ENV || '(not set)'}`);
 console.log(`   VERCEL: ${process.env.VERCEL || '(not set)'}`);
 console.log(`   VERCEL_ENV: ${process.env.VERCEL_ENV || '(not set)'}`);
 
+// IMPORTANTE: Normalizar la URL base - remover /api si ya está incluido para evitar /api/api
+let rawApiUrl = process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com';
+const baseApiUrl = rawApiUrl.replace(/\/api\/?$/, '');
+console.log(`   Base URL (normalized): ${baseApiUrl}`);
+console.log(`   Full API path will be: ${baseApiUrl}/api/...`);
+console.log('═'.repeat(60));
+
 // Configuración
 const CONFIG = {
-  // URL de la API - usar variable de entorno o default a producción
-  apiUrl: process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com',
+  // URL de la API - normalizada sin /api al final
+  apiUrl: baseApiUrl,
   siteUrl: 'https://scuticompany.com',
   siteName: 'SCUTI Company',
   defaultImage: 'https://scuticompany.com/Logo.png',

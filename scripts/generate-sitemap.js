@@ -19,8 +19,13 @@ const __dirname = path.dirname(__filename);
 const distPath = path.join(__dirname, '../dist');
 
 // Configuración
+// IMPORTANTE: Normalizar la URL base - remover /api si ya está incluido para evitar /api/api
+let rawApiUrl = process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com';
+// Remover /api del final si existe para evitar duplicación
+const baseApiUrl = rawApiUrl.replace(/\/api\/?$/, '');
+
 const CONFIG = {
-  apiUrl: process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com',
+  apiUrl: baseApiUrl,
   siteUrl: 'https://scuticompany.com'
 };
 
@@ -28,9 +33,10 @@ const CONFIG = {
 console.log('═'.repeat(60));
 console.log('🔧 CONFIGURACIÓN DE BUILD');
 console.log('═'.repeat(60));
-console.log(`   VITE_API_URL: ${process.env.VITE_API_URL || '(not set)'}`);
-console.log(`   API_URL: ${process.env.API_URL || '(not set)'}`);
-console.log(`   Using API: ${CONFIG.apiUrl}`);
+console.log(`   VITE_API_URL (raw): ${process.env.VITE_API_URL || '(not set)'}`);
+console.log(`   API_URL (raw): ${process.env.API_URL || '(not set)'}`);
+console.log(`   Base URL (normalized): ${CONFIG.apiUrl}`);
+console.log(`   Full API path will be: ${CONFIG.apiUrl}/api/...`);
 console.log('═'.repeat(60));
 
 /**

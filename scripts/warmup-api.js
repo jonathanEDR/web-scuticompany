@@ -8,8 +8,12 @@
  * Ejecutar ANTES de prerender-*.js y generate-sitemap.js
  */
 
+// IMPORTANTE: Normalizar la URL base - remover /api si ya está incluido para evitar /api/api
+let rawApiUrl = process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com';
+const baseApiUrl = rawApiUrl.replace(/\/api\/?$/, '');
+
 const CONFIG = {
-  apiUrl: process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com',
+  apiUrl: baseApiUrl,
   maxRetries: 5,
   retryDelay: 10000, // 10 segundos entre reintentos
   timeout: 60000 // 60 segundos timeout (Render puede tardar en despertar)
