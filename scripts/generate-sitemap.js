@@ -24,28 +24,53 @@ const CONFIG = {
   siteUrl: 'https://scuticompany.com'
 };
 
+// Debug: mostrar qué URL se está usando
+console.log('═'.repeat(60));
+console.log('🔧 CONFIGURACIÓN DE BUILD');
+console.log('═'.repeat(60));
+console.log(`   VITE_API_URL: ${process.env.VITE_API_URL || '(not set)'}`);
+console.log(`   API_URL: ${process.env.API_URL || '(not set)'}`);
+console.log(`   Using API: ${CONFIG.apiUrl}`);
+console.log('═'.repeat(60));
+
 /**
  * Fetch wrapper con timeout y retry
  * Aumentado timeout a 60s y reintentos a 5 para manejar cold starts de Render
  */
 async function fetchWithRetry(url, options = {}, retries = 5) {
+  console.log(`   🔗 Fetching: ${url}`);
+  
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 60000); // 60s para cold start
 
       const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'Vercel-Build-Sitemap/1.0'
+        },
         ...options,
         signal: controller.signal
       });
 
       clearTimeout(timeout);
 
+      // Log detallado de la respuesta
+      console.log(`   📊 Response: ${response.status} ${response.statusText}`);
+      
       if (!response.ok) {
+        // Intentar leer el cuerpo del error
+        const errorBody = await response.text().catch(() => 'No body');
+        console.log(`   📄 Error body: ${errorBody.substring(0, 200)}`);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log(`   ✅ Success: ${JSON.stringify(data).substring(0, 100)}...`);
+      return data;
     } catch (error) {
       console.warn(`   ⚠️ Intento ${i + 1}/${retries} fallido: ${error.message}`);
       if (i === retries - 1) throw error;

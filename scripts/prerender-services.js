@@ -21,6 +21,16 @@ const __dirname = path.dirname(__filename);
 
 const distPath = path.join(__dirname, '../dist');
 
+// Debug: mostrar todas las variables de entorno relevantes
+console.log('═'.repeat(60));
+console.log('🔧 PRERENDER-SERVICES: CONFIGURACIÓN');
+console.log('═'.repeat(60));
+console.log(`   VITE_API_URL: ${process.env.VITE_API_URL || '(not set)'}`);
+console.log(`   API_URL: ${process.env.API_URL || '(not set)'}`);
+console.log(`   NODE_ENV: ${process.env.NODE_ENV || '(not set)'}`);
+console.log(`   VERCEL: ${process.env.VERCEL || '(not set)'}`);
+console.log(`   VERCEL_ENV: ${process.env.VERCEL_ENV || '(not set)'}`);
+
 // Configuración
 const CONFIG = {
   // URL de la API - usar variable de entorno o default a producción
@@ -36,19 +46,33 @@ const CONFIG = {
  * Aumentado timeout a 60s y reintentos a 5 para manejar cold starts de Render
  */
 async function fetchWithRetry(url, options = {}, retries = 5) {
+  console.log(`   🔗 Fetching: ${url}`);
+  
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout (Render cold start)
 
       const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'Vercel-Build-Prerender/1.0'
+        },
         ...options,
         signal: controller.signal
       });
 
       clearTimeout(timeout);
 
+      // Log detallado de la respuesta
+      console.log(`   📊 Response: ${response.status} ${response.statusText}`);
+
       if (!response.ok) {
+        // Intentar leer el cuerpo del error
+        const errorBody = await response.text().catch(() => 'No body');
+        console.log(`   📄 Error body: ${errorBody.substring(0, 200)}`);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
