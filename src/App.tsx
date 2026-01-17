@@ -14,6 +14,7 @@ import SmartDashboardLayout from './components/SmartDashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import WelcomeNotification from './components/WelcomeNotification';
 import useGTMPageView from './hooks/useGTMPageView';
+import { useKeepBackendAlive } from './hooks/useKeepBackendAlive';
 import { UserRole } from './types/roles';
 import { useAuth } from './contexts/AuthContext';
 import { setTokenGetter } from './services/blog/blogApiClientSetup';
@@ -149,6 +150,12 @@ function GTMTracker() {
   return null;
 }
 
+// 🏓 Componente para mantener el backend de Render activo
+function BackendKeepAlive() {
+  useKeepBackendAlive();
+  return null;
+}
+
 function AppContent() {
   const { showWelcomeNotification, onboardingData, dismissWelcomeNotification } = useAuth();
   const { getToken } = useClerkAuth();
@@ -161,6 +168,7 @@ function AppContent() {
   return (
     <BrowserRouter>
       <GTMTracker />
+      <BackendKeepAlive />
       <ScrollToTop />
       
       {/* 🎉 Notificación de bienvenida para nuevos clientes */}
