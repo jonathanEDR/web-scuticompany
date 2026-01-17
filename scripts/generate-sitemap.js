@@ -169,6 +169,68 @@ async function generateBlogSitemap() {
 }
 
 /**
+ * Obtener todos los servicios activos
+ */
+async function getAllServices() {
+  try {
+    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/servicios?activo=true&visibleEnWeb=true&limit=1000`);
+    if (!data.success || !data.data) return [];
+    return data.data;
+  } catch (error) {
+    console.error(`   ❌ Error obteniendo servicios: ${error.message}`);
+    return [];
+  }
+}
+
+/**
+ * Generar sitemap-services.xml con servicios
+ */
+async function generateServicesSitemap() {
+  console.log('\n💼 Generando sitemap-services.xml');
+  console.log('═'.repeat(50));
+
+  console.log('\n📡 Conectando a API...');
+  const servicios = await getAllServices();
+
+  if (servicios.length === 0) {
+    console.warn('\n⚠️ No se encontraron servicios para el sitemap.');
+    return { servicesCount: 0 };
+  }
+
+  let urls = [];
+
+  // Agregar servicios
+  console.log(`\n💼 Servicios (${servicios.length}):`);
+  for (const servicio of servicios) {
+    if (servicio.slug) {
+      const lastmod = formatDate(servicio.updatedAt || servicio.createdAt);
+      urls.push(`
+  <url>
+    <loc>${escapeXml(CONFIG.siteUrl)}/servicios/${escapeXml(servicio.slug)}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`);
+      console.log(`   ✅ /servicios/${servicio.slug}`);
+    }
+  }
+
+  // Generar XML del sitemap de servicios
+  const sitemapServices = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Sitemap de Servicios - Generado: ${new Date().toISOString()} -->
+  <!-- Total URLs: ${urls.length} -->${urls.join('')}
+</urlset>`;
+
+  // Escribir sitemap-services.xml
+  const sitemapServicesPath = path.join(distPath, 'sitemap-services.xml');
+  fs.writeFileSync(sitemapServicesPath, sitemapServices);
+  console.log(`\n   📁 Archivo generado: dist/sitemap-services.xml`);
+
+  return { servicesCount: servicios.length };
+}
+
+/**
  * Actualizar el índice principal (sitemap.xml) con la fecha actual
  */
 function updateSitemapIndex() {
@@ -182,6 +244,12 @@ function updateSitemapIndex() {
   <!-- Sitemap de paginas estaticas -->
   <sitemap>
     <loc>${CONFIG.siteUrl}/sitemap-pages.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+
+  <!-- Sitemap de servicios (dinamico) -->
+  <sitemap>
+    <loc>${CONFIG.siteUrl}/sitemap-services.xml</loc>
     <lastmod>${today}</lastmod>
   </sitemap>
 
@@ -209,20 +277,23 @@ async function main() {
   }
 
   const { postsCount, categoriesCount } = await generateBlogSitemap();
+  const { servicesCount } = await generateServicesSitemap();
   updateSitemapIndex();
 
   // Resumen
   console.log('\n' + '═'.repeat(50));
   console.log('📊 RESUMEN DE SITEMAPS');
   console.log('═'.repeat(50));
+  console.log(`   💼 Servicios: ${servicesCount}`);
   console.log(`   📝 Posts del blog: ${postsCount}`);
   console.log(`   📁 Categorías: ${categoriesCount}`);
-  console.log(`   🔢 Total URLs en sitemap-blog.xml: ${postsCount + categoriesCount}`);
+  console.log(`   🔢 Total URLs: ${servicesCount + postsCount + categoriesCount}`);
   console.log('═'.repeat(50));
 
-  if (postsCount > 0) {
+  if (postsCount > 0 || servicesCount > 0) {
     console.log('\n🎉 Sitemaps actualizados correctamente!');
     console.log('   - sitemap.xml (índice)');
+    console.log('   - sitemap-services.xml (servicios)');
     console.log('   - sitemap-blog.xml (posts)');
   }
 }

@@ -1,12 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:simple",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
     {
       "source": "/sitemap-blog.xml",
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/sitemap.xml"
+    },
+    {
+      "source": "/sitemap-services.xml",
+      "destination": "/sitemap-services.xml"
     },
     {
       "source": "/api/blog/(.*)",
