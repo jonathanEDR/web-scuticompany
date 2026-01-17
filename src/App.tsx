@@ -13,6 +13,7 @@ import DashboardRouter from './components/DashboardRouter';
 import SmartDashboardLayout from './components/SmartDashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import WelcomeNotification from './components/WelcomeNotification';
+import useGTMPageView from './hooks/useGTMPageView';
 import { UserRole } from './types/roles';
 import { useAuth } from './contexts/AuthContext';
 import { setTokenGetter } from './services/blog/blogApiClientSetup';
@@ -142,6 +143,12 @@ const ClientDashboardLayoutWrapper = () => (
   </DashboardProviders>
 );
 
+// 📊 Componente para trackear Page Views en GTM
+function GTMTracker() {
+  useGTMPageView();
+  return null;
+}
+
 function AppContent() {
   const { showWelcomeNotification, onboardingData, dismissWelcomeNotification } = useAuth();
   const { getToken } = useClerkAuth();
@@ -153,6 +160,7 @@ function AppContent() {
 
   return (
     <BrowserRouter>
+      <GTMTracker />
       <ScrollToTop />
       
       {/* 🎉 Notificación de bienvenida para nuevos clientes */}
