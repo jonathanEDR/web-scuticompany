@@ -20,32 +20,59 @@ const __dirname = path.dirname(__filename);
 const distPath = path.join(__dirname, '../dist');
 
 // Configuración
+// IMPORTANTE: Normalizar la URL base - remover /api si ya está incluido para evitar /api/api
+const rawApiUrl = process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com';
+// Remover /api del final si existe para evitar duplicación
+const baseApiUrl = rawApiUrl.replace(/\/api\/?$/, '');
+
 const CONFIG = {
-  // URL de la API - usar variable de entorno o default a producción
-  apiUrl: process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com',
+  apiUrl: baseApiUrl,
   siteUrl: 'https://scuticompany.com',
   siteName: 'SCUTI Company Blog',
   defaultImage: 'https://scuticompany.com/Logo.png',
   twitterHandle: '@scuticompany'
 };
 
+// Debug: mostrar qué URL se está usando
+console.log('═'.repeat(60));
+console.log('🔧 CONFIGURACIÓN DE PRE-RENDERING BLOG');
+console.log('═'.repeat(60));
+console.log(`   VITE_API_URL (raw): ${process.env.VITE_API_URL || '(not set)'}`);
+console.log(`   API_URL (raw): ${process.env.API_URL || '(not set)'}`);
+console.log(`   Base URL (normalized): ${CONFIG.apiUrl}`);
+console.log(`   Full API path will be: ${CONFIG.apiUrl}/api/blog/...`);
+console.log('═'.repeat(60));
+
 /**
  * Fetch wrapper con timeout y retry
+ * Aumentado timeout a 60s y reintentos a 5 para manejar cold starts de Render
  */
-async function fetchWithRetry(url, options = {}, retries = 3) {
+async function fetchWithRetry(url, options = {}, retries = 5) {
+  console.log(`   🔗 Fetching: ${url}`);
+  
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+      const timeout = setTimeout(() => controller.abort(), 60000); // 60s para cold start
 
       const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'Vercel-Build-Blog-Prerender/1.0'
+        },
         ...options,
         signal: controller.signal
       });
 
       clearTimeout(timeout);
+      
+      console.log(`   📊 Response: ${response.status} ${response.statusText}`);
 
       if (!response.ok) {
+        const errorBody = await response.text().catch(() => 'No body');
+        console.log(`   📄 Error body: ${errorBody.substring(0, 200)}`);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
