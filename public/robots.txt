@@ -8,9 +8,19 @@ Allow: /
 Disallow: /admin/
 Disallow: /dashboard/
 
+# Bloquear filtros de blog (no son páginas, son filtros de la página principal)
+Disallow: /blog/category/
+Disallow: /blog/categoria/
+Disallow: /blog/tag/
+Disallow: /blog/tags/
+
+# Bloquear parámetros de filtro
+Disallow: /*?categoria=
+Disallow: /*?tag=
+Disallow: /*?search=
+
 # Sitemaps
 Sitemap: https://scuticompany.com/sitemap.xml
-Sitemap: https://scuticompany.com/sitemap-blog.xml
 
 # Crawl-delay
 Crawl-delay: 1

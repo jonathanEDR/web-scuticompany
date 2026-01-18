@@ -102,10 +102,12 @@ export default function TagList({
         );
 
         if (clickable) {
+          // Usar query param en lugar de ruta separada para SEO
+          // /blog?tag=slug en lugar de /blog/tag/slug
           return (
             <Link
               key={`${tagSlug}-${index}`}
-              to={`/blog/tag/${encodeURIComponent(tagSlug)}`}
+              to={`/blog?tag=${encodeURIComponent(tagSlug)}`}
               className={tagClass}
               style={getTagStyle()}
               onMouseEnter={(e) => {

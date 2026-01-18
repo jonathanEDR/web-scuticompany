@@ -142,12 +142,6 @@ export const AIOptimizedContent: React.FC<AIOptimizedContentProps> = ({ post }) 
             {
               '@type': 'ListItem',
               position: 3,
-              name: typeof post.category === 'string' ? post.category : post.category.name,
-              item: `https://scuticompany.com/blog/category/${typeof post.category === 'string' ? post.category : post.category.slug}`
-            },
-            {
-              '@type': 'ListItem',
-              position: 4,
               name: post.title,
               item: `https://scuticompany.com/blog/${post.slug}`
             }

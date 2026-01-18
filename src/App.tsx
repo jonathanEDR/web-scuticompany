@@ -76,6 +76,7 @@ const MySolicitudes = lazy(() => import('./pages/client/MySolicitudes'));
 // Módulo de Blog - Páginas Públicas
 const BlogHome = lazy(() => import('./pages/public/blog/BlogHome'));
 const BlogPost = lazy(() => import('./pages/public/blog/BlogPost'));
+const BlogFilterRedirect = lazy(() => import('./pages/public/blog/BlogFilterRedirect'));
 
 // Módulo de Blog - Páginas Administrativas
 const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
@@ -196,8 +197,12 @@ function AppContent() {
               {/* 📰 BLOG - Páginas Públicas */}
               <Route path="/blog" element={<BlogHome />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
-              
-              {/* �🔐 RUTAS DE AUTENTICACIÓN - Clerk ya disponible globalmente */}
+                            {/* 🔄 Redirecciones de filtros de blog (noindex) */}
+              <Route path="/blog/category/:slug" element={<BlogFilterRedirect filterType="category" />} />
+              <Route path="/blog/categoria/:slug" element={<BlogFilterRedirect filterType="category" />} />
+              <Route path="/blog/tag/:slug" element={<BlogFilterRedirect filterType="tag" />} />
+              <Route path="/blog/tags/:slug" element={<BlogFilterRedirect filterType="tag" />} />
+                            {/* �🔐 RUTAS DE AUTENTICACIÓN - Clerk ya disponible globalmente */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
       

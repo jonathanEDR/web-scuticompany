@@ -143,7 +143,8 @@ async function generateBlogSitemap() {
 
   console.log('\n📡 Conectando a API...');
   const posts = await getAllPosts();
-  const categories = await getAllCategories();
+  // NO incluir categorías en el sitemap - son filtros, no páginas
+  // const categories = await getAllCategories();
 
   if (posts.length === 0) {
     console.warn('\n⚠️ No se encontraron posts para el sitemap.');
@@ -168,28 +169,17 @@ async function generateBlogSitemap() {
     }
   }
 
-  // Agregar categorías del blog
-  if (categories.length > 0) {
-    console.log(`\n📁 Categorías del blog (${categories.length}):`);
-    for (const category of categories) {
-      if (category.slug) {
-        urls.push(`
-  <url>
-    <loc>${escapeXml(CONFIG.siteUrl)}/blog/categoria/${escapeXml(category.slug)}</loc>
-    <lastmod>${formatDate(new Date())}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>`);
-        console.log(`   ✅ /blog/categoria/${category.slug}`);
-      }
-    }
-  }
+  // ❌ NO incluir categorías del blog en el sitemap
+  // Las categorías son FILTROS de la página /blog, no páginas independientes
+  // Google debe indexar /blog y los posts individuales, no los filtros
+  console.log(`\n📁 Categorías del blog: NO incluidas en sitemap (son filtros)`);
 
   // Generar XML del sitemap de blog
   const sitemapBlog = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Sitemap del Blog - Generado: ${new Date().toISOString()} -->
-  <!-- Total URLs: ${urls.length} -->${urls.join('')}
+  <!-- Total URLs: ${urls.length} -->
+  <!-- NOTA: Categorías y tags NO incluidos (son filtros, no páginas) -->${urls.join('')}
 </urlset>`;
 
   // Escribir sitemap-blog.xml
@@ -197,7 +187,7 @@ async function generateBlogSitemap() {
   fs.writeFileSync(sitemapBlogPath, sitemapBlog);
   console.log(`\n   📁 Archivo generado: dist/sitemap-blog.xml`);
 
-  return { postsCount: posts.length, categoriesCount: categories.length };
+  return { postsCount: posts.length, categoriesCount: 0 };
 }
 
 /**
