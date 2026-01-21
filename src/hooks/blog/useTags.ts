@@ -18,11 +18,16 @@ interface UseTagsReturn {
 
 /**
  * Hook para obtener todos los tags
- * ✅ Con sistema de cache (TTL: 6 horas)
+ * ✅ Con sistema de cache (TTL: 7 días)
+ * ✅ Optimizado: loading inteligente basado en caché existente
  */
 export function useTags(): UseTagsReturn {
-  const [tags, setTags] = useState<BlogTag[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ Inicialización inteligente: verificar caché inmediatamente
+  const cacheKey = 'all-tags';
+  const initialCached = blogCache.get<BlogTag[]>('TAGS', cacheKey);
+  
+  const [tags, setTags] = useState<BlogTag[]>(initialCached || []);
+  const [loading, setLoading] = useState(!initialCached); // ✅ No loading si hay caché
   const [error, setError] = useState<string | null>(null);
 
   const fetchTags = useCallback(async () => {

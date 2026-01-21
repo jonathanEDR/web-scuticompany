@@ -897,8 +897,10 @@ const parsePageDataToConfig = (pageData: any): BlogCmsConfig => {
 const getInitialConfig = (): { config: BlogCmsConfig; fromCache: boolean } => {
   const cachedData = getCachedPageSync('blog');
   if (cachedData) {
+    console.log('✅ [BlogCmsConfig] Cargado desde cache - sin flash');
     return { config: parsePageDataToConfig(cachedData), fromCache: true };
   }
+  console.log('⏳ [BlogCmsConfig] Sin cache - cargando desde API');
   return {
     config: {
       blogHero: DEFAULT_BLOG_HERO_CONFIG,
@@ -912,35 +914,37 @@ const getInitialConfig = (): { config: BlogCmsConfig; fromCache: boolean } => {
 
 export const useBlogCmsConfig = () => {
   // ⚡ Inicializar con datos del cache si existen (evita flash)
-  const initial = getInitialConfig();
-  const [config, setConfig] = useState<BlogCmsConfig>(initial.config);
-  const [loading, setLoading] = useState(!initial.fromCache);
+  const [initialState] = useState(() => getInitialConfig());
+  const [config, setConfig] = useState<BlogCmsConfig>(initialState.config);
+  const [loading, setLoading] = useState(!initialState.fromCache);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // ✅ Si ya tenemos datos del cache, no hacer fetch inmediato
+    // Solo refrescar en background para mantener datos actualizados
     const loadBlogConfig = async () => {
-      // Si ya tenemos datos del cache, no mostrar loading
-      if (!initial.fromCache) {
-        setLoading(true);
-      }
-      
       try {
         const pageData = await getPageBySlug('blog');
         
         if (pageData?.content) {
-          setConfig(parsePageDataToConfig(pageData));
+          const newConfig = parsePageDataToConfig(pageData);
+          setConfig(newConfig);
         }
       } catch (err) {
-        console.warn('⚠️ No se pudo cargar la configuración del blog, usando valores por defecto');
-        setError('Error cargando configuración');
-        // Mantener la configuración actual (cache o default)
+        // Solo loguear en dev, no es crítico si falla el refresh
+        if (import.meta.env.DEV) {
+          console.warn('⚠️ [BlogCmsConfig] Error actualizando config:', err);
+        }
+        if (!initialState.fromCache) {
+          setError('Error cargando configuración');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadBlogConfig();
-  }, []);
+  }, [initialState.fromCache]);
 
   return { config, loading, error };
 };

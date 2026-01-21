@@ -1,12 +1,13 @@
 /**
  * 📊 BlogDashboard Component
  * Panel de control principal del blog con estadísticas
+ * ✅ Incluye opción de invalidar caché manualmente
  */
 
 import { useEffect, useState } from 'react';
 import { 
   FileText, MessageCircle, Eye, TrendingUp, 
-  Users, Calendar, BarChart3, Clock, Target, Trash2
+  Users, Calendar, BarChart3, Clock, Target, Trash2, RefreshCw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCategories, useAdminPosts } from '../../../hooks/blog';
@@ -16,6 +17,7 @@ import { BlogAnalyticsDashboard } from '../../../components/blog/analytics/BlogA
 import { SEOCanvasModal } from '../../../components/admin/seo';
 import { useAuth } from '../../../contexts/AuthContext';
 import { blogPostApi } from '../../../services/blog';
+import { invalidateAllBlogCache } from '../../../utils/blogCache';
 
 export default function BlogDashboard() {
   
@@ -175,6 +177,22 @@ export default function BlogDashboard() {
         </div>
 
         <div className="flex gap-3">
+          {/* 🗑️ Botón Limpiar Caché - Solo para ADMIN/SUPER_ADMIN */}
+          {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
+            <button
+              onClick={() => {
+                invalidateAllBlogCache();
+                refetch(); // Recargar datos frescos
+                alert('✅ Caché del blog limpiado correctamente.\nLos usuarios verán los cambios actualizados.');
+              }}
+              className="inline-flex items-center gap-2 px-4 py-3 bg-orange-600 dark:bg-orange-700 text-white rounded-lg hover:bg-orange-700 dark:hover:bg-orange-800 transition-colors font-medium shadow-sm"
+              title="Limpiar caché del blog para forzar actualización"
+            >
+              <RefreshCw className="w-5 h-5" />
+              <span>Limpiar Caché</span>
+            </button>
+          )}
+          
           {/* Botón SEO Canvas - Solo para ADMIN/SUPER_ADMIN */}
           {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
             <button

@@ -18,11 +18,16 @@ interface UseCategoriesReturn {
 
 /**
  * Hook para obtener todas las categorías
- * ✅ Con sistema de cache (TTL: 6 horas)
+ * ✅ Con sistema de cache (TTL: 7 días)
+ * ✅ Optimizado: loading inteligente basado en caché existente
  */
 export function useCategories(): UseCategoriesReturn {
-  const [categories, setCategories] = useState<BlogCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ Inicialización inteligente: verificar caché inmediatamente
+  const cacheKey = 'all-categories';
+  const initialCached = blogCache.get<BlogCategory[]>('CATEGORIES', cacheKey);
+  
+  const [categories, setCategories] = useState<BlogCategory[]>(initialCached || []);
+  const [loading, setLoading] = useState(!initialCached); // ✅ No loading si hay caché
   const [error, setError] = useState<string | null>(null);
 
   const fetchCategories = useCallback(async () => {

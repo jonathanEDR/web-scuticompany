@@ -49,11 +49,15 @@ interface UseBlogPostReturn {
  * Hook para obtener un post por su slug
  * ✅ Devuelve también relatedPosts del backend (evita llamadas API extra)
  * ✅ Maneja correctamente el pre-renderizado SEO
+ * ✅ Optimizado: loading inteligente basado en caché existente
  */
 export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ Inicialización inteligente: verificar caché inmediatamente
+  const initialCached = slug ? blogCache.get<{ post: BlogPost; relatedPosts: BlogPost[] }>('POST_DETAIL', slug) : null;
+  
+  const [post, setPost] = useState<BlogPost | null>(initialCached?.post || null);
+  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>(initialCached?.relatedPosts || []);
+  const [loading, setLoading] = useState(!initialCached && !!slug); // ✅ No loading si hay caché
   const [error, setError] = useState<string | null>(null);
   const prerenderMode = isPrerendering();
 

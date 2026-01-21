@@ -26,17 +26,18 @@ interface CacheStats {
 
 /**
  * Configuración de TTL por tipo de contenido
- * Blog público: Contenido semi-estático (actualiza ocasionalmente)
+ * Blog público: Contenido casi estático (actualiza muy raramente)
+ * ✅ Optimizado para mejor UX: TTL largos porque el contenido público cambia poco
  */
 const CACHE_TTL = {
-  POST_DETAIL: 2 * 60 * 60 * 1000,      // 2 horas - Posts individuales
-  POST_LIST: 1 * 60 * 60 * 1000,        // 1 hora - Listados de posts
-  FEATURED: 4 * 60 * 60 * 1000,         // 4 horas - Posts destacados
-  POPULAR: 2 * 60 * 60 * 1000,          // 2 horas - Posts populares
-  CATEGORIES: 6 * 60 * 60 * 1000,       // 6 horas - Categorías
-  TAGS: 6 * 60 * 60 * 1000,             // 6 horas - Tags
-  SEARCH: 30 * 60 * 1000,               // 30 minutos - Búsqueda
-  COMMENTS: 5 * 60 * 1000,              // 5 minutos - Comentarios (dinámicos)
+  POST_DETAIL: 7 * 24 * 60 * 60 * 1000,   // 7 días - Posts individuales (contenido estable)
+  POST_LIST: 24 * 60 * 60 * 1000,         // 24 horas - Listados de posts
+  FEATURED: 3 * 24 * 60 * 60 * 1000,      // 3 días - Posts destacados
+  POPULAR: 24 * 60 * 60 * 1000,           // 24 horas - Posts populares
+  CATEGORIES: 7 * 24 * 60 * 60 * 1000,    // 7 días - Categorías (muy estables)
+  TAGS: 7 * 24 * 60 * 60 * 1000,          // 7 días - Tags (muy estables)
+  SEARCH: 4 * 60 * 60 * 1000,             // 4 horas - Búsqueda
+  COMMENTS: 15 * 60 * 1000,               // 15 minutos - Comentarios (más dinámicos)
 } as const;
 
 /**
@@ -258,20 +259,37 @@ const blogCache = new BlogCacheManager(100);
 
 /**
  * Invalidar cache cuando se crea/actualiza/elimina contenido
+ * ✅ Usado automáticamente por operaciones admin
  */
-export const invalidateOnMutation = (mutationType: 'post' | 'comment' | 'category'): void => {
+export const invalidateOnMutation = (mutationType: 'post' | 'comment' | 'category' | 'tag'): void => {
+  console.log(`🗑️ [BlogCache] Invalidando caché por mutación: ${mutationType}`);
+  
   switch (mutationType) {
     case 'post':
-      blogCache.invalidateRelated(['POST_LIST', 'FEATURED', 'POPULAR', 'SEARCH']);
+      // Invalidar todo lo relacionado con posts
+      blogCache.invalidateRelated(['POST_LIST', 'POST_DETAIL', 'FEATURED', 'POPULAR', 'SEARCH']);
       break;
     case 'comment':
       blogCache.invalidateType('COMMENTS');
       break;
     case 'category':
       blogCache.invalidateType('CATEGORIES');
-      blogCache.invalidateType('POST_LIST');
+      blogCache.invalidateType('POST_LIST'); // Posts usan categorías
+      break;
+    case 'tag':
+      blogCache.invalidateType('TAGS');
+      blogCache.invalidateType('POST_LIST'); // Posts usan tags
       break;
   }
+};
+
+/**
+ * Invalidar TODO el caché del blog
+ * Útil para forzar actualización completa desde admin
+ */
+export const invalidateAllBlogCache = (): void => {
+  console.log('🗑️ [BlogCache] Invalidando TODO el caché del blog');
+  blogCache.clear();
 };
 
 /**

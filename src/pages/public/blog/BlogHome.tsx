@@ -11,6 +11,41 @@ import { BlogCtaSection } from '../../../components/blog/sections/BlogCtaSection
 import PublicHeader from '../../../components/public/PublicHeader';
 import PublicFooter from '../../../components/public/PublicFooter';
 
+// ✅ Skeleton para Featured Posts mientras carga la configuración
+const FeaturedPostsSkeleton: React.FC = () => (
+  <section className="relative py-12 bg-gray-100 dark:bg-gray-900 animate-pulse">
+    <div className="container mx-auto px-4">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
+        <div className="w-48 h-8 bg-gray-300 dark:bg-gray-700 rounded"></div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 h-96 bg-gray-300 dark:bg-gray-700 rounded-xl"></div>
+        <div className="flex flex-col gap-4">
+          <div className="h-44 bg-gray-300 dark:bg-gray-700 rounded-xl"></div>
+          <div className="h-44 bg-gray-300 dark:bg-gray-700 rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// ✅ Skeleton para All News mientras carga la configuración
+const AllNewsSkeleton: React.FC = () => (
+  <section className="py-12 bg-white dark:bg-gray-800 animate-pulse">
+    <div className="container mx-auto px-4">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-48 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="h-72 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
 const BlogHome: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -19,7 +54,8 @@ const BlogHome: React.FC = () => {
   const postsPerPage = 9;
 
   // 🆕 Cargar configuración del CMS y tema actual
-  const { config: cmsConfig } = useBlogCmsConfig();
+  // ✅ loading: true si no hay cache disponible (evita flash de layout)
+  const { config: cmsConfig, loading: cmsLoading } = useBlogCmsConfig();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const featuredPostsConfig = cmsConfig.featuredPosts;
@@ -171,7 +207,11 @@ const BlogHome: React.FC = () => {
       />
 
       {/* Featured Posts Section - Noticias Destacadas */}
-      {featuredPosts && featuredPosts.length > 0 && (
+      {/* ✅ Mostrar skeleton mientras carga la config del CMS (evita flash de layout) */}
+      {cmsLoading && featuredPosts && featuredPosts.length > 0 && <FeaturedPostsSkeleton />}
+      
+      {/* ✅ Mostrar sección real solo cuando la config esté lista */}
+      {!cmsLoading && featuredPosts && featuredPosts.length > 0 && (
         <section 
           className="relative py-12 transition-colors duration-300"
           style={featuredStyles.sectionStyle}
@@ -257,19 +297,25 @@ const BlogHome: React.FC = () => {
       )}
 
       {/* All News Section - Todas las Noticias (Nuevo diseño maqueta) */}
-      <AllNewsSection
-        posts={posts || []}
-        categories={categories || []}
-        tags={tags || []}
-        config={cmsConfig.allNews}
-        onCategorySelect={handleCategoryClick}
-        onTagSelect={handleTagClick}
-        selectedCategory={selectedCategory}
-        selectedTag={selectedTag}
-      />
+      {/* ✅ Mostrar skeleton mientras carga la config del CMS */}
+      {cmsLoading && <AllNewsSkeleton />}
+      
+      {/* ✅ Mostrar sección real solo cuando la config esté lista */}
+      {!cmsLoading && (
+        <AllNewsSection
+          posts={posts || []}
+          categories={categories || []}
+          tags={tags || []}
+          config={cmsConfig.allNews}
+          onCategorySelect={handleCategoryClick}
+          onTagSelect={handleTagClick}
+          selectedCategory={selectedCategory}
+          selectedTag={selectedTag}
+        />
+      )}
 
       {/* CTA Section - Último Llamado */}
-      <BlogCtaSection config={cmsConfig.blogCta} />
+      {!cmsLoading && <BlogCtaSection config={cmsConfig.blogCta} />}
 
       {/* Footer */}
       <PublicFooter />

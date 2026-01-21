@@ -1,10 +1,12 @@
 /**
  * 📂 Servicio de API para Categorías del Blog
  * Maneja operaciones CRUD de categorías
+ * ✅ Incluye invalidación automática de caché en operaciones admin
  */
 
 import axios, { AxiosError } from 'axios';
 import { getApiUrl } from '../../utils/apiConfig';
+import blogCache, { invalidateOnMutation } from '../../utils/blogCache';
 import type {
   BlogCategory,
   CreateCategoryDto,
@@ -98,35 +100,54 @@ const getCategoryPosts = async (
 
 /**
  * Crea una nueva categoría - Admin
+ * ✅ Invalida caché automáticamente
  */
 const createCategory = async (
   data: CreateCategoryDto
 ): Promise<ApiResponse<BlogCategory>> => {
   const response = await categoryApiClient.post('/categories', data);
+  
+  // ✅ Invalidar caché de categorías y posts relacionados
+  invalidateOnMutation('category');
+  console.log('🗑️ [Admin] Caché invalidado tras crear categoría');
+  
   return response.data;
 };
 
 /**
  * Actualiza una categoría - Admin
+ * ✅ Invalida caché automáticamente
  */
 const updateCategory = async (
   id: string,
   data: UpdateCategoryDto
 ): Promise<ApiResponse<BlogCategory>> => {
   const response = await categoryApiClient.put(`/categories/${id}`, data);
+  
+  // ✅ Invalidar caché de categorías y posts relacionados
+  invalidateOnMutation('category');
+  console.log('🗑️ [Admin] Caché invalidado tras actualizar categoría');
+  
   return response.data;
 };
 
 /**
  * Elimina una categoría - Admin
+ * ✅ Invalida caché automáticamente
  */
 const deleteCategory = async (id: string): Promise<ApiResponse<void>> => {
   const response = await categoryApiClient.delete(`/categories/${id}`);
+  
+  // ✅ Invalidar caché de categorías y posts relacionados
+  invalidateOnMutation('category');
+  console.log('🗑️ [Admin] Caché invalidado tras eliminar categoría');
+  
   return response.data;
 };
 
 /**
  * Reordena categorías - Admin
+ * ✅ Invalida caché automáticamente
  */
 const reorderCategories = async (
   categoryIds: string[]
@@ -134,6 +155,11 @@ const reorderCategories = async (
   const response = await categoryApiClient.put('/categories/reorder', {
     order: categoryIds
   });
+  
+  // ✅ Invalidar caché de categorías
+  blogCache.invalidateType('CATEGORIES');
+  console.log('🗑️ [Admin] Caché invalidado tras reordenar categorías');
+  
   return response.data;
 };
 

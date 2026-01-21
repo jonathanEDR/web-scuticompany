@@ -1,11 +1,13 @@
 /**
  * 📡 Servicio de API para Posts del Blog
  * Maneja todas las peticiones relacionadas con posts
+ * ✅ Incluye invalidación automática de caché en operaciones admin
  */
 
 import axios, { AxiosError } from 'axios';
 import { getApiUrl } from '../../utils/apiConfig';
 import { setupAuthInterceptor } from './blogApiClientSetup';
+import blogCache, { invalidateOnMutation } from '../../utils/blogCache';
 import type {
   BlogPost,
   CreatePostDto,
@@ -220,54 +222,93 @@ const getPostById = async (id: string): Promise<ApiResponse<BlogPost>> => {
 
 /**
  * Crea un nuevo post - Admin
+ * ✅ Invalida caché automáticamente
  */
 const createPost = async (
   data: CreatePostDto
 ): Promise<ApiResponse<BlogPost>> => {
   const response = await blogApiClient.post('/posts', data);
+  
+  // ✅ Invalidar caché de listas de posts
+  invalidateOnMutation('post');
+  console.log('🗑️ [Admin] Caché invalidado tras crear post');
+  
   return response.data;
 };
 
 /**
  * Actualiza un post existente - Admin
+ * ✅ Invalida caché automáticamente (incluyendo el post específico)
  */
 const updatePost = async (
   id: string,
   data: UpdatePostDto
 ): Promise<ApiResponse<BlogPost>> => {
   const response = await blogApiClient.put(`/posts/${id}`, data);
+  
+  // ✅ Invalidar caché del post específico y listas
+  if (data.slug) {
+    blogCache.invalidate('POST_DETAIL', data.slug);
+  }
+  invalidateOnMutation('post');
+  console.log('🗑️ [Admin] Caché invalidado tras actualizar post');
+  
   return response.data;
 };
 
 /**
  * Elimina un post - Admin
+ * ✅ Invalida caché automáticamente
  */
 const deletePost = async (id: string): Promise<ApiResponse<void>> => {
   const response = await blogApiClient.delete(`/posts/${id}`);
+  
+  // ✅ Invalidar todo el caché de posts
+  invalidateOnMutation('post');
+  console.log('🗑️ [Admin] Caché invalidado tras eliminar post');
+  
   return response.data;
 };
 
 /**
  * Publica un post - Admin
+ * ✅ Invalida caché automáticamente
  */
 const publishPost = async (id: string): Promise<ApiResponse<BlogPost>> => {
   const response = await blogApiClient.patch(`/posts/${id}/publish`);
+  
+  // ✅ Invalidar caché (el post ahora aparece en listas públicas)
+  invalidateOnMutation('post');
+  console.log('🗑️ [Admin] Caché invalidado tras publicar post');
+  
   return response.data;
 };
 
 /**
  * Despublica un post - Admin
+ * ✅ Invalida caché automáticamente
  */
 const unpublishPost = async (id: string): Promise<ApiResponse<BlogPost>> => {
   const response = await blogApiClient.patch(`/posts/${id}/unpublish`);
+  
+  // ✅ Invalidar caché (el post ya no aparece en listas públicas)
+  invalidateOnMutation('post');
+  console.log('🗑️ [Admin] Caché invalidado tras despublicar post');
+  
   return response.data;
 };
 
 /**
  * Duplica un post - Admin
+ * ✅ Invalida caché automáticamente
  */
 const duplicatePost = async (id: string): Promise<ApiResponse<BlogPost>> => {
   const response = await blogApiClient.post(`/posts/${id}/duplicate`);
+  
+  // ✅ Invalidar caché de listas
+  invalidateOnMutation('post');
+  console.log('🗑️ [Admin] Caché invalidado tras duplicar post');
+  
   return response.data;
 };
 

@@ -20,12 +20,17 @@ interface UseBlogPostsReturn {
 
 /**
  * Hook para obtener lista de posts con filtros
+ * ✅ Optimizado: loading inteligente basado en caché existente
  */
 export function useBlogPosts(filters?: BlogFilters): UseBlogPostsReturn {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ Inicialización inteligente: verificar caché inmediatamente
+  const initialCacheKey = filters || {};
+  const initialCached = blogCache.get<{ data: BlogPost[]; pagination: PaginationInfo }>('POST_LIST', initialCacheKey);
+  
+  const [posts, setPosts] = useState<BlogPost[]>(initialCached?.data || []);
+  const [loading, setLoading] = useState(!initialCached); // ✅ No loading si hay caché
   const [error, setError] = useState<string | null>(null);
-  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(initialCached?.pagination || null);
 
   const fetchPosts = useCallback(async () => {
     // ✅ No hacer petición si limit es 0 o si tags está vacío cuando se requiere
@@ -96,10 +101,14 @@ export function useBlogPosts(filters?: BlogFilters): UseBlogPostsReturn {
 
 /**
  * Hook para obtener posts destacados
+ * ✅ Optimizado: loading inteligente basado en caché existente
  */
 export function useFeaturedPosts() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ Inicialización inteligente: verificar caché inmediatamente
+  const initialCached = blogCache.get<BlogPost[]>('FEATURED', 'featured-posts');
+  
+  const [posts, setPosts] = useState<BlogPost[]>(initialCached || []);
+  const [loading, setLoading] = useState(!initialCached); // ✅ No loading si hay caché
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -142,10 +151,15 @@ export function useFeaturedPosts() {
 
 /**
  * Hook para obtener posts populares
+ * ✅ Optimizado: loading inteligente basado en caché existente
  */
 export function usePopularPosts(limit: number = 5) {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ Inicialización inteligente: verificar caché inmediatamente
+  const cacheKey = `popular-${limit}`;
+  const initialCached = blogCache.get<BlogPost[]>('POPULAR', cacheKey);
+  
+  const [posts, setPosts] = useState<BlogPost[]>(initialCached || []);
+  const [loading, setLoading] = useState(!initialCached); // ✅ No loading si hay caché
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
