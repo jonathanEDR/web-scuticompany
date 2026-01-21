@@ -3,6 +3,7 @@
  * Maneja la carga de un post específico por slug
  * ✅ Optimizado con cache para evitar recargas innecesarias
  * ✅ Ahora expone relatedPosts del backend para evitar llamadas extra
+ * ✅ Compatible con pre-renderizado SEO (no muestra error durante build)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -10,11 +11,36 @@ import { blogPostApi } from '../../services/blog';
 import blogCache from '../../utils/blogCache';
 import type { BlogPost } from '../../types/blog';
 
+/**
+ * 🔍 Detecta si estamos en modo pre-renderizado (react-snap, Vercel build, etc.)
+ * Esto evita mostrar "Artículo no encontrado" durante el build cuando la API no responde
+ */
+const isPrerendering = (): boolean => {
+  if (typeof window === 'undefined') return true;
+  if (typeof navigator === 'undefined') return true;
+  
+  // Detectar react-snap
+  if (navigator.userAgent?.includes('ReactSnap')) return true;
+  
+  // Detectar Puppeteer/Headless Chrome (usado por react-snap y Vercel)
+  if (navigator.userAgent?.includes('HeadlessChrome')) return true;
+  
+  // Detectar crawlers de build
+  if (navigator.userAgent?.includes('Prerender')) return true;
+  if (navigator.userAgent?.includes('Vercel-Build')) return true;
+  
+  // Variable de entorno para modo de build
+  if ((window as any).__PRERENDER_INJECTED !== undefined) return true;
+  
+  return false;
+};
+
 interface UseBlogPostReturn {
   post: BlogPost | null;
   relatedPosts: BlogPost[];  // ✅ Ahora se exponen los posts relacionados
   loading: boolean;
   error: string | null;
+  isPrerendering: boolean; // ✅ Nuevo: indica si estamos en modo pre-renderizado
   refetch: () => Promise<void>;
   updateLocalPost: (updatedPost: BlogPost) => void;
 }
@@ -22,18 +48,29 @@ interface UseBlogPostReturn {
 /**
  * Hook para obtener un post por su slug
  * ✅ Devuelve también relatedPosts del backend (evita llamadas API extra)
+ * ✅ Maneja correctamente el pre-renderizado SEO
  */
 export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const prerenderMode = isPrerendering();
 
   const fetchPost = useCallback(async () => {
     if (!slug) {
       setPost(null);
       setRelatedPosts([]);
       setLoading(false);
+      return;
+    }
+
+    // 🔍 En modo pre-renderizado, solo marcar como no-loading sin error
+    // El contenido estático ya fue generado por prerender-blog.js
+    if (prerenderMode) {
+      console.log('[useBlogPost] Modo pre-renderizado detectado, omitiendo fetch API');
+      setLoading(false);
+      // No setear error - dejar que el HTML estático pre-renderizado sea visible
       return;
     }
 
@@ -66,13 +103,16 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
         throw new Error('Post no encontrado');
       }
     } catch (err: any) {
-      setError(err.message || 'Error al cargar el post');
-      setPost(null);
-      setRelatedPosts([]);
+      // ✅ No mostrar error si estamos en pre-renderizado (el contenido estático existe)
+      if (!prerenderMode) {
+        setError(err.message || 'Error al cargar el post');
+        setPost(null);
+        setRelatedPosts([]);
+      }
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [slug, prerenderMode]);
 
   useEffect(() => {
     fetchPost();
@@ -88,6 +128,7 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
     relatedPosts,
     loading,
     error,
+    isPrerendering: prerenderMode,
     refetch: fetchPost,
     updateLocalPost,
   };

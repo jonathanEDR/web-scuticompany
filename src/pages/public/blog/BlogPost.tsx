@@ -34,7 +34,7 @@ import PublicHeader from '../../../components/public/PublicHeader';
 
 const BlogPostEnhanced: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { post, relatedPosts, loading, error } = useBlogPost(slug || '');
+  const { post, relatedPosts, loading, error, isPrerendering } = useBlogPost(slug || '');
   const { theme } = useTheme();
   
   // ✅ Obtener configuración del CMS para blog-post-detail
@@ -80,7 +80,10 @@ const BlogPostEnhanced: React.FC = () => {
     );
   }
 
-  if (error || !post) {
+  // ✅ SEO FIX: Durante pre-renderizado, NO mostrar "Artículo no encontrado"
+  // El contenido estático ya fue generado por prerender-blog.js y está en el HTML
+  // Si mostramos el error, Google verá "Artículo no encontrado" en lugar del contenido real
+  if ((error || !post) && !isPrerendering) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="container mx-auto px-4 max-w-4xl">
@@ -96,6 +99,15 @@ const BlogPostEnhanced: React.FC = () => {
       </div>
     );
   }
+
+  // ✅ Durante pre-renderizado sin datos, retornar null para que el HTML estático permanezca
+  // El script prerender-blog.js ya generó el contenido SEO-friendly
+  if (!post && isPrerendering) {
+    return null;
+  }
+
+  // ✅ A partir de aquí, post existe y podemos renderizar normalmente
+  if (!post) return null;
 
   return (
     <div 

@@ -360,7 +360,8 @@ export const ServicioDetail: React.FC = () => {
   const {
     data: servicio,
     loading,
-    error: errorServicio
+    error: errorServicio,
+    isPrerendering
   } = useServicioDetail(slug || '', {
     enabled: !!slug,
     onSuccess: () => {
@@ -480,6 +481,12 @@ export const ServicioDetail: React.FC = () => {
   }
 
   if (error || !servicio) {
+    // ✅ SEO FIX: Durante pre-renderizado, NO mostrar "Servicio no encontrado"
+    // El contenido estático ya fue generado por prerender-services.js
+    if (isPrerendering) {
+      return null; // Permite que el HTML estático permanezca visible
+    }
+    
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <PublicHeader />

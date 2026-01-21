@@ -1,6 +1,7 @@
 /**
  * 📝 BlogPost Público (Sin IA)
  * Versión optimizada para páginas públicas sin funcionalidades de IA
+ * ✅ Compatible con pre-renderizado SEO
  */
 
 import React, { useEffect } from 'react';
@@ -22,7 +23,7 @@ import PublicFooter from '../../../components/public/PublicFooter';
 
 const BlogPostEnhanced: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { post, loading, error } = useBlogPost(slug || '');
+  const { post, loading, error, isPrerendering } = useBlogPost(slug || '');
 
   useEffect(() => {
     if (post) {
@@ -42,7 +43,8 @@ const BlogPostEnhanced: React.FC = () => {
     );
   }
 
-  if (error || !post) {
+  // ✅ SEO FIX: Durante pre-renderizado, NO mostrar "Artículo no encontrado"
+  if ((error || !post) && !isPrerendering) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -63,6 +65,9 @@ const BlogPostEnhanced: React.FC = () => {
       </div>
     );
   }
+
+  // ✅ Durante pre-renderizado sin datos, retornar null para que el HTML estático permanezca
+  if (!post) return null;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

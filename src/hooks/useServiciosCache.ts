@@ -2,11 +2,36 @@
  * 🎯 useServiciosCache Hook
  * Hook personalizado para cache optimizado de servicios públicos
  * Previene race conditions y re-renders innecesarios
+ * ✅ Compatible con pre-renderizado SEO
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import serviciosCache, { SERVICIOS_CACHE_TTL } from '../utils/serviciosCache';
 import type { Servicio, ServicioFilters } from '../types/servicios';
+
+/**
+ * 🔍 Detecta si estamos en modo pre-renderizado (react-snap, Vercel build, etc.)
+ * Esto evita mostrar errores durante el build cuando la API no responde
+ */
+const isPrerendering = (): boolean => {
+  if (typeof window === 'undefined') return true;
+  if (typeof navigator === 'undefined') return true;
+  
+  // Detectar react-snap
+  if (navigator.userAgent?.includes('ReactSnap')) return true;
+  
+  // Detectar Puppeteer/Headless Chrome (usado por react-snap y Vercel)
+  if (navigator.userAgent?.includes('HeadlessChrome')) return true;
+  
+  // Detectar crawlers de build
+  if (navigator.userAgent?.includes('Prerender')) return true;
+  if (navigator.userAgent?.includes('Vercel-Build')) return true;
+  
+  // Variable de entorno para modo de build
+  if ((window as any).__PRERENDER_INJECTED !== undefined) return true;
+  
+  return false;
+};
 
 interface UseServiciosCacheOptions {
   enabled?: boolean;
@@ -18,6 +43,7 @@ interface UseServiciosCacheReturn<T> {
   data: T | null;
   loading: boolean;
   error: string | null;
+  isPrerendering: boolean; // ✅ Nuevo: indica si estamos en modo pre-renderizado
   refetch: () => Promise<void>;
   clearCache: () => void;
   isFromCache: boolean;
@@ -25,6 +51,7 @@ interface UseServiciosCacheReturn<T> {
 
 /**
  * Hook para cache de servicios con control de race conditions
+ * ✅ Maneja correctamente el pre-renderizado SEO
  */
 export function useServiciosCache<T>(
   cacheKey: keyof typeof SERVICIOS_CACHE_TTL,
@@ -33,6 +60,7 @@ export function useServiciosCache<T>(
   options: UseServiciosCacheOptions = {}
 ): UseServiciosCacheReturn<T> {
   const { enabled = true, onSuccess, onError } = options;
+  const prerenderMode = isPrerendering();
 
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,6 +79,14 @@ export function useServiciosCache<T>(
   // Función para cargar datos (con cache o fetch)
   const loadData = useCallback(async (force = false) => {
     if (!enabled) return;
+    
+    // 🔍 En modo pre-renderizado, solo marcar como no-loading sin fetch
+    // El contenido estático ya fue generado por prerender-services.js
+    if (prerenderMode) {
+      console.log('[useServiciosCache] Modo pre-renderizado detectado, omitiendo fetch API');
+      setLoading(false);
+      return;
+    }
     
     // ⚡ Si ya hay una carga pendiente y no es forzada, saltarse
     if (isLoadingRef.current && !force) {
@@ -194,6 +230,7 @@ export function useServiciosCache<T>(
     data,
     loading,
     error,
+    isPrerendering: prerenderMode, // ✅ Indica si estamos en modo pre-renderizado
     refetch,
     clearCache,
     isFromCache
