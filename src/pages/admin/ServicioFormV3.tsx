@@ -972,13 +972,30 @@ export const ServicioFormV3: React.FC = () => {
       
       const { caracteristicas, beneficios, incluye, noIncluye, faq, ...formDataSinArrays } = formData;
       
+      // ✅ Validar que contenidoAdicional no sea JSON
+      let contenidoAdicionalSanitizado = formData.contenidoAdicional || '';
+      const jsonPatterns = [
+        /^\s*\{\s*"title":/i,
+        /^\s*\{\s*"description":/i,
+        /^\s*SEO:\s*\{/i,
+        /"metaTitle":/i,
+        /"metaDescription":/i,
+        /seo\s*[:=]\s*\{/i
+      ];
+      
+      const isJSON = jsonPatterns.some(pattern => pattern.test(contenidoAdicionalSanitizado));
+      if (isJSON) {
+        console.warn('⚠️ Contenido adicional contiene JSON - será limpiado antes de guardar');
+        contenidoAdicionalSanitizado = ''; // Limpiar si es JSON
+      }
+      
       const processedData = {
         ...formDataSinArrays,
         ...blocksData,
         descripcionRica: formData.descripcionRica || '',
         videoUrl: formData.videoUrl || '',
         galeriaImagenes: formData.galeriaImagenes || [],
-        contenidoAdicional: formData.contenidoAdicional || '',
+        contenidoAdicional: contenidoAdicionalSanitizado,
         seo: {
           titulo: formData.seo?.titulo || '',
           descripcion: formData.seo?.descripcion || '',

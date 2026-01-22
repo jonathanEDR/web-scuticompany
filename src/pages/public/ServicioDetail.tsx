@@ -74,7 +74,10 @@ const hasPanelContent = (servicio: Servicio, panelId: PanelType): boolean => {
         (servicio.tecnologias && servicio.tecnologias.length > 0)
       );
     case 'info':
-      return !!(servicio.contenidoAdicional?.trim() || (servicio.etiquetas && servicio.etiquetas.length > 0));
+      return !!(
+        (sanitizeContenidoAdicional(servicio.contenidoAdicional) && sanitizeContenidoAdicional(servicio.contenidoAdicional).length > 0) ||
+        (servicio.etiquetas && servicio.etiquetas.length > 0)
+      );
     case 'faq':
       return !!(servicio.faq && servicio.faq.length > 0);
     case 'multimedia':
@@ -93,6 +96,33 @@ const hasPanelContent = (servicio: Servicio, panelId: PanelType): boolean => {
  */
 const getAvailablePanels = (servicio: Servicio): PanelConfig[] => {
   return PANELS_CONFIG.filter(panel => hasPanelContent(servicio, panel.id));
+};
+
+/**
+ * Sanitiza el contenido adicional para evitar mostrar JSON técnico o datos de SEO
+ */
+const sanitizeContenidoAdicional = (contenido: string | undefined): string => {
+  if (!contenido || !contenido.trim()) return '';
+  
+  // Detectar si el contenido parece ser JSON
+  const jsonPatterns = [
+    /^\s*\{\s*"title":/i,
+    /^\s*\{\s*"description":/i,
+    /^\s*SEO:\s*\{/i,
+    /"metaTitle":/i,
+    /"metaDescription":/i,
+    /seo\s*[:=]\s*\{/i
+  ];
+  
+  const isJSON = jsonPatterns.some(pattern => pattern.test(contenido));
+  
+  // Si parece JSON, no mostrar nada
+  if (isJSON) {
+    console.warn('⚠️ Contenido adicional contiene JSON técnico - no se mostrará');
+    return '';
+  }
+  
+  return contenido.trim();
 };
 
 export const ServicioDetail: React.FC = () => {
@@ -516,15 +546,15 @@ export const ServicioDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 animate-fade-in">
-      {/* ✅ SEO directo del servicio (NO del CMS genérico) */}
+      {/* ✅ SEO directo del servicio - Prioriza campos SEO configurados */}
       <Helmet>
-        <title>{servicio.titulo} - SCUTI Company</title>
-        <meta name="description" content={servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo} - SCUTI Company`} />
-        <meta name="keywords" content={servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicio, desarrollo, tecnología`} />
+        <title>{servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`}</title>
+        <meta name="description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo} - SCUTI Company`} />
+        <meta name="keywords" content={servicio.seo?.palabrasClave || servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicio, desarrollo, tecnología`} />
 
         {/* Open Graph */}
-        <meta property="og:title" content={`${servicio.titulo} - SCUTI Company`} />
-        <meta property="og:description" content={servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
+        <meta property="og:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
+        <meta property="og:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
         {servicio.imagenPrincipal && <meta property="og:image" content={servicio.imagenPrincipal} />}
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://scuticompany.com/servicios/${servicio.slug}`} />
@@ -533,8 +563,8 @@ export const ServicioDetail: React.FC = () => {
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${servicio.titulo} - SCUTI Company`} />
-        <meta name="twitter:description" content={servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
+        <meta name="twitter:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
+        <meta name="twitter:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
         {servicio.imagenPrincipal && <meta name="twitter:image" content={servicio.imagenPrincipal} />}
 
         {/* Canonical */}
@@ -1518,7 +1548,7 @@ export const ServicioDetail: React.FC = () => {
                     }}
                   >
                     {/* Contenido Adicional */}
-                    {servicio.contenidoAdicional?.trim() && (
+                    {sanitizeContenidoAdicional(servicio.contenidoAdicional) && (
                       <div 
                         className="rounded-xl p-6"
                         style={{
@@ -1532,7 +1562,7 @@ export const ServicioDetail: React.FC = () => {
                         <div 
                           className="leading-relaxed whitespace-pre-line"
                           style={{ color: getAccordionStyles().contentText }}
-                          dangerouslySetInnerHTML={{ __html: servicio.contenidoAdicional.replace(/\n/g, '<br>') }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeContenidoAdicional(servicio.contenidoAdicional).replace(/\n/g, '<br>') }}
                         />
                       </div>
                     )}

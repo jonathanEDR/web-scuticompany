@@ -549,10 +549,16 @@ function generateVisibleContent(servicio) {
 function generateServiceHtml(indexHtml, servicio) {
   const serviceUrl = `${CONFIG.siteUrl}/servicios/${servicio.slug}`;
   const imageUrl = getImageUrl(servicio.imagenPrincipal);
-  const description = escapeHtml(servicio.descripcionCorta || truncate(stripHtml(servicio.descripcion), 160));
-  const title = escapeHtml(servicio.titulo);
+  
+  // ✅ PRIORIZAR campos SEO configurados sobre los genéricos
+  const seoTitle = servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - ${CONFIG.siteName}`;
+  const seoDescription = servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || truncate(stripHtml(servicio.descripcion), 160);
+  const seoKeywords = servicio.seo?.palabrasClave || servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicios, ${getCategoryName(servicio.categoria)}, SCUTI Company`;
+  
+  const title = escapeHtml(seoTitle);
+  const description = escapeHtml(seoDescription);
   const categoryName = getCategoryName(servicio.categoria);
-  const keywords = servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicios, ${categoryName}, SCUTI Company`;
+  const keywords = escapeHtml(seoKeywords);
 
   // Generar Schema.org JSON-LD
   const serviceSchema = generateServiceSchema(servicio);
@@ -563,22 +569,22 @@ function generateServiceHtml(indexHtml, servicio) {
 
   let html = indexHtml;
 
-  // Reemplazar título
+  // Reemplazar título - ✅ Usa título SEO configurado
   html = html.replace(
     /<title[^>]*>.*?<\/title>/,
-    `<title data-react-helmet="true">${title} - ${CONFIG.siteName}</title>`
+    `<title data-react-helmet="true">${title}</title>`
   );
 
-  // Reemplazar meta description
+  // Reemplazar meta description - ✅ Usa descripción SEO configurada
   html = html.replace(
     /<meta name="description"[^>]*>/,
     `<meta name="description" content="${description}" data-react-helmet="true" />`
   );
 
-  // Reemplazar keywords
+  // Reemplazar keywords - ✅ Usa palabras clave SEO configuradas
   html = html.replace(
     /<meta name="keywords"[^>]*>/,
-    `<meta name="keywords" content="${escapeHtml(keywords)}" data-react-helmet="true" />`
+    `<meta name="keywords" content="${keywords}" data-react-helmet="true" />`
   );
 
   // Reemplazar canonical
@@ -587,10 +593,10 @@ function generateServiceHtml(indexHtml, servicio) {
     `<link rel="canonical" href="${serviceUrl}" data-react-helmet="true" />`
   );
 
-  // Reemplazar Open Graph tags
+  // Reemplazar Open Graph tags - ✅ Usa datos SEO configurados
   html = html.replace(
     /<meta property="og:title"[^>]*>/,
-    `<meta property="og:title" content="${title} - ${CONFIG.siteName}" data-react-helmet="true" />`
+    `<meta property="og:title" content="${title}" data-react-helmet="true" />`
   );
   html = html.replace(
     /<meta property="og:description"[^>]*>/,
@@ -609,10 +615,10 @@ function generateServiceHtml(indexHtml, servicio) {
     `<meta property="og:type" content="website" data-react-helmet="true" />`
   );
 
-  // Reemplazar Twitter Card tags
+  // Reemplazar Twitter Card tags - ✅ Usa datos SEO configurados
   html = html.replace(
     /<meta name="twitter:title"[^>]*>/,
-    `<meta name="twitter:title" content="${title} - ${CONFIG.siteName}" data-react-helmet="true" />`
+    `<meta name="twitter:title" content="${title}" data-react-helmet="true" />`
   );
   html = html.replace(
     /<meta name="twitter:description"[^>]*>/,
@@ -709,7 +715,11 @@ async function main() {
       const htmlPath = path.join(serviceDir, 'index.html');
       fs.writeFileSync(htmlPath, serviceHtml);
 
+      // ✅ Log detallado del SEO usado
+      const usedSeoTitle = servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`;
+      const usedSeoDesc = (servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || '').substring(0, 60);
       console.log(`   ✅ /servicios/${slug}/index.html`);
+      console.log(`      📄 SEO: "${usedSeoTitle.substring(0, 50)}${usedSeoTitle.length > 50 ? '...' : ''}"`);
       successCount++;
 
     } catch (error) {
