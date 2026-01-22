@@ -500,7 +500,7 @@ export default function PostEditor() {
       };
 
       if (isEditing && id) {
-        await blogPostApi.admin.updatePost(id, postData as UpdatePostDto);
+        await blogPostApi.admin.updatePost(id, postData as UpdatePostDto, formData.slug);
         alert('✅ Borrador actualizado exitosamente');
       } else {
         console.log('➕ [handleSaveDraft] Creando nuevo borrador');
@@ -562,7 +562,7 @@ export default function PostEditor() {
       };
 
       if (isEditing && id) {
-        await blogPostApi.admin.updatePost(id, { ...postData, isPublished: true } as UpdatePostDto);
+        await blogPostApi.admin.updatePost(id, { ...postData, isPublished: true } as UpdatePostDto, formData.slug);
         alert('✅ Post actualizado y publicado exitosamente');
       } else {
         const response = await blogPostApi.admin.createPost(postData);

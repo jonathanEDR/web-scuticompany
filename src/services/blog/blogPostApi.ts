@@ -242,13 +242,14 @@ const createPost = async (
  */
 const updatePost = async (
   id: string,
-  data: UpdatePostDto
+  data: UpdatePostDto,
+  slug?: string
 ): Promise<ApiResponse<BlogPost>> => {
   const response = await blogApiClient.put(`/posts/${id}`, data);
   
   // ✅ Invalidar caché del post específico y listas
-  if (data.slug) {
-    blogCache.invalidate('POST_DETAIL', data.slug);
+  if (slug) {
+    blogCache.invalidate('POST_DETAIL', slug);
   }
   invalidateOnMutation('post');
   console.log('🗑️ [Admin] Caché invalidado tras actualizar post');
