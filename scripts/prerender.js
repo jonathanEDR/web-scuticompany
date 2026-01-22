@@ -54,55 +54,55 @@ function replaceSeoTags(html, seo) {
   // Replace title
   result = result.replace(
     /<title[^>]*>.*?<\/title>/,
-    `<title data-react-helmet="true">${seo.title}</title>`
+    `<title data-rh="true">${seo.title}</title>`
   );
 
   // Replace meta description
   result = result.replace(
     /<meta name="description"[^>]*>/,
-    `<meta name="description" content="${seo.description}" data-react-helmet="true" />`
+    `<meta name="description" content="${seo.description}" data-rh="true" />`
   );
 
   // Replace keywords
   result = result.replace(
     /<meta name="keywords"[^>]*>/,
-    `<meta name="keywords" content="${seo.keywords}" data-react-helmet="true" />`
+    `<meta name="keywords" content="${seo.keywords}" data-rh="true" />`
   );
 
   // Replace canonical
   result = result.replace(
     /<link rel="canonical"[^>]*>/,
-    `<link rel="canonical" href="${seo.url}" data-react-helmet="true" />`
+    `<link rel="canonical" href="${seo.url}" data-rh="true" />`
   );
 
   // Replace og:title
   result = result.replace(
     /<meta property="og:title"[^>]*>/,
-    `<meta property="og:title" content="${seo.ogTitle}" data-react-helmet="true" />`
+    `<meta property="og:title" content="${seo.ogTitle}" data-rh="true" />`
   );
 
   // Replace og:description
   result = result.replace(
     /<meta property="og:description"[^>]*>/,
-    `<meta property="og:description" content="${seo.ogDescription}" data-react-helmet="true" />`
+    `<meta property="og:description" content="${seo.ogDescription}" data-rh="true" />`
   );
 
   // Replace og:url
   result = result.replace(
     /<meta property="og:url"[^>]*>/,
-    `<meta property="og:url" content="${seo.url}" data-react-helmet="true" />`
+    `<meta property="og:url" content="${seo.url}" data-rh="true" />`
   );
 
   // Replace twitter:title
   result = result.replace(
     /<meta name="twitter:title"[^>]*>/,
-    `<meta name="twitter:title" content="${seo.title}" data-react-helmet="true" />`
+    `<meta name="twitter:title" content="${seo.title}" data-rh="true" />`
   );
 
   // Replace twitter:description
   result = result.replace(
     /<meta name="twitter:description"[^>]*>/,
-    `<meta name="twitter:description" content="${seo.description}" data-react-helmet="true" />`
+    `<meta name="twitter:description" content="${seo.description}" data-rh="true" />`
   );
 
   return result;

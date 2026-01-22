@@ -429,61 +429,61 @@ function generatePostHtml(indexHtml, post) {
   // Reemplazar título
   html = html.replace(
     /<title[^>]*>.*?<\/title>/,
-    `<title data-react-helmet="true">${title} | ${CONFIG.siteName}</title>`
+    `<title data-rh="true">${title} | ${CONFIG.siteName}</title>`
   );
 
   // Reemplazar meta description
   html = html.replace(
     /<meta name="description"[^>]*>/,
-    `<meta name="description" content="${description}" data-react-helmet="true" />`
+    `<meta name="description" content="${description}" data-rh="true" />`
   );
 
   // Reemplazar keywords
   html = html.replace(
     /<meta name="keywords"[^>]*>/,
-    `<meta name="keywords" content="${escapeHtml(keywords)}" data-react-helmet="true" />`
+    `<meta name="keywords" content="${escapeHtml(keywords)}" data-rh="true" />`
   );
 
   // Reemplazar canonical
   html = html.replace(
     /<link rel="canonical"[^>]*>/,
-    `<link rel="canonical" href="${postUrl}" data-react-helmet="true" />`
+    `<link rel="canonical" href="${postUrl}" data-rh="true" />`
   );
 
   // Reemplazar Open Graph tags
   html = html.replace(
     /<meta property="og:title"[^>]*>/,
-    `<meta property="og:title" content="${title}" data-react-helmet="true" />`
+    `<meta property="og:title" content="${title}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:description"[^>]*>/,
-    `<meta property="og:description" content="${description}" data-react-helmet="true" />`
+    `<meta property="og:description" content="${description}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:url"[^>]*>/,
-    `<meta property="og:url" content="${postUrl}" data-react-helmet="true" />`
+    `<meta property="og:url" content="${postUrl}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:image"[^>]*>/,
-    `<meta property="og:image" content="${imageUrl}" data-react-helmet="true" />`
+    `<meta property="og:image" content="${imageUrl}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:type"[^>]*>/,
-    `<meta property="og:type" content="article" data-react-helmet="true" />`
+    `<meta property="og:type" content="article" data-rh="true" />`
   );
 
   // Reemplazar Twitter Card tags
   html = html.replace(
     /<meta name="twitter:title"[^>]*>/,
-    `<meta name="twitter:title" content="${title}" data-react-helmet="true" />`
+    `<meta name="twitter:title" content="${title}" data-rh="true" />`
   );
   html = html.replace(
     /<meta name="twitter:description"[^>]*>/,
-    `<meta name="twitter:description" content="${description}" data-react-helmet="true" />`
+    `<meta name="twitter:description" content="${description}" data-rh="true" />`
   );
   html = html.replace(
     /<meta name="twitter:image"[^>]*>/,
-    `<meta name="twitter:image" content="${imageUrl}" data-react-helmet="true" />`
+    `<meta name="twitter:image" content="${imageUrl}" data-rh="true" />`
   );
 
   // Agregar article meta tags adicionales
