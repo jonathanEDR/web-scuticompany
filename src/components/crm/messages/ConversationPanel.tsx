@@ -119,22 +119,58 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
   const handleSendMessage = async () => {
     if (!newMessage.trim() || isSending) return;
 
+    const messageContent = newMessage.trim();
+    const currentMessageType = messageType;
+    const currentReplyingTo = replyingTo;
+    
     setIsSending(true);
     setError(null);
 
+    // 🚀 OPTIMISTIC UPDATE: Agregar mensaje localmente inmediatamente
+    const optimisticMessage: LeadMessage = {
+      _id: `temp-${Date.now()}`, // ID temporal
+      leadId: lead._id,
+      autor: {
+        userId: user?.id || '',
+        nombre: user?.fullName || user?.firstName || 'Tú',
+        email: user?.primaryEmailAddress?.emailAddress || '',
+        rol: 'ADMIN',
+        profileImage: user?.imageUrl || null,
+      },
+      contenido: messageContent,
+      tipo: currentMessageType === 'internal' ? 'nota_interna' : 'mensaje_cliente',
+      esPrivado: currentMessageType === 'internal',
+      estado: 'pendiente', // Estado temporal mientras se envía
+      leido: false,
+      prioridad: 'normal',
+      eliminado: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    } as LeadMessage;
+
+    // Agregar mensaje optimista al final de la lista
+    setMessages(prev => [...prev, optimisticMessage]);
+    
+    // Limpiar input inmediatamente para mejor UX
+    setNewMessage('');
+    setReplyingTo(null);
+    
+    // Scroll al nuevo mensaje
+    setTimeout(() => scrollToBottom(), 50);
+
     try {
-      if (replyingTo) {
+      if (currentReplyingTo) {
         // Responder a un mensaje específico
         await messageService.replyMessage({
-          messageId: replyingTo._id,
-          contenido: newMessage.trim(),
-          esPrivado: messageType === 'internal',
+          messageId: currentReplyingTo._id,
+          contenido: messageContent,
+          esPrivado: currentMessageType === 'internal',
         });
-      } else if (messageType === 'internal') {
+      } else if (currentMessageType === 'internal') {
         // Nota interna
         await messageService.sendInternalMessage({
           leadId: lead._id,
-          contenido: newMessage.trim(),
+          contenido: messageContent,
           prioridad: 'normal',
         });
       } else {
@@ -144,43 +180,46 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
           console.warn('Lead sin usuario registrado, enviando como nota interna');
           await messageService.sendInternalMessage({
             leadId: lead._id,
-            contenido: `[Mensaje pendiente para cliente]: ${newMessage.trim()}`,
+            contenido: `[Mensaje pendiente para cliente]: ${messageContent}`,
             prioridad: 'normal',
           });
           setError('El lead no tiene usuario vinculado. El mensaje se guardó como nota interna.');
         } else {
           await messageService.sendClientMessage({
             leadId: lead._id,
-            contenido: newMessage.trim(),
+            contenido: messageContent,
             prioridad: 'normal',
             canal: 'sistema',
           });
         }
       }
 
-      // Limpiar y recargar
-      setNewMessage('');
-      setReplyingTo(null);
-      
-      // Recargar mensajes
+      // ✅ Éxito: Recargar mensajes para obtener el ID real del servidor
+      // Esto reemplazará el mensaje optimista con el real
       try {
         await loadMessages();
       } catch (loadErr) {
         console.error('Error recargando mensajes:', loadErr);
       }
       
-      // Notificar al padre
+      // Notificar al padre (solo actualiza stats, no recarga toda la página)
       onMessageSent?.();
       
       // Volver a enfocar el textarea para continuar escribiendo
       setTimeout(() => {
         textareaRef.current?.focus();
         scrollToBottom();
-      }, 150);
+      }, 100);
       
     } catch (err: any) {
       console.error('Error enviando mensaje:', err);
       setError(err.response?.data?.message || err.message || 'Error al enviar el mensaje');
+      
+      // ❌ Error: Remover el mensaje optimista
+      setMessages(prev => prev.filter(m => m._id !== optimisticMessage._id));
+      
+      // Restaurar el contenido del mensaje para que el usuario pueda reintentar
+      setNewMessage(messageContent);
     } finally {
       setIsSending(false);
     }
@@ -461,20 +500,35 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
                       <div className="flex items-center justify-between mt-2 text-xs opacity-70">
                         <span>{formatRelativeTime(message.createdAt)}</span>
                         <div className="flex items-center gap-2">
-                          {message.leido && (
-                            <span title="Leído">✓✓</span>
+                          {/* Indicador de estado del mensaje */}
+                          {message._id.startsWith('temp-') ? (
+                            // Mensaje enviando (optimista)
+                            <span className="flex items-center gap-1 text-blue-400" title="Enviando...">
+                              <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                              </svg>
+                            </span>
+                          ) : message.leido ? (
+                            // Mensaje leído
+                            <span title="Leído" className="text-blue-400">✓✓</span>
+                          ) : (
+                            // Mensaje enviado pero no leído
+                            <span title="Enviado" className="opacity-60">✓</span>
                           )}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setReplyingTo(message);
-                              textareaRef.current?.focus();
-                            }}
-                            className="hover:opacity-100 opacity-60 transition-opacity"
-                            title="Responder"
-                          >
-                            ↩️
-                          </button>
+                          {!message._id.startsWith('temp-') && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setReplyingTo(message);
+                                textareaRef.current?.focus();
+                              }}
+                              className="hover:opacity-100 opacity-60 transition-opacity"
+                              title="Responder"
+                            >
+                              ↩️
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

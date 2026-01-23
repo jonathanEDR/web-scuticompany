@@ -162,8 +162,38 @@ export default function ClientConversationPanel({
     if (!newMessage.trim() || !lead?._id || isSending) return;
     
     const messageContent = newMessage.trim();
+    
+    // 🚀 OPTIMISTIC UPDATE: Limpiar input y mostrar mensaje inmediatamente
     setNewMessage('');
     setIsSending(true);
+    
+    // Crear mensaje optimista para mostrar inmediatamente
+    const optimisticMessage: LeadMessage = {
+      _id: `temp-${Date.now()}`,
+      leadId: lead._id,
+      autor: {
+        userId: clerkUser?.id || '',
+        nombre: clerkUser?.fullName || clerkUser?.firstName || 'Tú',
+        email: clerkUser?.primaryEmailAddress?.emailAddress || '',
+        rol: 'CLIENT',
+        profileImage: clerkUser?.imageUrl || null,
+      },
+      contenido: messageContent,
+      tipo: 'respuesta_cliente',
+      esPrivado: false,
+      estado: 'pendiente', // Estado temporal mientras se envía
+      leido: false,
+      prioridad: 'normal',
+      eliminado: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    } as LeadMessage;
+
+    // Agregar mensaje optimista al final de la lista
+    setMessages(prev => [...prev, optimisticMessage]);
+    
+    // Scroll al nuevo mensaje
+    setTimeout(() => scrollToBottom(), 50);
     
     try {
       // Encontrar el último mensaje para responder
@@ -186,7 +216,7 @@ export default function ClientConversationPanel({
         // Nota: El cliente normalmente responde a mensajes existentes
       }
       
-      // Recargar mensajes
+      // ✅ Éxito: Recargar mensajes para obtener el ID real del servidor
       try {
         await loadMessages();
       } catch (e) {
@@ -196,7 +226,7 @@ export default function ClientConversationPanel({
       // Scroll al final
       scrollToBottom();
       
-      // Notificar al componente padre
+      // Notificar al componente padre (actualización optimizada)
       if (onMessageSent) {
         onMessageSent();
       }
@@ -208,6 +238,10 @@ export default function ClientConversationPanel({
       
     } catch (err: any) {
       console.error('Error enviando mensaje:', err);
+      
+      // ❌ Error: Remover el mensaje optimista
+      setMessages(prev => prev.filter(m => m._id !== optimisticMessage._id));
+      
       // Restaurar el mensaje si falla
       setNewMessage(messageContent);
       const errorMsg = err.response?.data?.message || err.message || 'Error al enviar mensaje';
@@ -510,9 +544,25 @@ export default function ClientConversationPanel({
                             {message.contenido}
                           </p>
                           
-                          {/* Hora */}
-                          <div className={`text-[10px] mt-1 text-right ${isOwn ? 'text-green-100' : 'text-gray-400 dark:text-gray-500'}`}>
-                            {formatMessageTime(message.createdAt)}
+                          {/* Hora y estado */}
+                          <div className={`text-[10px] mt-1 text-right flex items-center justify-end gap-1 ${isOwn ? 'text-green-100' : 'text-gray-400 dark:text-gray-500'}`}>
+                            <span>{formatMessageTime(message.createdAt)}</span>
+                            {/* Indicador de estado del mensaje */}
+                            {isOwn && (
+                              message._id.startsWith('temp-') ? (
+                                // Mensaje enviando (optimista)
+                                <svg className="animate-spin h-3 w-3 ml-1" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                </svg>
+                              ) : message.leido ? (
+                                // Mensaje leído
+                                <span className="ml-1" title="Leído">✓✓</span>
+                              ) : (
+                                // Mensaje enviado pero no leído
+                                <span className="ml-1 opacity-60" title="Enviado">✓</span>
+                              )
+                            )}
                           </div>
                         </div>
                       </div>

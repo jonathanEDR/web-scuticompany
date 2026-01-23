@@ -4,7 +4,7 @@
  * Usa el logo del negocio para consistencia de marca
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ClientConversationPanel from '../../components/client/ClientConversationPanel';
 import type { LeadMessage } from '../../types/message.types';
@@ -198,12 +198,48 @@ export default function MyMessages() {
   };
 
   /**
-   * 📨 Callback cuando se envía un mensaje
+   * 📨 Callback optimizado cuando se envía un mensaje
+   * Solo actualiza el mensaje del lead actual sin recargar toda la página
    */
-  const handleMessageSent = () => {
-    // Recargar datos para actualizar la lista
-    loadData();
-  };
+  const handleMessageSent = useCallback(async () => {
+    if (!selectedConversationLead?._id) return;
+
+    try {
+      // Obtener el último mensaje de este lead específico
+      const response = await messageService.getLeadMessages(selectedConversationLead._id, {
+        limit: 1,
+        incluirPrivados: false,
+      });
+
+      if (response.data?.mensajes && response.data.mensajes.length > 0) {
+        const latestMessage = response.data.mensajes[0];
+
+        // Actualizar solo este mensaje en la lista existente
+        setMessages(prevMessages => {
+          const leadId = selectedConversationLead._id;
+          const existingIndex = prevMessages.findIndex(m => {
+            const msgLeadId = extractLeadId(m.leadId);
+            return msgLeadId === leadId;
+          });
+
+          if (existingIndex >= 0) {
+            // Reemplazar el mensaje existente con el más reciente
+            const updatedMessages = [...prevMessages];
+            updatedMessages[existingIndex] = latestMessage;
+            // Re-ordenar por fecha
+            return updatedMessages.sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          } else {
+            // Agregar el nuevo mensaje al inicio
+            return [latestMessage, ...prevMessages];
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error actualizando mensaje en lista:', error);
+    }
+  }, [selectedConversationLead?._id]);
 
   const handleMarkAsRead = async (messageId: string) => {
     try {

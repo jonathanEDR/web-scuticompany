@@ -3,7 +3,7 @@
  * Panel administrativo completo para gestionar todos los mensajes del CRM
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MessageFiltersComponent } from '../../components/crm/messages/MessageFilters';
 import { TemplateEditor } from '../../components/crm/templates/TemplateEditor';
@@ -363,6 +363,69 @@ export const CrmMessages: React.FC = () => {
     setSelectedConversationLead(null);
     setSelectedConversationMessage(null);
   };
+
+  /**
+   * 🔄 Callback optimizado cuando se envía un mensaje desde el panel de conversación
+   * Solo actualiza las estadísticas y el mensaje más reciente del lead en la lista
+   * SIN recargar toda la tabla de mensajes para evitar re-renders innecesarios
+   */
+  const handleConversationMessageSent = useCallback(async () => {
+    // 1. Solo actualizar las estadísticas (ligero)
+    try {
+      const response = await messageService.getMessageStats();
+      if (response.success && response.data) {
+        setStats({
+          total: response.data.total || 0,
+          noLeidos: response.data.noLeidos || 0,
+          enviados: response.data.enviados || 0,
+          respondidos: response.data.respondidos || 0,
+          porTipo: response.data.porTipo || {},
+        });
+      }
+    } catch (error) {
+      console.error('Error actualizando estadísticas:', error);
+    }
+
+    // 2. Actualizar solo el mensaje del lead actual en la lista (si existe)
+    if (selectedConversationLead?._id) {
+      try {
+        // Obtener el último mensaje de este lead específico
+        const response = await messageService.getLeadMessages(selectedConversationLead._id, {
+          limit: 1,
+          incluirPrivados: false,
+        });
+        
+        if (response.success && response.data?.mensajes && response.data.mensajes.length > 0) {
+          const latestMessage = response.data.mensajes[0];
+          
+          // Actualizar solo este mensaje en la lista existente
+          setMessages(prevMessages => {
+            // Buscar si ya existe un mensaje de este lead
+            const leadId = selectedConversationLead._id;
+            const existingIndex = prevMessages.findIndex(m => {
+              const msgLeadId = typeof m.leadId === 'object' ? m.leadId._id : m.leadId;
+              return msgLeadId === leadId;
+            });
+
+            if (existingIndex >= 0) {
+              // Reemplazar el mensaje existente con el más reciente
+              const updatedMessages = [...prevMessages];
+              updatedMessages[existingIndex] = latestMessage;
+              // Re-ordenar por fecha
+              return updatedMessages.sort(
+                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              );
+            } else {
+              // Agregar el nuevo mensaje al inicio
+              return [latestMessage, ...prevMessages];
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error actualizando mensaje en lista:', error);
+      }
+    }
+  }, [selectedConversationLead?._id]);
 
   /**
    * Cargar lista de leads para el composer
@@ -1259,10 +1322,7 @@ export const CrmMessages: React.FC = () => {
             lead={selectedConversationLead}
             initialMessage={selectedConversationMessage || undefined}
             onClose={handleCloseConversation}
-            onMessageSent={() => {
-              loadMessages();
-              loadStats();
-            }}
+            onMessageSent={handleConversationMessageSent}
           />
         </>
       )}
