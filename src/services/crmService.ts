@@ -101,6 +101,14 @@ export interface Lead {
     nombre: string;
     email: string;
   };
+  // 👤 Usuario registrado vinculado al lead
+  usuarioRegistrado?: {
+    userId: string;
+    nombre: string;
+    email: string;
+    profileImage?: string | null;
+    vinculadoEn?: string;
+  };
   origen: 'web' | 'web-authenticated' | 'referido' | 'redes_sociales' | 'email' | 'telefono' | 'evento' | 'chat' | 'otro';
   actividades: LeadActivity[];
   creadoPor: {

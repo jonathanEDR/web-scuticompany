@@ -342,12 +342,37 @@ const LeadsManagement: React.FC = () => {
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                            {/* Avatar: Mostrar imagen si usuario registrado tiene profileImage */}
+                            {lead.usuarioRegistrado?.profileImage ? (
+                              <img 
+                                src={lead.usuarioRegistrado.profileImage}
+                                alt={lead.nombre}
+                                className="flex-shrink-0 h-10 w-10 rounded-full object-cover"
+                                onError={(e) => {
+                                  // Fallback a inicial si falla la imagen
+                                  e.currentTarget.style.display = 'none';
+                                  const fallback = e.currentTarget.nextElementSibling;
+                                  if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            {/* Fallback: Inicial con gradiente */}
+                            <div 
+                              className={`flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 items-center justify-center text-white font-bold ${
+                                lead.usuarioRegistrado?.profileImage ? 'hidden' : 'flex'
+                              }`}
+                            >
                               {lead.nombre.charAt(0).toUpperCase()}
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                 {lead.nombre}
+                                {/* Indicador de usuario registrado */}
+                                {lead.usuarioRegistrado?.userId && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300" title="Usuario registrado">
+                                    ✓
+                                  </span>
+                                )}
                               </div>
                               {lead.empresa && (
                                 <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -444,12 +469,32 @@ const LeadsManagement: React.FC = () => {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                        {/* Avatar móvil: Mostrar imagen si usuario registrado tiene profileImage */}
+                        {lead.usuarioRegistrado?.profileImage ? (
+                          <img 
+                            src={lead.usuarioRegistrado.profileImage}
+                            alt={lead.nombre}
+                            className="flex-shrink-0 h-10 w-10 rounded-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const fallback = e.currentTarget.nextElementSibling;
+                              if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className={`flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 items-center justify-center text-white font-bold ${
+                            lead.usuarioRegistrado?.profileImage ? 'hidden' : 'flex'
+                          }`}
+                        >
                           {lead.nombre.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                          <h3 className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-1">
                             {lead.nombre}
+                            {lead.usuarioRegistrado?.userId && (
+                              <span className="text-green-500 text-xs" title="Usuario registrado">✓</span>
+                            )}
                           </h3>
                           {lead.empresa && (
                             <p className="text-xs text-gray-500 dark:text-gray-400">{lead.empresa}</p>

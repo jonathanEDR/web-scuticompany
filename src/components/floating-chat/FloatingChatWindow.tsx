@@ -12,14 +12,15 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { 
-  Minimize2, 
-  Maximize2, 
-  X, 
+import {
+  Minimize2,
+  Maximize2,
+  X,
   Brain,
   Loader2,
   Sparkles
 } from 'lucide-react';
+import { SCUTI_AI_MASCOT } from '../../utils/brandAssets';
 import EnhancedMessageBubble from './EnhancedMessageBubble';
 import ChatInput from '../scuti-ai/ChatInput';
 import ChatTextSelection from './ChatTextSelection';
@@ -148,17 +149,27 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         <div className="flex items-center gap-3">
           {/* Logo Dinámico */}
           {config.logo[theme] ? (
-            <img 
-              src={config.logo[theme]} 
+            <img
+              src={config.logo[theme]}
               alt={config.logoAlt}
               className="w-8 h-8 rounded-lg object-cover"
             />
           ) : (
-            <div 
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: headerStyles.logoBackground }}
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden p-1"
+              style={{ background: 'linear-gradient(to bottom right, #EFF6FF, #F5F3FF)' }}
             >
-              <Brain size={16} className="text-white" />
+              <img
+                src={SCUTI_AI_MASCOT.png}
+                alt={SCUTI_AI_MASCOT.alt}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const fallback = e.currentTarget.nextElementSibling;
+                  if (fallback) fallback.classList.remove('hidden');
+                }}
+              />
+              <Brain size={16} className="text-purple-600 hidden" />
             </div>
           )}
           
@@ -209,9 +220,18 @@ export const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
         {messages.length === 0 ? (
           // Estado vacío - Mensaje de bienvenida desde CMS
           <div className="flex flex-col items-center justify-center h-full text-center px-4 sm:px-6">
-            <div className="w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-full flex items-center justify-center mb-3 sm:mb-4">
-              <Brain size={32} className="text-blue-600 dark:text-blue-400 sm:hidden" />
-              <Brain size={40} className="text-blue-600 dark:text-blue-400 hidden sm:block" />
+            <div className="w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-full flex items-center justify-center mb-3 sm:mb-4 p-2">
+              <img
+                src={SCUTI_AI_MASCOT.png}
+                alt={SCUTI_AI_MASCOT.alt}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const fallback = e.currentTarget.nextElementSibling;
+                  if (fallback) fallback.classList.remove('hidden');
+                }}
+              />
+              <Brain size={40} className="text-blue-600 dark:text-blue-400 hidden" />
             </div>
             {/* Título desde CMS */}
             <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">

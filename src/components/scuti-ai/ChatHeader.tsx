@@ -9,14 +9,15 @@
  */
 
 import React from 'react';
-import { 
-  Settings, 
-  Download, 
-  Trash2, 
+import {
+  Settings,
+  Download,
+  Trash2,
   MoreVertical,
   Brain
 } from 'lucide-react';
 import type { ChatSession, ScutiAIStatus } from '../../types/scutiAI.types';
+import { SCUTI_AI_MASCOT } from '../../utils/brandAssets';
 
 interface ChatHeaderProps {
   session: ChatSession | null;
@@ -67,8 +68,18 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
       {/* Left side - Session info */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
-          <Brain size={20} className="text-white" />
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-xl flex items-center justify-center p-1.5">
+          <img
+            src={SCUTI_AI_MASCOT.png}
+            alt={SCUTI_AI_MASCOT.alt}
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              const fallback = e.currentTarget.nextElementSibling;
+              if (fallback) fallback.classList.remove('hidden');
+            }}
+          />
+          <Brain size={20} className="text-purple-600 dark:text-purple-400 hidden" />
         </div>
         <div>
           <h1 className="font-bold text-lg text-gray-900 dark:text-white">

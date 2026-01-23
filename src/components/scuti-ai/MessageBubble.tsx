@@ -15,6 +15,7 @@ import React from 'react';
 import { User, Copy, CheckCircle } from 'lucide-react';
 import type { ChatMessage } from '../../types/scutiAI.types';
 import InteractiveButtons from '../floating-chat/InteractiveButtons';
+import { SCUTI_AI_MASCOT } from '../../utils/brandAssets';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -69,15 +70,29 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     >
       {/* Avatar */}
       <div
-        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ${
           isUser
             ? 'bg-blue-600 text-white'
-            : `bg-${getAgentColor(message.agentUsed)}-100 dark:bg-${getAgentColor(
-                message.agentUsed
-              )}-900/30`
+            : 'bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 p-1'
         }`}
       >
-        {isUser ? <User size={16} /> : <span className="text-sm">{getAgentIcon(message.agentUsed)}</span>}
+        {isUser ? (
+          <User size={16} />
+        ) : (
+          <>
+            <img
+              src={SCUTI_AI_MASCOT.png}
+              alt={SCUTI_AI_MASCOT.alt}
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling;
+                if (fallback) fallback.classList.remove('hidden');
+              }}
+            />
+            <span className="text-sm hidden">{getAgentIcon(message.agentUsed)}</span>
+          </>
+        )}
       </div>
 
       {/* Mensaje */}

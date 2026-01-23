@@ -18,19 +18,20 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import { useScutiAI } from '../../hooks/useScutiAI';
-import SessionList from '../../components/scuti-ai/SessionList';
 import ChatHeader from '../../components/scuti-ai/ChatHeader';
 import MessageBubble from '../../components/scuti-ai/MessageBubble';
 import ChatInput from '../../components/scuti-ai/ChatInput';
+import SessionList from '../../components/scuti-ai/SessionList';
 import CanvasEditor from '../../components/scuti-ai/CanvasEditor';
 import CategoryQuickActions from '../../components/scuti-ai/CategoryQuickActions';
 import EventDetailModal from '../../components/agenda/EventDetailModal';
 import type { CategoryType } from '../../types/scuti-ai';
-import { 
-  AlertCircle, 
-  Loader2, 
+import {
+  AlertCircle,
+  Loader2,
   Sparkles
 } from 'lucide-react';
+import { SCUTI_AI_MASCOT } from '../../utils/brandAssets';
 
 const ScutiAIChatPage: React.FC = () => {
   const navigate = useNavigate();
@@ -39,13 +40,13 @@ const ScutiAIChatPage: React.FC = () => {
   
   // Estado para categoría seleccionada
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);
-  
-  // Estado para panel colapsado
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  
+
   // Estado para modal de eventos
   const [showEventDetailModal, setShowEventDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
+
+  // Estado para sidebar colapsado
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const {
     // Estado
@@ -134,10 +135,6 @@ const ScutiAIChatPage: React.FC = () => {
     setSelectedCategory(null);
   };
 
-  const handleToggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
-  };
-
   const handleExport = () => {
     if (!activeSession || messages.length === 0) return;
 
@@ -215,10 +212,8 @@ const ScutiAIChatPage: React.FC = () => {
   return (
     <SmartDashboardLayout>
       <div className="flex h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-950">
-        {/* Sidebar - Lista de conversaciones compacta y colapsable */}
-        <div className={`flex-shrink-0 transition-all duration-300 ${
-          isSidebarCollapsed ? 'w-14' : 'w-64'
-        }`}>
+        {/* Sidebar con historial de conversaciones */}
+        <div className={`${isSidebarCollapsed ? 'w-14' : 'w-72'} flex-shrink-0 transition-all duration-300`}>
           <SessionList
             sessions={sessions}
             activeSession={activeSession}
@@ -226,7 +221,7 @@ const ScutiAIChatPage: React.FC = () => {
             onNewSession={createNewSession}
             loading={loadingSessions}
             isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={handleToggleSidebar}
+            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
         </div>
 
@@ -258,8 +253,18 @@ const ScutiAIChatPage: React.FC = () => {
                   ) : (
                     // Vista inicial con tarjetas de categorías - COMPACTO
                     <div className="flex flex-col items-center justify-center h-full text-center py-8">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
-                        <Sparkles size={32} className="text-white" />
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-xl flex items-center justify-center mb-4 p-2">
+                        <img
+                          src={SCUTI_AI_MASCOT.png}
+                          alt={SCUTI_AI_MASCOT.alt}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.nextElementSibling;
+                            if (fallback) fallback.classList.remove('hidden');
+                          }}
+                        />
+                        <Sparkles size={32} className="text-purple-600 dark:text-purple-400 hidden" />
                       </div>
                       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                         ¡Hola! Soy SCUTI AI
@@ -344,8 +349,12 @@ const ScutiAIChatPage: React.FC = () => {
               {/* Typing indicator */}
               {sending && (
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <span className="text-sm">🤖</span>
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center p-1 overflow-hidden">
+                    <img
+                      src={SCUTI_AI_MASCOT.png}
+                      alt={SCUTI_AI_MASCOT.alt}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3">
                     <div className="flex gap-1">

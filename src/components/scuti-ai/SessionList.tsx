@@ -80,11 +80,6 @@ export const SessionList: React.FC<SessionListProps> = ({
       {isCollapsed ? (
         // Vista colapsada - Solo iconos
         <div className="flex flex-col items-center h-full py-3 gap-3">
-          {/* Logo mini */}
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center cursor-pointer" onClick={onToggleCollapse}>
-            <span className="text-base">🚀</span>
-          </div>
-          
           {/* Botón nueva conversación */}
           <button
             onClick={onNewSession}
@@ -124,35 +119,27 @@ export const SessionList: React.FC<SessionListProps> = ({
       ) : (
         // Vista expandida - Lista completa
         <>
-      {/* Header Compacto */}
+      {/* Header - Acciones */}
       <div className="p-3 border-b border-gray-200 dark:border-gray-800">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-base">🚀</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="font-bold text-sm text-gray-900 dark:text-white truncate">SCUTI AI</h2>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">Tu asistente inteligente</p>
-          </div>
+        {/* Botón nueva conversación con botón colapsar */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onNewSession}
+            className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors text-sm font-medium"
+          >
+            <MessageSquarePlus size={16} />
+            Nueva Conversación
+          </button>
           {onToggleCollapse && (
             <button
               onClick={onToggleCollapse}
-              className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors flex-shrink-0"
+              className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex-shrink-0 border border-gray-200 dark:border-gray-700"
               title="Colapsar panel"
             >
-              <ChevronLeft size={14} className="text-gray-600 dark:text-gray-400" />
+              <ChevronLeft size={16} className="text-gray-600 dark:text-gray-400" />
             </button>
           )}
         </div>
-
-        {/* Botón nueva conversación compacto */}
-        <button
-          onClick={onNewSession}
-          className="w-full flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors text-sm font-medium"
-        >
-          <MessageSquarePlus size={16} />
-          Nueva Conversación
-        </button>
 
         {/* Búsqueda - Solo si hay más de 5 conversaciones */}
         {sessions.length > 5 && (
