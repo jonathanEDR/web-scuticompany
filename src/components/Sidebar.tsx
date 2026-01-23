@@ -9,6 +9,7 @@ import { messageService } from '../services/messageService';
 import { useDashboardSidebarConfig } from '../hooks/cms/useDashboardSidebarConfig';
 import { useTheme } from '../contexts/ThemeContext';
 import DynamicIcon from './ui/DynamicIcon';
+import NotificationBell from './notifications/NotificationBell';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -324,6 +325,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                         Sesión Activa
                       </p>
                     </div>
+                    {/* 🔔 Campana de Notificaciones */}
+                    <NotificationBell iconClassName="w-4 h-4" />
                     {/* Botón Cerrar Sesión compacto */}
                     <SignOutButton>
                       <button
@@ -367,6 +370,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </button>
+                {/* 🔔 Campana de Notificaciones colapsado */}
+                <NotificationBell iconClassName="w-4 h-4" isCollapsed={true} />
                 {/* Theme Toggle colapsado */}
                 <div className="bg-white/20 rounded-lg">
                   <ThemeToggle />

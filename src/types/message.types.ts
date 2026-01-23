@@ -68,6 +68,7 @@ export interface MessageAuthor {
   nombre: string;
   email: string;
   rol: UserRole;
+  profileImage?: string; // URL del avatar de Clerk
 }
 
 /**
@@ -89,7 +90,12 @@ export interface MessageRecipient {
  */
 export interface LeadMessage {
   _id: string;
-  leadId: string;
+  leadId: string | {
+    _id: string;
+    nombre?: string;
+    correo?: string;
+    estado?: string;
+  };
   
   // Autor y destinatario
   autor: MessageAuthor;

@@ -68,9 +68,9 @@ export const Button = ({
 
 // Componente Card reutilizable
 export const Card = ({ children, className = '', hover = true, gradient = false }: CardProps) => {
-  const baseClasses = 'bg-white rounded-2xl shadow-xl border border-slate-200 gpu-accelerated';
-  const hoverClasses = hover ? 'hover:shadow-2xl hover:-translate-y-1 transition-all duration-300' : '';
-  const gradientClasses = gradient ? 'bg-gradient-to-br from-white to-slate-50' : '';
+  const baseClasses = 'bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-gray-900/30 border border-slate-200 dark:border-gray-700 gpu-accelerated';
+  const hoverClasses = hover ? 'hover:shadow-2xl dark:hover:shadow-gray-900/50 hover:-translate-y-1 transition-all duration-300' : '';
+  const gradientClasses = gradient ? 'bg-gradient-to-br from-white to-slate-50 dark:from-gray-800 dark:to-gray-900' : '';
 
   return (
     <div className={`${baseClasses} ${hoverClasses} ${gradientClasses} ${className}`}>
@@ -97,24 +97,24 @@ export const LoadingSpinner = ({
 
   return (
     <div className={`flex items-center justify-center gap-3 py-4 ${className}`}>
-      <div className={`animate-spin rounded-full border-b-2 border-blue-600 ${sizeClasses[size]}`}></div>
-      {text && <span className="text-slate-600 font-medium text-sm sm:text-base">{text}</span>}
+      <div className={`animate-spin rounded-full border-b-2 border-blue-600 dark:border-blue-400 ${sizeClasses[size]}`}></div>
+      {text && <span className="text-slate-600 dark:text-slate-300 font-medium text-sm sm:text-base">{text}</span>}
     </div>
   );
 };
 
 // Componente StatusCard optimizado
-export const StatusCard = ({ 
-  icon, 
-  title, 
-  subtitle, 
-  status, 
+export const StatusCard = ({
+  icon,
+  title,
+  subtitle,
+  status,
   gradient,
   className = ''
-}: { 
-  icon: string; 
-  title: string; 
-  subtitle: string; 
+}: {
+  icon: string;
+  title: string;
+  subtitle: string;
   status: string;
   gradient: string;
   className?: string;
@@ -123,21 +123,21 @@ export const StatusCard = ({
     <div className="text-3xl sm:text-4xl lg:text-5xl mb-2 sm:mb-3 transform hover:rotate-12 transition-transform duration-300">
       {icon}
     </div>
-    <h3 className="font-bold text-slate-800 text-base sm:text-lg mb-1">{title}</h3>
-    <p className="text-xs sm:text-sm text-slate-600 mb-2 sm:mb-3">{subtitle}</p>
+    <h3 className="font-bold text-slate-800 dark:text-white text-base sm:text-lg mb-1">{title}</h3>
+    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mb-2 sm:mb-3">{subtitle}</p>
     <div className="flex items-center gap-2">
       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-      <p className="text-xs text-green-700 font-semibold">{status}</p>
+      <p className="text-xs text-green-700 dark:text-green-400 font-semibold">{status}</p>
     </div>
   </Card>
 );
 
 // Componente Alert reutilizable
-export const Alert = ({ 
-  type = 'info', 
-  children, 
+export const Alert = ({
+  type = 'info',
+  children,
   className = '',
-  onClose 
+  onClose
 }: {
   type?: 'success' | 'error' | 'warning' | 'info';
   children: ReactNode;
@@ -145,10 +145,10 @@ export const Alert = ({
   onClose?: () => void;
 }) => {
   const variants = {
-    success: 'bg-green-50 border-green-200 text-green-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
-    warning: 'bg-amber-50 border-amber-200 text-amber-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800'
+    success: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
+    error: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
+    warning: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200',
+    info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
   };
 
   const icons = {

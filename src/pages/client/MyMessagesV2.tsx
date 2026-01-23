@@ -1,23 +1,51 @@
 /**
  * 💬 MIS MENSAJES - Inbox de Mensajes del Cliente (Versión Mejorada)
- * Vista de lista compacta con detalle al hacer clic
+ * Vista de lista compacta con panel de conversación estilo WhatsApp
+ * Usa el logo del negocio para consistencia de marca
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUser } from '@clerk/clerk-react';
-import SmartDashboardLayout from '../../components/SmartDashboardLayout';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ClientConversationPanel from '../../components/client/ClientConversationPanel';
 import type { LeadMessage } from '../../types/message.types';
 import type { Lead } from '../../services/crmService';
 import { messageService } from '../../services/messageService';
 import { crmService } from '../../services/crmService';
 import { useFilterPrivateMessages } from '../../components/guards/PrivateMessageGuard';
-// import { checkIfNeedsOnboarding, executeWelcomeOnboarding } from '../../services/onboardingService';
-import { Mail, MailOpen, Reply, X, Send, Loader, Filter, Inbox, Search } from 'lucide-react';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
+import { MessageCircle, Loader, Inbox, Search, Building2, ArrowLeft, Filter } from 'lucide-react';
+
+// 🔧 Helper para identificar si un mensaje es del equipo (no del cliente)
+const isMessageFromTeam = (message: LeadMessage): boolean => {
+  // Criterio 1: El tipo de mensaje NO es respuesta_cliente
+  const notClientResponse = message.tipo !== 'respuesta_cliente';
+  
+  // Criterio 2: El autor tiene rol de admin/moderador/sistema
+  const isTeamRole = ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'SYSTEM'].includes(message.autor?.rol || '');
+  
+  // Criterio 3: El autor se llama "Sistema" o "SCUTI" (mensajes automáticos)
+  const isSystemAuthor = message.autor?.nombre?.toLowerCase().includes('sistema') || 
+                         message.autor?.nombre?.toLowerCase().includes('scuti');
+  
+  // Es del equipo si cumple el criterio principal O tiene rol de equipo O es sistema
+  return notClientResponse || isTeamRole || isSystemAuthor;
+};
+
+// 🔧 Helper para extraer leadId de manera consistente
+const extractLeadId = (leadId: string | object): string => {
+  return typeof leadId === 'object' ? (leadId as any)._id : leadId;
+};
 
 export default function MyMessages() {
   const navigate = useNavigate();
-  const { user: _clerkUser } = useUser();
+  const location = useLocation();
+  
+  // 🎨 Tema del sidebar para consistencia visual
+  const { headerGradient, colors } = useDashboardHeaderGradient();
+  const accentColor = colors.from; // Usar el primer color del gradiente como acento
+  
+  // 🎨 Logo del negocio - usar FAVICON.png que tiene mejor visibilidad
+  const businessLogo = '/FAVICON.png';
 
   // ========================================
   // 📊 STATE
@@ -26,13 +54,14 @@ export default function MyMessages() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<LeadMessage[]>([]);
   const [selectedLead, setSelectedLead] = useState<string>('all');
-  const [selectedMessage, setSelectedMessage] = useState<LeadMessage | null>(null);
-  const [showMessageDetail, setShowMessageDetail] = useState(false);
-  const [replyContent, setReplyContent] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Estado para panel de conversación
+  const [showConversation, setShowConversation] = useState(false);
+  const [selectedConversationLead, setSelectedConversationLead] = useState<Lead | null>(null);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // ========================================
   // 🔄 EFFECTS
@@ -79,7 +108,9 @@ export default function MyMessages() {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
-      setMessages(allMessages);
+      // Agrupar mensajes por Lead: mostrar solo el último mensaje de cada conversación
+      const mensajesAgrupados = agruparMensajesPorLead(allMessages);
+      setMessages(mensajesAgrupados);
     } catch (err: any) {
       console.error('Error cargando datos:', err);
       setError(err.message || 'Error al cargar los mensajes');
@@ -88,6 +119,24 @@ export default function MyMessages() {
     }
   };
 
+  /**
+   * 🔄 Agrupar mensajes por Lead
+   * Muestra solo el mensaje más reciente de cada conversación (Lead)
+   */
+  const agruparMensajesPorLead = (mensajes: LeadMessage[]): LeadMessage[] => {
+    const mensajesPorLead = new Map<string, LeadMessage>();
+    
+    // Ya vienen ordenados por fecha más reciente primero
+    for (const mensaje of mensajes) {
+      const leadId = extractLeadId(mensaje.leadId);
+      
+      if (!mensajesPorLead.has(leadId)) {
+        mensajesPorLead.set(leadId, mensaje);
+      }
+    }
+    
+    return Array.from(mensajesPorLead.values());
+  };
   // ========================================
   // 🎯 FILTROS
   // ========================================
@@ -119,41 +168,41 @@ export default function MyMessages() {
   // 📨 ACCIONES DE MENSAJES
   // ========================================
 
-  const handleMessageClick = async (message: LeadMessage) => {
-    setSelectedMessage(message);
-    setShowMessageDetail(true);
+  /**
+   * 🔓 Abrir panel de conversación
+   */
+  const handleOpenConversation = async (message: LeadMessage) => {
+    // Obtener el leadId correctamente
+    const leadId = extractLeadId(message.leadId);
     
-    // Marcar como leído si no lo está
-    if (!message.leido) {
-      await handleMarkAsRead(message._id);
+    // Buscar el lead completo
+    const lead = leads.find(l => l._id === leadId);
+    
+    if (lead) {
+      setSelectedConversationLead(lead);
+      setShowConversation(true);
+      
+      // Marcar como leído
+      if (!message.leido) {
+        await handleMarkAsRead(message._id);
+      }
     }
   };
 
-  const handleCloseDetail = () => {
-    setShowMessageDetail(false);
-    setSelectedMessage(null);
-    setReplyContent('');
+  /**
+   * 🔒 Cerrar panel de conversación
+   */
+  const handleCloseConversation = () => {
+    setShowConversation(false);
+    setSelectedConversationLead(null);
   };
 
-  const handleReply = async () => {
-    if (!selectedMessage || !replyContent.trim()) return;
-
-    setIsSending(true);
-    try {
-      await messageService.replyMessage({
-        messageId: selectedMessage._id,
-        contenido: replyContent.trim(),
-        esPrivado: false,
-      });
-
-      await loadData();
-      handleCloseDetail();
-    } catch (err: any) {
-      console.error('Error enviando respuesta:', err);
-      alert('Error al enviar la respuesta');
-    } finally {
-      setIsSending(false);
-    }
+  /**
+   * 📨 Callback cuando se envía un mensaje
+   */
+  const handleMessageSent = () => {
+    // Recargar datos para actualizar la lista
+    loadData();
   };
 
   const handleMarkAsRead = async (messageId: string) => {
@@ -211,59 +260,95 @@ export default function MyMessages() {
 
   if (isLoading) {
     return (
-      <SmartDashboardLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <Loader className="w-12 h-12 text-green-600 mx-auto mb-4 animate-spin" />
-            <p className="text-gray-600 dark:text-gray-400">Cargando mensajes...</p>
-          </div>
+      <div className="w-full min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="w-12 h-12 text-green-600 mx-auto mb-4 animate-spin" />
+          <p className="text-gray-600 dark:text-gray-400">Cargando mensajes...</p>
         </div>
-      </SmartDashboardLayout>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <SmartDashboardLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto p-6">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error al Cargar</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-            <button
-              onClick={loadData}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              🔄 Reintentar
-            </button>
-          </div>
+      <div className="w-full min-h-[60vh] flex items-center justify-center">
+        <div className="text-center max-w-md p-6">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error al Cargar</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <button
+            onClick={loadData}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            🔄 Reintentar
+          </button>
         </div>
-      </SmartDashboardLayout>
+      </div>
     );
   }
 
   return (
-    <SmartDashboardLayout>
-      <div className="max-w-7xl mx-auto p-6">
-        
-        {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 rounded-2xl p-8 mb-6 text-white shadow-xl">
+    <div className="w-full px-4 py-6 md:py-8">
+        {/* Header con tema del sidebar */}
+        <div 
+          className="rounded-2xl p-6 md:p-8 mb-6 text-white shadow-xl"
+          style={{ background: headerGradient }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-                <Inbox className="w-10 h-10" />
-                Mis Mensajes
+              <h1 className="text-2xl md:text-4xl font-bold mb-2 flex items-center gap-3">
+                <MessageCircle className="w-8 h-8" />
+                Comunicación y Solicitudes
               </h1>
-              <p className="text-green-100 text-lg">
-                {filteredMessages.length} {filteredMessages.length === 1 ? 'mensaje' : 'mensajes'}
-                {unreadCount > 0 && ` • ${unreadCount} sin leer`}
+              <p className="text-white/80 text-sm md:text-lg">
+                Gestiona tus mensajes y el seguimiento de tus solicitudes
               </p>
             </div>
             <button
               onClick={() => navigate('/dashboard/client')}
-              className="px-6 py-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg transition-all border border-white/30"
+              className="px-4 md:px-6 py-2 md:py-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg transition-all border border-white/30 text-sm md:text-base flex items-center gap-2"
             >
-              ← Volver
+              <ArrowLeft className="w-4 h-4" />
+              Volver
+            </button>
+          </div>
+        </div>
+
+        {/* Pestañas de navegación */}
+        <div className="mb-6">
+          <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+            <button
+              onClick={() => navigate('/dashboard/client/messages')}
+              className={`px-4 md:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${
+                location.pathname === '/dashboard/client/messages'
+                  ? ''
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+              style={location.pathname === '/dashboard/client/messages' ? { color: accentColor } : {}}
+            >
+              💬 Mensajes
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+              {location.pathname === '/dashboard/client/messages' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: accentColor }} />
+              )}
+            </button>
+            <button
+              onClick={() => navigate('/dashboard/client/solicitudes')}
+              className={`px-4 md:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${
+                location.pathname === '/dashboard/client/solicitudes'
+                  ? ''
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+              style={location.pathname === '/dashboard/client/solicitudes' ? { color: accentColor } : {}}
+            >
+              📋 Mis Solicitudes
+              {location.pathname === '/dashboard/client/solicitudes' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: accentColor }} />
+              )}
             </button>
           </div>
         </div>
@@ -279,7 +364,8 @@ export default function MyMessages() {
                 placeholder="Buscar mensajes..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:outline-none dark:bg-gray-700 dark:text-white transition-colors"
+                style={{ '--tw-ring-color': accentColor } as any}
               />
             </div>
 
@@ -289,7 +375,8 @@ export default function MyMessages() {
               <select
                 value={selectedLead}
                 onChange={(e) => setSelectedLead(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:outline-none dark:bg-gray-700 dark:text-white transition-colors"
+                style={{ '--tw-ring-color': accentColor } as any}
               >
                 <option value="all">Todos los proyectos</option>
                 {leads.map((lead) => (
@@ -316,20 +403,45 @@ export default function MyMessages() {
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {secureFilteredMessages.map((message) => (
+              {secureFilteredMessages.map((message) => {
+                // 🎯 Usar helper mejorado para identificar mensajes del equipo
+                const isTeamMessage = isMessageFromTeam(message);
+                const displayName = isTeamMessage ? 'SCUTI Company' : message.autor.nombre;
+                const avatarInitial = isTeamMessage ? 'SC' : message.autor.nombre.charAt(0).toUpperCase();
+                
+                return (
                 <div
                   key={message._id}
-                  onClick={() => handleMessageClick(message)}
-                  className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
-                    !message.leido ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                  }`}
+                  onClick={() => handleOpenConversation(message)}
+                  className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  style={!message.leido ? {
+                    backgroundColor: `${accentColor}10`
+                  } : {}}
                 >
                   <div className="flex items-start gap-4">
-                    {/* Avatar */}
+                    {/* Avatar - Logo del negocio para mensajes del equipo */}
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white text-lg font-bold">
-                        {message.autor.nombre.charAt(0).toUpperCase()}
-                      </div>
+                      {isTeamMessage ? (
+                        <div 
+                          className="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-md"
+                          style={{ border: `2px solid ${accentColor}` }}
+                        >
+                          <img 
+                            src={businessLogo}
+                            alt="SCUTI Company"
+                            className="w-9 h-9 object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                          <Building2 className="w-5 h-5 hidden" style={{ color: accentColor }} />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-lg font-bold">
+                          {avatarInitial}
+                        </div>
+                      )}
                     </div>
 
                     {/* Contenido */}
@@ -337,10 +449,30 @@ export default function MyMessages() {
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                           <h3 className={`font-semibold ${!message.leido ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
-                            {message.autor.nombre}
+                            {displayName}
                           </h3>
+                          {isTeamMessage && (
+                            <span 
+                              className="px-2 py-0.5 text-xs rounded-full flex items-center gap-1 font-medium"
+                              style={{ 
+                                backgroundColor: `${accentColor}20`, 
+                                color: accentColor 
+                              }}
+                            >
+                              <img 
+                                src={businessLogo}
+                                alt=""
+                                className="w-3 h-3 object-contain"
+                                onError={(e) => e.currentTarget.style.display = 'none'}
+                              />
+                              SCUTI COMPANY
+                            </span>
+                          )}
                           {!message.leido && (
-                            <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                            <span 
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: accentColor }}
+                            ></span>
                           )}
                         </div>
                         <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
@@ -350,7 +482,7 @@ export default function MyMessages() {
 
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
-                          📊 {getLeadName(message.leadId)}
+                          📊 {getLeadName(extractLeadId(message.leadId))}
                         </span>
                       </div>
 
@@ -365,128 +497,31 @@ export default function MyMessages() {
                       </p>
                     </div>
 
-                    {/* Icono de estado */}
-                    <div className="flex-shrink-0">
-                      {message.leido ? (
-                        <MailOpen className="w-5 h-5 text-gray-400" />
-                      ) : (
-                        <Mail className="w-5 h-5 text-blue-600" />
+                    {/* Icono de conversación */}
+                    <div className="flex-shrink-0 flex flex-col items-center gap-1">
+                      <MessageCircle 
+                        className="w-5 h-5" 
+                        style={{ color: !message.leido ? accentColor : '#9ca3af' }}
+                      />
+                      {!message.leido && (
+                        <span className="text-xs font-medium" style={{ color: accentColor }}>Nuevo</span>
                       )}
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* Modal de Detalle del Mensaje */}
-        {showMessageDetail && selectedMessage && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-              
-              {/* Header del Modal */}
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white text-lg font-bold">
-                    {selectedMessage.autor.nombre.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {selectedMessage.autor.nombre}
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {selectedMessage.autor.email}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={handleCloseDetail}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <X className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-                </button>
-              </div>
-
-              {/* Contenido del Mensaje */}
-              <div className="flex-1 overflow-y-auto p-6">
-                {/* Metadata */}
-                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                  <span>📊 {getLeadName(selectedMessage.leadId)}</span>
-                  <span>•</span>
-                  <span>{new Date(selectedMessage.createdAt).toLocaleDateString('es-ES', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}</span>
-                  <span>•</span>
-                  <span>{new Date(selectedMessage.createdAt).toLocaleTimeString('es-ES', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}</span>
-                </div>
-
-                {/* Asunto */}
-                {selectedMessage.asunto && (
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                    {selectedMessage.asunto}
-                  </h3>
-                )}
-
-                {/* Contenido */}
-                <div className="prose dark:prose-invert max-w-none">
-                  <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
-                    {selectedMessage.contenido}
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer con Respuesta */}
-              <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    <Reply className="w-4 h-4 inline mr-2" />
-                    Tu Respuesta
-                  </label>
-                  <textarea
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
-                    placeholder="Escribe tu respuesta aquí..."
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white resize-none"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={handleCloseDetail}
-                    className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    Cerrar
-                  </button>
-                  <button
-                    onClick={handleReply}
-                    disabled={!replyContent.trim() || isSending}
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    {isSending ? (
-                      <>
-                        <Loader className="w-4 h-4 animate-spin" />
-                        Enviando...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        Enviar Respuesta
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Panel de Conversación */}
+        <ClientConversationPanel
+          isOpen={showConversation}
+          onClose={handleCloseConversation}
+          lead={selectedConversationLead}
+          onMessageSent={handleMessageSent}
+        />
       </div>
-    </SmartDashboardLayout>
   );
 }

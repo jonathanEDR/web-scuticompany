@@ -199,6 +199,20 @@ export const messageService = {
   },
 
   /**
+   * 📩 Obtener un mensaje específico por ID
+   * GET /api/crm/messages/:messageId
+   */
+  getMessage: async (messageId: string): Promise<ApiResponse<LeadMessage>> => {
+    try {
+      const response = await api.get(`/messages/${messageId}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Error obteniendo mensaje:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
    * ✅ Marcar mensaje como leído
    * PATCH /api/crm/messages/:messageId/read
    */
@@ -236,6 +250,26 @@ export const messageService = {
       return response.data;
     } catch (error: any) {
       console.error('❌ Error obteniendo mensajes no leídos:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * 📊 Obtener estadísticas de mensajes
+   * GET /api/crm/messages/stats
+   */
+  getMessageStats: async (): Promise<ApiResponse<{
+    total: number;
+    noLeidos: number;
+    enviados: number;
+    respondidos: number;
+    porTipo: Record<string, number>;
+  }>> => {
+    try {
+      const response = await api.get('/messages/stats');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Error obteniendo estadísticas de mensajes:', error);
       throw error.response?.data || error;
     }
   },

@@ -3,6 +3,7 @@ import { crmService } from '../../services/crmService';
 import type { LeadEstadisticas } from '../../services/crmService';
 import { Card, LoadingSpinner } from '../UI';
 import { StatusBadge, PriorityBadge } from './Badges';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 
 /**
  * 📊 Componente de estadísticas del CRM
@@ -12,6 +13,7 @@ export const CrmStats: React.FC = () => {
   const [leadsPendientes, setLeadsPendientes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { headerGradient } = useDashboardHeaderGradient();
 
   // ========================================
   // 📥 CARGAR DATOS
@@ -88,65 +90,82 @@ export const CrmStats: React.FC = () => {
   // ========================================
   return (
     <div className="space-y-6">
-      {/* KPIs Principales */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total de Leads */}
-        <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100 text-sm font-medium">Total de Leads</p>
-              <p className="text-3xl font-bold mt-2">{stats.total}</p>
-            </div>
-            <div className="text-4xl opacity-80">📊</div>
-          </div>
-        </Card>
+      {/* Header con KPIs - Diseño Glassmorphism */}
+      <div
+        className="rounded-2xl p-6 md:p-8 text-white shadow-xl"
+        style={{ background: headerGradient }}
+      >
+        {/* Título del header */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+            <span className="text-3xl">📊</span>
+            Panel de Estadísticas
+          </h2>
+          <p className="text-white/80 text-sm mt-1">
+            Resumen general del rendimiento del CRM
+          </p>
+        </div>
 
-        {/* Leads Nuevos */}
-        <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-100 text-sm font-medium">Nuevos</p>
-              <p className="text-3xl font-bold mt-2">{estadoPorNombre.nuevo || 0}</p>
-              <p className="text-green-100 text-xs mt-1">
-                {calcularPorcentaje(estadoPorNombre.nuevo || 0, stats.total)}% del total
-              </p>
+        {/* KPIs en diseño glassmorphism */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total de Leads */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/80 text-xs font-medium uppercase tracking-wide">Total Leads</p>
+                <p className="text-3xl font-bold mt-1">{stats.total}</p>
+              </div>
+              <div className="text-3xl opacity-80">📊</div>
             </div>
-            <div className="text-4xl opacity-80">🆕</div>
           </div>
-        </Card>
 
-        {/* Leads en Proceso */}
-        <Card className="p-6 bg-gradient-to-br from-yellow-500 to-yellow-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-yellow-100 text-sm font-medium">En Proceso</p>
-              <p className="text-3xl font-bold mt-2">
-                {(estadoPorNombre.contactado || 0) + (estadoPorNombre.calificado || 0) + (estadoPorNombre.propuesta || 0)}
-              </p>
-              <p className="text-yellow-100 text-xs mt-1">
-                {calcularPorcentaje(
-                  (estadoPorNombre.contactado || 0) + (estadoPorNombre.calificado || 0) + (estadoPorNombre.propuesta || 0),
-                  stats.total
-                )}% del total
-              </p>
+          {/* Leads Nuevos */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/80 text-xs font-medium uppercase tracking-wide">Nuevos</p>
+                <p className="text-3xl font-bold mt-1">{estadoPorNombre.nuevo || 0}</p>
+                <p className="text-white/70 text-xs mt-1">
+                  {calcularPorcentaje(estadoPorNombre.nuevo || 0, stats.total)}% del total
+                </p>
+              </div>
+              <div className="text-3xl opacity-80">🆕</div>
             </div>
-            <div className="text-4xl opacity-80">⏳</div>
           </div>
-        </Card>
 
-        {/* Leads Ganados */}
-        <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-100 text-sm font-medium">Ganados</p>
-              <p className="text-3xl font-bold mt-2">{estadoPorNombre.ganado || 0}</p>
-              <p className="text-purple-100 text-xs mt-1">
-                {calcularPorcentaje(estadoPorNombre.ganado || 0, stats.total)}% conversión
-              </p>
+          {/* Leads en Proceso */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/80 text-xs font-medium uppercase tracking-wide">En Proceso</p>
+                <p className="text-3xl font-bold mt-1">
+                  {(estadoPorNombre.contactado || 0) + (estadoPorNombre.calificado || 0) + (estadoPorNombre.propuesta || 0)}
+                </p>
+                <p className="text-white/70 text-xs mt-1">
+                  {calcularPorcentaje(
+                    (estadoPorNombre.contactado || 0) + (estadoPorNombre.calificado || 0) + (estadoPorNombre.propuesta || 0),
+                    stats.total
+                  )}% del total
+                </p>
+              </div>
+              <div className="text-3xl opacity-80">⏳</div>
             </div>
-            <div className="text-4xl opacity-80">🎉</div>
           </div>
-        </Card>
+
+          {/* Leads Ganados */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/80 text-xs font-medium uppercase tracking-wide">Ganados</p>
+                <p className="text-3xl font-bold mt-1">{estadoPorNombre.ganado || 0}</p>
+                <p className="text-white/70 text-xs mt-1">
+                  {calcularPorcentaje(estadoPorNombre.ganado || 0, stats.total)}% conversión
+                </p>
+              </div>
+              <div className="text-3xl opacity-80">🎉</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Distribución por Estado */}

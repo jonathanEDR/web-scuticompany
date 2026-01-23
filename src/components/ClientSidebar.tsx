@@ -11,6 +11,7 @@ import RoleBadge from './RoleBadge';
 import { useDashboardSidebarConfig } from '../hooks/cms/useDashboardSidebarConfig';
 import { useTheme } from '../contexts/ThemeContext';
 import DynamicIcon from './ui/DynamicIcon';
+import NotificationBell from './notifications/NotificationBell';
 
 interface ClientSidebarProps {
   isOpen: boolean;
@@ -154,6 +155,8 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
                     <div className="bg-white/20 rounded-lg">
                       <ThemeToggle />
                     </div>
+                    {/* 🔔 Campana de Notificaciones */}
+                    <NotificationBell iconClassName="w-4 h-4" />
                     {/* Botón Cerrar Sesión compacto */}
                     <SignOutButton>
                       <button
@@ -237,6 +240,11 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
                 {/* Theme Toggle colapsado */}
                 <div className="bg-white/20 rounded-lg mb-2">
                   <ThemeToggle />
+                </div>
+                
+                {/* 🔔 Campana de Notificaciones colapsado */}
+                <div className="mb-2">
+                  <NotificationBell iconClassName="w-4 h-4" isCollapsed={true} />
                 </div>
                 
                 {/* Botón Cerrar Sesión en modo colapsado */}

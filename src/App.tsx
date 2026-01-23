@@ -4,6 +4,7 @@ import { ClerkProvider, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { ServerNotificationProvider } from './contexts/ServerNotificationContext';
 import ToastContainer from './components/common/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary';
 import { DashboardProviders } from './components/DashboardProviders';
@@ -70,7 +71,7 @@ const ServicioForm = lazy(() => import('./pages/admin/ServicioFormV3'));
 
 // Páginas del Portal Cliente
 const ClientPortal = lazy(() => import('./pages/client/ClientPortal'));
-const MyMessages = lazy(() => import('./pages/client/MyMessages'));
+const MyMessages = lazy(() => import('./pages/client/MyMessagesV2'));
 const MySolicitudes = lazy(() => import('./pages/client/MySolicitudes'));
 
 // Módulo de Blog - Páginas Públicas
@@ -104,6 +105,9 @@ const ServicesAgentTraining = lazy(() => import('./pages/admin/ServicesAgentTrai
 // 🚀 SCUTI AI - Chat Principal con GerenteGeneral
 const ScutiAIChatPage = lazy(() => import('./pages/admin/ScutiAIChatPage'));
 const AIAnalytics = lazy(() => import('./pages/admin/AIAnalytics'));
+
+// 🔔 Historial de Notificaciones
+const NotificationsHistory = lazy(() => import('./pages/admin/NotificationsHistory'));
 
 // ⚡ Componente de loading minimalista - Optimizado para LCP
 const LoadingSpinner = () => (
@@ -256,7 +260,16 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* 📚 Mi Actividad en el Blog - Accesible para todos los usuarios autenticados */}
+              {/* � Historial de Notificaciones - Solo Admins */}
+              <Route path="/dashboard/notifications" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <NotificationsHistory />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* �📚 Mi Actividad en el Blog - Accesible para todos los usuarios autenticados */}
               <Route path="/dashboard/mi-blog" element={
                 <ProtectedRoute>
                   <MyBlogHub />
@@ -548,11 +561,14 @@ function App() {
       >
         {/* ⚡ ThemeProvider es ligero, se mantiene global */}
         <ThemeProvider>
-          {/* 🔔 Sistema de notificaciones global */}
+          {/* 🔔 Sistema de notificaciones global (toasts) */}
           <NotificationProvider>
             {/* 🔐 AuthProvider con notificación de bienvenida */}
             <AuthProvider>
-              <AppContent />
+              {/* 🔔 Notificaciones del servidor (persistentes) */}
+              <ServerNotificationProvider pollInterval={30000}>
+                <AppContent />
+              </ServerNotificationProvider>
             </AuthProvider>
           </NotificationProvider>
         </ThemeProvider>

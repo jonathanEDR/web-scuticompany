@@ -3,10 +3,12 @@
  * Panel administrativo completo para gestionar todos los mensajes del CRM
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MessageFiltersComponent } from '../../components/crm/messages/MessageFilters';
 import { TemplateEditor } from '../../components/crm/templates/TemplateEditor';
 import { MessageComposer } from '../../components/crm/messages/MessageComposer';
+import { ConversationPanel } from '../../components/crm/messages/ConversationPanel';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import type { 
@@ -33,6 +35,14 @@ export const CrmMessages: React.FC = () => {
   // 🎨 Obtener gradiente del header del sidebar para consistencia visual
   const { headerGradient } = useDashboardHeaderGradient();
   
+  // 🔗 Parámetros de URL para abrir conversación desde notificaciones
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlLeadId = searchParams.get('leadId');
+  const urlMessageId = searchParams.get('messageId');
+  
+  // Flag para evitar abrir múltiples veces
+  const hasOpenedFromUrl = useRef(false);
+  
   // ========================================
   // 📊 STATE
   // ========================================
@@ -47,6 +57,11 @@ export const CrmMessages: React.FC = () => {
     limit: 50,
   });
   const [stats, setStats] = useState<MessageStats | null>(null);
+  
+  // Panel de conversación
+  const [showConversation, setShowConversation] = useState(false);
+  const [selectedConversationLead, setSelectedConversationLead] = useState<any>(null);
+  const [selectedConversationMessage, setSelectedConversationMessage] = useState<LeadMessage | null>(null);
   
   // Plantillas
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
@@ -84,6 +99,56 @@ export const CrmMessages: React.FC = () => {
     }
   }, [viewMode, messageFilters.page]);
 
+  /**
+   * 🔔 Abrir conversación desde notificación (URL params)
+   */
+  useEffect(() => {
+    const openConversationFromUrl = async () => {
+      // Solo procesar si hay parámetros y no hemos abierto ya
+      if (!urlLeadId || hasOpenedFromUrl.current || showConversation) return;
+      
+      hasOpenedFromUrl.current = true;
+      
+      try {
+        // Cargar datos del lead
+        const response = await crmService.getLead(urlLeadId);
+        
+        if (response.success && response.data) {
+          const leadData = response.data;
+          
+          // Si tenemos messageId, intentar cargar ese mensaje específico
+          let messageData = null;
+          if (urlMessageId) {
+            try {
+              const msgResponse = await messageService.getMessage(urlMessageId);
+              if (msgResponse.success && msgResponse.data) {
+                messageData = msgResponse.data;
+              }
+            } catch (msgError) {
+              console.warn('No se pudo cargar el mensaje específico:', msgError);
+            }
+          }
+          
+          // Abrir panel de conversación
+          setSelectedConversationLead(leadData);
+          setSelectedConversationMessage(messageData);
+          setShowConversation(true);
+          
+          // Limpiar los parámetros de URL después de procesar
+          setSearchParams({}, { replace: true });
+        }
+      } catch (error) {
+        console.error('Error abriendo conversación desde URL:', error);
+        hasOpenedFromUrl.current = false; // Permitir reintentar
+      }
+    };
+    
+    // Esperar a que los mensajes se carguen antes de procesar URL
+    if (messages.length > 0 || !isLoadingMessages) {
+      openConversationFromUrl();
+    }
+  }, [urlLeadId, urlMessageId, messages.length, isLoadingMessages, showConversation, setSearchParams]);
+
   // ========================================
   // 📩 FUNCIONES DE MENSAJES
   // ========================================
@@ -91,17 +156,37 @@ export const CrmMessages: React.FC = () => {
   const loadMessages = async () => {
     setIsLoadingMessages(true);
     try {
+      // Filtrar para excluir notas internas de la lista principal
+      // Las notas internas solo se ven dentro del panel de conversación
+      const filtersWithoutInternalNotes = {
+        ...messageFilters,
+        // Solo mostrar mensajes de cliente y respuestas en la bandeja principal
+        excluirNotasInternas: true,
+      };
+
       // Si hay texto de búsqueda, usar searchMessages
       if (messageFilters.search && messageFilters.search.length >= 3) {
-        const response = await messageService.searchMessages(messageFilters);
+        const response = await messageService.searchMessages(filtersWithoutInternalNotes);
         if (response.success && response.data) {
-          setMessages(response.data.mensajes || []);
+          // Filtrar notas internas del resultado
+          const mensajesFiltrados = (response.data.mensajes || []).filter(
+            (m: any) => m.tipo !== 'nota_interna'
+          );
+          // Agrupar por Lead: mostrar solo el último mensaje de cada conversación
+          const mensajesAgrupados = agruparMensajesPorLead(mensajesFiltrados);
+          setMessages(mensajesAgrupados);
         }
       } else {
-        // Si no hay búsqueda, cargar todos los mensajes
-        const response = await messageService.getAllMessages(messageFilters);
+        // Si no hay búsqueda, cargar todos los mensajes (excepto notas internas)
+        const response = await messageService.getAllMessages(filtersWithoutInternalNotes);
         if (response.success && response.data) {
-          setMessages(response.data.mensajes || []);
+          // Filtrar notas internas del resultado
+          const mensajesFiltrados = (response.data.mensajes || []).filter(
+            (m: any) => m.tipo !== 'nota_interna'
+          );
+          // Agrupar por Lead: mostrar solo el último mensaje de cada conversación
+          const mensajesAgrupados = agruparMensajesPorLead(mensajesFiltrados);
+          setMessages(mensajesAgrupados);
         }
       }
     } catch (error) {
@@ -113,17 +198,46 @@ export const CrmMessages: React.FC = () => {
     }
   };
 
+  /**
+   * 🔄 Agrupar mensajes por Lead
+   * Muestra solo el mensaje más reciente de cada conversación (Lead)
+   * Esto evita que aparezcan múltiples filas para el mismo Lead
+   */
+  const agruparMensajesPorLead = (mensajes: LeadMessage[]): LeadMessage[] => {
+    const mensajesPorLead = new Map<string, LeadMessage>();
+    
+    // Ordenar por fecha más reciente primero
+    const mensajesOrdenados = [...mensajes].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    
+    // Agrupar: solo guardar el primer mensaje (más reciente) de cada Lead
+    for (const mensaje of mensajesOrdenados) {
+      const leadId = typeof mensaje.leadId === 'object' 
+        ? mensaje.leadId._id 
+        : mensaje.leadId;
+      
+      if (!mensajesPorLead.has(leadId)) {
+        mensajesPorLead.set(leadId, mensaje);
+      }
+    }
+    
+    // Retornar como array ordenado por fecha
+    return Array.from(mensajesPorLead.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  };
+
   const loadStats = async () => {
     try {
-      const response = await messageService.getUnreadMessages();
+      const response = await messageService.getMessageStats();
       if (response.success && response.data) {
-        // Crear stats básicos
         const stats: MessageStats = {
           total: response.data.total || 0,
-          noLeidos: response.data.mensajes?.length || 0,
-          enviados: 0,
-          respondidos: 0,
-          porTipo: {},
+          noLeidos: response.data.noLeidos || 0,
+          enviados: response.data.enviados || 0,
+          respondidos: response.data.respondidos || 0,
+          porTipo: response.data.porTipo || {},
         };
         setStats(stats);
       }
@@ -199,6 +313,55 @@ export const CrmMessages: React.FC = () => {
     } else {
       setSelectedMessages(new Set(messages.map(m => m._id)));
     }
+  };
+
+  /**
+   * 💬 Abrir panel de conversación
+   */
+  const handleOpenConversation = async (message: LeadMessage) => {
+    try {
+      // Obtener información del lead
+      let leadData = null;
+      
+      if (typeof message.leadId === 'object' && message.leadId !== null) {
+        // Ya tenemos la info del lead populada
+        const leadInfo = message.leadId as any;
+        leadData = {
+          _id: leadInfo._id,
+          nombre: leadInfo.nombre || 'Lead',
+          correo: leadInfo.correo,
+          estado: leadInfo.estado,
+          usuarioRegistrado: leadInfo.usuarioRegistrado,
+        };
+      } else if (typeof message.leadId === 'string') {
+        // Necesitamos cargar el lead completo
+        const response = await crmService.getLead(message.leadId);
+        if (response.success && response.data) {
+          leadData = response.data;
+        }
+      }
+
+      if (leadData) {
+        setSelectedConversationLead(leadData);
+        setSelectedConversationMessage(message);
+        setShowConversation(true);
+      } else {
+        console.error('No se pudo obtener información del lead');
+        alert('Error: No se pudo obtener información de la solicitud');
+      }
+    } catch (error) {
+      console.error('Error abriendo conversación:', error);
+      alert('Error al abrir la conversación');
+    }
+  };
+
+  /**
+   * 🔄 Cerrar panel de conversación
+   */
+  const handleCloseConversation = () => {
+    setShowConversation(false);
+    setSelectedConversationLead(null);
+    setSelectedConversationMessage(null);
   };
 
   /**
@@ -525,12 +688,13 @@ export const CrmMessages: React.FC = () => {
         {/* VISTA: MENSAJES */}
         {viewMode === 'messages' && (
           <div className="space-y-6">
-            {/* Filtros */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            {/* Filtros colapsables */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
               <MessageFiltersComponent
                 onFilterChange={handleFilterChange}
                 currentFilters={messageFilters}
-                stats={stats || undefined}
+                compact={true}
+                defaultExpanded={false}
               />
             </div>
 
@@ -606,11 +770,12 @@ export const CrmMessages: React.FC = () => {
                       {messages.map((message) => (
                         <tr
                           key={message._id}
-                          className={`hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors ${
+                          className={`hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer ${
                             !message.leido ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''
                           }`}
+                          onClick={() => handleOpenConversation(message)}
                         >
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                             <input
                               type="checkbox"
                               checked={selectedMessages.has(message._id)}
@@ -622,24 +787,96 @@ export const CrmMessages: React.FC = () => {
                             <div className="flex items-center gap-2">
                               {getPriorityBadge(message.prioridad)}
                               {!message.leido && (
-                                <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded">
+                                <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded animate-pulse">
                                   Nuevo
                                 </span>
                               )}
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            {getMessageTypeBadge(message.tipo)}
+                            <div className="flex items-center gap-1">
+                              {getMessageTypeBadge(message.tipo)}
+                              {message.tipo === 'respuesta_cliente' && (
+                                <span className="text-purple-600 dark:text-purple-400" title="Respuesta del cliente">
+                                  💬
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-3">
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              Lead #{message.leadId.toString().substring(0, 8)}
+                            <div className="flex items-center gap-2">
+                              {/* Avatar del Lead o Logo de la Empresa */}
+                              {/* Verificar si es realmente un mensaje del cliente (rol CLIENT o USER) */}
+                              {message.tipo === 'respuesta_cliente' && 
+                               (message.autor?.rol === 'CLIENT' || message.autor?.rol === 'USER') ? (
+                                /* Mensaje del Cliente Real - Mostrar su avatar */
+                                message.autor?.profileImage ? (
+                                  /* Tiene imagen de perfil guardada */
+                                  <img 
+                                    src={message.autor.profileImage}
+                                    alt={message.autor.nombre}
+                                    className="w-8 h-8 rounded-full object-cover"
+                                    onError={(e) => {
+                                      // Fallback a inicial si falla la imagen
+                                      const target = e.currentTarget;
+                                      target.style.display = 'none';
+                                      const fallback = target.nextElementSibling;
+                                      if (fallback) fallback.classList.remove('hidden');
+                                    }}
+                                  />
+                                ) : (
+                                  /* Sin imagen de perfil - Usar inicial */
+                                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                    {message.autor?.nombre?.[0]?.toUpperCase() || 'C'}
+                                  </div>
+                                )
+                              ) : (
+                                /* Mensaje del Equipo - Mostrar logo de la empresa */
+                                <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border-2 border-green-500">
+                                  <img 
+                                    src="/FAVICON.png"
+                                    alt="SCUTI Company"
+                                    className="w-5 h-5 object-contain"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      const fallback = e.currentTarget.nextElementSibling;
+                                      if (fallback) fallback.classList.remove('hidden');
+                                    }}
+                                  />
+                                  <span className="text-xs font-bold text-green-600 hidden">SC</span>
+                                </div>
+                              )}
+                              {/* Eliminar fallback duplicado - ya está incluido arriba */}
+                              <div>
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {typeof message.leadId === 'object' && message.leadId?.nombre 
+                                    ? message.leadId.nombre 
+                                    : `Lead #${typeof message.leadId === 'string' 
+                                        ? message.leadId.substring(0, 8) 
+                                        : message.leadId?._id?.substring(0, 8) || 'N/A'}`}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {typeof message.leadId === 'object' && message.leadId?.correo 
+                                    ? message.leadId.correo 
+                                    : 'Ver conversación →'}
+                                </div>
+                              </div>
                             </div>
                           </td>
                           <td className="px-4 py-3 max-w-md">
-                            <div className="text-sm text-gray-900 dark:text-white truncate">
-                              {message.contenido.substring(0, 100)}
-                              {message.contenido.length > 100 && '...'}
+                            <div className="flex items-start gap-2">
+                              <span className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
+                                {message.tipo === 'mensaje_cliente' ? '→' : '←'}
+                              </span>
+                              <div>
+                                <div className="text-sm text-gray-900 dark:text-white line-clamp-2">
+                                  {message.contenido.substring(0, 100)}
+                                  {message.contenido.length > 100 && '...'}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                  {message.tipo === 'mensaje_cliente' ? 'Enviado al cliente' : 'Respuesta del cliente'}
+                                </div>
+                              </div>
                             </div>
                           </td>
                           <td className="px-4 py-3">
@@ -653,11 +890,18 @@ export const CrmMessages: React.FC = () => {
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                onClick={() => handleOpenConversation(message)}
+                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                                title="Abrir conversación"
+                              >
+                                💬
+                              </button>
                               {!message.leido && (
                                 <button
                                   onClick={() => handleMarkAsRead(message._id)}
-                                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                  className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
                                   title="Marcar como leído"
                                 >
                                   ✅
@@ -665,7 +909,7 @@ export const CrmMessages: React.FC = () => {
                               )}
                               <button
                                 onClick={() => handleDeleteMessage(message._id)}
-                                className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                                 title="Eliminar"
                               >
                                 🗑️
@@ -1000,6 +1244,27 @@ export const CrmMessages: React.FC = () => {
             />
           </div>
         </div>
+      )}
+
+      {/* Panel: Conversación */}
+      {showConversation && selectedConversationLead && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/30 z-40"
+            onClick={handleCloseConversation}
+          />
+          {/* Panel */}
+          <ConversationPanel
+            lead={selectedConversationLead}
+            initialMessage={selectedConversationMessage || undefined}
+            onClose={handleCloseConversation}
+            onMessageSent={() => {
+              loadMessages();
+              loadStats();
+            }}
+          />
+        </>
       )}
       </div>
     </SmartDashboardLayout>
