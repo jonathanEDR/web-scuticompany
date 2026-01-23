@@ -65,6 +65,7 @@ export type NotificationType =
   | 'mensaje_interno'
   | 'mensaje_cliente'
   | 'respuesta_cliente'
+  | 'respuesta_equipo'
   | 'lead_asignado'
   | 'lead_estado_cambio'
   | 'usuario_vinculado'
@@ -251,6 +252,7 @@ class NotificationService {
       mensaje_interno: '💬',
       mensaje_cliente: '📨',
       respuesta_cliente: '↩️',
+      respuesta_equipo: '👥',
       lead_asignado: '🎯',
       lead_estado_cambio: '📊',
       usuario_vinculado: '🔗',
