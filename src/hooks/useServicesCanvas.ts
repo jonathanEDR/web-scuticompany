@@ -316,18 +316,18 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
       
       // Mapear respuesta del backend correctamente
       const analysisResult: ServicesAnalysisResult = {
-        score: data?.score || 0,
-        seoScore: data?.seoScore,
-        qualityScore: data?.qualityScore,
-        completenessScore: data?.completenessScore,
-        conversionScore: data?.conversionScore,
-        strengths: data?.strengths || [],
-        weaknesses: data?.weaknesses || [],
-        improvements: data?.weaknesses?.map((w: any) => typeof w === 'string' ? w : w.title) || [],
+        score: data?.scores?.overall || 0,
+        seoScore: data?.scores?.seo,
+        qualityScore: data?.scores?.quality,
+        completenessScore: data?.scores?.completeness,
+        conversionScore: data?.scores?.conversion,
+        strengths: data?.analysis?.strengths || [],
+        weaknesses: data?.analysis?.weaknesses || [],
+        improvements: data?.analysis?.weaknesses?.map((w: any) => typeof w === 'string' ? w : w) || [],
         recommendations: data?.recommendations || [],
-        detailedMetrics: data?.detailedMetrics,
-        quickWins: data?.quickWins || [],
-        criticalIssues: data?.criticalIssues || []
+        detailedMetrics: undefined,
+        quickWins: data?.analysis?.opportunities?.slice(0, 3) || [],
+        criticalIssues: data?.analysis?.weaknesses?.slice(0, 3) || []
       };
 
       setState(prev => ({

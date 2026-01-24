@@ -281,7 +281,7 @@ const ServicesAnalysisPanel: React.FC = memo(() => {
           </div>
 
           {/* Quick Wins y Problemas Críticos */}
-          {(currentAnalysis.quickWins?.length > 0 || currentAnalysis.criticalIssues?.length > 0) && (
+          {((currentAnalysis.quickWins?.length ?? 0) > 0 || (currentAnalysis.criticalIssues?.length ?? 0) > 0) && (
             <div className="mt-6 grid md:grid-cols-2 gap-4">
               {currentAnalysis.quickWins && currentAnalysis.quickWins.length > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">

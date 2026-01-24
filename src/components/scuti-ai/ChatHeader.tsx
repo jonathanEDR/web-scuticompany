@@ -17,7 +17,6 @@ import {
   Brain,
   PanelRightOpen,
   Share2,
-  Copy,
   Check
 } from 'lucide-react';
 import type { ChatSession, ScutiAIStatus } from '../../types/scutiAI.types';

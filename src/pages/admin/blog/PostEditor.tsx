@@ -13,7 +13,6 @@ import {
 import { RichTextEditor, ContentPreview, EnhancedEditorAISidebar } from '../../../components/blog/editor';
 import { CategoryBadge } from '../../../components/blog/common';
 import AIPreviewModal from '../../../components/blog/editor/AIPreviewModal';
-import { selectionAIService, type AIActionRequest } from '../../../components/blog/services/selectionAIService';
 import ImageSelectorModal from '../../../components/ImageSelectorModal';
 
 import { useCategories } from '../../../hooks/blog';
@@ -83,7 +82,7 @@ export default function PostEditor() {
   const [isUploading, setIsUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [showAISidebar, setShowAISidebar] = useState(false);
-  const [isProcessingAI, setIsProcessingAI] = useState(false);
+  const [isProcessingAI, _setIsProcessingAI] = useState(false);
   
   // Estado para el modal de preview de IA
   const [previewState, setPreviewState] = useState<{
@@ -122,9 +121,10 @@ export default function PostEditor() {
             )
           : [];
         
-        // ✅ Extraer keywords SEO (pueden venir como array o estar en aiOptimization)
+        // ✅ Extraer keywords SEO (pueden venir como array o estar en el post)
+        const postData = post as any; // Cast para acceder a propiedades opcionales
         const seoKeywords = post.seo?.keywords || 
-                           post.aiOptimization?.aiMetadata?.primaryKeywords || 
+                           postData.aiOptimization?.aiMetadata?.primaryKeywords || 
                            [];
         
         setFormData({
@@ -144,7 +144,7 @@ export default function PostEditor() {
             metaTitle: post.seo?.metaTitle || '',
             metaDescription: post.seo?.metaDescription || '',
             // Priorizar seo.focusKeyphrase, fallback a aiOptimization
-            focusKeyphrase: post.seo?.focusKeyphrase || post.aiOptimization?.aiMetadata?.primaryKeywords?.[0] || '',
+            focusKeyphrase: post.seo?.focusKeyphrase || postData.aiOptimization?.aiMetadata?.primaryKeywords?.[0] || '',
             keywords: Array.isArray(seoKeywords) ? seoKeywords : []
           }
         });

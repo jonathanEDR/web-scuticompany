@@ -197,7 +197,6 @@ const ScutiAIChatPage: React.FC = () => {
         title: activeSession.title,
         createdAt: activeSession.createdAt,
         updatedAt: activeSession.updatedAt,
-        category: activeSession.category,
         messageCount: messages.length,
         agentsUsed: [...new Set(messages.filter(m => m.agentUsed).map(m => m.agentUsed))],
         lastMessage: messages.length > 0 ? messages[messages.length - 1].content.substring(0, 100) + '...' : null

@@ -103,7 +103,7 @@ function renderTable(rows: string[]): string {
   const parseRow = (row: string): string[] => {
     return row
       .split('|')
-      .filter((cell, idx, arr) => idx > 0 && idx < arr.length - 1)
+      .filter((_cell, idx, arr) => idx > 0 && idx < arr.length - 1)
       .map(cell => cell.trim());
   };
 

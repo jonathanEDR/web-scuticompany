@@ -8,11 +8,10 @@
  * - empty: Estado inicial sin contenido
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   X, 
   Maximize2, 
-  Minimize2,
   FileText,
   List,
   Eye,
@@ -60,7 +59,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   mode,
   content,
   onClose,
-  onToggleExpand,
+  onToggleExpand: _onToggleExpand,
   onItemClick,
   onEditClick,
   canvasSize = 'medium',
@@ -1808,7 +1807,7 @@ interface ServiceListViewProps {
   onDashboardClick?: (itemId: string) => void;
 }
 
-const ServiceListView: React.FC<ServiceListViewProps> = ({ data, onItemClick, onDashboardClick }) => {
+const ServiceListView: React.FC<ServiceListViewProps> = ({ data, onItemClick, onDashboardClick: _onDashboardClick }) => {
   const items = data.items || [];
   const totalCount = data.totalCount || items.length;
   const categories = data.categories || [];
