@@ -8,10 +8,11 @@
  * - Descripción corta (con IA)
  * - Categoría (con modal para crear)
  * - Estado del servicio
- * - Precio base
- * - Icono
  * - Etiquetas (agregar/eliminar)
  * - Opciones: destacado, activo, visible
+ * 
+ * ⚠️ NOTA: Precio se configura en PricingForm (Panel Precios)
+ * ⚠️ NOTA: Icono fue removido - campo obsoleto no utilizado en UI
  * 
  * Ventajas:
  * ✅ Sin race conditions - Estado aislado
@@ -200,34 +201,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
               <option value="pausado">⏸️ Pausado</option>
               <option value="descontinuado">❌ Descontinuado</option>
             </select>
-          </div>
-
-          {/* Precio */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Precio (USD)
-            </label>
-            <input
-              type="number"
-              {...register('precio', { valueAsNumber: true })}
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Icono
-            </label>
-            <input
-              type="text"
-              {...register('icono')}
-              placeholder="🚀"
-              maxLength={4}
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white text-center text-2xl placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
           </div>
 
           {/* Descripción corta */}

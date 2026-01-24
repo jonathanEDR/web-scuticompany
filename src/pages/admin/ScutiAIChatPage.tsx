@@ -26,6 +26,10 @@ import CanvasEditor from '../../components/scuti-ai/CanvasEditor';
 import CategoryQuickActions from '../../components/scuti-ai/CategoryQuickActions';
 import EventDetailModal from '../../components/agenda/EventDetailModal';
 import type { CategoryType } from '../../types/scuti-ai';
+
+// Tipo para tamaño del Canvas
+type CanvasSize = 'small' | 'medium' | 'large' | 'full';
+
 import {
   AlertCircle,
   Loader2,
@@ -47,6 +51,10 @@ const ScutiAIChatPage: React.FC = () => {
 
   // Estado para sidebar colapsado
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // 🆕 Estado para tamaño flexible del Canvas
+  const [canvasSizeState, setCanvasSizeState] = useState<CanvasSize>('medium');
+  const [canvasCustomWidth, setCanvasCustomWidth] = useState<number>(33.333);
 
   const {
     // Estado
@@ -165,7 +173,58 @@ const ScutiAIChatPage: React.FC = () => {
   };
 
   const handleSettings = () => {
-    navigate('/dashboard/agents');
+    navigate('/dashboard/ai-agents');
+  };
+
+  // 🆕 Handler para "Ver detalles" - Abre el Canvas con info de la sesión
+  const handleViewDetails = () => {
+    if (!activeSession) {
+      // Si no hay sesión activa, mostrar canvas vacío
+      _showCanvas({
+        type: 'session_details',
+        title: 'Sin conversación activa',
+        data: null
+      }, 'preview');
+      return;
+    }
+
+    // Preparar datos de la sesión para mostrar en el Canvas
+    const sessionDetails = {
+      type: 'session_details' as const,
+      title: activeSession.title || 'Detalles de la Conversación',
+      data: {
+        sessionId: activeSession.sessionId,
+        title: activeSession.title,
+        createdAt: activeSession.createdAt,
+        updatedAt: activeSession.updatedAt,
+        category: activeSession.category,
+        messageCount: messages.length,
+        agentsUsed: [...new Set(messages.filter(m => m.agentUsed).map(m => m.agentUsed))],
+        lastMessage: messages.length > 0 ? messages[messages.length - 1].content.substring(0, 100) + '...' : null
+      }
+    };
+
+    _showCanvas(sessionDetails, 'preview');
+  };
+
+  // 🆕 Handler para "Compartir" - Copia enlace de la conversación
+  const handleShare = async () => {
+    if (!activeSession) {
+      alert('No hay conversación activa para compartir');
+      return;
+    }
+
+    // Crear enlace con el ID de la sesión
+    const shareUrl = `${window.location.origin}/dashboard/scuti-ai?session=${activeSession.sessionId}`;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      // El ChatHeader maneja el feedback visual
+    } catch (err) {
+      console.error('Error al copiar:', err);
+      // Fallback
+      prompt('Copia este enlace:', shareUrl);
+    }
   };
 
   // Handler para cuando se hace click en un item del canvas
@@ -191,6 +250,25 @@ const ScutiAIChatPage: React.FC = () => {
         }
       } catch (error) {
         console.error('Error al cargar evento:', error);
+      }
+      return;
+    }
+
+    // Si es un servicio en lista, enviar consulta automática para más info
+    if (canvasContent?.type === 'service_list') {
+      if (itemTitle) {
+        sendMessage(`Dame información detallada del servicio: ${itemTitle}`);
+      } else {
+        sendMessage(`Dame información del servicio con id: ${itemId}`);
+      }
+      return;
+    }
+
+    // Si es análisis de servicio, enviar la acción directamente
+    // itemTitle contiene el mensaje de acción (ej: "analiza el SEO de este servicio")
+    if (canvasContent?.type === 'service_analysis') {
+      if (itemTitle) {
+        sendMessage(itemTitle);
       }
       return;
     }
@@ -225,8 +303,16 @@ const ScutiAIChatPage: React.FC = () => {
           />
         </div>
 
-        {/* Área principal de chat */}
-        <div className="flex-1 flex flex-col">
+        {/* Área principal de chat - Se ajusta dinámicamente según el Canvas */}
+        <div 
+          className="flex flex-col transition-all duration-300"
+          style={{ 
+            width: canvasVisible 
+              ? `calc(100% - ${isSidebarCollapsed ? '3.5rem' : '18rem'} - ${canvasCustomWidth}%)` 
+              : `calc(100% - ${isSidebarCollapsed ? '3.5rem' : '18rem'})`,
+            minWidth: '300px'
+          }}
+        >
           {/* Header */}
           <ChatHeader
             session={activeSession}
@@ -234,6 +320,8 @@ const ScutiAIChatPage: React.FC = () => {
             onExport={handleExport}
             onClear={handleClearConversation}
             onSettings={handleSettings}
+            onViewDetails={handleViewDetails}
+            onShare={handleShare}
           />
 
           {/* Mensajes */}
@@ -409,6 +497,10 @@ const ScutiAIChatPage: React.FC = () => {
           onToggleExpand={toggleCanvasExpand}
           onItemClick={handleCanvasItemClick}
           onEditClick={handleEditBlog}
+          canvasSize={canvasSizeState}
+          onSizeChange={setCanvasSizeState}
+          customWidth={canvasCustomWidth}
+          onWidthChange={setCanvasCustomWidth}
         />
 
         {/* Event Detail Modal */}

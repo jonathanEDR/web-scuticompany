@@ -59,17 +59,43 @@ export interface ServicesChatMessage {
 
 export interface ServicesAnalysisResult {
   score: number;
-  strengths: string[];
-  improvements: string[]; // weaknesses del API
   seoScore?: number;
   qualityScore?: number;
   completenessScore?: number;
+  conversionScore?: number;
+  strengths: Array<{
+    title: string;
+    detail: string;
+    category: string;
+    impact: string;
+  } | string>;
+  weaknesses: Array<{
+    title: string;
+    detail: string;
+    category: string;
+    severity: string;
+    affectsScore?: boolean;
+  } | string>;
+  improvements: string[]; // alias para weaknesses
   recommendations: Array<{
     type: string;
     priority: 'high' | 'medium' | 'low';
+    title?: string;
     description: string;
     impact: string;
+    action?: string;
+    estimatedImprovement?: string;
+    difficulty?: string;
+    timeToImplement?: string;
   }>;
+  detailedMetrics?: {
+    completeness?: any;
+    seo?: any;
+    quality?: any;
+    conversion?: any;
+  };
+  quickWins?: string[];
+  criticalIssues?: string[];
 }
 
 export interface PricingStrategy {
@@ -90,8 +116,16 @@ export interface GeneratedContent {
 
 export interface PortfolioAnalysis {
   totalServices: number;
-  totalRevenue: number;
-  categories: string[];
+  activeServices: number;
+  withPricing: number;
+  withImages: number;
+  avgCompleteness: number;
+  categories: {
+    [key: string]: {
+      count: number;
+      services: Array<{ id: string; titulo: string; estado: string }>;
+    };
+  };
   gaps: Array<{
     type: string;
     description: string;
@@ -179,13 +213,13 @@ const ServicesCanvasContext = createContext<ServicesCanvasContextType | undefine
 interface ServicesCanvasProviderProps {
   children: ReactNode;
   initialContext?: ServiceContext;
-  allServices?: ServiceContext[]; // 🆕 Pasar servicios globales
+  allServices?: ServiceContext[];
 }
 
 export const ServicesCanvasProvider: React.FC<ServicesCanvasProviderProps> = ({ 
   children, 
   initialContext,
-  allServices = [] // 🆕 Servicios globales
+  allServices = []
 }) => {
   const servicesCanvas = useServicesCanvas({ initialContext, allServices });
 

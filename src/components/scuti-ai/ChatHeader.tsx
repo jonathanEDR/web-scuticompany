@@ -14,7 +14,11 @@ import {
   Download,
   Trash2,
   MoreVertical,
-  Brain
+  Brain,
+  PanelRightOpen,
+  Share2,
+  Copy,
+  Check
 } from 'lucide-react';
 import type { ChatSession, ScutiAIStatus } from '../../types/scutiAI.types';
 import { SCUTI_AI_MASCOT } from '../../utils/brandAssets';
@@ -25,6 +29,8 @@ interface ChatHeaderProps {
   onExport?: () => void;
   onClear?: () => void;
   onSettings?: () => void;
+  onViewDetails?: () => void;
+  onShare?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -32,9 +38,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   systemStatus,
   onExport,
   onClear,
-  onSettings
+  onSettings,
+  onViewDetails,
+  onShare
 }) => {
   const [showActions, setShowActions] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -165,21 +174,31 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10">
               <button
                 onClick={() => {
-                  // TODO: Ver detalles
+                  if (onViewDetails) onViewDetails();
                   setShowActions(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
               >
+                <PanelRightOpen size={16} />
                 Ver detalles
               </button>
               <button
                 onClick={() => {
-                  // TODO: Compartir
+                  if (onShare) {
+                    onShare();
+                  } else {
+                    // Fallback: copiar URL de la conversación
+                    const url = window.location.href;
+                    navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }
                   setShowActions(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
               >
-                Compartir
+                {copied ? <Check size={16} className="text-green-500" /> : <Share2 size={16} />}
+                {copied ? 'Enlace copiado!' : 'Compartir'}
               </button>
               <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
               <button
@@ -187,8 +206,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                   if (onClear) onClear();
                   setShowActions(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
               >
+                <Trash2 size={16} />
                 Eliminar conversación
               </button>
             </div>

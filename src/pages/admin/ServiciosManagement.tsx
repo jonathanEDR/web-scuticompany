@@ -577,7 +577,7 @@ export const ServiciosManagementOptimized = () => {
         isOpen={showCategoriesModal}
         onClose={() => setShowCategoriesModal(false)}
         onCategoryChange={async () => {
-          await refresh(); // Refrescar servicios cuando cambian las categorías
+          await refresh();
         }}
       />
 
@@ -585,6 +585,7 @@ export const ServiciosManagementOptimized = () => {
       <ServicesCanvasModal
         isOpen={isCanvasOpen}
         onClose={closeCanvas}
+        allServices={servicios.map(servicioToServiceContext)}
       />
     </div>
   );

@@ -2,11 +2,12 @@
  * 🎨 VisualForm - Componente especializado para Diseño Visual
  * 
  * Maneja exclusivamente:
- * - Icono del servicio (emoji)
- * - Imagen principal (con upload)
- * - Color primario
- * - Color secundario
+ * - Imagen principal (con upload desde galería o URL)
+ * - Color primario (para gradientes y botones)
+ * - Color secundario (para acentos)
  * - Vista previa en tiempo real
+ * 
+ * ⚠️ NOTA: Campo Icono fue removido - campo obsoleto no utilizado en UI
  * 
  * Ventajas:
  * ✅ Sin race conditions - Estado aislado
@@ -114,26 +115,6 @@ export const VisualForm: React.FC<VisualFormProps> = ({
         </h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          {/* Icono */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Icono del Servicio
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                {...register('icono')}
-                placeholder="🚀"
-                maxLength={4}
-                className="w-16 h-16 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-center text-xl placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <div className="flex-1 text-sm text-gray-600 dark:text-gray-400">
-                <p>Emoji o símbolo para representar el servicio</p>
-                <p className="text-xs mt-1">Ejemplos: 🚀 💻 🎨 📱 ☁️</p>
-              </div>
-            </div>
-          </div>
-
           {/* Imagen Principal */}
           <div className="lg:col-span-2">
             <ImageUploader
@@ -200,16 +181,43 @@ export const VisualForm: React.FC<VisualFormProps> = ({
           {/* Preview */}
           <div className="lg:col-span-2 mt-4 p-4 bg-gray-100/50 dark:bg-gray-700/30 rounded-lg border border-gray-300 dark:border-gray-600">
             <h3 className="text-gray-900 dark:text-white font-medium mb-3">Vista Previa</h3>
-            <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
-                style={{ backgroundColor: watch('colorPrimario') + '20', color: watch('colorPrimario') }}
-              >
-                {watch('icono') || '🚀'}
-              </div>
-              <div>
+            <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              {/* Imagen o placeholder con colores */}
+              {watch('imagen') ? (
+                <img 
+                  src={watch('imagen')} 
+                  alt="Preview" 
+                  className="w-16 h-16 rounded-lg object-cover border-2"
+                  style={{ borderColor: watch('colorPrimario') }}
+                />
+              ) : (
+                <div 
+                  className="w-16 h-16 rounded-lg flex items-center justify-center"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${watch('colorPrimario')}20, ${watch('colorSecundario')}20)`,
+                    border: `2px solid ${watch('colorPrimario')}40`
+                  }}
+                >
+                  <span className="text-2xl">🖼️</span>
+                </div>
+              )}
+              <div className="flex-1">
                 <h4 className="text-gray-900 dark:text-white font-medium">{watch('titulo') || 'Título del Servicio'}</h4>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">{watch('descripcionCorta') || 'Descripción corta del servicio'}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{watch('descripcionCorta') || 'Descripción corta del servicio'}</p>
+                {/* Muestra de colores */}
+                <div className="flex items-center gap-2 mt-2">
+                  <div 
+                    className="w-4 h-4 rounded-full border border-gray-300"
+                    style={{ backgroundColor: watch('colorPrimario') }}
+                    title="Color Primario"
+                  />
+                  <div 
+                    className="w-4 h-4 rounded-full border border-gray-300"
+                    style={{ backgroundColor: watch('colorSecundario') }}
+                    title="Color Secundario"
+                  />
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Colores del servicio</span>
+                </div>
               </div>
             </div>
           </div>

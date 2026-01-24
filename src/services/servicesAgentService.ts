@@ -131,9 +131,25 @@ export interface ServicesAgentPortfolioResponse {
   data?: {
     summary: {
       totalServices: number;
-      averageScore: number;
-      topPerformers: any[];
-      needsImprovement: any[];
+      activeServices: number;
+      withPricing: number;
+      withImages: number;
+      avgCompleteness: number;
+      averageScore?: number;
+      topPerformers?: any[];
+      needsImprovement?: any[];
+    };
+    categories: {
+      [key: string]: {
+        count: number;
+        services: Array<{ id: string; titulo: string; estado: string }>;
+      };
+    };
+    swot: {
+      strengths: string[];
+      weaknesses: string[];
+      opportunities: string[];
+      threats: string[];
     };
     gaps: Array<{
       type: string;

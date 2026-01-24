@@ -260,7 +260,7 @@ const ServicesAnalysisPanel: React.FC = memo(() => {
             Puntuación General
           </h4>
           
-          <div className="flex items-center justify-around">
+          <div className="flex items-center justify-around flex-wrap gap-4">
             {renderScoreCircle(currentAnalysis.score, 'General', 'lg')}
             
             {currentAnalysis.seoScore !== undefined && (
@@ -274,122 +274,250 @@ const ServicesAnalysisPanel: React.FC = memo(() => {
             {currentAnalysis.completenessScore !== undefined && (
               renderScoreCircle(currentAnalysis.completenessScore, 'Completitud', 'sm')
             )}
+
+            {currentAnalysis.conversionScore !== undefined && (
+              renderScoreCircle(currentAnalysis.conversionScore, 'Conversión', 'sm')
+            )}
           </div>
+
+          {/* Quick Wins y Problemas Críticos */}
+          {(currentAnalysis.quickWins?.length > 0 || currentAnalysis.criticalIssues?.length > 0) && (
+            <div className="mt-6 grid md:grid-cols-2 gap-4">
+              {currentAnalysis.quickWins && currentAnalysis.quickWins.length > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <h5 className="text-xs font-semibold text-green-800 mb-2 flex items-center">
+                    <Zap className="h-3.5 w-3.5 mr-1" />
+                    Quick Wins (mejoras rápidas)
+                  </h5>
+                  <ul className="space-y-1">
+                    {currentAnalysis.quickWins.map((item: string, idx: number) => (
+                      <li key={idx} className="text-xs text-green-700 flex items-center">
+                        <CheckCircle className="h-3 w-3 mr-1.5 text-green-600" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {currentAnalysis.criticalIssues && currentAnalysis.criticalIssues.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <h5 className="text-xs font-semibold text-red-800 mb-2 flex items-center">
+                    <AlertCircle className="h-3.5 w-3.5 mr-1" />
+                    Problemas Críticos
+                  </h5>
+                  <ul className="space-y-1">
+                    {currentAnalysis.criticalIssues.map((item: string, idx: number) => (
+                      <li key={idx} className="text-xs text-red-700 flex items-center">
+                        <AlertCircle className="h-3 w-3 mr-1.5 text-red-600" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Fortalezas */}
+        {/* Fortalezas Detalladas */}
         {currentAnalysis.strengths && currentAnalysis.strengths.length > 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
               <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
               Fortalezas ({currentAnalysis.strengths.length})
             </h4>
-            <ul className="space-y-2">
-              {currentAnalysis.strengths.map((strength, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span className="text-sm text-gray-700">{strength}</span>
-                </li>
+            <div className="space-y-3">
+              {currentAnalysis.strengths.map((strength: any, index: number) => (
+                <div key={index} className="border-l-4 border-green-500 bg-green-50 rounded-r-lg p-4">
+                  {typeof strength === 'string' ? (
+                    <p className="text-sm text-gray-700">{strength}</p>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-green-900">{strength.title}</span>
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                          strength.impact === 'alto' ? 'bg-green-200 text-green-800' : 'bg-green-100 text-green-700'
+                        }`}>
+                          impacto {strength.impact}
+                        </span>
+                      </div>
+                      <p className="text-sm text-green-800">{strength.detail}</p>
+                      <span className="inline-block mt-2 px-2 py-0.5 bg-green-200 text-green-800 text-xs rounded">
+                        {strength.category}
+                      </span>
+                    </>
+                  )}
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
 
-        {/* Áreas de Mejora */}
-        {currentAnalysis.improvements && currentAnalysis.improvements.length > 0 && (
+        {/* Debilidades/Áreas de Mejora Detalladas */}
+        {currentAnalysis.weaknesses && currentAnalysis.weaknesses.length > 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
               <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
-              Áreas de Mejora ({currentAnalysis.improvements.length})
+              Áreas de Mejora ({currentAnalysis.weaknesses.length})
             </h4>
-            <ul className="space-y-2">
-              {currentAnalysis.improvements.map((improvement, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="inline-block w-2 h-2 bg-yellow-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span className="text-sm text-gray-700">{improvement}</span>
-                </li>
+            <div className="space-y-3">
+              {currentAnalysis.weaknesses.map((weakness: any, index: number) => (
+                <div key={index} className={`border-l-4 rounded-r-lg p-4 ${
+                  weakness.severity === 'alta' 
+                    ? 'border-red-500 bg-red-50' 
+                    : 'border-yellow-500 bg-yellow-50'
+                }`}>
+                  {typeof weakness === 'string' ? (
+                    <p className="text-sm text-gray-700">{weakness}</p>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`font-semibold ${weakness.severity === 'alta' ? 'text-red-900' : 'text-yellow-900'}`}>
+                          {weakness.title}
+                        </span>
+                        <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
+                          weakness.severity === 'alta' 
+                            ? 'bg-red-200 text-red-800' 
+                            : 'bg-yellow-200 text-yellow-800'
+                        }`}>
+                          severidad {weakness.severity}
+                        </span>
+                      </div>
+                      <p className={`text-sm ${weakness.severity === 'alta' ? 'text-red-800' : 'text-yellow-800'}`}>
+                        {weakness.detail}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`px-2 py-0.5 text-xs rounded ${
+                          weakness.severity === 'alta' ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800'
+                        }`}>
+                          {weakness.category}
+                        </span>
+                        {weakness.affectsScore && (
+                          <span className="px-2 py-0.5 bg-red-300 text-red-900 text-xs rounded font-medium">
+                            ⚠️ Afecta puntuación
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
 
-        {/* Recomendaciones */}
+        {/* Recomendaciones Detalladas */}
         {currentAnalysis.recommendations && currentAnalysis.recommendations.length > 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h4 className="font-semibold text-gray-900 flex items-center">
                 <Lightbulb className="h-5 w-5 text-purple-600 mr-2" />
-                Recomendaciones de Mejora
+                Plan de Acción
               </h4>
               <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                {currentAnalysis.recommendations.length} sugerencias
+                {currentAnalysis.recommendations.length} mejoras identificadas
               </span>
             </div>
             
             <div className="space-y-4">
-              {currentAnalysis.recommendations.map((rec, index) => (
+              {currentAnalysis.recommendations.map((rec: any, index: number) => (
                 <div 
                   key={index} 
-                  className="group relative border-l-4 border-transparent hover:border-purple-500 bg-gray-50 rounded-r-lg p-5 hover:bg-white hover:shadow-md transition-all duration-200"
+                  className={`group relative border-l-4 rounded-r-lg p-5 transition-all duration-200 hover:shadow-md ${
+                    rec.priority === 'high' 
+                      ? 'border-red-500 bg-red-50 hover:bg-red-100' 
+                      : rec.priority === 'medium'
+                        ? 'border-yellow-500 bg-yellow-50 hover:bg-yellow-100'
+                        : 'border-blue-500 bg-blue-50 hover:bg-blue-100'
+                  }`}
                 >
-                  {/* Header con Tipo y Prioridad */}
+                  {/* Header con Tipo, Título y Prioridad */}
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-lg border ${getTypeColor(rec.type)}`}>
                         {getTypeIcon(rec.type)}
                       </div>
                       <div>
-                        <span className="text-sm font-semibold text-gray-900 block">{rec.type}</span>
+                        <span className="text-sm font-bold text-gray-900 block">
+                          {rec.title || rec.type}
+                        </span>
                         <span className="text-xs text-gray-500">Recomendación #{index + 1}</span>
                       </div>
                     </div>
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getPriorityColor(rec.priority)}`}>
-                      Prioridad {getPriorityLabel(rec.priority)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {rec.difficulty && (
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                          rec.difficulty === 'fácil' ? 'bg-green-100 text-green-700' :
+                          rec.difficulty === 'media' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {rec.difficulty}
+                        </span>
+                      )}
+                      <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getPriorityColor(rec.priority)}`}>
+                        Prioridad {getPriorityLabel(rec.priority)}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Descripción */}
-                  <p className="text-sm text-gray-700 leading-relaxed mb-4 pl-12">
+                  <p className="text-sm text-gray-700 leading-relaxed mb-3 pl-12">
                     {rec.description}
                   </p>
 
-                  {/* Footer con Impacto */}
-                  <div className="flex items-center justify-between pl-12 pt-3 border-t border-gray-200">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center text-xs text-gray-600">
-                        <TrendingUp className="h-3.5 w-3.5 mr-1.5 text-green-600" />
-                        <span className="font-medium">Impacto:</span>
-                        <span className="ml-1 text-green-700 font-semibold">{rec.impact}</span>
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600">
-                        <Target className="h-3.5 w-3.5 mr-1.5 text-blue-600" />
-                        <span className="font-medium">Beneficio esperado</span>
-                      </div>
+                  {/* Acción sugerida */}
+                  {rec.action && (
+                    <div className="ml-12 mb-3 p-3 bg-white border border-gray-200 rounded-lg">
+                      <p className="text-xs text-gray-600">
+                        <span className="font-semibold text-purple-700">📋 Acción:</span> {rec.action}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Footer con métricas */}
+                  <div className="flex flex-wrap items-center gap-4 pl-12 pt-3 border-t border-gray-200">
+                    <div className="flex items-center text-xs text-gray-600">
+                      <TrendingUp className="h-3.5 w-3.5 mr-1.5 text-green-600" />
+                      <span className="font-medium">Impacto:</span>
+                      <span className="ml-1 text-green-700 font-semibold">{rec.impact}</span>
                     </div>
                     
-                    {/* Indicador de acción recomendada */}
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-xs text-purple-600 font-medium flex items-center">
-                        <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                        Implementar
-                      </span>
-                    </div>
+                    {rec.estimatedImprovement && (
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Target className="h-3.5 w-3.5 mr-1.5 text-blue-600" />
+                        <span className="font-medium">Mejora estimada:</span>
+                        <span className="ml-1 text-blue-700 font-semibold">{rec.estimatedImprovement}</span>
+                      </div>
+                    )}
+
+                    {rec.timeToImplement && (
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Zap className="h-3.5 w-3.5 mr-1.5 text-orange-600" />
+                        <span className="font-medium">Tiempo:</span>
+                        <span className="ml-1 text-orange-700 font-semibold">{rec.timeToImplement}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Nota informativa */}
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 rounded-lg">
               <div className="flex items-start">
-                <AlertCircle className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                  <Lightbulb className="h-5 w-5 text-purple-600" />
+                </div>
                 <div className="flex-1">
-                  <p className="text-sm text-blue-900 font-medium mb-1">
-                    💡 Consejo profesional
+                  <p className="text-sm text-purple-900 font-semibold mb-1">
+                    💡 Estrategia recomendada
                   </p>
-                  <p className="text-xs text-blue-700 leading-relaxed">
-                    Implementa las recomendaciones de <span className="font-semibold">alta prioridad</span> primero para obtener los mejores resultados. 
-                    Cada mejora incrementará significativamente la calidad y conversión de tu servicio.
+                  <p className="text-xs text-purple-700 leading-relaxed">
+                    1. Comienza con las mejoras marcadas como <span className="font-semibold text-red-600">prioridad alta</span> y <span className="font-semibold text-green-600">dificultad fácil</span>.
+                    <br />
+                    2. Las Quick Wins generan resultados inmediatos con poco esfuerzo.
+                    <br />
+                    3. Cada mejora incrementará tu puntuación y las conversiones de tu servicio.
                   </p>
                 </div>
               </div>

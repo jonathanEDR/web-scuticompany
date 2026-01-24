@@ -421,6 +421,9 @@ function AppContent() {
               
               {/* 🤖 MÓDULO DE AGENTES IA - Solo ADMIN y SUPER_ADMIN */}
               
+              {/* Redirección de ruta antigua a nueva */}
+              <Route path="/dashboard/agents" element={<Navigate to="/dashboard/ai-agents" replace />} />
+              
               {/* Dashboard Central de Agentes IA - Configuración y monitoreo */}
               <Route path="/dashboard/ai-agents" element={
                 <DashboardRoute>

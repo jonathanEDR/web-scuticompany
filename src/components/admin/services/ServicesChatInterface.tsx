@@ -22,6 +22,7 @@ import { useServicesCanvasContext } from '../../../contexts/ServicesCanvasContex
 import QuickActionButton from './QuickActionButton';
 import FormCollectionProgress from './FormCollectionProgress';
 import CategoryButtons from './CategoryButtons';
+import { chatMarkdownToHTML } from '../../../utils/blog/markdownUtils';
 
 const ServicesChatInterface: React.FC = memo(() => {
   const {
@@ -94,21 +95,22 @@ const ServicesChatInterface: React.FC = memo(() => {
 
   const suggestedCommands = useMemo(() => {
     if (currentService?.serviceId) {
-      // Si hay un servicio cargado
+      // Si hay un servicio cargado - acciones específicas para ese servicio
       return [
         `Analiza la calidad de "${currentService.serviceTitle}"`,
-        'Sugiere mejoras para la descripción',
-        'Qué precio recomiendas para este servicio?',
-        'Ayúdame a optimizar este servicio'
+        `Mejora la descripción de este servicio`,
+        `Qué precio recomiendas para "${currentService.serviceTitle}"?`,
+        `Genera características y beneficios para este servicio`,
+        `Optimiza el SEO de este servicio`
       ];
     } else {
-      // Contexto global - sin servicio específico
+      // Contexto global - acciones de gestión de portafolio
       return [
-        '🌍 Analiza mi portafolio completo de servicios',
-        '💡 Sugiere nuevos servicios para mi negocio',
-        '🎯 Identifica gaps en mi oferta actual',
-        '📊 Compara los precios de mis servicios',
-        '🚀 Qué servicios debería promocionar más?'
+        'Crea un nuevo servicio de desarrollo web',
+        'Analiza mi portafolio de servicios',
+        'Qué servicios me recomiendas agregar?',
+        'Ayúdame a definir precios competitivos',
+        'Genera ideas de paquetes y bundles'
       ];
     }
   }, [currentService?.serviceId, currentService?.serviceTitle]);
@@ -241,9 +243,16 @@ const ServicesChatInterface: React.FC = memo(() => {
                     />
                   )}
                   
-                  <p className="text-sm whitespace-pre-wrap break-words">
-                    {chat.content}
-                  </p>
+                  <div className="text-sm whitespace-pre-wrap break-words">
+                    {chat.role === 'assistant' ? (
+                      <span 
+                        dangerouslySetInnerHTML={{ __html: chatMarkdownToHTML(chat.content) }}
+                        className="[&>strong]:font-semibold [&>strong]:text-purple-600 dark:[&>strong]:text-purple-400 [&>em]:italic [&>a]:text-purple-500 [&>a]:underline"
+                      />
+                    ) : (
+                      chat.content
+                    )}
+                  </div>
                   
                   {/* 🆕 Renderizar Quick Actions */}
                   {chat.role === 'assistant' && chat.quickActions && chat.quickActions.length > 0 && (

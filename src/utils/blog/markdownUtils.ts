@@ -179,3 +179,31 @@ export function validateContentLength(content: string, minWords: number = 100): 
   const words = countWords(content);
   return words >= minWords;
 }
+
+/**
+ * Convierte Markdown a HTML optimizado para chat
+ * Maneja mejor los saltos de línea y formato para interfaces de chat
+ */
+export function chatMarkdownToHTML(markdown: string): string {
+  let html = markdown
+    // Headers (convertir a bold con salto de línea)
+    .replace(/^### (.*$)/gim, '<strong>$1</strong>')
+    .replace(/^## (.*$)/gim, '<strong>$1</strong>')
+    .replace(/^# (.*$)/gim, '<strong>$1</strong>')
+    // Bold - más específico para evitar conflictos
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/__([^_]+)__/g, '<strong>$1</strong>')
+    // Italic
+    .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+    .replace(/(?<!_)_([^_]+)_(?!_)/g, '<em>$1</em>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^\)]+)\)/gim, '<a href="$2" target="_blank" rel="noopener" class="text-purple-600 hover:underline">$1</a>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">$1</code>')
+    // Lista con guiones
+    .replace(/^- (.+)$/gim, '• $1')
+    // Lista numerada (mantener formato)
+    .replace(/^(\d+)\. (.+)$/gim, '$1. $2');
+  
+  return sanitizeHTML(html);
+}

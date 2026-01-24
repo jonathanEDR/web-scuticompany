@@ -8,7 +8,7 @@
  * - empty: Estado inicial sin contenido
  */
 
-import React from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { 
   X, 
   Maximize2, 
@@ -16,9 +16,19 @@ import {
   FileText,
   List,
   Eye,
-  MessageCircle
+  MessageCircle,
+  Columns,
+  PanelLeftClose,
+  PanelRightClose,
+  GripVertical
 } from 'lucide-react';
 import type { CanvasContent, CanvasMode } from '../../types/scutiAI.types';
+
+// ============================================
+// TIPOS DE TAMAÑO DEL CANVAS
+// ============================================
+
+export type CanvasSize = 'small' | 'medium' | 'large' | 'full';
 
 // ============================================
 // PROPS
@@ -31,8 +41,13 @@ interface CanvasEditorProps {
   content: CanvasContent | null;
   onClose: () => void;
   onToggleExpand: () => void;
-  onItemClick?: (itemId: string, itemTitle?: string) => void; // Callback con título opcional
-  onEditClick?: (itemId: string) => void; // Callback para editar
+  onItemClick?: (itemId: string, itemTitle?: string) => void;
+  onEditClick?: (itemId: string) => void;
+  // 🆕 Props para control de tamaño flexible
+  canvasSize?: CanvasSize;
+  onSizeChange?: (size: CanvasSize) => void;
+  customWidth?: number; // Porcentaje personalizado (0-100)
+  onWidthChange?: (width: number) => void;
 }
 
 // ============================================
@@ -47,17 +62,109 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   onClose,
   onToggleExpand,
   onItemClick,
-  onEditClick
+  onEditClick,
+  canvasSize = 'medium',
+  onSizeChange,
+  customWidth,
+  onWidthChange
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragStartWidth, setDragStartWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Efecto para manejar el arrastre - DEBE estar antes del early return
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !containerRef.current?.parentElement) return;
+      
+      const parentWidth = containerRef.current.parentElement.clientWidth;
+      const deltaX = dragStartX - e.clientX;
+      const deltaPercent = (deltaX / parentWidth) * 100;
+      let newWidth = dragStartWidth + deltaPercent;
+      
+      // Limitar entre 20% y 80%
+      newWidth = Math.max(20, Math.min(80, newWidth));
+      
+      if (onWidthChange) {
+        onWidthChange(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragStartX, dragStartWidth, onWidthChange]);
+
+  // 🔒 Early return DESPUÉS de todos los hooks
   if (!isVisible) return null;
 
-  // Ancho del canvas según si está expandido o no
-  const canvasWidth = isExpanded ? 'w-2/3' : 'w-1/3';
+  // Calcular ancho basado en el tamaño o ancho personalizado
+  const getCanvasWidth = () => {
+    if (customWidth !== undefined) {
+      return `${customWidth}%`;
+    }
+    switch (canvasSize) {
+      case 'small': return '25%';
+      case 'medium': return '33.333%';
+      case 'large': return '50%';
+      case 'full': return '66.666%';
+      default: return isExpanded ? '66.666%' : '33.333%';
+    }
+  };
+
+  // Manejador de inicio de arrastre
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragStartX(e.clientX);
+    const parentWidth = containerRef.current?.parentElement?.clientWidth || window.innerWidth;
+    const currentWidth = containerRef.current?.clientWidth || 0;
+    setDragStartWidth((currentWidth / parentWidth) * 100);
+  };
+
+  // Cambiar a un tamaño preset
+  const handleSizePreset = (size: CanvasSize) => {
+    if (onSizeChange) {
+      onSizeChange(size);
+    }
+    // También actualizar el ancho personalizado según el preset
+    if (onWidthChange) {
+      switch (size) {
+        case 'small': onWidthChange(25); break;
+        case 'medium': onWidthChange(33.333); break;
+        case 'large': onWidthChange(50); break;
+        case 'full': onWidthChange(66.666); break;
+      }
+    }
+  };
 
   return (
     <div 
-      className={`${canvasWidth} border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col transition-all duration-300`}
+      ref={containerRef}
+      style={{ width: getCanvasWidth() }}
+      className={`relative border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col transition-all ${isDragging ? 'duration-0' : 'duration-300'}`}
     >
+      {/* 🆕 Handle de resize draggable */}
+      <div
+        onMouseDown={handleMouseDown}
+        className={`absolute left-0 top-0 bottom-0 w-1 cursor-col-resize group hover:bg-purple-500/50 transition-colors z-10 ${isDragging ? 'bg-purple-500' : ''}`}
+      >
+        <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-1 rounded bg-gray-200 dark:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity ${isDragging ? 'opacity-100 bg-purple-500' : ''}`}>
+          <GripVertical size={12} className="text-gray-500 dark:text-gray-400" />
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-3">
@@ -82,19 +189,38 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Botón expandir/contraer */}
-          <button
-            onClick={onToggleExpand}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-            title={isExpanded ? 'Contraer' : 'Expandir'}
-          >
-            {isExpanded ? (
-              <Minimize2 size={18} className="text-gray-600 dark:text-gray-400" />
-            ) : (
-              <Maximize2 size={18} className="text-gray-600 dark:text-gray-400" />
-            )}
-          </button>
+        <div className="flex items-center gap-1">
+          {/* 🆕 Botones de tamaño preset */}
+          <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mr-2">
+            <button
+              onClick={() => handleSizePreset('small')}
+              className={`p-1.5 transition-colors ${canvasSize === 'small' || (customWidth && customWidth <= 27) ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'}`}
+              title="Pequeño (25%)"
+            >
+              <PanelRightClose size={14} />
+            </button>
+            <button
+              onClick={() => handleSizePreset('medium')}
+              className={`p-1.5 transition-colors border-l border-r border-gray-200 dark:border-gray-700 ${canvasSize === 'medium' || (customWidth && customWidth > 27 && customWidth <= 40) ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'}`}
+              title="Mediano (33%)"
+            >
+              <Columns size={14} />
+            </button>
+            <button
+              onClick={() => handleSizePreset('large')}
+              className={`p-1.5 transition-colors border-r border-gray-200 dark:border-gray-700 ${canvasSize === 'large' || (customWidth && customWidth > 40 && customWidth <= 55) ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'}`}
+              title="Grande (50%)"
+            >
+              <Maximize2 size={14} />
+            </button>
+            <button
+              onClick={() => handleSizePreset('full')}
+              className={`p-1.5 transition-colors ${canvasSize === 'full' || (customWidth && customWidth > 55) ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'}`}
+              title="Máximo (66%)"
+            >
+              <PanelLeftClose size={14} />
+            </button>
+          </div>
 
           {/* Botón cerrar */}
           <button
@@ -199,8 +325,22 @@ const PreviewMode: React.FC<{ content: CanvasContent; onEditClick?: (itemId: str
     return <EventListView data={content.data} onItemClick={onItemClick} />;
   }
 
+  if (content.type === 'service_list') {
+    return <ServiceListView data={content.data} onItemClick={onItemClick} />;
+  }
+
   if (content.type === 'seo_analysis') {
     return <SEOAnalysisView data={content.data} />;
+  }
+
+  if (content.type === 'service_analysis') {
+    console.log('🔍 [PreviewMode] service_analysis detectado, pasando data:', content.data);
+    return <ServiceAnalysisView data={content.data} onItemClick={onItemClick} />;
+  }
+
+  // 🆕 Vista de detalles de sesión/conversación
+  if (content.type === 'session_details') {
+    return <SessionDetailsView data={content.data} />;
   }
 
   if (content.type === 'service') {
@@ -1259,6 +1399,639 @@ const ServicePreview: React.FC<{ data: any }> = ({ data }) => (
 );
 
 // ============================================
+// SESSION DETAILS VIEW - Detalles de la conversación
+// ============================================
+
+interface SessionDetailsViewProps {
+  data: any;
+}
+
+const SessionDetailsView: React.FC<SessionDetailsViewProps> = ({ data }) => {
+  if (!data) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center p-8">
+        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+          <FileText size={32} className="text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          Sin conversación activa
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+          Inicia una nueva conversación para ver los detalles aquí
+        </p>
+      </div>
+    );
+  }
+
+  const formatDate = (date: string | Date) => {
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header con título de la sesión */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          {data.title || 'Conversación'}
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+          ID: {data.sessionId}
+        </p>
+      </div>
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            {data.messageCount || 0}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            Mensajes
+          </div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            {data.agentsUsed?.length || 0}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            Agentes usados
+          </div>
+        </div>
+      </div>
+
+      {/* Información detallada */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="p-4 flex justify-between">
+          <span className="text-sm text-gray-500 dark:text-gray-400">Creada</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-white">
+            {formatDate(data.createdAt)}
+          </span>
+        </div>
+        <div className="p-4 flex justify-between">
+          <span className="text-sm text-gray-500 dark:text-gray-400">Última actividad</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-white">
+            {formatDate(data.updatedAt)}
+          </span>
+        </div>
+        {data.category && (
+          <div className="p-4 flex justify-between">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Categoría</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+              {data.category}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Agentes utilizados */}
+      {data.agentsUsed && data.agentsUsed.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+            Agentes utilizados
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {data.agentsUsed.map((agent: string, index: number) => (
+              <span 
+                key={index}
+                className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium"
+              >
+                {agent}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Último mensaje */}
+      {data.lastMessage && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            Último mensaje
+          </h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+            "{data.lastMessage}"
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// SERVICE ANALYSIS VIEW - Vista técnica para administradores
+// ============================================
+
+interface ServiceAnalysisViewProps {
+  data: any;
+  onItemClick?: (itemId: string, itemTitle?: string) => void;
+}
+
+const ServiceAnalysisView: React.FC<ServiceAnalysisViewProps> = ({ data, onItemClick }) => {
+  // 🔍 DEBUG: Ver qué datos llegan al componente
+  console.log('🔍 [ServiceAnalysisView] Data completa recibida:', JSON.stringify(data, null, 2));
+  console.log('🔍 [ServiceAnalysisView] Estructura:', {
+    hasService: !!data?.service,
+    hasAnalysis: !!data?.analysis,
+    serviceKeys: data?.service ? Object.keys(data.service) : [],
+    analysisKeys: data?.analysis ? Object.keys(data.analysis) : [],
+    rawDataKeys: Object.keys(data || {})
+  });
+
+  const { service, analysis } = data || {};
+
+  // Si no hay service, mostrar mensaje de error
+  if (!service) {
+    console.warn('⚠️ [ServiceAnalysisView] No hay datos de servicio');
+    return (
+      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+        <p className="text-yellow-700 dark:text-yellow-300">No se encontraron datos del servicio</p>
+        <pre className="text-xs mt-2 overflow-auto">{JSON.stringify(data, null, 2)}</pre>
+      </div>
+    );
+  }
+
+  // Función para determinar color del score
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600 dark:text-green-400';
+    if (score >= 60) return 'text-yellow-600 dark:text-yellow-400';
+    if (score >= 40) return 'text-orange-600 dark:text-orange-400';
+    return 'text-red-600 dark:text-red-400';
+  };
+
+  const getScoreBg = (score: number) => {
+    if (score >= 80) return 'bg-green-100 dark:bg-green-900/30 border-green-500';
+    if (score >= 60) return 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-500';
+    if (score >= 40) return 'bg-orange-100 dark:bg-orange-900/30 border-orange-500';
+    return 'bg-red-100 dark:bg-red-900/30 border-red-500';
+  };
+
+  const getScoreRing = (score: number) => {
+    if (score >= 80) return 'stroke-green-500';
+    if (score >= 60) return 'stroke-yellow-500';
+    if (score >= 40) return 'stroke-orange-500';
+    return 'stroke-red-500';
+  };
+
+  // Componente de círculo de progreso
+  const ScoreCircle = ({ score, label, size = 80 }: { score: number; label: string; size?: number }) => {
+    const radius = (size - 8) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (score / 100) * circumference;
+
+    return (
+      <div className="flex flex-col items-center">
+        <div className="relative" style={{ width: size, height: size }}>
+          <svg className="transform -rotate-90" style={{ width: size, height: size }}>
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              strokeWidth="6"
+              fill="none"
+              className="stroke-gray-200 dark:stroke-gray-700"
+            />
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              strokeWidth="6"
+              fill="none"
+              strokeLinecap="round"
+              className={getScoreRing(score)}
+              style={{
+                strokeDasharray: circumference,
+                strokeDashoffset: offset,
+                transition: 'stroke-dashoffset 0.5s ease'
+              }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className={`text-lg font-bold ${getScoreColor(score)}`}>{score}</span>
+          </div>
+        </div>
+        <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">{label}</span>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header con info del servicio */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4">
+        <div className="flex items-start gap-4">
+          {service.imagen ? (
+            <img 
+              src={service.imagen} 
+              alt={service.titulo}
+              className="w-16 h-16 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-lg bg-purple-200 dark:bg-purple-800 flex items-center justify-center">
+              <span className="text-2xl">🛠️</span>
+            </div>
+          )}
+          <div className="flex-1">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              {service.titulo}
+            </h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-purple-600 dark:text-purple-400">
+                {service.categoria || 'Sin categoría'}
+              </span>
+              {service.destacado && (
+                <span className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs rounded-full">
+                  ⭐ Destacado
+                </span>
+              )}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              ID: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">{service.id}</code>
+            </div>
+          </div>
+          <a
+            href={`/dashboard/servicios/${service.id}/edit`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Editar
+          </a>
+        </div>
+      </div>
+
+      {/* Métricas de análisis */}
+      {analysis && (
+        <>
+          {/* Scores circulares */}
+          <div className="grid grid-cols-5 gap-2">
+            <ScoreCircle score={analysis.score} label="General" size={70} />
+            <ScoreCircle score={analysis.seoScore} label="SEO" size={70} />
+            <ScoreCircle score={analysis.qualityScore} label="Calidad" size={70} />
+            <ScoreCircle score={analysis.completenessScore} label="Completitud" size={70} />
+            <ScoreCircle score={analysis.conversionScore} label="Conversión" size={70} />
+          </div>
+
+          {/* Quick Wins */}
+          {analysis.quickWins?.length > 0 && (
+            <div className={`p-4 rounded-lg border-l-4 ${getScoreBg(70)}`}>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <span>⚡</span> Quick Wins ({analysis.quickWins.length})
+              </h4>
+              <ul className="space-y-1">
+                {analysis.quickWins.slice(0, 4).map((qw: any, idx: number) => (
+                  <li key={idx} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                    <span className="text-green-500">✓</span>
+                    {qw.title}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Problemas Críticos */}
+          {analysis.criticalIssues?.length > 0 && (
+            <div className={`p-4 rounded-lg border-l-4 ${getScoreBg(30)}`}>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <span>⚠️</span> Problemas Críticos ({analysis.criticalIssues.length})
+              </h4>
+              <ul className="space-y-1">
+                {analysis.criticalIssues.slice(0, 4).map((issue: any, idx: number) => (
+                  <li key={idx} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                    <span className="text-red-500">⊗</span>
+                    <span>
+                      <strong>{issue.title}</strong>
+                      {issue.detail && <span className="text-gray-500 dark:text-gray-400"> - {issue.detail}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Fortalezas */}
+          {analysis.strengths?.length > 0 && (
+            <div className={`p-4 rounded-lg border-l-4 ${getScoreBg(85)}`}>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <span>💪</span> Fortalezas ({analysis.strengths.length})
+              </h4>
+              <ul className="space-y-1">
+                {analysis.strengths.slice(0, 4).map((s: any, idx: number) => (
+                  <li key={idx} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                    <span className="text-green-500">●</span>
+                    {s.title}
+                    {s.impact === 'alto' && (
+                      <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded">
+                        Alto impacto
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Acciones sugeridas */}
+      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+          📌 Acciones disponibles:
+        </h4>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onItemClick?.(service.id, 'analiza el SEO de este servicio')}
+            className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs rounded-lg transition-all"
+          >
+            🔍 Analizar SEO
+          </button>
+          <button
+            onClick={() => onItemClick?.(service.id, '¿cómo mejorar la conversión de este servicio?')}
+            className="px-3 py-1.5 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 text-xs rounded-lg transition-all"
+          >
+            📈 Mejorar Conversión
+          </button>
+          <button
+            onClick={() => onItemClick?.(service.id, 'genera una descripción optimizada para este servicio')}
+            className="px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-xs rounded-lg transition-all"
+          >
+            ✍️ Generar Descripción
+          </button>
+          <button
+            onClick={() => onItemClick?.(service.id, 'sugiere un precio competitivo para este servicio')}
+            className="px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 hover:bg-yellow-200 dark:hover:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 text-xs rounded-lg transition-all"
+          >
+            💰 Sugerir Precio
+          </button>
+        </div>
+      </div>
+
+      {/* Footer con enlaces */}
+      <div className="flex gap-2 pt-2">
+        <a
+          href={`/dashboard/servicios/${service.id}/edit`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm text-center rounded-lg transition-all"
+        >
+          Abrir en Editor
+        </a>
+        <a
+          href={`/servicios/${service.slug || service.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg transition-all"
+        >
+          Ver Público
+        </a>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// SERVICE LIST VIEW - Vista especializada para servicios
+// ============================================
+
+interface ServiceListViewProps {
+  data: any;
+  onItemClick?: (itemId: string, itemTitle?: string) => void;
+  onDashboardClick?: (itemId: string) => void;
+}
+
+const ServiceListView: React.FC<ServiceListViewProps> = ({ data, onItemClick, onDashboardClick }) => {
+  const items = data.items || [];
+  const totalCount = data.totalCount || items.length;
+  const categories = data.categories || [];
+
+  // Estado para filtro de categoría
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+
+  // Filtrar items por categoría
+  const filteredItems = selectedCategory 
+    ? items.filter((item: any) => item.subtitle === selectedCategory)
+    : items;
+
+  if (!items || items.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full flex items-center justify-center">
+          <span className="text-3xl">🛠️</span>
+        </div>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          No hay servicios disponibles
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400">
+          Actualmente no tenemos servicios para mostrar.
+        </p>
+      </div>
+    );
+  }
+
+  // Determinar color del precio según valor
+  const getPriceStyle = (price: number | null, priceLabel: string) => {
+    if (!price && priceLabel === 'Consultar') {
+      return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
+    }
+    return 'bg-gradient-to-r from-purple-600 to-pink-600 text-white';
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <span className="text-2xl">🛠️</span>
+            Catálogo de Servicios
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {totalCount} {totalCount === 1 ? 'servicio disponible' : 'servicios disponibles'}
+          </p>
+        </div>
+        
+        {/* Acceso rápido a gestión de servicios */}
+        <a
+          href="/dashboard/servicios/management"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded-lg transition-all"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          </svg>
+          Ver Servicios
+        </a>
+      </div>
+
+      {/* Filtros de categoría */}
+      {categories.length > 1 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-3 py-1.5 text-sm rounded-full transition-all ${
+              !selectedCategory
+                ? 'bg-purple-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            Todos ({totalCount})
+          </button>
+          {categories.map((cat: string) => {
+            const count = items.filter((i: any) => i.subtitle === cat).length;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 text-sm rounded-full transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                {cat} ({count})
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Grid de servicios */}
+      <div className="grid gap-4">
+        {filteredItems.map((item: any) => (
+          <div
+            key={item.id}
+            className="group p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 transition-all hover:shadow-lg"
+          >
+            <div className="flex gap-4">
+              {/* Imagen del servicio */}
+              {item.image && (
+                <div className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+              
+              {/* Sin imagen - placeholder */}
+              {!item.image && (
+                <div className="flex-shrink-0 w-24 h-24 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 flex items-center justify-center">
+                  <span className="text-3xl">🛠️</span>
+                </div>
+              )}
+
+              {/* Contenido */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                      {item.title}
+                    </h3>
+                    <span className="text-sm text-purple-600 dark:text-purple-400">
+                      {item.subtitle}
+                    </span>
+                  </div>
+                  
+                  {/* Badge de precio */}
+                  <span className={`flex-shrink-0 px-3 py-1 text-sm font-bold rounded-lg ${getPriceStyle(item.price, item.priceLabel)}`}>
+                    {item.priceLabel}
+                  </span>
+                </div>
+
+                {/* Descripción */}
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                  {item.description}
+                </p>
+
+                {/* Badges adicionales */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {item.destacado && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs rounded-full">
+                      ⭐ Destacado
+                    </span>
+                  )}
+                  {item.estado === 'activo' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded-full">
+                      ✓ Activo
+                    </span>
+                  )}
+                </div>
+
+                {/* Botones de acción */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onItemClick?.(item.id, item.title)}
+                    className="flex-1 px-2.5 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/30 text-gray-700 dark:text-gray-300 hover:text-purple-700 dark:hover:text-purple-300 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Más Info
+                  </button>
+                  <a
+                    href={`/dashboard/servicios/management`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2.5 py-1.5 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all flex items-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Editar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer con acciones globales */}
+      <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="/dashboard/servicios/management"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Nuevo Servicio
+          </a>
+          <a
+            href="/servicios"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-lg transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            Ver Web Pública
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
 // MODO LISTA
 // ============================================
 
@@ -1268,6 +2041,11 @@ const ListMode: React.FC<{ content: CanvasContent; onItemClick?: (itemId: string
   // Si es event_list, delegar a EventListView
   if (content.type === 'event_list') {
     return <EventListView data={data} onItemClick={onItemClick} />;
+  }
+
+  // Si es service_list, delegar a ServiceListView
+  if (content.type === 'service_list') {
+    return <ServiceListView data={data} onItemClick={onItemClick} />;
   }
   
   // Soportar 'items', 'posts', o 'events' para compatibilidad

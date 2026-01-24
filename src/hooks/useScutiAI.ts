@@ -11,7 +11,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth as useClerkAuth } from '@clerk/clerk-react';
+import { useAuth } from '../contexts/AuthContext';
 import scutiAIService from '../services/scutiAIService';
 import type { 
   ChatSession, 
@@ -23,7 +24,8 @@ import type {
 } from '../types/scutiAI.types';
 
 export const useScutiAI = () => {
-  const { userId } = useAuth();
+  const { userId } = useClerkAuth();
+  const { role } = useAuth(); // Obtener rol del usuario
 
   // ============================================
   // ESTADO
@@ -234,7 +236,11 @@ export const useScutiAI = () => {
 
     try {
       // Construir contexto adicional para conversación de blog
-      const additionalContext: Record<string, any> = {};
+      const additionalContext: Record<string, any> = {
+        // 🔧 Siempre incluir rol y panel
+        userRole: role || 'USER',
+        isAdminPanel: true // Scuti-AI siempre se usa desde panel admin
+      };
       
       if (blogCreationSessionId && conversationMode) {
         additionalContext.blogCreationSessionId = blogCreationSessionId;
@@ -250,7 +256,7 @@ export const useScutiAI = () => {
         messageText,
         activeSession?.sessionId?.startsWith('temp-') ? undefined : activeSession?.sessionId,
         userId,
-        Object.keys(additionalContext).length > 0 ? additionalContext : undefined
+        additionalContext // Siempre enviar contexto con rol
       );
 
       if (result.success && result.data) {
@@ -275,6 +281,15 @@ export const useScutiAI = () => {
         // 🎨 Si hay canvas_data (snake_case o camelCase), abrir el canvas automáticamente
         const canvasDataRaw = result.data.canvasData || result.data.canvas_data;
         
+        // 🔍 DEBUG: Ver qué llega del servicio
+        console.log('🔍 [useScutiAI] canvasDataRaw recibido:', {
+          hasCanvasData: !!canvasDataRaw,
+          type: canvasDataRaw?.type,
+          hasData: !!canvasDataRaw?.data,
+          dataKeys: canvasDataRaw?.data ? Object.keys(canvasDataRaw.data) : [],
+          fullCanvasData: canvasDataRaw
+        });
+        
         if (canvasDataRaw) {
           
           const canvasContent: CanvasContent = {
@@ -291,6 +306,15 @@ export const useScutiAI = () => {
               sessionId: canvasDataRaw.data?.sessionId
             }
           };
+          
+          // 🔍 DEBUG: Ver canvasContent construido
+          console.log('🔍 [useScutiAI] canvasContent construido:', {
+            type: canvasContent.type,
+            title: canvasContent.title,
+            dataKeys: canvasContent.data ? Object.keys(canvasContent.data) : [],
+            hasService: !!canvasContent.data?.service,
+            hasAnalysis: !!canvasContent.data?.analysis
+          });
           
           const mode = canvasDataRaw.mode || 
                       (canvasDataRaw.type === 'list' ? 'list' : 'preview');

@@ -8,7 +8,7 @@
  * - Verificación automática de permisos al abrir
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import servicesAgentService from '../services/servicesAgentService';
 import type {
@@ -82,7 +82,7 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
     error: null,
     activeMode: 'chat',
     currentService: initialContext || null,
-    allServices: allServices, // 🆕 Inicializar servicios globales
+    allServices: allServices,
     currentAnalysis: null,
     currentPricingStrategies: null,
     generatedContent: null,
@@ -94,6 +94,20 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // 🆕 Ref para mantener servicios siempre actualizados (soluciona problema de closure)
+  const allServicesRef = useRef<ServiceContext[]>(allServices);
+
+  // 🆕 Efecto para sincronizar allServices cuando cambia la prop
+  useEffect(() => {
+    if (allServices && allServices.length > 0) {
+      allServicesRef.current = allServices; // Actualizar ref
+      setState(prev => ({
+        ...prev,
+        allServices: allServices
+      }));
+    }
+  }, [allServices]);
 
   // ============================================
   // UTILIDADES
@@ -299,14 +313,21 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
       });
 
       const data = response.data;
+      
+      // Mapear respuesta del backend correctamente
       const analysisResult: ServicesAnalysisResult = {
-        score: data?.scores?.overall || 0,
-        strengths: data?.analysis?.strengths || [],
-        improvements: data?.analysis?.weaknesses || [],
-        seoScore: data?.scores?.seo,
-        qualityScore: data?.scores?.quality,
-        completenessScore: data?.scores?.completeness,
-        recommendations: data?.recommendations || []
+        score: data?.score || 0,
+        seoScore: data?.seoScore,
+        qualityScore: data?.qualityScore,
+        completenessScore: data?.completenessScore,
+        conversionScore: data?.conversionScore,
+        strengths: data?.strengths || [],
+        weaknesses: data?.weaknesses || [],
+        improvements: data?.weaknesses?.map((w: any) => typeof w === 'string' ? w : w.title) || [],
+        recommendations: data?.recommendations || [],
+        detailedMetrics: data?.detailedMetrics,
+        quickWins: data?.quickWins || [],
+        criticalIssues: data?.criticalIssues || []
       };
 
       setState(prev => ({
@@ -487,12 +508,14 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Usar servicios proporcionados o todos los servicios disponibles
-      const servicesToAnalyze = services || state.allServices;
+      // 🆕 Usar ref para obtener servicios actualizados (evita problema de closure)
+      const servicesToAnalyze = services || allServicesRef.current;
       
       if (!servicesToAnalyze.length) {
         throw new Error('No hay servicios disponibles para analizar');
       }
+
+      console.log('📊 [analyzePortfolio] Analizando', servicesToAnalyze.length, 'servicios');
 
       const response = await servicesAgentService.analyzePortfolio({
         categoria: undefined,
@@ -501,17 +524,22 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
       });
 
       const data = response.data;
+      
+      // Mapear correctamente todos los datos del backend
       const analysis: PortfolioAnalysis = {
         totalServices: data?.summary?.totalServices || servicesToAnalyze.length,
-        totalRevenue: 0, // No disponible en API actual
-        categories: [], // No disponible en API actual
+        activeServices: data?.summary?.activeServices || 0,
+        withPricing: data?.summary?.withPricing || 0,
+        withImages: data?.summary?.withImages || 0,
+        avgCompleteness: data?.summary?.avgCompleteness || 0,
+        categories: data?.categories || {},
         gaps: data?.gaps || [],
         bundlingOpportunities: [],
         swotAnalysis: {
-          strengths: [],
-          weaknesses: [],
-          opportunities: [],
-          threats: []
+          strengths: data?.swot?.strengths || [],
+          weaknesses: data?.swot?.weaknesses || [],
+          opportunities: data?.swot?.opportunities || [],
+          threats: data?.swot?.threats || []
         },
         recommendations: data?.recommendations || []
       };
@@ -524,7 +552,7 @@ const useServicesCanvas = (options: UseServicesCanvasOptions = {}) => {
 
       return analysis;
     } catch (error: any) {
-      console.error('Error in analyzePortfolio:', error);
+      console.error('❌ [analyzePortfolio] Error:', error.message);
       setState(prev => ({
         ...prev,
         isLoading: false,

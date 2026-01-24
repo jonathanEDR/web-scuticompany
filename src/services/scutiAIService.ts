@@ -136,6 +136,14 @@ class ScutiAIService {
                         result.canvas_data ||
                         null;
 
+      // 🔍 DEBUG: Ver canvas_data extraído
+      console.log('🔍 [scutiAIService] canvas_data extraído:', {
+        hasCanvasData: !!canvasData,
+        canvasDataType: canvasData?.type,
+        canvasDataKeys: canvasData ? Object.keys(canvasData) : [],
+        rawCanvasData: canvasData
+      });
+
       return {
         success: result.success,
         data: {

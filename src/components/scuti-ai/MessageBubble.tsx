@@ -16,6 +16,7 @@ import { User, Copy, CheckCircle } from 'lucide-react';
 import type { ChatMessage } from '../../types/scutiAI.types';
 import InteractiveButtons from '../floating-chat/InteractiveButtons';
 import { SCUTI_AI_MASCOT } from '../../utils/brandAssets';
+import { renderChatMarkdown, sanitizeChatText } from '../../utils/markdownUtils';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -105,9 +106,18 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm'
           }`}
         >
-          {/* Contenido del mensaje */}
+          {/* Contenido del mensaje - con soporte Markdown para asistente */}
           <div className="prose prose-sm max-w-none dark:prose-invert">
-            <p className="mb-0 whitespace-pre-wrap break-words">{message.content}</p>
+            {isUser ? (
+              <p className="mb-0 whitespace-pre-wrap break-words">{message.content}</p>
+            ) : (
+              <div 
+                className="mb-0 whitespace-pre-wrap break-words [&>br]:block [&>strong]:font-semibold [&>em]:italic"
+                dangerouslySetInnerHTML={{ 
+                  __html: renderChatMarkdown(sanitizeChatText(message.content)) 
+                }}
+              />
+            )}
           </div>
 
           {/* Botón copiar (aparece en hover) */}

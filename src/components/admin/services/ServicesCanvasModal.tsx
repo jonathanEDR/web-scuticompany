@@ -23,6 +23,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { X, MessageSquare, BarChart3, DollarSign, FileText, Briefcase } from 'lucide-react';
 import { ServicesCanvasProvider, useServicesCanvasContext } from '../../../contexts/ServicesCanvasContext';
+import type { ServiceContext } from '../../../contexts/ServicesCanvasContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import ServicesCanvasErrorBoundary from './ServicesCanvasErrorBoundary';
 import Tooltip from '../../common/Tooltip';
@@ -50,6 +51,7 @@ interface ServicesCanvasModalProps {
     beneficios?: string;
     etiquetas?: string[];
   };
+  allServices?: ServiceContext[]; // 🆕 Servicios globales para análisis de portafolio
 }
 
 // ============================================
@@ -475,7 +477,7 @@ const ServicesCanvasModalContent: React.FC<{
 
 const ServicesCanvasModal: React.FC<ServicesCanvasModalProps> = (props) => {
   return (
-    <ServicesCanvasProvider>
+    <ServicesCanvasProvider allServices={props.allServices}>
       <ServicesCanvasModalContent {...props} />
     </ServicesCanvasProvider>
   );

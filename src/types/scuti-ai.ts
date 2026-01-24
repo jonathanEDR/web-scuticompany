@@ -46,38 +46,32 @@ export const CATEGORY_CONFIGS: Record<CategoryType, CategoryConfig> = {
   servicios: {
     id: 'servicios',
     title: 'Servicios',
-    description: 'Gestiona tu portafolio de servicios',
+    description: 'Consulta información de nuestros servicios',
     emoji: '💼',
     bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     actions: [
       { 
-        icon: '➕', 
-        label: 'Crear servicio', 
-        prompt: 'crear nuevo servicio',
-        color: 'bg-purple-100 dark:bg-purple-800/30 hover:bg-purple-200 dark:hover:bg-purple-800/50'
-      },
-      { 
         icon: '📋', 
-        label: 'Ver servicios', 
-        prompt: 'mostrar servicios',
+        label: 'Ver catálogo de servicios', 
+        prompt: 'qué servicios ofrecen',
         color: 'bg-purple-100 dark:bg-purple-800/30 hover:bg-purple-200 dark:hover:bg-purple-800/50'
       },
       { 
-        icon: '✏️', 
-        label: 'Editar servicio', 
-        prompt: 'editar servicio',
-        color: 'bg-blue-100 dark:bg-blue-800/30 hover:bg-blue-200 dark:hover:bg-blue-800/50'
-      },
-      { 
-        icon: '📊', 
-        label: 'Analizar portafolio', 
-        prompt: 'analizar mi portafolio de servicios',
+        icon: '💰', 
+        label: 'Consultar precios', 
+        prompt: 'cuáles son los precios de los servicios',
         color: 'bg-green-100 dark:bg-green-800/30 hover:bg-green-200 dark:hover:bg-green-800/50'
       },
       { 
-        icon: '🎨', 
-        label: 'Optimizar presentación', 
-        prompt: 'optimizar presentación de servicios',
+        icon: '🔍', 
+        label: 'Detalles de un servicio', 
+        prompt: 'qué incluye el servicio de diseño web',
+        color: 'bg-blue-100 dark:bg-blue-800/30 hover:bg-blue-200 dark:hover:bg-blue-800/50'
+      },
+      { 
+        icon: '💡', 
+        label: 'Recomendación de servicio', 
+        prompt: 'qué servicio me recomiendas para mi negocio',
         color: 'bg-pink-100 dark:bg-pink-800/30 hover:bg-pink-200 dark:hover:bg-pink-800/50'
       }
     ]

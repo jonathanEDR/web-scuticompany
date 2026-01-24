@@ -143,7 +143,7 @@ export interface ChatStatistics {
 
 export type CanvasMode = 'preview' | 'list' | 'empty' | 'conversation';
 
-export type CanvasContentType = 'blog' | 'service' | 'list' | 'html' | 'markdown' | 'blog_creation' | 'blog_list' | 'seo_analysis' | 'event_list' | 'empty_state';
+export type CanvasContentType = 'blog' | 'service' | 'service_list' | 'service_analysis' | 'list' | 'html' | 'markdown' | 'blog_creation' | 'blog_list' | 'seo_analysis' | 'event_list' | 'empty_state' | 'session_details';
 
 export interface CanvasContent {
   type: CanvasContentType;

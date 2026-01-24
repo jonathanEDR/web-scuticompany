@@ -13,6 +13,8 @@ import { type Categoria } from '../../services/categoriasApi';
 import { CreateCategoriaModal } from '../../components/categorias/CreateCategoriaModal';
 const ServicesCanvasModal = lazy(() => import('../../components/admin/services/ServicesCanvasModal'));
 import { Sparkles } from 'lucide-react';
+import { servicioToServiceContext } from '../../hooks/useServicesCanvas';
+import type { ServiceContext } from '../../contexts/ServicesCanvasContext';
 import useCategorias from '../../hooks/useCategoriasCacheadas';
 import useServicesAgentOptimized from '../../hooks/useServicesAgentOptimized';
 import useDebugBlocks from '../../hooks/useDebugBlocks';
@@ -44,6 +46,7 @@ export const ServicioFormV3: React.FC = () => {
   const [etiquetaInput, setEtiquetaInput] = useState('');
   const [showCreateCategoriaModal, setShowCreateCategoriaModal] = useState(false);
   const [showServicesCanvas, setShowServicesCanvas] = useState(false);
+  const [allServices, setAllServices] = useState<ServiceContext[]>([]); // 🆕 Servicios para portafolio
   const loadingRef = useRef(false); // Prevenir doble carga
 
   // ✅ Hook centralizado para manejar todos los bloques
@@ -359,6 +362,22 @@ export const ServicioFormV3: React.FC = () => {
       loadServicio(id);
     }
   }, [id, isEditMode, loadServicio]);
+
+  // 🆕 Efecto para cargar todos los servicios (para análisis de portafolio)
+  useEffect(() => {
+    const loadAllServices = async () => {
+      try {
+        const response = await serviciosApi.getAllAdmin({}, { limit: 1000 });
+        if (response.success && response.data) {
+          const servicesContext = response.data.map(servicioToServiceContext);
+          setAllServices(servicesContext);
+        }
+      } catch (err) {
+        console.warn('No se pudieron cargar todos los servicios para análisis de portafolio');
+      }
+    };
+    loadAllServices();
+  }, []);
 
   // ============================================
   // FUNCIONES AUXILIARES OPTIMIZADAS
@@ -1407,6 +1426,7 @@ export const ServicioFormV3: React.FC = () => {
             onClose={() => setShowServicesCanvas(false)}
             initialMode="chat"
             serviceContext={serviceContext}
+            allServices={allServices}
           />
         </Suspense>
       )}

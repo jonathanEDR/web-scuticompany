@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { User, Copy, CheckCircle } from 'lucide-react';
 import type { ChatMessage } from '../../types/scutiAI.types';
 import InteractiveButtons from '../floating-chat/InteractiveButtons';
+import { renderChatMarkdown } from '../../utils/markdownUtils';
 
 interface EnhancedMessageBubbleProps {
   message: ChatMessage;
@@ -33,10 +34,26 @@ export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({
     setDisplayContent(newContent);
   };
 
-  // 🆕 Detectar y hacer clickeables las listas numeradas
+  // 🆕 Detectar y hacer clickeables las listas numeradas + renderizar Markdown
   const renderClickableContent = () => {
-    if (isUser || !onInteractiveClick) {
-      return <p className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">{displayContent}</p>;
+    // 🔧 Para mensajes del usuario, solo renderizar markdown básico
+    if (isUser) {
+      return (
+        <div 
+          className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: renderChatMarkdown(displayContent) }}
+        />
+      );
+    }
+
+    // Para mensajes del bot sin handler de clicks, renderizar markdown
+    if (!onInteractiveClick) {
+      return (
+        <div 
+          className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed chat-markdown-content"
+          dangerouslySetInnerHTML={{ __html: renderChatMarkdown(displayContent) }}
+        />
+      );
     }
 
     // Detectar si hay lista numerada (1. 2. 3. etc.)
@@ -45,10 +62,16 @@ export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({
     const hasNumberedList = lines.some(line => listPattern.test(line.trim()));
 
     if (!hasNumberedList) {
-      return <p className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">{displayContent}</p>;
+      // 🔧 Renderizar con markdown si no hay lista numerada clickeable
+      return (
+        <div 
+          className="mb-0 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed chat-markdown-content"
+          dangerouslySetInnerHTML={{ __html: renderChatMarkdown(displayContent) }}
+        />
+      );
     }
 
-    // Renderizar con elementos clickeables
+    // Renderizar con elementos clickeables (listas numeradas) + markdown en el resto
     return (
       <div className="mb-0 text-sm sm:text-base leading-relaxed">
         {lines.map((line, index) => {
@@ -68,10 +91,13 @@ export const EnhancedMessageBubble: React.FC<EnhancedMessageBubbleProps> = ({
               </div>
             );
           } else {
+            // 🔧 Renderizar líneas no-numeradas con markdown
             return (
-              <p key={index} className="whitespace-pre-wrap break-words">
-                {line || '\u00A0'}
-              </p>
+              <div 
+                key={index} 
+                className="whitespace-pre-wrap break-words chat-markdown-content"
+                dangerouslySetInnerHTML={{ __html: renderChatMarkdown(line) || '\u00A0' }}
+              />
             );
           }
         })}
