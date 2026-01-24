@@ -6,6 +6,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAIChat, type ChatMessage, type ChatContext } from '../../../hooks/ai/useAIChat';
+import { renderChatMarkdown } from '../../../utils/markdownUtils';
 
 interface ChatWithBlogAgentProps {
   context: ChatContext;
@@ -189,7 +190,15 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onApplyContent }
             : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
         }`}
       >
-        <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+        {/* ✅ Renderizar markdown correctamente */}
+        {isUser ? (
+          <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+        ) : (
+          <div 
+            className="text-sm prose prose-sm dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: renderChatMarkdown(message.content) }}
+          />
+        )}
         
         {/* Suggestions */}
         {message.suggestions && message.suggestions.length > 0 && (

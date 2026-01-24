@@ -7,26 +7,28 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Save, Eye, Send, ArrowLeft, Image as ImageIcon,
-  Tag, Folder, Settings, Upload, Sparkles, X
+  Tag, Folder, Settings, Upload, Sparkles, X,
+  Search, ChevronDown, ChevronUp, AlertCircle, CheckCircle
 } from 'lucide-react';
-import { RichTextEditor, ContentPreview, EnhancedEditorAISidebar, QuickSuggestionToggle } from '../../../components/blog/editor';
+import { RichTextEditor, ContentPreview, EnhancedEditorAISidebar } from '../../../components/blog/editor';
 import { CategoryBadge } from '../../../components/blog/common';
-import { SuggestionRating } from '../../../components/ai/SuggestionRating';
-import { SelectionContextMenu } from '../../../components/blog/components/SelectionContextMenu';
-import { ContextPatternHelper } from '../../../components/blog/components/ContextPatternHelper';
 import AIPreviewModal from '../../../components/blog/editor/AIPreviewModal';
 import { selectionAIService, type AIActionRequest } from '../../../components/blog/services/selectionAIService';
-import { useContextAwareAutoComplete } from '../../../components/blog/hooks/useContextAwareAutoComplete';
 import ImageSelectorModal from '../../../components/ImageSelectorModal';
 
-import { useCursorAwareAutoComplete } from '../../../hooks/ai/useCursorAwareAutoComplete';
-import { useAITracking } from '../../../hooks/ai/useAITracking';
 import { useCategories } from '../../../hooks/blog';
-import { useQuickSuggestionControl } from '../../../hooks/useQuickSuggestionControl';
 import { generateSlug } from '../../../utils/blog';
 import { blogPostApi } from '../../../services/blog';
 import { uploadImage } from '../../../services/imageService';
 import type { CreatePostDto, UpdatePostDto } from '../../../types/blog';
+
+// ✅ Interface SEO para el formulario
+interface SEOFormData {
+  metaTitle: string;
+  metaDescription: string;
+  focusKeyphrase: string;
+  keywords: string[];
+}
 
 interface PostFormData {
   title: string;
@@ -40,6 +42,8 @@ interface PostFormData {
   allowComments: boolean;
   isPinned: boolean;
   isFeatured: boolean;
+  // ✅ NUEVO: Campos SEO
+  seo: SEOFormData;
 }
 
 export default function PostEditor() {
@@ -60,8 +64,19 @@ export default function PostEditor() {
     isPublished: false,
     allowComments: true,
     isPinned: false,
-    isFeatured: false
+    isFeatured: false,
+    // ✅ NUEVO: Estado inicial SEO
+    seo: {
+      metaTitle: '',
+      metaDescription: '',
+      focusKeyphrase: '',
+      keywords: []
+    }
   });
+
+  // ✅ Estado para controlar si la sección SEO está expandida
+  const [showSEOSection, setShowSEOSection] = useState(false);
+  const [keywordInput, setKeywordInput] = useState('');
 
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -85,81 +100,6 @@ export default function PostEditor() {
 
   // 🖼️ Estado para el modal de galería de imágenes
   const [showImageGallery, setShowImageGallery] = useState(false);
-  
-  // Hook para control directo de sugerencias (incluye configuración global)
-  const { effectiveEnabled, isOverridden, globalSettings } = useQuickSuggestionControl();
-  
-  // Usar configuración de sugerencias del hook unificado
-  const suggestionSettings = {
-    debounceMs: globalSettings?.debounceMs || 800,
-    minLength: globalSettings?.minLength || 10,
-    contextLength: globalSettings?.contextLength || 200
-  };
-
-  // Hook de autocompletado contextual (como Copilot) - ✅ Controlado por toggle
-  const {
-    suggestion,
-    isVisible: showAutoComplete,
-    currentPosition,
-    handleContentChange,
-    acceptSuggestion,
-    rejectSuggestion
-  } = useCursorAwareAutoComplete({
-    enabled: effectiveEnabled, // ✅ Controlado por el botón de toggle
-    debounceMs: suggestionSettings.debounceMs,
-    minLength: suggestionSettings.minLength,
-    contextLength: suggestionSettings.contextLength
-  });
-
-  // Hook de tracking para persistencia
-  const {
-    createSession,
-    addRating
-  } = useAITracking();
-
-  // Hook de context-aware para patrones #...# - ✅ Controlado por toggle
-  const {
-    patternSuggestions,
-    isTypingPattern,
-    activePattern,
-    handleContentChange: handlePatternContentChange,
-    insertPatternSuggestion
-  } = useContextAwareAutoComplete({
-    enabled: effectiveEnabled // ✅ Controlado por el botón de toggle
-  });
-
-  // Crear sesión de tracking solo UNA VEZ al montar el componente
-  const sessionCreatedRef = React.useRef(false);
-  React.useEffect(() => {
-    // Evitar múltiples creaciones de sesión
-    if (sessionCreatedRef.current) return;
-    sessionCreatedRef.current = true;
-    
-    try {
-      createSession(id || 'new-post', {
-        postTitle: formData.title || 'Nuevo Post',
-        postCategory: formData.category || 'Sin categoría'
-      });
-    } catch (error) {
-      // Silenciar errores de tracking para no interrumpir la funcionalidad
-      console.warn('⚠️ [PostEditor] Error creando sesión de tracking:', error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ✅ NUEVO: Limpiar sugerencias cuando el usuario hace click en la toolbar
-  React.useEffect(() => {
-    const handleToolbarClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      // Si el click es en la toolbar, rechazar sugerencias activas
-      if (target.closest('.rich-text-editor .border-b') && suggestion) {
-        rejectSuggestion();
-      }
-    };
-
-    document.addEventListener('click', handleToolbarClick);
-    return () => document.removeEventListener('click', handleToolbarClick);
-  }, [suggestion, rejectSuggestion]);
 
   // Cargar post si está editando
   useEffect(() => {
@@ -167,28 +107,6 @@ export default function PostEditor() {
       loadPost(id);
     }
   }, [isEditing, id]);
-
-  // Manejar teclas Tab/Esc para sugerencias - SOLO cuando el editor NO tiene foco
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // ✅ Solo procesar si hay sugerencia Y el foco NO está en el editor
-      const isEditorFocused = document.activeElement?.closest('.ProseMirror') || 
-                              document.activeElement?.closest('.rich-text-editor');
-      
-      if (showAutoComplete && suggestion && !isEditorFocused) {
-        if (e.key === 'Tab') {
-          e.preventDefault();
-          acceptSuggestion();
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
-          rejectSuggestion();
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showAutoComplete, suggestion, acceptSuggestion, rejectSuggestion, formData.content]);
 
   const loadPost = async (postId: string) => {
     try {
@@ -204,6 +122,11 @@ export default function PostEditor() {
             )
           : [];
         
+        // ✅ Extraer keywords SEO (pueden venir como array o estar en aiOptimization)
+        const seoKeywords = post.seo?.keywords || 
+                           post.aiOptimization?.aiMetadata?.primaryKeywords || 
+                           [];
+        
         setFormData({
           title: post.title || '',
           slug: post.slug || '',
@@ -215,8 +138,21 @@ export default function PostEditor() {
           isPublished: post.isPublished || false,
           allowComments: post.allowComments !== undefined ? post.allowComments : true,
           isPinned: post.isPinned || false,
-          isFeatured: post.isFeatured || false
+          isFeatured: post.isFeatured || false,
+          // ✅ NUEVO: Cargar campos SEO
+          seo: {
+            metaTitle: post.seo?.metaTitle || '',
+            metaDescription: post.seo?.metaDescription || '',
+            // Priorizar seo.focusKeyphrase, fallback a aiOptimization
+            focusKeyphrase: post.seo?.focusKeyphrase || post.aiOptimization?.aiMetadata?.primaryKeywords?.[0] || '',
+            keywords: Array.isArray(seoKeywords) ? seoKeywords : []
+          }
         });
+        
+        // Si hay datos SEO, expandir la sección automáticamente
+        if (post.seo?.metaTitle || post.seo?.metaDescription || post.seo?.focusKeyphrase || seoKeywords.length > 0) {
+          setShowSEOSection(true);
+        }
       }
     } catch (error) {
       console.error('❌ [PostEditor] Error al cargar post:', error);
@@ -292,52 +228,6 @@ export default function PostEditor() {
     }
   };
 
-  // Función para manejar el rating de sugerencias
-  const handleSuggestionRating = async (rating: number) => {
-    try {
-      await addRating('current', rating);
-    } catch (error) {
-      console.error('❌ Error al enviar rating:', error);
-    }
-  };
-
-  // Función para manejar acciones del menú contextual
-  const handleSelectionAction = async (action: any, selectedText: string) => {
-    if (!selectedText.trim()) return;
-
-    setIsProcessingAI(true);
-    
-    try {
-      const request: AIActionRequest = {
-        action: action.id,
-        selectedText,
-        context: {
-          wordCount: selectedText.split(/\s+/).length,
-          isCode: /```/.test(selectedText) || /`.*`/.test(selectedText)
-        }
-      };
-
-      const response = await selectionAIService.processAIAction(request);
-      
-      if (response.success) {
-        setPreviewState({
-          isOpen: true,
-          originalText: selectedText,
-          expandedText: response.result,
-          actionLabel: action.label
-        });
-      } else {
-        console.error('❌ Error procesando acción:', response.result);
-        alert(`❌ Error: ${response.result}`);
-      }
-    } catch (error) {
-      console.error('❌ Error en acción de selección:', error);
-      alert('❌ Error procesando la acción. Intenta de nuevo.');
-    } finally {
-      setIsProcessingAI(false);
-    }
-  };
-
   // Funciones para manejar el modal de preview
   const handleAcceptPreview = async () => {
     try {
@@ -367,58 +257,6 @@ export default function PostEditor() {
     setPreviewState({ ...previewState, isOpen: false });
   };
 
-  // Función para manejar acciones de IA en el extracto
-  const handleExcerptAIAction = async (actionType: 'expand' | 'improve') => {
-    if (!formData.excerpt.trim()) {
-      alert('⚠️ Escribe primero algo en el extracto');
-      return;
-    }
-    
-    try {
-      setIsProcessingAI(true);
-      
-      const request: AIActionRequest = {
-        action: actionType === 'expand' ? 'expand' : 'rewrite',
-        selectedText: formData.excerpt,
-        context: {
-          wordCount: formData.excerpt.split(/\s+/).length,
-          isCode: false,
-          surroundingText: `Título: ${formData.title}\nCategoría: ${formData.category}\nInstrucción: ${
-            actionType === 'expand' 
-              ? 'Expandir este extracto manteniendo la esencia pero añadiendo más detalles atractivos' 
-              : 'Mejorar este extracto haciéndolo más atractivo y profesional'
-          }`
-        }
-      };
-
-      const response = await selectionAIService.processAIAction(request);
-
-      if (response.success && response.result) {
-        setPreviewState({
-          isOpen: true,
-          originalText: formData.excerpt,
-          expandedText: response.result,
-          actionLabel: actionType === 'expand' ? 'Expandir Extracto' : 'Mejorar Extracto'
-        });
-      } else {
-        console.error('❌ Error procesando acción:', response.result);
-        alert(`❌ Error: ${response.result}`);
-      }
-    } catch (error) {
-      console.error('❌ Error en acción de IA del extracto:', error);
-      alert('❌ Error procesando la acción. Intenta de nuevo.');
-    } finally {
-      setIsProcessingAI(false);
-    }
-  };
-
-  // Función para insertar sugerencia de patrón
-  const handlePatternSuggestionInsert = (suggestion: string) => {
-    const newContent = insertPatternSuggestion(suggestion);
-    handleChange('content', newContent);
-  };
-
-
   // Auto-generar slug desde el título
   useEffect(() => {
     if (!isEditing && formData.title) {
@@ -435,12 +273,6 @@ export default function PostEditor() {
       ...prev,
       [field]: value
     }));
-
-    // Si el campo es 'content', notificar al sistema de patrones
-    if (field === 'content' && typeof value === 'string') {
-      handlePatternContentChange(value);
-      handleContentChange(value); // También notificar al autocompletado normal
-    }
   };
 
   // Agregar tag
@@ -460,6 +292,97 @@ export default function PostEditor() {
       ...prev,
       tags: prev.tags.filter(tag => tag !== tagToRemove)
     }));
+  };
+
+  // ✅ NUEVO: Manejar cambios en campos SEO
+  const handleSEOChange = (field: keyof SEOFormData, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      seo: {
+        ...prev.seo,
+        [field]: value
+      }
+    }));
+  };
+
+  // ✅ NUEVO: Agregar keyword SEO
+  const handleAddKeyword = () => {
+    if (keywordInput.trim() && !formData.seo.keywords.includes(keywordInput.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        seo: {
+          ...prev.seo,
+          keywords: [...prev.seo.keywords, keywordInput.trim()]
+        }
+      }));
+      setKeywordInput('');
+    }
+  };
+
+  // ✅ NUEVO: Eliminar keyword SEO
+  const handleRemoveKeyword = (keywordToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      seo: {
+        ...prev.seo,
+        keywords: prev.seo.keywords.filter(k => k !== keywordToRemove)
+      }
+    }));
+  };
+
+  // ✅ NUEVO: Auto-generar SEO desde el contenido
+  const handleAutoGenerateSEO = () => {
+    const title = formData.title || '';
+    const excerpt = formData.excerpt || '';
+    const content = formData.content.replace(/<[^>]*>/g, '').trim();
+    
+    // Generar metaTitle si está vacío
+    const autoMetaTitle = title.length > 60 ? title.substring(0, 57) + '...' : title;
+    
+    // Generar metaDescription si está vacío
+    const autoMetaDescription = excerpt || (content.length > 160 ? content.substring(0, 157) + '...' : content);
+    
+    // Extraer posibles keywords del título y contenido
+    const words = (title + ' ' + content).toLowerCase()
+      .replace(/[^a-záéíóúüñ\s]/gi, '')
+      .split(/\s+/)
+      .filter(w => w.length > 4);
+    
+    // Contar frecuencia y obtener las más comunes
+    const wordFreq: Record<string, number> = {};
+    words.forEach(w => { wordFreq[w] = (wordFreq[w] || 0) + 1; });
+    
+    const topKeywords = Object.entries(wordFreq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([word]) => word);
+    
+    // ✅ Generar tags adicionales (palabras más largas y relevantes)
+    const tagCandidates = Object.entries(wordFreq)
+      .filter(([word]) => word.length > 5) // Palabras más significativas
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([word]) => word.charAt(0).toUpperCase() + word.slice(1)); // Capitalizar
+    
+    setFormData(prev => {
+      // Combinar tags existentes con nuevos (sin duplicados)
+      const existingTags = prev.tags.map(t => t.toLowerCase());
+      const newTags = tagCandidates.filter(tag => !existingTags.includes(tag.toLowerCase()));
+      const combinedTags = [...prev.tags, ...newTags].slice(0, 10); // Máximo 10 tags
+      
+      return {
+        ...prev,
+        tags: prev.tags.length > 0 ? prev.tags : combinedTags,
+        seo: {
+          metaTitle: prev.seo.metaTitle || autoMetaTitle,
+          metaDescription: prev.seo.metaDescription || autoMetaDescription,
+          focusKeyphrase: prev.seo.focusKeyphrase || topKeywords[0] || '',
+          keywords: prev.seo.keywords.length > 0 ? prev.seo.keywords : topKeywords
+        }
+      };
+    });
+    
+    setShowSEOSection(true);
   };
 
   // Guardar como borrador
@@ -496,7 +419,14 @@ export default function PostEditor() {
         isPublished: false,
         allowComments: formData.allowComments,
         isPinned: formData.isPinned,
-        isFeatured: formData.isFeatured
+        isFeatured: formData.isFeatured,
+        // ✅ NUEVO: Incluir campos SEO
+        seo: {
+          focusKeyphrase: formData.seo.focusKeyphrase || undefined,
+          metaTitle: formData.seo.metaTitle || undefined,
+          metaDescription: formData.seo.metaDescription || undefined,
+          keywords: formData.seo.keywords.length > 0 ? formData.seo.keywords : undefined
+        }
       };
 
       if (isEditing && id) {
@@ -558,7 +488,14 @@ export default function PostEditor() {
         isPublished: true,
         allowComments: formData.allowComments,
         isPinned: formData.isPinned,
-        isFeatured: formData.isFeatured
+        isFeatured: formData.isFeatured,
+        // ✅ NUEVO: Incluir campos SEO
+        seo: {
+          focusKeyphrase: formData.seo.focusKeyphrase || undefined,
+          metaTitle: formData.seo.metaTitle || undefined,
+          metaDescription: formData.seo.metaDescription || undefined,
+          keywords: formData.seo.keywords.length > 0 ? formData.seo.keywords : undefined
+        }
       };
 
       if (isEditing && id) {
@@ -640,12 +577,6 @@ export default function PostEditor() {
               <span>{isEditing ? 'Actualizar' : 'Publicar'}</span>
             </button>
 
-            {/* ✅ Control de Sugerencias Automáticas - Controla TODOS los sistemas de IA */}
-            <QuickSuggestionToggle
-              size="md"
-              showLabel={true}
-            />
-
             {/* Botón Asistente IA */}
             <button
               onClick={() => setShowAISidebar(!showAISidebar)}
@@ -698,102 +629,14 @@ export default function PostEditor() {
                 <ContentPreview content={formData.content} />
               </div>
             ) : (
-            <div className="space-y-4 relative">
-              {/* RichTextEditor con diseño moderno */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                 <RichTextEditor
                   content={formData.content}
-                  onChange={(html) => {
-                    try {
-                      handleChange('content', html);
-                      
-                      // Solo activar autocompletado si está habilitado
-                      if (effectiveEnabled) {
-                        handleContentChange(html, {
-                          title: formData.title,
-                          category: formData.category,
-                          postId: id || 'new'
-                        });
-                      }
-                    } catch (error) {
-                      console.error('Error en onChange del editor:', error);
-                    }
-                  }}
+                  onChange={(html) => handleChange('content', html)}
                   minHeight="500px"
                   maxHeight="1000px"
                 />
               </div>
-
-              {/* ✅ Panel de sugerencias moderno */}
-              {suggestion && effectiveEnabled && (
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-2 border-purple-400 dark:border-purple-600 rounded-xl p-5 ai-suggestion-active relative shadow-lg">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      rejectSuggestion();
-                    }}
-                    className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
-                    title="Cerrar sugerencias"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-
-                  <div className="flex items-center justify-between mb-4 pr-10">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 animate-pulse" />
-                      <span className="font-semibold text-purple-900 dark:text-purple-100 text-lg">
-                        🎯 Sugerencia AI
-                      </span>
-                      {currentPosition && (
-                        <span className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2.5 py-1 rounded-full font-medium">
-                          L{currentPosition.line}:C{currentPosition.column}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500 shadow-sm">
-                    <div className="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
-                      "{suggestion.text.slice(0, 200)}{suggestion.text.length > 200 ? '...' : ''}"
-                    </div>
-                    <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
-                      <span>{suggestion.text.length} caracteres</span>
-                      <span>•</span>
-                      <span>Confianza: {Math.round((suggestion.confidence || 0.8) * 100)}%</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-3">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          acceptSuggestion();
-                        }}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-md"
-                      >
-                        ✅ Aceptar <kbd className="px-2 py-1 text-xs bg-green-700 rounded">Tab</kbd>
-                      </button>
-                      
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          rejectSuggestion();
-                        }}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-all transform hover:scale-105 shadow-md"
-                      >
-                        ❌ Rechazar <kbd className="px-2 py-1 text-xs bg-red-600 rounded">Esc</kbd>
-                      </button>
-                    </div>
-                    
-                    <SuggestionRating 
-                      onRating={handleSuggestionRating}
-                      className="ml-4"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
           )}
 
           {/* Excerpt con diseño moderno */}
@@ -802,24 +645,6 @@ export default function PostEditor() {
               <label className="block text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 📄 Extracto (Resumen)
               </label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleExcerptAIAction('expand')}
-                  disabled={!formData.excerpt.trim() || isProcessingAI}
-                  className="px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                  title="Expandir extracto con IA"
-                >
-                  🚀 Expandir
-                </button>
-                <button
-                  onClick={() => handleExcerptAIAction('improve')}
-                  disabled={!formData.excerpt.trim() || isProcessingAI}
-                  className="px-3 py-1.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                  title="Mejorar extracto con IA"
-                >
-                  ✨ Mejorar
-                </button>
-              </div>
             </div>
             <textarea
               value={formData.excerpt}
@@ -1029,6 +854,200 @@ export default function PostEditor() {
             )}
           </div>
 
+          {/* ✅ NUEVO: Sección SEO con diseño mejorado */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Header colapsable */}
+            <button
+              onClick={() => setShowSEOSection(!showSEOSection)}
+              className="w-full flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <h3 className="font-bold text-gray-900 dark:text-white">🔍 SEO y Posicionamiento</h3>
+                {/* Indicador de estado SEO */}
+                {(formData.seo.metaTitle || formData.seo.metaDescription) ? (
+                  <span className="ml-2 flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Configurado
+                  </span>
+                ) : (
+                  <span className="ml-2 flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    Sin configurar
+                  </span>
+                )}
+              </div>
+              {showSEOSection ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+
+            {/* Contenido SEO */}
+            {showSEOSection && (
+              <div className="px-6 pb-6 space-y-5 border-t border-gray-200 dark:border-gray-700 pt-4">
+                {/* Botón Auto-generar */}
+                <button
+                  onClick={handleAutoGenerateSEO}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg text-sm"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  ✨ Auto-generar SEO
+                </button>
+
+                {/* Focus Keyphrase */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    🎯 Palabra Clave Principal
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.seo.focusKeyphrase}
+                    onChange={(e) => handleSEOChange('focusKeyphrase', e.target.value)}
+                    placeholder="Ej: inteligencia artificial empresas"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-green-500 transition-all duration-200"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    La palabra clave principal que quieres posicionar
+                  </p>
+                </div>
+
+                {/* Meta Title */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    📝 Título SEO (Meta Title)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.seo.metaTitle}
+                    onChange={(e) => handleSEOChange('metaTitle', e.target.value)}
+                    placeholder="Título optimizado para Google..."
+                    maxLength={60}
+                    className={`w-full px-3 py-2.5 text-sm border bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 transition-all duration-200 ${
+                      formData.seo.metaTitle.length > 60 
+                        ? 'border-red-400 focus:ring-red-500 focus:border-red-500' 
+                        : formData.seo.metaTitle.length > 50
+                          ? 'border-yellow-400 focus:ring-yellow-500 focus:border-yellow-500'
+                          : 'border-gray-300 dark:border-gray-600 focus:ring-green-500 focus:border-green-500'
+                    }`}
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Aparece en la pestaña del navegador y Google
+                    </p>
+                    <span className={`text-xs font-medium ${
+                      formData.seo.metaTitle.length > 60 ? 'text-red-500' : 
+                      formData.seo.metaTitle.length > 50 ? 'text-yellow-500' : 'text-gray-400'
+                    }`}>
+                      {formData.seo.metaTitle.length}/60
+                    </span>
+                  </div>
+                </div>
+
+                {/* Meta Description */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    📄 Descripción SEO (Meta Description)
+                  </label>
+                  <textarea
+                    value={formData.seo.metaDescription}
+                    onChange={(e) => handleSEOChange('metaDescription', e.target.value)}
+                    placeholder="Descripción atractiva para los resultados de Google..."
+                    maxLength={160}
+                    rows={3}
+                    className={`w-full px-3 py-2.5 text-sm border bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 transition-all duration-200 resize-none ${
+                      formData.seo.metaDescription.length > 160 
+                        ? 'border-red-400 focus:ring-red-500 focus:border-red-500' 
+                        : formData.seo.metaDescription.length > 140
+                          ? 'border-yellow-400 focus:ring-yellow-500 focus:border-yellow-500'
+                          : 'border-gray-300 dark:border-gray-600 focus:ring-green-500 focus:border-green-500'
+                    }`}
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Snippet que aparece en los resultados de búsqueda
+                    </p>
+                    <span className={`text-xs font-medium ${
+                      formData.seo.metaDescription.length > 160 ? 'text-red-500' : 
+                      formData.seo.metaDescription.length > 140 ? 'text-yellow-500' : 'text-gray-400'
+                    }`}>
+                      {formData.seo.metaDescription.length}/160
+                    </span>
+                  </div>
+                </div>
+
+                {/* Keywords SEO */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    🔑 Palabras Clave SEO
+                  </label>
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={keywordInput}
+                      onChange={(e) => setKeywordInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddKeyword();
+                        }
+                      }}
+                      placeholder="Agregar keyword..."
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-green-500 transition-all duration-200"
+                    />
+                    <button
+                      onClick={handleAddKeyword}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 text-sm font-medium"
+                    >
+                      +
+                    </button>
+                  </div>
+                  
+                  {formData.seo.keywords.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.seo.keywords.map((keyword, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-medium"
+                        >
+                          {keyword}
+                          <button
+                            onClick={() => handleRemoveKeyword(keyword)}
+                            className="text-green-500 hover:text-red-500 transition-colors"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Palabras clave secundarias para mejorar el posicionamiento
+                  </p>
+                </div>
+
+                {/* Preview de Google */}
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
+                    Vista previa en Google
+                  </p>
+                  <div className="space-y-1">
+                    <p className="text-blue-600 dark:text-blue-400 text-lg font-medium hover:underline cursor-pointer truncate">
+                      {formData.seo.metaTitle || formData.title || 'Título del artículo'}
+                    </p>
+                    <p className="text-green-700 dark:text-green-500 text-sm truncate">
+                      scuticompany.com/blog/{formData.slug || 'url-del-articulo'}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+                      {formData.seo.metaDescription || formData.excerpt || 'Descripción del artículo que aparecerá en los resultados de búsqueda de Google...'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Configuración con diseño mejorado */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -1088,47 +1107,6 @@ export default function PostEditor() {
           }));
         }}
       />
-
-      {/* Debug info simplificado - solo en desarrollo */}
-      {import.meta.env.DEV && (
-        <div className="fixed bottom-4 left-4 bg-black/85 text-white px-3 py-2 rounded-lg text-xs z-50 font-mono">
-          <div className="flex items-center gap-2">
-            <span>AI:</span>
-            <span className={effectiveEnabled ? 'text-green-400' : 'text-red-400'}>
-              {effectiveEnabled ? '🟢 ON' : '🔴 OFF'}
-            </span>
-            {isOverridden && <span className="text-orange-400">⚠️</span>}
-            <span className="text-gray-400">|</span>
-            <span>Sugg: {suggestion ? '📝' : '∅'}</span>
-            <span className="text-gray-400">|</span>
-            <span>{formData.content.length}ch</span>
-          </div>
-        </div>
-      )}
-
-      {/* ✅ Menú contextual de selección - Solo cuando effectiveEnabled está activo */}
-      {effectiveEnabled && (
-        <SelectionContextMenu
-          onActionSelect={handleSelectionAction}
-          onClose={() => {
-            const selection = window.getSelection();
-            if (selection) {
-              selection.removeAllRanges();
-            }
-          }}
-        />
-      )}
-
-      {/* ✅ Helper de patrones #...# - Solo cuando effectiveEnabled está activo */}
-      {effectiveEnabled && (isTypingPattern || activePattern) && (
-        <ContextPatternHelper
-          isTypingPattern={isTypingPattern}
-          suggestions={patternSuggestions}
-          activePattern={activePattern}
-          onSuggestionClick={handlePatternSuggestionInsert}
-          className="max-w-md"
-        />
-      )}
 
       {/* Indicador de procesamiento AI */}
       {isProcessingAI && (

@@ -9,5 +9,5 @@ export { EditorAISidebar } from './EditorAISidebar';
 export { EnhancedEditorAISidebar } from './EnhancedEditorAISidebar';
 export { ChatWithBlogAgent } from './ChatWithBlogAgent';
 export { ContentAutoComplete } from './ContentAutoComplete';
-export { QuickSuggestionToggle } from './QuickSuggestionToggle';
+// QuickSuggestionToggle removido - sistema de sugerencias eliminado
 

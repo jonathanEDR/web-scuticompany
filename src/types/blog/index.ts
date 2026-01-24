@@ -150,6 +150,7 @@ export interface PostStats {
 }
 
 export interface SEOMetadata {
+  focusKeyphrase?: string;  // ✅ Palabra clave principal
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
