@@ -544,32 +544,39 @@ export const ServicioDetail: React.FC = () => {
     );
   }
 
+  // ✅ Detectar si ya hay meta tags pre-renderizados (para evitar duplicación)
+  const isPrerendered = typeof window !== 'undefined' && 
+    document.querySelector('meta[name="description"][data-rh="true"]') !== null;
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 animate-fade-in">
       {/* ✅ SEO directo del servicio - Prioriza campos SEO configurados */}
-      <Helmet>
-        <title>{servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`}</title>
-        <meta name="description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo} - SCUTI Company`} />
-        <meta name="keywords" content={servicio.seo?.palabrasClave || servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicio, desarrollo, tecnología`} />
+      {/* ⚠️ Solo actualiza meta tags si NO están pre-renderizados (evita duplicación) */}
+      {!isPrerendered && (
+        <Helmet>
+          <title>{servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`}</title>
+          <meta name="description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo} - SCUTI Company`} />
+          <meta name="keywords" content={servicio.seo?.palabrasClave || servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicio, desarrollo, tecnología`} />
 
-        {/* Open Graph */}
-        <meta property="og:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
-        <meta property="og:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
-        {servicio.imagenPrincipal && <meta property="og:image" content={servicio.imagenPrincipal} />}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={`https://scuticompany.com/servicios/${servicio.slug}`} />
-        <meta property="og:site_name" content="SCUTI Company" />
-        <meta property="og:locale" content="es_PE" />
+          {/* Open Graph */}
+          <meta property="og:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
+          <meta property="og:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
+          {servicio.imagenPrincipal && <meta property="og:image" content={servicio.imagenPrincipal} />}
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content={`https://scuticompany.com/servicios/${servicio.slug}`} />
+          <meta property="og:site_name" content="SCUTI Company" />
+          <meta property="og:locale" content="es_PE" />
 
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
-        <meta name="twitter:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
-        {servicio.imagenPrincipal && <meta name="twitter:image" content={servicio.imagenPrincipal} />}
+          {/* Twitter Card */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
+          <meta name="twitter:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
+          {servicio.imagenPrincipal && <meta name="twitter:image" content={servicio.imagenPrincipal} />}
 
-        {/* Canonical */}
-        <link rel="canonical" href={`https://scuticompany.com/servicios/${servicio.slug}`} />
-      </Helmet>
+          {/* Canonical */}
+          <link rel="canonical" href={`https://scuticompany.com/servicios/${servicio.slug}`} />
+        </Helmet>
+      )}
 
       <PublicHeader />
       
