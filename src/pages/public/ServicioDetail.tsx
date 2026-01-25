@@ -558,23 +558,86 @@ export const ServicioDetail: React.FC = () => {
           <meta name="description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo} - SCUTI Company`} />
           <meta name="keywords" content={servicio.seo?.palabrasClave || servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicio, desarrollo, tecnología`} />
 
-          {/* Open Graph */}
+          {/* Open Graph - 🔧 Mejorado con imagen OG y dimensiones */}
           <meta property="og:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
           <meta property="og:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
-          {servicio.imagenPrincipal && <meta property="og:image" content={servicio.imagenPrincipal} />}
+          <meta property="og:image" content={servicio.imagenPrincipal || servicio.imagen || 'https://scuticompany.com/logofondonegro.jpeg'} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={`${servicio.titulo} - Servicio de SCUTI Company`} />
           <meta property="og:type" content="website" />
           <meta property="og:url" content={`https://scuticompany.com/servicios/${servicio.slug}`} />
           <meta property="og:site_name" content="SCUTI Company" />
           <meta property="og:locale" content="es_PE" />
 
-          {/* Twitter Card */}
+          {/* Twitter Card - 🔧 Mejorado */}
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
           <meta name="twitter:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
-          {servicio.imagenPrincipal && <meta name="twitter:image" content={servicio.imagenPrincipal} />}
+          <meta name="twitter:image" content={servicio.imagenPrincipal || servicio.imagen || 'https://scuticompany.com/logofondonegro.jpeg'} />
+          <meta name="twitter:image:alt" content={`${servicio.titulo} - Servicio de SCUTI Company`} />
 
           {/* Canonical */}
           <link rel="canonical" href={`https://scuticompany.com/servicios/${servicio.slug}`} />
+          
+          {/* 🆕 Schema.org JSON-LD para Service - SEO estructurado */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": servicio.titulo,
+              "description": servicio.seo?.descripcion || servicio.descripcion,
+              "url": `https://scuticompany.com/servicios/${servicio.slug}`,
+              "image": servicio.imagenPrincipal || servicio.imagen || 'https://scuticompany.com/logofondonegro.jpeg',
+              "provider": {
+                "@type": "Organization",
+                "name": "SCUTI Company",
+                "url": "https://scuticompany.com",
+                "logo": "https://scuticompany.com/FAVICON.png"
+              },
+              ...(servicio.precio && servicio.tipoPrecio !== 'personalizado' ? {
+                "offers": {
+                  "@type": "Offer",
+                  "priceCurrency": servicio.moneda || "PEN",
+                  "price": servicio.precio,
+                  "availability": "https://schema.org/InStock"
+                }
+              } : {}),
+              "areaServed": {
+                "@type": "Country",
+                "name": "Peru"
+              },
+              "serviceType": typeof servicio.categoria === 'object' ? servicio.categoria?.nombre : servicio.categoria
+            })}
+          </script>
+          
+          {/* 🆕 Schema.org BreadcrumbList */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Inicio",
+                  "item": "https://scuticompany.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Servicios",
+                  "item": "https://scuticompany.com/servicios"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": servicio.titulo,
+                  "item": `https://scuticompany.com/servicios/${servicio.slug}`
+                }
+              ]
+            })}
+          </script>
         </Helmet>
       )}
 

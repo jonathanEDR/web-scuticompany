@@ -26,6 +26,7 @@ import PricingForm from '../../components/forms/PricingForm';
 import VisualForm from '../../components/forms/VisualForm';
 import SettingsForm from '../../components/forms/SettingsForm';
 import { intelligentTruncate, cleanAIContent, prepareSEOContent } from '../../utils/textUtils';
+import { invalidateServiciosCache } from '../../utils/serviciosCache';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -1057,10 +1058,14 @@ export const ServicioFormV3: React.FC = () => {
 
       if (isEditMode && id) {
         await serviciosApi.update(id, processedData);
+        // 🔧 FIX: Invalidar cache local después de actualizar
+        invalidateServiciosCache();
         success('Servicio actualizado', 'Los cambios se guardaron correctamente');
         navigate('/dashboard/servicios/management');
       } else {
         const response = await serviciosApi.create(processedData);
+        // 🔧 FIX: Invalidar cache local después de crear
+        invalidateServiciosCache();
         success('Servicio creado', 'El servicio se creó correctamente');
         if (response.data?._id) {
           navigate(`/dashboard/servicios/${response.data._id}/edit`);

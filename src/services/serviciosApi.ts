@@ -179,12 +179,19 @@ export const serviciosApi = {
 
   /**
    * Obtener un servicio por ID o slug
+   * 🔧 FIX: Para admin, bypass del cache HTTP del navegador
    */
   getById: async (id: string, includePaquetes = true, admin = true): Promise<ServicioResponse> => {
     try {
       const config: any = {
         params: { includePaquetes, admin }
       };
+      
+      // 🔧 FIX: Si es admin, agregar timestamp para bypass de cache HTTP
+      // No usar headers Cache-Control/Pragma porque requieren configuración CORS adicional
+      if (admin) {
+        config.params._t = Date.now(); // Cache buster - suficiente para evitar cache
+      }
       
       const { data } = await apiClient.get<ServicioResponse>(`/${id}`, config);
       return data;

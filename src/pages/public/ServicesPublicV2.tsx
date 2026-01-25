@@ -228,20 +228,24 @@ const ServicesPublicV2 = () => {
         <meta name="description" content="Consultoría IT, Proyectos Tecnológicos e Inteligencia Artificial para impulsar tu negocio. Soluciones de desarrollo de software a medida." />
         <meta name="keywords" content="servicios, consultoría, tecnología, software, inteligencia artificial, desarrollo web, aplicaciones móviles, soluciones digitales" />
 
-        {/* Open Graph */}
-        <meta property="og:title" content="Servicios - SCUTI Company" />
-        <meta property="og:description" content="Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa" />
-        <meta property="og:image" content="https://scuticompany.com/FAVICON.png" />
+        {/* Open Graph - ✅ Imagen OG mejorada */}
+        <meta property="og:title" content="Servicios de Desarrollo de Software - SCUTI Company" />
+        <meta property="og:description" content="Consultoría IT, desarrollo web/móvil e Inteligencia Artificial para impulsar tu negocio. Soluciones tecnológicas a medida en Perú." />
+        <meta property="og:image" content="https://scuticompany.com/FAVICON.jpeg" />
+        <meta property="og:image:width" content="800" />
+        <meta property="og:image:height" content="800" />
+        <meta property="og:image:alt" content="SCUTI Company - Servicios de desarrollo de software y consultoría IT" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://scuticompany.com/servicios" />
         <meta property="og:site_name" content="SCUTI Company" />
         <meta property="og:locale" content="es_PE" />
 
-        {/* Twitter Card */}
+        {/* Twitter Card - ✅ Imagen mejorada */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Servicios - SCUTI Company" />
-        <meta name="twitter:description" content="Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa" />
-        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta name="twitter:title" content="Servicios de Desarrollo de Software - SCUTI Company" />
+        <meta name="twitter:description" content="Consultoría IT, desarrollo web/móvil e Inteligencia Artificial para impulsar tu negocio." />
+        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.jpeg" />
+        <meta name="twitter:image:alt" content="SCUTI Company - Servicios de desarrollo de software y consultoría IT" />
 
         {/* Canonical */}
         <link rel="canonical" href="https://scuticompany.com/servicios" />
