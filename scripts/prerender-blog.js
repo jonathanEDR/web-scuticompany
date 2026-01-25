@@ -204,12 +204,18 @@ function generateArticleSchema(post) {
   const authorName = getAuthorName(post.author);
   const imageUrl = getImageUrl(post.featuredImage);
   const postUrl = `${CONFIG.siteUrl}/blog/${post.slug}`;
+  
+  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), fallback a tags
+  const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
+    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    : post.tags?.map(t => typeof t === 'string' ? t : t.name) || [];
+  const keywords = seoKeywords.join(', ');
 
-  return {
+  const schema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.excerpt || truncate(stripHtml(post.content), 160),
+    "headline": post.seo?.metaTitle || post.title,
+    "description": post.seo?.metaDescription || post.excerpt || truncate(stripHtml(post.content), 160),
     "image": imageUrl,
     "datePublished": formatDate(post.publishedAt || post.createdAt),
     "dateModified": formatDate(post.updatedAt || post.publishedAt || post.createdAt),
@@ -230,11 +236,21 @@ function generateArticleSchema(post) {
       "@id": postUrl
     },
     "url": postUrl,
-    "keywords": post.tags?.map(t => typeof t === 'string' ? t : t.name).join(', ') || '',
+    "keywords": keywords,
     "articleSection": post.category?.name || 'Blog',
     "wordCount": stripHtml(post.content).split(/\s+/).length,
     "inLanguage": "es"
   };
+
+  // Agregar "about" si hay focusKeyphrase
+  if (post.seo?.focusKeyphrase) {
+    schema.about = {
+      "@type": "Thing",
+      "name": post.seo.focusKeyphrase
+    };
+  }
+
+  return schema;
 }
 
 /**
@@ -284,8 +300,15 @@ function generateVisibleContent(post) {
   // Extraer primeros párrafos del contenido (visible para SEO)
   const contentPreview = stripHtml(post.content).substring(0, 1000);
 
-  // Tags como texto
-  const tagsText = post.tags?.map(t => typeof t === 'string' ? t : t.name).join(', ') || '';
+  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), fallback a tags
+  const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
+    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    : post.tags?.map(t => typeof t === 'string' ? t : t.name) || [];
+  const keywordsText = seoKeywords.join(', ');
+  
+  // ✅ CORREGIDO: Usar SEO title y description
+  const title = post.seo?.metaTitle || post.title;
+  const description = post.seo?.metaDescription || post.excerpt || '';
 
   return `
     <article itemscope itemtype="https://schema.org/BlogPosting" class="blog-post-content">
@@ -296,7 +319,7 @@ function generateVisibleContent(post) {
           <span>${escapeHtml(categoryName)}</span>
         </nav>
 
-        <h1 itemprop="headline" class="post-title">${escapeHtml(post.title)}</h1>
+        <h1 itemprop="headline" class="post-title">${escapeHtml(title)}</h1>
 
         <div class="post-meta">
           <span itemprop="author" itemscope itemtype="https://schema.org/Person">
@@ -306,7 +329,7 @@ function generateVisibleContent(post) {
           <span>En <span itemprop="articleSection">${escapeHtml(categoryName)}</span></span>
         </div>
 
-        ${post.excerpt ? `<p itemprop="description" class="post-excerpt">${escapeHtml(post.excerpt)}</p>` : ''}
+        ${description ? `<p itemprop="description" class="post-excerpt">${escapeHtml(description)}</p>` : ''}
       </header>
 
       ${post.featuredImage ? `
@@ -314,7 +337,7 @@ function generateVisibleContent(post) {
           <img
             itemprop="image"
             src="${imageUrl}"
-            alt="${escapeHtml(post.title)}"
+            alt="${escapeHtml(title)}"
             loading="lazy"
             width="1200"
             height="630"
@@ -326,11 +349,11 @@ function generateVisibleContent(post) {
         <p>${escapeHtml(contentPreview)}${contentPreview.length >= 1000 ? '...' : ''}</p>
       </div>
 
-      ${tagsText ? `
+      ${keywordsText ? `
         <footer class="post-footer">
           <div class="post-tags">
-            <strong>Etiquetas:</strong>
-            <span itemprop="keywords">${escapeHtml(tagsText)}</span>
+            <strong>Palabras clave:</strong>
+            <span itemprop="keywords">${escapeHtml(keywordsText)}</span>
           </div>
         </footer>
       ` : ''}
@@ -413,9 +436,15 @@ function generateVisibleContent(post) {
 function generatePostHtml(indexHtml, post) {
   const postUrl = `${CONFIG.siteUrl}/blog/${post.slug}`;
   const imageUrl = getImageUrl(post.featuredImage);
-  const description = escapeHtml(post.excerpt || truncate(stripHtml(post.content), 160));
-  const title = escapeHtml(post.title);
-  const keywords = post.tags?.map(t => typeof t === 'string' ? t : t.name).join(', ') || '';
+  // ✅ CORREGIDO: Usar SEO description
+  const description = escapeHtml(post.seo?.metaDescription || post.excerpt || truncate(stripHtml(post.content), 160));
+  // ✅ CORREGIDO: Usar SEO title
+  const title = escapeHtml(post.seo?.metaTitle || post.title);
+  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), fallback a tags
+  const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
+    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    : post.tags?.map(t => typeof t === 'string' ? t : t.name) || [];
+  const keywords = seoKeywords.join(', ');
 
   // Generar Schema.org JSON-LD
   const articleSchema = generateArticleSchema(post);

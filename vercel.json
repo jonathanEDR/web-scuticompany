@@ -17,6 +17,10 @@
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/$1"
     },
     {
+      "source": "/blog/:slug",
+      "destination": "/blog/:slug/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

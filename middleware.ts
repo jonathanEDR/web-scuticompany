@@ -633,6 +633,111 @@ function generateMetaTags(post: any): string {
 }
 
 /**
+ * 🎯 CRÍTICO PARA SEO: Generar contenido visible del artículo para crawlers
+ * Esto reemplaza el div#root vacío con contenido real del artículo
+ * Para que Google vea contenido real en lugar de "Artículo no encontrado"
+ */
+function generateVisibleArticleContent(post: any): string {
+  const title = escapeHtml(post.seo?.metaTitle || post.title);
+  const description = escapeHtml(post.seo?.metaDescription || post.excerpt || '');
+  const authorName = escapeHtml(getAuthorName(post.author));
+  const imageUrl = getImageUrl(post.featuredImage);
+  const categoryName = escapeHtml(post.category?.name || 'Blog');
+  const postUrl = `${CONFIG.siteUrl}/blog/${post.slug}`;
+  
+  // Keywords para mostrar
+  const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
+    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    : post.tags?.map((t: any) => typeof t === 'string' ? t : t.name) || [];
+  const keywords = escapeHtml(seoKeywords.join(', '));
+  
+  // Fecha formateada
+  const publishDate = post.publishedAt 
+    ? new Date(post.publishedAt).toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }) 
+    : '';
+
+  // Extraer preview del contenido (primeros 1500 caracteres de texto plano)
+  let contentPreview = '';
+  if (post.content) {
+    contentPreview = post.content
+      .replace(/<[^>]*>/g, ' ')  // Remover HTML
+      .replace(/\s+/g, ' ')       // Normalizar espacios
+      .trim()
+      .substring(0, 1500);
+    if (contentPreview.length >= 1500) {
+      contentPreview += '...';
+    }
+  }
+
+  return `
+    <article itemscope itemtype="https://schema.org/BlogPosting" class="blog-article-seo">
+      <header>
+        <nav aria-label="Breadcrumb">
+          <a href="/" data-discover="true">Inicio</a> &gt; 
+          <a href="/blog" data-discover="true">Blog</a> &gt; 
+          <span>${categoryName}</span>
+        </nav>
+        
+        <h1 itemprop="headline">${title}</h1>
+        
+        <div class="article-meta">
+          <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+            Por <span itemprop="name">${authorName}</span>
+          </span>
+          ${publishDate ? `<time itemprop="datePublished" datetime="${new Date(post.publishedAt).toISOString()}">${publishDate}</time>` : ''}
+          <span>En <span itemprop="articleSection">${categoryName}</span></span>
+        </div>
+        
+        ${description ? `<p itemprop="description" class="article-excerpt">${description}</p>` : ''}
+      </header>
+      
+      ${imageUrl !== CONFIG.defaultImage ? `
+        <figure>
+          <img itemprop="image" src="${imageUrl}" alt="${title}" width="1200" height="630" loading="lazy" />
+        </figure>
+      ` : ''}
+      
+      <div itemprop="articleBody" class="article-content">
+        <p>${escapeHtml(contentPreview)}</p>
+      </div>
+      
+      ${keywords ? `
+        <footer>
+          <strong>Palabras clave:</strong>
+          <span itemprop="keywords">${keywords}</span>
+        </footer>
+      ` : ''}
+      
+      <meta itemprop="url" content="${postUrl}" />
+      <meta itemprop="mainEntityOfPage" content="${postUrl}" />
+    </article>
+    
+    <style>
+      .blog-article-seo { max-width: 800px; margin: 2rem auto; padding: 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      .blog-article-seo h1 { font-size: 2rem; margin: 1rem 0; color: #1f2937; }
+      .blog-article-seo nav { font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem; }
+      .blog-article-seo nav a { color: #7c3aed; text-decoration: none; }
+      .blog-article-seo .article-meta { color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+      .blog-article-seo .article-excerpt { font-size: 1.125rem; color: #4b5563; line-height: 1.6; margin-bottom: 1.5rem; }
+      .blog-article-seo figure { margin: 1.5rem 0; }
+      .blog-article-seo img { width: 100%; height: auto; border-radius: 0.5rem; }
+      .blog-article-seo .article-content { font-size: 1rem; line-height: 1.8; color: #374151; }
+      .blog-article-seo footer { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; color: #6b7280; }
+      @media (prefers-color-scheme: dark) {
+        .blog-article-seo { background: #111; color: #f9fafb; }
+        .blog-article-seo h1 { color: #f9fafb; }
+        .blog-article-seo .article-excerpt { color: #d1d5db; }
+        .blog-article-seo .article-content { color: #e5e7eb; }
+      }
+    </style>
+  `;
+}
+
+/**
  * Middleware principal
  */
 export default async function middleware(request: Request) {
@@ -887,6 +992,14 @@ export default async function middleware(request: Request) {
 
     // Insertar los nuevos meta tags después de <head>
     html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // 🎯 CRÍTICO PARA SEO: Reemplazar el div#root con contenido real del artículo
+    // Esto evita que Google vea "Artículo no encontrado" o un div vacío
+    const visibleContent = generateVisibleArticleContent(post);
+    html = html.replace(
+      /<div id="root">[\s\S]*?<\/div>/i,
+      `<div id="root">${visibleContent}</div>`
+    );
 
     // Retornar el HTML modificado
     return new Response(html, {
