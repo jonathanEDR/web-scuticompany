@@ -197,8 +197,8 @@ export const BlogArticleSchema = ({
   keywords,
   focusKeyphrase
 }: BlogArticleSchemaProps) => {
-  // ✅ Construir keywords para Schema.org: focusKeyphrase primero, luego keywords
-  const allKeywords = [focusKeyphrase, ...(keywords || [])].filter(Boolean);
+  // ✅ Construir keywords para Schema.org: focusKeyphrase primero, luego keywords (sin duplicados)
+  const allKeywords = [...new Set([focusKeyphrase, ...(keywords || [])].filter(Boolean))];
   
   const schema = {
     "@context": "https://schema.org",
