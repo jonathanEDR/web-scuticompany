@@ -103,52 +103,8 @@
     <meta name="twitter:description" content="Software, IA y Automatización para PYMES en Perú" data-rh="true" />
     <meta name="twitter:image" content="https://scuticompany.com/logofondonegro.jpeg" data-rh="true" />
     
-    <!-- Schema.org JSON-LD - Visible para Google incluso sin JavaScript -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "SCUTI Company",
-      "alternateName": "Scuti",
-      "url": "https://scuticompany.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://scuticompany.com/Logo.png"
-      },
-      "image": {
-        "@type": "ImageObject",
-        "url": "https://scuticompany.com/Logo.png"
-      },
-      "description": "Empresa de desarrollo de software, inteligencia artificial y automatización para PYMES en Perú",
-      "foundingDate": "2024",
-      "areaServed": {
-        "@type": "Country",
-        "name": "Perú"
-      },
-      "sameAs": [
-        "https://www.linkedin.com/company/scuticompany",
-        "https://twitter.com/scuticompany"
-      ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer service",
-        "availableLanguage": ["Spanish", "English"]
-      }
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "SCUTI Company",
-      "url": "https://scuticompany.com",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://scuticompany.com/blog?search={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
+    <!-- Schema.org JSON-LD - Fallback para crawlers sin JS (React sobrescribe con data-rh="true") -->
+    <!-- NOTA: Los schemas principales están en SchemaOrg.tsx y se inyectan via React Helmet -->
     
     <!-- Robots -->
     <meta name="robots" content="index, follow, max-image-preview:large" />

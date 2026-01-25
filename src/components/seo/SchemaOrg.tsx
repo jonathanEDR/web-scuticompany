@@ -32,9 +32,10 @@ export const OrganizationSchema = () => {
     ],
     "address": {
       "@type": "PostalAddress",
+      "streetAddress": "Calles Los Molles Lt-02",
       "addressCountry": "PE",
-      "addressLocality": "Lima",
-      "addressRegion": "Lima"
+      "addressLocality": "Huánuco",
+      "addressRegion": "Huánuco"
     },
     "contactPoint": {
       "@type": "ContactPoint",
