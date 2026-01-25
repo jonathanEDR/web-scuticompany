@@ -109,12 +109,27 @@ interface ValuesConfigSectionProps {
   updateContent: (field: string, value: any) => void;
 }
 
+// 🆕 Interface para items de "¿Por qué elegirnos?"
+interface WhyChooseUsItem {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface WhyChooseUsContent {
+  title: string;
+  subtitle?: string;
+  items: WhyChooseUsItem[];
+}
+
 const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
   pageData,
   updateContent
 }) => {
   const values: ValuesContent = pageData?.content?.values || { title: '', items: [] };
+  const whyChooseUs: WhyChooseUsContent = pageData?.content?.whyChooseUs || { title: '', items: [] }; // 🆕
   const [collapsed, setCollapsed] = useState(true);
+  const [collapsedWhyChooseUs, setCollapsedWhyChooseUs] = useState(true); // 🆕
   const [expandedValue, setExpandedValue] = useState<number | null>(null);
   const [imageTheme, setImageTheme] = useState<'light' | 'dark'>('light');
 
@@ -168,6 +183,47 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
     const newItems = [...values.items];
     [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
     updateContent('values.items', newItems);
+  };
+
+  // 🆕 FUNCIONES PARA "¿POR QUÉ ELEGIRNOS?"
+  // Actualizar un item de whyChooseUs
+  const updateWhyChooseUsItem = (index: number, field: string, value: any) => {
+    const newItems = [...(whyChooseUs.items || [])];
+    newItems[index] = { ...newItems[index], [field]: value };
+    updateContent('whyChooseUs.items', newItems);
+  };
+
+  // Agregar nuevo item a whyChooseUs
+  const addWhyChooseUsItem = () => {
+    const newItems = [...(whyChooseUs.items || []), {
+      icon: '✅',
+      title: 'Nuevo beneficio',
+      description: 'Descripción del beneficio...'
+    }];
+    updateContent('whyChooseUs.items', newItems);
+  };
+
+  // Eliminar item de whyChooseUs
+  const removeWhyChooseUsItem = (index: number) => {
+    if (!whyChooseUs.items) return;
+    const newItems = whyChooseUs.items.filter((_, i) => i !== index);
+    updateContent('whyChooseUs.items', newItems);
+  };
+
+  // Mover item hacia arriba
+  const moveWhyChooseUsItemUp = (index: number) => {
+    if (!whyChooseUs.items || index === 0) return;
+    const newItems = [...whyChooseUs.items];
+    [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+    updateContent('whyChooseUs.items', newItems);
+  };
+
+  // Mover item hacia abajo
+  const moveWhyChooseUsItemDown = (index: number) => {
+    if (!whyChooseUs.items || index === whyChooseUs.items.length - 1) return;
+    const newItems = [...whyChooseUs.items];
+    [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+    updateContent('whyChooseUs.items', newItems);
   };
 
   return (
@@ -1774,6 +1830,227 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             </div>
           )}
         </div>
+      </div>
+
+      {/* 🏆 SECCIÓN "¿POR QUÉ ELEGIRNOS?" - NUEVA */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-blue-200 dark:border-gray-700/50">
+        {/* Encabezado colapsable */}
+        <button
+          type="button"
+          className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded transition-colors"
+          onClick={() => setCollapsedWhyChooseUs((prev) => !prev)}
+          aria-expanded={!collapsedWhyChooseUs}
+          aria-controls="why-choose-us-content"
+          style={{ cursor: 'pointer' }}
+        >
+          <span className="flex items-center gap-2">
+            🏆 ¿Por qué elegirnos?
+          </span>
+          <span className="ml-2 text-lg">
+            {collapsedWhyChooseUs ? '▼ Mostrar' : '▲ Ocultar'}
+          </span>
+        </button>
+
+        {/* Contenido colapsable */}
+        {!collapsedWhyChooseUs && (
+          <div id="why-choose-us-content" className="space-y-6">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Lista de beneficios o razones por las que los clientes deberían elegir tu empresa.
+              Esta sección aparecerá después de los Valores.
+            </p>
+
+            {/* Título de la sección */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Título de la Sección
+              </label>
+              <input
+                type="text"
+                value={whyChooseUs.title || ''}
+                onChange={(e) => updateContent('whyChooseUs.title', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Ej: ¿Por qué elegir SCUTI Company?"
+              />
+            </div>
+
+            {/* Subtítulo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Subtítulo (opcional)
+              </label>
+              <input
+                type="text"
+                value={whyChooseUs.subtitle || ''}
+                onChange={(e) => updateContent('whyChooseUs.subtitle', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Ej: ¿Por qué las PYMES confían en nosotros?"
+              />
+            </div>
+
+            {/* Botón para agregar item */}
+            <div className="flex justify-end">
+              <button
+                onClick={addWhyChooseUsItem}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Agregar Beneficio
+              </button>
+            </div>
+
+            {/* Lista de items */}
+            <div className="space-y-4">
+              {whyChooseUs.items && whyChooseUs.items.map((item, index) => (
+                <div
+                  key={index}
+                  className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Selector de Icono/Emoji */}
+                    <div className="flex-shrink-0">
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        Icono
+                      </label>
+                      <input
+                        type="text"
+                        value={item.icon || '✅'}
+                        onChange={(e) => updateWhyChooseUsItem(index, 'icon', e.target.value)}
+                        className="w-16 h-12 text-2xl text-center border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500"
+                        placeholder="✅"
+                        maxLength={2}
+                      />
+                    </div>
+
+                    {/* Contenido */}
+                    <div className="flex-1 space-y-3">
+                      {/* Título del item */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                          Título
+                        </label>
+                        <input
+                          type="text"
+                          value={item.title || ''}
+                          onChange={(e) => updateWhyChooseUsItem(index, 'title', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                          placeholder="Ej: Experiencia comprobada"
+                        />
+                      </div>
+
+                      {/* Descripción del item */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                          Descripción
+                        </label>
+                        <textarea
+                          value={item.description || ''}
+                          onChange={(e) => updateWhyChooseUsItem(index, 'description', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none"
+                          rows={2}
+                          placeholder="Ej: Hemos trabajado con empresas de diversos sectores..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Controles */}
+                    <div className="flex flex-col gap-1">
+                      {/* Mover arriba */}
+                      <button
+                        onClick={() => moveWhyChooseUsItemUp(index)}
+                        disabled={index === 0}
+                        className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Mover arriba"
+                      >
+                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                      </button>
+                      {/* Mover abajo */}
+                      <button
+                        onClick={() => moveWhyChooseUsItemDown(index)}
+                        disabled={index === whyChooseUs.items.length - 1}
+                        className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Mover abajo"
+                      >
+                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {/* Eliminar */}
+                      <button
+                        onClick={() => removeWhyChooseUsItem(index)}
+                        className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500"
+                        title="Eliminar"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Mensaje cuando no hay items */}
+            {(!whyChooseUs.items || whyChooseUs.items.length === 0) && (
+              <div className="text-center py-8 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                <span className="text-4xl mb-4 block">🏆</span>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  No hay beneficios configurados aún
+                </p>
+                <button
+                  onClick={addWhyChooseUsItem}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Agregar primer beneficio
+                </button>
+              </div>
+            )}
+
+            {/* Vista previa de items */}
+            {whyChooseUs.items && whyChooseUs.items.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                  👁️ Vista Previa
+                </h5>
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                  {whyChooseUs.title && (
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                      {whyChooseUs.title}
+                    </h3>
+                  )}
+                  {whyChooseUs.subtitle && (
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      {whyChooseUs.subtitle}
+                    </p>
+                  )}
+                  <div className="space-y-3">
+                    {whyChooseUs.items.slice(0, 4).map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <span className="text-xl flex-shrink-0">{item.icon || '✅'}</span>
+                        <div>
+                          <span className="font-semibold text-gray-900 dark:text-white">{item.title}:</span>{' '}
+                          <span className="text-gray-600 dark:text-gray-400">{item.description}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {whyChooseUs.items.length > 4 && (
+                      <p className="text-sm text-gray-500 italic">
+                        + {whyChooseUs.items.length - 4} más...
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 📊 Vista Previa del Carrusel */}

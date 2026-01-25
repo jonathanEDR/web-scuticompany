@@ -180,12 +180,39 @@ interface ValuesContent {
   sectionSubtitleColorDark?: string;
 }
 
+// 🆕 Interface para la sección de Historia
+interface HistoryContent {
+  title: string;
+  description: string;
+  image?: {
+    light?: string;
+    dark?: string;
+  };
+  fontFamily?: string;
+}
+
+// 🆕 Interface para items de "¿Por qué elegirnos?"
+interface WhyChooseUsItem {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+// 🆕 Interface para la sección "¿Por qué elegirnos?"
+interface WhyChooseUsContent {
+  title: string;
+  subtitle?: string;
+  items: WhyChooseUsItem[];
+}
+
 interface PageContent {
   hero: HeroContent;
   mission: SectionContent;
   vision: SectionContent;
   missionVisionBackground?: MissionVisionBackground;
   values?: ValuesContent;
+  history?: HistoryContent; // 🆕
+  whyChooseUs?: WhyChooseUsContent; // 🆕
 }
 
 const About = () => {
@@ -297,7 +324,7 @@ const About = () => {
     );
   }
 
-  const { hero, mission, vision, values } = pageData?.content || {};
+  const { hero, mission, vision, values, history, whyChooseUs } = pageData?.content || {};
 
   // Obtener colores personalizados del CMS o usar defaults
   const getHeroStyles = () => {
@@ -455,8 +482,8 @@ const About = () => {
           </div>
         </section>
         
-        {/* 📋 Misión y Visión - Bloque unificado con fondo compartido */}
-        {(mission?.title || vision?.title) && (
+        {/* 📋 Historia, Misión y Visión - Bloque unificado con fondo compartido */}
+        {(history?.title || mission?.title || vision?.title) && (
           <section 
             className="relative py-16 md:py-24 overflow-hidden"
             style={{
@@ -502,6 +529,34 @@ const About = () => {
             
             <div className="relative z-10 container mx-auto px-4" style={{ fontFamily: "'Montserrat', sans-serif" }}>
               <div className="max-w-6xl mx-auto space-y-20 md:space-y-32">
+                
+                {/* 📖 Historia - Solo texto, sin imagen */}
+                {history?.title && history?.description && (
+                  <div 
+                    className="max-w-4xl mx-auto text-center space-y-6"
+                    style={{ fontFamily: `'${history.fontFamily || 'Montserrat'}', sans-serif` }}
+                  >
+                    <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium ${
+                      theme === 'dark' 
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' 
+                        : 'bg-amber-100 text-amber-700 border border-amber-200'
+                    }`}>
+                      Nuestra Historia
+                    </div>
+                    <h2 className={`text-3xl md:text-4xl font-bold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {stripHtmlTags(history.title)}
+                    </h2>
+                    <div className={`space-y-4 text-lg md:text-xl leading-relaxed ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>
+                      {history.description.split('\n\n').map((paragraph: string, idx: number) => (
+                        <p key={idx}>{paragraph}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 {/* 🎯 Misión */}
                 {mission?.title && (
@@ -1093,6 +1148,100 @@ const About = () => {
                 </div>
               );
             })()}
+
+            {/* 🏆 ¿POR QUÉ ELEGIRNOS? - Integrado dentro de Valores */}
+            {whyChooseUs?.items && whyChooseUs.items.length > 0 && (
+              <div className="mt-16 pt-16 border-t border-gray-700/30">
+                <div className="max-w-4xl mx-auto">
+                  {/* Encabezado de la sección */}
+                  <div className="text-center mb-12">
+                    {/* Badge decorativo */}
+                    <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4 ${
+                      theme === 'dark' 
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' 
+                        : 'bg-blue-100 text-blue-700 border border-blue-200'
+                    }`}>
+                      ¿Por qué elegirnos?
+                    </div>
+                    
+                    {/* Título */}
+                    {whyChooseUs.title && (
+                      <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}
+                      style={{ fontFamily: "'Montserrat', sans-serif" }}
+                      >
+                        {whyChooseUs.title}
+                      </h2>
+                    )}
+                    
+                    {/* Subtítulo */}
+                    {whyChooseUs.subtitle && (
+                      <p className={`text-lg max-w-2xl mx-auto ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        {whyChooseUs.subtitle}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Lista de beneficios */}
+                  <div className="space-y-4">
+                    {whyChooseUs.items.map((item, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-start gap-4 p-5 rounded-xl transition-all duration-300 ${
+                          theme === 'dark'
+                            ? 'bg-gray-800/50 hover:bg-gray-800/80 border border-gray-700/50'
+                            : 'bg-white/80 hover:bg-white border border-gray-200'
+                        }`}
+                        style={{ 
+                          animationDelay: `${index * 100}ms`,
+                          animation: 'fadeInUp 0.5s ease-out forwards'
+                        }}
+                      >
+                        {/* Icono */}
+                        <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${
+                          theme === 'dark'
+                            ? 'bg-gradient-to-br from-blue-500/20 to-indigo-500/20'
+                            : 'bg-gradient-to-br from-blue-100 to-indigo-100'
+                        }`}>
+                          {item.icon || '✅'}
+                        </div>
+                        
+                        {/* Contenido */}
+                        <div className="flex-1">
+                          <h3 className={`text-lg font-bold mb-1 ${
+                            theme === 'dark' ? 'text-white' : 'text-gray-900'
+                          }`}>
+                            {item.title}
+                          </h3>
+                          <p className={`leading-relaxed ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Estilos para animación */}
+                <style>{`
+                  @keyframes fadeInUp {
+                    from {
+                      opacity: 0;
+                      transform: translateY(20px);
+                    }
+                    to {
+                      opacity: 1;
+                      transform: translateY(0);
+                    }
+                  }
+                `}</style>
+              </div>
+            )}
             
                 </div>
               </div>

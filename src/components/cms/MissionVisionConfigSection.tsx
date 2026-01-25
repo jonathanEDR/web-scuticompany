@@ -27,6 +27,7 @@ const MissionVisionConfigSection: React.FC<MissionVisionConfigSectionProps> = ({
   const mission = pageData?.content?.mission || {};
   const vision = pageData?.content?.vision || {};
   const missionVisionBackground = pageData?.content?.missionVisionBackground || {};
+  const history = pageData?.content?.history || {}; // 🆕 Sección Historia
   
   // Estado para controlar si la sección está colapsada
   const [collapsed, setCollapsed] = useState(true);
@@ -270,6 +271,143 @@ const MissionVisionConfigSection: React.FC<MissionVisionConfigSectionProps> = ({
         </div>
       </div>
 
+      {/* 📖 SECCIÓN HISTORIA - NUEVA */}
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-emerald-200 dark:border-gray-700/50">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+            📖 Nuestra Historia
+          </h3>
+        </div>
+
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Cuenta la historia de cómo nació tu empresa. Esta sección aparecerá después del Hero.
+        </p>
+
+        <div className="space-y-6">
+          {/* Título de la Historia */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Título de la Sección
+            </label>
+            <input
+              type="text"
+              value={history.title || ''}
+              onChange={(e) => updateContent('history.title', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              placeholder="Ej: ¿Cómo nació SCUTI Company?"
+            />
+          </div>
+
+          {/* Descripción/Contenido de la Historia */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Contenido de la Historia
+            </label>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              Puedes incluir varios párrafos describiendo la historia de tu empresa.
+            </p>
+            <textarea
+              value={history.description || ''}
+              onChange={(e) => updateContent('history.description', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
+              rows={8}
+              placeholder="SCUTI Company nació de una visión clara: cerrar la brecha tecnológica que enfrentan las PYMES peruanas...
+
+Fundada por un equipo de profesionales apasionados por la tecnología y el emprendimiento...
+
+Hoy, SCUTI Company se posiciona como una empresa líder en desarrollo de software e inteligencia artificial en Perú..."
+            />
+          </div>
+
+          {/* 🖼️ Imagen de la Historia */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+              🖼️ Imagen de la Historia (Opcional)
+            </label>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Imagen que aparecerá junto al texto de tu historia.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Tema Claro */}
+              <div className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div className="flex items-center mb-3">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">☀️ Tema Claro</span>
+                </div>
+                <ManagedImageSelector
+                  currentImage={
+                    typeof history.image === 'string' 
+                      ? history.image 
+                      : (history.image?.light || '')
+                  }
+                  onImageSelect={(url: string) => {
+                    const currentImage = typeof history.image === 'string'
+                      ? { light: history.image, dark: history.image }
+                      : (history.image || {});
+                    updateContent('history.image', { ...currentImage, light: url });
+                  }}
+                  label="Imagen Historia (Claro)"
+                  description="Tamaño recomendado: 800x600px"
+                  darkMode={false}
+                  hideButtonArea={!!(
+                    typeof history.image === 'string' 
+                      ? history.image 
+                      : history.image?.light
+                  )}
+                />
+              </div>
+
+              {/* Tema Oscuro */}
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-600">
+                <div className="flex items-center mb-3">
+                  <span className="text-sm font-medium text-gray-200">🌙 Tema Oscuro</span>
+                </div>
+                <ManagedImageSelector
+                  currentImage={
+                    typeof history.image === 'string' 
+                      ? history.image 
+                      : (history.image?.dark || '')
+                  }
+                  onImageSelect={(url: string) => {
+                    const currentImage = typeof history.image === 'string'
+                      ? { light: history.image, dark: history.image }
+                      : (history.image || {});
+                    updateContent('history.image', { ...currentImage, dark: url });
+                  }}
+                  label="Imagen Historia (Oscuro)"
+                  description="Tamaño recomendado: 800x600px"
+                  darkMode={true}
+                  hideButtonArea={!!(
+                    typeof history.image === 'string' 
+                      ? history.image 
+                      : history.image?.dark
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Tipografía de la Historia */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              🔤 Tipografía
+            </label>
+            <select
+              value={history.fontFamily || 'Montserrat'}
+              onChange={(e) => updateContent('history.fontFamily', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              style={{ fontFamily: history.fontFamily || 'Montserrat' }}
+            >
+              {AVAILABLE_FONTS.map(font => (
+                <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                  {font.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* 🎯 SECCIÓN MISIÓN */}
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
         <div className="flex items-center justify-between mb-6">
@@ -427,6 +565,23 @@ const MissionVisionConfigSection: React.FC<MissionVisionConfigSectionProps> = ({
         </h4>
         
         <div className="space-y-8">
+          {/* Preview Historia - Nueva */}
+          {history.title && (
+            <div className="border-l-4 border-emerald-500 pl-4" style={{ fontFamily: history.fontFamily || 'Montserrat' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                  <span className="text-white text-lg">📖</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  {history.title}
+                </h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line line-clamp-4">
+                {history.description}
+              </p>
+            </div>
+          )}
+
           {/* Preview Misión - Zigzag */}
           {mission.title && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
