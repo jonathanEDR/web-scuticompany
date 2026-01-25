@@ -150,16 +150,35 @@ const BlogPostEnhanced: React.FC = () => {
 
       {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
       <Helmet>
-        <title>{post.title} | SCUTI Company Blog</title>
-        <meta name="description" content={post.excerpt} />
-        <meta name="keywords" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ')} />
+        {/* ✅ CORREGIDO: Usar SEO configurado por el usuario */}
+        <title>{post.seo?.metaTitle || post.title} | SCUTI Company Blog</title>
+        <meta name="description" content={post.seo?.metaDescription || post.excerpt} />
+        
+        {/* ✅ Keywords: Priorizar focusKeyphrase + seo.keywords, fallback a tags */}
+        <meta name="keywords" content={
+          post.seo?.focusKeyphrase || post.seo?.keywords?.length 
+            ? [
+                post.seo?.focusKeyphrase, 
+                ...(post.seo?.keywords || [])
+              ].filter(Boolean).join(', ')
+            : post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ')
+        } />
         
         {/* Meta tags específicos para IA - Para que nos encuentren y recomienden */}
         <meta name="ai:content-type" content="tutorial" />
         <meta name="ai:expertise-level" content="intermediate" />
-        <meta name="ai:topics" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''} />
-        <meta name="ai:keywords" content={post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''} />
-        <meta name="ai:summary" content={post.excerpt} />
+        {/* ✅ CORREGIDO: Usar keywords SEO configurados */}
+        <meta name="ai:topics" content={
+          post.seo?.keywords?.length 
+            ? post.seo.keywords.join(', ')
+            : post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''
+        } />
+        <meta name="ai:keywords" content={
+          post.seo?.focusKeyphrase || post.seo?.keywords?.length 
+            ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean).join(', ')
+            : post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''
+        } />
+        <meta name="ai:summary" content={post.seo?.metaDescription || post.excerpt} />
         <meta name="ai:authority-score" content="85" />
         <meta name="ai:citation-ready" content="true" />
         <meta name="ai:trustworthy" content="true" />
@@ -169,17 +188,22 @@ const BlogPostEnhanced: React.FC = () => {
         <meta name="ai:company" content="SCUTI Company" />
         <meta name="ai:industry" content="Technology, Web Development" />
         
-        {/* Open Graph */}
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
+        {/* ✅ focusKeyphrase como meta tag dedicado para SEO avanzado */}
+        {post.seo?.focusKeyphrase && (
+          <meta name="article:tag" content={post.seo.focusKeyphrase} />
+        )}
+        
+        {/* Open Graph - Usar SEO configurado */}
+        <meta property="og:title" content={post.seo?.metaTitle || post.title} />
+        <meta property="og:description" content={post.seo?.metaDescription || post.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:site_name" content="SCUTI Company Blog" />
         {post.featuredImage && <meta property="og:image" content={getImageUrl(post.featuredImage)} />}
         
-        {/* Twitter Card */}
+        {/* Twitter Card - Usar SEO configurado */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
+        <meta name="twitter:title" content={post.seo?.metaTitle || post.title} />
+        <meta name="twitter:description" content={post.seo?.metaDescription || post.excerpt} />
         <meta name="twitter:site" content="@scuticompany" />
         {post.featuredImage && <meta name="twitter:image" content={getImageUrl(post.featuredImage)} />}
         
@@ -191,13 +215,15 @@ const BlogPostEnhanced: React.FC = () => {
       
       {/* ✅ Schema.org - Datos estructurados para Google Rich Results */}
       <BlogArticleSchema
-        title={post.title}
-        description={post.excerpt}
+        title={post.seo?.metaTitle || post.title}
+        description={post.seo?.metaDescription || post.excerpt}
         image={post.featuredImage ? getImageUrl(post.featuredImage) : undefined}
         datePublished={post.publishedAt || post.createdAt}
         dateModified={post.updatedAt}
         authorName={typeof post.author === 'string' ? post.author : (post.author?.displayName || post.author?.firstName || 'SCUTI Company')}
         url={`https://scuticompany.com/blog/${post.slug}`}
+        keywords={post.seo?.keywords}
+        focusKeyphrase={post.seo?.focusKeyphrase}
       />
       <BreadcrumbSchema
         items={[

@@ -182,6 +182,8 @@ interface BlogArticleSchemaProps {
   dateModified?: string;
   authorName: string;
   url: string;
+  keywords?: string[];  // ✅ Agregado para SEO
+  focusKeyphrase?: string;  // ✅ Palabra clave principal
 }
 
 export const BlogArticleSchema = ({
@@ -191,8 +193,13 @@ export const BlogArticleSchema = ({
   datePublished,
   dateModified,
   authorName,
-  url
+  url,
+  keywords,
+  focusKeyphrase
 }: BlogArticleSchemaProps) => {
+  // ✅ Construir keywords para Schema.org: focusKeyphrase primero, luego keywords
+  const allKeywords = [focusKeyphrase, ...(keywords || [])].filter(Boolean);
+  
   const schema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -217,7 +224,16 @@ export const BlogArticleSchema = ({
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": url
-    }
+    },
+    // ✅ Keywords para Google - Muy importante para SEO
+    ...(allKeywords.length > 0 && { "keywords": allKeywords.join(', ') }),
+    // ✅ About: Indica de qué trata el artículo (mejora Rich Results)
+    ...(focusKeyphrase && {
+      "about": {
+        "@type": "Thing",
+        "name": focusKeyphrase
+      }
+    })
   };
 
   return (

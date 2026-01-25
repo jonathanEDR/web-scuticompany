@@ -539,15 +539,6 @@ export default function BlogDashboard() {
       )}
 
       {/* SEO Canvas Modal */}
-      {/* 🔍 DEBUG: Log para verificar datos SEO */}
-      {selectedPostForSEO && console.log('📊 [BlogDashboard] SEO Data:', {
-        postId: selectedPostForSEO._id,
-        title: selectedPostForSEO.title,
-        seo: selectedPostForSEO.seo,
-        metaDescription: selectedPostForSEO.seo?.metaDescription,
-        keywords: selectedPostForSEO.seo?.keywords,
-        excerpt: selectedPostForSEO.excerpt
-      })}
       <SEOCanvasModal
         isOpen={isSEOCanvasOpen}
         onClose={() => {
@@ -560,7 +551,6 @@ export default function BlogDashboard() {
           postId: selectedPostForSEO._id,
           title: selectedPostForSEO.title,
           content: selectedPostForSEO.content,
-          // ✅ CORREGIDO: Usar campos SEO reales
           description: selectedPostForSEO.seo?.metaDescription || selectedPostForSEO.excerpt,
           keywords: selectedPostForSEO.seo?.keywords || []
         } : undefined}

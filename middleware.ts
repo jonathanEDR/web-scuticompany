@@ -545,12 +545,19 @@ function generateServicioDetailMetaTags(servicio: any): string {
  * Generar meta tags para el post
  */
 function generateMetaTags(post: any): string {
-  const title = escapeHtml(post.title);
-  const description = escapeHtml(post.excerpt || '');
+  // ✅ CORREGIDO: Usar SEO configurado por el usuario
+  const title = escapeHtml(post.seo?.metaTitle || post.title);
+  const description = escapeHtml(post.seo?.metaDescription || post.excerpt || '');
   const imageUrl = getImageUrl(post.featuredImage);
   const postUrl = `${CONFIG.siteUrl}/blog/${post.slug}`;
   const authorName = escapeHtml(getAuthorName(post.author));
-  const keywords = post.tags?.map((t: any) => typeof t === 'string' ? t : t.name).join(', ') || '';
+  
+  // ✅ Keywords: Priorizar focusKeyphrase + seo.keywords, fallback a tags
+  const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
+    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    : post.tags?.map((t: any) => typeof t === 'string' ? t : t.name) || [];
+  const keywords = seoKeywords.join(', ');
+  
   const publishedTime = post.publishedAt || post.createdAt;
   const modifiedTime = post.updatedAt || publishedTime;
 
@@ -578,7 +585,7 @@ function generateMetaTags(post: any): string {
     <meta property="article:modified_time" content="${new Date(modifiedTime).toISOString()}" />
     <meta property="article:author" content="${authorName}" />
     ${post.category?.name ? `<meta property="article:section" content="${escapeHtml(post.category.name)}" />` : ''}
-    ${post.tags?.map((t: any) => `<meta property="article:tag" content="${escapeHtml(typeof t === 'string' ? t : t.name)}" />`).join('\n    ') || ''}
+    ${seoKeywords.map((kw: string) => `<meta property="article:tag" content="${escapeHtml(kw)}" />`).join('\n    ')}
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -614,7 +621,12 @@ function generateMetaTags(post: any): string {
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": "${postUrl}"
-      }
+      }${seoKeywords.length > 0 ? `,
+      "keywords": "${escapeHtml(keywords)}"` : ''}${post.seo?.focusKeyphrase ? `,
+      "about": {
+        "@type": "Thing",
+        "name": "${escapeHtml(post.seo.focusKeyphrase)}"
+      }` : ''}
     }
     </script>
   `;
