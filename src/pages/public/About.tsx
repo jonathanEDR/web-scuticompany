@@ -317,14 +317,17 @@ const About = () => {
     <>
       {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
       <Helmet>
-        <title>Sobre Nosotros - SCUTI Company</title>
-        <meta name="description" content="Conoce más sobre SCUTI Company, nuestra misión, visión y el equipo de expertos en tecnología dedicados a transformar empresas con software inteligente." />
-        <meta name="keywords" content="sobre nosotros, equipo, misión, visión, SCUTI, empresa de software, desarrollo tecnológico" />
+        <title>Sobre Nosotros - SCUTI Company | Empresa de Software en Perú</title>
+        <meta name="description" content="Conoce SCUTI Company: empresa líder en desarrollo de software e IA para PYMES en Perú. Nuestra misión es transformar negocios con tecnología inteligente." />
+        <meta name="keywords" content="sobre nosotros, equipo SCUTI, empresa de software Perú, desarrollo tecnológico, misión, visión, transformación digital PYMES" />
 
         {/* Open Graph */}
-        <meta property="og:title" content="Sobre Nosotros - SCUTI Company" />
-        <meta property="og:description" content="Conoce más sobre SCUTI Company y nuestro equipo de expertos en desarrollo de software" />
-        <meta property="og:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta property="og:title" content="Sobre Nosotros - SCUTI Company | Empresa de Software en Perú" />
+        <meta property="og:description" content="Conoce SCUTI Company: empresa líder en desarrollo de software e IA para PYMES en Perú. Transformamos negocios con tecnología inteligente." />
+        <meta property="og:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="SCUTI Company - Empresa de Desarrollo de Software en Perú" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://scuticompany.com/nosotros" />
         <meta property="og:site_name" content="SCUTI Company" />
@@ -332,12 +335,40 @@ const About = () => {
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Sobre Nosotros - SCUTI Company" />
-        <meta name="twitter:description" content="Conoce más sobre SCUTI Company y nuestro equipo" />
-        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta name="twitter:title" content="Sobre Nosotros - SCUTI Company | Empresa de Software en Perú" />
+        <meta name="twitter:description" content="Empresa líder en desarrollo de software e IA para PYMES en Perú" />
+        <meta name="twitter:image" content="https://scuticompany.com/logofondonegro.jpeg" />
 
         {/* Canonical */}
         <link rel="canonical" href="https://scuticompany.com/nosotros" />
+
+        {/* Schema.org - AboutPage */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            "name": "Sobre Nosotros - SCUTI Company",
+            "description": "Conoce SCUTI Company: empresa líder en desarrollo de software e IA para PYMES en Perú",
+            "url": "https://scuticompany.com/nosotros",
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "SCUTI Company",
+              "description": "Empresa de desarrollo de software a medida, inteligencia artificial y automatización para PYMES en Perú",
+              "foundingDate": "2023",
+              "foundingLocation": {
+                "@type": "Place",
+                "name": "Huánuco, Perú"
+              },
+              "slogan": "Impulsa tu PYME con Software a Medida e Inteligencia Artificial",
+              "knowsAbout": [
+                "Desarrollo de Software a Medida",
+                "Inteligencia Artificial",
+                "Automatización de Procesos",
+                "Transformación Digital"
+              ]
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className={`min-h-screen w-full overflow-x-hidden ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>

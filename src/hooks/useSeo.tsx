@@ -31,6 +31,10 @@ interface SeoData {
   ogTitle: string;
   ogDescription: string;
   ogImage?: string;
+  ogImageWidth?: string;
+  ogImageHeight?: string;
+  ogImageAlt?: string;
+  canonical?: string;
   // 🔍 Metadata para transparencia
   _source?: 'cms' | 'hardcoded' | 'fallback';
 }
@@ -270,17 +274,25 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
         <meta name="description" content={seoData.metaDescription} />
         <meta name="keywords" content={seoData.keywords.join(', ')} />
         
+        {/* Canonical URL */}
+        {seoData.canonical && <link rel="canonical" href={seoData.canonical} />}
+        
         {/* Open Graph */}
         <meta property="og:title" content={seoData.ogTitle} />
         <meta property="og:description" content={seoData.ogDescription} />
         {seoData.ogImage && <meta property="og:image" content={seoData.ogImage} />}
+        {seoData.ogImageWidth && <meta property="og:image:width" content={seoData.ogImageWidth} />}
+        {seoData.ogImageHeight && <meta property="og:image:height" content={seoData.ogImageHeight} />}
+        {seoData.ogImageAlt && <meta property="og:image:alt" content={seoData.ogImageAlt} />}
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="SCUTI Company" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={seoData.ogTitle} />
         <meta name="twitter:description" content={seoData.ogDescription} />
         {seoData.ogImage && <meta name="twitter:image" content={seoData.ogImage} />}
+        {seoData.ogImageAlt && <meta name="twitter:image:alt" content={seoData.ogImageAlt} />}
       </Helmet>
     );
   };

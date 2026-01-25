@@ -28,7 +28,11 @@ export interface PageSeoConfig {
   ogTitle: string;
   ogDescription: string;
   ogImage?: string;
+  ogImageWidth?: string;
+  ogImageHeight?: string;
+  ogImageAlt?: string;
   twitterCard?: string;
+  canonical?: string;
 }
 
 export interface SeoConfigMap {
@@ -58,14 +62,18 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
     ],
     ogTitle: 'Blog SCUTI - Innovación y Tecnología',
     ogDescription: 'Lee las últimas noticias del mundo tecnológico y mantente actualizado',
-    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
-    twitterCard: 'summary_large_image'
+    ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
+    ogImageWidth: '1200',
+    ogImageHeight: '630',
+    ogImageAlt: 'SCUTI Company - Blog de Tecnología e Innovación',
+    twitterCard: 'summary_large_image',
+    canonical: 'https://scuticompany.com/blog'
   },
 
   // 💼 PÁGINA SERVICIOS
   services: {
-    metaTitle: 'Servicios de Desarrollo Software - SCUTI Company',
-    metaDescription: 'Desarrollo de aplicaciones web y móviles, soluciones de IA, cloud computing, consultoría tecnológica y más. Servicios profesionales para empresas en crecimiento.',
+    metaTitle: 'Servicios de Desarrollo Software en Perú - SCUTI Company',
+    metaDescription: 'Desarrollo de aplicaciones web y móviles, soluciones de IA, cloud computing, consultoría tecnológica. Servicios profesionales para empresas PYMES en Perú.',
     keywords: [
       'servicios desarrollo software',
       'aplicaciones web peru',
@@ -74,18 +82,23 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
       'soluciones ia',
       'cloud computing',
       'desarrollo backend',
-      'desarrollo frontend'
+      'desarrollo frontend',
+      'empresa software huanuco'
     ],
-    ogTitle: 'Nuestros Servicios - SCUTI Company',
-    ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa',
-    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
-    twitterCard: 'summary_large_image'
+    ogTitle: 'Servicios de Desarrollo Software - SCUTI Company',
+    ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa en Perú',
+    ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
+    ogImageWidth: '1200',
+    ogImageHeight: '630',
+    ogImageAlt: 'SCUTI Company - Servicios de Desarrollo de Software',
+    twitterCard: 'summary_large_image',
+    canonical: 'https://scuticompany.com/servicios'
   },
 
   // Alias para servicios
   servicios: {
-    metaTitle: 'Servicios de Desarrollo Software - SCUTI Company',
-    metaDescription: 'Desarrollo de aplicaciones web y móviles, soluciones de IA, cloud computing, consultoría tecnológica y más. Servicios profesionales para empresas en crecimiento.',
+    metaTitle: 'Servicios de Desarrollo Software en Perú - SCUTI Company',
+    metaDescription: 'Desarrollo de aplicaciones web y móviles, soluciones de IA, cloud computing, consultoría tecnológica. Servicios profesionales para empresas PYMES en Perú.',
     keywords: [
       'servicios desarrollo software',
       'aplicaciones web peru',
@@ -94,88 +107,115 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
       'soluciones ia',
       'cloud computing',
       'desarrollo backend',
-      'desarrollo frontend'
+      'desarrollo frontend',
+      'empresa software huanuco'
     ],
-    ogTitle: 'Nuestros Servicios - SCUTI Company',
-    ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa',
-    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
-    twitterCard: 'summary_large_image'
+    ogTitle: 'Servicios de Desarrollo Software - SCUTI Company',
+    ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa en Perú',
+    ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
+    ogImageWidth: '1200',
+    ogImageHeight: '630',
+    ogImageAlt: 'SCUTI Company - Servicios de Desarrollo de Software',
+    twitterCard: 'summary_large_image',
+    canonical: 'https://scuticompany.com/servicios'
   },
 
   // 👥 PÁGINA NOSOTROS/ABOUT
   about: {
-    metaTitle: 'Sobre Nosotros - SCUTI Company | Quiénes Somos',
-    metaDescription: 'Conoce a SCUTI Company: equipo de expertos en tecnología comprometidos con la innovación. Nuestra misión es transformar negocios mediante soluciones tecnológicas de vanguardia.',
+    metaTitle: 'Sobre Nosotros - SCUTI Company | Empresa de Software en Perú',
+    metaDescription: 'Conoce a SCUTI Company: equipo de expertos en tecnología en Huánuco, Perú. Transformamos negocios PYMES con soluciones tecnológicas innovadoras.',
     keywords: [
       'scuti company',
       'empresa tecnologia peru',
-      'equipo desarrollo',
+      'equipo desarrollo huanuco',
       'nosotros scuti',
       'vision mision',
       'valores empresa',
       'historia scuti',
-      'equipo tech'
+      'equipo tech peru',
+      'transformacion digital pymes'
     ],
-    ogTitle: 'Sobre SCUTI Company - Nuestro Equipo y Visión',
-    ogDescription: 'Conoce quiénes somos, qué nos motiva y cómo transformamos negocios',
-    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
-    twitterCard: 'summary_large_image'
+    ogTitle: 'Sobre Nosotros - SCUTI Company | Empresa de Software en Perú',
+    ogDescription: 'Conoce quiénes somos, nuestra visión y cómo transformamos negocios en Perú',
+    ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
+    ogImageWidth: '1200',
+    ogImageHeight: '630',
+    ogImageAlt: 'SCUTI Company - Empresa de Desarrollo de Software en Perú',
+    twitterCard: 'summary_large_image',
+    canonical: 'https://scuticompany.com/nosotros'
   },
 
   // Alias para nosotros
   nosotros: {
-    metaTitle: 'Sobre Nosotros - SCUTI Company | Quiénes Somos',
-    metaDescription: 'Conoce a SCUTI Company: equipo de expertos en tecnología comprometidos con la innovación. Nuestra misión es transformar negocios mediante soluciones tecnológicas de vanguardia.',
+    metaTitle: 'Sobre Nosotros - SCUTI Company | Empresa de Software en Perú',
+    metaDescription: 'Conoce a SCUTI Company: equipo de expertos en tecnología en Huánuco, Perú. Transformamos negocios PYMES con soluciones tecnológicas innovadoras.',
     keywords: [
       'scuti company',
       'empresa tecnologia peru',
-      'equipo desarrollo',
+      'equipo desarrollo huanuco',
       'nosotros scuti',
       'vision mision',
       'valores empresa',
       'historia scuti',
-      'equipo tech'
+      'equipo tech peru',
+      'transformacion digital pymes'
     ],
-    ogTitle: 'Sobre SCUTI Company - Nuestro Equipo y Visión',
-    ogDescription: 'Conoce quiénes somos, qué nos motiva y cómo transformamos negocios',
-    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
-    twitterCard: 'summary_large_image'
+    ogTitle: 'Sobre Nosotros - SCUTI Company | Empresa de Software en Perú',
+    ogDescription: 'Conoce quiénes somos, nuestra visión y cómo transformamos negocios en Perú',
+    ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
+    ogImageWidth: '1200',
+    ogImageHeight: '630',
+    ogImageAlt: 'SCUTI Company - Empresa de Desarrollo de Software en Perú',
+    twitterCard: 'summary_large_image',
+    canonical: 'https://scuticompany.com/nosotros'
   },
 
   // 📞 PÁGINA CONTACTO
   contact: {
-    metaTitle: 'Contacto - SCUTI Company | Hablemos de tu Proyecto',
-    metaDescription: 'Ponte en contacto con SCUTI Company. Agenda una consulta gratuita y descubre cómo podemos ayudarte a alcanzar tus objetivos tecnológicos.',
+    metaTitle: 'Contacto - SCUTI Company | Agenda tu Consulta Gratuita',
+    metaDescription: 'Contáctanos para tu proyecto tecnológico. Desarrollo web, apps móviles y soluciones digitales en Huánuco, Perú. Agenda una consulta gratuita.',
     keywords: [
       'contacto scuti',
-      'consultoria tecnologica',
+      'consultoria tecnologica peru',
       'agenda reunion',
-      'contacto empresa tech',
+      'contacto empresa tech huanuco',
       'solicitar servicio',
-      'presupuesto desarrollo'
+      'presupuesto desarrollo',
+      'desarrollo web peru',
+      'apps moviles peru'
     ],
-    ogTitle: 'Contáctanos - SCUTI Company',
-    ogDescription: 'Agenda una consulta gratuita y llevemos tu proyecto al siguiente nivel',
-    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
-    twitterCard: 'summary_large_image'
+    ogTitle: 'Contacto - SCUTI Company | Hablemos de tu Proyecto',
+    ogDescription: 'Agenda una consulta gratuita y llevemos tu proyecto tecnológico al siguiente nivel',
+    ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
+    ogImageWidth: '1200',
+    ogImageHeight: '630',
+    ogImageAlt: 'SCUTI Company - Contáctanos para tu Proyecto',
+    twitterCard: 'summary_large_image',
+    canonical: 'https://scuticompany.com/contacto'
   },
 
   // Alias para contacto
   contacto: {
-    metaTitle: 'Contacto - SCUTI Company | Hablemos de tu Proyecto',
-    metaDescription: 'Ponte en contacto con SCUTI Company. Agenda una consulta gratuita y descubre cómo podemos ayudarte a alcanzar tus objetivos tecnológicos.',
+    metaTitle: 'Contacto - SCUTI Company | Agenda tu Consulta Gratuita',
+    metaDescription: 'Contáctanos para tu proyecto tecnológico. Desarrollo web, apps móviles y soluciones digitales en Huánuco, Perú. Agenda una consulta gratuita.',
     keywords: [
       'contacto scuti',
-      'consultoria tecnologica',
+      'consultoria tecnologica peru',
       'agenda reunion',
-      'contacto empresa tech',
+      'contacto empresa tech huanuco',
       'solicitar servicio',
-      'presupuesto desarrollo'
+      'presupuesto desarrollo',
+      'desarrollo web peru',
+      'apps moviles peru'
     ],
-    ogTitle: 'Contáctanos - SCUTI Company',
-    ogDescription: 'Agenda una consulta gratuita y llevemos tu proyecto al siguiente nivel',
-    ogImage: '/Logo.png', // TODO: Crear imagen OG optimizada 1200x630px
-    twitterCard: 'summary_large_image'
+    ogTitle: 'Contacto - SCUTI Company | Hablemos de tu Proyecto',
+    ogDescription: 'Agenda una consulta gratuita y llevemos tu proyecto tecnológico al siguiente nivel',
+    ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
+    ogImageWidth: '1200',
+    ogImageHeight: '630',
+    ogImageAlt: 'SCUTI Company - Contáctanos para tu Proyecto',
+    twitterCard: 'summary_large_image',
+    canonical: 'https://scuticompany.com/contacto'
   }
 };
 

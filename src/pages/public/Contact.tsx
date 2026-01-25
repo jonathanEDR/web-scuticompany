@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import ContactSection from '../../components/public/ContactSection';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
@@ -191,6 +192,40 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 animate-fade-in">
       <SeoHelmet />
+      
+      {/* Schema.org ContactPage */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ContactPage",
+            "name": "Contacto - SCUTI Company",
+            "description": "Contáctanos para tu proyecto tecnológico. Desarrollo web, apps móviles y soluciones digitales en Perú.",
+            "url": "https://scuticompany.com/contacto",
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "SCUTI Company",
+              "url": "https://scuticompany.com",
+              "logo": "https://scuticompany.com/logofondonegro.jpeg",
+              "email": "gscutic@gmail.com",
+              "telephone": "+51973397306",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Calles Los Molles Lt-02",
+                "addressLocality": "Huánuco",
+                "addressCountry": "PE"
+              },
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+51973397306",
+                "contactType": "customer service",
+                "availableLanguage": ["Spanish", "English"]
+              }
+            }
+          })}
+        </script>
+      </Helmet>
+      
       <PublicHeader />
       
       {/* Hero Section */}
