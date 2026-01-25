@@ -459,12 +459,14 @@ function generateServicioDetailMetaTags(servicio: any): string {
   const servicioUrl = `${CONFIG.siteUrl}/servicios/${servicio.slug}`;
   const imageUrl = getServicioImageUrl(servicio);
   
-  // Keywords del servicio
-  const keywords = [
-    ...(servicio.etiquetas || []),
-    servicio.categoria?.nombre || '',
-    servicio.seo?.palabrasClave || ''
-  ].filter(Boolean).join(', ');
+  // ✅ Keywords del servicio - Priorizar seo.palabrasClave configuradas
+  const keywords = servicio.seo?.palabrasClave 
+    ? servicio.seo.palabrasClave  // Si hay SEO configurado, usarlo directamente
+    : [
+        ...(servicio.etiquetas || []),
+        servicio.categoria?.nombre || '',
+        servicio.titulo || ''
+      ].filter(Boolean).join(', ');
 
   // Información de precio
   let priceInfo = '';
