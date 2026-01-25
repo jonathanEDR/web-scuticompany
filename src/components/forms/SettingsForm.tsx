@@ -212,7 +212,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
               </button>
             </div>
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-              💡 El botón genera automáticamente: Título SEO + Descripción + Palabras Clave
+              💡 El botón genera automáticamente: Título SEO + Descripción + Palabra Clave Principal + Palabras Clave Secundarias
             </p>
 
             {/* Vista Previa SEO en Tiempo Real */}
@@ -225,6 +225,65 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             </div>
 
             <div className="space-y-4">
+              {/* 🆕 Palabra Clave Principal (Focus Keyword) - CRÍTICO PARA SEO */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+                <label className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-2">
+                  🎯 Palabra Clave Principal (Focus Keyword)
+                  <span className="text-xs text-purple-600 dark:text-purple-400 ml-2">* Más importante para SEO</span>
+                </label>
+
+                <input
+                  type="text"
+                  {...register('seo.palabraClavePrincipal')}
+                  placeholder="ej: desarrollo web profesional"
+                  maxLength={100}
+                  className="w-full bg-white dark:bg-gray-800 border-2 border-purple-300 dark:border-purple-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                />
+                <div className="mt-2 text-xs text-purple-600 dark:text-purple-400">
+                  <p className="font-medium mb-1">💡 Tips para elegir tu palabra clave principal:</p>
+                  <ul className="list-disc list-inside space-y-0.5 text-purple-500 dark:text-purple-400">
+                    <li>Usa 2-4 palabras que describan tu servicio</li>
+                    <li>Piensa en qué buscaría tu cliente ideal en Google</li>
+                    <li>Debe aparecer en el título y descripción SEO</li>
+                  </ul>
+                </div>
+                {/* Análisis de la palabra clave */}
+                {watch('seo.palabraClavePrincipal') && (
+                  <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-purple-200 dark:border-purple-700">
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">📊 Análisis de palabra clave:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        watch('seo.titulo')?.toLowerCase().includes(watch('seo.palabraClavePrincipal')?.toLowerCase() || '')
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      }`}>
+                        {watch('seo.titulo')?.toLowerCase().includes(watch('seo.palabraClavePrincipal')?.toLowerCase() || '')
+                          ? '✓ En título SEO'
+                          : '✗ No está en título SEO'}
+                      </span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        watch('seo.descripcion')?.toLowerCase().includes(watch('seo.palabraClavePrincipal')?.toLowerCase() || '')
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                      }`}>
+                        {watch('seo.descripcion')?.toLowerCase().includes(watch('seo.palabraClavePrincipal')?.toLowerCase() || '')
+                          ? '✓ En descripción'
+                          : '⚠ No está en descripción'}
+                      </span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        watch('titulo')?.toLowerCase().includes(watch('seo.palabraClavePrincipal')?.toLowerCase() || '')
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                      }`}>
+                        {watch('titulo')?.toLowerCase().includes(watch('seo.palabraClavePrincipal')?.toLowerCase() || '')
+                          ? '✓ En título del servicio'
+                          : '⚠ No está en título'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Título SEO - Usando register() igual que AdvancedContentForm */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -283,19 +342,20 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                 </p>
               </div>
 
-              {/* Palabras Clave - Usando register() igual que AdvancedContentForm */}
+              {/* Palabras Clave Secundarias - Usando register() igual que AdvancedContentForm */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Palabras Clave
+                  🏷️ Palabras Clave Secundarias
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">Términos relacionados adicionales</span>
                 </label>
                 <input
                   type="text"
                   {...register('seo.palabrasClave')}
-                  placeholder="desarrollo web, diseño, programación"
+                  placeholder="diseño web, programación, desarrollo software, aplicaciones"
                   className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                  Separar con comas
+                  💡 Separar con comas. Estas complementan tu palabra clave principal.
                 </p>
               </div>
             </div>

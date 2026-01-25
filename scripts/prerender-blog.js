@@ -205,9 +205,9 @@ function generateArticleSchema(post) {
   const imageUrl = getImageUrl(post.featuredImage);
   const postUrl = `${CONFIG.siteUrl}/blog/${post.slug}`;
   
-  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), fallback a tags
+  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), eliminar duplicados
   const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
-    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    ? [...new Set([post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean))]
     : post.tags?.map(t => typeof t === 'string' ? t : t.name) || [];
   const keywords = seoKeywords.join(', ');
 
@@ -300,9 +300,9 @@ function generateVisibleContent(post) {
   // Extraer primeros párrafos del contenido (visible para SEO)
   const contentPreview = stripHtml(post.content).substring(0, 1000);
 
-  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), fallback a tags
+  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), eliminar duplicados
   const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
-    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    ? [...new Set([post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean))]
     : post.tags?.map(t => typeof t === 'string' ? t : t.name) || [];
   const keywordsText = seoKeywords.join(', ');
   
@@ -440,9 +440,9 @@ function generatePostHtml(indexHtml, post) {
   const description = escapeHtml(post.seo?.metaDescription || post.excerpt || truncate(stripHtml(post.content), 160));
   // ✅ CORREGIDO: Usar SEO title
   const title = escapeHtml(post.seo?.metaTitle || post.title);
-  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), fallback a tags
+  // ✅ CORREGIDO: Usar SEO keywords (focusKeyphrase + seo.keywords), eliminar duplicados
   const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
-    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    ? [...new Set([post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean))]
     : post.tags?.map(t => typeof t === 'string' ? t : t.name) || [];
   const keywords = seoKeywords.join(', ');
 

@@ -142,6 +142,7 @@ export const ServicioFormV3: React.FC = () => {
       seo: {
         titulo: '',
         descripcion: '',
+        palabraClavePrincipal: '',
         palabrasClave: ''
       },
       tiempoEntrega: '',
@@ -328,12 +329,16 @@ export const ServicioFormV3: React.FC = () => {
           seo: {
             titulo: (servicio.seo?.titulo && servicio.seo.titulo.trim()) || servicio.metaTitle || '',
             descripcion: (servicio.seo?.descripcion && servicio.seo.descripcion.trim()) || servicio.metaDescription || '',
+            palabraClavePrincipal: (servicio.seo?.palabraClavePrincipal && servicio.seo.palabraClavePrincipal.trim()) || '',
             palabrasClave: (servicio.seo?.palabrasClave && servicio.seo.palabrasClave.trim()) || ''
           },
           tiempoEntrega: servicio.tiempoEntrega || '',
           garantia: servicio.garantia || '',
           soporte: servicio.soporte || 'basico',
         });
+        
+        // 🔍 DEBUG: Ver qué SEO viene del servidor
+        console.log('[loadServicio] servicio.seo desde servidor:', servicio.seo);
       
         // ✅ CARGAR BLOQUES usando el hook centralizado
         loadBlocksFromService(servicio);
@@ -922,6 +927,9 @@ export const ServicioFormV3: React.FC = () => {
       if (response.success && response.data?.content) {
         let seoContent;
         
+        console.log('[handleGenerateSEO] Response.data.content:', response.data.content);
+        console.log('[handleGenerateSEO] Type:', typeof response.data.content);
+        
         // Verificar si la respuesta es un objeto JSON estructurado
         if (typeof response.data.content === 'object' && response.data.content.titulo) {
           seoContent = response.data.content;
@@ -934,26 +942,46 @@ export const ServicioFormV3: React.FC = () => {
             
             // Fallback: usar el contenido como descripción
             const fallbackContent = response.data.content;
+            const tituloServicio = watch('titulo') || '';
             seoContent = {
-              titulo: prepareSEOContent(watch('titulo') || '', 'title'),
+              titulo: prepareSEOContent(tituloServicio, 'title'),
               descripcion: prepareSEOContent(fallbackContent, 'description'),
-              palabrasClave: ['consultoría', 'servicios', 'profesional']
+              palabrasClave: ['consultoría', 'servicios', 'profesional'],
+              // 🆕 Generar palabra clave principal desde el título
+              palabraClavePrincipal: tituloServicio.toLowerCase().replace(/[^a-záéíóúñü\s]/g, '').trim().split(' ').slice(0, 3).join(' ')
             };
           }
         }
+        
+        console.log('[handleGenerateSEO] seoContent parsed:', seoContent);
+        console.log('[handleGenerateSEO] palabraClavePrincipal:', seoContent.palabraClavePrincipal);
 
         // Aplicar contenido SEO a los campos
         if (seoContent.titulo) {
-          setValue('seo.titulo', prepareSEOContent(seoContent.titulo, 'title'));
+          setValue('seo.titulo', prepareSEOContent(seoContent.titulo, 'title'), { shouldDirty: true, shouldTouch: true });
         }
         if (seoContent.descripcion) {
-          setValue('seo.descripcion', prepareSEOContent(seoContent.descripcion, 'description'));
+          setValue('seo.descripcion', prepareSEOContent(seoContent.descripcion, 'description'), { shouldDirty: true, shouldTouch: true });
         }
         if (seoContent.palabrasClave) {
           const keywords = Array.isArray(seoContent.palabrasClave) 
             ? seoContent.palabrasClave.join(', ')
             : seoContent.palabrasClave;
-          setValue('seo.palabrasClave', keywords);
+          setValue('seo.palabrasClave', keywords, { shouldDirty: true, shouldTouch: true });
+        }
+        // 🆕 Aplicar palabra clave principal
+        if (seoContent.palabraClavePrincipal) {
+          setValue('seo.palabraClavePrincipal', seoContent.palabraClavePrincipal.toLowerCase().trim(), { shouldDirty: true, shouldTouch: true });
+          console.log('[handleGenerateSEO] ✅ palabraClavePrincipal aplicada:', seoContent.palabraClavePrincipal);
+        } else {
+          console.warn('[handleGenerateSEO] ⚠️ palabraClavePrincipal no vino en la respuesta');
+          // 🆕 Fallback: generar desde título si no viene en la respuesta
+          const tituloServicio = watch('titulo') || '';
+          const fallbackKeyword = tituloServicio.toLowerCase().replace(/[^a-záéíóúñü\s]/g, '').trim().split(' ').slice(0, 3).join(' ');
+          if (fallbackKeyword) {
+            setValue('seo.palabraClavePrincipal', fallbackKeyword, { shouldDirty: true, shouldTouch: true });
+            console.log('[handleGenerateSEO] ✅ palabraClavePrincipal generada desde título:', fallbackKeyword);
+          }
         }
 
         success('Éxito', '✨ Contenido SEO profesional generado y aplicado automáticamente');
@@ -1018,9 +1046,14 @@ export const ServicioFormV3: React.FC = () => {
         seo: {
           titulo: formData.seo?.titulo || '',
           descripcion: formData.seo?.descripcion || '',
+          palabraClavePrincipal: formData.seo?.palabraClavePrincipal || '',
           palabrasClave: formData.seo?.palabrasClave || ''
         }
       };
+      
+      // 🔍 DEBUG: Ver qué SEO se está enviando
+      console.log('[onSubmit] formData.seo:', formData.seo);
+      console.log('[onSubmit] processedData.seo:', processedData.seo);
 
       if (isEditMode && id) {
         await serviciosApi.update(id, processedData);

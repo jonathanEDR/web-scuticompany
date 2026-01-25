@@ -85,6 +85,7 @@ export interface Servicio {
   seo?: {
     titulo: string;
     descripcion: string;
+    palabraClavePrincipal: string; // Focus Keyword - palabra clave principal
     palabrasClave: string;
   };
   
@@ -376,8 +377,18 @@ export interface CreateServicioRequest {
   visibleEnWeb?: boolean;
   requiereContacto?: boolean;
   departamento?: string;
+  
+  // SEO - Usar objeto seo preferentemente
+  /** @deprecated Usar seo.titulo */
   metaTitle?: string;
+  /** @deprecated Usar seo.descripcion */
   metaDescription?: string;
+  seo?: {
+    titulo?: string;
+    descripcion?: string;
+    palabraClavePrincipal?: string;
+    palabrasClave?: string;
+  };
   
   // Contenido Avanzado
   descripcionRica?: string;

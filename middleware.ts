@@ -552,9 +552,9 @@ function generateMetaTags(post: any): string {
   const postUrl = `${CONFIG.siteUrl}/blog/${post.slug}`;
   const authorName = escapeHtml(getAuthorName(post.author));
   
-  // ✅ Keywords: Priorizar focusKeyphrase + seo.keywords, fallback a tags
+  // ✅ Keywords: Priorizar focusKeyphrase + seo.keywords, eliminar duplicados
   const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
-    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    ? [...new Set([post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean))]
     : post.tags?.map((t: any) => typeof t === 'string' ? t : t.name) || [];
   const keywords = seoKeywords.join(', ');
   
@@ -645,9 +645,9 @@ function generateVisibleArticleContent(post: any): string {
   const categoryName = escapeHtml(post.category?.name || 'Blog');
   const postUrl = `${CONFIG.siteUrl}/blog/${post.slug}`;
   
-  // Keywords para mostrar
+  // Keywords para mostrar - eliminar duplicados
   const seoKeywords = post.seo?.focusKeyphrase || post.seo?.keywords?.length
-    ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean)
+    ? [...new Set([post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean))]
     : post.tags?.map((t: any) => typeof t === 'string' ? t : t.name) || [];
   const keywords = escapeHtml(seoKeywords.join(', '));
   

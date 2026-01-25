@@ -443,13 +443,30 @@ class ServicesAgentService {
       // 🔄 REDIRIGIR al método optimizado
       const result = await this.generateCompleteContent(serviceId, style, true);
       
-      if (result.success && result.data.generatedContent && result.data.generatedContent[contentType]) {
+      // 🆕 Para SEO, verificar el campo directamente
+      let content = result.data?.generatedContent?.[contentType];
+      
+      // 🔧 FIX: Si es SEO y no tiene palabraClavePrincipal, generarla desde el título
+      if (contentType === 'seo' && content && !content.palabraClavePrincipal) {
+        const titulo = result.data?.service?.titulo || content?.titulo || '';
+        content.palabraClavePrincipal = titulo
+          .toLowerCase()
+          .replace(/[^a-záéíóúñü\s]/g, '')
+          .trim()
+          .split(/\s+/)
+          .filter((word: string) => word.length > 2)
+          .slice(0, 3)
+          .join(' ');
+        console.log(`🔧 [generateContent] palabraClavePrincipal auto-generated: "${content.palabraClavePrincipal}"`);
+      }
+      
+      if (result.success && content) {
         // Simular la estructura del método viejo para compatibilidad
         return {
           success: true,
           data: {
             type: contentType,
-            content: result.data.generatedContent[contentType],
+            content: content,
             service: result.data.service,
             redirectedFromDeprecated: true
           }

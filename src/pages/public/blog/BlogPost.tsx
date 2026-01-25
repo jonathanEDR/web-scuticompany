@@ -154,13 +154,13 @@ const BlogPostEnhanced: React.FC = () => {
         <title>{post.seo?.metaTitle || post.title} | SCUTI Company Blog</title>
         <meta name="description" content={post.seo?.metaDescription || post.excerpt} />
         
-        {/* ✅ Keywords: Priorizar focusKeyphrase + seo.keywords, fallback a tags */}
+        {/* ✅ Keywords: Priorizar focusKeyphrase + seo.keywords, eliminar duplicados */}
         <meta name="keywords" content={
           post.seo?.focusKeyphrase || post.seo?.keywords?.length 
-            ? [
+            ? [...new Set([
                 post.seo?.focusKeyphrase, 
                 ...(post.seo?.keywords || [])
-              ].filter(Boolean).join(', ')
+              ].filter(Boolean))].join(', ')
             : post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ')
         } />
         
@@ -175,7 +175,7 @@ const BlogPostEnhanced: React.FC = () => {
         } />
         <meta name="ai:keywords" content={
           post.seo?.focusKeyphrase || post.seo?.keywords?.length 
-            ? [post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean).join(', ')
+            ? [...new Set([post.seo?.focusKeyphrase, ...(post.seo?.keywords || [])].filter(Boolean))].join(', ')
             : post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name).join(', ') || ''
         } />
         <meta name="ai:summary" content={post.seo?.metaDescription || post.excerpt} />
@@ -210,7 +210,12 @@ const BlogPostEnhanced: React.FC = () => {
         {/* Para GPT y otros crawlers */}
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
-        <link rel="canonical" content={`https://scuticompany.com/blog/${post.slug}`} />
+        
+        {/* ✅ CORREGIDO: canonical usa href, no content */}
+        <link rel="canonical" href={`https://scuticompany.com/blog/${post.slug}`} />
+        
+        {/* ✅ AÑADIDO: og:url obligatorio para SEO */}
+        <meta property="og:url" content={`https://scuticompany.com/blog/${post.slug}`} />
       </Helmet>
       
       {/* ✅ Schema.org - Datos estructurados para Google Rich Results */}
