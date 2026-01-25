@@ -236,8 +236,8 @@ const ServicesPublicV2 = () => {
         <meta property="og:title" content={`Servicios de Desarrollo de Software${config.seo.titleSuffix}`} />
         <meta property="og:description" content={`Consultoría IT, desarrollo web/móvil e Inteligencia Artificial para impulsar tu negocio. Soluciones tecnológicas a medida en ${config.country}.`} />
         <meta property="og:image" content={getImageUrl(config.images.ogServices)} />
-        <meta property="og:image:width" content="800" />
-        <meta property="og:image:height" content="800" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={`${config.siteName} - Servicios de desarrollo de software y consultoría IT`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={getFullUrl('/servicios')} />
@@ -253,6 +253,37 @@ const ServicesPublicV2 = () => {
 
         {/* Canonical */}
         <link rel="canonical" href={getFullUrl('/servicios')} />
+
+        {/* Schema.org - Service Catalog */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Servicios de Desarrollo de Software - SCUTI Company",
+            "description": "Catálogo de servicios de desarrollo de software, consultoría IT e inteligencia artificial para empresas PYMES en Perú",
+            "url": "https://scuticompany.com/servicios",
+            "numberOfItems": servicios?.length || 24,
+            "itemListElement": servicios?.slice(0, 10).map((servicio: Servicio, index: number) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Service",
+                "name": servicio.titulo,
+                "description": servicio.descripcionCorta || servicio.descripcion?.substring(0, 160),
+                "url": `https://scuticompany.com/servicios/${servicio.slug}`,
+                "provider": {
+                  "@type": "Organization",
+                  "name": "SCUTI Company",
+                  "url": "https://scuticompany.com"
+                },
+                "areaServed": {
+                  "@type": "Country",
+                  "name": "Perú"
+                }
+              }
+            })) || []
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">

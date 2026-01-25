@@ -175,7 +175,10 @@ const BlogHome: React.FC = () => {
         {/* Open Graph */}
         <meta property="og:title" content="Blog SCUTI Company - Noticias Tecnológicas" />
         <meta property="og:description" content="Las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos." />
-        <meta property="og:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta property="og:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="SCUTI Company - Blog de Tecnología e Innovación" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://scuticompany.com/blog" />
         <meta property="og:site_name" content="SCUTI Company" />
@@ -185,7 +188,8 @@ const BlogHome: React.FC = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Blog SCUTI Company - Noticias Tecnológicas" />
         <meta name="twitter:description" content="Las últimas noticias y tendencias del sector tecnológico" />
-        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta name="twitter:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta name="twitter:image:alt" content="SCUTI Company - Blog de Tecnología e Innovación" />
 
         {/* Canonical */}
         <link rel="canonical" href="https://scuticompany.com/blog" />

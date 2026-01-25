@@ -21,7 +21,10 @@ const TermsOfService = () => {
         {/* Open Graph */}
         <meta property="og:title" content="Terminos y Condiciones - SCUTI Company" />
         <meta property="og:description" content="Lee nuestros terminos y condiciones de uso de servicios" />
-        <meta property="og:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta property="og:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="SCUTI Company - Términos y Condiciones" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://scuticompany.com/terminos" />
         <meta property="og:site_name" content="SCUTI Company" />
@@ -31,7 +34,8 @@ const TermsOfService = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Terminos y Condiciones - SCUTI Company" />
         <meta name="twitter:description" content="Lee nuestros terminos y condiciones" />
-        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.png" />
+        <meta name="twitter:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta name="twitter:image:alt" content="SCUTI Company - Términos y Condiciones" />
 
         {/* Canonical */}
         <link rel="canonical" href="https://scuticompany.com/terminos" />
