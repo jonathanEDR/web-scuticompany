@@ -289,6 +289,35 @@ const HomeOptimized = () => {
     }
   };
 
+  // ✅ Validar que la imagen OG sea una URL directa de imagen (no URLs de Facebook/redes sociales)
+  const isValidOgImage = (url: string | undefined): boolean => {
+    if (!url) return false;
+    // Rechazar URLs de Facebook, Instagram, Twitter que no son imágenes directas
+    const invalidPatterns = [
+      'facebook.com/photo',
+      'facebook.com/profile',
+      'instagram.com/p/',
+      'twitter.com/',
+      'x.com/'
+    ];
+    return !invalidPatterns.some(pattern => url.includes(pattern));
+  };
+
+  // Obtener la imagen OG válida (prioriza CMS, pero valida que sea URL de imagen directa)
+  const getValidOgImage = (): string => {
+    const cmsImage = pageData.seo?.ogImage;
+    if (cmsImage && isValidOgImage(cmsImage)) {
+      // Si es una ruta relativa, convertir a absoluta
+      if (cmsImage.startsWith('/')) {
+        return `https://scuticompany.com${cmsImage}`;
+      }
+      return cmsImage;
+    }
+    return DEFAULT_SEO_CONFIG.ogImage;
+  };
+
+  const ogImage = getValidOgImage();
+
   return (
     <>
       {/* ✅ SEO Manual desde pageData (sin hook duplicado) */}
@@ -300,7 +329,10 @@ const HomeOptimized = () => {
         {/* Open Graph */}
         <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.ogTitle} />
         <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.ogDescription} />
-        {(pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage) && <meta property="og:image" content={pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage} />}
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="SCUTI Company - Desarrollo de Software e IA para PYMES" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://scuticompany.com/" />
         <meta property="og:site_name" content="SCUTI Company" />
@@ -310,7 +342,7 @@ const HomeOptimized = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.ogTitle} />
         <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.ogDescription} />
-        {(pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage) && <meta name="twitter:image" content={pageData.seo?.ogImage || DEFAULT_SEO_CONFIG.ogImage} />}
+        <meta name="twitter:image" content={ogImage} />
         
         {/* Canonical */}
         <link rel="canonical" href="https://scuticompany.com/" />

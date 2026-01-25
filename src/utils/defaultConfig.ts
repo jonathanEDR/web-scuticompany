@@ -975,7 +975,7 @@ export const DEFAULT_SEO_CONFIG = {
   ],
   ogTitle: 'Desarrollo de Software e IA para PYMES | SCUTI Company Perú',
   ogDescription: 'Transformamos procesos con soluciones digitales innovadoras | La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido',
-  ogImage: '/FAVICON.png', // ⚠️ Imagen por defecto - Configurar imagen OG 1200x630px desde CMS
+  ogImage: 'https://scuticompany.com/logofondonegro.jpeg', // ✅ URL absoluta de imagen para OG (ideal 1200x630px)
   twitterCard: 'summary_large_image'
 };
 

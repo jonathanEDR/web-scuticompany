@@ -91,41 +91,99 @@ export const WebsiteSchema = () => {
 };
 
 // ====================================
-// SCHEMA: LOCAL BUSINESS (Empresa)
+// SCHEMA: LOCAL BUSINESS (Empresa de Software)
 // ====================================
 export const LocalBusinessSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
+    "@id": "https://scuticompany.com/#organization",
     "name": "SCUTI Company",
-    "image": "https://scuticompany.com/favicon-512x512.png",
+    "alternateName": ["Scuti", "SCUTI Software", "SCUTI IA"],
+    "image": "https://scuticompany.com/logofondonegro.jpeg",
     "url": "https://scuticompany.com",
     "telephone": "+51-973 397 306",
     "email": "gscutic@gmail.com",
+    "description": "Empresa de desarrollo de software a medida, inteligencia artificial y automatización de procesos para PYMES en Perú. Especialistas en ERP, CRM y soluciones tecnológicas personalizadas.",
+    "slogan": "Impulsa tu PYME con Software a Medida e Inteligencia Artificial",
+    "knowsAbout": [
+      "Desarrollo de Software a Medida",
+      "Inteligencia Artificial",
+      "Automatización de Procesos",
+      "Sistemas ERP para PYMES",
+      "CRM Personalizado",
+      "Transformación Digital",
+      "Machine Learning",
+      "Chatbots Inteligentes"
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Servicios de Desarrollo de Software",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Desarrollo de Software a Medida",
+            "description": "Sistemas ERP y CRM personalizados para PYMES"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Soluciones de Inteligencia Artificial",
+            "description": "Análisis predictivo, chatbots y automatización con IA"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Consultoría de Transformación Digital",
+            "description": "Estrategia tecnológica para el crecimiento empresarial"
+          }
+        }
+      ]
+    },
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "PE",
-      "addressLocality": "Lima",
-      "addressRegion": "Lima"
+      "addressLocality": "Huánuco",
+      "addressRegion": "Huánuco"
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": -12.0464,
-      "longitude": -77.0428
+      "latitude": -9.9306,
+      "longitude": -76.2422
     },
+    "areaServed": [
+      {
+        "@type": "Country",
+        "name": "Perú"
+      },
+      {
+        "@type": "AdministrativeArea",
+        "name": "Latinoamérica"
+      }
+    ],
     "priceRange": "$$",
+    "currenciesAccepted": "PEN, USD",
+    "paymentAccepted": "Transferencia Bancaria, PayPal, Tarjeta de Crédito",
     "openingHoursSpecification": [
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
         "opens": "09:00",
-        "closes": "18:00"
+        "closes": "19:00"
       }
     ],
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "reviewCount": "47"
+      "reviewCount": "47",
+      "bestRating": "5",
+      "worstRating": "1"
     }
   };
 
