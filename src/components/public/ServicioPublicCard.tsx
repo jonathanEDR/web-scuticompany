@@ -6,6 +6,7 @@
 
 import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
+import { SITE_CONFIG } from '../../config/siteConfig';
 import type { Servicio } from '../../types/servicios';
 
 // ============================================
@@ -126,14 +127,10 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
   const formatPrice = () => {
     if (!showPrice) return null;
     
-    // Determinar el símbolo de moneda correcto
+    // ✅ Usar configuración centralizada para símbolos de moneda
     const getCurrencySymbol = (moneda?: string): string => {
-      switch (moneda?.toUpperCase()) {
-        case 'PEN': return 'S/.';
-        case 'USD': return '$';
-        case 'EUR': return '€';
-        default: return 'S/.';
-      }
+      const code = moneda?.toUpperCase() || SITE_CONFIG.defaultCurrency;
+      return SITE_CONFIG.currencySymbols[code] || SITE_CONFIG.currencySymbols[SITE_CONFIG.defaultCurrency];
     };
     
     const symbol = getCurrencySymbol(servicio.moneda);

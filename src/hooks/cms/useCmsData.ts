@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getPageBySlug, updatePage, clearCache } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_PAGE_CONFIG } from '../../utils/defaultConfig';
+import { SITE_CONFIG } from '../../config/siteConfig';
 import { cms } from '../../utils/contentManagementCache';
 import type { PageData, MessageState } from '../../types/cms';
 
@@ -63,57 +64,59 @@ export const useCmsData = (pageSlug: string = 'home') => {
           }
         };
 
-        // 🔥 NUEVO: SEO específico por página
+        // 🔥 NUEVO: SEO específico por página - ✅ Usando configuración centralizada
         const getSeoForPage = (slug: string) => {
+          const { siteName, siteDescription, images, seo } = SITE_CONFIG;
+          
           switch (slug) {
             case 'home':
               return {
-                metaTitle: 'Scuti Company - Transformamos tu empresa con tecnología inteligente',
-                metaDescription: 'Soluciones digitales, desarrollo de software y modelos de IA personalizados para impulsar tu negocio',
-                keywords: ['tecnología', 'software', 'inteligencia artificial', 'transformación digital'],
-                ogTitle: 'Scuti Company - Tecnología Inteligente',
+                metaTitle: `${siteName} - Transformamos tu empresa con tecnología inteligente`,
+                metaDescription: siteDescription,
+                keywords: seo.defaultKeywords,
+                ogTitle: `${siteName} - Tecnología Inteligente`,
                 ogDescription: 'Transformamos procesos con soluciones digitales y modelos de IA personalizados',
-                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                ogImage: images.ogDefault,
                 twitterCard: 'summary_large_image'
               };
             case 'services':
               return {
-                metaTitle: 'Nuestros Servicios - SCUTI Company',
+                metaTitle: `Nuestros Servicios${seo.titleSuffix}`,
                 metaDescription: 'Consultoría IT, Proyectos Tecnológicos e Inteligencia Artificial para impulsar tu negocio',
                 keywords: ['servicios', 'consultoría', 'tecnología', 'software', 'inteligencia artificial'],
-                ogTitle: 'Servicios - SCUTI Company',
+                ogTitle: `Servicios${seo.titleSuffix}`,
                 ogDescription: 'Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa',
-                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                ogImage: images.ogServices,
                 twitterCard: 'summary_large_image'
               };
             case 'about':
               return {
-                metaTitle: 'Sobre Nosotros - SCUTI Company',
-                metaDescription: 'Conoce más sobre SCUTI Company, nuestra misión, visión y el equipo de expertos en tecnología',
-                keywords: ['sobre nosotros', 'equipo', 'misión', 'visión', 'SCUTI'],
-                ogTitle: 'Sobre Nosotros - SCUTI Company',
-                ogDescription: 'Conoce más sobre SCUTI Company y nuestro equipo',
-                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                metaTitle: `Sobre Nosotros${seo.titleSuffix}`,
+                metaDescription: `Conoce más sobre ${siteName}, nuestra misión, visión y el equipo de expertos en tecnología`,
+                keywords: ['sobre nosotros', 'equipo', 'misión', 'visión', siteName],
+                ogTitle: `Sobre Nosotros${seo.titleSuffix}`,
+                ogDescription: `Conoce más sobre ${siteName} y nuestro equipo`,
+                ogImage: images.ogDefault,
                 twitterCard: 'summary_large_image'
               };
             case 'contact':
               return {
-                metaTitle: 'Contacto - SCUTI Company',
+                metaTitle: `Contacto${seo.titleSuffix}`,
                 metaDescription: 'Contáctanos para conocer más sobre nuestras soluciones tecnológicas',
-                keywords: ['contacto', 'SCUTI', 'consulta', 'soporte'],
-                ogTitle: 'Contacto - SCUTI Company',
+                keywords: ['contacto', siteName, 'consulta', 'soporte'],
+                ogTitle: `Contacto${seo.titleSuffix}`,
                 ogDescription: 'Ponte en contacto con nuestro equipo',
-                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                ogImage: images.ogDefault,
                 twitterCard: 'summary_large_image'
               };
             case 'blog':
               return {
-                metaTitle: 'Blog SCUTI Company - Noticias y Tendencias Tecnológicas',
+                metaTitle: `Blog ${siteName} - Noticias y Tendencias Tecnológicas`,
                 metaDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos.',
                 keywords: ['blog', 'noticias tecnológicas', 'tendencias tech', 'desarrollo web', 'programación', 'AI'],
-                ogTitle: 'Blog SCUTI Company - Noticias Tecnológicas',
+                ogTitle: `Blog ${siteName} - Noticias Tecnológicas`,
                 ogDescription: 'Las últimas noticias y tendencias del sector tecnológico',
-                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                ogImage: images.ogBlog,
                 twitterCard: 'summary_large_image'
               };
             case 'blog-post-detail':

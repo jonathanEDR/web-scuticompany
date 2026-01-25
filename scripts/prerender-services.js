@@ -38,14 +38,22 @@ console.log(`   Base URL (normalized): ${baseApiUrl}`);
 console.log(`   Full API path will be: ${baseApiUrl}/api/...`);
 console.log('═'.repeat(60));
 
-// Configuración
+// ✅ Configuración centralizada - Usar variables de entorno con fallbacks
 const CONFIG = {
   // URL de la API - normalizada sin /api al final
   apiUrl: baseApiUrl,
-  siteUrl: 'https://scuticompany.com',
-  siteName: 'SCUTI Company',
-  defaultImage: 'https://scuticompany.com/Logo.png',
-  twitterHandle: '@scuticompany'
+  siteUrl: process.env.VITE_SITE_URL || 'https://scuticompany.com',
+  siteName: process.env.VITE_SITE_NAME || 'SCUTI Company',
+  defaultImage: `${process.env.VITE_SITE_URL || 'https://scuticompany.com'}/logofondonegro.jpeg`,
+  twitterHandle: '@scuticompany',
+  locale: 'es_PE',
+  country: 'Peru',
+  defaultCurrency: 'PEN',
+  currencySymbols: {
+    PEN: 'S/.',
+    USD: '$',
+    EUR: '€'
+  }
 };
 
 /**

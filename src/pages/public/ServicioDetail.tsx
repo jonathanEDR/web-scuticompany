@@ -15,6 +15,7 @@ import ContactModal from '../../components/public/ContactModal';
 import { useServicioDetail } from '../../hooks/useServiciosCache';
 import { useCmsData } from '../../hooks/cms/useCmsData';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSiteConfig } from '../../hooks/useSiteConfig';
 import type { Servicio } from '../../types/servicios';
 
 // Helper para renderizar iconos de Lucide dinámicamente
@@ -132,6 +133,9 @@ export const ServicioDetail: React.FC = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   // Estado para el panel acordeón activo (null = todos cerrados)
   const [activePanel, setActivePanel] = useState<PanelType | null>('descripcion');
+
+  // 🆕 Configuración centralizada del sitio
+  const { config, getFullUrl, getImageUrl, getServiceSchema, getBreadcrumbSchema } = useSiteConfig();
 
   // Obtener configuración del CMS para servicio-detail
   const { pageData: cmsConfig } = useCmsData('servicio-detail');
@@ -554,89 +558,52 @@ export const ServicioDetail: React.FC = () => {
       {/* ⚠️ Solo actualiza meta tags si NO están pre-renderizados (evita duplicación) */}
       {!isPrerendered && (
         <Helmet>
-          <title>{servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`}</title>
-          <meta name="description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo} - SCUTI Company`} />
+          <title>{servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo}${config.seo.titleSuffix}`}</title>
+          <meta name="description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}${config.seo.titleSuffix}`} />
           <meta name="keywords" content={servicio.seo?.palabrasClave || servicio.etiquetas?.join(', ') || `${servicio.titulo}, servicio, desarrollo, tecnología`} />
 
-          {/* Open Graph - 🔧 Mejorado con imagen OG y dimensiones */}
-          <meta property="og:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
+          {/* Open Graph - ✅ Usando configuración centralizada */}
+          <meta property="og:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo}${config.seo.titleSuffix}`} />
           <meta property="og:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
-          <meta property="og:image" content={servicio.imagenPrincipal || servicio.imagen || 'https://scuticompany.com/logofondonegro.jpeg'} />
+          <meta property="og:image" content={servicio.imagenPrincipal || servicio.imagen || getImageUrl(config.images.ogServices)} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
-          <meta property="og:image:alt" content={`${servicio.titulo} - Servicio de SCUTI Company`} />
+          <meta property="og:image:alt" content={`${servicio.titulo} - Servicio de ${config.siteName}`} />
           <meta property="og:type" content="website" />
-          <meta property="og:url" content={`https://scuticompany.com/servicios/${servicio.slug}`} />
-          <meta property="og:site_name" content="SCUTI Company" />
-          <meta property="og:locale" content="es_PE" />
+          <meta property="og:url" content={getFullUrl(`/servicios/${servicio.slug}`)} />
+          <meta property="og:site_name" content={config.siteName} />
+          <meta property="og:locale" content={config.locale} />
 
-          {/* Twitter Card - 🔧 Mejorado */}
+          {/* Twitter Card - ✅ Usando configuración centralizada */}
           <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo} - SCUTI Company`} />
+          <meta name="twitter:title" content={servicio.seo?.titulo || servicio.metaTitle || `${servicio.titulo}${config.seo.titleSuffix}`} />
           <meta name="twitter:description" content={servicio.seo?.descripcion || servicio.metaDescription || servicio.descripcionCorta || servicio.descripcion || `Servicio de ${servicio.titulo}`} />
-          <meta name="twitter:image" content={servicio.imagenPrincipal || servicio.imagen || 'https://scuticompany.com/logofondonegro.jpeg'} />
-          <meta name="twitter:image:alt" content={`${servicio.titulo} - Servicio de SCUTI Company`} />
+          <meta name="twitter:image" content={servicio.imagenPrincipal || servicio.imagen || getImageUrl(config.images.ogServices)} />
+          <meta name="twitter:image:alt" content={`${servicio.titulo} - Servicio de ${config.siteName}`} />
 
           {/* Canonical */}
-          <link rel="canonical" href={`https://scuticompany.com/servicios/${servicio.slug}`} />
+          <link rel="canonical" href={getFullUrl(`/servicios/${servicio.slug}`)} />
           
-          {/* 🆕 Schema.org JSON-LD para Service - SEO estructurado */}
+          {/* ✅ Schema.org JSON-LD - Usando helpers centralizados */}
           <script type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Service",
-              "name": servicio.titulo,
-              "description": servicio.seo?.descripcion || servicio.descripcion,
-              "url": `https://scuticompany.com/servicios/${servicio.slug}`,
-              "image": servicio.imagenPrincipal || servicio.imagen || 'https://scuticompany.com/logofondonegro.jpeg',
-              "provider": {
-                "@type": "Organization",
-                "name": "SCUTI Company",
-                "url": "https://scuticompany.com",
-                "logo": "https://scuticompany.com/FAVICON.png"
-              },
-              ...(servicio.precio && servicio.tipoPrecio !== 'personalizado' ? {
-                "offers": {
-                  "@type": "Offer",
-                  "priceCurrency": servicio.moneda || "PEN",
-                  "price": servicio.precio,
-                  "availability": "https://schema.org/InStock"
-                }
-              } : {}),
-              "areaServed": {
-                "@type": "Country",
-                "name": "Peru"
-              },
-              "serviceType": typeof servicio.categoria === 'object' ? servicio.categoria?.nombre : servicio.categoria
-            })}
+            {JSON.stringify(getServiceSchema({
+              name: servicio.titulo,
+              description: servicio.seo?.descripcion || servicio.descripcion || '',
+              url: getFullUrl(`/servicios/${servicio.slug}`),
+              image: servicio.imagenPrincipal || servicio.imagen,
+              price: servicio.tipoPrecio !== 'personalizado' ? servicio.precio : undefined,
+              currency: servicio.moneda,
+              category: typeof servicio.categoria === 'object' ? servicio.categoria?.nombre : servicio.categoria,
+            }))}
           </script>
           
-          {/* 🆕 Schema.org BreadcrumbList */}
+          {/* ✅ Schema.org BreadcrumbList - Usando helper centralizado */}
           <script type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                {
-                  "@type": "ListItem",
-                  "position": 1,
-                  "name": "Inicio",
-                  "item": "https://scuticompany.com"
-                },
-                {
-                  "@type": "ListItem",
-                  "position": 2,
-                  "name": "Servicios",
-                  "item": "https://scuticompany.com/servicios"
-                },
-                {
-                  "@type": "ListItem",
-                  "position": 3,
-                  "name": servicio.titulo,
-                  "item": `https://scuticompany.com/servicios/${servicio.slug}`
-                }
-              ]
-            })}
+            {JSON.stringify(getBreadcrumbSchema([
+              { name: 'Inicio', url: '/' },
+              { name: 'Servicios', url: '/servicios' },
+              { name: servicio.titulo, url: `/servicios/${servicio.slug}` },
+            ]))}
           </script>
         </Helmet>
       )}

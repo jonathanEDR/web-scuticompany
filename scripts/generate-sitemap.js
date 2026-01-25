@@ -24,9 +24,11 @@ let rawApiUrl = process.env.VITE_API_URL || process.env.API_URL || 'https://web-
 // Remover /api del final si existe para evitar duplicación
 const baseApiUrl = rawApiUrl.replace(/\/api\/?$/, '');
 
+// ✅ Configuración centralizada - Usar variables de entorno con fallbacks
 const CONFIG = {
   apiUrl: baseApiUrl,
-  siteUrl: 'https://scuticompany.com'
+  siteUrl: process.env.VITE_SITE_URL || 'https://scuticompany.com',
+  siteName: process.env.VITE_SITE_NAME || 'SCUTI Company'
 };
 
 // Debug: mostrar qué URL se está usando

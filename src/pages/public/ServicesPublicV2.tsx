@@ -17,6 +17,7 @@ import { useServiciosList } from '../../hooks/useServiciosCache';
 import { useCategoriasList } from '../../hooks/useCategoriasCache';
 import { invalidateServiciosCache } from '../../utils/serviciosCache';
 import { getPageBySlug } from '../../services/cmsApi';
+import { useSiteConfig } from '../../hooks/useSiteConfig';
 import type { Servicio, ServicioFilters } from '../../types/servicios';
 
 // ============================================
@@ -27,6 +28,9 @@ const ServicesPublicV2 = () => {
   // ============================================
   // ESTADO
   // ============================================
+
+  // 🆕 Configuración centralizada del sitio
+  const { config, getFullUrl, getImageUrl } = useSiteConfig();
 
   // Obtener query params de la URL
   const [searchParams] = useSearchParams();
@@ -222,33 +226,33 @@ const ServicesPublicV2 = () => {
 
   return (
     <>
-      {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
+      {/* ✅ SEO usando configuración centralizada */}
       <Helmet>
-        <title>Nuestros Servicios - SCUTI Company</title>
+        <title>Nuestros Servicios{config.seo.titleSuffix}</title>
         <meta name="description" content="Consultoría IT, Proyectos Tecnológicos e Inteligencia Artificial para impulsar tu negocio. Soluciones de desarrollo de software a medida." />
         <meta name="keywords" content="servicios, consultoría, tecnología, software, inteligencia artificial, desarrollo web, aplicaciones móviles, soluciones digitales" />
 
-        {/* Open Graph - ✅ Imagen OG mejorada */}
-        <meta property="og:title" content="Servicios de Desarrollo de Software - SCUTI Company" />
-        <meta property="og:description" content="Consultoría IT, desarrollo web/móvil e Inteligencia Artificial para impulsar tu negocio. Soluciones tecnológicas a medida en Perú." />
-        <meta property="og:image" content="https://scuticompany.com/FAVICON.jpeg" />
+        {/* Open Graph - ✅ Usando configuración centralizada */}
+        <meta property="og:title" content={`Servicios de Desarrollo de Software${config.seo.titleSuffix}`} />
+        <meta property="og:description" content={`Consultoría IT, desarrollo web/móvil e Inteligencia Artificial para impulsar tu negocio. Soluciones tecnológicas a medida en ${config.country}.`} />
+        <meta property="og:image" content={getImageUrl(config.images.ogServices)} />
         <meta property="og:image:width" content="800" />
         <meta property="og:image:height" content="800" />
-        <meta property="og:image:alt" content="SCUTI Company - Servicios de desarrollo de software y consultoría IT" />
+        <meta property="og:image:alt" content={`${config.siteName} - Servicios de desarrollo de software y consultoría IT`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://scuticompany.com/servicios" />
-        <meta property="og:site_name" content="SCUTI Company" />
-        <meta property="og:locale" content="es_PE" />
+        <meta property="og:url" content={getFullUrl('/servicios')} />
+        <meta property="og:site_name" content={config.siteName} />
+        <meta property="og:locale" content={config.locale} />
 
-        {/* Twitter Card - ✅ Imagen mejorada */}
+        {/* Twitter Card - ✅ Usando configuración centralizada */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Servicios de Desarrollo de Software - SCUTI Company" />
+        <meta name="twitter:title" content={`Servicios de Desarrollo de Software${config.seo.titleSuffix}`} />
         <meta name="twitter:description" content="Consultoría IT, desarrollo web/móvil e Inteligencia Artificial para impulsar tu negocio." />
-        <meta name="twitter:image" content="https://scuticompany.com/FAVICON.jpeg" />
-        <meta name="twitter:image:alt" content="SCUTI Company - Servicios de desarrollo de software y consultoría IT" />
+        <meta name="twitter:image" content={getImageUrl(config.images.ogServices)} />
+        <meta name="twitter:image:alt" content={`${config.siteName} - Servicios de desarrollo de software y consultoría IT`} />
 
         {/* Canonical */}
-        <link rel="canonical" href="https://scuticompany.com/servicios" />
+        <link rel="canonical" href={getFullUrl('/servicios')} />
       </Helmet>
 
       <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
