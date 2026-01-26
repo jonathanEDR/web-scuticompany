@@ -331,28 +331,6 @@ export default function AdminDashboard() {
               </p>
             </button>
 
-            {/* Configuración */}
-            <button
-              onClick={() => navigate('/dashboard/settings')}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 group text-left w-full"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                  🔧
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Configuración
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Ajustes de la cuenta
-                  </p>
-                </div>
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Configura las preferencias de tu cuenta.
-              </p>
-            </button>
           </div>
         </div>
 

@@ -436,7 +436,7 @@ const BlogAgentTraining: React.FC = () => {
                           ...prev,
                           category: e.target.value as TrainingExample['category']
                         }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       >
                         <option value="general">General</option>
                         <option value="seo">Optimización SEO</option>
@@ -459,7 +459,7 @@ const BlogAgentTraining: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Salida Esperada (Expected Output)
                       </label>
                       <textarea
@@ -468,12 +468,12 @@ const BlogAgentTraining: React.FC = () => {
                         placeholder="Ej: He analizado el contenido sobre React. Aquí están las mejoras SEO sugeridas:
 1. Agregar keywords relacionadas...
 2. Mejorar la meta descripción..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[150px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[150px] bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Notas (Opcional)
                       </label>
                       <input
@@ -481,7 +481,7 @@ const BlogAgentTraining: React.FC = () => {
                         value={newExample.notes}
                         onChange={(e) => setNewExample(prev => ({ ...prev, notes: e.target.value }))}
                         placeholder="Contexto adicional sobre este ejemplo..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                     </div>
 
@@ -498,11 +498,11 @@ const BlogAgentTraining: React.FC = () => {
                 {/* Lista de ejemplos existentes */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       Ejemplos Guardados ({trainingConfig.examples.length})
                     </h3>
                     {trainingConfig.examples.length > 0 && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300">
                         <span className="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
                         Activo
                       </span>
@@ -510,12 +510,12 @@ const BlogAgentTraining: React.FC = () => {
                   </div>
 
                   {trainingConfig.examples.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                      <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600">No hay ejemplos de entrenamiento aún</p>
-                      <p className="text-sm text-gray-500 mt-1">Agrega ejemplos para mejorar las respuestas del agente</p>
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-xs text-blue-700">
+                    <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                      <BookOpen className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+                      <p className="text-gray-600 dark:text-gray-400">No hay ejemplos de entrenamiento aún</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Agrega ejemplos para mejorar las respuestas del agente</p>
+                      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
                           💡 <strong>Tip:</strong> Los ejemplos se crearán automáticamente cuando el sistema lo detecte necesario
                         </p>
                       </div>
@@ -538,23 +538,23 @@ const BlogAgentTraining: React.FC = () => {
 
                           <div className="space-y-3">
                             <div>
-                              <p className="text-sm font-medium text-gray-700 mb-1">📥 Input:</p>
-                              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded border border-gray-200">
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">📥 Input:</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-200 dark:border-gray-700">
                                 {example.input}
                               </p>
                             </div>
 
                             <div>
-                              <p className="text-sm font-medium text-gray-700 mb-1">📤 Output Esperado:</p>
-                              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded border border-gray-200">
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">📤 Output Esperado:</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-200 dark:border-gray-700">
                                 {example.expectedOutput}
                               </p>
                             </div>
 
                             {example.notes && (
                               <div>
-                                <p className="text-sm font-medium text-gray-700 mb-1">📝 Notas:</p>
-                                <p className="text-sm text-gray-500 italic">{example.notes}</p>
+                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">📝 Notas:</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 italic">{example.notes}</p>
                               </div>
                             )}
                           </div>
@@ -596,7 +596,7 @@ const BlogAgentTraining: React.FC = () => {
                             ...prev,
                             taskType: e.target.value
                           }))}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                         >
                           <option value="">Selecciona tipo de tarea</option>
                           <option value="seo_analysis">Análisis SEO</option>
@@ -611,7 +611,7 @@ const BlogAgentTraining: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Temperatura (Creatividad)
                         </label>
                         <div className="flex items-center space-x-3">
@@ -625,20 +625,20 @@ const BlogAgentTraining: React.FC = () => {
                               ...prev,
                               temperature: parseFloat(e.target.value)
                             }))}
-                            className="flex-1"
+                            className="flex-1 accent-indigo-600"
                           />
-                          <span className="text-sm font-medium text-gray-700 w-12">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-12">
                             {newTaskPrompt.temperature}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           0.0 = Preciso, 1.0 = Creativo
                         </p>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         System Prompt Personalizado
                       </label>
                       <textarea
@@ -648,12 +648,12 @@ const BlogAgentTraining: React.FC = () => {
                           systemPrompt: e.target.value
                         }))}
                         placeholder="Ej: Eres un especialista en SEO técnico. Tu trabajo es analizar contenido y proporcionar recomendaciones específicas para mejorar el ranking en buscadores..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[120px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[120px] bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Template de Prompt de Usuario (Opcional)
                       </label>
                       <textarea
@@ -665,9 +665,9 @@ const BlogAgentTraining: React.FC = () => {
                         placeholder="Ej: Analiza el siguiente contenido: {content}
 Enfócate en: {focus_areas}
 Proporciona: {deliverables}"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[80px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[80px] bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Usa {'{variables}'} para campos dinámicos
                       </p>
                     </div>
@@ -687,10 +687,10 @@ Proporciona: {deliverables}"
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                         Prompts Profesionales Configurados
                       </h3>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {trainingConfig.taskPrompts.length > 0 
                           ? `${trainingConfig.taskPrompts.length} prompts especializados disponibles`
                           : 'Los prompts se inicializarán automáticamente'
@@ -698,7 +698,7 @@ Proporciona: {deliverables}"
                       </p>
                     </div>
                     {trainingConfig.taskPrompts.length > 0 && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300">
                         <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
                         Activo
                       </span>
@@ -706,7 +706,7 @@ Proporciona: {deliverables}"
                   </div>
 
                   {trainingConfig.taskPrompts.length === 0 ? (
-                    <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                    <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl border border-blue-200 dark:border-blue-800">
                       <Sparkles className="w-16 h-16 text-blue-400 mx-auto mb-4" />
                       <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Sistema Preparado</h4>
                       <p className="text-gray-600 dark:text-gray-400 mb-4">Los prompts profesionales se inicializarán automáticamente cuando sea necesario</p>
@@ -742,16 +742,16 @@ Proporciona: {deliverables}"
                           'content_strategy': '📊'
                         };
                         const promptColors = {
-                          'seo_analysis': 'bg-blue-50 border-blue-200',
-                          'content_improvement': 'bg-green-50 border-green-200', 
-                          'tag_generation': 'bg-purple-50 border-purple-200',
-                          'content_strategy': 'bg-orange-50 border-orange-200'
+                          'seo_analysis': 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800',
+                          'content_improvement': 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800', 
+                          'tag_generation': 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800',
+                          'content_strategy': 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800'
                         };
                         const badgeColors = {
-                          'seo_analysis': 'bg-blue-100 text-blue-700',
-                          'content_improvement': 'bg-green-100 text-green-700', 
-                          'tag_generation': 'bg-purple-100 text-purple-700',
-                          'content_strategy': 'bg-orange-100 text-orange-700'
+                          'seo_analysis': 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300',
+                          'content_improvement': 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300', 
+                          'tag_generation': 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300',
+                          'content_strategy': 'bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300'
                         };
 
                         return (
@@ -759,7 +759,7 @@ Proporciona: {deliverables}"
                             key={index} 
                             className={`border rounded-xl transition-all duration-200 ${
                               isExpanded ? 'shadow-lg' : 'shadow-sm hover:shadow-md'
-                            } ${promptColors[taskPrompt.taskType as keyof typeof promptColors] || 'bg-gray-50 border-gray-200'}`}
+                            } ${promptColors[taskPrompt.taskType as keyof typeof promptColors] || 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'}`}
                           >
                             {/* Header colapsable */}
                             <div 
@@ -771,16 +771,16 @@ Proporciona: {deliverables}"
                                   {promptIcons[taskPrompt.taskType as keyof typeof promptIcons] || '⚙️'}
                                 </div>
                                 <div>
-                                  <h4 className="text-lg font-semibold text-gray-900 capitalize">
+                                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
                                     {taskPrompt.taskType.replace(/_/g, ' ')}
                                   </h4>
                                   <div className="flex items-center space-x-3 mt-1">
                                     <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                                      badgeColors[taskPrompt.taskType as keyof typeof badgeColors] || 'bg-gray-100 text-gray-700'
+                                      badgeColors[taskPrompt.taskType as keyof typeof badgeColors] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                                     }`}>
                                       Temp: {taskPrompt.temperature}
                                     </span>
-                                    <span className="text-sm text-gray-500">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
                                       {taskPrompt.systemPrompt.length} caracteres
                                     </span>
                                   </div>
@@ -809,13 +809,13 @@ Proporciona: {deliverables}"
 
                             {/* Contenido expandible */}
                             {isExpanded && (
-                              <div className="px-5 pb-5 border-t border-gray-200 pt-4">
+                              <div className="px-5 pb-5 border-t border-gray-200 dark:border-gray-700 pt-4">
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                   {/* System Prompt */}
                                   <div>
-                                    <h5 className="font-semibold text-gray-800 mb-3 flex items-center">
+                                    <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
                                       🎯 System Prompt
-                                      <span className="ml-2 text-xs text-gray-500 font-normal">
+                                      <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 font-normal">
                                         ({taskPrompt.systemPrompt.length} chars)
                                       </span>
                                     </h5>
@@ -829,9 +829,9 @@ Proporciona: {deliverables}"
                                   {/* User Template */}
                                   {taskPrompt.userPromptTemplate && (
                                     <div>
-                                      <h5 className="font-semibold text-gray-800 mb-3 flex items-center">
+                                      <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
                                         📝 Template de Usuario
-                                        <span className="ml-2 text-xs text-gray-500 font-normal">
+                                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 font-normal">
                                           ({taskPrompt.userPromptTemplate.length} chars)
                                         </span>
                                       </h5>
@@ -845,11 +845,11 @@ Proporciona: {deliverables}"
                                 </div>
 
                                 {/* Variables detectadas */}
-                                <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
-                                  <h6 className="font-medium text-gray-700 mb-2">� Variables Detectadas:</h6>
+                                <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                  <h6 className="font-medium text-gray-700 dark:text-gray-300 mb-2">🔧 Variables Detectadas:</h6>
                                   <div className="flex flex-wrap gap-2">
                                     {(taskPrompt.userPromptTemplate?.match(/\{[^}]+\}/g) || []).map((variable, idx) => (
-                                      <span key={idx} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200 font-mono">
+                                      <span key={idx} className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs border border-blue-200 dark:border-blue-800 font-mono">
                                         {variable}
                                       </span>
                                     ))}
@@ -880,10 +880,10 @@ Proporciona: {deliverables}"
                         temperature: 0.3,
                         examples: []
                       })}
-                      className="p-4 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="p-4 text-left bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
-                      <h4 className="font-medium text-gray-900">🔍 Análisis SEO Avanzado</h4>
-                      <p className="text-sm text-gray-600 mt-1">Especialista en optimización técnica con métricas</p>
+                      <h4 className="font-medium text-gray-900 dark:text-white">🔍 Análisis SEO Avanzado</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Especialista en optimización técnica con métricas</p>
                     </button>
 
                     <button
@@ -894,10 +894,10 @@ Proporciona: {deliverables}"
                         temperature: 0.7,
                         examples: []
                       })}
-                      className="p-4 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="p-4 text-left bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
-                      <h4 className="font-medium text-gray-900">✨ Mejora de Engagement</h4>
-                      <p className="text-sm text-gray-600 mt-1">Optimización para mayor interacción y conversión</p>
+                      <h4 className="font-medium text-gray-900 dark:text-white">✨ Mejora de Engagement</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Optimización para mayor interacción y conversión</p>
                     </button>
 
                     <button
@@ -908,10 +908,10 @@ Proporciona: {deliverables}"
                         temperature: 0.5,
                         examples: []
                       })}
-                      className="p-4 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="p-4 text-left bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
-                      <h4 className="font-medium text-gray-900">🏷️ Generación de Tags Estratégicos</h4>
-                      <p className="text-sm text-gray-600 mt-1">Tags balanceados para SEO y categorización</p>
+                      <h4 className="font-medium text-gray-900 dark:text-white">🏷️ Generación de Tags Estratégicos</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Tags balanceados para SEO y categorización</p>
                     </button>
 
                     <button
@@ -922,10 +922,10 @@ Proporciona: {deliverables}"
                         temperature: 0.8,
                         examples: []
                       })}
-                      className="p-4 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="p-4 text-left bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
-                      <h4 className="font-medium text-gray-900">📊 Estrategia de Contenido</h4>
-                      <p className="text-sm text-gray-600 mt-1">Planificación estratégica para máximo impacto</p>
+                      <h4 className="font-medium text-gray-900 dark:text-white">📊 Estrategia de Contenido</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Planificación estratégica para máximo impacto</p>
                     </button>
                   </div>
                 </div>
@@ -957,15 +957,15 @@ Proporciona: {deliverables}"
                   </div>
 
                   {trainingConfig.behaviorRules.length === 0 ? (
-                    <div className="text-center py-8 bg-gray-50 rounded-lg">
-                      <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600">No hay reglas de comportamiento definidas</p>
+                    <div className="text-center py-8 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                      <Target className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+                      <p className="text-gray-600 dark:text-gray-400">No hay reglas de comportamiento definidas</p>
                     </div>
                   ) : (
                     <ul className="space-y-2">
                       {trainingConfig.behaviorRules.map((rule, index) => (
-                        <li key={index} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
-                          <span className="text-gray-700 flex-1">{rule}</span>
+                        <li key={index} className="flex items-start justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                          <span className="text-gray-700 dark:text-gray-300 flex-1">{rule}</span>
                           <button
                             onClick={() => removeBehaviorRule(index)}
                             className="ml-4 text-red-500 hover:text-red-700 transition-colors"
@@ -979,7 +979,7 @@ Proporciona: {deliverables}"
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Instrucciones Especiales
                   </label>
                   <textarea
@@ -989,12 +989,12 @@ Proporciona: {deliverables}"
                       specialInstructions: e.target.value
                     }))}
                     placeholder="Instrucciones adicionales que el agente debe considerar siempre..."
-                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[150px]"
+                    className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[150px] bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Modo de Aprendizaje
                   </label>
                   <select
@@ -1003,13 +1003,13 @@ Proporciona: {deliverables}"
                       ...prev,
                       learningMode: e.target.value as 'conservative' | 'balanced' | 'aggressive'
                     }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   >
                     <option value="conservative">Conservador (Más predecible, menos creativo)</option>
                     <option value="balanced">Balanceado (Equilibrio entre creatividad y precisión)</option>
                     <option value="aggressive">Agresivo (Más creativo, menos predecible)</option>
                   </select>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                     {trainingConfig.learningMode === 'conservative' && 'El agente priorizará respuestas consistentes y probadas'}
                     {trainingConfig.learningMode === 'balanced' && 'El agente equilibrará creatividad con consistencia'}
                     {trainingConfig.learningMode === 'aggressive' && 'El agente explorará soluciones más creativas e innovadoras'}

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import agentConfigService, { type AgentConfigData } from '../../services/agentConfigService';
@@ -11,7 +11,6 @@ import {
   Settings, 
   Activity, 
   Cpu, 
-  Database, 
   Brain, 
   AlertTriangle,
   CheckCircle,
@@ -20,14 +19,16 @@ import {
   BarChart3,
   CheckCircle2,
   Info,
-  ChevronRight
+  ChevronRight,
+  Database
 } from 'lucide-react';
 import AgentSystemTester from '../../components/admin/AgentSystemTester';
-import BasicConfigPanel from '../../components/admin/agent-config/BasicConfigPanel';
-import PersonalityConfigPanel from '../../components/admin/agent-config/PersonalityConfigPanel';
-import ContextConfigPanel from '../../components/admin/agent-config/ContextConfigPanel';
-import ResponseConfigPanel from '../../components/admin/agent-config/ResponseConfigPanel';
 import { GerenteGeneralBasicConfig } from '../../components/admin/agent-config/GerenteGeneralBasicConfig';
+import { GerenteGeneralPersonalityConfig } from '../../components/admin/agent-config/GerenteGeneralPersonalityConfig';
+import { GerenteGeneralTrainingConfig } from '../../components/admin/agent-config/GerenteGeneralTrainingConfig';
+import { GerenteGeneralResponseConfig } from '../../components/admin/agent-config/GerenteGeneralResponseConfig';
+import { GerenteGeneralPromptConfig } from '../../components/admin/agent-config/GerenteGeneralPromptConfig';
+import { GerenteGeneralStats } from '../../components/admin/agent-config/GerenteGeneralStats';
 import { RoutingRulesPanel } from '../../components/admin/agent-config/RoutingRulesPanel';
 import { GerenteGeneralTester } from '../../components/admin/GerenteGeneralTester';
 
@@ -220,14 +221,12 @@ const AIAgentsDashboard = () => {
   
   // Estados locales (no cacheados)
   const [activeTab, setActiveTab] = useState('overview');
-  const [activeConfigTab, setActiveConfigTab] = useState('basic');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [configSaved, setConfigSaved] = useState(false);
   const [configError, setConfigError] = useState<string | null>(null);
   
-  // Estado local para ediciones de configuración (temporal hasta guardar)
-  const [editingConfig, setEditingConfig] = useState<AgentConfigData | null>(null);
+  // Estado local para ediciones de configuración de GerenteGeneral
   const [editingGerenteConfig, setEditingGerenteConfig] = useState<GerenteGeneralConfigData | null>(null);
   const [gerenteActiveConfigTab, setGerenteActiveConfigTab] = useState('basic');
 
@@ -240,25 +239,15 @@ const AIAgentsDashboard = () => {
     error: gerenteError,
     updateConfig: updateGerenteConfig,
     updateRoutingRules: updateGerenteRoutingRules,
-    refetchAll: refetchGerenteAll
+    refetchAll: refetchGerenteAll,
+    initializeConfig: initializeGerenteConfig
   } = useGerenteGeneralCache();
 
   // Estados derivados del cache
   const systemHealth = aiAgentsData?.systemHealth || null;
   const systemMetrics = aiAgentsData?.systemMetrics || null;
   const agentsConfig = aiAgentsData?.agentsConfig || null;
-  const agentConfig = aiAgentsData?.agentConfig || null;
   const error = cacheError;
-
-  // Configuración actual (editando si existe, sino del cache)
-  const currentConfig = editingConfig || agentConfig;
-
-  // Inicializar configuración de edición cuando cambie el cache
-  useEffect(() => {
-    if (agentConfig && !editingConfig) {
-      setEditingConfig({ ...agentConfig });
-    }
-  }, [agentConfig, editingConfig]);
 
   // Función de refresh manual
   const handleRefresh = async () => {
@@ -303,121 +292,6 @@ const AIAgentsDashboard = () => {
     }
   };
 
-  // Handlers para configuración de agentes
-  const handleToggleAgent = async (agentId: string) => {
-    if (agentId === 'blog' && currentConfig) {
-      const newEnabled = !currentConfig.enabled;
-      
-      // Actualizar estado local inmediatamente para UI responsiva
-      setEditingConfig(prev => prev ? { ...prev, enabled: newEnabled } : null);
-      
-      // Guardar automáticamente
-      try {
-        await agentConfigService.updateConfig('blog', {
-          enabled: newEnabled
-        });
-        
-        // Invalidar cache y refrescar datos
-        await refreshAIAgents();
-        
-        // Limpiar estado de edición después de guardar exitosamente
-        setEditingConfig(null);
-      } catch (error) {
-        console.error('Error toggling agent:', error);
-        // Revertir en caso de error
-        setEditingConfig(prev => prev ? { ...prev, enabled: !newEnabled } : null);
-        setConfigError('Error al cambiar estado del agente');
-      }
-    }
-  };
-
-  // Handler genérico para cambios de configuración en cualquier sección
-  const handleConfigChange = (section: string, key: string, value: any) => {
-    if (!currentConfig) return;
-    
-    setEditingConfig(prev => {
-      if (!prev) return null;
-      
-      // Actualizar la sección correspondiente
-      return {
-        ...prev,
-        [section]: typeof value === 'object' && value !== null
-          ? value  // Si el value ya es el objeto completo de la sección
-          : {
-              ...(prev[section as keyof AgentConfigData] as any),
-              [key]: value
-            }
-      };
-    });
-  };
-
-  const handleSaveConfig = async () => {
-    if (!editingConfig) return;
-    
-    setIsSaving(true);
-    setConfigSaved(false);
-    setConfigError(null);
-    
-    try {
-      const response = await agentConfigService.updateConfig('blog', editingConfig);
-      
-      if (response.success) {
-        setConfigSaved(true);
-        
-        // Invalidar cache y refrescar datos
-        await refreshAIAgents();
-        
-        // Limpiar estado de edición después de guardar exitosamente
-        setEditingConfig(null);
-        
-        setTimeout(() => setConfigSaved(false), 3000);
-      } else {
-        setConfigError(response.error || 'Error al guardar configuración');
-        setTimeout(() => setConfigError(null), 5000);
-      }
-    } catch (error) {
-      console.error('Error guardando configuración:', error);
-      setConfigError('Error al guardar configuración');
-      setTimeout(() => setConfigError(null), 5000);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleResetConfig = async () => {
-    if (!window.confirm('¿Estás seguro de que quieres restaurar la configuración a valores por defecto?')) {
-      return;
-    }
-    
-    setIsSaving(true);
-    setConfigError(null);
-    
-    try {
-      const response = await agentConfigService.resetConfig('blog');
-      
-      if (response.success && response.data) {
-        setConfigSaved(true);
-        
-        // Invalidar cache y refrescar datos
-        await refreshAIAgents();
-        
-        // Limpiar estado de edición después de resetear exitosamente
-        setEditingConfig(null);
-        
-        setTimeout(() => setConfigSaved(false), 3000);
-      } else {
-        setConfigError(response.error || 'Error al resetear configuración');
-        setTimeout(() => setConfigError(null), 5000);
-      }
-    } catch (error) {
-      console.error('Error reseteando configuración:', error);
-      setConfigError('Error al resetear configuración');
-      setTimeout(() => setConfigError(null), 5000);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   // Handlers para GerenteGeneral
   // Handler para cambios en configuración de GerenteGeneral
   const handleGerenteConfigChange = (section: string, key: string, value: any) => {
@@ -425,14 +299,24 @@ const AIAgentsDashboard = () => {
     
     setEditingGerenteConfig(prev => {
       const current = prev || gerenteConfig;
+      
+      // Si el section y key son iguales, es un reemplazo completo de la sección
+      if (section === key) {
+        return {
+          ...current,
+          [section]: value
+        };
+      }
+      
+      // Obtener el valor actual de la sección (puede ser undefined)
+      const currentSection = current[section as keyof GerenteGeneralConfigData] as any || {};
+      
       return {
         ...current,
-        [section]: typeof value === 'object' && value !== null && section === key
-          ? value
-          : {
-              ...(current[section as keyof GerenteGeneralConfigData] as any),
-              [key]: value
-            }
+        [section]: {
+          ...currentSection,
+          [key]: value
+        }
       };
     });
   };
@@ -461,12 +345,35 @@ const AIAgentsDashboard = () => {
     }
   };
 
-  const handleResetGerenteConfig = async () => {
-    if (!window.confirm('¿Estás seguro de que quieres restaurar la configuración por defecto?')) {
+  // Handler para inicializar la configuración con valores por defecto del servidor
+  const handleInitializeGerenteConfig = async () => {
+    if (!window.confirm(
+      '⚠️ ¿Estás seguro de que quieres INICIALIZAR la configuración del Gerente General?\n\n' +
+      'Esto SOBRESCRIBIRÁ toda la configuración actual con los valores por defecto del sistema.\n\n' +
+      'Esta acción no se puede deshacer.'
+    )) {
       return;
     }
-    setEditingGerenteConfig(null);
-    await refetchGerenteAll();
+
+    try {
+      setIsSaving(true);
+      setConfigError(null);
+      
+      const success = await initializeGerenteConfig();
+      
+      if (success) {
+        setConfigSaved(true);
+        setEditingGerenteConfig(null);
+        setTimeout(() => setConfigSaved(false), 3000);
+      } else {
+        setConfigError('Error al inicializar la configuración');
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
+      setConfigError(errorMsg);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleRoutingConfigChange = (newConfig: any) => {
@@ -546,7 +453,6 @@ const AIAgentsDashboard = () => {
         <nav className="flex space-x-8">
           {[
             { id: 'overview', label: 'Resumen General', icon: BarChart3 },
-            { id: 'agents', label: 'Configurar Agentes', icon: Settings },
             { id: 'gerente', label: 'Coordinador IA', icon: Brain },
             { id: 'health', label: 'Estado del Sistema', icon: Activity },
             { id: 'metrics', label: 'Métricas Avanzadas', icon: Cpu },
@@ -700,6 +606,14 @@ const AIAgentsDashboard = () => {
                       {agentName === 'SEOAgent' && (
                         <div className="flex flex-col gap-2">
                           <button
+                            onClick={() => navigate('/dashboard/agents/seo/config')}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium"
+                          >
+                            <Settings size={16} />
+                            Configurar Agente
+                            <ChevronRight size={16} />
+                          </button>
+                          <button
                             onClick={() => navigate('/dashboard/agents/seo/training')}
                             className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white rounded-lg transition-colors text-sm font-medium"
                           >
@@ -737,178 +651,6 @@ const AIAgentsDashboard = () => {
           </div>
         )}
 
-        {/* Agents Configuration Tab */}
-        {activeTab === 'agents' && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Settings className="text-blue-600 dark:text-blue-400" />
-                Configuración de Agentes
-              </h2>
-              
-              <div className="flex items-center gap-3">
-                {configError && (
-                  <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg">
-                    <XCircle size={18} />
-                    <span className="text-sm font-medium">{configError}</span>
-                  </div>
-                )}
-                
-                {configSaved && (
-                  <div className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-lg">
-                    <CheckCircle2 size={18} />
-                    <span className="text-sm font-medium">Configuración guardada</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {!agentConfig ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
-                <span className="ml-3 text-gray-600 dark:text-gray-400">Cargando configuración...</span>
-              </div>
-            ) : (
-              <>
-                {/* Blog Agent Header */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-6">
-                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                          <Brain className="text-purple-600 dark:text-purple-400" />
-                          Blog Agent
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          Agente especializado en optimización de contenido de blog
-                        </p>
-                      </div>
-                      
-                      {/* Enable/Disable Toggle */}
-                      <button
-                        onClick={() => handleToggleAgent('blog')}
-                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                          currentConfig?.enabled ? 'bg-green-600' : 'bg-gray-300'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                            currentConfig?.enabled ? 'translate-x-7' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sub-tabs Navigation */}
-                <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-                  <nav className="-mb-px flex space-x-8">
-                    <button
-                      onClick={() => setActiveConfigTab('basic')}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeConfigTab === 'basic'
-                          ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400'
-                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
-                    >
-                      Configuración Básica
-                    </button>
-                    <button
-                      onClick={() => setActiveConfigTab('personality')}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeConfigTab === 'personality'
-                          ? 'border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400'
-                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
-                    >
-                      Personalidad
-                    </button>
-                    <button
-                      onClick={() => setActiveConfigTab('context')}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeConfigTab === 'context'
-                          ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
-                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
-                    >
-                      Contexto
-                    </button>
-                    <button
-                      onClick={() => setActiveConfigTab('response')}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeConfigTab === 'response'
-                          ? 'border-emerald-600 text-emerald-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      Respuestas
-                    </button>
-                  </nav>
-                </div>
-
-                {/* Sub-tab Content */}
-                <div className="mt-6">
-                  {activeConfigTab === 'basic' && (
-                    <BasicConfigPanel
-                      config={currentConfig}
-                      onConfigChange={handleConfigChange}
-                      onSave={handleSaveConfig}
-                      onReset={handleResetConfig}
-                      isSaving={isSaving}
-                    />
-                  )}
-
-                  {activeConfigTab === 'personality' && (
-                    <PersonalityConfigPanel
-                      config={currentConfig}
-                      onConfigChange={handleConfigChange}
-                      onSave={handleSaveConfig}
-                      onReset={handleResetConfig}
-                      isSaving={isSaving}
-                    />
-                  )}
-
-                  {activeConfigTab === 'context' && (
-                    <ContextConfigPanel
-                      config={currentConfig}
-                      onConfigChange={handleConfigChange}
-                      onSave={handleSaveConfig}
-                      onReset={handleResetConfig}
-                      isSaving={isSaving}
-                    />
-                  )}
-
-                  {activeConfigTab === 'response' && (
-                    <ResponseConfigPanel
-                      config={currentConfig}
-                      onConfigChange={handleConfigChange}
-                      onSave={handleSaveConfig}
-                      onReset={handleResetConfig}
-                      isSaving={isSaving}
-                    />
-                  )}
-                </div>
-
-                {/* Info Box */}
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex gap-3">
-                    <Info className="text-blue-600 flex-shrink-0" size={20} />
-                    <div className="text-sm text-blue-800">
-                      <p className="font-medium mb-1">Sistema de Configuración Avanzado</p>
-                      <p>
-                        Este sistema te permite configurar todos los aspectos del agente: desde parámetros 
-                        básicos de OpenAI hasta personalidad, contexto y formato de respuestas. Los cambios 
-                        se guardan en la base de datos y persistirán entre sesiones.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
         {/* GerenteGeneral Coordinator Tab */}
         {activeTab === 'gerente' && (
           <div className="space-y-6">
@@ -922,14 +664,14 @@ const AIAgentsDashboard = () => {
                 
                 <div className="flex items-center gap-3">
                   {configError && (
-                    <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-2 text-red-600 bg-red-50 dark:bg-red-900/30 px-4 py-2 rounded-lg">
                       <XCircle size={18} />
                       <span className="text-sm font-medium">{configError}</span>
                     </div>
                   )}
                   
                   {configSaved && (
-                    <div className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-600 bg-green-50 dark:bg-green-900/30 px-4 py-2 rounded-lg">
                       <CheckCircle2 size={18} />
                       <span className="text-sm font-medium">Configuración guardada</span>
                     </div>
@@ -966,10 +708,10 @@ const AIAgentsDashboard = () => {
 
                   {/* Sub-tabs Navigation */}
                   <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-                    <nav className="-mb-px flex space-x-8">
+                    <nav className="-mb-px flex space-x-8 overflow-x-auto">
                       <button
                         onClick={() => setGerenteActiveConfigTab('basic')}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                           gerenteActiveConfigTab === 'basic'
                             ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400'
                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
@@ -978,14 +720,64 @@ const AIAgentsDashboard = () => {
                         Configuración Básica
                       </button>
                       <button
+                        onClick={() => setGerenteActiveConfigTab('personality')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                          gerenteActiveConfigTab === 'personality'
+                            ? 'border-pink-600 dark:border-pink-400 text-pink-600 dark:text-pink-400'
+                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        Personalidad
+                      </button>
+                      <button
+                        onClick={() => setGerenteActiveConfigTab('training')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                          gerenteActiveConfigTab === 'training'
+                            ? 'border-green-600 dark:border-green-400 text-green-600 dark:text-green-400'
+                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        Entrenamiento
+                      </button>
+                      <button
+                        onClick={() => setGerenteActiveConfigTab('responses')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                          gerenteActiveConfigTab === 'responses'
+                            ? 'border-orange-600 dark:border-orange-400 text-orange-600 dark:text-orange-400'
+                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        Respuestas
+                      </button>
+                      <button
+                        onClick={() => setGerenteActiveConfigTab('prompts')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                          gerenteActiveConfigTab === 'prompts'
+                            ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
+                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        Prompts
+                      </button>
+                      <button
                         onClick={() => setGerenteActiveConfigTab('routing')}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                           gerenteActiveConfigTab === 'routing'
                             ? 'border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400'
                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                         }`}
                       >
                         Reglas de Routing
+                      </button>
+                      <button
+                        onClick={() => setGerenteActiveConfigTab('stats')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                          gerenteActiveConfigTab === 'stats'
+                            ? 'border-cyan-600 dark:border-cyan-400 text-cyan-600 dark:text-cyan-400'
+                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        Estadísticas
                       </button>
                     </nav>
                   </div>
@@ -996,7 +788,51 @@ const AIAgentsDashboard = () => {
                       config={editingGerenteConfig || gerenteConfig}
                       onConfigChange={handleGerenteConfigChange}
                       onSave={handleSaveGerenteConfig}
-                      onReset={handleResetGerenteConfig}
+                      onInitialize={handleInitializeGerenteConfig}
+                      isSaving={isSaving}
+                      isLoading={gerenteLoading}
+                    />
+                  )}
+
+                  {/* Personality Configuration Panel */}
+                  {gerenteActiveConfigTab === 'personality' && (
+                    <GerenteGeneralPersonalityConfig
+                      config={editingGerenteConfig || gerenteConfig}
+                      onConfigChange={handleGerenteConfigChange}
+                      onSave={handleSaveGerenteConfig}
+                      isSaving={isSaving}
+                      isLoading={gerenteLoading}
+                    />
+                  )}
+
+                  {/* Training Configuration Panel */}
+                  {gerenteActiveConfigTab === 'training' && (
+                    <GerenteGeneralTrainingConfig
+                      config={editingGerenteConfig || gerenteConfig}
+                      onConfigChange={handleGerenteConfigChange}
+                      onSave={handleSaveGerenteConfig}
+                      isSaving={isSaving}
+                      isLoading={gerenteLoading}
+                    />
+                  )}
+
+                  {/* Response Configuration Panel */}
+                  {gerenteActiveConfigTab === 'responses' && (
+                    <GerenteGeneralResponseConfig
+                      config={editingGerenteConfig || gerenteConfig}
+                      onConfigChange={handleGerenteConfigChange}
+                      onSave={handleSaveGerenteConfig}
+                      isSaving={isSaving}
+                      isLoading={gerenteLoading}
+                    />
+                  )}
+
+                  {/* Prompt Configuration Panel */}
+                  {gerenteActiveConfigTab === 'prompts' && (
+                    <GerenteGeneralPromptConfig
+                      config={editingGerenteConfig || gerenteConfig}
+                      onConfigChange={handleGerenteConfigChange}
+                      onSave={handleSaveGerenteConfig}
                       isSaving={isSaving}
                       isLoading={gerenteLoading}
                     />
@@ -1009,6 +845,14 @@ const AIAgentsDashboard = () => {
                       onConfigChange={handleRoutingConfigChange}
                       onSave={handleSaveGerenteRoutingRules}
                       isSaving={isSaving}
+                      isLoading={gerenteLoading}
+                    />
+                  )}
+
+                  {/* Statistics Panel */}
+                  {gerenteActiveConfigTab === 'stats' && (
+                    <GerenteGeneralStats
+                      config={editingGerenteConfig || gerenteConfig}
                       isLoading={gerenteLoading}
                     />
                   )}
@@ -1039,73 +883,83 @@ const AIAgentsDashboard = () => {
         )}
 
         {/* Health Tab */}
-        {activeTab === 'health' && systemHealth && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <Activity className="text-green-600 dark:text-green-400" />
-                Estado de Componentes
-              </h2>
-              
-              <div className="space-y-4">
-                {systemHealth.components && Object.entries(systemHealth.components).map(([component, status]) => (
-                  <div key={component} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(status as string)}
-                      <span className="font-medium text-gray-900 dark:text-white capitalize">{component.replace('_', ' ')}</span>
+        {activeTab === 'health' && (
+          systemHealth ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Activity className="text-green-600 dark:text-green-400" />
+                  Estado de Componentes
+                </h2>
+                
+                <div className="space-y-4">
+                  {systemHealth.components && Object.entries(systemHealth.components).map(([component, status]) => (
+                    <div key={component} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        {getStatusIcon(status as string)}
+                        <span className="font-medium text-gray-900 dark:text-white capitalize">{component.replace('_', ' ')}</span>
+                      </div>
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(status as string)}`}>
+                        {status as string}
+                      </div>
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(status as string)}`}>
-                      {status as string}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <Database className="text-blue-600 dark:text-blue-400" />
-                Información del Sistema
-              </h3>
-              
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Timestamp:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {systemHealth.timestamp ? new Date(systemHealth.timestamp).toLocaleString() : 'N/A'}
-                  </span>
-                </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Database className="text-blue-600 dark:text-blue-400" />
+                  Información del Sistema
+                </h3>
                 
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Estado Global:</span>
-                  <span className={`font-medium ${
-                    systemHealth.status === 'healthy' ? 'text-green-600' : 
-                    systemHealth.status === 'degraded' ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
-                    {systemHealth.status}
-                  </span>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Timestamp:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {systemHealth.timestamp ? new Date(systemHealth.timestamp).toLocaleString() : 'N/A'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Estado Global:</span>
+                    <span className={`font-medium ${
+                      systemHealth.status === 'healthy' ? 'text-green-600' : 
+                      systemHealth.status === 'degraded' ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {systemHealth.status}
+                    </span>
+                  </div>
+                  
+                  {systemHealth.metrics && (
+                    <>
+                      <hr className="my-3" />
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Total Requests:</span>
+                        <span className="font-medium">{systemHealth.metrics.total_requests}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Cached Responses:</span>
+                        <span className="font-medium">{systemHealth.metrics.cached_responses}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Error Rate:</span>
+                        <span className="font-medium">{(systemHealth.metrics.error_rate * 100).toFixed(2)}%</span>
+                      </div>
+                    </>
+                  )}
                 </div>
-                
-                {systemHealth.metrics && (
-                  <>
-                    <hr className="my-3" />
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Requests:</span>
-                      <span className="font-medium">{systemHealth.metrics.total_requests}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Cached Responses:</span>
-                      <span className="font-medium">{systemHealth.metrics.cached_responses}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Error Rate:</span>
-                      <span className="font-medium">{(systemHealth.metrics.error_rate * 100).toFixed(2)}%</span>
-                    </div>
-                  </>
-                )}
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+              <div className="text-center py-8 text-gray-500">
+                <Activity size={48} className="mx-auto mb-4 text-gray-400" />
+                <p>No hay información de estado disponible</p>
+                <p className="text-sm mt-2">Verifica que el backend esté en funcionamiento.</p>
+              </div>
+            </div>
+          )
         )}
 
         {/* Metrics Tab */}
@@ -1116,26 +970,26 @@ const AIAgentsDashboard = () => {
               Métricas Avanzadas del Sistema
             </h2>
             
-            {systemMetrics ? (
+            {systemMetrics?.metrics ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 {/* Prompt System */}
-                {systemMetrics.data?.promptSystem && (
+                {systemMetrics.metrics?.promptSystem && (
                   <div className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <h3 className="font-bold mb-3 text-blue-600 dark:text-blue-400">Sistema de Prompts</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Templates:</span>
-                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.promptSystem.templates}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.metrics.promptSystem.templates}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Total Usage:</span>
-                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.promptSystem.totalUsage}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.metrics.promptSystem.totalUsage}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Success Rate:</span>
                         <span className="font-medium text-green-600 dark:text-green-400">
-                          {(systemMetrics.data.promptSystem.avgSuccessRate * 100).toFixed(1)}%
+                          {(systemMetrics.metrics.promptSystem.avgSuccessRate * 100).toFixed(1)}%
                         </span>
                       </div>
                     </div>
@@ -1143,48 +997,48 @@ const AIAgentsDashboard = () => {
                 )}
 
                 {/* Memory System */}
-                {systemMetrics.data?.memorySystem && (
+                {systemMetrics.metrics?.memorySystem && (
                   <div className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <h3 className="font-bold mb-3 text-green-600 dark:text-green-400">Sistema de Memoria</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Cached Patterns:</span>
-                        <span className="font-medium">{systemMetrics.data.memorySystem.cachedPatterns}</span>
+                        <span className="font-medium">{systemMetrics.metrics.memorySystem.cachedPatterns}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Cached Users:</span>
-                        <span className="font-medium">{systemMetrics.data.memorySystem.cachedUsers}</span>
+                        <span className="font-medium">{systemMetrics.metrics.memorySystem.cachedUsers}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Learning Queue:</span>
-                        <span className="font-medium">{systemMetrics.data.memorySystem.learningQueueSize}</span>
+                        <span className="font-medium">{systemMetrics.metrics.memorySystem.learningQueueSize}</span>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* OpenAI Service */}
-                {systemMetrics.data?.openaiService && (
+                {systemMetrics.metrics?.openaiService && (
                   <div className="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <h3 className="font-bold mb-3 text-purple-600 dark:text-purple-400">Servicio OpenAI</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Total Requests:</span>
-                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.openaiService.totalRequests}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.metrics.openaiService.totalRequests}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Cached:</span>
-                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.openaiService.cachedResponses}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.metrics.openaiService.cachedResponses}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Error Rate:</span>
                         <span className="font-medium text-red-600 dark:text-red-400">
-                          {(systemMetrics.data.openaiService.errorRate * 100).toFixed(2)}%
+                          {(systemMetrics.metrics.openaiService.errorRate * 100).toFixed(2)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Avg Response:</span>
-                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.data.openaiService.avgResponseTime}ms</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{systemMetrics.metrics.openaiService.avgResponseTime}ms</span>
                       </div>
                     </div>
                   </div>

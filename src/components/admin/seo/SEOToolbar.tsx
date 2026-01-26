@@ -1,24 +1,25 @@
 /**
  * 🛠️ SEO Toolbar
- * Barra de herramientas con modos y acciones rápidas del SEO Canvas
+ * Barra de herramientas con acciones rápidas del SEO Canvas
  * Solo disponible para Admin Dashboard
+ * 
+ * NOTA: Las tabs de navegación fueron movidas a SEOCanvasModal.tsx
+ * Este componente ahora solo contiene las acciones (Exportar, Guardar, Limpiar, etc.)
  */
 
 import React, { useState } from 'react';
-import { MessageSquare, BarChart3, FileText, Eye, Download, Trash2, Save, Zap } from 'lucide-react';
+import { Download, Trash2, Save, Zap } from 'lucide-react';
 import { useSEOCanvasContext } from '../../../contexts/SEOCanvasContext';
 
 const SEOToolbar: React.FC = () => {
   const { 
-    activeMode, 
-    setActiveMode, 
-    quickActions, 
     canUseAdvancedFeatures,
     currentAnalysis,
     chatHistory,
     clearChatHistory,
     clearAnalysis,
-    context
+    context,
+    quickActions
   } = useSEOCanvasContext();
 
   const [exportLoading, setExportLoading] = useState(false);
@@ -31,7 +32,6 @@ const SEOToolbar: React.FC = () => {
     try {
       const exportData = {
         timestamp: new Date().toISOString(),
-        mode: activeMode,
         context: context,
         analysis: currentAnalysis,
         chatHistory: chatHistory,
@@ -50,7 +50,6 @@ const SEOToolbar: React.FC = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      // Notificación de éxito (puedes mejorar esto con un toast)
       console.log('✅ Análisis exportado correctamente');
     } catch (error) {
       console.error('❌ Error al exportar:', error);
@@ -66,7 +65,6 @@ const SEOToolbar: React.FC = () => {
     try {
       const saveData = {
         timestamp: new Date().toISOString(),
-        mode: activeMode,
         context: context,
         analysis: currentAnalysis,
         chatHistory: chatHistory
@@ -98,82 +96,35 @@ const SEOToolbar: React.FC = () => {
     }
   };
 
-  const modes = [
-    {
-      key: 'chat',
-      label: 'Chat',
-      icon: MessageSquare,
-      description: 'Conversación con SEO Agent'
-    },
-    {
-      key: 'analysis',
-      label: 'Análisis',
-      icon: BarChart3,
-      description: 'Análisis detallado de SEO'
-    },
-    {
-      key: 'structure',
-      label: 'Estructura',
-      icon: FileText,
-      description: 'Generar estructura de contenido'
-    },
-    {
-      key: 'review',
-      label: 'Revisión',
-      icon: Eye,
-      description: 'Revisión completa de SEO'
+  // Contar análisis guardados
+  const getSavedCount = () => {
+    try {
+      const saved = localStorage.getItem('seo_analyses');
+      return saved ? JSON.parse(saved).length : 0;
+    } catch {
+      return 0;
     }
-  ];
+  };
+
+  const savedCount = getSavedCount();
+  const hasContent = currentAnalysis || chatHistory.length > 0;
 
   return (
-    <div className="p-4 border-b border-gray-200 bg-gray-50">
-      {/* Modos de trabajo */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex space-x-2">
-          {modes.map((mode) => {
-            const Icon = mode.icon;
-            const isActive = activeMode === mode.key;
-            
-            return (
-              <button
-                key={mode.key}
-                onClick={() => setActiveMode(mode.key as any)}
-                className={`
-                  flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                  ${isActive 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                  }
-                `}
-                title={mode.description}
-              >
-                <Icon size={16} />
-                <span>{mode.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Estado de permisos */}
-        <div className="text-xs text-gray-500">
-          {canUseAdvancedFeatures ? 'Funciones avanzadas habilitadas' : 'Acceso básico'}
-        </div>
-      </div>
-
-      {/* Acciones rápidas */}
+    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       <div className="flex items-center justify-between">
+        {/* Acciones principales */}
         <div className="flex items-center space-x-2">
-          <span className="text-xs text-gray-600 font-medium">Acciones:</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium mr-1">Acciones:</span>
           
           {/* Botón Exportar */}
           <button
             onClick={handleExport}
-            disabled={!currentAnalysis && chatHistory.length === 0}
+            disabled={!hasContent}
             className={`
-              flex items-center space-x-1 px-3 py-1.5 text-xs rounded-md transition-colors
-              ${(currentAnalysis || chatHistory.length > 0)
-                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              flex items-center space-x-1.5 px-3 py-1.5 text-xs rounded-lg transition-all duration-200
+              ${hasContent
+                ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800' 
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed border border-transparent'
               }
             `}
             title="Exportar resultados a JSON"
@@ -185,12 +136,12 @@ const SEOToolbar: React.FC = () => {
           {/* Botón Guardar */}
           <button
             onClick={handleSave}
-            disabled={!currentAnalysis && chatHistory.length === 0}
+            disabled={!hasContent}
             className={`
-              flex items-center space-x-1 px-3 py-1.5 text-xs rounded-md transition-colors
-              ${(currentAnalysis || chatHistory.length > 0)
-                ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              flex items-center space-x-1.5 px-3 py-1.5 text-xs rounded-lg transition-all duration-200
+              ${hasContent
+                ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/50 border border-green-200 dark:border-green-800' 
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed border border-transparent'
               }
             `}
             title="Guardar en historial local"
@@ -202,12 +153,12 @@ const SEOToolbar: React.FC = () => {
           {/* Botón Limpiar */}
           <button
             onClick={handleClearAll}
-            disabled={!currentAnalysis && chatHistory.length === 0}
+            disabled={!hasContent}
             className={`
-              flex items-center space-x-1 px-3 py-1.5 text-xs rounded-md transition-colors
-              ${(currentAnalysis || chatHistory.length > 0)
-                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              flex items-center space-x-1.5 px-3 py-1.5 text-xs rounded-lg transition-all duration-200
+              ${hasContent
+                ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800' 
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed border border-transparent'
               }
             `}
             title="Limpiar todo"
@@ -216,11 +167,11 @@ const SEOToolbar: React.FC = () => {
             <span>Limpiar</span>
           </button>
           
-          {/* Botón Análisis Rápido */}
+          {/* Botón Análisis Rápido - Solo si hay contenido y permisos */}
           {canUseAdvancedFeatures && context?.currentContent && (
             <button
-              onClick={quickActions.analyzeCurrentContent}
-              className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"
+              onClick={quickActions?.analyzeCurrentContent}
+              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 shadow-sm"
               title="Análisis rápido del contenido actual"
             >
               <Zap size={14} />
@@ -230,12 +181,15 @@ const SEOToolbar: React.FC = () => {
         </div>
 
         {/* Indicador de elementos guardados */}
-        <div className="text-xs text-gray-500">
-          {(() => {
-            const saved = localStorage.getItem('seo_analyses');
-            const count = saved ? JSON.parse(saved).length : 0;
-            return count > 0 ? `${count} análisis guardados` : 'Sin análisis guardados';
-          })()}
+        <div className="text-xs text-gray-500 dark:text-gray-400">
+          {savedCount > 0 ? (
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              {savedCount} análisis guardados
+            </span>
+          ) : (
+            'Sin análisis guardados'
+          )}
         </div>
       </div>
     </div>

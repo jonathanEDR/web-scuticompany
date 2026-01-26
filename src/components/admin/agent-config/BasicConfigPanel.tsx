@@ -267,7 +267,7 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-3 pt-4 border-t">
+      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={onSave}
           disabled={isSaving || !config.enabled}
@@ -289,7 +289,7 @@ export const BasicConfigPanel: React.FC<BasicConfigPanelProps> = ({
         <button
           onClick={onReset}
           disabled={isSaving}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
           <RotateCcw size={18} />
           <span>Resetear</span>

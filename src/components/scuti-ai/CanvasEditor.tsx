@@ -237,12 +237,16 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         {mode === 'empty' || !content ? (
           <EmptyState />
         ) : mode === 'preview' ? (
-          <PreviewMode content={content} onEditClick={onEditClick} />
+          <PreviewMode content={content} onEditClick={onEditClick} onItemClick={onItemClick} />
         ) : mode === 'conversation' ? (
-          <PreviewMode content={content} onEditClick={onEditClick} />
+          <PreviewMode content={content} onEditClick={onEditClick} onItemClick={onItemClick} />
+        ) : mode === 'suggestions' ? (
+          <PreviewMode content={content} onEditClick={onEditClick} onItemClick={onItemClick} />
         ) : mode === 'list' ? (
           <ListMode content={content} onItemClick={onItemClick} />
-        ) : null}
+        ) : (
+          <PreviewMode content={content} onEditClick={onEditClick} onItemClick={onItemClick} />
+        )}
       </div>
 
       {/* Footer con metadata */}
@@ -301,12 +305,6 @@ const EmptyState: React.FC = () => (
 // ============================================
 
 const PreviewMode: React.FC<{ content: CanvasContent; onEditClick?: (itemId: string) => void; onItemClick?: (itemId: string, itemTitle?: string) => void }> = ({ content, onEditClick, onItemClick }) => {
-  // Debug: ver qué tipo de contenido estamos recibiendo
-  console.log('📊 PreviewMode recibiendo:', {
-    type: content.type,
-    hasData: !!content.data,
-    dataKeys: content.data ? Object.keys(content.data) : []
-  });
 
   if (content.type === 'blog') {
     return <BlogPreview data={content.data} blogId={content.metadata?.blogId} onEditClick={onEditClick} />;
@@ -332,8 +330,22 @@ const PreviewMode: React.FC<{ content: CanvasContent; onEditClick?: (itemId: str
     return <SEOAnalysisView data={content.data} />;
   }
 
+  // 🆕 Vista de sugerencias de mejora para blogs
+  if (content.type === 'blog_improvements') {
+    return <BlogImprovementsView data={content.data} />;
+  }
+
+  // 🆕 Vista de estadísticas de blog individual
+  if (content.type === 'blog_statistics') {
+    return <BlogStatisticsView data={content.data} />;
+  }
+
+  // 🆕 Vista de estadísticas generales del blog
+  if (content.type === 'blog_statistics_general') {
+    return <BlogStatisticsGeneralView data={content.data} />;
+  }
+
   if (content.type === 'service_analysis') {
-    console.log('🔍 [PreviewMode] service_analysis detectado, pasando data:', content.data);
     return <ServiceAnalysisView data={content.data} onItemClick={onItemClick} />;
   }
 
@@ -661,8 +673,10 @@ const BlogPreview: React.FC<{ data: any; blogId?: string; onEditClick?: (itemId:
           )}
           <button
             onClick={() => {
+              // Usar título del blog en lugar del ID para un comando más natural
+              const blogTitle = data.title || 'este blog';
               const event = new CustomEvent('scuti-ai-option-selected', {
-                detail: { value: `analizar seo del blog (id: ${blogId})` }
+                detail: { value: `analizar seo de: ${blogTitle}` }
               });
               window.dispatchEvent(event);
             }}
@@ -1082,6 +1096,418 @@ const SEOAnalysisView: React.FC<{ data: any }> = ({ data }) => {
               </span>
             ))}
           </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// BLOG IMPROVEMENTS VIEW
+// ============================================
+
+const BlogImprovementsView: React.FC<{ data: any }> = ({ data }) => {
+  const { post, improvements } = data || {};
+  
+  // Helper para obtener color del score
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getScoreBgColor = (score: number) => {
+    if (score >= 80) return 'bg-green-100 dark:bg-green-900/20';
+    if (score >= 60) return 'bg-yellow-100 dark:bg-yellow-900/20';
+    return 'bg-red-100 dark:bg-red-900/20';
+  };
+
+  // Helper para renderizar sugerencias como lista
+  const renderSuggestionList = (suggestions: any[], title: string, icon: string, color: string) => {
+    if (!suggestions || suggestions.length === 0) return null;
+    
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <h4 className={`text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2`}>
+          <span>{icon}</span>
+          <span>{title}</span>
+          <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${color}`}>
+            {suggestions.length}
+          </span>
+        </h4>
+        <ul className="space-y-2">
+          {suggestions.map((item: any, idx: number) => (
+            <li key={idx} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-gray-400 mt-0.5">•</span>
+              <span>
+                {typeof item === 'string' ? item : item.suggestion || item.tag || item.keyword || item.message || JSON.stringify(item)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const score = improvements?.score?.total || post?.currentScore || 0;
+
+  return (
+    <div className="space-y-4">
+      {/* Header con información del post */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-5">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          💡 Sugerencias de Mejora
+        </h2>
+        <h3 className="text-md text-gray-700 dark:text-gray-300 mb-4 line-clamp-2">
+          {post?.title || 'Blog sin título'}
+        </h3>
+        
+        <div className="flex items-center gap-4">
+          {/* Score total */}
+          <div className={`${getScoreBgColor(score)} rounded-full w-20 h-20 flex items-center justify-center`}>
+            <div className="text-center">
+              <div className={`text-2xl font-bold ${getScoreColor(score)}`}>
+                {score}
+              </div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">Score</div>
+            </div>
+          </div>
+          
+          {/* Stats del post */}
+          <div className="flex-1 grid grid-cols-2 gap-3 text-center">
+            {post?.wordCount && (
+              <div>
+                <div className="text-xl font-bold text-gray-900 dark:text-white">
+                  {post.wordCount}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">Palabras</div>
+              </div>
+            )}
+            {post?.readingTime && (
+              <div>
+                <div className="text-xl font-bold text-gray-900 dark:text-white">
+                  {post.readingTime}m
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">Lectura</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Score detallado */}
+      {improvements?.score && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            📊 Puntuación Detallada
+          </h4>
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(improvements.score).filter(([key]) => key !== 'total').map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">{key}</span>
+                <span className={`text-sm font-semibold ${getScoreColor(Number(value) || 0)}`}>
+                  {String(value)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mejoras SEO */}
+      {improvements?.seo?.suggestions && renderSuggestionList(
+        improvements.seo.suggestions,
+        'Mejoras SEO',
+        '🔍',
+        'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+      )}
+
+      {/* Legibilidad */}
+      {improvements?.readability?.suggestions && renderSuggestionList(
+        improvements.readability.suggestions,
+        'Legibilidad',
+        '📖',
+        'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+      )}
+
+      {/* Estructura */}
+      {improvements?.structure?.suggestions && renderSuggestionList(
+        improvements.structure.suggestions,
+        'Estructura',
+        '🏗️',
+        'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+      )}
+
+      {/* Engagement */}
+      {improvements?.engagement?.suggestions && renderSuggestionList(
+        improvements.engagement.suggestions,
+        'Engagement',
+        '💬',
+        'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
+      )}
+
+      {/* Tags sugeridos */}
+      {improvements?.tags?.suggestions && improvements.tags.suggestions.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            🏷️ Tags Sugeridos
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {improvements.tags.suggestions.map((tag: any, idx: number) => (
+              <span 
+                key={idx} 
+                className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm"
+              >
+                {typeof tag === 'string' ? tag : tag.tag || tag.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Keywords sugeridas */}
+      {improvements?.keywords?.suggestions && improvements.keywords.suggestions.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            🔑 Keywords Sugeridas
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {improvements.keywords.suggestions.map((kw: any, idx: number) => (
+              <span 
+                key={idx} 
+                className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-sm border border-blue-200 dark:border-blue-800"
+              >
+                {typeof kw === 'string' ? kw : kw.keyword || kw.word}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Si no hay mejoras */}
+      {!improvements?.seo?.suggestions?.length && 
+       !improvements?.readability?.suggestions?.length && 
+       !improvements?.structure?.suggestions?.length && 
+       !improvements?.engagement?.suggestions?.length && (
+        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 text-center">
+          <span className="text-4xl mb-2 block">✨</span>
+          <p className="text-green-700 dark:text-green-300 font-medium">
+            ¡Tu contenido está muy bien optimizado!
+          </p>
+          <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+            No se encontraron mejoras significativas para sugerir.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// BLOG STATISTICS VIEW (Individual Post)
+// ============================================
+
+const BlogStatisticsView: React.FC<{ data: any }> = ({ data }) => {
+  const { post, stats, performance } = data || {};
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num?.toString() || '0';
+  };
+
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return 'No publicado';
+    return new Date(dateStr).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-5">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+          📊 Estadísticas del Blog
+        </h2>
+        <h3 className="text-md text-gray-700 dark:text-gray-300 line-clamp-2">
+          {post?.title || 'Blog sin título'}
+        </h3>
+        {stats?.publishedAt && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Publicado: {formatDate(stats.publishedAt)} ({stats.daysSincePublished} días)
+          </p>
+        )}
+      </div>
+
+      {/* Métricas principales */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+            {formatNumber(stats?.views || 0)}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">👁️ Vistas</div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+            {formatNumber(stats?.likes || 0)}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">❤️ Likes</div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+            {formatNumber(stats?.comments || 0)}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">💬 Comentarios</div>
+        </div>
+      </div>
+
+      {/* Rendimiento */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          📈 Rendimiento
+        </h4>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {performance?.viewsPerDay || 0}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Vistas/día promedio</div>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {performance?.engagementRate || 0}%
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Tasa de engagement</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Detalles del contenido */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          📝 Detalles del Contenido
+        </h4>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="text-center">
+            <div className="text-xl font-bold text-gray-900 dark:text-white">
+              {stats?.wordCount || 0}
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Palabras</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-gray-900 dark:text-white">
+              {stats?.readingTime || 0}m
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Lectura</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-gray-900 dark:text-white">
+              {stats?.score !== 'N/A' ? stats?.score : '—'}
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// BLOG STATISTICS GENERAL VIEW
+// ============================================
+
+const BlogStatisticsGeneralView: React.FC<{ data: any }> = ({ data }) => {
+  const { summary, topPerformers, insights } = data || {};
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num?.toString() || '0';
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-5">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+          📊 Estadísticas Generales del Blog
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Resumen de rendimiento de todos los posts publicados
+        </p>
+      </div>
+
+      {/* Resumen */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+            {summary?.totalPosts || 0}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">📝 Posts</div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+            {formatNumber(summary?.totalViews || 0)}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">👁️ Vistas totales</div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+            {formatNumber(summary?.totalLikes || 0)}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">❤️ Likes totales</div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+            {summary?.averageReadingTime || 0}m
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">⏱️ Tiempo promedio</div>
+        </div>
+      </div>
+
+      {/* Top performers */}
+      {topPerformers && topPerformers.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            🏆 Posts más populares
+          </h4>
+          <ul className="space-y-2">
+            {topPerformers.slice(0, 5).map((post: any, idx: number) => (
+              <li key={idx} className="flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                    #{idx + 1}
+                  </span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                    {post.title}
+                  </span>
+                </div>
+                <span className="text-sm font-medium text-blue-600 dark:text-blue-400 ml-2">
+                  {formatNumber(post.views)} 👁️
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Insights */}
+      {insights && insights.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            💡 Insights
+          </h4>
+          <ul className="space-y-2">
+            {insights.map((insight: string, idx: number) => (
+              <li key={idx} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-yellow-500">•</span>
+                {insight}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

@@ -5,16 +5,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, RefreshCw, Briefcase, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, RefreshCw, Briefcase, Sparkles, Terminal } from 'lucide-react';
 import agentConfigService, { type AgentConfigData } from '../../services/agentConfigService';
 import BasicConfigPanel from '../../components/admin/agent-config/BasicConfigPanel';
 import PersonalityConfigPanel from '../../components/admin/agent-config/PersonalityConfigPanel';
 import ContextConfigPanel from '../../components/admin/agent-config/ContextConfigPanel';
 import ResponseConfigPanel from '../../components/admin/agent-config/ResponseConfigPanel';
+import ServicesAgentPromptConfig from '../../components/admin/agent-config/ServicesAgentPromptConfig';
 
 export const ServicesAgentConfig: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'basic' | 'personality' | 'context' | 'response'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'personality' | 'context' | 'response' | 'prompts'>('basic');
   const [agentConfig, setAgentConfig] = useState<AgentConfigData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,7 +111,8 @@ export const ServicesAgentConfig: React.FC = () => {
         config: agentConfig.config,
         personality: agentConfig.personality,
         contextConfig: agentConfig.contextConfig,
-        responseConfig: agentConfig.responseConfig
+        responseConfig: agentConfig.responseConfig,
+        promptConfig: agentConfig.promptConfig
       });
 
       if (response.success) {
@@ -160,6 +162,12 @@ export const ServicesAgentConfig: React.FC = () => {
             [key]: value
           }
         };
+      } else if (section === 'promptConfig' && key === 'promptConfig') {
+        // Caso especial: reemplazar todo el promptConfig
+        return {
+          ...prev,
+          promptConfig: value
+        };
       } else {
         return {
           ...prev,
@@ -174,10 +182,10 @@ export const ServicesAgentConfig: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando configuración...</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-indigo-900/10 flex items-center justify-center">
+        <div className="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando configuración...</p>
         </div>
       </div>
     );
@@ -185,9 +193,9 @@ export const ServicesAgentConfig: React.FC = () => {
 
   if (!agentConfig) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Error al cargar configuración</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-indigo-900/10 flex items-center justify-center">
+        <div className="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <p className="text-red-600 dark:text-red-400">Error al cargar configuración</p>
           <button
             onClick={loadAgentConfig}
             className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
@@ -200,27 +208,27 @@ export const ServicesAgentConfig: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-indigo-900/10">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Left Section */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate('/dashboard/ai-agents')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
               
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Briefcase className="w-6 h-6 text-purple-600" />
+                <div className="p-2 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg">
+                  <Briefcase className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">Configuración ServicesAgent</h1>
-                  <p className="text-sm text-gray-500">Gestión inteligente de servicios y pricing</p>
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">Configuración ServicesAgent</h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Gestión inteligente de servicios y pricing</p>
                 </div>
               </div>
             </div>
@@ -229,7 +237,7 @@ export const ServicesAgentConfig: React.FC = () => {
             <div className="flex items-center gap-3">
               {saveMessage && (
                 <div className={`px-4 py-2 rounded-lg ${
-                  saveMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  saveMessage.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                 }`}>
                   {saveMessage.text}
                 </div>
@@ -238,7 +246,7 @@ export const ServicesAgentConfig: React.FC = () => {
               <button
                 onClick={handleReset}
                 disabled={isSaving}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
                 Resetear
@@ -264,13 +272,13 @@ export const ServicesAgentConfig: React.FC = () => {
           </div>
 
           {/* Tabs */}
-          <div className="mt-4 flex gap-2 border-b border-gray-200">
+          <div className="mt-4 flex gap-2 border-b border-gray-200 dark:border-gray-700">
             <button
               onClick={() => setActiveTab('basic')}
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === 'basic'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               Configuración Básica
@@ -279,8 +287,8 @@ export const ServicesAgentConfig: React.FC = () => {
               onClick={() => setActiveTab('personality')}
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === 'personality'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               Personalidad
@@ -289,8 +297,8 @@ export const ServicesAgentConfig: React.FC = () => {
               onClick={() => setActiveTab('context')}
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === 'context'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               Contexto
@@ -299,11 +307,22 @@ export const ServicesAgentConfig: React.FC = () => {
               onClick={() => setActiveTab('response')}
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === 'response'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               Respuestas
+            </button>
+            <button
+              onClick={() => setActiveTab('prompts')}
+              className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
+                activeTab === 'prompts'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              }`}
+            >
+              <Terminal className="w-4 h-4" />
+              Prompts
             </button>
           </div>
         </div>
@@ -343,6 +362,16 @@ export const ServicesAgentConfig: React.FC = () => {
 
         {activeTab === 'response' && (
           <ResponseConfigPanel
+            config={agentConfig}
+            onConfigChange={onConfigChange}
+            onSave={handleSave}
+            onReset={handleReset}
+            isSaving={isSaving}
+          />
+        )}
+
+        {activeTab === 'prompts' && (
+          <ServicesAgentPromptConfig
             config={agentConfig}
             onConfigChange={onConfigChange}
             onSave={handleSave}

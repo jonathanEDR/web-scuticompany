@@ -444,6 +444,63 @@ class SEOAgentService {
       };
     }
   }
+
+  /**
+   * Guardar auditoría SEO en el post
+   */
+  async saveSEOAudit(postId: string, auditData: any): Promise<ApiResponse<any>> {
+    const hasAccess = await this.hasRequiredAccess(['SUPER_ADMIN' as UserRole, 'ADMIN' as UserRole, 'MODERATOR' as UserRole]);
+    if (!hasAccess) {
+      return {
+        success: false,
+        error: 'No tienes permisos para guardar auditorías SEO.',
+      };
+    }
+
+    try {
+      const response = await this.fetchWithAuth(`/agents/seo/audit/save/${postId}`, {
+        method: 'POST',
+        body: JSON.stringify({ auditData }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error saving SEO audit:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error guardando auditoría SEO',
+      };
+    }
+  }
+
+  /**
+   * Obtener auditoría SEO guardada del post
+   */
+  async getSEOAudit(postId: string): Promise<ApiResponse<any>> {
+    const hasAccess = await this.hasRequiredAccess(['SUPER_ADMIN' as UserRole, 'ADMIN' as UserRole, 'MODERATOR' as UserRole]);
+    if (!hasAccess) {
+      return {
+        success: false,
+        error: 'No tienes permisos para ver auditorías SEO.',
+      };
+    }
+
+    try {
+      const response = await this.fetchWithAuth(`/agents/seo/audit/${postId}`, {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error getting SEO audit:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error obteniendo auditoría SEO',
+      };
+    }
+  }
 }
 
 // Exportar instancia singleton

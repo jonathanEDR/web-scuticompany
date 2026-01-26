@@ -1,19 +1,19 @@
 /**
- * Página de Configuración Detallada del BlogAgent
+ * Página de Configuración Detallada del SEOAgent
  * Accedida desde el Panel Central IA
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, RefreshCw, Brain, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, RefreshCw, Brain, Sparkles, Search, BarChart3, Code2 } from 'lucide-react';
 import agentConfigService, { type AgentConfigData } from '../../services/agentConfigService';
 import BasicConfigPanel from '../../components/admin/agent-config/BasicConfigPanel';
 import PersonalityConfigPanel from '../../components/admin/agent-config/PersonalityConfigPanel';
 import ContextConfigPanel from '../../components/admin/agent-config/ContextConfigPanel';
 import ResponseConfigPanel from '../../components/admin/agent-config/ResponseConfigPanel';
-import { BlogAgentPromptConfig } from '../../components/admin/agent-config/BlogAgentPromptConfig';
+import { SEOAgentPromptConfig } from '../../components/admin/agent-config/SEOAgentPromptConfig';
 
-export const BlogAgentConfig: React.FC = () => {
+export const SEOAgentConfig: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'basic' | 'personality' | 'context' | 'response' | 'prompts'>('basic');
   const [agentConfig, setAgentConfig] = useState<AgentConfigData | null>(null);
@@ -28,15 +28,14 @@ export const BlogAgentConfig: React.FC = () => {
   const loadAgentConfig = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Loading BlogAgent configuration...');
-      const response = await agentConfigService.getConfig('blog');
+      console.log('🔄 Loading SEOAgent configuration...');
+      const response = await agentConfigService.getConfig('seo');
       
       if (response.success && response.data) {
         console.log('✅ Config loaded:', response.data);
         setAgentConfig(response.data);
       } else {
         console.error('❌ Failed to load config');
-        // Usar valores por defecto
         setAgentConfig(getDefaultConfig());
       }
     } catch (error) {
@@ -49,46 +48,38 @@ export const BlogAgentConfig: React.FC = () => {
 
   const getDefaultConfig = (): AgentConfigData => {
     return {
-      agentName: 'blog',
+      agentName: 'seo',
       enabled: true,
       config: {
-        timeout: 30,
-        maxTokens: 2000,
-        temperature: 0.7,
-        maxTagsPerPost: 10,
-        minContentLength: 300,
-        seoScoreThreshold: 70,
-        autoOptimization: true,
-        // Configuración de sugerencias automáticas
-        autoSuggestions: true,
-        suggestionDebounceMs: 800,
-        suggestionMinLength: 10,
-        suggestionContextLength: 200,
+        timeout: 75,
+        maxTokens: 3000,
+        temperature: 0.3,
       },
       personality: {
         archetype: 'expert',
         traits: [
-          { trait: 'analytical', intensity: 8 },
-          { trait: 'professional', intensity: 7 },
-          { trait: 'creative', intensity: 6 }
+          { trait: 'analytical', intensity: 9 },
+          { trait: 'precise', intensity: 9 },
+          { trait: 'technical', intensity: 8 },
+          { trait: 'professional', intensity: 8 }
         ],
         communicationStyle: {
-          tone: 'professional',
-          verbosity: 'moderate',
-          formality: 7,
-          enthusiasm: 6,
-          technicality: 7
+          tone: 'technical',
+          verbosity: 'detailed',
+          formality: 8,
+          enthusiasm: 5,
+          technicality: 9
         }
       },
       contextConfig: {
         projectInfo: {
           name: 'Web Scuti',
-          type: 'tech_blog',
+          type: 'seo_platform',
           domain: 'technology',
           language: 'es-ES',
-          tone: 'professional_friendly'
+          tone: 'technical_professional'
         },
-        userExpertise: 'intermediate'
+        userExpertise: 'advanced'
       },
       responseConfig: {
         defaultLanguage: 'es-ES',
@@ -103,7 +94,7 @@ export const BlogAgentConfig: React.FC = () => {
         useCustomPrompts: false,
         customSystemPrompt: '',
         promptVariables: {},
-        contextWindow: 10
+        contextWindow: 15
       }
     };
   };
@@ -141,9 +132,9 @@ export const BlogAgentConfig: React.FC = () => {
       setIsSaving(true);
       setSaveMessage(null);
 
-      console.log('💾 Saving configuration...', agentConfig);
+      console.log('💾 Saving SEO configuration...', agentConfig);
 
-      const response = await agentConfigService.updateConfig('blog', {
+      const response = await agentConfigService.updateConfig('seo', {
         enabled: agentConfig.enabled,
         config: agentConfig.config,
         personality: agentConfig.personality,
@@ -154,8 +145,7 @@ export const BlogAgentConfig: React.FC = () => {
 
       if (response.success) {
         console.log('✅ Configuration saved successfully');
-        setSaveMessage({ type: 'success', text: '✅ Configuración guardada exitosamente' });
-        // Recargar para confirmar cambios
+        setSaveMessage({ type: 'success', text: '✅ Configuración SEO guardada exitosamente' });
         await loadAgentConfig();
       } else {
         console.error('❌ Failed to save:', response.error);
@@ -171,16 +161,16 @@ export const BlogAgentConfig: React.FC = () => {
   };
 
   const handleResetConfig = async () => {
-    if (!confirm('¿Estás seguro de resetear la configuración a valores por defecto?')) {
+    if (!confirm('¿Estás seguro de resetear la configuración SEO a valores por defecto?')) {
       return;
     }
 
     try {
       setIsSaving(true);
-      const response = await agentConfigService.resetConfig('blog');
+      const response = await agentConfigService.resetConfig('seo');
 
       if (response.success) {
-        setSaveMessage({ type: 'success', text: '✅ Configuración reseteada' });
+        setSaveMessage({ type: 'success', text: '✅ Configuración SEO reseteada' });
         await loadAgentConfig();
       } else {
         setSaveMessage({ type: 'error', text: `❌ Error: ${response.error}` });
@@ -197,8 +187,8 @@ export const BlogAgentConfig: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <RefreshCw className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Cargando configuración...</p>
+          <RefreshCw className="w-12 h-12 text-red-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Cargando configuración SEO...</p>
         </div>
       </div>
     );
@@ -208,8 +198,8 @@ export const BlogAgentConfig: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-red-600">Error al cargar la configuración</p>
-          <button onClick={loadAgentConfig} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">
+          <p className="text-red-600">Error al cargar la configuración SEO</p>
+          <button onClick={loadAgentConfig} className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg">
             Reintentar
           </button>
         </div>
@@ -230,18 +220,19 @@ export const BlogAgentConfig: React.FC = () => {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              🤖 Configuración del BlogAgent
+              <Search className="w-7 h-7 text-red-600" />
+              Configuración del SEOAgent
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Personaliza el comportamiento, personalidad y capacidades del agente de blog
+              Configura análisis técnico, auditorías y optimización SEO avanzada
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => navigate('/dashboard/agents/blog/training')}
-            className="px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+            onClick={() => navigate('/dashboard/agents/seo/training')}
+            className="px-3 py-2 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
           >
             <Brain className="w-4 h-4" />
             <Sparkles className="w-4 h-4" />
@@ -258,7 +249,7 @@ export const BlogAgentConfig: React.FC = () => {
           <button
             onClick={handleSaveConfig}
             disabled={isSaving}
-            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all disabled:opacity-50 flex items-center gap-2 text-sm font-medium"
+            className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white rounded-lg transition-all disabled:opacity-50 flex items-center gap-2 text-sm font-medium"
           >
             {isSaving ? (
               <>
@@ -286,6 +277,37 @@ export const BlogAgentConfig: React.FC = () => {
         </div>
       )}
 
+      {/* SEO Features Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+          <div className="flex items-center gap-3">
+            <Search className="w-8 h-8 text-red-600" />
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Auditoría Técnica</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Análisis profundo de SEO</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="w-8 h-8 text-orange-600" />
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Keywords Research</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Investigación de palabras clave</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+          <div className="flex items-center gap-3">
+            <Code2 className="w-8 h-8 text-purple-600" />
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Schema.org</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Datos estructurados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Card */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         {/* Tabs */}
@@ -295,7 +317,7 @@ export const BlogAgentConfig: React.FC = () => {
               onClick={() => setActiveTab('basic')}
               className={`px-6 py-4 font-medium transition-colors border-b-2 whitespace-nowrap ${
                 activeTab === 'basic'
-                  ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  ? 'border-red-600 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
                   : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
               }`}
             >
@@ -383,7 +405,7 @@ export const BlogAgentConfig: React.FC = () => {
             />
           )}
           {activeTab === 'prompts' && (
-            <BlogAgentPromptConfig
+            <SEOAgentPromptConfig
               config={agentConfig}
               onConfigChange={handleConfigChange}
               onSave={handleSaveConfig}
@@ -397,4 +419,4 @@ export const BlogAgentConfig: React.FC = () => {
   );
 };
 
-export default BlogAgentConfig;
+export default SEOAgentConfig;

@@ -72,10 +72,10 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
       {/* Response Format */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <FileText className="text-emerald-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Formato de Respuesta</h3>
+          <FileText className="text-emerald-600 dark:text-emerald-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Formato de Respuesta</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Selecciona cómo el agente debe estructurar sus respuestas
         </p>
 
@@ -87,15 +87,15 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
               disabled={!config.enabled}
               className={`p-4 rounded-lg border-2 text-left transition-all ${
                 config.responseConfig.responseFormat === format.value
-                  ? 'border-emerald-600 bg-emerald-50'
-                  : 'border-gray-200 hover:border-emerald-300'
+                  ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-500'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 bg-white dark:bg-gray-800'
               } ${!config.enabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <div className="flex items-start gap-3">
-                <div className="text-emerald-600">{format.icon}</div>
+                <div className="text-emerald-600 dark:text-emerald-400">{format.icon}</div>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">{format.label}</div>
-                  <div className="text-xs text-gray-500 mt-1">{format.description}</div>
+                  <div className="font-medium text-gray-900 dark:text-white">{format.label}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{format.description}</div>
                 </div>
               </div>
             </button>
@@ -106,18 +106,18 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
       {/* Language Configuration */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <FileText className="text-blue-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Configuración de Idiomas</h3>
+          <FileText className="text-blue-600 dark:text-blue-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Configuración de Idiomas</h3>
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Idioma Principal
           </label>
           <select
             value={config.responseConfig.defaultLanguage}
             onChange={(e) => onConfigChange('responseConfig', 'defaultLanguage', e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             disabled={!config.enabled}
           >
             {languages.map((lang) => (
@@ -129,7 +129,7 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Idiomas Soportados
           </label>
           <div className="flex flex-wrap gap-2">
@@ -140,15 +140,15 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
                 disabled={!config.enabled}
                 className={`px-4 py-2 rounded-lg border transition-all ${
                   config.responseConfig.supportedLanguages.includes(lang.code)
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300'
+                    ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 dark:border-blue-500'
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-600'
                 } ${!config.enabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 {lang.name}
               </button>
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             Selecciona los idiomas en los que el agente puede responder
           </p>
         </div>
@@ -157,21 +157,21 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
       {/* Response Content Options */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <CheckSquare className="text-purple-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Contenido de Respuestas</h3>
+          <CheckSquare className="text-purple-600 dark:text-purple-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Contenido de Respuestas</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Controla qué elementos debe incluir el agente en sus respuestas
         </p>
 
         <div className="space-y-3">
           {/* Include Examples */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <Lightbulb className="text-yellow-600" size={20} />
+              <Lightbulb className="text-yellow-600 dark:text-yellow-400" size={20} />
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Incluir Ejemplos</h4>
-                <p className="text-xs text-gray-500 mt-1">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white">Incluir Ejemplos</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Proporciona ejemplos prácticos en las respuestas
                 </p>
               </div>
@@ -180,7 +180,7 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
               onClick={() => onConfigChange('responseConfig', 'includeExamples', !config.responseConfig.includeExamples)}
               disabled={!config.enabled}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                config.responseConfig.includeExamples ? 'bg-green-600' : 'bg-gray-300'
+                config.responseConfig.includeExamples ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span
@@ -192,12 +192,12 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
           </div>
 
           {/* Include Steps */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <List className="text-blue-600" size={20} />
+              <List className="text-blue-600 dark:text-blue-400" size={20} />
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Incluir Pasos</h4>
-                <p className="text-xs text-gray-500 mt-1">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white">Incluir Pasos</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Desglose en pasos cuando sea relevante
                 </p>
               </div>
@@ -206,7 +206,7 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
               onClick={() => onConfigChange('responseConfig', 'includeSteps', !config.responseConfig.includeSteps)}
               disabled={!config.enabled}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                config.responseConfig.includeSteps ? 'bg-green-600' : 'bg-gray-300'
+                config.responseConfig.includeSteps ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span
@@ -218,12 +218,12 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
           </div>
 
           {/* Include Metrics */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <BarChart3 className="text-purple-600" size={20} />
+              <BarChart3 className="text-purple-600 dark:text-purple-400" size={20} />
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Incluir Métricas</h4>
-                <p className="text-xs text-gray-500 mt-1">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white">Incluir Métricas</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Proporciona datos y métricas cuando sea aplicable
                 </p>
               </div>
@@ -232,7 +232,7 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
               onClick={() => onConfigChange('responseConfig', 'includeMetrics', !config.responseConfig.includeMetrics)}
               disabled={!config.enabled}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                config.responseConfig.includeMetrics ? 'bg-green-600' : 'bg-gray-300'
+                config.responseConfig.includeMetrics ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span
@@ -244,12 +244,12 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
           </div>
 
           {/* Include Recommendations */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <Lightbulb className="text-orange-600" size={20} />
+              <Lightbulb className="text-orange-600 dark:text-orange-400" size={20} />
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Incluir Recomendaciones</h4>
-                <p className="text-xs text-gray-500 mt-1">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white">Incluir Recomendaciones</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Agrega sugerencias y mejores prácticas
                 </p>
               </div>
@@ -258,7 +258,7 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
               onClick={() => onConfigChange('responseConfig', 'includeRecommendations', !config.responseConfig.includeRecommendations)}
               disabled={!config.enabled}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                config.responseConfig.includeRecommendations ? 'bg-green-600' : 'bg-gray-300'
+                config.responseConfig.includeRecommendations ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span
@@ -272,7 +272,7 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 pt-4 border-t">
+      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={onSave}
           disabled={isSaving || !config.enabled}
@@ -294,7 +294,7 @@ export const ResponseConfigPanel: React.FC<ResponseConfigPanelProps> = ({
         <button
           onClick={onReset}
           disabled={isSaving}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
           <RotateCcw size={18} />
           <span>Resetear</span>

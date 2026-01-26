@@ -49,7 +49,6 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 // Páginas del dashboard - Con autenticación
 const Profile = lazy(() => import('./pages/dashboard/Profile'));
-const Settings = lazy(() => import('./pages/Settings'));
 const LeadsManagement = lazy(() => import('./pages/admin/LeadsManagement'));
 // Página de mensajería CRM (admin)
 const CrmMessages = lazy(() => import('./pages/admin/CrmMessages'));
@@ -98,6 +97,7 @@ const MyBlogHub = lazy(() => import('./components/blog/MyBlogHub'));
 const AIAgentsDashboard = lazy(() => import('./pages/admin/AIAgentsDashboard'));
 const BlogAgentConfig = lazy(() => import('./pages/admin/BlogAgentConfig'));
 const BlogAgentTraining = lazy(() => import('./pages/admin/BlogAgentTraining'));
+const SEOAgentConfig = lazy(() => import('./pages/admin/SEOAgentConfig'));
 const SEOAgentTraining = lazy(() => import('./pages/admin/SEOAgentTraining'));
 const ServicesAgentConfig = lazy(() => import('./pages/admin/ServicesAgentConfig'));
 const ServicesAgentTraining = lazy(() => import('./pages/admin/ServicesAgentTraining'));
@@ -253,12 +253,6 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* Configuración - Accesible para todos */}
-              <Route path="/dashboard/settings" element={
-                <DashboardRoute>
-                  <Settings />
-                </DashboardRoute>
-              } />
               
               {/* � Historial de Notificaciones - Solo Admins */}
               <Route path="/dashboard/notifications" element={
@@ -439,7 +433,9 @@ function AppContent() {
               <Route path="/dashboard/agents/blog/config" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                    <BlogAgentConfig />
+                    <SmartDashboardLayout>
+                      <BlogAgentConfig />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -448,7 +444,20 @@ function AppContent() {
               <Route path="/dashboard/agents/blog/training" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                    <BlogAgentTraining />
+                    <SmartDashboardLayout>
+                      <BlogAgentTraining />
+                    </SmartDashboardLayout>
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* Configuración detallada del SEOAgent */}
+              <Route path="/dashboard/agents/seo/config" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <SmartDashboardLayout>
+                      <SEOAgentConfig />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -457,7 +466,9 @@ function AppContent() {
               <Route path="/dashboard/agents/seo/training" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                    <SEOAgentTraining />
+                    <SmartDashboardLayout>
+                      <SEOAgentTraining />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -466,7 +477,9 @@ function AppContent() {
               <Route path="/dashboard/agents/services/config" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                    <ServicesAgentConfig />
+                    <SmartDashboardLayout>
+                      <ServicesAgentConfig />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />
@@ -475,7 +488,9 @@ function AppContent() {
               <Route path="/dashboard/agents/services/training" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                    <ServicesAgentTraining />
+                    <SmartDashboardLayout>
+                      <ServicesAgentTraining />
+                    </SmartDashboardLayout>
                   </RoleBasedRoute>
                 </DashboardRoute>
               } />

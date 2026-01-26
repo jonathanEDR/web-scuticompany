@@ -24,21 +24,33 @@ export const CATEGORY_CONFIGS: Record<CategoryType, CategoryConfig> = {
   blog: {
     id: 'blog',
     title: 'Contenido & Blog',
-    description: 'Crea, gestiona y optimiza tus artículos',
-    emoji: '✍️',
+    description: 'Consulta y analiza tus artículos publicados',
+    emoji: '📝',
     bgColor: 'bg-blue-50 dark:bg-blue-900/20',
     actions: [
-      { 
-        icon: '✍️', 
-        label: 'Crear nuevo blog', 
-        prompt: 'mostrar contenido',
-        color: 'bg-blue-100 dark:bg-blue-800/30 hover:bg-blue-200 dark:hover:bg-blue-800/50'
-      },
       { 
         icon: '📝', 
         label: 'Ver blogs publicados', 
         prompt: 'mostrar blog',
         color: 'bg-blue-100 dark:bg-blue-800/30 hover:bg-blue-200 dark:hover:bg-blue-800/50'
+      },
+      { 
+        icon: '🔍', 
+        label: 'Analizar SEO de un blog', 
+        prompt: 'analizar seo del blog',
+        color: 'bg-green-100 dark:bg-green-800/30 hover:bg-green-200 dark:hover:bg-green-800/50'
+      },
+      { 
+        icon: '📊', 
+        label: 'Estadísticas del blog', 
+        prompt: 'mostrar estadísticas del blog',
+        color: 'bg-purple-100 dark:bg-purple-800/30 hover:bg-purple-200 dark:hover:bg-purple-800/50'
+      },
+      { 
+        icon: '🏷️', 
+        label: 'Sugerir mejoras', 
+        prompt: 'sugerir mejoras para el blog',
+        color: 'bg-orange-100 dark:bg-orange-800/30 hover:bg-orange-200 dark:hover:bg-orange-800/50'
       }
     ]
   },

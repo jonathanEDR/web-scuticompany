@@ -62,6 +62,13 @@ export const useScutiAI = () => {
   const [blogCreationSessionId, setBlogCreationSessionId] = useState<string | null>(null);
   const [conversationMode, setConversationMode] = useState<string | null>(null);
 
+  // 🆕 Blog context - Para mantener el blog seleccionado activo
+  const [activeBlogContext, setActiveBlogContext] = useState<{
+    id: string;
+    title: string;
+    slug?: string;
+  } | null>(null);
+
   // 🆕 Cache para evitar múltiples llamadas
   const [lastSessionsLoad, setLastSessionsLoad] = useState<number>(0);
   const [lastStatusLoad, setLastStatusLoad] = useState<number>(0);
@@ -224,6 +231,16 @@ export const useScutiAI = () => {
     setSending(true);
     setError(null);
 
+    // 🆕 Detectar si el usuario quiere cambiar de blog o limpiar contexto
+    const messageLower = messageText.toLowerCase();
+    if (messageLower.includes('cambiar blog') || 
+        messageLower.includes('otro blog') || 
+        messageLower.includes('salir del blog') ||
+        messageLower.includes('volver a blogs')) {
+      setActiveBlogContext(null);
+      console.log('🔄 Contexto de blog limpiado');
+    }
+
     // Mensaje del usuario (optimistic update)
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -242,10 +259,18 @@ export const useScutiAI = () => {
         isAdminPanel: true // Scuti-AI siempre se usa desde panel admin
       };
       
+      // 🆕 Incluir contexto del blog activo si existe
+      if (activeBlogContext) {
+        additionalContext.activeBlogId = activeBlogContext.id;
+        additionalContext.activeBlogTitle = activeBlogContext.title;
+        additionalContext.activeBlogSlug = activeBlogContext.slug;
+        console.log('📝 Enviando contexto de blog activo:', activeBlogContext);
+      }
+      
       if (blogCreationSessionId && conversationMode) {
         additionalContext.blogCreationSessionId = blogCreationSessionId;
         additionalContext.conversationMode = conversationMode;
-        console.log('📝 Enviando contexto de blog:', {
+        console.log('📝 Enviando contexto de creación de blog:', {
           blogCreationSessionId,
           conversationMode
         });
@@ -281,15 +306,6 @@ export const useScutiAI = () => {
         // 🎨 Si hay canvas_data (snake_case o camelCase), abrir el canvas automáticamente
         const canvasDataRaw = result.data.canvasData || result.data.canvas_data;
         
-        // 🔍 DEBUG: Ver qué llega del servicio
-        console.log('🔍 [useScutiAI] canvasDataRaw recibido:', {
-          hasCanvasData: !!canvasDataRaw,
-          type: canvasDataRaw?.type,
-          hasData: !!canvasDataRaw?.data,
-          dataKeys: canvasDataRaw?.data ? Object.keys(canvasDataRaw.data) : [],
-          fullCanvasData: canvasDataRaw
-        });
-        
         if (canvasDataRaw) {
           
           const canvasContent: CanvasContent = {
@@ -307,15 +323,6 @@ export const useScutiAI = () => {
             }
           };
           
-          // 🔍 DEBUG: Ver canvasContent construido
-          console.log('🔍 [useScutiAI] canvasContent construido:', {
-            type: canvasContent.type,
-            title: canvasContent.title,
-            dataKeys: canvasContent.data ? Object.keys(canvasContent.data) : [],
-            hasService: !!canvasContent.data?.service,
-            hasAnalysis: !!canvasContent.data?.analysis
-          });
-          
           const mode = canvasDataRaw.mode || 
                       (canvasDataRaw.type === 'list' ? 'list' : 'preview');
           
@@ -326,6 +333,29 @@ export const useScutiAI = () => {
             
             setBlogCreationSessionId(blogSessionId);
             setConversationMode('blog_creation');
+          }
+          
+          // 🆕 Si es un blog individual (vista de blog), guardar contexto activo
+          if (canvasDataRaw.type === 'blog' || canvasDataRaw.type === 'blog_preview') {
+            const blogData = canvasDataRaw.data;
+            if (blogData) {
+              setActiveBlogContext({
+                id: blogData.id || canvasDataRaw.metadata?.blogId,
+                title: blogData.title || canvasContent.title,
+                slug: blogData.slug
+              });
+              console.log('📝 Blog activo establecido:', blogData.title);
+            }
+          }
+          
+          // 🆕 Si es análisis SEO de un blog, mantener/actualizar contexto
+          if (canvasDataRaw.type === 'seo_analysis' && canvasDataRaw.metadata?.blogId) {
+            const blogTitle = canvasDataRaw.data?.title || canvasDataRaw.title;
+            setActiveBlogContext(prev => ({
+              id: canvasDataRaw.metadata.blogId,
+              title: blogTitle || prev?.title || 'Blog',
+              slug: canvasDataRaw.data?.slug || prev?.slug
+            }));
           }
           
           showCanvas(canvasContent, mode);
@@ -514,7 +544,12 @@ export const useScutiAI = () => {
     showCanvas,
     hideCanvas,
     toggleCanvasExpand,
-    updateCanvasContent
+    updateCanvasContent,
+    
+    // 🆕 Blog context
+    activeBlogContext,
+    setActiveBlogContext,
+    clearBlogContext: () => setActiveBlogContext(null)
   };
 };
 

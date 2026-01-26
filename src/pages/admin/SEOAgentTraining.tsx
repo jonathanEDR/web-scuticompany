@@ -298,36 +298,36 @@ const SEOAgentTraining: React.FC = () => {
       case 'technical_audit':
         return { 
           icon: Search, 
-          color: 'bg-red-50 border-red-200 text-red-800',
-          headerColor: 'bg-red-500',
+          color: 'bg-purple-50 border-purple-200 text-purple-800 dark:bg-purple-900/30 dark:border-purple-700 dark:text-purple-300',
+          headerColor: 'bg-gradient-to-r from-purple-600 to-purple-700',
           name: 'Auditoría Técnica'
         };
       case 'keyword_research':
         return { 
           icon: BarChart3, 
-          color: 'bg-green-50 border-green-200 text-green-800',
-          headerColor: 'bg-green-500',
+          color: 'bg-indigo-50 border-indigo-200 text-indigo-800 dark:bg-indigo-900/30 dark:border-indigo-700 dark:text-indigo-300',
+          headerColor: 'bg-gradient-to-r from-indigo-600 to-indigo-700',
           name: 'Investigación Keywords'
         };
       case 'schema_optimization':
         return { 
           icon: Code2, 
-          color: 'bg-blue-50 border-blue-200 text-blue-800',
-          headerColor: 'bg-blue-500',
+          color: 'bg-violet-50 border-violet-200 text-violet-800 dark:bg-violet-900/30 dark:border-violet-700 dark:text-violet-300',
+          headerColor: 'bg-gradient-to-r from-violet-600 to-violet-700',
           name: 'Optimización Schema'
         };
       case 'performance_analysis':
         return { 
           icon: Gauge, 
-          color: 'bg-orange-50 border-orange-200 text-orange-800',
-          headerColor: 'bg-orange-500',
+          color: 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-800 dark:bg-fuchsia-900/30 dark:border-fuchsia-700 dark:text-fuchsia-300',
+          headerColor: 'bg-gradient-to-r from-fuchsia-600 to-fuchsia-700',
           name: 'Análisis Performance'
         };
       default:
         return { 
           icon: Brain, 
-          color: 'bg-gray-50 border-gray-200 text-gray-800',
-          headerColor: 'bg-gray-500',
+          color: 'bg-gray-50 border-gray-200 text-gray-800 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300',
+          headerColor: 'bg-gradient-to-r from-gray-600 to-gray-700',
           name: 'Tarea Genérica'
         };
     }
@@ -335,9 +335,9 @@ const SEOAgentTraining: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20">
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-blue-900/20">
         <div className="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 dark:border-red-400 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
           <p className="text-gray-700 dark:text-gray-200 text-lg font-medium">Cargando configuración de entrenamiento SEO...</p>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">Esto puede tomar unos segundos</p>
         </div>
@@ -346,7 +346,7 @@ const SEOAgentTraining: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-blue-900/20 py-8 px-4">
       <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
@@ -361,7 +361,7 @@ const SEOAgentTraining: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="p-4 bg-gradient-to-br from-red-500 to-orange-600 rounded-2xl mr-4">
+                <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl mr-4">
                   <Search className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -381,7 +381,7 @@ const SEOAgentTraining: React.FC = () => {
                 <button
                   onClick={saveTrainingConfig}
                   disabled={saving}
-                  className="flex items-center px-6 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg hover:from-red-700 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? (
                     <>
@@ -425,7 +425,7 @@ const SEOAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('examples')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'examples'
-                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -436,7 +436,7 @@ const SEOAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('prompts')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'prompts'
-                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -447,7 +447,7 @@ const SEOAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('behavior')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'behavior'
-                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -458,7 +458,7 @@ const SEOAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('testing')}
               className={`flex-1 px-6 py-4 text-center font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'testing'
-                  ? 'bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400'
+                  ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -488,7 +488,7 @@ const SEOAgentTraining: React.FC = () => {
                         <select
                           value={newExample.category}
                           onChange={(e) => setNewExample(prev => ({ ...prev, category: e.target.value as any }))}
-                          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         >
                           <option value="general">General</option>
                           <option value="technical_audit">Auditoría Técnica</option>
@@ -507,7 +507,7 @@ const SEOAgentTraining: React.FC = () => {
                         value={newExample.input}
                         onChange={(e) => setNewExample(prev => ({ ...prev, input: e.target.value }))}
                         placeholder="Ej: Analiza el SEO técnico de https://ejemplo.com y proporciona recomendaciones..."
-                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[100px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[100px]"
                       />
                     </div>
 
@@ -519,7 +519,7 @@ const SEOAgentTraining: React.FC = () => {
                         value={newExample.expectedOutput}
                         onChange={(e) => setNewExample(prev => ({ ...prev, expectedOutput: e.target.value }))}
                         placeholder="Ej: Análisis SEO Técnico: 1. Core Web Vitals: LCP 2.1s (Bueno), 2. Meta tags: Falta meta description..."
-                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[120px]"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[120px]"
                       />
                     </div>
 
@@ -532,13 +532,13 @@ const SEOAgentTraining: React.FC = () => {
                         value={newExample.notes}
                         onChange={(e) => setNewExample(prev => ({ ...prev, notes: e.target.value }))}
                         placeholder="Contexto adicional o consideraciones especiales..."
-                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       />
                     </div>
 
                     <button
                       onClick={addExample}
-                      className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Agregar Ejemplo</span>
@@ -555,14 +555,14 @@ const SEOAgentTraining: React.FC = () => {
                   ) : (
                     <div className="space-y-4">
                       {trainingConfig.examples.map((example) => (
-                        <div key={example.id} className="border border-gray-200 rounded-lg p-4">
+                        <div key={example.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
                           <div className="flex justify-between items-start mb-3">
                             <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                              example.category === 'technical_audit' ? 'bg-red-100 text-red-800' :
-                              example.category === 'keyword_research' ? 'bg-green-100 text-green-800' :
-                              example.category === 'schema_optimization' ? 'bg-blue-100 text-blue-800' :
-                              example.category === 'performance_analysis' ? 'bg-orange-100 text-orange-800' :
-                              'bg-gray-100 text-gray-800'
+                              example.category === 'technical_audit' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300' :
+                              example.category === 'keyword_research' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' :
+                              example.category === 'schema_optimization' ? 'bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300' :
+                              example.category === 'performance_analysis' ? 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/50 dark:text-fuchsia-300' :
+                              'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                             }`}>
                               {example.category}
                             </span>
@@ -658,7 +658,7 @@ const SEOAgentTraining: React.FC = () => {
                                       );
                                       setTrainingConfig(prev => ({ ...prev, taskPrompts: updatedPrompts }));
                                     }}
-                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[200px] font-mono text-sm"
+                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[200px] font-mono text-sm"
                                   />
                                 </div>
 
@@ -677,7 +677,7 @@ const SEOAgentTraining: React.FC = () => {
                                         );
                                         setTrainingConfig(prev => ({ ...prev, taskPrompts: updatedPrompts }));
                                       }}
-                                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[100px] font-mono text-sm"
+                                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[100px] font-mono text-sm"
                                     />
                                   </div>
 
@@ -745,7 +745,7 @@ const SEOAgentTraining: React.FC = () => {
                           <select
                             value={newTaskPrompt.taskType}
                             onChange={(e) => setNewTaskPrompt(prev => ({ ...prev, taskType: e.target.value }))}
-                            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           >
                             <option value="">Seleccionar tipo de tarea...</option>
                             <option value="technical_audit">Auditoría Técnica</option>
@@ -765,7 +765,7 @@ const SEOAgentTraining: React.FC = () => {
                             value={newTaskPrompt.systemPrompt}
                             onChange={(e) => setNewTaskPrompt(prev => ({ ...prev, systemPrompt: e.target.value }))}
                             placeholder="Eres un experto en [tipo de tarea SEO]. Tu especialidad es..."
-                            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[150px]"
+                            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[150px]"
                           />
                         </div>
 
@@ -778,7 +778,7 @@ const SEOAgentTraining: React.FC = () => {
                               value={newTaskPrompt.userPromptTemplate}
                               onChange={(e) => setNewTaskPrompt(prev => ({ ...prev, userPromptTemplate: e.target.value }))}
                               placeholder="Realiza un análisis de {tipo} para {objetivo}..."
-                              className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[100px]"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[100px]"
                             />
                           </div>
 
@@ -803,7 +803,7 @@ const SEOAgentTraining: React.FC = () => {
 
                         <button
                           onClick={addTaskPrompt}
-                          className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                          className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
                         >
                           <Plus className="w-4 h-4" />
                           <span>Agregar Task Prompt</span>
@@ -833,12 +833,12 @@ const SEOAgentTraining: React.FC = () => {
                         value={newBehaviorRule}
                         onChange={(e) => setNewBehaviorRule(e.target.value)}
                         placeholder="Ej: Siempre incluir métricas de Core Web Vitals en análisis de rendimiento..."
-                        className="flex-1 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="flex-1 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         onKeyPress={(e) => e.key === 'Enter' && addBehaviorRule()}
                       />
                       <button
                         onClick={addBehaviorRule}
-                        className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                        className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
                       >
                         <Plus className="w-4 h-4" />
                         <span>Agregar</span>
@@ -880,7 +880,7 @@ const SEOAgentTraining: React.FC = () => {
                       specialInstructions: e.target.value
                     }))}
                     placeholder="Instrucciones adicionales que el agente debe considerar siempre..."
-                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[150px]"
+                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[150px]"
                   />
                 </div>
 
@@ -894,7 +894,7 @@ const SEOAgentTraining: React.FC = () => {
                       ...prev,
                       learningMode: e.target.value as any
                     }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="conservative">Conservador (Sigue patrones establecidos)</option>
                     <option value="balanced">Balanceado (Equilibrio entre precisión y adaptabilidad)</option>
@@ -925,7 +925,7 @@ const SEOAgentTraining: React.FC = () => {
                       onChange={(e) => setTestInput(e.target.value)}
                       placeholder="Escribe una consulta SEO para probar el agente...
 Ej: Analiza el SEO técnico de mi sitio web y proporciona recomendaciones específicas para mejorar Core Web Vitals y el ranking en Google"
-                      className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[200px]"
+                      className="w-full p-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[200px]"
                     />
                     <button
                       onClick={testAgent}

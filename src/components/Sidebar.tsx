@@ -199,14 +199,6 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       roles: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
       // Solo ADMIN y SUPER_ADMIN
     },
-    {
-      name: 'Configuración',
-      icon: '⚙️',
-      menuKey: 'configuracion',
-      path: '/dashboard/settings',
-      description: 'Ajustes de la cuenta',
-      // Todos pueden configurar su cuenta
-    }
   ];
 
   // Filtrar items del menú según permisos y rol

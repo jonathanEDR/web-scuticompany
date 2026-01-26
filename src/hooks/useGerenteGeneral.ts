@@ -33,6 +33,7 @@ interface UseGerenteGeneralCacheReturn {
   // Config updates
   updateConfig: (config: Partial<GerenteGeneralConfigData>) => Promise<boolean>;
   updateRoutingRules: (rules: RoutingConfiguration) => Promise<boolean>;
+  initializeConfig: () => Promise<boolean>;
 
   // Testing
   testRouting: (command: string) => Promise<any>;
@@ -45,11 +46,26 @@ export function useGerenteGeneralCache(): UseGerenteGeneralCacheReturn {
   // Estabilizar las funciones fetch con useCallback para evitar loop infinito
   const fetchConfig = useCallback(async () => {
     try {
+      console.log('🔄 [useGerenteGeneral] Iniciando fetchConfig...');
       const result = await gerenteGeneralService.getConfig();
+      
+      console.log('📦 [useGerenteGeneral] Resultado completo:', result);
+      
       if (!result.success) {
         console.warn('❌ [useGerenteGeneral] Config request failed:', result);
         return null;
       }
+      
+      // Log detallado de los datos recibidos
+      console.log('✅ [useGerenteGeneral] Config recibida:');
+      console.log('   - config:', result.data?.config);
+      console.log('   - personality:', result.data?.personality);
+      console.log('   - trainingConfig:', result.data?.trainingConfig);
+      console.log('   - trainingConfig.examples:', result.data?.trainingConfig?.examples);
+      console.log('   - trainingConfig.behaviorRules:', result.data?.trainingConfig?.behaviorRules);
+      console.log('   - responseConfig:', result.data?.responseConfig);
+      console.log('   - promptConfig:', result.data?.promptConfig);
+      
       return result.data!;
     } catch (error) {
       console.error('💥 [useGerenteGeneral] Error en fetchConfig:', error);
@@ -271,6 +287,30 @@ export function useGerenteGeneralCache(): UseGerenteGeneralCacheReturn {
     }
   }, []);
 
+  // Inicializar configuración con valores por defecto
+  const initializeConfig = useCallback(async (): Promise<boolean> => {
+    setUpdateLoading(true);
+    try {
+      console.log('🔄 [useGerenteGeneral] Inicializando configuración con valores por defecto...');
+      const result = await gerenteGeneralService.initializeConfig();
+      
+      if (result.success) {
+        console.log('✅ [useGerenteGeneral] Configuración inicializada exitosamente');
+        // Refrescar toda la configuración
+        await refetchAll();
+        return true;
+      } else {
+        console.error('❌ [useGerenteGeneral] Error inicializando:', result.error);
+        return false;
+      }
+    } catch (error) {
+      console.error('💥 [useGerenteGeneral] Error inicializando configuración:', error);
+      return false;
+    } finally {
+      setUpdateLoading(false);
+    }
+  }, [refetchAll]);
+
   // Limpiar todo el cache
   const clearAllCache = useCallback(() => {
     // Implementar cuando tengas acceso a dashboardCache
@@ -291,6 +331,7 @@ export function useGerenteGeneralCache(): UseGerenteGeneralCacheReturn {
     refetchAll,
     updateConfig,
     updateRoutingRules,
+    initializeConfig,
     testRouting,
     clearAllCache
   };

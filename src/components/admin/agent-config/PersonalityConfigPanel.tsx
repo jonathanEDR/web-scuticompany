@@ -77,10 +77,10 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
       {/* Archetype Selection */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <User className="text-purple-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Arquetipo del Agente</h3>
+          <User className="text-purple-600 dark:text-purple-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Arquetipo del Agente</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Define la personalidad fundamental y el enfoque del agente
         </p>
         
@@ -92,13 +92,13 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
               disabled={!config.enabled}
               className={`p-4 rounded-lg border-2 text-left transition-all ${
                 config.personality.archetype === archetype.value
-                  ? 'border-purple-600 bg-purple-50'
-                  : 'border-gray-200 hover:border-purple-300'
+                  ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/30 dark:border-purple-500'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 bg-white dark:bg-gray-800'
               } ${!config.enabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <div className="text-2xl mb-2">{archetype.icon}</div>
-              <div className="font-medium text-gray-900">{archetype.label}</div>
-              <div className="text-xs text-gray-500 mt-1">{archetype.description}</div>
+              <div className="font-medium text-gray-900 dark:text-white">{archetype.label}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{archetype.description}</div>
             </button>
           ))}
         </div>
@@ -107,25 +107,25 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
       {/* Personality Traits */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="text-blue-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Rasgos de Personalidad</h3>
+          <Sparkles className="text-blue-600 dark:text-blue-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Rasgos de Personalidad</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Ajusta la intensidad de cada rasgo de personalidad (1-10)
         </p>
 
         {/* Active Traits */}
         <div className="space-y-3 mb-4">
           {config.personality.traits.map((trait) => (
-            <div key={trait.trait} className="p-4 bg-gray-50 rounded-lg">
+            <div key={trait.trait} className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-900 capitalize">
+                <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
                   {trait.trait}
                 </span>
                 <button
                   onClick={() => handleRemoveTrait(trait.trait)}
                   disabled={!config.enabled}
-                  className="text-red-600 hover:text-red-800 text-sm disabled:opacity-50"
+                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm disabled:opacity-50"
                 >
                   Remover
                 </button>
@@ -137,10 +137,10 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
                   max="10"
                   value={trait.intensity}
                   onChange={(e) => handleTraitIntensityChange(trait.trait, parseInt(e.target.value))}
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                   disabled={!config.enabled}
                 />
-                <span className="text-sm font-medium text-gray-900 w-8 text-right">
+                <span className="text-sm font-medium text-gray-900 dark:text-white w-8 text-right">
                   {trait.intensity}
                 </span>
               </div>
@@ -157,7 +157,7 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
                 key={trait}
                 onClick={() => handleAddTrait(trait)}
                 disabled={!config.enabled}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-full hover:bg-gray-50 disabled:opacity-50 capitalize"
+                className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50 capitalize"
               >
                 + {trait}
               </button>
@@ -168,13 +168,13 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
       {/* Communication Style */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <MessageCircle className="text-green-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Estilo de Comunicación</h3>
+          <MessageCircle className="text-green-600 dark:text-green-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Estilo de Comunicación</h3>
         </div>
 
         {/* Tone */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Tono de Comunicación
           </label>
           <select
@@ -184,7 +184,7 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
               tone: e.target.value
             })}
             disabled={!config.enabled}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             {tones.map((tone) => (
               <option key={tone.value} value={tone.value}>
@@ -196,7 +196,7 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
 
         {/* Verbosity */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Nivel de Detalle (Verbosity)
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -210,12 +210,12 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
                 disabled={!config.enabled}
                 className={`p-3 rounded-lg border text-left transition-all ${
                   config.personality.communicationStyle.verbosity === level.value
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300'
+                    ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-500'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 bg-white dark:bg-gray-800'
                 }`}
               >
-                <div className="font-medium text-sm text-gray-900">{level.label}</div>
-                <div className="text-xs text-gray-500">{level.description}</div>
+                <div className="font-medium text-sm text-gray-900 dark:text-white">{level.label}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{level.description}</div>
               </button>
             ))}
           </div>
@@ -223,11 +223,11 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
 
         {/* Formality Slider */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Nivel de Formalidad: {config.personality.communicationStyle.formality}
           </label>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-500">Informal</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Informal</span>
             <input
               type="range"
               min="1"
@@ -237,20 +237,20 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
                 ...config.personality.communicationStyle,
                 formality: parseInt(e.target.value)
               })}
-              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
               disabled={!config.enabled}
             />
-            <span className="text-xs text-gray-500">Formal</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Formal</span>
           </div>
         </div>
 
         {/* Enthusiasm Slider */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Nivel de Entusiasmo: {config.personality.communicationStyle.enthusiasm}
           </label>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-500">Neutral</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Neutral</span>
             <input
               type="range"
               min="1"
@@ -260,20 +260,20 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
                 ...config.personality.communicationStyle,
                 enthusiasm: parseInt(e.target.value)
               })}
-              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
               disabled={!config.enabled}
             />
-            <span className="text-xs text-gray-500">Entusiasta</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Entusiasta</span>
           </div>
         </div>
 
         {/* Technicality Slider */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Nivel Técnico: {config.personality.communicationStyle.technicality}
           </label>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-500">Simple</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Simple</span>
             <input
               type="range"
               min="1"
@@ -283,16 +283,16 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
                 ...config.personality.communicationStyle,
                 technicality: parseInt(e.target.value)
               })}
-              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
               disabled={!config.enabled}
             />
-            <span className="text-xs text-gray-500">Técnico</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Técnico</span>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 pt-4 border-t">
+      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={onSave}
           disabled={isSaving || !config.enabled}
@@ -314,7 +314,7 @@ export const PersonalityConfigPanel: React.FC<PersonalityConfigPanelProps> = ({
         <button
           onClick={onReset}
           disabled={isSaving}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
           <RotateCcw size={18} />
           <span>Resetear</span>

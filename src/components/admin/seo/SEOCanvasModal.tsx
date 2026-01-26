@@ -9,7 +9,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { X, MessageSquare, BarChart3, FileText, Eye, Settings } from 'lucide-react';
+import { X, MessageSquare, BarChart3, FileText, Eye, Settings, CheckCircle, Sparkles } from 'lucide-react';
 import { SEOCanvasProvider, useSEOCanvasContext } from '../../../contexts/SEOCanvasContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import SEOChatInterface from './SEOChatInterface';
@@ -20,6 +20,18 @@ import SEOResultsPanel from './SEOResultsPanel';
 import SEOToolbar from './SEOToolbar';
 import SEOHistoryPanel from './SEOHistoryPanel';
 import SEOConfigPanel from './SEOConfigPanel';
+
+// Descripciones dinámicas para cada modo
+const getModeDescription = (mode: string): string => {
+  switch (mode) {
+    case 'chat': return 'Asistente conversacional para consultas SEO';
+    case 'analysis': return 'Análisis detallado del contenido actual';
+    case 'structure': return 'Genera estructuras optimizadas para SEO';
+    case 'review': return 'Revisión completa y recomendaciones';
+    case 'config': return 'Configuración avanzada del agente';
+    default: return 'Asistente SEO inteligente';
+  }
+};
 
 interface SEOCanvasModalProps {
   isOpen: boolean;
@@ -96,24 +108,24 @@ const SEOCanvasModalContent: React.FC<{
   // Solo verificamos a nivel de UI como backup
   if (!hasAdminAccess) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-red-600">Acceso Denegado</h3>
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Acceso Denegado</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               <X size={20} />
             </button>
           </div>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
             El SEO Canvas solo está disponible para administradores.
           </p>
           <div className="flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cerrar
             </button>
@@ -137,34 +149,45 @@ const SEOCanvasModalContent: React.FC<{
   const ModeIcon = getModeIcon(activeMode);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <ModeIcon className="h-6 w-6 text-blue-600" />
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700">
+        {/* Header Rediseñado con Gradiente */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900">
+          <div className="flex items-center space-x-4">
+            {/* Icono con gradiente */}
+            <div className="relative">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                <ModeIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 p-1 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full">
+                <Sparkles className="h-3 w-3 text-white" />
+              </div>
             </div>
+            
+            {/* Título y descripción */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 SEO Canvas
+                <span className="text-xs font-normal px-2 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
+                  IA
+                </span>
               </h2>
-              <p className="text-sm text-gray-500">
-                Asistente SEO inteligente • Modo: {activeMode.charAt(0).toUpperCase() + activeMode.slice(1)}
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {getModeDescription(activeMode)}
               </p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {/* Indicador de permisos */}
-            <div className="flex items-center space-x-2 text-xs">
+          <div className="flex items-center space-x-3">
+            {/* Badges de permisos mejorados */}
+            <div className="flex items-center space-x-2">
               {canUseAdvancedFeatures && (
-                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                <span className="px-3 py-1.5 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40 text-green-700 dark:text-green-300 rounded-full text-xs font-medium border border-green-200 dark:border-green-800">
                   Admin Access
                 </span>
               )}
               {canAccessConfiguration && isSuperAdmin && (
-                <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
+                <span className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium border border-purple-200 dark:border-purple-800">
                   Super Admin
                 </span>
               )}
@@ -173,41 +196,56 @@ const SEOCanvasModalContent: React.FC<{
             {/* Botón de configuración (solo SUPER_ADMIN) */}
             {canAccessConfiguration && isSuperAdmin && (
               <button
-                onClick={() => setActiveMode('review')} // Temporal, cambiaremos por modo config
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                onClick={() => setActiveMode('config')}
+                className="p-2 text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-all duration-200"
                 title="Configuración SEO"
               >
                 <Settings size={20} />
               </button>
             )}
             
-            {/* Botón cerrar */}
+            {/* Botón cerrar mejorado */}
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200"
+              title="Cerrar SEO Canvas"
             >
               <X size={20} />
             </button>
           </div>
         </div>
 
-        {/* Tabs de navegación */}
-        <div className="border-b border-gray-200 bg-white">
-          {!postContext && (
-            <div className="px-4 py-2 bg-blue-50 border-b border-blue-100">
-              <p className="text-xs text-blue-700">
-                💡 <strong>Modo Chat General:</strong> Los modos Análisis, Estructura y Revisión requieren seleccionar un post específico desde el dashboard.
-              </p>
+        {/* Indicador de contexto del post + Tabs de navegación */}
+        <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          {/* Indicador de post seleccionado (solo si hay contexto) */}
+          {postContext && (
+            <div className="px-4 py-2.5 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-b border-green-100 dark:border-green-800/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    Analizando: <strong className="text-green-700 dark:text-green-400">{postContext.title}</strong>
+                  </span>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="text-xs text-gray-500 hover:text-green-700 dark:text-gray-400 dark:hover:text-green-400 transition-colors font-medium"
+                >
+                  Cambiar post →
+                </button>
+              </div>
             </div>
           )}
-          <div className="flex space-x-1 px-4">
+          
+          {/* Tabs de navegación mejoradas */}
+          <div className="flex space-x-1 px-4 pt-2">
             {/* Tab Chat - Siempre disponible */}
             <button
               onClick={() => setActiveMode('chat')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`relative px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 rounded-t-lg ${
                 activeMode === 'chat'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <MessageSquare className="inline-block h-4 w-4 mr-2" />
@@ -218,26 +256,32 @@ const SEOCanvasModalContent: React.FC<{
             <button
               onClick={() => postContext && setActiveMode('analysis')}
               disabled={!postContext}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`relative group px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 rounded-t-lg ${
                 !postContext
-                  ? 'border-transparent text-gray-300 cursor-not-allowed opacity-50'
+                  ? 'border-transparent text-gray-300 dark:text-gray-600 cursor-not-allowed'
                   : activeMode === 'analysis'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-purple-600 text-purple-600 dark:text-purple-400 bg-purple-50/50 dark:bg-purple-900/20'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
-              title={!postContext ? 'Selecciona un post para usar este modo' : ''}
             >
               <BarChart3 className="inline-block h-4 w-4 mr-2" />
               Análisis
+              {/* Tooltip elegante para tabs deshabilitadas */}
+              {!postContext && (
+                <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl whitespace-nowrap z-20">
+                  Selecciona un post desde el dashboard
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                </div>
+              )}
             </button>
             
             {/* Tab Estructura - Disponible siempre (puede generar sin post) */}
             <button
               onClick={() => setActiveMode('structure')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 rounded-t-lg ${
                 activeMode === 'structure'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <FileText className="inline-block h-4 w-4 mr-2" />
@@ -248,27 +292,33 @@ const SEOCanvasModalContent: React.FC<{
             <button
               onClick={() => postContext && setActiveMode('review')}
               disabled={!postContext}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`relative group px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 rounded-t-lg ${
                 !postContext
-                  ? 'border-transparent text-gray-300 cursor-not-allowed opacity-50'
+                  ? 'border-transparent text-gray-300 dark:text-gray-600 cursor-not-allowed'
                   : activeMode === 'review'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-green-600 text-green-600 dark:text-green-400 bg-green-50/50 dark:bg-green-900/20'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
-              title={!postContext ? 'Selecciona un post para usar este modo' : ''}
             >
               <Eye className="inline-block h-4 w-4 mr-2" />
               Revisión
+              {/* Tooltip elegante para tabs deshabilitadas */}
+              {!postContext && (
+                <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl whitespace-nowrap z-20">
+                  Selecciona un post desde el dashboard
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                </div>
+              )}
             </button>
 
             {/* Tab Configuración - Solo SUPER_ADMIN */}
             {isSuperAdmin && (
               <button
                 onClick={() => setActiveMode('config')}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 rounded-t-lg ${
                   activeMode === 'config'
-                    ? 'border-purple-600 text-purple-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-orange-600 text-orange-600 dark:text-orange-400 bg-orange-50/50 dark:bg-orange-900/20'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
                 title="Configuración avanzada (Solo SUPER_ADMIN)"
               >
@@ -283,9 +333,9 @@ const SEOCanvasModalContent: React.FC<{
         <SEOToolbar />
 
         {/* Contenido principal */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden bg-gray-50 dark:bg-gray-950">
           {/* Panel izquierdo - Chat/Análisis/Configuración */}
-          <div className="w-1/2 border-r border-gray-200 flex flex-col">
+          <div className="w-1/2 border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900">
             {activeMode === 'chat' && <SEOChatInterface />}
             {activeMode === 'analysis' && (
               <SEOAnalysisPanel
@@ -307,35 +357,39 @@ const SEOCanvasModalContent: React.FC<{
                 title={postContext?.title || ''}
                 description={postContext?.description}
                 keywords={postContext?.keywords}
+                postId={postContext?.postId}
               />
             )}
             {activeMode === 'config' && <SEOConfigPanel />}
           </div>
 
           {/* Panel derecho - Resultados */}
-          <div className="w-1/2 flex flex-col">
+          <div className="w-1/2 flex flex-col bg-white dark:bg-gray-900">
             <SEOResultsPanel />
           </div>
         </div>
 
-        {/* Loading Overlay */}
+        {/* Loading Overlay mejorado */}
         {isLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="text-gray-600">Verificando permisos...</span>
+          <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm flex items-center justify-center rounded-2xl">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400"></div>
+                <Sparkles className="absolute inset-0 m-auto h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="text-gray-600 dark:text-gray-400 font-medium">Procesando...</span>
             </div>
           </div>
         )}
 
-        {/* Error Toast */}
+        {/* Error Toast mejorado */}
         {error && (
-          <div className="absolute top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg max-w-md">
+          <div className="absolute top-4 right-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl shadow-lg max-w-md backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <span className="text-sm">{error}</span>
               <button
                 onClick={clearError}
-                className="ml-2 text-red-400 hover:text-red-600"
+                className="ml-3 p-1 text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-800/50 rounded-lg transition-colors"
               >
                 <X size={16} />
               </button>

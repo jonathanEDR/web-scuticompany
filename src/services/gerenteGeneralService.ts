@@ -57,31 +57,140 @@ export interface OrchestrationConfig {
   };
 }
 
+// ============================================
+// INTERFACES DE PERSONALIDAD
+// ============================================
+
+export interface PersonalityTrait {
+  trait: string;
+  intensity: number; // 1-10
+}
+
+export interface CommunicationStyle {
+  tone: 'formal' | 'casual' | 'friendly' | 'professional' | 'technical' | 'motivational';
+  verbosity: 'concise' | 'moderate' | 'detailed' | 'comprehensive';
+  formality: number; // 1-10
+  enthusiasm: number; // 1-10
+  technicality: number; // 1-10
+}
+
+export interface PersonalityConfig {
+  archetype: 'analyst' | 'coach' | 'expert' | 'assistant' | 'guardian' | 'innovator' | 'coordinator';
+  traits: PersonalityTrait[];
+  communicationStyle: CommunicationStyle;
+}
+
+// ============================================
+// INTERFACES DE TRAINING
+// ============================================
+
+export interface TrainingExample {
+  id: string;
+  input: string;
+  expectedOutput: string;
+  category: string;
+  notes?: string;
+}
+
+export interface TaskPrompt {
+  taskType: string;
+  systemPrompt: string;
+  userPromptTemplate: string;
+  temperature: number;
+  examples: string[];
+}
+
+export interface TrainingConfig {
+  examples: TrainingExample[];
+  taskPrompts: TaskPrompt[];
+  behaviorRules: string[];
+  specialInstructions: string;
+  learningMode: 'conservative' | 'balanced' | 'aggressive' | 'adaptive';
+}
+
+// ============================================
+// INTERFACES DE RESPUESTAS Y PROMPTS
+// ============================================
+
+export interface ResponseConfig {
+  defaultLanguage: string;
+  supportedLanguages: string[];
+  includeExamples: boolean;
+  includeSteps: boolean;
+  includeMetrics: boolean;
+  includeRecommendations: boolean;
+  responseFormat: 'text' | 'structured' | 'markdown' | 'detailed';
+}
+
+export interface PromptConfig {
+  useCustomPrompts: boolean;
+  customSystemPrompt: string;
+  promptVariables: Record<string, string>;
+  contextWindow: number;
+}
+
+export interface ProjectInfo {
+  name: string;
+  type: string;
+  domain: string;
+  language: string;
+  tone: string;
+}
+
+// ============================================
+// INTERFACE PRINCIPAL DE CONFIGURACIÓN
+// ============================================
+
 export interface GerenteGeneralConfigData {
   agentName: 'gerente';
   enabled: boolean;
+  
+  // Configuración básica (OpenAI)
+  config: {
+    timeout: number;
+    maxTokens: number;
+    temperature: number;
+    maxSessionsPerUser?: number;
+    sessionTTLHours?: number;
+    autoRouting?: boolean;
+    contextSharing?: boolean;
+  };
+  
+  // Configuración de personalidad
+  personality?: PersonalityConfig;
+  
+  // Configuración de contexto del proyecto
+  contextConfig: {
+    sessionTTL: number;
+    maxSessions: number;
+    enableContextSharing: boolean;
+    enableContextEnrichment: boolean;
+    contextMemorySize: number;
+    projectInfo?: ProjectInfo;
+    userExpertise?: 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'varied';
+  };
+  
+  // Configuración de respuestas
+  responseConfig?: ResponseConfig;
+  
+  // Configuración de prompts
+  promptConfig?: PromptConfig;
+  
+  // Configuración de entrenamiento
+  trainingConfig?: TrainingConfig;
   
   // Configuración de routing inteligente
   routingConfig: RoutingConfiguration;
   
   // Configuración de orquestación
-  orchestrationConfig: OrchestrationConfig;
-  
-  // Configuración de contexto centralizado
-  contextConfig: {
-    sessionTTL: number; // milliseconds
-    maxSessions: number;
-    enableContextSharing: boolean;
-    enableContextEnrichment: boolean;
-    contextMemorySize: number; // items a recordar
-  };
+  orchestrationConfig?: OrchestrationConfig;
   
   // Configuración de coordinación multi-agente
-  coordinationStrategies: {
+  coordinationStrategies?: {
     [coordinationType: string]: {
       name: string;
       description: string;
-      agentSequence: string[]; // Orden de ejecución
+      agentSequence: string[];
       contextFlow: 'sequential' | 'parallel' | 'hybrid';
       enabled: boolean;
       timeout: number;
@@ -90,20 +199,13 @@ export interface GerenteGeneralConfigData {
     };
   };
   
-  // Configuración básica (común con otros agentes)
-  config: {
-    timeout: number;
-    maxTokens: number;
-    temperature: number;
-  };
-  
   // Estadísticas
   statistics?: {
     totalCoordinations: number;
     successfulCoordinations: number;
     failedCoordinations: number;
     averageCoordinationTime: number;
-    routingAccuracy: number; // 0-1
+    routingAccuracy: number;
     lastUsed?: string;
   };
   
@@ -233,9 +335,6 @@ class GerenteGeneralService {
 
       const result = await response.json();
       console.log('📦 [gerenteGeneralService] Response JSON:', result);
-      console.log('📋 [gerenteGeneralService] Result data:', result?.data);
-      console.log('🔍 [gerenteGeneralService] Result.data.config:', result?.data?.config);
-
       return result;
     } catch (error) {
       console.error('❌ Error fetching GerenteGeneral config:', error);
@@ -322,6 +421,35 @@ class GerenteGeneralService {
       return await response.json();
     } catch (error) {
       console.error('❌ Error updating routing rules:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error desconocido'
+      };
+    }
+  }
+
+  /**
+   * Inicializar/Reinicializar configuración con valores por defecto
+   * SOBRESCRIBE la configuración actual
+   */
+  async initializeConfig(): Promise<{
+    success: boolean;
+    data?: GerenteGeneralConfigData;
+    message?: string;
+    error?: string;
+  }> {
+    try {
+      const response = await this.fetchWithAuth('/gerente/config/initialize', {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('❌ Error initializing GerenteGeneral config:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Error desconocido'

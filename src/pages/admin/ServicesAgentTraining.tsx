@@ -278,12 +278,12 @@ const ServicesAgentTraining: React.FC = () => {
   };
 
   const categoryColors = {
-    pricing: 'bg-green-100 text-green-700 border-green-200',
-    analysis: 'bg-blue-100 text-blue-700 border-blue-200',
-    generation: 'bg-purple-100 text-purple-700 border-purple-200',
-    optimization: 'bg-orange-100 text-orange-700 border-orange-200',
-    portfolio: 'bg-pink-100 text-pink-700 border-pink-200',
-    general: 'bg-gray-100 text-gray-700 border-gray-200'
+    pricing: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700',
+    analysis: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-700',
+    generation: 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-700',
+    optimization: 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200 dark:bg-fuchsia-900/30 dark:text-fuchsia-300 dark:border-fuchsia-700',
+    portfolio: 'bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-700',
+    general: 'bg-gray-100 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600'
   };
 
   const categoryIcons = {
@@ -297,37 +297,37 @@ const ServicesAgentTraining: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando configuración de entrenamiento...</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-indigo-900/10 flex items-center justify-center">
+        <div className="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando configuración de entrenamiento...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-indigo-900/10">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Left Section */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate('/dashboard/ai-agents')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
               
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
+                <div className="p-2 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg">
                   <Briefcase className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">Entrenar ServicesAgent</h1>
-                  <p className="text-sm text-gray-500">Ejemplos, prompts y reglas de comportamiento</p>
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">Entrenar ServicesAgent</h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Ejemplos, prompts y reglas de comportamiento</p>
                 </div>
               </div>
             </div>
@@ -336,7 +336,7 @@ const ServicesAgentTraining: React.FC = () => {
             <div className="flex items-center gap-3">
               {message && (
                 <div className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-                  message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  message.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                 }`}>
                   {message.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   {message.text}
@@ -346,7 +346,7 @@ const ServicesAgentTraining: React.FC = () => {
               <button
                 onClick={loadTrainingConfig}
                 disabled={saving}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
                 Recargar
@@ -364,13 +364,13 @@ const ServicesAgentTraining: React.FC = () => {
           </div>
 
           {/* Tabs */}
-          <div className="mt-4 flex gap-2 border-b border-gray-200">
+          <div className="mt-4 flex gap-2 border-b border-gray-200 dark:border-gray-700">
             <button
               onClick={() => setActiveTab('examples')}
               className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'examples'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               <BookOpen className="w-4 h-4" />
@@ -380,8 +380,8 @@ const ServicesAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('prompts')}
               className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'prompts'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               <Target className="w-4 h-4" />
@@ -391,8 +391,8 @@ const ServicesAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('behavior')}
               className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'behavior'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               <Zap className="w-4 h-4" />
@@ -402,8 +402,8 @@ const ServicesAgentTraining: React.FC = () => {
               onClick={() => setActiveTab('testing')}
               className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'testing'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               <Sparkles className="w-4 h-4" />
@@ -419,12 +419,12 @@ const ServicesAgentTraining: React.FC = () => {
         {activeTab === 'examples' && (
           <div className="space-y-6">
             {/* Info Card */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <BookOpen className="w-5 h-5 text-blue-600 mt-0.5" />
+                <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-blue-900">¿Qué son los ejemplos de entrenamiento?</h3>
-                  <p className="text-sm text-blue-700 mt-1">
+                  <h3 className="font-semibold text-indigo-900 dark:text-indigo-200">¿Qué son los ejemplos de entrenamiento?</h3>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
                     Los ejemplos de entrenamiento enseñan al agente cómo responder en situaciones específicas.
                     Usa "few-shot learning" para mejorar la calidad y consistencia de las respuestas relacionadas con servicios, pricing y análisis de portafolio.
                   </p>
@@ -433,20 +433,20 @@ const ServicesAgentTraining: React.FC = () => {
             </div>
 
             {/* Add New Example */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-purple-600" />
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 Agregar Nuevo Ejemplo
               </h3>
 
               <div className="space-y-4">
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
                   <select
                     value={newExample.category}
                     onChange={(e) => setNewExample({ ...newExample, category: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="general">General</option>
                     <option value="pricing">Pricing / Precios</option>
@@ -459,35 +459,35 @@ const ServicesAgentTraining: React.FC = () => {
 
                 {/* Input */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Entrada del Usuario (Input)
                   </label>
                   <textarea
                     value={newExample.input}
                     onChange={(e) => setNewExample({ ...newExample, input: e.target.value })}
                     placeholder="Ej: Analiza este servicio de desarrollo web y sugiere mejoras de pricing..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     rows={3}
                   />
                 </div>
 
                 {/* Expected Output */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Salida Esperada (Expected Output)
                   </label>
                   <textarea
                     value={newExample.expectedOutput}
                     onChange={(e) => setNewExample({ ...newExample, expectedOutput: e.target.value })}
                     placeholder="Ej: He analizado el contenido sobre desarrollo web. Aquí están las mejoras de pricing sugeridas:..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     rows={4}
                   />
                 </div>
 
                 {/* Notes */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Notas (Opcional)
                   </label>
                   <input
@@ -495,7 +495,7 @@ const ServicesAgentTraining: React.FC = () => {
                     value={newExample.notes || ''}
                     onChange={(e) => setNewExample({ ...newExample, notes: e.target.value })}
                     placeholder="Contexto adicional sobre este ejemplo..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                 </div>
 
@@ -511,22 +511,22 @@ const ServicesAgentTraining: React.FC = () => {
 
             {/* Existing Examples */}
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Ejemplos Existentes ({trainingConfig.examples.length})
               </h3>
 
               {trainingConfig.examples.length === 0 ? (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center">
                   <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600">No hay ejemplos de entrenamiento aún.</p>
-                  <p className="text-sm text-gray-500 mt-1">Agrega tu primer ejemplo arriba para comenzar.</p>
+                  <p className="text-gray-600 dark:text-gray-300">No hay ejemplos de entrenamiento aún.</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Agrega tu primer ejemplo arriba para comenzar.</p>
                 </div>
               ) : (
                 <div className="grid gap-4">
                   {trainingConfig.examples.map((example) => {
                     const Icon = categoryIcons[example.category];
                     return (
-                      <div key={example.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <div key={example.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-start justify-between mb-3">
                           <div className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${categoryColors[example.category]}`}>
                             <Icon className="w-3 h-3" />
@@ -542,19 +542,19 @@ const ServicesAgentTraining: React.FC = () => {
 
                         <div className="space-y-3">
                           <div>
-                            <p className="text-xs font-medium text-gray-500 mb-1">INPUT:</p>
+                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">INPUT:</p>
                             <p className="text-sm text-gray-900">{example.input}</p>
                           </div>
 
                           <div>
-                            <p className="text-xs font-medium text-gray-500 mb-1">EXPECTED OUTPUT:</p>
+                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">EXPECTED OUTPUT:</p>
                             <p className="text-sm text-gray-700">{example.expectedOutput}</p>
                           </div>
 
                           {example.notes && (
                             <div>
-                              <p className="text-xs font-medium text-gray-500 mb-1">NOTAS:</p>
-                              <p className="text-sm text-gray-600 italic">{example.notes}</p>
+                              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">NOTAS:</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300 italic">{example.notes}</p>
                             </div>
                           )}
                         </div>
@@ -585,15 +585,15 @@ const ServicesAgentTraining: React.FC = () => {
             </div>
 
             {/* Add New Task Prompt */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <Plus className="w-5 h-5 text-purple-600" />
                 Agregar Nuevo Prompt de Tarea
               </h3>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Tarea</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de Tarea</label>
                   <input
                     type="text"
                     value={newTaskPrompt.taskType}
@@ -604,7 +604,7 @@ const ServicesAgentTraining: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">System Prompt</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">System Prompt</label>
                   <textarea
                     value={newTaskPrompt.systemPrompt}
                     onChange={(e) => setNewTaskPrompt({ ...newTaskPrompt, systemPrompt: e.target.value })}
@@ -615,7 +615,7 @@ const ServicesAgentTraining: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">User Prompt Template</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">User Prompt Template</label>
                   <textarea
                     value={newTaskPrompt.userPromptTemplate}
                     onChange={(e) => setNewTaskPrompt({ ...newTaskPrompt, userPromptTemplate: e.target.value })}
@@ -626,7 +626,7 @@ const ServicesAgentTraining: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Temperature: {newTaskPrompt.temperature}
                   </label>
                   <input
@@ -657,19 +657,19 @@ const ServicesAgentTraining: React.FC = () => {
               </h3>
 
               {trainingConfig.taskPrompts.length === 0 ? (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+                <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center">
                   <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600">No hay prompts de tareas configurados.</p>
+                  <p className="text-gray-600 dark:text-gray-300">No hay prompts de tareas configurados.</p>
                 </div>
               ) : (
                 <div className="grid gap-4">
                   {trainingConfig.taskPrompts.map((prompt, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
                       <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-semibold text-gray-900">{prompt.taskType}</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{prompt.taskType}</h4>
                         <button
                           onClick={() => removeTaskPrompt(index)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -677,16 +677,16 @@ const ServicesAgentTraining: React.FC = () => {
 
                       <div className="space-y-2 text-sm">
                         <div>
-                          <p className="text-xs font-medium text-gray-500">SYSTEM PROMPT:</p>
-                          <p className="text-gray-700">{prompt.systemPrompt}</p>
+                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">SYSTEM PROMPT:</p>
+                          <p className="text-gray-700 dark:text-gray-300">{prompt.systemPrompt}</p>
                         </div>
                         {prompt.userPromptTemplate && (
                           <div>
-                            <p className="text-xs font-medium text-gray-500">USER TEMPLATE:</p>
-                            <p className="text-gray-700">{prompt.userPromptTemplate}</p>
+                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">USER TEMPLATE:</p>
+                            <p className="text-gray-700 dark:text-gray-300">{prompt.userPromptTemplate}</p>
                           </div>
                         )}
-                        <p className="text-xs text-gray-500">Temperature: {prompt.temperature}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Temperature: {prompt.temperature}</p>
                       </div>
                     </div>
                   ))}
@@ -699,21 +699,21 @@ const ServicesAgentTraining: React.FC = () => {
         {/* TAB: Reglas de Comportamiento */}
         {activeTab === 'behavior' && (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <Zap className="w-5 h-5 text-blue-600 mt-0.5" />
+                <Zap className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-blue-900">Reglas de Comportamiento</h3>
-                  <p className="text-sm text-blue-700 mt-1">
+                  <h3 className="font-semibold text-indigo-900 dark:text-indigo-200">Reglas de Comportamiento</h3>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
                     Define reglas específicas que el agente debe seguir siempre. Por ejemplo: "Siempre incluir análisis de ROI en recomendaciones de pricing" o "Nunca sugerir precios por debajo del costo".
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Reglas Activas ({trainingConfig.behaviorRules.length})
                 </h3>
                 <button
@@ -726,21 +726,21 @@ const ServicesAgentTraining: React.FC = () => {
               </div>
 
               {trainingConfig.behaviorRules.length === 0 ? (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+                <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center">
                   <Zap className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600">No hay reglas de comportamiento definidas.</p>
+                  <p className="text-gray-600 dark:text-gray-300">No hay reglas de comportamiento definidas.</p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {trainingConfig.behaviorRules.map((rule, index) => (
-                    <div key={index} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div key={index} className="flex items-start justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                       <div className="flex items-start gap-3 flex-1">
-                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-900">{rule}</p>
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-gray-900 dark:text-gray-100">{rule}</p>
                       </div>
                       <button
                         onClick={() => removeBehaviorRule(index)}
-                        className="text-red-600 hover:text-red-700 ml-2"
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -751,8 +751,8 @@ const ServicesAgentTraining: React.FC = () => {
             </div>
 
             {/* Special Instructions */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Instrucciones Especiales</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Instrucciones Especiales</h3>
               <textarea
                 value={trainingConfig.specialInstructions}
                 onChange={(e) => setTrainingConfig({ ...trainingConfig, specialInstructions: e.target.value })}
@@ -763,8 +763,8 @@ const ServicesAgentTraining: React.FC = () => {
             </div>
 
             {/* Learning Mode */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Modo de Aprendizaje</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Modo de Aprendizaje</h3>
               <div className="grid grid-cols-3 gap-4">
                 {(['conservative', 'balanced', 'aggressive'] as const).map((mode) => (
                   <button
@@ -773,11 +773,11 @@ const ServicesAgentTraining: React.FC = () => {
                     className={`p-4 rounded-lg border-2 transition-all ${
                       trainingConfig.learningMode === mode
                         ? 'border-purple-600 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
                     }`}
                   >
-                    <p className="font-semibold text-gray-900 capitalize">{mode}</p>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="font-semibold text-gray-900 dark:text-white capitalize">{mode}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                       {mode === 'conservative' && 'Respuestas más predecibles'}
                       {mode === 'balanced' && 'Balance entre creatividad y consistencia'}
                       {mode === 'aggressive' && 'Más creativo y exploratorio'}
@@ -792,25 +792,25 @@ const ServicesAgentTraining: React.FC = () => {
         {/* TAB: Testing */}
         {activeTab === 'testing' && (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <Sparkles className="w-5 h-5 text-blue-600 mt-0.5" />
+                <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-blue-900">Probar el Agente</h3>
-                  <p className="text-sm text-blue-700 mt-1">
+                  <h3 className="font-semibold text-indigo-900 dark:text-indigo-200">Probar el Agente</h3>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
                     Prueba cómo responde el agente con la configuración actual. Usa prompts reales que usarías en producción.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Input de Prueba</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Input de Prueba</h3>
               <textarea
                 value={testInput}
                 onChange={(e) => setTestInput(e.target.value)}
                 placeholder="Escribe tu prompt aquí para probar el agente..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500"
                 rows={4}
               />
 
@@ -825,10 +825,10 @@ const ServicesAgentTraining: React.FC = () => {
             </div>
 
             {testOutput && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Resultado</h3>
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-900">{testOutput}</pre>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resultado</h3>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                  <pre className="whitespace-pre-wrap text-sm text-gray-900 dark:text-gray-100">{testOutput}</pre>
                 </div>
               </div>
             )}

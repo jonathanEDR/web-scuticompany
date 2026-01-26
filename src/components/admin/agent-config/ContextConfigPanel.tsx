@@ -34,17 +34,17 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
       {/* Project Information */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Building className="text-indigo-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Información del Proyecto</h3>
+          <Building className="text-indigo-600 dark:text-indigo-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Información del Proyecto</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Define el contexto del proyecto para respuestas más personalizadas
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Project Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Nombre del Proyecto
             </label>
             <input
@@ -54,7 +54,7 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
                 ...config.contextConfig.projectInfo,
                 name: e.target.value
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               disabled={!config.enabled}
               placeholder="Web Scuti"
             />
@@ -62,7 +62,7 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
 
           {/* Project Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Tipo de Proyecto
             </label>
             <input
@@ -72,18 +72,18 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
                 ...config.contextConfig.projectInfo,
                 type: e.target.value
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               disabled={!config.enabled}
               placeholder="tech_blog"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Ej: tech_blog, e-commerce, portfolio, etc.
             </p>
           </div>
 
           {/* Domain */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Dominio/Industria
             </label>
             <input
@@ -93,18 +93,18 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
                 ...config.contextConfig.projectInfo,
                 domain: e.target.value
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               disabled={!config.enabled}
               placeholder="technology"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Ej: technology, business, health, etc.
             </p>
           </div>
 
           {/* Language */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Idioma Principal
             </label>
             <select
@@ -113,7 +113,7 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
                 ...config.contextConfig.projectInfo,
                 language: e.target.value
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               disabled={!config.enabled}
             >
               <option value="es-ES">Español (ES)</option>
@@ -128,7 +128,7 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
 
           {/* Tone */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Tono del Proyecto
             </label>
             <input
@@ -138,11 +138,11 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
                 ...config.contextConfig.projectInfo,
                 tone: e.target.value
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               disabled={!config.enabled}
               placeholder="professional_friendly"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Ej: professional_friendly, casual_fun, formal_corporate, etc.
             </p>
           </div>
@@ -152,10 +152,10 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
       {/* User Expertise Level */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <User className="text-blue-600" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">Nivel de Expertise del Usuario</h3>
+          <User className="text-blue-600 dark:text-blue-400" size={20} />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Nivel de Expertise del Usuario</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Define el nivel de conocimiento del usuario objetivo para adaptar las respuestas
         </p>
 
@@ -167,23 +167,23 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
               disabled={!config.enabled}
               className={`p-4 rounded-lg border-2 text-center transition-all ${
                 config.contextConfig.userExpertise === level.value
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-gray-200 hover:border-blue-300'
+                  ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-500'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 bg-white dark:bg-gray-800'
               } ${!config.enabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <div className="text-3xl mb-2">{level.icon}</div>
-              <div className="font-medium text-gray-900">{level.label}</div>
-              <div className="text-xs text-gray-500 mt-1">{level.description}</div>
+              <div className="font-medium text-gray-900 dark:text-white">{level.label}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{level.description}</div>
             </button>
           ))}
         </div>
       </div>
 
       {/* Info Box */}
-      <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+      <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-lg">
         <div className="flex gap-3">
-          <Globe className="text-indigo-600 flex-shrink-0" size={20} />
-          <div className="text-sm text-indigo-800">
+          <Globe className="text-indigo-600 dark:text-indigo-400 flex-shrink-0" size={20} />
+          <div className="text-sm text-indigo-800 dark:text-indigo-300">
             <p className="font-medium mb-1">Importancia del Contexto</p>
             <p>
               El agente utiliza esta información para adaptar sus respuestas al contexto específico 
@@ -195,7 +195,7 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 pt-4 border-t">
+      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={onSave}
           disabled={isSaving || !config.enabled}
@@ -217,7 +217,7 @@ export const ContextConfigPanel: React.FC<ContextConfigPanelProps> = ({
         <button
           onClick={onReset}
           disabled={isSaving}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
           <RotateCcw size={18} />
           <span>Resetear</span>

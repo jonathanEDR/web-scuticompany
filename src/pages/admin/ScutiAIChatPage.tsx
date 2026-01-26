@@ -86,7 +86,12 @@ const ScutiAIChatPage: React.FC = () => {
     // Canvas actions
     hideCanvas,
     toggleCanvasExpand,
-    showCanvas: _showCanvas // No usado directamente, el canvas se abre automáticamente
+    showCanvas: _showCanvas, // No usado directamente, el canvas se abre automáticamente
+    
+    // 🆕 Blog context
+    activeBlogContext,
+    setActiveBlogContext,
+    clearBlogContext
   } = useScutiAI();
 
   // Cargar estado del sistema al montar (solo una vez)
@@ -131,6 +136,16 @@ const ScutiAIChatPage: React.FC = () => {
 
   // Handlers de navegación de categorías
   const handleCategorySelect = (category: CategoryType) => {
+    // Blog y Servicios van directo a listar (sin accesos directos intermedios)
+    if (category === 'blog') {
+      sendMessage('mostrar blog');
+      return;
+    }
+    if (category === 'servicios') {
+      sendMessage('ver catálogo de servicios');
+      return;
+    }
+    // Agenda mantiene sus accesos directos
     setSelectedCategory(category);
   };
 
@@ -273,8 +288,27 @@ const ScutiAIChatPage: React.FC = () => {
     }
     
     // Si es un blog, enviar comando automático para verlo
+    // 🆕 También establecer el contexto del blog activo
+    if (canvasContent?.type === 'blog_list') {
+      // Establecer contexto inmediatamente (optimistic update)
+      setActiveBlogContext({
+        id: itemId,
+        title: itemTitle || 'Blog seleccionado',
+        slug: undefined // Se actualizará cuando llegue la respuesta del backend
+      });
+      
+      // Usar el título para un mensaje más natural
+      if (itemTitle) {
+        sendMessage(`ver blog: ${itemTitle}`);
+      } else {
+        sendMessage(`ver blog id: ${itemId}`);
+      }
+      return;
+    }
+    
+    // Para otros tipos de contenido de blog, también usar el título
     if (itemTitle) {
-      sendMessage(`ver blog: ${itemTitle} (id: ${itemId})`);
+      sendMessage(`ver blog: ${itemTitle}`);
     } else {
       sendMessage(`ver blog id: ${itemId}`);
     }
@@ -322,6 +356,27 @@ const ScutiAIChatPage: React.FC = () => {
             onViewDetails={handleViewDetails}
             onShare={handleShare}
           />
+          
+          {/* 🆕 Indicador de Blog Activo */}
+          {activeBlogContext && (
+            <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border-b border-blue-200 dark:border-blue-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600 dark:text-blue-400">📝</span>
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  Trabajando con: <strong>{activeBlogContext.title}</strong>
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  clearBlogContext();
+                  sendMessage('mostrar blog');
+                }}
+                className="text-xs px-3 py-1 bg-blue-100 dark:bg-blue-800/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-700 transition-colors"
+              >
+                Cambiar blog
+              </button>
+            </div>
+          )}
 
           {/* Mensajes */}
           <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
@@ -359,7 +414,7 @@ const ScutiAIChatPage: React.FC = () => {
                       <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mb-4">
                         Selecciona una categoría para comenzar:
                       </p>
-                      <div className="grid grid-cols-2 gap-3 max-w-xl">
+                      <div className="grid grid-cols-3 gap-3 max-w-xl">
                         <button
                           onClick={() => handleCategorySelect('blog')}
                           className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-left hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all transform hover:scale-105 hover:shadow-md border border-transparent hover:border-blue-300 dark:hover:border-blue-700"
@@ -382,18 +437,6 @@ const ScutiAIChatPage: React.FC = () => {
                           </h3>
                           <p className="text-xs text-gray-600 dark:text-gray-400">
                             Analizar y gestionar portafolio
-                          </p>
-                        </button>
-                        <button
-                          onClick={() => handleCategorySelect('seo')}
-                          className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-left hover:bg-green-100 dark:hover:bg-green-900/30 transition-all transform hover:scale-105 hover:shadow-md border border-transparent hover:border-green-300 dark:hover:border-green-700"
-                        >
-                          <div className="text-xl mb-1">🔍</div>
-                          <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-0.5">
-                            SEO
-                          </h3>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
-                            Optimización y análisis
                           </p>
                         </button>
                         <button

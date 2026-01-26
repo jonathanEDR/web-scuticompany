@@ -141,9 +141,9 @@ export interface ChatStatistics {
 // CANVAS EDITOR
 // ============================================
 
-export type CanvasMode = 'preview' | 'list' | 'empty' | 'conversation';
+export type CanvasMode = 'preview' | 'list' | 'empty' | 'conversation' | 'suggestions';
 
-export type CanvasContentType = 'blog' | 'service' | 'service_list' | 'service_analysis' | 'list' | 'html' | 'markdown' | 'blog_creation' | 'blog_list' | 'seo_analysis' | 'event_list' | 'empty_state' | 'session_details';
+export type CanvasContentType = 'blog' | 'service' | 'service_list' | 'service_analysis' | 'list' | 'html' | 'markdown' | 'blog_creation' | 'blog_list' | 'blog_improvements' | 'blog_statistics' | 'blog_statistics_general' | 'seo_analysis' | 'event_list' | 'empty_state' | 'session_details';
 
 export interface CanvasContent {
   type: CanvasContentType;
