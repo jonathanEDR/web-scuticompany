@@ -9,16 +9,14 @@ import FeaturedBlogSection from '../../components/public/FeaturedBlogSection';
 import ContactSection from '../../components/public/ContactSection';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
+import PageLoader from '../../components/common/PageLoader';
 import { HomePageSchema } from '../../components/seo/SchemaOrg';
-import { getPageBySlug, forceReload } from '../../services/cmsApi';
+import { getPageBySlug, forceReload, getCachedPageSync } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
-import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG, DEFAULT_FEATURED_BLOG_CONFIG, DEFAULT_SEO_CONFIG } from '../../utils/defaultConfig';
 import { useCategoriasList, type Categoria } from '../../hooks/useCategoriasCache';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
 import type { ClientLogosContent } from '../../types/cms';
-import type { DefaultFeaturedBlogConfig } from '../../utils/defaultConfig';
-
 
 interface ButtonTheme {
   background: string;
@@ -43,6 +41,31 @@ interface ExtendedThemeConfig extends ThemeConfig {
   };
 }
 
+interface FeaturedBlogConfig {
+  headerIcon?: string;
+  headerIconColor?: string;
+  fontFamily?: string;
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
+  };
+  backgroundImageAlt?: string;
+  limit?: number;
+  buttonText?: string;
+  buttonLink?: string;
+  styles?: {
+    light?: Record<string, string>;
+    dark?: Record<string, string>;
+  };
+  cardsDesign?: {
+    light?: Record<string, string>;
+    dark?: Record<string, string>;
+  };
+}
+
 interface PageData {
   content: {
     hero: {
@@ -56,20 +79,33 @@ interface PageData {
         dark?: string;
       };
       backgroundImageAlt?: string;
+      styles?: {
+        light?: Record<string, string>;
+        dark?: Record<string, string>;
+      };
     };
     solutions: {
       title: string;
-      subtitle: string;
-      backgroundImage: {
-        light: string;
-        dark: string;
+      subtitle?: string;
+      description?: string;
+      backgroundImage?: {
+        light?: string;
+        dark?: string;
       };
-      backgroundImageAlt: string;
-      cards: Array<{
+      backgroundImageAlt?: string;
+      cards?: Array<{
         id: string;
         title: string;
         description: string;
-        icon: string;
+        icon?: string;
+        iconLight?: string;
+        iconDark?: string;
+      }>;
+      items?: Array<{
+        id: string;
+        title: string;
+        description: string;
+        icon?: string;
         iconLight?: string;
         iconDark?: string;
       }>;
@@ -77,16 +113,17 @@ interface PageData {
     valueAdded: {
       title: string;
       subtitle?: string;
-      backgroundImage: {
-        light: string;
-        dark: string;
+      description?: string;
+      backgroundImage?: {
+        light?: string;
+        dark?: string;
       };
-      backgroundImageAlt: string;
-      cards: Array<{
+      backgroundImageAlt?: string;
+      cards?: Array<{
         id: string;
         title: string;
         description: string;
-        icon?: string; // Opcional, ahora usamos iconLight/iconDark
+        icon?: string;
         iconLight?: string;
         iconDark?: string;
         gradient?: string;
@@ -100,58 +137,34 @@ interface PageData {
         order: number;
       }>;
       logosBarDesign?: {
-        light?: {
-          animationsEnabled?: boolean;
-          rotationMode?: 'none' | 'individual';
-          animationSpeed?: 'slow' | 'normal' | 'fast';
-          hoverEffects?: boolean;
-          hoverIntensity?: 'light' | 'normal' | 'strong';
-          glowEffects?: boolean;
-          autoDetectTech?: boolean;
-          logoSize?: 'small' | 'medium' | 'large';
-          logoSpacing?: 'compact' | 'normal' | 'wide';
-          logoFormat?: 'square' | 'rectangle' | 'original';
-          maxLogoWidth?: 'small' | 'medium' | 'large';
-          uniformSize?: boolean;
-        };
-        dark?: {
-          animationsEnabled?: boolean;
-          rotationMode?: 'none' | 'individual';
-          animationSpeed?: 'slow' | 'normal' | 'fast';
-          hoverEffects?: boolean;
-          hoverIntensity?: 'light' | 'normal' | 'strong';
-          glowEffects?: boolean;
-          autoDetectTech?: boolean;
-          logoSize?: 'small' | 'medium' | 'large';
-          logoSpacing?: 'compact' | 'normal' | 'wide';
-          logoFormat?: 'square' | 'rectangle' | 'original';
-          maxLogoWidth?: 'small' | 'medium' | 'large';
-          uniformSize?: boolean;
-        };
+        light?: Record<string, unknown>;
+        dark?: Record<string, unknown>;
       };
     };
     clientLogos?: ClientLogosContent;
-    featuredBlog?: DefaultFeaturedBlogConfig;
-    contactForm?: any;
+    featuredBlog?: FeaturedBlogConfig;
+    contactForm?: Record<string, unknown>;
   };
-  seo: {
-    focusKeyphrase?: string;  // Palabra clave principal para SEO
-    metaTitle: string;
-    metaDescription: string;
-    keywords: string[];
-    ogTitle: string;
-    ogDescription: string;
-    ogImage: string;
+  seo?: {
+    focusKeyphrase?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
   };
   theme?: ExtendedThemeConfig;
 }
 
 // Función para agregar categorías a la configuración del CMS
-const addCategoriasToConfig = (cmsConfig: any, categorias: Categoria[] = []) => {
-  const configWithCategories = {
+const addCategoriasToConfig = (cmsConfig: Record<string, unknown> | undefined, categorias: Categoria[] = []): any => {
+  if (!cmsConfig) return undefined;
+
+  return {
     ...cmsConfig,
     fields: {
-      ...cmsConfig.fields,
+      ...(cmsConfig.fields as Record<string, unknown> || {}),
       ...(categorias.length > 0 && {
         categoriaLabel: 'Servicio de Interés',
         categoriaPlaceholder: 'Selecciona el tipo de servicio que necesitas',
@@ -160,40 +173,29 @@ const addCategoriasToConfig = (cmsConfig: any, categorias: Categoria[] = []) => 
       })
     }
   };
-  
-  return configWithCategories;
-};
-
-const DEFAULT_PAGE_DATA: PageData = {
-  content: {
-    hero: DEFAULT_HERO_CONFIG,
-    solutions: DEFAULT_SOLUTIONS_CONFIG,
-    valueAdded: DEFAULT_VALUE_ADDED_CONFIG,
-    featuredBlog: DEFAULT_FEATURED_BLOG_CONFIG,
-    contactForm: DEFAULT_CONTACT_CONFIG
-  },
-  seo: DEFAULT_SEO_CONFIG  // ✅ Importado de defaultConfig.ts (una sola fuente de verdad)
 };
 
 /**
- * Página Home Optimizada
- * - Renderiza contenido estático inmediatamente
- * - Carga datos del CMS en background sin bloquear
- * - Sin dependencias de autenticación
+ * Página Home - Solo datos del CMS
+ * - Usa PageLoader mientras carga datos
+ * - Carga datos del CMS y renderiza cuando están disponibles
+ * - Sin datos hardcodeados
  */
 const HomeOptimized = () => {
-  const [pageData, setPageData] = useState<PageData>(DEFAULT_PAGE_DATA);
-  const { setThemeConfig } = useTheme();
-  
-  // ✅ Configuración centralizada del sitio (sin hardcoded)
+  // Intentar obtener datos del caché de forma síncrona para evitar flash
+  const cachedData = getCachedPageSync('home');
+
+  const [pageData, setPageData] = useState<PageData | null>(cachedData);
+  const [isLoading, setIsLoading] = useState(!cachedData);
+  const { setThemeConfig, theme } = useTheme();
+
+  // Configuración centralizada del sitio
   const { config, getFullUrl, getImageUrl } = useSiteConfig();
-  
-  // 🚀 Usar hook con cache para categorías
+
+  // Hook con cache para categorías
   const { data: categorias } = useCategoriasList({ activas: true });
-  
-  // ✅ SOLUCIÓN: Usar SEO de pageData en lugar de hook separado (evita consulta duplicada)
-  
-  // ✅ Efecto inicial con cleanup - SIN limpiar caché automáticamente
+
+  // Efecto inicial - cargar datos del CMS
   useEffect(() => {
     const controller = new AbortController();
     let isMounted = true;
@@ -212,39 +214,36 @@ const HomeOptimized = () => {
     };
   }, []);
 
-  // 📍 Manejo de navegación a sección de contacto con cleanup
+  // Manejo de navegación a sección de contacto
   useEffect(() => {
+    if (!pageData) return;
+
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     const hash = window.location.hash;
     if (hash === '#contacto') {
-      // Pequeño delay para asegurar que el contenido se haya renderizado
       timeoutId = setTimeout(() => {
         const contactoElement = document.getElementById('contacto');
         if (contactoElement) {
-          contactoElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
+          contactoElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
           });
         }
       }, 500);
     }
 
-    // ✅ Cleanup del timeout
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
     };
-  }, []);
+  }, [pageData]);
 
-  // ⏰ Sistema de eventos CMS - SOLO recargar cuando haya actualización real
+  // Sistema de eventos CMS
   useEffect(() => {
-    // ✅ ELIMINADO: setInterval que recargaba cada 5 minutos innecesariamente
-    
-    // Escuchar eventos de actualización del CMS
     const handleCMSUpdate = () => {
-      loadPageData(true); // Forzar recarga cuando el CMS se actualiza
+      loadPageData(true);
     };
 
     const handleClearCache = () => {
@@ -254,7 +253,6 @@ const HomeOptimized = () => {
     window.addEventListener('cmsUpdate', handleCMSUpdate);
     window.addEventListener('clearCache', handleClearCache);
 
-    // ✅ Cleanup completo
     return () => {
       window.removeEventListener('cmsUpdate', handleCMSUpdate);
       window.removeEventListener('clearCache', handleClearCache);
@@ -263,22 +261,15 @@ const HomeOptimized = () => {
 
   const loadPageData = async (forceRefresh = false) => {
     try {
-      
-      // ✅ OPTIMIZACIÓN: Usar cache normalmente, forceReload solo cuando se pide explícitamente
-      const data = forceRefresh 
+      setIsLoading(true);
+
+      const data = forceRefresh
         ? await forceReload('home')
         : await getPageBySlug('home');
 
-      // 🐛 DEBUG: Ver qué datos se están cargando
-      console.log('🏠 HOME: Datos cargados del CMS:', data);
-      console.log('🏠 HOME: Título del Hero:', data?.content?.hero?.title);
-      console.log('🏠 HOME: Título de Soluciones:', data?.content?.solutions?.title);
-      console.log('🏠 HOME: SEO Title:', data?.seo?.metaTitle);
-
-      // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
         setPageData(data);
-        
+
         if (data.theme) {
           setThemeConfig(data.theme);
         }
@@ -286,21 +277,21 @@ const HomeOptimized = () => {
         if (data.seo?.metaTitle) {
           document.title = data.seo.metaTitle;
         }
-        
-        window.dispatchEvent(new CustomEvent('pageDataUpdated', { 
-          detail: { valueAdded: data.content.valueAdded } 
+
+        window.dispatchEvent(new CustomEvent('pageDataUpdated', {
+          detail: { valueAdded: data.content.valueAdded }
         }));
       }
     } catch (error) {
       console.error('Error cargando datos de página:', error);
     } finally {
+      setIsLoading(false);
     }
   };
 
-  // ✅ Validar que la imagen OG sea una URL directa de imagen (no URLs de Facebook/redes sociales)
+  // Validar que la imagen OG sea una URL directa de imagen
   const isValidOgImage = (url: string | undefined): boolean => {
     if (!url) return false;
-    // Rechazar URLs de Facebook, Instagram, Twitter que no son imágenes directas
     const invalidPatterns = [
       'facebook.com/photo',
       'facebook.com/profile',
@@ -311,43 +302,69 @@ const HomeOptimized = () => {
     return !invalidPatterns.some(pattern => url.includes(pattern));
   };
 
-  // Obtener la imagen OG válida (prioriza CMS, pero valida que sea URL de imagen directa)
+  // Obtener la imagen OG válida
   const getValidOgImage = (): string => {
-    const cmsImage = pageData.seo?.ogImage;
+    const cmsImage = pageData?.seo?.ogImage;
     if (cmsImage && isValidOgImage(cmsImage)) {
-      // ✅ Si es una ruta relativa, convertir a absoluta usando configuración del sitio
       if (cmsImage.startsWith('/')) {
         return getFullUrl(cmsImage);
       }
       return cmsImage;
     }
-    // ✅ Usar imagen por defecto de la configuración del sitio
     return getImageUrl(config.images.ogDefault);
   };
+
+  // Mostrar loader mientras carga (solo si no hay datos en caché)
+  if (isLoading && !pageData) {
+    return <PageLoader fullScreen />;
+  }
+
+  // Si no hay datos después de cargar, mostrar mensaje de error
+  if (!pageData) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-background)' }}>
+        <div className="text-center p-8">
+          <h1 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
+            Error al cargar la página
+          </h1>
+          <p className={`mb-6 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+            No se pudieron cargar los datos del CMS. Por favor, intenta nuevamente.
+          </p>
+          <button
+            onClick={() => loadPageData(true)}
+            className="px-6 py-3 rounded-full text-white font-semibold"
+            style={{ background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)' }}
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const ogImage = getValidOgImage();
 
   return (
     <>
-      {/* ✅ SEO Manual desde pageData (sin hook duplicado) */}
+      {/* SEO desde datos del CMS */}
       <Helmet>
-        <title>{pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.metaTitle}</title>
-        <meta name="description" content={pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.metaDescription} />
-        {/* Keywords: focusKeyphrase primero, luego las demás keywords (sin duplicados) */}
-        <meta name="keywords" content={
-          [...new Set([
-            pageData.seo?.focusKeyphrase,
-            ...(pageData.seo?.keywords || DEFAULT_SEO_CONFIG.keywords)
-          ].filter(Boolean))].join(', ')
-        } />
-        {/* Focus Keyphrase como meta tag dedicado para SEO avanzado */}
+        <title>{pageData.seo?.metaTitle || config.siteName}</title>
+        <meta name="description" content={pageData.seo?.metaDescription || config.siteDescription} />
+        {pageData.seo?.keywords && pageData.seo.keywords.length > 0 && (
+          <meta name="keywords" content={
+            [...new Set([
+              pageData.seo?.focusKeyphrase,
+              ...pageData.seo.keywords
+            ].filter(Boolean))].join(', ')
+          } />
+        )}
         {pageData.seo?.focusKeyphrase && (
           <meta name="article:tag" content={pageData.seo.focusKeyphrase} />
         )}
 
         {/* Open Graph */}
-        <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.ogTitle} />
-        <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.ogDescription} />
+        <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || config.siteName} />
+        <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || config.siteDescription} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -356,51 +373,50 @@ const HomeOptimized = () => {
         <meta property="og:url" content={getFullUrl('/')} />
         <meta property="og:site_name" content={config.siteName} />
         <meta property="og:locale" content={config.locale} />
-        
+
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.ogTitle} />
-        <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.ogDescription} />
+        <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || config.siteName} />
+        <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || config.siteDescription} />
         <meta name="twitter:image" content={ogImage} />
-        
+
         {/* Canonical */}
         <link rel="canonical" href={getFullUrl('/')} />
       </Helmet>
-      
-      {/* ✅ Schema.org - Datos estructurados para Google Rich Results */}
+
+      {/* Schema.org */}
       <HomePageSchema />
 
       <div className="min-h-screen w-full overflow-x-hidden bg-transparent">
         <PublicHeader />
         <main className="w-full bg-transparent">
           <HeroSection data={pageData.content.hero} />
-          <SolutionsSection 
-            data={pageData.content.solutions} 
+          <SolutionsSection
+            data={pageData.content.solutions}
             themeConfig={pageData.theme}
           />
-          <ValueAddedSection 
-            data={pageData.content.valueAdded} 
+          <ValueAddedSection
+            data={pageData.content.valueAdded}
             themeConfig={pageData.theme}
           />
-          <ClientLogosSection 
+          <ClientLogosSection
             data={pageData.content.clientLogos}
           />
 
-          <ContactSection 
+          <ContactSection
             data={addCategoriasToConfig(pageData.content.contactForm, categorias)}
             categorias={categorias}
           />
 
-          <FeaturedBlogSection 
+          <FeaturedBlogSection
             data={pageData.content.featuredBlog}
             themeConfig={pageData.theme}
           />
         </main>
         <PublicFooter />
-        
-        {/* 💬 Chatbot de Ventas Flotante */}
+
+        {/* Chatbot de Ventas Flotante */}
         <FloatingChatWidget />
-        
       </div>
     </>
   );

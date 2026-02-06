@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, Clock, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { DEFAULT_FEATURED_BLOG_CONFIG } from '../../utils/defaultConfig';
-import type { DefaultFeaturedBlogConfig } from '../../utils/defaultConfig';
 import DynamicIcon from '../ui/DynamicIcon';
 import PageLoader from '../common/PageLoader';
 
@@ -27,8 +25,33 @@ interface BlogPost {
   readingTime: number;
 }
 
+interface FeaturedBlogConfig {
+  headerIcon?: string;
+  headerIconColor?: string;
+  fontFamily?: string;
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
+  };
+  backgroundImageAlt?: string;
+  limit?: number;
+  buttonText?: string;
+  buttonLink?: string;
+  styles?: {
+    light?: Record<string, string>;
+    dark?: Record<string, string>;
+  };
+  cardsDesign?: {
+    light?: Record<string, string>;
+    dark?: Record<string, string>;
+  };
+}
+
 interface FeaturedBlogSectionProps {
-  data?: DefaultFeaturedBlogConfig;
+  data?: FeaturedBlogConfig;
   themeConfig?: any;
 }
 
@@ -37,7 +60,11 @@ interface FeaturedBlogSectionProps {
  * Muestra los posts marcados como "destacados" en el home
  * Configurable desde CMS con estilos y textos personalizados
  */
-const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig }: FeaturedBlogSectionProps) => {
+const FeaturedBlogSection = ({ data, themeConfig }: FeaturedBlogSectionProps) => {
+  // Si no hay datos del CMS, no renderizar la sección
+  if (!data) {
+    return null;
+  }
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -308,7 +335,7 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
         {/* CTA to Blog */}
         <div className="text-center">
           <Link
-            to={data.buttonLink}
+            to={data.buttonLink || '/blog'}
             className="inline-flex items-center space-x-3 px-8 py-4 font-semibold rounded-full hover:shadow-2xl transform hover:scale-105 transition-all duration-300 group"
             style={{
               background: buttonBackground,

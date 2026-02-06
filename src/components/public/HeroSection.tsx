@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
-import { DEFAULT_HERO_CONFIG } from '../../utils/defaultConfig';
 import '../../styles/gradient-borders.css';
 
 interface HeroData {
@@ -17,12 +16,12 @@ interface HeroData {
   };
   backgroundImageAlt?: string;
   styles?: {
-    light: {
+    light?: {
       titleColor?: string;
       subtitleColor?: string;
       descriptionColor?: string;
     };
-    dark: {
+    dark?: {
       titleColor?: string;
       subtitleColor?: string;
       descriptionColor?: string;
@@ -31,7 +30,7 @@ interface HeroData {
 }
 
 interface HeroSectionProps {
-  data?: HeroData;
+  data: HeroData;
 }
 
 const HeroSection = ({ data }: HeroSectionProps) => {
@@ -40,8 +39,8 @@ const HeroSection = ({ data }: HeroSectionProps) => {
   const [animationPhase, setAnimationPhase] = useState(0);
   const { theme: currentTheme } = useTheme();
 
-  // Usar datos proporcionados o configuración predeterminada como fallback
-  const rawHeroData: HeroData = data || DEFAULT_HERO_CONFIG;
+  // Usar datos del CMS directamente (sin fallback hardcodeado)
+  const rawHeroData: HeroData = data;
   
   // Validar y corregir ctaLink para asegurar navegación correcta
   const heroData: HeroData = {

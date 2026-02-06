@@ -13,6 +13,11 @@ const ValueAddedSection = ({ data, themeConfig: _themeConfig }: ValueAddedSectio
   const { isVisible } = useAnimations();
   const { mappedData, cardStyles, currentBackgroundImage, valueItems } = useValueAddedData(data, theme);
 
+  // Si no hay datos del CMS, no renderizar la sección
+  if (!mappedData) {
+    return null;
+  }
+
   return (
     <section
       className="relative py-32 theme-transition overflow-hidden w-full"

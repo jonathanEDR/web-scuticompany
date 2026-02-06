@@ -191,9 +191,14 @@ const ContactSection = ({ data, categorias = [], transparentBackground = false }
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState<string>('');
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  
+
   const { theme: currentTheme } = useTheme();
-  const { user } = useAuth(); // ✅ Detectar si usuario está autenticado
+  const { user } = useAuth();
+
+  // Si no hay datos del CMS, no renderizar la sección
+  if (!data || !data.title) {
+    return null;
+  }
 
   // Obtener imagen de fondo según el tema actual
   const currentBackground = data?.backgroundImage?.[currentTheme === 'light' ? 'light' : 'dark'];

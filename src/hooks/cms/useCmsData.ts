@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react';
 import { getPageBySlug, updatePage, clearCache } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
-import { DEFAULT_PAGE_CONFIG } from '../../utils/defaultConfig';
 import { SITE_CONFIG } from '../../config/siteConfig';
 import { cms } from '../../utils/contentManagementCache';
 import type { PageData, MessageState } from '../../types/cms';
+
+// Valores por defecto mínimos para fallback (cuando no hay conexión con BD)
+const FALLBACK_BACKGROUND_IMAGES = {
+  light: '',
+  dark: ''
+};
+
+const FALLBACK_HERO_STYLES = {
+  light: { titleColor: '', subtitleColor: '', descriptionColor: '' },
+  dark: { titleColor: '', subtitleColor: '', descriptionColor: '' }
+};
 
 export const useCmsData = (pageSlug: string = 'home') => {
   const [loading, setLoading] = useState(true);
@@ -132,7 +142,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 keywords: ['blog', 'artículo', 'tecnología', 'software', 'inteligencia artificial'],
                 ogTitle: 'Blog - SCUTI Company',
                 ogDescription: 'Contenido educativo sobre tecnología y desarrollo',
-                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                ogImage: images.ogDefault,
                 twitterCard: 'summary_large_image'
               };
             default:
@@ -143,80 +153,80 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 keywords: ['tecnología', 'software'],
                 ogTitle: 'SCUTI Company',
                 ogDescription: 'Soluciones tecnológicas',
-                ogImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark,
+                ogImage: images.ogDefault,
                 twitterCard: 'summary_large_image'
               };
           }
         };
 
-        // 🔥 NUEVO: Hero específico por página
+        // Hero específico por página (fallback mínimo)
         const getHeroForPage = (slug: string) => {
+          const { siteName } = SITE_CONFIG;
+          const baseHero = {
+            backgroundImage: FALLBACK_BACKGROUND_IMAGES,
+            styles: FALLBACK_HERO_STYLES
+          };
+
           switch (slug) {
             case 'home':
               return {
-                title: DEFAULT_PAGE_CONFIG.hero.title,
-                subtitle: DEFAULT_PAGE_CONFIG.hero.subtitle,
-                description: DEFAULT_PAGE_CONFIG.hero.description,
-                ctaText: DEFAULT_PAGE_CONFIG.hero.ctaText,
-                ctaLink: DEFAULT_PAGE_CONFIG.hero.ctaLink,
-                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
-                backgroundImageAlt: DEFAULT_PAGE_CONFIG.hero.backgroundImageAlt,
-                styles: DEFAULT_PAGE_CONFIG.hero.styles
+                title: 'Bienvenido',
+                subtitle: 'Configura tu página desde el CMS',
+                description: 'Esta es una configuración temporal. Actualiza el contenido desde el administrador.',
+                ctaText: 'Comenzar',
+                ctaLink: '/servicios',
+                backgroundImageAlt: 'Hero background',
+                ...baseHero
               };
             case 'services':
               return {
                 title: 'Nuestros Servicios',
                 subtitle: 'Soluciones inteligentes para tu negocio',
-                description: 'Descubre nuestras soluciones tecnológicas diseñadas para transformar tu empresa y potenciar su crecimiento.',
+                description: 'Descubre nuestras soluciones tecnológicas.',
                 ctaText: 'Ver Servicios',
                 ctaLink: '/servicios',
-                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
-                backgroundImageAlt: 'Servicios profesionales de tecnología',
-                styles: DEFAULT_PAGE_CONFIG.hero.styles
+                backgroundImageAlt: 'Servicios',
+                ...baseHero
               };
             case 'about':
               return {
                 title: 'Sobre Nosotros',
                 subtitle: 'Conoce nuestra historia',
-                description: 'Somos un equipo apasionado por la tecnología y la innovación.',
+                description: 'Somos un equipo apasionado por la tecnología.',
                 ctaText: 'Conocer más',
                 ctaLink: '/nosotros',
-                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
-                backgroundImageAlt: 'Equipo SCUTI Company',
-                styles: DEFAULT_PAGE_CONFIG.hero.styles
+                backgroundImageAlt: 'Equipo',
+                ...baseHero
               };
             case 'contact':
               return {
                 title: 'Contáctanos',
                 subtitle: 'Estamos aquí para ayudarte',
-                description: 'Ponte en contacto con nosotros y descubre cómo podemos impulsar tu negocio.',
+                description: 'Ponte en contacto con nosotros.',
                 ctaText: 'Enviar mensaje',
                 ctaLink: '/contacto',
-                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
-                backgroundImageAlt: 'Contacto SCUTI Company',
-                styles: DEFAULT_PAGE_CONFIG.hero.styles
+                backgroundImageAlt: 'Contacto',
+                ...baseHero
               };
             case 'blog':
               return {
                 title: 'Blog',
-                subtitle: 'Las últimas noticias y tendencias tecnológicas',
-                description: 'Mantente informado con contenido curado por expertos en tecnología.',
+                subtitle: 'Noticias y tendencias tecnológicas',
+                description: 'Contenido curado por expertos.',
                 ctaText: 'Ver Noticias',
                 ctaLink: '/blog',
-                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
-                backgroundImageAlt: 'Blog Web Scuti',
-                styles: DEFAULT_PAGE_CONFIG.hero.styles
+                backgroundImageAlt: 'Blog',
+                ...baseHero
               };
             default:
               return {
-                title: 'SCUTI Company',
+                title: siteName,
                 subtitle: 'Tecnología Inteligente',
                 description: 'Transformamos empresas con soluciones digitales.',
                 ctaText: 'Comenzar',
                 ctaLink: '/',
-                backgroundImage: DEFAULT_PAGE_CONFIG.hero.backgroundImage,
-                backgroundImageAlt: 'SCUTI Company',
-                styles: DEFAULT_PAGE_CONFIG.hero.styles
+                backgroundImageAlt: siteName,
+                ...baseHero
               };
           }
         };
@@ -228,21 +238,16 @@ export const useCmsData = (pageSlug: string = 'home') => {
             hero: getHeroForPage(slug)
           };
 
-          // ✅ SOLO para HOME: agregar solutions, valueAdded, clientLogos
+          // SOLO para HOME: agregar solutions (fallback mínimo)
           if (slug === 'home') {
             return {
               ...baseContent,
               solutions: {
-                title: DEFAULT_PAGE_CONFIG.solutions.title,
-                description: DEFAULT_PAGE_CONFIG.solutions.subtitle,
-                backgroundImage: DEFAULT_PAGE_CONFIG.solutions.backgroundImage,
-                backgroundImageAlt: DEFAULT_PAGE_CONFIG.solutions.backgroundImageAlt,
-                items: DEFAULT_PAGE_CONFIG.solutions.cards.map(card => ({
-                  title: card.title,
-                  description: card.description,
-                  icon: card.icon,
-                  gradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
-                })),
+                title: 'Nuestras Soluciones',
+                description: 'Configura las soluciones desde el CMS',
+                backgroundImage: FALLBACK_BACKGROUND_IMAGES,
+                backgroundImageAlt: 'Soluciones',
+                items: [],
                 cardsDesign: {
                   light: {
                     background: '#ffffff',
@@ -416,23 +421,23 @@ export const useCmsData = (pageSlug: string = 'home') => {
       if (typeof data.content.hero.backgroundImage === 'string') {
         const oldValue = data.content.hero.backgroundImage;
         data.content.hero.backgroundImage = {
-          light: DEFAULT_PAGE_CONFIG.hero.backgroundImage.light,
-          dark: oldValue || DEFAULT_PAGE_CONFIG.hero.backgroundImage.dark
+          light: oldValue || '',
+          dark: oldValue || ''
         };
       }
-      
-      // 🔥 CORREGIDO: Solo migrar solutions si existe (solo HOME tiene solutions)
+
+      // Solo migrar solutions si existe (solo HOME tiene solutions)
       if (data.content.solutions && typeof data.content.solutions.backgroundImage === 'string') {
         const oldValue = data.content.solutions.backgroundImage;
         data.content.solutions.backgroundImage = {
-          light: DEFAULT_PAGE_CONFIG.solutions.backgroundImage.light,
-          dark: oldValue || DEFAULT_PAGE_CONFIG.solutions.backgroundImage.dark
+          light: oldValue || '',
+          dark: oldValue || ''
         };
       }
-      
+
       // Asegurar que los estilos existen con valores predeterminados
       if (!data.content.hero.styles) {
-        data.content.hero.styles = DEFAULT_PAGE_CONFIG.hero.styles;
+        data.content.hero.styles = FALLBACK_HERO_STYLES;
       }
       
       // 🔥 CORREGIDO: Solo asegurar estilos de solutions si existe

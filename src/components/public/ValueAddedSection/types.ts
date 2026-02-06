@@ -36,11 +36,11 @@ export interface ValueAddedData {
   subtitle?: string;
   description?: string;
   showIcons?: boolean;
-  backgroundImage: {
-    light: string;
-    dark: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
   };
-  backgroundImageAlt: string;
+  backgroundImageAlt?: string;
   cards?: ValueAddedItem[];
   items?: ValueAddedItem[];
   logos?: ValueAddedLogo[];

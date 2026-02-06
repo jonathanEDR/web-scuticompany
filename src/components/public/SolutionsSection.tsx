@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
-import { DEFAULT_SOLUTIONS_CONFIG } from '../../utils/defaultConfig';
 import type { CardDesignStyles, ButtonStyle } from '../../types/cms';
 
 interface SolutionItem {
@@ -32,15 +31,15 @@ interface SolutionItem {
 
 interface SolutionsData {
   title: string;
-  subtitle?: string; // Opcional para compatibilidad con defaultConfig
-  description?: string; // Del CMS
-  backgroundImage: {
-    light: string;
-    dark: string;
+  subtitle?: string;
+  description?: string;
+  backgroundImage?: {
+    light?: string;
+    dark?: string;
   };
-  backgroundImageAlt: string;
-  cards?: SolutionItem[]; // Del defaultConfig
-  items?: SolutionItem[]; // Del CMS
+  backgroundImageAlt?: string;
+  cards?: SolutionItem[];
+  items?: SolutionItem[];
   cardsDesign?: {
     light: CardDesignStyles;
     dark: CardDesignStyles;
@@ -59,23 +58,27 @@ interface SolutionsData {
 
 interface SolutionsSectionProps {
   data?: SolutionsData;
-  themeConfig?: any; // Simplificado para evitar conflictos de tipos
+  themeConfig?: any;
 }
 
 const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   const { theme } = useTheme();
 
-  // 🔧 SOLUCIÓN: Función para limpiar HTML del RichTextEditor y extraer solo texto
+  // Si no hay datos del CMS, no renderizar la sección
+  if (!data) {
+    return null;
+  }
+
+  // Función para limpiar HTML del RichTextEditor y extraer solo texto
   const cleanHtmlToText = (htmlString: string): string => {
     if (!htmlString) return '';
-    // Crear un div temporal para extraer solo el texto
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = DOMPurify.sanitize(htmlString);
     return tempDiv.textContent || tempDiv.innerText || '';
   };
 
-  // ⚡ Priorizar datos del CMS sobre defaultConfig
-  const solutionsData: SolutionsData = data || DEFAULT_SOLUTIONS_CONFIG;
+  // Usar datos del CMS directamente
+  const solutionsData: SolutionsData = data;
 
   // Mapear datos del CMS a estructura esperada
   const getMappedSolutionsData = () => {
