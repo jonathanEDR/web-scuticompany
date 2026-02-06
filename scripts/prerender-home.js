@@ -88,7 +88,7 @@ async function getHomePageData() {
   console.log(`\n📡 Obteniendo datos del CMS para Home...`);
 
   try {
-    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/pages/home`);
+    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/cms/pages/home`);
 
     if (!data.success || !data.data) {
       console.warn('   ⚠️ No se encontraron datos del CMS, usando defaults');
