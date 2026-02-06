@@ -119,6 +119,8 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
 
   return (
     <section 
+      aria-label="Artículos Destacados del Blog - Desarrollo de Software"
+      role="region"
       className="py-20 theme-transition relative overflow-hidden bg-cover bg-center bg-no-repeat" 
       style={{ 
         backgroundColor: 'var(--color-background)',
@@ -174,6 +176,8 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
               key={post._id}
               to={`/blog/${post.slug}`}
               className="group rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 flex flex-col"
+              itemScope
+              itemType="https://schema.org/BlogPosting"
               style={{
                 background: currentCardsDesign?.background || undefined,
                 border: `${currentCardsDesign?.borderWidth || '1px'} solid ${currentCardsDesign?.border || 'transparent'}`,
@@ -267,6 +271,7 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
                 <h3 
                   className="text-xl font-bold mb-3 transition-colors line-clamp-2 leading-snug"
                   style={{ color: currentCardsDesign?.titleColor || undefined }}
+                  itemProp="headline"
                 >
                   {post.title}
                 </h3>
@@ -275,6 +280,7 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
                 <p 
                   className="text-sm mb-4 line-clamp-3 flex-grow leading-relaxed"
                   style={{ color: currentCardsDesign?.excerptColor || undefined }}
+                  itemProp="description"
                 >
                   {post.excerpt}
                 </p>

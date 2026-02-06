@@ -272,6 +272,8 @@ const ContactSection = ({ data, categorias = [], transparentBackground = false }
   return (
     <section
       id="contacto"
+      aria-label="Formulario de Contacto - SCUTI Company"
+      role="region"
       className={`relative py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center overflow-hidden ${transparentBackground ? '' : 'min-h-screen'}`}
       style={transparentBackground ? {} : sectionStyles}
     >

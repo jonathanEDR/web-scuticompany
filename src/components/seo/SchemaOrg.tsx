@@ -386,6 +386,95 @@ export const FAQSchema = ({ faqs }: FAQSchemaProps) => {
 };
 
 // ====================================
+// SCHEMA: CONTACTPAGE (Sección Contacto)
+// ====================================
+export const ContactPageSchema = () => {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contáctanos - SCUTI Company",
+    "description": "Solicita una sesión de viabilidad técnica gratuita. Diseñamos software a medida para empresas en Perú.",
+    "url": "https://scuticompany.com#contacto",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "SCUTI Company",
+      "telephone": "+51-973 397 306",
+      "email": "gscutic@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Calles Los Molles Lt-02",
+        "addressLocality": "Huánuco",
+        "addressRegion": "Huánuco",
+        "addressCountry": "PE"
+      }
+    }
+  };
+
+  return (
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(schema)}
+      </script>
+    </Helmet>
+  );
+};
+
+// ====================================
+// SCHEMA: ITEMLIST (Lista de Artículos Blog en Home)
+// ====================================
+interface BlogArticle {
+  title: string;
+  slug: string;
+  excerpt?: string;
+  publishedAt?: string;
+  author?: string;
+}
+
+interface BlogsListSchemaProps {
+  articles: BlogArticle[];
+}
+
+export const BlogsListSchema = ({ articles }: BlogsListSchemaProps) => {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Artículos Destacados sobre Desarrollo de Software",
+    "description": "Guías y recursos técnicos sobre desarrollo de software a medida en Perú",
+    "itemListElement": articles.map((article, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "BlogPosting",
+        "headline": article.title,
+        "url": `https://scuticompany.com/blog/${article.slug}`,
+        "description": article.excerpt || article.title,
+        "datePublished": article.publishedAt || new Date().toISOString(),
+        "author": {
+          "@type": "Person",
+          "name": article.author || "SCUTI Company"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "SCUTI Company",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://scuticompany.com/favicon-512x512.png"
+          }
+        }
+      }
+    }))
+  };
+
+  return (
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(schema)}
+      </script>
+    </Helmet>
+  );
+};
+
+// ====================================
 // SCHEMA COMBINADO PARA HOME
 // ====================================
 export const HomePageSchema = () => {
@@ -394,6 +483,7 @@ export const HomePageSchema = () => {
       <OrganizationSchema />
       <WebsiteSchema />
       <LocalBusinessSchema />
+      <ContactPageSchema />
     </>
   );
 };
