@@ -269,6 +269,12 @@ const HomeOptimized = () => {
         ? await forceReload('home')
         : await getPageBySlug('home');
 
+      // 🐛 DEBUG: Ver qué datos se están cargando
+      console.log('🏠 HOME: Datos cargados del CMS:', data);
+      console.log('🏠 HOME: Título del Hero:', data?.content?.hero?.title);
+      console.log('🏠 HOME: Título de Soluciones:', data?.content?.solutions?.title);
+      console.log('🏠 HOME: SEO Title:', data?.seo?.metaTitle);
+
       // Actualizar solo si obtuvimos datos válidos
       if (data && data.content) {
         setPageData(data);
