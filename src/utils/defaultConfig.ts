@@ -958,6 +958,7 @@ export const DEFAULT_CONTACT_INFO = {
 // SEO - Configuración por defecto
 // =====================================================
 export const DEFAULT_SEO_CONFIG = {
+  focusKeyphrase: 'desarrollo de software',  // Palabra clave principal para SEO
   metaTitle: 'Desarrollo de Software e IA para PYMES | SCUTI Company Perú',
   metaDescription: 'Transformamos procesos con soluciones digitales innovadoras | La Solución en Perú: Software, IA y Automatización para PYMES. Obtén la tecnología y escala rápido',
   keywords: [

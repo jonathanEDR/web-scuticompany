@@ -3,42 +3,45 @@ import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSiteConfig } from '../../hooks/useSiteConfig';
 
 /**
  * Pagina de Politica de Privacidad
- * Contiene informacion sobre como SCUTI Company maneja los datos personales
+ * Contiene informacion sobre como se manejan los datos personales
+ * ✅ Usa configuración centralizada del sitio
  */
 const PrivacyPolicy = () => {
   const { theme } = useTheme();
+  const { config, getFullUrl, getImageUrl } = useSiteConfig();
 
   return (
     <>
       <Helmet>
-        <title>Politica de Privacidad - SCUTI Company</title>
-        <meta name="description" content="Conoce nuestra politica de privacidad y como protegemos tus datos personales en SCUTI Company." />
-        <meta name="keywords" content="politica de privacidad, proteccion de datos, SCUTI Company, privacidad" />
+        <title>Política de Privacidad - {config.siteName}</title>
+        <meta name="description" content={`Conoce nuestra política de privacidad y cómo protegemos tus datos personales en ${config.siteName}.`} />
+        <meta name="keywords" content={`política de privacidad, protección de datos, ${config.siteName}, privacidad`} />
 
         {/* Open Graph */}
-        <meta property="og:title" content="Politica de Privacidad - SCUTI Company" />
-        <meta property="og:description" content="Conoce nuestra politica de privacidad y como protegemos tus datos personales" />
-        <meta property="og:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta property="og:title" content={`Política de Privacidad - ${config.siteName}`} />
+        <meta property="og:description" content="Conoce nuestra política de privacidad y cómo protegemos tus datos personales" />
+        <meta property="og:image" content={getImageUrl(config.images.ogDefault)} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="SCUTI Company - Política de Privacidad" />
+        <meta property="og:image:alt" content={`${config.siteName} - Política de Privacidad`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://scuticompany.com/privacidad" />
-        <meta property="og:site_name" content="SCUTI Company" />
-        <meta property="og:locale" content="es_PE" />
+        <meta property="og:url" content={getFullUrl('/privacidad')} />
+        <meta property="og:site_name" content={config.siteName} />
+        <meta property="og:locale" content={config.locale} />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Politica de Privacidad - SCUTI Company" />
-        <meta name="twitter:description" content="Conoce nuestra politica de privacidad" />
-        <meta name="twitter:image" content="https://scuticompany.com/logofondonegro.jpeg" />
-        <meta name="twitter:image:alt" content="SCUTI Company - Política de Privacidad" />
+        <meta name="twitter:title" content={`Política de Privacidad - ${config.siteName}`} />
+        <meta name="twitter:description" content="Conoce nuestra política de privacidad" />
+        <meta name="twitter:image" content={getImageUrl(config.images.ogDefault)} />
+        <meta name="twitter:image:alt" content={`${config.siteName} - Política de Privacidad`} />
 
         {/* Canonical */}
-        <link rel="canonical" href="https://scuticompany.com/privacidad" />
+        <link rel="canonical" href={getFullUrl('/privacidad')} />
       </Helmet>
 
       <div className={`min-h-screen w-full overflow-x-hidden ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -88,7 +91,7 @@ const PrivacyPolicy = () => {
                 </h2>
                 <div className={`space-y-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                   <p>
-                    En SCUTI Company recopilamos informacion que nos proporcionas directamente cuando:
+                    En {config.siteName} recopilamos informacion que nos proporcionas directamente cuando:
                   </p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Creas una cuenta en nuestra plataforma</li>
@@ -250,23 +253,25 @@ const PrivacyPolicy = () => {
                     <li>
                       <strong>Email:</strong>{' '}
                       <a
-                        href="mailto:gscutic@gmail.com"
+                        href={`mailto:${config.contact.email}`}
                         className="text-purple-500 hover:text-purple-400 transition-colors"
                       >
-                        gscutic@gmail.com
+                        {config.contact.email}
                       </a>
                     </li>
+                    {config.contact.phone && (
+                      <li>
+                        <strong>Teléfono:</strong>{' '}
+                        <a
+                          href={`tel:${config.contact.phoneClean || config.contact.phone}`}
+                          className="text-purple-500 hover:text-purple-400 transition-colors"
+                        >
+                          {config.contact.phone}
+                        </a>
+                      </li>
+                    )}
                     <li>
-                      <strong>Telefono:</strong>{' '}
-                      <a
-                        href="tel:+51973397306"
-                        className="text-purple-500 hover:text-purple-400 transition-colors"
-                      >
-                        +51 973 397 306
-                      </a>
-                    </li>
-                    <li>
-                      <strong>Ubicacion:</strong> Lima, Peru
+                      <strong>Ubicación:</strong> {config.region}, {config.country}
                     </li>
                   </ul>
                 </div>

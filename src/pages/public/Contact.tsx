@@ -6,6 +6,7 @@ import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { useCategoriasTipoServicio } from '../../hooks/useCategoriasTipoServicio';
 import { useSeo } from '../../hooks/useSeo';
+import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { useTheme } from '../../contexts/ThemeContext';
 import { getPageBySlug } from '../../services/cmsApi';
 
@@ -70,12 +71,13 @@ interface ContactPageContent {
  */
 const Contact = () => {
   const { theme } = useTheme();
+  const { config, getFullUrl, getImageUrl } = useSiteConfig();
   const [pageData, setPageData] = useState<{ content: ContactPageContent } | null>(null);
 
   // 🎯 SEO dinámico
   const { SeoHelmet } = useSeo({
     pageName: 'contact',
-    fallbackTitle: 'Contacto - SCUTI Company',
+    fallbackTitle: `Contacto - ${config.siteName}`,
     fallbackDescription: 'Contáctanos para discutir tu proyecto. Desarrollo web, apps móviles y soluciones digitales personalizadas.'
   });
 
@@ -199,25 +201,25 @@ const Contact = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ContactPage",
-            "name": "Contacto - SCUTI Company",
-            "description": "Contáctanos para tu proyecto tecnológico. Desarrollo web, apps móviles y soluciones digitales en Perú.",
-            "url": "https://scuticompany.com/contacto",
+            "name": `Contacto - ${config.siteName}`,
+            "description": config.siteDescription,
+            "url": getFullUrl('/contacto'),
             "mainEntity": {
               "@type": "Organization",
-              "name": "SCUTI Company",
-              "url": "https://scuticompany.com",
-              "logo": "https://scuticompany.com/logofondonegro.jpeg",
-              "email": "gscutic@gmail.com",
-              "telephone": "+51973397306",
+              "name": config.siteName,
+              "url": config.siteUrl,
+              "logo": getImageUrl(config.images.logo),
+              "email": config.contact.email,
+              "telephone": config.contact.phoneClean || config.contact.phone,
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "Calles Los Molles Lt-02",
-                "addressLocality": "Huánuco",
-                "addressCountry": "PE"
+                "streetAddress": config.contact.address,
+                "addressLocality": config.region,
+                "addressCountry": config.countryCode
               },
               "contactPoint": {
                 "@type": "ContactPoint",
-                "telephone": "+51973397306",
+                "telephone": config.contact.phoneClean || config.contact.phone,
                 "contactType": "customer service",
                 "availableLanguage": ["Spanish", "English"]
               }

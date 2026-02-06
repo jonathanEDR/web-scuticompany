@@ -12,6 +12,7 @@ import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidge
 import { HomePageSchema } from '../../components/seo/SchemaOrg';
 import { getPageBySlug, forceReload } from '../../services/cmsApi';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { DEFAULT_HERO_CONFIG, DEFAULT_SOLUTIONS_CONFIG, DEFAULT_VALUE_ADDED_CONFIG, DEFAULT_CONTACT_CONFIG, DEFAULT_FEATURED_BLOG_CONFIG, DEFAULT_SEO_CONFIG } from '../../utils/defaultConfig';
 import { useCategoriasList, type Categoria } from '../../hooks/useCategoriasCache';
 import type { ThemeConfig } from '../../contexts/ThemeContext';
@@ -134,6 +135,7 @@ interface PageData {
     contactForm?: any;
   };
   seo: {
+    focusKeyphrase?: string;  // Palabra clave principal para SEO
     metaTitle: string;
     metaDescription: string;
     keywords: string[];
@@ -181,8 +183,10 @@ const DEFAULT_PAGE_DATA: PageData = {
  */
 const HomeOptimized = () => {
   const [pageData, setPageData] = useState<PageData>(DEFAULT_PAGE_DATA);
-  const [isLoadingCMS, setIsLoadingCMS] = useState(false);
   const { setThemeConfig } = useTheme();
+  
+  // ✅ Configuración centralizada del sitio (sin hardcoded)
+  const { config, getFullUrl, getImageUrl } = useSiteConfig();
   
   // 🚀 Usar hook con cache para categorías
   const { data: categorias } = useCategoriasList({ activas: true });
@@ -259,7 +263,6 @@ const HomeOptimized = () => {
 
   const loadPageData = async (forceRefresh = false) => {
     try {
-      if (!forceRefresh) setIsLoadingCMS(true);
       
       // ✅ OPTIMIZACIÓN: Usar cache normalmente, forceReload solo cuando se pide explícitamente
       const data = forceRefresh 
@@ -285,7 +288,6 @@ const HomeOptimized = () => {
     } catch (error) {
       console.error('Error cargando datos de página:', error);
     } finally {
-      if (!forceRefresh) setIsLoadingCMS(false);
     }
   };
 
@@ -307,13 +309,14 @@ const HomeOptimized = () => {
   const getValidOgImage = (): string => {
     const cmsImage = pageData.seo?.ogImage;
     if (cmsImage && isValidOgImage(cmsImage)) {
-      // Si es una ruta relativa, convertir a absoluta
+      // ✅ Si es una ruta relativa, convertir a absoluta usando configuración del sitio
       if (cmsImage.startsWith('/')) {
-        return `https://scuticompany.com${cmsImage}`;
+        return getFullUrl(cmsImage);
       }
       return cmsImage;
     }
-    return DEFAULT_SEO_CONFIG.ogImage;
+    // ✅ Usar imagen por defecto de la configuración del sitio
+    return getImageUrl(config.images.ogDefault);
   };
 
   const ogImage = getValidOgImage();
@@ -324,19 +327,29 @@ const HomeOptimized = () => {
       <Helmet>
         <title>{pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.metaTitle}</title>
         <meta name="description" content={pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.metaDescription} />
-        <meta name="keywords" content={(pageData.seo?.keywords || DEFAULT_SEO_CONFIG.keywords).join(', ')} />
-        
+        {/* Keywords: focusKeyphrase primero, luego las demás keywords (sin duplicados) */}
+        <meta name="keywords" content={
+          [...new Set([
+            pageData.seo?.focusKeyphrase,
+            ...(pageData.seo?.keywords || DEFAULT_SEO_CONFIG.keywords)
+          ].filter(Boolean))].join(', ')
+        } />
+        {/* Focus Keyphrase como meta tag dedicado para SEO avanzado */}
+        {pageData.seo?.focusKeyphrase && (
+          <meta name="article:tag" content={pageData.seo.focusKeyphrase} />
+        )}
+
         {/* Open Graph */}
         <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || DEFAULT_SEO_CONFIG.ogTitle} />
         <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || DEFAULT_SEO_CONFIG.ogDescription} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="SCUTI Company - Desarrollo de Software e IA para PYMES" />
+        <meta property="og:image:alt" content={`${config.siteName} - ${config.siteDescription.substring(0, 50)}`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://scuticompany.com/" />
-        <meta property="og:site_name" content="SCUTI Company" />
-        <meta property="og:locale" content="es_PE" />
+        <meta property="og:url" content={getFullUrl('/')} />
+        <meta property="og:site_name" content={config.siteName} />
+        <meta property="og:locale" content={config.locale} />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -345,7 +358,7 @@ const HomeOptimized = () => {
         <meta name="twitter:image" content={ogImage} />
         
         {/* Canonical */}
-        <link rel="canonical" href="https://scuticompany.com/" />
+        <link rel="canonical" href={getFullUrl('/')} />
       </Helmet>
       
       {/* ✅ Schema.org - Datos estructurados para Google Rich Results */}
@@ -382,73 +395,6 @@ const HomeOptimized = () => {
         {/* 💬 Chatbot de Ventas Flotante */}
         <FloatingChatWidget />
         
-        {/* Indicador de carga del CMS con logo - ¡Escapa del cursor! */}
-        {isLoadingCMS && (
-          <div 
-            className="fixed z-50 pointer-events-auto select-none"
-            style={{ bottom: '16px', right: '16px' }}
-            onMouseEnter={(e) => {
-              const element = e.currentTarget;
-              
-              // Calcular nueva posición aleatoria para escapar
-              const positions = [
-                { bottom: '16px', right: '80px' },
-                { bottom: '80px', right: '16px' },
-                { bottom: '80px', right: '80px' },
-                { bottom: '16px', right: '150px' },
-                { bottom: '150px', right: '16px' },
-                { bottom: '120px', right: '120px' },
-                { bottom: '50px', right: '200px' },
-                { bottom: '200px', right: '50px' },
-              ];
-              
-              const randomPos = positions[Math.floor(Math.random() * positions.length)];
-              element.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-              element.style.bottom = randomPos.bottom;
-              element.style.right = randomPos.right;
-            }}
-          >
-            <div className="relative flex items-center justify-center cursor-not-allowed w-16 h-16">
-              {/* Efecto de brillo pulsante de fondo */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 opacity-30 animate-ping"></div>
-              
-              {/* Círculo de carga giratorio principal - MÁS RÁPIDO */}
-              <div 
-                className="absolute inset-0 rounded-full"
-                style={{
-                  border: '3px solid transparent',
-                  borderTopColor: '#8B5CF6',
-                  borderRightColor: '#06B6D4',
-                  animation: 'spin 0.6s linear infinite'
-                }}
-              ></div>
-              
-              {/* Segundo anillo más sutil girando en dirección opuesta - MÁS RÁPIDO */}
-              <div 
-                className="absolute rounded-full"
-                style={{
-                  inset: '4px',
-                  border: '2px solid transparent',
-                  borderBottomColor: '#A78BFA',
-                  borderLeftColor: '#22D3EE',
-                  animation: 'spin 0.8s linear infinite reverse'
-                }}
-              ></div>
-              
-              {/* Logo favicon en el centro */}
-              <div className="absolute inset-2 rounded-full bg-white shadow-xl flex items-center justify-center overflow-hidden">
-                <img 
-                  src="https://res.cloudinary.com/ds54wlchi/image/upload/v1761502909/web-scuti/uze3gepsrrjpe43uobxj.png" 
-                  alt="Cargando..." 
-                  className="w-3/4 h-3/4 object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/FAVICON.png';
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );

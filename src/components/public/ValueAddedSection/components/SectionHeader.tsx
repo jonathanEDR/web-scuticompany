@@ -5,9 +5,32 @@ interface SectionHeaderProps {
   subtitle?: string;
   theme: 'light' | 'dark';
   isVisible: boolean;
+  styles?: {
+    light?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+    dark?: {
+      titleColor?: string;
+      descriptionColor?: string;
+    };
+  };
 }
 
-export const SectionHeader = ({ title, subtitle, theme, isVisible }: SectionHeaderProps) => {
+export const SectionHeader = ({ title, subtitle, theme, isVisible, styles }: SectionHeaderProps) => {
+  // Obtener colores del CMS con fallback
+  const getTitleColor = () => {
+    const cmsColor = styles?.[theme]?.titleColor;
+    if (cmsColor && cmsColor.trim() !== '') return cmsColor;
+    return '#FFFFFF'; // Fallback: blanco para ambos temas (sección con fondo oscuro)
+  };
+
+  const getDescriptionColor = () => {
+    const cmsColor = styles?.[theme]?.descriptionColor;
+    if (cmsColor && cmsColor.trim() !== '') return cmsColor;
+    return theme === 'light' ? '#E5E7EB' : '#D1D5DB'; // Fallback
+  };
+
   return (
     <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
       <div
@@ -16,7 +39,7 @@ export const SectionHeader = ({ title, subtitle, theme, isVisible }: SectionHead
         }`}
         style={{
           lineHeight: '1.2',
-          color: '#FFFFFF',
+          color: getTitleColor(),
           fontWeight: '700',
           textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6)'
         }}
@@ -30,7 +53,7 @@ export const SectionHeader = ({ title, subtitle, theme, isVisible }: SectionHead
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
             }`}
             style={{
-              color: theme === 'light' ? '#E5E7EB' : '#D1D5DB',
+              color: getDescriptionColor(),
               fontWeight: '400',
               lineHeight: '1.6',
               textShadow: '1px 1px 3px rgba(0,0,0,0.7)'

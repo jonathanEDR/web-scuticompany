@@ -9,7 +9,8 @@
       "Bash(npm run build:simple:*)",
       "Bash(wc -l:*)",
       "Bash(git stash:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

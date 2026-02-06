@@ -319,11 +319,24 @@ export function ServerNotificationProvider({
   }, [isAuthenticated, user, pollInterval, refreshUnreadCount]);
 
   // Recargar notificaciones cuando se abre el dropdown
+  // Y marcar como leídas después de 3 segundos (si sigue abierto)
   useEffect(() => {
     if (isDropdownOpen && isAuthenticated) {
       fetchNotifications({ limit: 10 });
+
+      // Auto-marcar como leídas después de 3 segundos si el dropdown sigue abierto
+      const autoMarkTimer = setTimeout(() => {
+        if (unreadCount > 0) {
+          console.log('[ServerNotificationContext] Auto-marcando notificaciones como leídas después de 3s');
+          markAllAsRead().catch(err => {
+            console.warn('[ServerNotificationContext] Error al auto-marcar como leídas:', err);
+          });
+        }
+      }, 3000);
+
+      return () => clearTimeout(autoMarkTimer);
     }
-  }, [isDropdownOpen, isAuthenticated, fetchNotifications]);
+  }, [isDropdownOpen, isAuthenticated, fetchNotifications, unreadCount, markAllAsRead]);
 
   // Toggle para activar/desactivar sonido
   const toggleSound = useCallback(() => {

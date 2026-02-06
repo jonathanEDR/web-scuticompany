@@ -13,6 +13,7 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { useSiteConfig } from '../../../hooks/useSiteConfig';
 
 interface BlogFilterRedirectProps {
   filterType: 'category' | 'tag';
@@ -21,6 +22,7 @@ interface BlogFilterRedirectProps {
 const BlogFilterRedirect: React.FC<BlogFilterRedirectProps> = ({ filterType }) => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { config, getFullUrl } = useSiteConfig();
 
   useEffect(() => {
     // Redirigir a /blog con el parámetro de filtro
@@ -35,8 +37,8 @@ const BlogFilterRedirect: React.FC<BlogFilterRedirectProps> = ({ filterType }) =
       {/* Meta noindex para que Google no indexe estas URLs */}
       <Helmet>
         <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href="https://scuticompany.com/blog" />
-        <title>Redirigiendo... | SCUTI Company</title>
+        <link rel="canonical" href={getFullUrl('/blog')} />
+        <title>Redirigiendo... | {config.siteName}</title>
       </Helmet>
       
       {/* Contenido mínimo mientras redirige */}

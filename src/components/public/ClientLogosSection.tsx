@@ -68,8 +68,9 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
     return null;
   }
 
-  // Obtener estilos de texto con validación de valores vacíos
+  // ✅ Obtener estilos de texto con validación robusta de valores vacíos
   const getTextStyles = () => {
+    // ✅ Defaults sincronizados - mismos que backend cuando los valores están vacíos
     const defaultStyles = {
       titleColor: theme === 'light' ? '#1F2937' : '#FFFFFF',
       descriptionColor: theme === 'light' ? '#4B5563' : '#D1D5DB'
@@ -82,12 +83,18 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
 
     const cmsStyles = data.styles[theme];
 
-    // Validar que los colores no estén vacíos, si lo están usar defaults
+    // ✅ Validar que los colores no estén vacíos, undefined o null
     return {
-      titleColor: cmsStyles.titleColor && cmsStyles.titleColor.trim() !== ''
+      titleColor: cmsStyles.titleColor && 
+                  cmsStyles.titleColor.trim() !== '' && 
+                  cmsStyles.titleColor !== 'undefined' &&
+                  cmsStyles.titleColor !== 'null'
         ? cmsStyles.titleColor
         : defaultStyles.titleColor,
-      descriptionColor: cmsStyles.descriptionColor && cmsStyles.descriptionColor.trim() !== ''
+      descriptionColor: cmsStyles.descriptionColor && 
+                        cmsStyles.descriptionColor.trim() !== '' &&
+                        cmsStyles.descriptionColor !== 'undefined' &&
+                        cmsStyles.descriptionColor !== 'null'
         ? cmsStyles.descriptionColor
         : defaultStyles.descriptionColor
     };

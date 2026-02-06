@@ -1273,6 +1273,7 @@ export interface DashboardFeaturedPostsConfig {
 }
 
 export interface PageSeo {
+  focusKeyphrase: string;  // Palabra clave principal para SEO
   metaTitle: string;
   metaDescription: string;
   keywords: string[];

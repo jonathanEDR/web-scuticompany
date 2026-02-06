@@ -2,19 +2,19 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // ========== CACHE CONFIGURATION ==========
 // Diferentes duraciones según el tipo de contenido
-// ✅ Optimizado para páginas públicas que cambian raramente
+// ✅ OPTIMIZADO: Cache más corto para permitir actualización rápida de colores/estilos
 const CACHE_DURATIONS = {
-  // 🌐 Páginas públicas - Contenido estático (raramente cambia)
-  PUBLIC_PAGES: 7 * 24 * 60 * 60 * 1000, // 7 días (contenido CMS muy estable)
-  PUBLIC_FOOTER: 7 * 24 * 60 * 60 * 1000,// 7 días
-  
+  // 🌐 Páginas públicas - Cache corto para ver cambios rápidamente
+  PUBLIC_PAGES: 5 * 60 * 1000,           // 5 minutos (permite ver cambios CMS rápido)
+  PUBLIC_FOOTER: 5 * 60 * 1000,          // 5 minutos
+
   // 📝 Contenido semi-estático
-  BLOG_POSTS: 24 * 60 * 60 * 1000,       // 24 horas
-  SERVICES: 24 * 60 * 60 * 1000,         // 24 horas
-  
+  BLOG_POSTS: 60 * 60 * 1000,            // 1 hora
+  SERVICES: 60 * 60 * 1000,              // 1 hora
+
   // 🔐 Datos administrativos - Contenido dinámico (cambia frecuentemente)
   ADMIN_DATA: 2 * 60 * 1000,             // 2 minutos
-  
+
   // 🔄 Datos en tiempo real
   REALTIME: 0,                            // Sin cache
 };
@@ -345,16 +345,36 @@ export const updatePage = async (slug: string, pageData: any) => {
       throw new Error(data.message || 'Error al actualizar página');
     }
 
-    // Invalidar caché de esta página (memoria)
+    // ✅ LIMPIEZA COMPLETA DE CACHE
+    // 1. Limpiar cache en memoria
     cache.clear(`page-${slug}`);
     cache.clear('all-pages');
 
-    // 🔥 CRÍTICO: También limpiar localStorage para forzar recarga fresca
+    // 2. Limpiar localStorage de esta página y todas las páginas
+    const localStorageKey = `cmsCache_page-${slug}`;
     try {
-      localStorage.removeItem(`cmsCache_page-${slug}`);
-      console.log(`✅ [CMS] Cache de localStorage limpiado para "${slug}"`);
+      localStorage.removeItem(localStorageKey);
+      localStorage.removeItem('cmsCache_all-pages');
+
+      // 3. Limpiar TODOS los caches de CMS para asegurar consistencia
+      const allKeys = Object.keys(localStorage);
+      allKeys.forEach(key => {
+        if (key.startsWith('cmsCache_')) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      console.log(`✅ [updatePage] Cache COMPLETO limpiado para: ${slug}`);
     } catch (e) {
       console.error('Error limpiando localStorage:', e);
+    }
+
+    // 4. 🔥 EMITIR EVENTO para que las páginas públicas recarguen
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cmsUpdate', {
+        detail: { slug, timestamp: Date.now() }
+      }));
+      console.log(`📡 [updatePage] Evento cmsUpdate emitido para: ${slug}`);
     }
 
     return data.data;
@@ -461,30 +481,65 @@ export const updatePageBySlug = async (slug: string, partialData: { content?: Re
 // ⚡ Exportar función para limpiar caché manualmente
 export const clearCache = (pattern?: string) => {
   console.log('🗑️ [clearCache] Limpiando caché:', { pattern: pattern || 'TODO' });
-  
+
   // Limpiar RequestCache en memoria
   cache.clear(pattern);
 
-  // ✅ NUEVO: También limpiar localStorage
-  if (!pattern) {
-    // Limpiar todo el localStorage que empiece con 'cmsCache_'
+  // ✅ Limpiar localStorage
+  try {
+    const keys = Object.keys(localStorage);
+    let count = 0;
+
+    keys.forEach(key => {
+      if (key.startsWith('cmsCache_')) {
+        if (!pattern || key.includes(pattern)) {
+          localStorage.removeItem(key);
+          count++;
+        }
+      }
+    });
+
+    console.log(`🗑️ [clearCache] Eliminados ${count} items de localStorage`);
+  } catch (e) {
+    console.error('Error limpiando localStorage:', e);
+  }
+};
+
+// 🔥 NUEVA FUNCIÓN: Limpiar TODO el cache y forzar recarga
+export const clearAllCacheAndReload = async (slug?: string) => {
+  console.log('🔥 [clearAllCacheAndReload] Limpieza COMPLETA iniciada');
+
+  // 1. Limpiar cache en memoria
+  cache.clear();
+
+  // 2. Limpiar TODO localStorage de CMS
+  try {
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
       if (key.startsWith('cmsCache_')) {
         localStorage.removeItem(key);
-        console.log('🗑️ [clearCache] Eliminado de localStorage:', key);
       }
     });
-  } else {
-    // Limpiar solo las keys que coincidan con el patrón
-    const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-      if (key.startsWith('cmsCache_') && key.includes(pattern)) {
-        localStorage.removeItem(key);
-        console.log('🗑️ [clearCache] Eliminado de localStorage:', key);
-      }
-    });
+    console.log('🗑️ [clearAllCacheAndReload] localStorage limpiado');
+  } catch (e) {
+    console.error('Error limpiando localStorage:', e);
   }
+
+  // 3. Emitir evento para que las páginas recarguen
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('cmsUpdate', {
+      detail: { slug: slug || 'all', timestamp: Date.now(), forceReload: true }
+    }));
+    window.dispatchEvent(new CustomEvent('clearCache'));
+    console.log('📡 [clearAllCacheAndReload] Eventos emitidos');
+  }
+
+  // 4. Si se especificó un slug, recargar esa página
+  if (slug) {
+    return await getPageBySlug(slug, false);
+  }
+
+  return true;
 };
 
 // ⚡ Exportar función para forzar recarga sin caché
@@ -527,8 +582,9 @@ if (typeof window !== 'undefined') {
     clearCache,
     forceReload,
     debugCmsCache,
+    clearAllCacheAndReload,
     clearAll: () => {
-      clearCache();
+      clearAllCacheAndReload();
     }
   };
 }
@@ -596,5 +652,6 @@ export default {
   initHomePage,
   initAllPages,
   clearCache,
+  clearAllCacheAndReload,
   forceReload
 };

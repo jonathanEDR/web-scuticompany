@@ -35,6 +35,7 @@ const ValueAddedSection = ({ data, themeConfig: _themeConfig }: ValueAddedSectio
           subtitle={mappedData.subtitle}
           theme={theme}
           isVisible={isVisible}
+          styles={mappedData.styles}
         />
 
         {/* ✨ Grid responsive de tarjetas - Mobile: 1, Tablet: 2, Desktop: 3 */}

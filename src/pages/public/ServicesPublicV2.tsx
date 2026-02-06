@@ -259,9 +259,9 @@ const ServicesPublicV2 = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "name": "Servicios de Desarrollo de Software - SCUTI Company",
-            "description": "Catálogo de servicios de desarrollo de software, consultoría IT e inteligencia artificial para empresas PYMES en Perú",
-            "url": "https://scuticompany.com/servicios",
+            "name": `Servicios de Desarrollo de Software - ${config.siteName}`,
+            "description": `Catálogo de servicios de desarrollo de software, consultoría IT e inteligencia artificial para empresas PYMES en ${config.country}`,
+            "url": getFullUrl('/servicios'),
             "numberOfItems": servicios?.length || 24,
             "itemListElement": servicios?.slice(0, 10).map((servicio: Servicio, index: number) => ({
               "@type": "ListItem",
@@ -270,15 +270,15 @@ const ServicesPublicV2 = () => {
                 "@type": "Service",
                 "name": servicio.titulo,
                 "description": servicio.descripcionCorta || servicio.descripcion?.substring(0, 160),
-                "url": `https://scuticompany.com/servicios/${servicio.slug}`,
+                "url": getFullUrl(`/servicios/${servicio.slug}`),
                 "provider": {
                   "@type": "Organization",
-                  "name": "SCUTI Company",
-                  "url": "https://scuticompany.com"
+                  "name": config.siteName,
+                  "url": config.siteUrl
                 },
                 "areaServed": {
                   "@type": "Country",
-                  "name": "Perú"
+                  "name": config.country
                 }
               }
             })) || []

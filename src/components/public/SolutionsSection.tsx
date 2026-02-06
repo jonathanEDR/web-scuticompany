@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -130,59 +130,55 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
     return theme === 'light' ? defaultLightStyles : defaultDarkStyles;
   };
 
-  // Valores por defecto para el diseño de tarjetas - Colores según maqueta
+  // ✅ Valores por defecto sincronizados con backend/models/Page.js
   const defaultLightStyles: CardDesignStyles = {
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+    background: 'rgba(0, 0, 0, 0.08)',
+    border: 'rgba(0, 0, 0, 0.15)',
     borderWidth: '1px',
     shadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-    hoverBackground: 'rgba(255, 255, 255, 0.15)',
-    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
-    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.2)',
+    hoverBackground: 'rgba(255, 255, 255, 0.25)',
+    hoverBorder: 'rgba(139, 92, 246, 0.4)',
+    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.15)',
     iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
     iconBackground: 'rgba(255, 255, 255, 0.9)',
-    iconColor: '#7528ee', // Color violeta para iconos según maqueta
-    titleColor: '#333333', // Color específico de la maqueta para títulos
-    descriptionColor: '#6B7280', // Gris medio más legible
-    linkColor: '#7528ee', // Violeta para enlaces
-    cardMinWidth: '340px',
-    cardMaxWidth: '380px',
-    cardMinHeight: '260px',
-    cardPadding: '1.5rem',
-    cardsAlignment: 'center',
-    iconBorderEnabled: false,
-    iconAlignment: 'center'
+    iconColor: '#1f2937', // ✅ Sincronizado con backend
+    titleColor: '#1f2937', // ✅ Sincronizado con backend
+    descriptionColor: '#4b5563', // ✅ Sincronizado con backend
+    linkColor: '#a78bfa', // ✅ Sincronizado con backend
+    cardMinWidth: '280px', // ✅ Sincronizado con backend
+    cardMaxWidth: '100%', // ✅ Sincronizado con backend
+    cardMinHeight: 'auto', // ✅ Sincronizado con backend
+    cardPadding: '2rem',
+    cardsAlignment: 'left', // ✅ Sincronizado con backend
+    iconBorderEnabled: true, // ✅ Sincronizado con backend
+    iconAlignment: 'left' // ✅ Sincronizado con backend
   };
 
   const defaultDarkStyles: CardDesignStyles = {
-    background: 'rgba(0, 0, 0, 0.3)',
-    border: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
-    borderWidth: '2px',
-    shadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-    hoverBackground: 'rgba(0, 0, 0, 0.4)',
-    hoverBorder: 'linear-gradient(135deg, #a78bfa, #22d3ee)',
-    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.3)',
+    background: 'rgba(255, 255, 255, 0.05)',
+    border: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: '1px',
+    shadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+    hoverBackground: 'rgba(255, 255, 255, 0.08)',
+    hoverBorder: 'rgba(139, 92, 246, 0.5)',
+    hoverShadow: '0 20px 40px rgba(139, 92, 246, 0.2)',
     iconGradient: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
     iconBackground: 'rgba(17, 24, 39, 0.8)',
     iconColor: '#ffffff',
     titleColor: '#ffffff',
     descriptionColor: '#d1d5db',
     linkColor: '#a78bfa',
-    cardMinWidth: '340px',
-    cardMaxWidth: '380px',
-    cardMinHeight: '260px',
-    cardPadding: '1.5rem',
-    cardsAlignment: 'center',
-    iconBorderEnabled: false,
-    iconAlignment: 'center'
+    cardMinWidth: '280px', // ✅ Sincronizado con backend
+    cardMaxWidth: '100%', // ✅ Sincronizado con backend
+    cardMinHeight: 'auto', // ✅ Sincronizado con backend
+    cardPadding: '2rem',
+    cardsAlignment: 'left', // ✅ Sincronizado con backend
+    iconBorderEnabled: true, // ✅ Sincronizado con backend
+    iconAlignment: 'left' // ✅ Sincronizado con backend
   };
 
   // Obtener estilos actuales según el tema (CMS o defaults)
   const cardStyles = getCMSCardStyles();
-
-  // 🔍 LOGS DE DEPURACIÓN - Para diagnosticar problemas de configuración
-  useEffect(() => {
-  }, [data, theme, cardStyles]);
 
   // ⚡ Obtener estilos del botón "Ver más..." desde la configuración de tema
   const getViewMoreButtonStyles = (): ButtonStyle => {

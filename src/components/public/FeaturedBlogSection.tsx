@@ -5,6 +5,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { DEFAULT_FEATURED_BLOG_CONFIG } from '../../utils/defaultConfig';
 import type { DefaultFeaturedBlogConfig } from '../../utils/defaultConfig';
 import DynamicIcon from '../ui/DynamicIcon';
+import PageLoader from '../common/PageLoader';
 
 interface BlogPost {
   _id: string;
@@ -104,31 +105,7 @@ const FeaturedBlogSection = ({ data = DEFAULT_FEATURED_BLOG_CONFIG, themeConfig 
   }
 
   if (loading) {
-    return (
-      <section className="py-20 theme-transition" style={{ backgroundColor: 'var(--color-background)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header Skeleton */}
-          <div className="text-center mb-12">
-            <div className="h-8 w-64 bg-gray-300 dark:bg-gray-700 rounded-lg mx-auto mb-4 animate-pulse"></div>
-            <div className="h-4 w-96 bg-gray-200 dark:bg-gray-600 rounded mx-auto animate-pulse"></div>
-          </div>
-
-          {/* Grid Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="theme-bg-card theme-border rounded-xl overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-300 dark:bg-gray-700"></div>
-                <div className="p-6 space-y-3">
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-5/6"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
+    return <PageLoader message="Cargando artículos..." />;
   }
 
   // Función para obtener nombre completo del autor

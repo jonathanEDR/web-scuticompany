@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "warmup": "node scripts/warmup-api.js",
-    "build": "tsc -b && vite build && node scripts/warmup-api.js && node scripts/prerender.js && node scripts/prerender-blog.js && node scripts/prerender-services.js && node scripts/generate-sitemap.js",
+    "build": "tsc -b && vite build && node scripts/warmup-api.js && node scripts/prerender-home.js && node scripts/prerender.js && node scripts/prerender-blog.js && node scripts/prerender-services.js && node scripts/generate-sitemap.js",
     "build:simple": "tsc -b && vite build && node scripts/generate-sitemap.js",
-    "build:prod": "tsc -b && vite build --mode production && node scripts/warmup-api.js && node scripts/prerender.js && node scripts/prerender-blog.js && node scripts/prerender-services.js && node scripts/generate-sitemap.js",
+    "build:prod": "tsc -b && vite build --mode production && node scripts/warmup-api.js && node scripts/prerender-home.js && node scripts/prerender.js && node scripts/prerender-blog.js && node scripts/prerender-services.js && node scripts/generate-sitemap.js",
+    "prerender:home": "node scripts/prerender-home.js",
     "prerender:blog": "node scripts/prerender-blog.js",
     "prerender:services": "node scripts/prerender-services.js",
     "generate:sitemap": "node scripts/generate-sitemap.js",

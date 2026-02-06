@@ -10,6 +10,17 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
   pageData,
   updateContent
 }) => {
+  // Verificar si la palabra clave principal aparece en el título/descripción
+  const focusKeyphrase = (pageData.seo.focusKeyphrase || '').toLowerCase().trim();
+  const metaTitle = (pageData.seo.metaTitle || '').toLowerCase();
+  const metaDescription = (pageData.seo.metaDescription || '').toLowerCase();
+
+  const isInTitle = focusKeyphrase && metaTitle.includes(focusKeyphrase);
+  const isInDescription = focusKeyphrase && metaDescription.includes(focusKeyphrase);
+  const isInKeywords = focusKeyphrase && (pageData.seo.keywords || []).some(
+    (kw: string) => kw.toLowerCase().includes(focusKeyphrase)
+  );
+
   const addKeyword = () => {
     const currentKeywords = pageData.seo.keywords || [];
     console.log('🔍 [SEO] Agregando keyword');
@@ -56,6 +67,67 @@ const SeoConfigSection: React.FC<SeoConfigSectionProps> = ({
       </div>
 
       <div className="space-y-6">
+        {/* Palabra Clave Principal (Focus Keyphrase) */}
+        <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+            🎯 Palabra Clave Principal
+          </h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Focus Keyphrase
+              </label>
+              <input
+                type="text"
+                value={pageData.seo.focusKeyphrase || ''}
+                onChange={(e) => handleSeoFieldUpdate('focusKeyphrase', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Ej: desarrollo web, marketing digital, etc."
+                maxLength={100}
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                La palabra clave principal por la que deseas posicionar esta página en buscadores
+              </p>
+            </div>
+
+            {/* Indicadores de uso de la keyword */}
+            {focusKeyphrase && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-amber-200 dark:border-amber-700">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Verificación de uso:
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${isInTitle ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                      {isInTitle ? '✓' : '✗'}
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {isInTitle ? 'Aparece en el título' : 'No aparece en el título'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${isInDescription ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                      {isInDescription ? '✓' : '✗'}
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {isInDescription ? 'Aparece en la descripción' : 'No aparece en la descripción'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${isInKeywords ? 'bg-green-500 text-white' : 'bg-yellow-500 text-white'}`}>
+                      {isInKeywords ? '✓' : '!'}
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {isInKeywords ? 'Incluida en palabras clave' : 'Considera agregarla a palabras clave'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Meta Tags Básicos */}
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">

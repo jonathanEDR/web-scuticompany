@@ -13,6 +13,7 @@ import RoleBasedRoute from './components/RoleBasedRoute';
 import DashboardRouter from './components/DashboardRouter';
 import SmartDashboardLayout from './components/SmartDashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
+import PageLoader from './components/common/PageLoader';
 import WelcomeNotification from './components/WelcomeNotification';
 import useGTMPageView from './hooks/useGTMPageView';
 import { useKeepBackendAlive } from './hooks/useKeepBackendAlive';
@@ -109,15 +110,6 @@ const AIAnalytics = lazy(() => import('./pages/admin/AIAnalytics'));
 // 🔔 Historial de Notificaciones
 const NotificationsHistory = lazy(() => import('./pages/admin/NotificationsHistory'));
 
-// ⚡ Componente de loading minimalista - Optimizado para LCP
-const LoadingSpinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
-    <div className="text-center">
-      <div className="w-12 h-12 border-4 border-purple-600/30 border-t-purple-600 rounded-full animate-spin mx-auto mb-3"></div>
-      <p className="text-gray-500 text-sm">Cargando...</p>
-    </div>
-  </div>
-);
 
 /**
  * Wrapper para rutas del dashboard con providers de autenticación y roles
@@ -184,7 +176,7 @@ function AppContent() {
         />
       )}
       
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<PageLoader fullScreen />}>
         <Routes>
                   {/* ⚡ PÁGINAS PÚBLICAS - SIN CLERK, CARGA INSTANTÁNEA */}
                   <Route path="/" element={<Home />} />

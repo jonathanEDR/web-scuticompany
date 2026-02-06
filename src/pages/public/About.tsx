@@ -5,6 +5,7 @@ import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { getPageBySlug } from '../../services/cmsApi';
 
 /**
@@ -339,52 +340,53 @@ const About = () => {
   };
 
   const heroStyles = getHeroStyles();
+  const { config: siteConfig, getFullUrl, getImageUrl } = useSiteConfig();
 
   return (
     <>
       {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
       <Helmet>
-        <title>Sobre Nosotros - SCUTI Company | Empresa de Software en Perú</title>
-        <meta name="description" content="Conoce SCUTI Company: empresa líder en desarrollo de software e IA para PYMES en Perú. Nuestra misión es transformar negocios con tecnología inteligente." />
+        <title>Sobre Nosotros - {siteConfig.siteName} | Empresa de Software en {siteConfig.country}</title>
+        <meta name="description" content={`Conoce ${siteConfig.siteName}: empresa líder en desarrollo de software e IA para PYMES en ${siteConfig.country}. Nuestra misión es transformar negocios con tecnología inteligente.`} />
         <meta name="keywords" content="sobre nosotros, equipo SCUTI, empresa de software Perú, desarrollo tecnológico, misión, visión, transformación digital PYMES" />
 
         {/* Open Graph */}
-        <meta property="og:title" content="Sobre Nosotros - SCUTI Company | Empresa de Software en Perú" />
-        <meta property="og:description" content="Conoce SCUTI Company: empresa líder en desarrollo de software e IA para PYMES en Perú. Transformamos negocios con tecnología inteligente." />
-        <meta property="og:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta property="og:title" content={`Sobre Nosotros - ${siteConfig.siteName} | Empresa de Software en ${siteConfig.country}`} />
+        <meta property="og:description" content={`Conoce ${siteConfig.siteName}: empresa líder en desarrollo de software e IA para PYMES en ${siteConfig.country}. Transformamos negocios con tecnología inteligente.`} />
+        <meta property="og:image" content={getImageUrl(siteConfig.images.ogDefault)} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="SCUTI Company - Empresa de Desarrollo de Software en Perú" />
+        <meta property="og:image:alt" content={`${siteConfig.siteName} - Empresa de Desarrollo de Software en ${siteConfig.country}`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://scuticompany.com/nosotros" />
-        <meta property="og:site_name" content="SCUTI Company" />
-        <meta property="og:locale" content="es_PE" />
+        <meta property="og:url" content={getFullUrl('/nosotros')} />
+        <meta property="og:site_name" content={siteConfig.siteName} />
+        <meta property="og:locale" content={siteConfig.locale} />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Sobre Nosotros - SCUTI Company | Empresa de Software en Perú" />
-        <meta name="twitter:description" content="Empresa líder en desarrollo de software e IA para PYMES en Perú" />
-        <meta name="twitter:image" content="https://scuticompany.com/logofondonegro.jpeg" />
+        <meta name="twitter:title" content={`Sobre Nosotros - ${siteConfig.siteName} | Empresa de Software en ${siteConfig.country}`} />
+        <meta name="twitter:description" content={`Empresa líder en desarrollo de software e IA para PYMES en ${siteConfig.country}`} />
+        <meta name="twitter:image" content={getImageUrl(siteConfig.images.ogDefault)} />
 
         {/* Canonical */}
-        <link rel="canonical" href="https://scuticompany.com/nosotros" />
+        <link rel="canonical" href={getFullUrl('/nosotros')} />
 
         {/* Schema.org - AboutPage */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "AboutPage",
-            "name": "Sobre Nosotros - SCUTI Company",
-            "description": "Conoce SCUTI Company: empresa líder en desarrollo de software e IA para PYMES en Perú",
-            "url": "https://scuticompany.com/nosotros",
+            "name": `Sobre Nosotros - ${siteConfig.siteName}`,
+            "description": `Conoce ${siteConfig.siteName}: empresa líder en desarrollo de software e IA para PYMES en ${siteConfig.country}`,
+            "url": getFullUrl('/nosotros'),
             "mainEntity": {
               "@type": "Organization",
-              "name": "SCUTI Company",
-              "description": "Empresa de desarrollo de software a medida, inteligencia artificial y automatización para PYMES en Perú",
+              "name": siteConfig.siteName,
+              "description": `Empresa de desarrollo de software a medida, inteligencia artificial y automatización para PYMES en ${siteConfig.country}`,
               "foundingDate": "2023",
               "foundingLocation": {
                 "@type": "Place",
-                "name": "Huánuco, Perú"
+                "name": `${siteConfig.region}, ${siteConfig.country}`
               },
               "slogan": "Impulsa tu PYME con Software a Medida e Inteligencia Artificial",
               "knowsAbout": [

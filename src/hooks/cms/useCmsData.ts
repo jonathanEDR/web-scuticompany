@@ -71,6 +71,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
           switch (slug) {
             case 'home':
               return {
+                focusKeyphrase: 'transformación digital',
                 metaTitle: `${siteName} - Transformamos tu empresa con tecnología inteligente`,
                 metaDescription: siteDescription,
                 keywords: seo.defaultKeywords,
@@ -81,6 +82,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
               };
             case 'services':
               return {
+                focusKeyphrase: 'servicios tecnológicos',
                 metaTitle: `Nuestros Servicios${seo.titleSuffix}`,
                 metaDescription: 'Consultoría IT, Proyectos Tecnológicos e Inteligencia Artificial para impulsar tu negocio',
                 keywords: ['servicios', 'consultoría', 'tecnología', 'software', 'inteligencia artificial'],
@@ -91,6 +93,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
               };
             case 'about':
               return {
+                focusKeyphrase: 'empresa tecnológica',
                 metaTitle: `Sobre Nosotros${seo.titleSuffix}`,
                 metaDescription: `Conoce más sobre ${siteName}, nuestra misión, visión y el equipo de expertos en tecnología`,
                 keywords: ['sobre nosotros', 'equipo', 'misión', 'visión', siteName],
@@ -101,6 +104,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
               };
             case 'contact':
               return {
+                focusKeyphrase: 'contacto',
                 metaTitle: `Contacto${seo.titleSuffix}`,
                 metaDescription: 'Contáctanos para conocer más sobre nuestras soluciones tecnológicas',
                 keywords: ['contacto', siteName, 'consulta', 'soporte'],
@@ -111,6 +115,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
               };
             case 'blog':
               return {
+                focusKeyphrase: 'blog tecnología',
                 metaTitle: `Blog ${siteName} - Noticias y Tendencias Tecnológicas`,
                 metaDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos.',
                 keywords: ['blog', 'noticias tecnológicas', 'tendencias tech', 'desarrollo web', 'programación', 'AI'],
@@ -121,6 +126,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
               };
             case 'blog-post-detail':
               return {
+                focusKeyphrase: 'artículo tecnología',
                 metaTitle: 'Artículo del Blog - SCUTI Company',
                 metaDescription: 'Lee nuestros artículos sobre tecnología, desarrollo de software e inteligencia artificial.',
                 keywords: ['blog', 'artículo', 'tecnología', 'software', 'inteligencia artificial'],
@@ -131,6 +137,7 @@ export const useCmsData = (pageSlug: string = 'home') => {
               };
             default:
               return {
+                focusKeyphrase: 'scuti company',
                 metaTitle: 'SCUTI Company',
                 metaDescription: 'Soluciones tecnológicas inteligentes',
                 keywords: ['tecnología', 'software'],
