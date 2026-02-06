@@ -28,6 +28,7 @@ import ServicioDetailConfigSection from './ServicioDetailConfigSection';
 import BlogPostDetailConfigSection from './BlogPostDetailConfigSection';
 import SidebarConfigSection from './SidebarConfigSection';
 import DashboardFeaturedPostsConfigSection from './DashboardFeaturedPostsConfigSection';
+import ServicesExtraSectionsConfig from './ServicesExtraSectionsConfig';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -569,6 +570,18 @@ const CmsManager: React.FC = () => {
                     onChange={(newConfig) => handleUpdateContent('servicesAccordion', newConfig)}
                   />
                 </div>
+
+                {/* 🆕 Secciones extra: ¿Por qué elegirnos?, Proceso, FAQ */}
+                <ServicesExtraSectionsConfig
+                  sharedBackgroundConfig={(pageData?.content as any)?.extraSectionsBackground || {}}
+                  whyChooseConfig={(pageData?.content as any)?.whyChooseUs || {}}
+                  processConfig={(pageData?.content as any)?.developmentProcess || {}}
+                  faqConfig={(pageData?.content as any)?.faq || {}}
+                  onUpdateSharedBackground={(field, value) => handleUpdateContent(`extraSectionsBackground.${field}`, value)}
+                  onUpdateWhyChoose={(field, value) => handleUpdateContent(`whyChooseUs.${field}`, value)}
+                  onUpdateProcess={(field, value) => handleUpdateContent(`developmentProcess.${field}`, value)}
+                  onUpdateFaq={(field, value) => handleUpdateContent(`faq.${field}`, value)}
+                />
                 
                 {/* Panel informativo */}
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
@@ -584,6 +597,9 @@ const CmsManager: React.FC = () => {
                     <li>✅ <strong>Sección Destacados:</strong> Título e imagen de fondo</li>
                     <li>✅ <strong>Tarjetas:</strong> Diseño visual de las tarjetas de servicio</li>
                     <li>✅ <strong>Acordeón:</strong> Lista expandible de todos los servicios</li>
+                    <li>✅ <strong>¿Por qué elegirnos?:</strong> Sección de ventajas competitivas</li>
+                    <li>✅ <strong>Proceso:</strong> Timeline del método de trabajo</li>
+                    <li>✅ <strong>FAQ:</strong> Preguntas frecuentes con Schema.org</li>
                     <li>✅ <strong>SEO:</strong> Optimización para búsquedas de servicios</li>
                   </ul>
                 </div>

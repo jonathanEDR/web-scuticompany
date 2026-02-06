@@ -21,6 +21,43 @@ import { useSiteConfig } from '../../hooks/useSiteConfig';
 import type { Servicio, ServicioFilters } from '../../types/servicios';
 
 // ============================================
+// COMPONENTE FAQ ACCORDION ITEM
+// ============================================
+const FaqAccordionItem = ({ question, answer, theme }: { question: string; answer: string; theme: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
+      theme === 'dark'
+        ? 'bg-transparent border-white/20 hover:border-white/40'
+        : `backdrop-blur-md ${isOpen ? 'border-purple-200 bg-white/70 shadow-lg shadow-purple-500/10' : 'border-gray-200/50 bg-white/50 hover:border-gray-300'}`
+    }`}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-5 text-left focus:outline-none"
+      >
+        <span className={`text-base font-semibold pr-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{question}</span>
+        <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+          isOpen 
+            ? 'bg-purple-600 text-white rotate-180' 
+            : (theme === 'dark' ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500')
+        }`}>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+      >
+        <div className={`px-5 pb-5 leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          {answer}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
 // COMPONENTE PRINCIPAL
 // ============================================
 
@@ -284,6 +321,35 @@ const ServicesPublicV2 = () => {
             })) || []
           })}
         </script>
+
+        {/* Schema.org - FAQ Page (SEO para preguntas frecuentes) */}
+        {(() => {
+          const faq = (pageData?.content as any)?.faq || {};
+          if (faq.enabled === false) return null;
+          const defaultFaqItems = [
+            { question: '¿Cuánto tiempo toma desarrollar un sistema personalizado?', answer: 'El tiempo varía según la complejidad. Un prototipo MVP funcional puede estar listo en 4 a 6 semanas, mientras que sistemas ERP o CRM completos suelen tomar de 3 a 5 meses.' },
+            { question: '¿El software será de mi propiedad o tendré que pagar mensualidades?', answer: 'En Scut1 Company entregamos la propiedad total del código y la documentación. No dependes de licencias mensuales; el sistema es un activo de tu empresa.' },
+            { question: '¿Qué pasa si mi empresa crece y necesito más funciones?', answer: 'Desarrollamos bajo una arquitectura escalable. Esto significa que podemos añadir nuevos módulos o integraciones en el futuro sin necesidad de rehacer el sistema desde cero.' },
+            { question: '¿Pueden integrar el nuevo software con mis sistemas actuales (Excel, SAP, etc.)?', answer: 'Sí, somos especialistas en integración de sistemas para que la información fluya sin interrupciones entre tus herramientas actuales y el nuevo software.' }
+          ];
+          const faqItems = faq.items?.length > 0 ? faq.items : defaultFaqItems;
+          return (
+            <script type="application/ld+json">
+              {JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": faqItems.map((item: any) => ({
+                  "@type": "Question",
+                  "name": item.question,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": item.answer
+                  }
+                }))
+              })}
+            </script>
+          );
+        })()}
       </Helmet>
 
       <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
@@ -1435,6 +1501,236 @@ const ServicesPublicV2 = () => {
               className="mt-0"
             />
           )}
+
+          {/* ===== CONTENEDOR CON FONDO COMPARTIDO PARA LAS 3 SECCIONES ===== */}
+          {(() => {
+            // 🔒 VALIDACIÓN: Esperar a que pageData?.content esté disponible
+            if (!pageData || !pageData.content) {
+              return null; // No renderizar hasta que los datos del CMS estén cargados
+            }
+            
+            // Verificar si al menos una de las 3 secciones está habilitada
+            const whyChoose = (pageData?.content as any)?.whyChooseUs || {};
+            const process = (pageData?.content as any)?.developmentProcess || {};
+            const faq = (pageData?.content as any)?.faq || {};
+            
+            const hasAnySectionEnabled = 
+              whyChoose.enabled !== false || 
+              process.enabled !== false || 
+              faq.enabled !== false;
+            
+            if (!hasAnySectionEnabled) return null;
+
+            // Configuración de fondo compartido
+            const sharedBg = (pageData?.content as any)?.extraSectionsBackground || {};
+            const bgImage = sharedBg.backgroundImage
+              ? (currentTheme === 'dark' 
+                  ? (sharedBg.backgroundImage.dark || sharedBg.backgroundImage.light) 
+                  : (sharedBg.backgroundImage.light || sharedBg.backgroundImage.dark))
+              : null;
+
+            return (
+              <div
+                className="relative overflow-hidden"
+                style={{
+                  width: '100vw',
+                  marginLeft: 'calc(-50vw + 50%)',
+                  marginRight: 'calc(-50vw + 50%)'
+                }}
+              >
+                {/* Fondo compartido para las 3 secciones - Full viewport width */}
+                {!bgImage && (
+                  <div className="absolute inset-0" style={{ backgroundColor: currentTheme === 'dark' ? '#1f2937' : '#ffffff' }} />
+                )}
+                {bgImage && (
+                  <>
+                    <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
+                      backgroundImage: `url(${bgImage})`,
+                      opacity: currentTheme === 'dark' ? 1 : (sharedBg.backgroundOpacity ?? 1)
+                    }} />
+                    {sharedBg.backgroundOverlay && currentTheme === 'light' && (
+                      <div className="absolute inset-0" style={{
+                        backgroundColor: 'rgba(255,255,255,0.3)'
+                      }} />
+                    )}
+                  </>
+                )}
+
+                {/* SECCIÓN 1: ¿POR QUÉ ELEGIRNOS? */}
+                {whyChoose.enabled !== false && (() => {
+                  const defaultItems = [
+                    { title: 'Desarrollo Rápido', description: 'Entregamos proyectos en tiempo récord sin comprometer la calidad.', iconBgColor: 'purple' },
+                    { title: 'Calidad Garantizada', description: 'Cada proyecto pasa por rigurosas pruebas de calidad.', iconBgColor: 'blue' },
+                    { title: 'Soporte Continuo', description: 'Te acompañamos durante todo el proceso y después del lanzamiento.', iconBgColor: 'green' }
+                  ];
+                  const items = whyChoose.items?.length > 0 ? whyChoose.items : defaultItems;
+                  const title = whyChoose.title || '¿Por qué elegir Scuti Company?';
+                  const subtitle = whyChoose.subtitle || '';
+                  const titleColor = currentTheme === 'dark' ? (whyChoose.titleColorDark || '#ffffff') : (whyChoose.titleColor || '#111827');
+                  const subtitleColor = currentTheme === 'dark' ? (whyChoose.subtitleColorDark || '#9ca3af') : (whyChoose.subtitleColor || '#6b7280');
+
+                  const colorMap: Record<string, { bg: string; text: string }> = {
+                    purple: { bg: 'bg-purple-100 dark:bg-purple-900/50', text: 'text-purple-600 dark:text-purple-400' },
+                    blue: { bg: 'bg-blue-100 dark:bg-blue-900/50', text: 'text-blue-600 dark:text-blue-400' },
+                    green: { bg: 'bg-green-100 dark:bg-green-900/50', text: 'text-green-600 dark:text-green-400' },
+                    cyan: { bg: 'bg-cyan-100 dark:bg-cyan-900/50', text: 'text-cyan-600 dark:text-cyan-400' },
+                    amber: { bg: 'bg-amber-100 dark:bg-amber-900/50', text: 'text-amber-600 dark:text-amber-400' },
+                    rose: { bg: 'bg-rose-100 dark:bg-rose-900/50', text: 'text-rose-600 dark:text-rose-400' }
+                  };
+
+                  const iconPaths = [
+                    'M13 10V3L4 14h7v7l9-11h-7z', // rayo
+                    'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', // check
+                    'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 109.75 9.75c0-1.148-.198-2.25-.559-3.262', // soporte
+                    'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', // settings
+                    'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', // idea
+                    'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', // equipo
+                  ];
+
+                  return (
+                    <section className="relative py-16">
+                      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: titleColor }}>{title}</h2>
+                          {subtitle && <p className="text-lg max-w-3xl mx-auto" style={{ color: subtitleColor }}>{subtitle}</p>}
+                        </div>
+                        <div className={`grid md:grid-cols-${Math.min(items.length, 4)} gap-8`}>
+                          {items.map((item: any, index: number) => {
+                            const colors = colorMap[item.iconBgColor || 'purple'] || colorMap.purple;
+                            return (
+                              <div key={index} className="text-center group">
+                                <div className={`w-16 h-16 ${colors.bg} rounded-full flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110`}>
+                                  <svg className={`w-8 h-8 ${colors.text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPaths[index % iconPaths.length]} />
+                                  </svg>
+                                </div>
+                                <h3 className={`text-xl font-semibold mb-2 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.title}</h3>
+                                <p className={currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>{item.description}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </section>
+                  );
+                })()}
+
+                {/* SECCIÓN 2: PROCESO DE DESARROLLO */}
+                {process.enabled !== false && (() => {
+                  const defaultSteps = [
+                    { title: 'Fase de Diagnóstico y Viabilidad', description: 'Analizamos tus procesos actuales para identificar cuellos de botella y asegurar que la solución propuesta sea técnicamente realizable y rentable.' },
+                    { title: 'Diseño de Arquitectura y UX', description: 'Planificamos la estructura técnica y el diseño de interfaz para que tu software sea intuitivo para el usuario y fácil de escalar a futuro.' },
+                    { title: 'Desarrollo Ágil (Sprints de 2 semanas)', description: 'Construimos el software en ciclos cortos con entregas constantes, permitiéndote ver avances reales y realizar ajustes sobre la marcha.' },
+                    { title: 'Despliegue, Capacitación y Soporte', description: 'Lanzamos la solución, capacitamos a tu equipo y te acompañamos con soporte técnico preventivo para asegurar la continuidad de tu operación.' }
+                  ];
+                  const steps = process.steps?.length > 0 ? process.steps : defaultSteps;
+                  const title = process.title || 'De la Idea al Sistema: Nuestro Método de Trabajo';
+                  const subtitle = process.subtitle || 'Un proceso ágil y transparente diseñado para minimizar riesgos y maximizar la inversión de tu empresa.';
+                  const titleColor = currentTheme === 'dark' ? (process.titleColorDark || '#ffffff') : (process.titleColor || '#111827');
+                  const subtitleColor = currentTheme === 'dark' ? (process.subtitleColorDark || '#9ca3af') : (process.subtitleColor || '#6b7280');
+
+                  const stepIcons = ['🔍', '📐', '⚡', '🚀', '🔧', '📊'];
+                  const stepColors = [
+                    'from-purple-500 to-indigo-500',
+                    'from-blue-500 to-cyan-500',
+                    'from-emerald-500 to-teal-500',
+                    'from-amber-500 to-orange-500',
+                    'from-rose-500 to-pink-500',
+                    'from-violet-500 to-fuchsia-500',
+                  ];
+
+                  return (
+                    <section className="relative py-20">
+                      {/* Patrón decorativo sutil */}
+                      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 25px 25px, currentColor 2px, transparent 0)', backgroundSize: '50px 50px' }} />
+                      
+                      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-16">
+                          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: titleColor }}>{title}</h2>
+                          <p className="text-lg max-w-3xl mx-auto" style={{ color: subtitleColor }}>{subtitle}</p>
+                        </div>
+                        
+                        <div className="relative">
+                          {/* Línea vertical conectora */}
+                          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-blue-500 to-emerald-500 hidden md:block" style={{ transform: 'translateX(-50%)' }} />
+                          
+                          <div className="space-y-12">
+                            {steps.map((step: any, index: number) => {
+                              const isLeft = index % 2 === 0;
+                              return (
+                                <div key={index} className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-col md:gap-8`}>
+                                  {/* Número/Icono central */}
+                                  <div className="absolute left-8 md:left-1/2 transform -translate-x-1/2 z-10 hidden md:flex">
+                                    <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${stepColors[index % stepColors.length]} flex items-center justify-center shadow-lg text-white font-bold text-lg`}>
+                                      {index + 1}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Tarjeta */}
+                                  <div className={`w-full md:w-5/12 ${isLeft ? 'md:pr-8 md:text-right' : 'md:pl-8 md:text-left'}`}>
+                                    <div className={`p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 ${currentTheme === 'dark' ? 'bg-transparent border-white/20 hover:border-white/40' : 'backdrop-blur-md bg-white/70 border-white/50 shadow-lg hover:shadow-xl'}`}>
+                                      <div className={`flex items-center gap-3 mb-3 ${isLeft ? 'md:flex-row-reverse' : ''}`}>
+                                        {/* Icono mobile */}
+                                        <div className={`md:hidden w-10 h-10 rounded-full bg-gradient-to-br ${stepColors[index % stepColors.length]} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                                          {index + 1}
+                                        </div>
+                                        <span className="text-2xl">{stepIcons[index % stepIcons.length]}</span>
+                                        <h3 className={`text-lg font-bold ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{step.title}</h3>
+                                      </div>
+                                      <p className={`leading-relaxed ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{step.description}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Espaciador */}
+                                  <div className="hidden md:block w-5/12" />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  );
+                })()}
+
+                {/* SECCIÓN 3: FAQ */}
+                {faq.enabled !== false && (() => {
+                  const defaultItems = [
+                    { question: '¿Cuánto tiempo toma desarrollar un sistema personalizado?', answer: 'El tiempo varía según la complejidad. Un prototipo MVP funcional puede estar listo en 4 a 6 semanas, mientras que sistemas ERP o CRM completos suelen tomar de 3 a 5 meses.' },
+                    { question: '¿El software será de mi propiedad o tendré que pagar mensualidades?', answer: 'En Scut1 Company entregamos la propiedad total del código y la documentación. No dependes de licencias mensuales; el sistema es un activo de tu empresa.' },
+                    { question: '¿Qué pasa si mi empresa crece y necesito más funciones?', answer: 'Desarrollamos bajo una arquitectura escalable. Esto significa que podemos añadir nuevos módulos o integraciones en el futuro sin necesidad de rehacer el sistema desde cero.' },
+                    { question: '¿Pueden integrar el nuevo software con mis sistemas actuales (Excel, SAP, etc.)?', answer: 'Sí, somos especialistas en integración de sistemas para que la información fluya sin interrupciones entre tus herramientas actuales y el nuevo software.' }
+                  ];
+                  const items = faq.items?.length > 0 ? faq.items : defaultItems;
+                  const title = faq.title || 'Consultas Frecuentes sobre Software a Medida';
+                  const titleColor = currentTheme === 'dark' ? (faq.titleColorDark || '#ffffff') : (faq.titleColor || '#111827');
+
+                  return (
+                    <section className="relative py-20">
+                      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                          <span className="text-4xl mb-4 block">❓</span>
+                          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: titleColor }}>{title}</h2>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {items.map((item: any, index: number) => (
+                            <FaqAccordionItem
+                              key={index}
+                              question={item.question}
+                              answer={item.answer}
+                              theme={currentTheme}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+                  );
+                })()}
+
+              </div>
+            );
+          })()}
           
         </main>
         
