@@ -41,6 +41,7 @@ function generateFavicons(): string {
 // Cache en memoria para evitar llamadas repetidas a la API
 const postCache = new Map<string, { data: any; timestamp: number }>();
 const servicioCache = new Map<string, { data: any; timestamp: number }>();
+const pageSeoCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
 /**
@@ -132,6 +133,52 @@ async function getServicioData(slug: string): Promise<any | null> {
 }
 
 /**
+ * Obtener datos SEO de una página del CMS
+ * Consulta /api/cms/pages/:slug y retorna el objeto seo
+ */
+async function getPageSeoData(slug: string): Promise<any | null> {
+  // Verificar cache
+  const cached = pageSeoCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  try {
+    const response = await fetch(
+      `${CONFIG.apiUrl}/api/cms/pages/${slug}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Vercel-Edge-Middleware'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`[Edge Middleware] Error fetching CMS page "${slug}": ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    if (!data.success || !data.data?.seo) {
+      console.log(`[Edge Middleware] No SEO data in CMS for page "${slug}"`);
+      return null;
+    }
+
+    const seo = data.data.seo;
+
+    // Guardar en cache
+    pageSeoCache.set(slug, { data: seo, timestamp: Date.now() });
+
+    return seo;
+  } catch (error) {
+    console.error(`[Edge Middleware] Error fetching CMS SEO for "${slug}":`, error);
+    return null;
+  }
+}
+
+/**
  * Obtener URL de imagen del servicio
  */
 function getServicioImageUrl(servicio: any): string {
@@ -186,6 +233,73 @@ function escapeHtml(text: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+/**
+ * Generar meta tags dinámicos desde datos SEO del CMS
+ * Si no hay datos del CMS, retorna el fallback hardcodeado
+ */
+function generateCmsPageMetaTags(
+  seo: any | null,
+  pageUrl: string,
+  pageName: string,
+  fallbackMetaTags: string
+): string {
+  // Si no hay datos del CMS, usar fallback hardcodeado
+  if (!seo || (!seo.metaTitle && !seo.metaDescription)) {
+    console.log(`[Edge Middleware] No CMS SEO for "${pageName}", using hardcoded fallback`);
+    return fallbackMetaTags;
+  }
+
+  console.log(`[Edge Middleware] Using CMS SEO for "${pageName}": ${seo.metaTitle?.substring(0, 50)}`);
+
+  const title = escapeHtml(seo.metaTitle || CONFIG.siteName);
+  const description = escapeHtml(seo.metaDescription || '');
+  const ogTitle = escapeHtml(seo.ogTitle || seo.metaTitle || CONFIG.siteName);
+  const ogDescription = escapeHtml(seo.ogDescription || seo.metaDescription || '');
+  const ogImage = seo.ogImage && seo.ogImage.startsWith('http')
+    ? seo.ogImage
+    : seo.ogImage
+      ? `${CONFIG.siteUrl}${seo.ogImage.startsWith('/') ? '' : '/'}${seo.ogImage}`
+      : `${CONFIG.siteUrl}/logofondonegro.jpeg`;
+  const focusKeyphrase = escapeHtml(seo.focusKeyphrase || '');
+
+  // Construir keywords: focusKeyphrase + keywords array
+  const keywordsArr: string[] = [];
+  if (seo.focusKeyphrase) keywordsArr.push(seo.focusKeyphrase);
+  if (seo.keywords?.length) keywordsArr.push(...seo.keywords);
+  const keywords = escapeHtml(Array.from(new Set(keywordsArr)).filter(Boolean).join(', '));
+
+  return `
+    ${generateFavicons()}
+    <!-- Primary Meta Tags - ${pageName} - Generado por Edge Middleware desde CMS -->
+    <title>${title}</title>
+    <meta name="title" content="${title}" />
+    <meta name="description" content="${description}" />
+    ${keywords ? `<meta name="keywords" content="${keywords}" />` : ''}
+    ${focusKeyphrase ? `<meta name="article:tag" content="${focusKeyphrase}" />` : ''}
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${pageUrl}" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${pageUrl}" />
+    <meta property="og:title" content="${ogTitle}" />
+    <meta property="og:description" content="${ogDescription}" />
+    <meta property="og:image" content="${ogImage}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="${seo.twitterCard || 'summary_large_image'}" />
+    <meta name="twitter:url" content="${pageUrl}" />
+    <meta name="twitter:title" content="${ogTitle}" />
+    <meta name="twitter:description" content="${ogDescription}" />
+    <meta name="twitter:image" content="${ogImage}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+  `;
 }
 
 /**
@@ -768,11 +882,17 @@ export default async function middleware(request: Request) {
     return next();
   }
 
-  // === CASO 0: Páginas estáticas (Home, Servicios, Nosotros) ===
+  // === CASO 0: Páginas CMS (Home, Servicios, Nosotros) ===
+  // Prioridad: 1) Datos del CMS (API) → 2) Fallback hardcodeado
   if (isHomePage || isServiciosPage || isNosotrosPage) {
-    const pageName = isHomePage ? 'home' : isServiciosPage ? 'servicios' : 'nosotros';
+    const pageName = isHomePage ? 'home' : isServiciosPage ? 'services' : 'about';
+    const pageSlug = pageName; // slug para el CMS API
+    const pageUrl = isHomePage ? CONFIG.siteUrl : `${CONFIG.siteUrl}/${isServiciosPage ? 'servicios' : 'nosotros'}`;
     console.log(`[Edge Middleware] Crawler detected for /${pageName}: ${userAgent.substring(0, 50)}`);
-    
+
+    // 1) Obtener datos SEO del CMS
+    const cmsSeo = await getPageSeoData(pageSlug);
+
     // Obtener el HTML original desde /index.html
     const indexUrl = new URL('/', request.url);
     const response = await fetch(indexUrl.toString(), {
@@ -781,23 +901,19 @@ export default async function middleware(request: Request) {
         'User-Agent': 'Vercel-Edge-Middleware-Internal'
       }
     });
-    
+
     if (!response.ok) {
       console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
       return next();
     }
-    
+
     let html = await response.text();
 
-    // Generar meta tags según la página
-    let metaTags: string;
-    if (isHomePage) {
-      metaTags = generateHomeMetaTags();
-    } else if (isServiciosPage) {
-      metaTags = generateServiciosMetaTags();
-    } else {
-      metaTags = generateNosotrosMetaTags();
-    }
+    // 2) Generar meta tags: CMS primero, hardcodeado como fallback
+    const fallbackFn = isHomePage ? generateHomeMetaTags
+      : isServiciosPage ? generateServiciosMetaTags
+      : generateNosotrosMetaTags;
+    const metaTags = generateCmsPageMetaTags(cmsSeo, pageUrl, pageName, fallbackFn());
 
     // Reemplazar el contenido del <head>
     html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
@@ -827,9 +943,13 @@ export default async function middleware(request: Request) {
   }
 
   // === CASO 1: Página del listado del blog ===
+  // Prioridad: 1) Datos del CMS (API) → 2) Fallback hardcodeado
   if (isBlogListPage) {
     console.log(`[Edge Middleware] Crawler detected for /blog: ${userAgent.substring(0, 50)}`);
-    
+
+    // 1) Obtener datos SEO del CMS para la página blog
+    const cmsSeo = await getPageSeoData('blog');
+
     // Obtener el HTML original desde /index.html
     const indexUrl = new URL('/', request.url);
     const response = await fetch(indexUrl.toString(), {
@@ -838,16 +958,16 @@ export default async function middleware(request: Request) {
         'User-Agent': 'Vercel-Edge-Middleware-Internal'
       }
     });
-    
+
     if (!response.ok) {
       console.log(`[Edge Middleware] Failed to fetch index.html: ${response.status}`);
       return next();
     }
-    
+
     let html = await response.text();
 
-    // Generar meta tags para el listado del blog
-    const metaTags = generateBlogListMetaTags();
+    // 2) Generar meta tags: CMS primero, hardcodeado como fallback
+    const metaTags = generateCmsPageMetaTags(cmsSeo, `${CONFIG.siteUrl}/blog`, 'blog', generateBlogListMetaTags());
 
     // Reemplazar el contenido del <head>
     html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');

@@ -251,8 +251,18 @@ async function main() {
     // Inyectar SEO del CMS
     html = injectSeoTags(html, pageData.seo);
     console.log('\n✅ Meta tags SEO del CMS inyectados correctamente');
+
+    // Verificar que los tags se inyectaron bien
+    const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
+    const descMatch = html.match(/<meta name="description" content="([^"]*?)"/i);
+    console.log(`   🔍 Verificación post-inyección:`);
+    console.log(`      Title en HTML: ${titleMatch?.[1]?.substring(0, 60) || 'NO ENCONTRADO'}...`);
+    console.log(`      Description en HTML: ${descMatch?.[1]?.substring(0, 60) || 'NO ENCONTRADO'}...`);
   } else {
-    console.log('\n⚠️ No hay datos SEO del CMS, manteniendo valores por defecto');
+    console.warn('\n⚠️ ADVERTENCIA: No hay datos SEO del CMS disponibles.');
+    console.warn('   Los meta tags en dist/index.html mantendrán los valores por defecto de index.html.');
+    console.warn('   Google indexará estos valores por defecto hasta el próximo build exitoso.');
+    console.warn('   Asegúrate de que el API esté disponible durante el build: ' + CONFIG.apiUrl);
   }
 
   // Guardar el HTML actualizado

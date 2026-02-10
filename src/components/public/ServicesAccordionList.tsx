@@ -4,7 +4,7 @@
  * Diseño inspirado en maqueta con numeración, títulos y contenido expandible
  */
 
-import React, { useState, memo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Servicio } from '../../types/servicios';
 
@@ -148,8 +148,11 @@ interface AccordionItemProps {
   index: number;
   isExpanded: boolean;
   onToggle: () => void;
+  onHoverOpen?: () => void;
   config?: AccordionConfig;
   currentTheme?: 'light' | 'dark';
+  enableHoverOpen?: boolean;
+  hoverDelay?: number;
 }
 
 const AccordionItem: React.FC<AccordionItemProps> = memo(({
@@ -157,10 +160,42 @@ const AccordionItem: React.FC<AccordionItemProps> = memo(({
   index,
   isExpanded,
   onToggle,
+  onHoverOpen,
   config,
-  currentTheme = 'light'
+  currentTheme = 'light',
+  enableHoverOpen = true,
+  hoverDelay = 400
 }) => {
   const isDark = currentTheme === 'dark';
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const itemRef = useRef<HTMLDivElement>(null);
+
+  // Limpiar timeout al desmontar
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Manejar hover con delay
+  const handleMouseEnter = useCallback(() => {
+    if (!enableHoverOpen || isExpanded) return;
+
+    hoverTimeoutRef.current = setTimeout(() => {
+      if (onHoverOpen) {
+        onHoverOpen();
+      }
+    }, hoverDelay);
+  }, [enableHoverOpen, isExpanded, onHoverOpen, hoverDelay]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  }, []);
   
   // Formatear número con ceros
   const formattedNumber = String(index + 1).padStart(2, '0');
@@ -231,8 +266,11 @@ const AccordionItem: React.FC<AccordionItemProps> = memo(({
   const headerBgHoverOpacity = config?.headerBgHoverOpacity ?? 0.2;
 
   return (
-    <div 
+    <div
+      ref={itemRef}
       className={'transition-all duration-300 ' + (isExpanded ? 'mb-2' : 'mb-0')}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Header del acordeón - siempre visible */}
       <button
@@ -519,11 +557,65 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
 }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isUserInteracting, setIsUserInteracting] = useState(false);
   const itemsPerPage = 10; // Número fijo de servicios por página
-  const sectionRef = React.useRef<HTMLElement>(null);
-  
+  const sectionRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const lastScrollY = useRef(0);
+  const scrollDirection = useRef<'up' | 'down'>('down');
+
   const isDark = currentTheme === 'dark';
-  
+
+  // Detectar dirección del scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      scrollDirection.current = currentScrollY > lastScrollY.current ? 'down' : 'up';
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Auto-abrir servicios al hacer scroll (IntersectionObserver)
+  useEffect(() => {
+    if (isUserInteracting) return; // No auto-abrir si el usuario está interactuando
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Solo procesar si el usuario no está interactuando manualmente
+        if (isUserInteracting) return;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.getAttribute('data-index') || '-1', 10);
+            if (index >= 0 && scrollDirection.current === 'down') {
+              // Solo abrir si va hacia abajo y el item entra en vista
+              setExpandedIndex(index);
+            }
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '-20% 0px -60% 0px', // Activar cuando el item está en el 20-40% superior del viewport
+        threshold: 0.1
+      }
+    );
+
+    // Observar cada item del acordeón en la página actual
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    itemRefs.current.forEach((element, index) => {
+      if (index >= startIndex && index < startIndex + itemsPerPage) {
+        element.setAttribute('data-index', index.toString());
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [currentPage, isUserInteracting, itemsPerPage]);
+
   // Helper para convertir dirección de gradiente a CSS
   const getGradientDirection = (dir?: string) => {
     switch (dir) {
@@ -566,10 +658,14 @@ export const ServicesAccordionList: React.FC<ServicesAccordionListProps> = memo(
     ? config?.backgroundImage?.dark
     : config?.backgroundImage?.light;
   
-  const handleToggle = (index: number) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
-  };
-  
+  const handleToggle = useCallback((index: number) => {
+    setIsUserInteracting(true);
+    setExpandedIndex(prev => prev === index ? null : index);
+
+    // Resetear el flag después de un tiempo
+    setTimeout(() => setIsUserInteracting(false), 2000);
+  }, []);
+
   // Calcular paginación
   const totalPages = Math.ceil(servicios.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
