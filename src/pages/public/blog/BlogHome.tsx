@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Newspaper } from 'lucide-react';
 import { useBlogPosts, useFeaturedPosts, useCategories, useTags } from '../../../hooks/blog';
 import { useBlogCmsConfig } from '../../../hooks/blog/useBlogCmsConfig';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useSiteConfig } from '../../../hooks/useSiteConfig';
+import { useSeo } from '../../../hooks/useSeo';
 import { SimpleHeroSection } from '../../../components/blog/hero/SimpleHeroSection';
 import { FeaturedBlogCard } from '../../../components/blog/cards/FeaturedBlogCard';
 import { AllNewsSection } from '../../../components/blog/sections/AllNewsSection';
@@ -59,6 +59,13 @@ const BlogHome: React.FC = () => {
   const { config: cmsConfig, loading: cmsLoading } = useBlogCmsConfig();
   const { theme } = useTheme();
   const { config: siteConfig, getFullUrl, getImageUrl } = useSiteConfig();
+
+  // 🎯 SEO dinámico desde CMS (prioridad: CMS → hardcoded → fallback)
+  const { SeoHelmet } = useSeo({
+    pageName: 'blog',
+    fallbackTitle: `Blog ${siteConfig.siteName} - Noticias y Tendencias Tecnológicas`,
+    fallbackDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico.'
+  });
   const isDarkMode = theme === 'dark';
   const featuredPostsConfig = cmsConfig.featuredPosts;
 
@@ -168,34 +175,8 @@ const BlogHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
-      <Helmet>
-        <title>Blog {siteConfig.siteName} - Noticias y Tendencias Tecnológicas</title>
-        <meta name="description" content="Mantente informado con las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos en desarrollo web, programación y tecnología." />
-        <meta name="keywords" content="blog, noticias tecnológicas, tendencias tech, desarrollo web, programación, AI, cloud computing, cybersecurity" />
-
-        {/* Open Graph */}
-        <meta property="og:title" content={`Blog ${siteConfig.siteName} - Noticias Tecnológicas`} />
-        <meta property="og:description" content="Las últimas noticias y tendencias del sector tecnológico. Contenido curado por expertos." />
-        <meta property="og:image" content={getImageUrl(siteConfig.images.ogBlog)} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content={`${siteConfig.siteName} - Blog de Tecnología e Innovación`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={getFullUrl('/blog')} />
-        <meta property="og:site_name" content={siteConfig.siteName} />
-        <meta property="og:locale" content={siteConfig.locale} />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`Blog ${siteConfig.siteName} - Noticias Tecnológicas`} />
-        <meta name="twitter:description" content="Las últimas noticias y tendencias del sector tecnológico" />
-        <meta name="twitter:image" content={getImageUrl(siteConfig.images.ogBlog)} />
-        <meta name="twitter:image:alt" content={`${siteConfig.siteName} - Blog de Tecnología e Innovación`} />
-
-        {/* Canonical */}
-        <link rel="canonical" href={getFullUrl('/blog')} />
-      </Helmet>
+      {/* ✅ SEO dinámico: CMS (prioridad) → hardcoded (seoConfig.ts) → fallback */}
+      <SeoHelmet />
 
       {/* JSON-LD para el sitio del blog - Memoizado */}
       <script type="application/ld+json">

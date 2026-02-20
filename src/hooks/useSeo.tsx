@@ -148,12 +148,13 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
                 // Usar datos del CMS si existen, sino usar hardcoded, sino fallback
                 metaTitle: data.seo.metaTitle || hardcodedSeo?.metaTitle || fallbackTitle || DEFAULT_SEO.metaTitle,
                 metaDescription: data.seo.metaDescription || hardcodedSeo?.metaDescription || fallbackDescription || DEFAULT_SEO.metaDescription,
-                keywords: (data.seo.keywords && data.seo.keywords.length > 0) 
-                  ? data.seo.keywords 
+                keywords: (data.seo.keywords && data.seo.keywords.length > 0)
+                  ? data.seo.keywords
                   : (hardcodedSeo?.keywords || DEFAULT_SEO.keywords),
                 ogTitle: data.seo.ogTitle || data.seo.metaTitle || hardcodedSeo?.ogTitle || fallbackTitle || DEFAULT_SEO.ogTitle,
                 ogDescription: data.seo.ogDescription || data.seo.metaDescription || hardcodedSeo?.ogDescription || fallbackDescription || DEFAULT_SEO.ogDescription,
                 ogImage: data.seo.ogImage || hardcodedSeo?.ogImage || '',
+                canonical: hardcodedSeo?.canonical,
                 _source: 'cms'
               };
               
@@ -285,7 +286,9 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
         {seoData.ogImageHeight && <meta property="og:image:height" content={seoData.ogImageHeight} />}
         {seoData.ogImageAlt && <meta property="og:image:alt" content={seoData.ogImageAlt} />}
         <meta property="og:type" content="website" />
+        {seoData.canonical && <meta property="og:url" content={seoData.canonical} />}
         <meta property="og:site_name" content="SCUTI Company" />
+        <meta property="og:locale" content="es_PE" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
