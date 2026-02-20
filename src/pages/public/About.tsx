@@ -348,7 +348,7 @@ const About = () => {
   };
 
   const heroStyles = getHeroStyles();
-  const { config: siteConfig, getFullUrl, getImageUrl } = useSiteConfig();
+  const { config: siteConfig, getFullUrl } = useSiteConfig();
 
   return (
     <>

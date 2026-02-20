@@ -68,7 +68,7 @@ const ServicesPublicV2 = () => {
   // ============================================
 
   // 🆕 Configuración centralizada del sitio
-  const { config, getFullUrl, getImageUrl } = useSiteConfig();
+  const { config, getFullUrl } = useSiteConfig();
 
   // 🎯 SEO dinámico desde CMS con fallback hardcodeado
   const { SeoHelmet } = useSeo({
