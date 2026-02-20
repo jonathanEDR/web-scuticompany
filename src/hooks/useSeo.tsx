@@ -3,6 +3,19 @@ import { Helmet } from 'react-helmet-async';
 import { getPageBySlug, forceReload } from '../services/cmsApi';
 import { getHardcodedSeo } from '../config/seoConfig';
 
+const SITE_URL = 'https://scuticompany.com';
+
+/**
+ * Convierte URLs de imagen relativas a absolutas.
+ * Google y redes sociales requieren URLs absolutas en og:image.
+ */
+function toAbsoluteImageUrl(url: string | undefined): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/')) return `${SITE_URL}${url}`;
+  return url;
+}
+
 /**
  * 🎯 Hook de SEO Global con Sistema de Prioridad
  * 
@@ -153,7 +166,7 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
                   : (hardcodedSeo?.keywords || DEFAULT_SEO.keywords),
                 ogTitle: data.seo.ogTitle || data.seo.metaTitle || hardcodedSeo?.ogTitle || fallbackTitle || DEFAULT_SEO.ogTitle,
                 ogDescription: data.seo.ogDescription || data.seo.metaDescription || hardcodedSeo?.ogDescription || fallbackDescription || DEFAULT_SEO.ogDescription,
-                ogImage: data.seo.ogImage || hardcodedSeo?.ogImage || '',
+                ogImage: toAbsoluteImageUrl(data.seo.ogImage || hardcodedSeo?.ogImage || ''),
                 canonical: hardcodedSeo?.canonical,
                 _source: 'cms'
               };

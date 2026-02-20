@@ -7,6 +7,7 @@ import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidge
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { getPageBySlug } from '../../services/cmsApi';
+import { useSeo } from '../../hooks/useSeo';
 
 /**
  * 🏢 Página Nosotros/About
@@ -222,6 +223,13 @@ const About = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { theme } = useTheme();
 
+  // 🎯 SEO dinámico desde CMS con fallback hardcodeado
+  const { SeoHelmet } = useSeo({
+    pageName: 'about',
+    fallbackTitle: 'Sobre Nosotros - SCUTI Company | Empresa de Software en Perú',
+    fallbackDescription: 'Conoce SCUTI Company: empresa líder en desarrollo de software e IA para PYMES en Perú. Nuestra misión es transformar negocios con tecnología inteligente.'
+  });
+
   // Cargar datos de la página About desde CMS
   useEffect(() => {
     const loadPageData = async () => {
@@ -344,34 +352,11 @@ const About = () => {
 
   return (
     <>
-      {/* ✅ SEO Hardcoded directo (para indexación inmediata de Google) */}
+      {/* ✅ SEO dinámico desde CMS (prioridad: CMS → hardcoded → fallback) */}
+      <SeoHelmet />
+
+      {/* Schema.org - AboutPage */}
       <Helmet>
-        <title>Sobre Nosotros - {siteConfig.siteName} | Empresa de Software en {siteConfig.country}</title>
-        <meta name="description" content={`Conoce ${siteConfig.siteName}: empresa líder en desarrollo de software e IA para PYMES en ${siteConfig.country}. Nuestra misión es transformar negocios con tecnología inteligente.`} />
-        <meta name="keywords" content="sobre nosotros, equipo SCUTI, empresa de software Perú, desarrollo tecnológico, misión, visión, transformación digital PYMES" />
-
-        {/* Open Graph */}
-        <meta property="og:title" content={`Sobre Nosotros - ${siteConfig.siteName} | Empresa de Software en ${siteConfig.country}`} />
-        <meta property="og:description" content={`Conoce ${siteConfig.siteName}: empresa líder en desarrollo de software e IA para PYMES en ${siteConfig.country}. Transformamos negocios con tecnología inteligente.`} />
-        <meta property="og:image" content={getImageUrl(siteConfig.images.ogDefault)} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content={`${siteConfig.siteName} - Empresa de Desarrollo de Software en ${siteConfig.country}`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={getFullUrl('/nosotros')} />
-        <meta property="og:site_name" content={siteConfig.siteName} />
-        <meta property="og:locale" content={siteConfig.locale} />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`Sobre Nosotros - ${siteConfig.siteName} | Empresa de Software en ${siteConfig.country}`} />
-        <meta name="twitter:description" content={`Empresa líder en desarrollo de software e IA para PYMES en ${siteConfig.country}`} />
-        <meta name="twitter:image" content={getImageUrl(siteConfig.images.ogDefault)} />
-
-        {/* Canonical */}
-        <link rel="canonical" href={getFullUrl('/nosotros')} />
-
-        {/* Schema.org - AboutPage */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
