@@ -551,6 +551,150 @@ function generateNosotrosMetaTags(): string {
 }
 
 /**
+ * Generar meta tags para la página Contacto
+ */
+function generateContactoMetaTags(): string {
+  const title = 'Contacto - SCUTI Company | Agenda tu Consulta Gratuita';
+  const description = 'Contáctanos para tu proyecto tecnológico. Desarrollo web, apps móviles y soluciones digitales en Huánuco, Perú. Agenda una consulta gratuita.';
+  const contactoUrl = `${CONFIG.siteUrl}/contacto`;
+  const imageUrl = `${CONFIG.siteUrl}/logofondonegro.jpeg`;
+
+  return `
+    ${generateFavicons()}
+    <!-- Primary Meta Tags - Contacto - Generado por Edge Middleware -->
+    <title>${title}</title>
+    <meta name="title" content="${title}" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="contacto scuti, consultoria tecnologica peru, agenda reunion, contacto empresa tech huanuco, solicitar servicio, presupuesto desarrollo, desarrollo web peru" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${contactoUrl}" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${contactoUrl}" />
+    <meta property="og:title" content="${title}" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${contactoUrl}" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "${title}",
+      "description": "${description}",
+      "url": "${contactoUrl}",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "SCUTI Company",
+        "url": "${CONFIG.siteUrl}",
+        "telephone": "+51 973 397 306",
+        "email": "gscutic@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "calles los molles lt-02",
+          "addressLocality": "Huánuco",
+          "addressCountry": "PE"
+        }
+      }
+    }
+    </script>
+  `;
+}
+
+/**
+ * Generar meta tags para la página Política de Privacidad
+ */
+function generatePrivacidadMetaTags(): string {
+  const title = 'Política de Privacidad - SCUTI Company';
+  const description = 'Conoce nuestra política de privacidad y cómo protegemos tus datos personales. SCUTI Company cumple con la legislación peruana de protección de datos.';
+  const privacidadUrl = `${CONFIG.siteUrl}/privacidad`;
+  const imageUrl = `${CONFIG.siteUrl}/logofondonegro.jpeg`;
+
+  return `
+    ${generateFavicons()}
+    <!-- Primary Meta Tags - Privacidad - Generado por Edge Middleware -->
+    <title>${title}</title>
+    <meta name="title" content="${title}" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="política de privacidad, protección de datos, SCUTI Company, datos personales, privacidad peru" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${privacidadUrl}" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${privacidadUrl}" />
+    <meta property="og:title" content="${title}" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${privacidadUrl}" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+  `;
+}
+
+/**
+ * Generar meta tags para la página Términos y Condiciones
+ */
+function generateTerminosMetaTags(): string {
+  const title = 'Términos y Condiciones - SCUTI Company';
+  const description = 'Lee nuestros términos y condiciones de uso. Información sobre los servicios de desarrollo de software y consultoría tecnológica de SCUTI Company.';
+  const terminosUrl = `${CONFIG.siteUrl}/terminos`;
+  const imageUrl = `${CONFIG.siteUrl}/logofondonegro.jpeg`;
+
+  return `
+    ${generateFavicons()}
+    <!-- Primary Meta Tags - Términos - Generado por Edge Middleware -->
+    <title>${title}</title>
+    <meta name="title" content="${title}" />
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="terminos y condiciones, terminos de servicio, SCUTI Company, condiciones de uso, servicios tecnologicos peru" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${terminosUrl}" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${terminosUrl}" />
+    <meta property="og:title" content="${title}" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${terminosUrl}" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+  `;
+}
+
+/**
  * Generar meta tags para un servicio individual (detalle)
  */
 function generateServicioDetailMetaTags(servicio: any): string {
@@ -864,12 +1008,15 @@ export default async function middleware(request: Request) {
   const isHomePage = /^\/?$/.test(pathname);
   const isServiciosPage = /^\/servicios\/?$/.test(pathname);
   const isNosotrosPage = /^\/nosotros\/?$/.test(pathname);
+  const isContactoPage = /^\/contacto\/?$/.test(pathname);
+  const isPrivacidadPage = /^\/privacidad\/?$/.test(pathname);
+  const isTerminosPage = /^\/terminos\/?$/.test(pathname);
   const isBlogListPage = /^\/blog\/?$/.test(pathname);
   const blogPostMatch = pathname.match(/^\/blog\/([^\/]+)$/);
   const servicioDetailMatch = pathname.match(/^\/servicios\/([^\/]+)$/);
-  
+
   // Si no es ninguna página que manejamos, continuar normal
-  if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isBlogListPage && !blogPostMatch && !servicioDetailMatch) {
+  if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isContactoPage && !isPrivacidadPage && !isTerminosPage && !isBlogListPage && !blogPostMatch && !servicioDetailMatch) {
     return next();
   }
 
@@ -882,12 +1029,12 @@ export default async function middleware(request: Request) {
     return next();
   }
 
-  // === CASO 0: Páginas CMS (Home, Servicios, Nosotros) ===
+  // === CASO 0: Páginas CMS (Home, Servicios, Nosotros, Contacto) ===
   // Prioridad: 1) Datos del CMS (API) → 2) Fallback hardcodeado
-  if (isHomePage || isServiciosPage || isNosotrosPage) {
-    const pageName = isHomePage ? 'home' : isServiciosPage ? 'services' : 'about';
+  if (isHomePage || isServiciosPage || isNosotrosPage || isContactoPage) {
+    const pageName = isHomePage ? 'home' : isServiciosPage ? 'services' : isNosotrosPage ? 'about' : 'contact';
     const pageSlug = pageName; // slug para el CMS API
-    const pageUrl = isHomePage ? CONFIG.siteUrl : `${CONFIG.siteUrl}/${isServiciosPage ? 'servicios' : 'nosotros'}`;
+    const pageUrl = isHomePage ? CONFIG.siteUrl : `${CONFIG.siteUrl}/${isServiciosPage ? 'servicios' : isNosotrosPage ? 'nosotros' : 'contacto'}`;
     console.log(`[Edge Middleware] Crawler detected for /${pageName}: ${userAgent.substring(0, 50)}`);
 
     // 1) Obtener datos SEO del CMS
@@ -912,7 +1059,8 @@ export default async function middleware(request: Request) {
     // 2) Generar meta tags: CMS primero, hardcodeado como fallback
     const fallbackFn = isHomePage ? generateHomeMetaTags
       : isServiciosPage ? generateServiciosMetaTags
-      : generateNosotrosMetaTags;
+      : isNosotrosPage ? generateNosotrosMetaTags
+      : generateContactoMetaTags;
     const metaTags = generateCmsPageMetaTags(cmsSeo, pageUrl, pageName, fallbackFn());
 
     // Reemplazar el contenido del <head>
@@ -931,6 +1079,52 @@ export default async function middleware(request: Request) {
     html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
 
     // Retornar el HTML modificado
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'X-Robots-Tag': 'index, follow',
+        'X-Edge-Middleware': `${pageName}-seo`
+      }
+    });
+  }
+
+  // === CASO 0.5: Páginas estáticas sin CMS (Privacidad, Términos) ===
+  // Solo usan fallback hardcodeado (no existen en el CMS)
+  if (isPrivacidadPage || isTerminosPage) {
+    const pageName = isPrivacidadPage ? 'privacidad' : 'terminos';
+    const pageUrl = `${CONFIG.siteUrl}/${pageName}`;
+    console.log(`[Edge Middleware] Crawler detected for /${pageName}: ${userAgent.substring(0, 50)}`);
+
+    const indexUrl = new URL('/', request.url);
+    const response = await fetch(indexUrl.toString(), {
+      headers: {
+        'Accept': 'text/html',
+        'User-Agent': 'Vercel-Edge-Middleware-Internal'
+      }
+    });
+
+    if (!response.ok) {
+      return next();
+    }
+
+    let html = await response.text();
+
+    const metaTags = isPrivacidadPage ? generatePrivacidadMetaTags() : generateTerminosMetaTags();
+
+    html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
+    html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
+
+    html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
     return new Response(html, {
       status: 200,
       headers: {
@@ -1144,5 +1338,5 @@ export default async function middleware(request: Request) {
  * Se ejecuta para rutas de blog y servicios
  */
 export const config = {
-  matcher: ['/', '/servicios', '/servicios/:path*', '/nosotros', '/blog', '/blog/:path*']
+  matcher: ['/', '/servicios', '/servicios/:path*', '/nosotros', '/contacto', '/privacidad', '/terminos', '/blog', '/blog/:path*']
 };
