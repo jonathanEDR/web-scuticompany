@@ -152,8 +152,8 @@ const BlogPostEnhanced: React.FC = () => {
 
       {/* SEO Head optimizado para IA externa (ChatGPT, Claude, Bard, Perplexity) */}
       <Helmet>
-        {/* ✅ CORREGIDO: Usar SEO configurado por el usuario */}
-        <title>{post.seo?.metaTitle || post.title} | {config.siteName} Blog</title>
+        {/* ✅ CORREGIDO: Usar metaTitle puro del SEO sin sufijo de marca (mejor posicionamiento) */}
+        <title>{post.seo?.metaTitle || post.title}</title>
         <meta name="description" content={post.seo?.metaDescription || post.excerpt} />
         
         {/* ✅ Keywords: Priorizar focusKeyphrase + seo.keywords, eliminar duplicados */}
@@ -199,7 +199,7 @@ const BlogPostEnhanced: React.FC = () => {
         <meta property="og:title" content={post.seo?.metaTitle || post.title} />
         <meta property="og:description" content={post.seo?.metaDescription || post.excerpt} />
         <meta property="og:type" content="article" />
-        <meta property="og:site_name" content={`${config.siteName} Blog`} />
+        <meta property="og:site_name" content={config.siteName} />
         {post.featuredImage && <meta property="og:image" content={getImageUrl(post.featuredImage)} />}
         
         {/* Twitter Card - Usar SEO configurado */}

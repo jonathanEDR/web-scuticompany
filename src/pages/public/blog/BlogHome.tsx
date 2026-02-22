@@ -63,7 +63,7 @@ const BlogHome: React.FC = () => {
   // 🎯 SEO dinámico desde CMS (prioridad: CMS → hardcoded → fallback)
   const { SeoHelmet } = useSeo({
     pageName: 'blog',
-    fallbackTitle: `Blog ${siteConfig.siteName} - Noticias y Tendencias Tecnológicas`,
+    fallbackTitle: 'Blog de Tecnología - Noticias y Tendencias Tecnológicas',
     fallbackDescription: 'Mantente informado con las últimas noticias y tendencias del sector tecnológico.'
   });
   const isDarkMode = theme === 'dark';

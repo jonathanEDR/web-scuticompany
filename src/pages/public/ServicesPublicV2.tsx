@@ -70,10 +70,10 @@ const ServicesPublicV2 = () => {
   // 🆕 Configuración centralizada del sitio
   const { config, getFullUrl } = useSiteConfig();
 
-  // 🎯 SEO dinámico desde CMS con fallback hardcodeado
+  // 🎯 SEO dinámico desde CMS con fallback sin marca (página de posicionamiento)
   const { SeoHelmet } = useSeo({
     pageName: 'services',
-    fallbackTitle: 'Nuestros Servicios | SCUTI Company - Desarrollo de Software en Perú',
+    fallbackTitle: 'Servicios de Desarrollo Software en Perú | Aplicaciones Web y Móviles',
     fallbackDescription: 'Consultoría IT, Proyectos Tecnológicos e Inteligencia Artificial para impulsar tu negocio. Soluciones de desarrollo de software a medida.'
   });
 

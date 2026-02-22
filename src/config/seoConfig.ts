@@ -71,8 +71,9 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
   },
 
   // 💼 PÁGINA SERVICIOS
+  // ⚠️ SIN MARCA en metaTitle: páginas de posicionamiento no deben saturar con brand name
   services: {
-    metaTitle: 'Servicios de Desarrollo Software en Perú - SCUTI Company',
+    metaTitle: 'Servicios de Desarrollo Software en Perú | Aplicaciones Web y Móviles',
     metaDescription: 'Desarrollo de aplicaciones web y móviles, soluciones de IA, cloud computing, consultoría tecnológica. Servicios profesionales para empresas PYMES en Perú.',
     keywords: [
       'servicios desarrollo software',
@@ -85,19 +86,19 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
       'desarrollo frontend',
       'empresa software huanuco'
     ],
-    ogTitle: 'Servicios de Desarrollo Software - SCUTI Company',
+    ogTitle: 'Servicios de Desarrollo Software en Perú | Apps Web y Móviles',
     ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa en Perú',
     ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
     ogImageWidth: '1200',
     ogImageHeight: '630',
-    ogImageAlt: 'SCUTI Company - Servicios de Desarrollo de Software',
+    ogImageAlt: 'Servicios de Desarrollo de Software en Perú',
     twitterCard: 'summary_large_image',
     canonical: 'https://scuticompany.com/servicios'
   },
 
   // Alias para servicios
   servicios: {
-    metaTitle: 'Servicios de Desarrollo Software en Perú - SCUTI Company',
+    metaTitle: 'Servicios de Desarrollo Software en Perú | Aplicaciones Web y Móviles',
     metaDescription: 'Desarrollo de aplicaciones web y móviles, soluciones de IA, cloud computing, consultoría tecnológica. Servicios profesionales para empresas PYMES en Perú.',
     keywords: [
       'servicios desarrollo software',
@@ -110,12 +111,12 @@ export const DEFAULT_SEO_CONFIG: SeoConfigMap = {
       'desarrollo frontend',
       'empresa software huanuco'
     ],
-    ogTitle: 'Servicios de Desarrollo Software - SCUTI Company',
+    ogTitle: 'Servicios de Desarrollo Software en Perú | Apps Web y Móviles',
     ogDescription: 'Servicios tecnológicos profesionales diseñados para impulsar tu empresa en Perú',
     ogImage: 'https://scuticompany.com/logofondonegro.jpeg',
     ogImageWidth: '1200',
     ogImageHeight: '630',
-    ogImageAlt: 'SCUTI Company - Servicios de Desarrollo de Software',
+    ogImageAlt: 'Servicios de Desarrollo de Software en Perú',
     twitterCard: 'summary_large_image',
     canonical: 'https://scuticompany.com/servicios'
   },
