@@ -42,6 +42,7 @@ function generateFavicons(): string {
 const postCache = new Map<string, { data: any; timestamp: number }>();
 const servicioCache = new Map<string, { data: any; timestamp: number }>();
 const pageSeoCache = new Map<string, { data: any; timestamp: number }>();
+const pageFullCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
 /**
@@ -179,6 +180,40 @@ async function getPageSeoData(slug: string): Promise<any | null> {
 }
 
 /**
+ * Obtener datos COMPLETOS de una página del CMS (SEO + contenido)
+ * Para generar contenido visible para crawlers
+ */
+async function getFullCmsPageData(slug: string): Promise<any | null> {
+  const cached = pageFullCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  try {
+    const response = await fetch(
+      `${CONFIG.apiUrl}/api/cms/pages/${slug}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Vercel-Edge-Middleware'
+        }
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (!data.success || !data.data) return null;
+
+    pageFullCache.set(slug, { data: data.data, timestamp: Date.now() });
+    return data.data;
+  } catch (error) {
+    console.error(`[Edge Middleware] Error fetching full CMS page "${slug}":`, error);
+    return null;
+  }
+}
+
+/**
  * Obtener URL de imagen del servicio
  */
 function getServicioImageUrl(servicio: any): string {
@@ -264,6 +299,18 @@ function generateCmsPageMetaTags(
       : `${CONFIG.siteUrl}/logofondonegro.jpeg`;
   const focusKeyphrase = escapeHtml(seo.focusKeyphrase || '');
 
+  // Nuevos campos SEO desde CMS
+  const canonicalUrl = seo.canonicalUrl || pageUrl;
+  const robots = seo.robots || 'index, follow';
+  const ogType = seo.ogType || 'website';
+  const twitterTitle = escapeHtml(seo.twitterTitle || ogTitle);
+  const twitterDescription = escapeHtml(seo.twitterDescription || ogDescription);
+  const twitterImage = seo.twitterImage && seo.twitterImage.startsWith('http')
+    ? seo.twitterImage
+    : seo.twitterImage
+      ? `${CONFIG.siteUrl}${seo.twitterImage.startsWith('/') ? '' : '/'}${seo.twitterImage}`
+      : ogImage;
+
   // Construir keywords: focusKeyphrase + keywords array
   const keywordsArr: string[] = [];
   if (seo.focusKeyphrase) keywordsArr.push(seo.focusKeyphrase);
@@ -279,10 +326,11 @@ function generateCmsPageMetaTags(
     ${keywords ? `<meta name="keywords" content="${keywords}" />` : ''}
     ${focusKeyphrase ? `<meta name="article:tag" content="${focusKeyphrase}" />` : ''}
     <meta name="author" content="SCUTI Company" />
-    <link rel="canonical" href="${pageUrl}" />
+    <meta name="robots" content="${robots}" />
+    <link rel="canonical" href="${canonicalUrl}" />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="${ogType}" />
     <meta property="og:url" content="${pageUrl}" />
     <meta property="og:title" content="${ogTitle}" />
     <meta property="og:description" content="${ogDescription}" />
@@ -295,9 +343,9 @@ function generateCmsPageMetaTags(
     <!-- Twitter -->
     <meta name="twitter:card" content="${seo.twitterCard || 'summary_large_image'}" />
     <meta name="twitter:url" content="${pageUrl}" />
-    <meta name="twitter:title" content="${ogTitle}" />
-    <meta name="twitter:description" content="${ogDescription}" />
-    <meta name="twitter:image" content="${ogImage}" />
+    <meta name="twitter:title" content="${twitterTitle}" />
+    <meta name="twitter:description" content="${twitterDescription}" />
+    <meta name="twitter:image" content="${twitterImage}" />
     <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
   `;
 }
@@ -893,6 +941,157 @@ function generateMetaTags(post: any): string {
 }
 
 /**
+ * 🎯 CRÍTICO PARA SEO: Generar contenido visible para páginas CMS
+ * Inyecta contenido semántico real en el div#root para crawlers que no ejecutan JS
+ * (Facebook, Twitter, LinkedIn, bots antiguos, etc.)
+ */
+function generateVisibleCmsContent(pageData: any, pageName: string, pageUrl: string): string {
+  const seo = pageData?.seo || {};
+  const content = pageData?.content || {};
+  const title = escapeHtml(seo.metaTitle || pageName);
+  const description = escapeHtml(seo.metaDescription || '');
+
+  // Extraer contenido según el tipo de página
+  let mainContent = '';
+
+  if (pageName === 'home') {
+    const hero = content.hero || {};
+    const solutions = content.solutions || {};
+    const valueAdded = content.valueAdded || {};
+
+    mainContent = `
+      <section>
+        ${hero.title ? `<h1>${escapeHtml(hero.title)}</h1>` : `<h1>${title}</h1>`}
+        ${hero.subtitle ? `<h2>${escapeHtml(hero.subtitle)}</h2>` : ''}
+        ${hero.description ? `<p>${escapeHtml(hero.description)}</p>` : ''}
+      </section>
+      
+      ${solutions.title ? `
+      <section>
+        <h2>${escapeHtml(solutions.title)}</h2>
+        ${solutions.description ? `<p>${escapeHtml(solutions.description)}</p>` : ''}
+        ${solutions.items?.length ? `<ul>${solutions.items.map((item: any) => 
+          `<li><strong>${escapeHtml(item.title || '')}</strong>${item.description ? ': ' + escapeHtml(item.description) : ''}</li>`
+        ).join('')}</ul>` : ''}
+      </section>` : ''}
+      
+      ${valueAdded?.title ? `
+      <section>
+        <h2>${escapeHtml(valueAdded.title)}</h2>
+        ${valueAdded.description ? `<p>${escapeHtml(valueAdded.description)}</p>` : ''}
+        ${valueAdded.items?.length ? `<ul>${valueAdded.items.map((item: any) =>
+          `<li><strong>${escapeHtml(item.title || '')}</strong>${item.description ? ': ' + escapeHtml(item.description) : ''}</li>`
+        ).join('')}</ul>` : ''}
+      </section>` : ''}
+    `;
+  } else if (pageName === 'services' || pageName === 'servicios') {
+    const hero = content.hero || {};
+    const servicesList = content.services || content.solutions || {};
+
+    mainContent = `
+      <section>
+        ${hero.title ? `<h1>${escapeHtml(hero.title)}</h1>` : `<h1>Servicios de Desarrollo de Software</h1>`}
+        ${hero.subtitle ? `<h2>${escapeHtml(hero.subtitle)}</h2>` : ''}
+        ${hero.description ? `<p>${escapeHtml(hero.description)}</p>` : ''}
+      </section>
+      
+      ${servicesList.items?.length ? `
+      <section>
+        <h2>Nuestros Servicios</h2>
+        <ul>${servicesList.items.map((item: any) =>
+          `<li><strong>${escapeHtml(item.title || '')}</strong>${item.description ? ': ' + escapeHtml(item.description) : ''}</li>`
+        ).join('')}</ul>
+      </section>` : ''}
+    `;
+  } else if (pageName === 'about' || pageName === 'nosotros') {
+    const hero = content.hero || {};
+    const mission = content.mission || content.valueAdded || {};
+    const team = content.team || {};
+
+    mainContent = `
+      <section>
+        ${hero.title ? `<h1>${escapeHtml(hero.title)}</h1>` : `<h1>Sobre Nosotros - SCUTI Company</h1>`}
+        ${hero.subtitle ? `<h2>${escapeHtml(hero.subtitle)}</h2>` : ''}
+        ${hero.description ? `<p>${escapeHtml(hero.description)}</p>` : ''}
+      </section>
+      
+      ${mission.title ? `
+      <section>
+        <h2>${escapeHtml(mission.title)}</h2>
+        ${mission.description ? `<p>${escapeHtml(mission.description)}</p>` : ''}
+      </section>` : ''}
+      
+      ${team.title ? `
+      <section>
+        <h2>${escapeHtml(team.title)}</h2>
+        ${team.members?.length ? `<ul>${team.members.map((m: any) =>
+          `<li><strong>${escapeHtml(m.name || '')}</strong>${m.role ? ' - ' + escapeHtml(m.role) : ''}</li>`
+        ).join('')}</ul>` : ''}
+      </section>` : ''}
+    `;
+  } else if (pageName === 'contact' || pageName === 'contacto') {
+    mainContent = `
+      <section>
+        <h1>Contacto - SCUTI Company</h1>
+        <p>${description || 'Contáctanos para una consulta gratuita sobre desarrollo de software e inteligencia artificial.'}</p>
+        
+        <div itemscope itemtype="https://schema.org/LocalBusiness">
+          <h2>Información de Contacto</h2>
+          <p><strong>Dirección:</strong> <span itemprop="address">Calles Los Molles Lt-02, Huánuco, Perú</span></p>
+          <p><strong>Teléfono:</strong> <a href="tel:+51973397306" itemprop="telephone">+51 973 397 306</a></p>
+          <p><strong>Email:</strong> <a href="mailto:contacto@scuticompany.com" itemprop="email">contacto@scuticompany.com</a></p>
+          <p><strong>Horario:</strong> <span itemprop="openingHours">Lunes a Viernes, 9:00 - 19:00</span></p>
+        </div>
+      </section>
+    `;
+  } else {
+    // Página genérica
+    mainContent = `
+      <section>
+        <h1>${title}</h1>
+        ${description ? `<p>${description}</p>` : ''}
+      </section>
+    `;
+  }
+
+  return `
+    <main class="cms-page-seo" itemscope itemtype="https://schema.org/WebPage">
+      <nav aria-label="Breadcrumb">
+        <a href="/" data-discover="true">Inicio</a> &gt; 
+        <span>${escapeHtml(pageName === 'home' ? 'Inicio' : pageName.charAt(0).toUpperCase() + pageName.slice(1))}</span>
+      </nav>
+      
+      ${mainContent}
+      
+      <footer>
+        <p>&copy; ${new Date().getFullYear()} SCUTI Company. Desarrollo de Software e IA para PYMES en Perú.</p>
+      </footer>
+      
+      <meta itemprop="url" content="${pageUrl}" />
+      <meta itemprop="name" content="${title}" />
+    </main>
+    
+    <style>
+      .cms-page-seo { max-width: 900px; margin: 2rem auto; padding: 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      .cms-page-seo h1 { font-size: 2rem; margin: 1rem 0; color: #1f2937; }
+      .cms-page-seo h2 { font-size: 1.5rem; margin: 1.5rem 0 0.5rem; color: #374151; }
+      .cms-page-seo nav { font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem; }
+      .cms-page-seo nav a { color: #7c3aed; text-decoration: none; }
+      .cms-page-seo p { font-size: 1rem; line-height: 1.7; color: #4b5563; margin-bottom: 1rem; }
+      .cms-page-seo ul { padding-left: 1.5rem; margin: 0.5rem 0; }
+      .cms-page-seo li { margin-bottom: 0.5rem; color: #4b5563; line-height: 1.6; }
+      .cms-page-seo footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; color: #9ca3af; font-size: 0.875rem; }
+      .cms-page-seo a { color: #7c3aed; }
+      @media (prefers-color-scheme: dark) {
+        .cms-page-seo { background: #111; color: #f9fafb; }
+        .cms-page-seo h1, .cms-page-seo h2 { color: #f9fafb; }
+        .cms-page-seo p, .cms-page-seo li { color: #d1d5db; }
+      }
+    </style>
+  `;
+}
+
+/**
  * 🎯 CRÍTICO PARA SEO: Generar contenido visible del artículo para crawlers
  * Esto reemplaza el div#root vacío con contenido real del artículo
  * Para que Google vea contenido real en lugar de "Artículo no encontrado"
@@ -1022,7 +1221,7 @@ export default async function middleware(request: Request) {
 
   // Verificar User-Agent para detectar crawlers
   const userAgent = request.headers.get('user-agent') || '';
-  const isCrawler = /facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Googlebot|bingbot|Slackbot|TelegramBot|Discordbot|Applebot|PetalBot|SemrushBot|AhrefsBot/i.test(userAgent);
+  const isCrawler = /facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Googlebot|bingbot|Slackbot|TelegramBot|Discordbot|Applebot|PetalBot|SemrushBot|AhrefsBot|GPTBot|ClaudeBot|PerplexityBot|YandexBot|DuckDuckBot|Baiduspider|MJ12bot|ia_archiver|Bytespider/i.test(userAgent);
 
   // Si no es un crawler, dejar pasar la request normal
   if (!isCrawler) {
@@ -1031,14 +1230,16 @@ export default async function middleware(request: Request) {
 
   // === CASO 0: Páginas CMS (Home, Servicios, Nosotros, Contacto) ===
   // Prioridad: 1) Datos del CMS (API) → 2) Fallback hardcodeado
+  // AHORA: Inyecta meta tags EN <head> Y contenido visible EN <div id="root">
   if (isHomePage || isServiciosPage || isNosotrosPage || isContactoPage) {
     const pageName = isHomePage ? 'home' : isServiciosPage ? 'services' : isNosotrosPage ? 'about' : 'contact';
     const pageSlug = pageName; // slug para el CMS API
     const pageUrl = isHomePage ? CONFIG.siteUrl : `${CONFIG.siteUrl}/${isServiciosPage ? 'servicios' : isNosotrosPage ? 'nosotros' : 'contacto'}`;
     console.log(`[Edge Middleware] Crawler detected for /${pageName}: ${userAgent.substring(0, 50)}`);
 
-    // 1) Obtener datos SEO del CMS
-    const cmsSeo = await getPageSeoData(pageSlug);
+    // 1) Obtener datos COMPLETOS del CMS (SEO + contenido)
+    const fullPageData = await getFullCmsPageData(pageSlug);
+    const cmsSeo = fullPageData?.seo || await getPageSeoData(pageSlug);
 
     // Obtener el HTML original desde /index.html
     const indexUrl = new URL('/', request.url);
@@ -1077,6 +1278,16 @@ export default async function middleware(request: Request) {
 
     // Insertar los nuevos meta tags después de <head>
     html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // 3) 🎯 CRÍTICO: Inyectar contenido visible en <div id="root">
+    if (fullPageData) {
+      const visibleContent = generateVisibleCmsContent(fullPageData, pageName, pageUrl);
+      html = html.replace(
+        /<div id="root">[\s\S]*?<\/div>/i,
+        `<div id="root">${visibleContent}</div>`
+      );
+      console.log(`[Edge Middleware] ✅ Injected visible content for /${pageName}`);
+    }
 
     // Retornar el HTML modificado
     return new Response(html, {
@@ -1178,6 +1389,45 @@ export default async function middleware(request: Request) {
     // Insertar los nuevos meta tags después de <head>
     html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
 
+    // 🎯 Inyectar contenido visible: listado de posts recientes para crawlers
+    try {
+      const postsResponse = await fetch(
+        `${CONFIG.apiUrl}/api/blog/posts?status=published&limit=10&sort=-publishedAt`,
+        { headers: { 'Accept': 'application/json', 'User-Agent': 'Vercel-Edge-Middleware' } }
+      );
+      if (postsResponse.ok) {
+        const postsData = await postsResponse.json();
+        const posts = postsData.data?.posts || postsData.data || [];
+        if (posts.length > 0) {
+          const postsList = posts.map((p: any) => {
+            const pTitle = escapeHtml(p.title || '');
+            const pExcerpt = escapeHtml((p.excerpt || p.seo?.metaDescription || '').substring(0, 200));
+            const pSlug = p.slug || '';
+            return `<li><a href="/blog/${pSlug}"><strong>${pTitle}</strong></a>${pExcerpt ? ` — ${pExcerpt}` : ''}</li>`;
+          }).join('');
+
+          const blogContent = `
+            <main class="cms-page-seo" itemscope itemtype="https://schema.org/Blog">
+              <nav aria-label="Breadcrumb"><a href="/">Inicio</a> &gt; <span>Blog</span></nav>
+              <h1>Blog de Tecnología y Software | SCUTI Company</h1>
+              <p>Artículos sobre desarrollo de software, inteligencia artificial, automatización y transformación digital para PYMES.</p>
+              <h2>Últimos Artículos</h2>
+              <ul>${postsList}</ul>
+              <meta itemprop="url" content="${CONFIG.siteUrl}/blog" />
+            </main>
+            <style>.cms-page-seo{max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif}.cms-page-seo h1{font-size:2rem;margin:1rem 0;color:#1f2937}.cms-page-seo h2{font-size:1.5rem;margin:1.5rem 0 .5rem;color:#374151}.cms-page-seo p{font-size:1rem;line-height:1.7;color:#4b5563}.cms-page-seo ul{padding-left:1.5rem}.cms-page-seo li{margin-bottom:.75rem;color:#4b5563;line-height:1.6}.cms-page-seo a{color:#7c3aed;text-decoration:none}.cms-page-seo nav{font-size:.875rem;color:#6b7280;margin-bottom:1rem}@media(prefers-color-scheme:dark){.cms-page-seo{background:#111;color:#f9fafb}.cms-page-seo h1,.cms-page-seo h2{color:#f9fafb}.cms-page-seo p,.cms-page-seo li{color:#d1d5db}}</style>
+          `;
+          html = html.replace(
+            /<div id="root">[\s\S]*?<\/div>/i,
+            `<div id="root">${blogContent}</div>`
+          );
+          console.log(`[Edge Middleware] ✅ Injected ${posts.length} posts for /blog list`);
+        }
+      }
+    } catch (e) {
+      console.log('[Edge Middleware] Could not fetch posts for blog list content');
+    }
+
     // Retornar el HTML modificado
     return new Response(html, {
       status: 200,
@@ -1242,6 +1492,53 @@ export default async function middleware(request: Request) {
 
     // Insertar los nuevos meta tags después de <head>
     html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // 🎯 Inyectar contenido visible del servicio para crawlers
+    const servicioTitle = escapeHtml(servicio.nombre || servicio.title || '');
+    const servicioDesc = escapeHtml(servicio.descripcion || servicio.description || '');
+    const servicioUrl = `${CONFIG.siteUrl}/servicios/${servicioSlug}`;
+    const servicioImage = getServicioImageUrl(servicio);
+    
+    // Extraer características/features del servicio
+    let featuresHtml = '';
+    if (servicio.caracteristicas?.length || servicio.features?.length) {
+      const features = servicio.caracteristicas || servicio.features || [];
+      featuresHtml = `<h2>Características</h2><ul>${features.map((f: any) => {
+        const fname = escapeHtml(typeof f === 'string' ? f : (f.titulo || f.name || f.title || ''));
+        const fdesc = typeof f === 'object' && f.descripcion ? ` — ${escapeHtml(f.descripcion)}` : '';
+        return `<li><strong>${fname}</strong>${fdesc}</li>`;
+      }).join('')}</ul>`;
+    }
+
+    // Extraer beneficios
+    let benefitsHtml = '';
+    if (servicio.beneficios?.length) {
+      benefitsHtml = `<h2>Beneficios</h2><ul>${servicio.beneficios.map((b: any) =>
+        `<li>${escapeHtml(typeof b === 'string' ? b : (b.titulo || b.name || ''))}</li>`
+      ).join('')}</ul>`;
+    }
+
+    const servicioContent = `
+      <main class="cms-page-seo" itemscope itemtype="https://schema.org/Service">
+        <nav aria-label="Breadcrumb">
+          <a href="/">Inicio</a> &gt; <a href="/servicios">Servicios</a> &gt; <span>${servicioTitle}</span>
+        </nav>
+        <h1 itemprop="name">${servicioTitle}</h1>
+        ${servicioDesc ? `<p itemprop="description">${servicioDesc}</p>` : ''}
+        ${servicioImage ? `<img itemprop="image" src="${servicioImage}" alt="${servicioTitle}" width="800" height="450" loading="lazy" style="max-width:100%;height:auto;border-radius:0.5rem;margin:1rem 0" />` : ''}
+        ${featuresHtml}
+        ${benefitsHtml}
+        ${servicio.precio ? `<p><strong>Precio:</strong> <span itemprop="offers" itemscope itemtype="https://schema.org/Offer"><span itemprop="price">${escapeHtml(String(servicio.precio))}</span></span></p>` : ''}
+        <meta itemprop="url" content="${servicioUrl}" />
+        <meta itemprop="provider" content="SCUTI Company" />
+      </main>
+      <style>.cms-page-seo{max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif}.cms-page-seo h1{font-size:2rem;margin:1rem 0;color:#1f2937}.cms-page-seo h2{font-size:1.5rem;margin:1.5rem 0 .5rem;color:#374151}.cms-page-seo p{font-size:1rem;line-height:1.7;color:#4b5563}.cms-page-seo ul{padding-left:1.5rem}.cms-page-seo li{margin-bottom:.5rem;color:#4b5563;line-height:1.6}.cms-page-seo a{color:#7c3aed;text-decoration:none}.cms-page-seo nav{font-size:.875rem;color:#6b7280;margin-bottom:1rem}@media(prefers-color-scheme:dark){.cms-page-seo{background:#111;color:#f9fafb}.cms-page-seo h1,.cms-page-seo h2{color:#f9fafb}.cms-page-seo p,.cms-page-seo li{color:#d1d5db}}</style>
+    `;
+    html = html.replace(
+      /<div id="root">[\s\S]*?<\/div>/i,
+      `<div id="root">${servicioContent}</div>`
+    );
+    console.log(`[Edge Middleware] ✅ Injected visible content for /servicios/${servicioSlug}`);
 
     // Retornar el HTML modificado
     return new Response(html, {

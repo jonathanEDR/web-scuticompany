@@ -362,6 +362,12 @@ const HomeOptimized = () => {
           <meta name="article:tag" content={pageData.seo.focusKeyphrase} />
         )}
 
+        {/* Robots */}
+        <meta name="robots" content={pageData.seo?.robots || 'index, follow'} />
+
+        {/* Canonical */}
+        <link rel="canonical" href={pageData.seo?.canonicalUrl || getFullUrl('/')} />
+
         {/* Open Graph */}
         <meta property="og:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || config.siteName} />
         <meta property="og:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || config.siteDescription} />
@@ -369,23 +375,29 @@ const HomeOptimized = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={`${config.siteName} - ${config.siteDescription.substring(0, 50)}`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={getFullUrl('/')} />
+        <meta property="og:type" content={pageData.seo?.ogType || 'website'} />
+        <meta property="og:url" content={pageData.seo?.canonicalUrl || getFullUrl('/')} />
         <meta property="og:site_name" content={config.siteName} />
         <meta property="og:locale" content={config.locale} />
 
         {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageData.seo?.ogTitle || pageData.seo?.metaTitle || config.siteName} />
-        <meta name="twitter:description" content={pageData.seo?.ogDescription || pageData.seo?.metaDescription || config.siteDescription} />
-        <meta name="twitter:image" content={ogImage} />
-
-        {/* Canonical */}
-        <link rel="canonical" href={getFullUrl('/')} />
+        <meta name="twitter:card" content={pageData.seo?.twitterCard || 'summary_large_image'} />
+        <meta name="twitter:title" content={pageData.seo?.twitterTitle || pageData.seo?.ogTitle || pageData.seo?.metaTitle || config.siteName} />
+        <meta name="twitter:description" content={pageData.seo?.twitterDescription || pageData.seo?.ogDescription || pageData.seo?.metaDescription || config.siteDescription} />
+        <meta name="twitter:image" content={pageData.seo?.twitterImage || ogImage} />
       </Helmet>
 
       {/* Schema.org */}
       <HomePageSchema />
+
+      {/* Structured Data personalizado desde CMS */}
+      {pageData.seo?.structuredData && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(pageData.seo.structuredData)}
+          </script>
+        </Helmet>
+      )}
 
       <div className="min-h-screen w-full overflow-x-hidden bg-transparent">
         <PublicHeader />

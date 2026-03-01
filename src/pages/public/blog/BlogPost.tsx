@@ -200,14 +200,17 @@ const BlogPostEnhanced: React.FC = () => {
         <meta property="og:description" content={post.seo?.metaDescription || post.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:site_name" content={config.siteName} />
-        {post.featuredImage && <meta property="og:image" content={getImageUrl(post.featuredImage)} />}
+        <meta property="og:image" content={post.featuredImage ? getImageUrl(post.featuredImage) : getImageUrl(config.images.ogDefault)} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={post.seo?.metaTitle || post.title} />
         
         {/* Twitter Card - Usar SEO configurado */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.seo?.metaTitle || post.title} />
         <meta name="twitter:description" content={post.seo?.metaDescription || post.excerpt} />
         <meta name="twitter:site" content={config.social?.twitter || '@scuticompany'} />
-        {post.featuredImage && <meta name="twitter:image" content={getImageUrl(post.featuredImage)} />}
+        <meta name="twitter:image" content={post.featuredImage ? getImageUrl(post.featuredImage) : getImageUrl(config.images.ogDefault)} />
         
         {/* Para GPT y otros crawlers */}
         <meta name="robots" content="index, follow" />

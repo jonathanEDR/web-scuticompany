@@ -9,10 +9,6 @@
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/sitemap.xml"
     },
     {
-      "source": "/sitemap-services.xml",
-      "destination": "/sitemap-services.xml"
-    },
-    {
       "source": "/api/blog/(.*)",
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/$1"
     },

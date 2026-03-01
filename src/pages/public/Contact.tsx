@@ -9,6 +9,8 @@ import { useSeo } from '../../hooks/useSeo';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { useTheme } from '../../contexts/ThemeContext';
 import { getPageBySlug } from '../../services/cmsApi';
+import { BreadcrumbSchema } from '../../components/seo/SchemaOrg';
+import Breadcrumbs from '../../components/common/Breadcrumbs';
 
 // Interfaces para el contenido de la página
 interface HeroSection {
@@ -227,9 +229,24 @@ const Contact = () => {
           })}
         </script>
       </Helmet>
+
+      <BreadcrumbSchema
+        items={[
+          { name: 'Inicio', url: getFullUrl('/') },
+          { name: 'Contacto', url: getFullUrl('/contacto') }
+        ]}
+      />
       
       <PublicHeader />
-      
+
+      {/* 🍞 Breadcrumbs visuales */}
+      <div className="container mx-auto px-4 pt-20 pb-2">
+        <Breadcrumbs items={[
+          { label: 'Inicio', href: '/' },
+          { label: 'Contacto' }
+        ]} />
+      </div>
+
       {/* Hero Section */}
       <section 
         className="relative pt-20 pb-12 overflow-hidden"

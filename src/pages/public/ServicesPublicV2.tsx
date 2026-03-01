@@ -19,6 +19,8 @@ import { invalidateServiciosCache } from '../../utils/serviciosCache';
 import { getPageBySlug } from '../../services/cmsApi';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { useSeo } from '../../hooks/useSeo';
+import { BreadcrumbSchema } from '../../components/seo/SchemaOrg';
+import Breadcrumbs from '../../components/common/Breadcrumbs';
 import type { Servicio, ServicioFilters } from '../../types/servicios';
 
 // ============================================
@@ -337,9 +339,24 @@ const ServicesPublicV2 = () => {
         })()}
       </Helmet>
 
+      <BreadcrumbSchema
+        items={[
+          { name: 'Inicio', url: getFullUrl('/') },
+          { name: 'Servicios', url: getFullUrl('/servicios') }
+        ]}
+      />
+
       <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
         <PublicHeader />
-        
+
+        {/* 🍞 Breadcrumbs visuales */}
+        <div className="container mx-auto px-4 pt-20 pb-2">
+          <Breadcrumbs items={[
+            { label: 'Inicio', href: '/' },
+            { label: 'Servicios' }
+          ]} />
+        </div>
+
         {/* 🖼️ Hero Section con imagen de fondo del CMS - SIN margen inferior para eliminar línea */}
         <section className="relative overflow-hidden -mt-12 -mx-4 px-4" style={{ minHeight: '500px' }}>
           {/* Imagen de fondo con opacidad configurable */}

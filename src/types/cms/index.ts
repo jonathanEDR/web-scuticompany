@@ -1277,10 +1277,21 @@ export interface PageSeo {
   metaTitle: string;
   metaDescription: string;
   keywords: string[];
+  // URL canónica y directivas de crawling
+  canonicalUrl: string;
+  robots: 'index, follow' | 'index, nofollow' | 'noindex, follow' | 'noindex, nofollow';
+  // Open Graph
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
+  ogType: 'website' | 'article' | 'product' | 'profile';
+  // Twitter Card
   twitterCard: string;
+  twitterTitle: string;
+  twitterDescription: string;
+  twitterImage: string;
+  // Datos estructurados personalizados (JSON-LD)
+  structuredData: Record<string, any> | null;
 }
 
 export interface PageTheme {

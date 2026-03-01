@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import SITE_CONFIG, { getFullUrl } from '../../config/siteConfig';
 
 /**
  * 🏢 Schema.org - Datos Estructurados para Google Rich Results
@@ -9,43 +10,47 @@ import { Helmet } from 'react-helmet-async';
  * - Breadcrumbs mejorados
  * - FAQs expandibles
  * - Artículos con autor y fecha
+ * 
+ * NOTA: Todos los schemas leen de SITE_CONFIG (siteConfig.ts)
+ * para evitar datos hardcodeados duplicados.
  */
 
 // ====================================
 // SCHEMA: ORGANIZACIÓN (Global)
 // ====================================
 export const OrganizationSchema = () => {
+  const org = SITE_CONFIG.organization;
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "SCUTI Company",
+    "name": org.name,
     "alternateName": "Scuti",
-    "url": "https://scuticompany.com",
-    "logo": "https://scuticompany.com/favicon-512x512.png",
-    "description": "Empresa líder en desarrollo de software, inteligencia artificial y automatización para PYMES en Perú",
-    "foundingDate": "2023",
+    "url": SITE_CONFIG.siteUrl,
+    "logo": getFullUrl(SITE_CONFIG.images.favicon),
+    "description": SITE_CONFIG.siteDescription,
+    "foundingDate": org.foundingDate || "2024",
     "sameAs": [
-      "https://www.linkedin.com/company/scuti-company",
-      "https://www.facebook.com/SCUTIcompany/",
-      "https://twitter.com/scuticompany",
-      "https://www.instagram.com/scuticompany"
-    ],
+      SITE_CONFIG.social.linkedin,
+      SITE_CONFIG.social.facebook,
+      SITE_CONFIG.social.twitter,
+      SITE_CONFIG.social.instagram
+    ].filter(Boolean),
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Calles Los Molles Lt-02",
-      "addressCountry": "PE",
-      "addressLocality": "Huánuco",
-      "addressRegion": "Huánuco"
+      "addressCountry": SITE_CONFIG.countryCode,
+      "addressLocality": SITE_CONFIG.region,
+      "addressRegion": SITE_CONFIG.region
     },
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+51-973 397 306",
+      "telephone": SITE_CONFIG.contact.phone,
       "contactType": "customer service",
       "availableLanguage": ["Spanish", "English"]
     },
     "areaServed": {
       "@type": "Country",
-      "name": "Peru"
+      "name": SITE_CONFIG.country
     }
   };
 
@@ -65,18 +70,18 @@ export const WebsiteSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "SCUTI Company",
-    "url": "https://scuticompany.com",
-    "description": "Desarrollo de Software e IA para PYMES en Perú",
+    "name": SITE_CONFIG.siteName,
+    "url": SITE_CONFIG.siteUrl,
+    "description": SITE_CONFIG.siteDescription,
     "publisher": {
       "@type": "Organization",
-      "name": "SCUTI Company"
+      "name": SITE_CONFIG.siteName
     },
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://scuticompany.com/blog?search={search_term_string}"
+        "urlTemplate": `${SITE_CONFIG.siteUrl}/blog?search={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     }
@@ -98,17 +103,17 @@ export const LocalBusinessSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    "@id": "https://scuticompany.com/#organization",
-    "name": "SCUTI Company",
+    "@id": `${SITE_CONFIG.siteUrl}/#organization`,
+    "name": SITE_CONFIG.siteName,
     "alternateName": ["Scuti", "SCUTI Software", "SCUTI IA"],
-    "image": "https://scuticompany.com/logofondonegro.jpeg",
-    "url": "https://scuticompany.com",
-    "telephone": "+51-973 397 306",
-    "email": "gscutic@gmail.com",
+    "image": getFullUrl(SITE_CONFIG.images.ogDefault),
+    "url": SITE_CONFIG.siteUrl,
+    "telephone": SITE_CONFIG.contact.phone,
+    "email": SITE_CONFIG.contact.email,
     "description": "Empresa de desarrollo de software a medida, inteligencia artificial y automatización de procesos para PYMES en Perú. Especialistas en ERP, CRM y soluciones tecnológicas personalizadas.",
     "slogan": "Impulsa tu PYME con Software a Medida e Inteligencia Artificial",
     "knowsAbout": [
-      "Desarrollo de Software a Medida",
+      "Desarrollo de Software ",
       "Inteligencia Artificial",
       "Automatización de Procesos",
       "Sistemas ERP para PYMES",
@@ -149,9 +154,9 @@ export const LocalBusinessSchema = () => {
     },
     "address": {
       "@type": "PostalAddress",
-      "addressCountry": "PE",
-      "addressLocality": "Huánuco",
-      "addressRegion": "Huánuco"
+      "addressCountry": SITE_CONFIG.countryCode,
+      "addressLocality": SITE_CONFIG.region,
+      "addressRegion": SITE_CONFIG.region
     },
     "geo": {
       "@type": "GeoCoordinates",
@@ -161,7 +166,7 @@ export const LocalBusinessSchema = () => {
     "areaServed": [
       {
         "@type": "Country",
-        "name": "Perú"
+        "name": SITE_CONFIG.country
       },
       {
         "@type": "AdministrativeArea",
@@ -178,14 +183,9 @@ export const LocalBusinessSchema = () => {
         "opens": "09:00",
         "closes": "19:00"
       }
-    ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "47",
-      "bestRating": "5",
-      "worstRating": "1"
-    }
+    ]
+    // NOTA: aggregateRating removido — no usar datos ficticios.
+    // Agregar solo cuando haya reseñas reales (Google Business, Trustpilot, etc.)
   };
 
   return (
@@ -264,20 +264,20 @@ export const BlogArticleSchema = ({
     "@type": "BlogPosting",
     "headline": title,
     "description": description,
-    "image": image || "https://scuticompany.com/favicon-512x512.png",
+    "image": image || getFullUrl(SITE_CONFIG.images.favicon),
     "datePublished": datePublished,
     "dateModified": dateModified || datePublished,
     "author": {
       "@type": "Person",
       "name": authorName,
-      "url": "https://scuticompany.com"
+      "url": SITE_CONFIG.siteUrl
     },
     "publisher": {
       "@type": "Organization",
-      "name": "SCUTI Company",
+      "name": SITE_CONFIG.siteName,
       "logo": {
         "@type": "ImageObject",
-        "url": "https://scuticompany.com/favicon-512x512.png"
+        "url": getFullUrl(SITE_CONFIG.images.favicon)
       }
     },
     "mainEntityOfPage": {
@@ -310,7 +310,6 @@ export const BlogArticleSchema = ({
 interface ServiceSchemaProps {
   name: string;
   description: string;
-  url: string;
   image?: string;
   priceRange?: string;
 }
@@ -318,7 +317,6 @@ interface ServiceSchemaProps {
 export const ServiceSchema = ({
   name,
   description,
-  url,
   image,
   priceRange = "$$"
 }: ServiceSchemaProps) => {
@@ -327,16 +325,16 @@ export const ServiceSchema = ({
     "@type": "Service",
     "name": name,
     "description": description,
-    "url": url,
-    "image": image || "https://scuticompany.com/favicon-512x512.png",
+    "url": SITE_CONFIG.siteUrl,
+    "image": image || getFullUrl(SITE_CONFIG.images.favicon),
     "provider": {
       "@type": "Organization",
-      "name": "SCUTI Company",
-      "url": "https://scuticompany.com"
+      "name": SITE_CONFIG.siteName,
+      "url": SITE_CONFIG.siteUrl
     },
     "areaServed": {
       "@type": "Country",
-      "name": "Peru"
+      "name": SITE_CONFIG.country
     },
     "priceRange": priceRange
   };
@@ -392,20 +390,20 @@ export const ContactPageSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    "name": "Contáctanos - SCUTI Company",
+    "name": `Contáctanos - ${SITE_CONFIG.siteName}`,
     "description": "Solicita una sesión de viabilidad técnica gratuita. Diseñamos software a medida para empresas en Perú.",
-    "url": "https://scuticompany.com#contacto",
+    "url": `${SITE_CONFIG.siteUrl}#contacto`,
     "mainEntity": {
       "@type": "Organization",
-      "name": "SCUTI Company",
-      "telephone": "+51-973 397 306",
-      "email": "gscutic@gmail.com",
+      "name": SITE_CONFIG.siteName,
+      "telephone": SITE_CONFIG.contact.phone,
+      "email": SITE_CONFIG.contact.email,
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Calles Los Molles Lt-02",
-        "addressLocality": "Huánuco",
-        "addressRegion": "Huánuco",
-        "addressCountry": "PE"
+        "addressLocality": SITE_CONFIG.region,
+        "addressRegion": SITE_CONFIG.region,
+        "addressCountry": SITE_CONFIG.countryCode
       }
     }
   };
@@ -446,19 +444,19 @@ export const BlogsListSchema = ({ articles }: BlogsListSchemaProps) => {
       "item": {
         "@type": "BlogPosting",
         "headline": article.title,
-        "url": `https://scuticompany.com/blog/${article.slug}`,
+        "url": `${SITE_CONFIG.siteUrl}/blog/${article.slug}`,
         "description": article.excerpt || article.title,
         "datePublished": article.publishedAt || new Date().toISOString(),
         "author": {
           "@type": "Person",
-          "name": article.author || "SCUTI Company"
+          "name": article.author || SITE_CONFIG.siteName
         },
         "publisher": {
           "@type": "Organization",
-          "name": "SCUTI Company",
+          "name": SITE_CONFIG.siteName,
           "logo": {
             "@type": "ImageObject",
-            "url": "https://scuticompany.com/favicon-512x512.png"
+            "url": getFullUrl(SITE_CONFIG.images.favicon)
           }
         }
       }

@@ -11,6 +11,8 @@ import { AllNewsSection } from '../../../components/blog/sections/AllNewsSection
 import { BlogCtaSection } from '../../../components/blog/sections/BlogCtaSection';
 import PublicHeader from '../../../components/public/PublicHeader';
 import PublicFooter from '../../../components/public/PublicFooter';
+import { BreadcrumbSchema, BlogsListSchema } from '../../../components/seo/SchemaOrg';
+import Breadcrumbs from '../../../components/common/Breadcrumbs';
 
 // ✅ Skeleton para Featured Posts mientras carga la configuración
 const FeaturedPostsSkeleton: React.FC = () => (
@@ -183,8 +185,36 @@ const BlogHome: React.FC = () => {
         {jsonLdData}
       </script>
 
+      <BreadcrumbSchema
+        items={[
+          { name: 'Inicio', url: getFullUrl('/') },
+          { name: 'Blog', url: getFullUrl('/blog') }
+        ]}
+      />
+
+      {/* ✅ Schema.org ItemList - Lista de artículos para Rich Results */}
+      {posts && posts.length > 0 && (
+        <BlogsListSchema
+          articles={posts.map(p => ({
+            title: p.title,
+            slug: p.slug,
+            excerpt: p.excerpt,
+            publishedAt: p.publishedAt || p.createdAt,
+            author: typeof p.author === 'string' ? p.author : (p.author?.displayName || p.author?.firstName)
+          }))}
+        />
+      )}
+
       {/* Header de navegación */}
       <PublicHeader />
+
+      {/* 🍞 Breadcrumbs visuales */}
+      <div className="container mx-auto px-4 pt-20 pb-2">
+        <Breadcrumbs items={[
+          { label: 'Inicio', href: '/' },
+          { label: 'Blog' }
+        ]} />
+      </div>
 
       {/* Simple Hero Section */}
       <SimpleHeroSection 

@@ -8,6 +8,8 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { getPageBySlug } from '../../services/cmsApi';
 import { useSeo } from '../../hooks/useSeo';
+import { BreadcrumbSchema } from '../../components/seo/SchemaOrg';
+import Breadcrumbs from '../../components/common/Breadcrumbs';
 
 /**
  * 🏢 Página Nosotros/About
@@ -385,9 +387,24 @@ const About = () => {
         </script>
       </Helmet>
 
+      <BreadcrumbSchema
+        items={[
+          { name: 'Inicio', url: getFullUrl('/') },
+          { name: 'Nosotros', url: getFullUrl('/nosotros') }
+        ]}
+      />
+
       <div className={`min-h-screen w-full overflow-x-hidden ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <PublicHeader />
-        
+
+        {/* 🍞 Breadcrumbs visuales */}
+        <div className="container mx-auto px-4 pt-20 pb-2">
+          <Breadcrumbs items={[
+            { label: 'Inicio', href: '/' },
+            { label: 'Nosotros' }
+          ]} />
+        </div>
+
         {/* 🎨 Hero Section con imagen de fondo del CMS */}
         <section 
           className="relative min-h-[60vh] flex items-center justify-center overflow-hidden"

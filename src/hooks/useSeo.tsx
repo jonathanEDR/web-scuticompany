@@ -48,6 +48,15 @@ interface SeoData {
   ogImageHeight?: string;
   ogImageAlt?: string;
   canonical?: string;
+  // Nuevos campos SEO avanzados
+  canonicalUrl?: string;
+  robots?: string;
+  ogType?: string;
+  twitterCard?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  structuredData?: Record<string, any> | null;
   // 🔍 Metadata para transparencia
   _source?: 'cms' | 'hardcoded' | 'fallback';
 }
@@ -168,6 +177,15 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
                 ogDescription: data.seo.ogDescription || data.seo.metaDescription || hardcodedSeo?.ogDescription || fallbackDescription || DEFAULT_SEO.ogDescription,
                 ogImage: toAbsoluteImageUrl(data.seo.ogImage || hardcodedSeo?.ogImage || ''),
                 canonical: hardcodedSeo?.canonical,
+                // Nuevos campos SEO del CMS
+                canonicalUrl: data.seo.canonicalUrl || '',
+                robots: data.seo.robots || 'index, follow',
+                ogType: data.seo.ogType || 'website',
+                twitterCard: data.seo.twitterCard || hardcodedSeo?.twitterCard || 'summary_large_image',
+                twitterTitle: data.seo.twitterTitle || '',
+                twitterDescription: data.seo.twitterDescription || '',
+                twitterImage: toAbsoluteImageUrl(data.seo.twitterImage || ''),
+                structuredData: data.seo.structuredData || null,
                 _source: 'cms'
               };
               
@@ -282,14 +300,25 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
   const SeoHelmet = () => {
     if (!seoData.metaTitle) return null;
 
+    // Resolver URLs y campos con fallbacks
+    const resolvedCanonical = seoData.canonicalUrl || seoData.canonical || '';
+    const resolvedTwitterTitle = seoData.twitterTitle || seoData.ogTitle;
+    const resolvedTwitterDescription = seoData.twitterDescription || seoData.ogDescription;
+    const resolvedTwitterImage = seoData.twitterImage || seoData.ogImage || '';
+    const resolvedTwitterCard = seoData.twitterCard || 'summary_large_image';
+    const resolvedOgType = seoData.ogType || 'website';
+
     return (
       <Helmet key={`seo-${pageName}-${seoData.metaTitle}`} defer={false}>
         <title>{seoData.metaTitle}</title>
         <meta name="description" content={seoData.metaDescription} />
         <meta name="keywords" content={seoData.keywords.join(', ')} />
         
+        {/* Robots */}
+        {seoData.robots && <meta name="robots" content={seoData.robots} />}
+        
         {/* Canonical URL */}
-        {seoData.canonical && <link rel="canonical" href={seoData.canonical} />}
+        {resolvedCanonical && <link rel="canonical" href={resolvedCanonical} />}
         
         {/* Open Graph */}
         <meta property="og:title" content={seoData.ogTitle} />
@@ -298,17 +327,24 @@ export function useSeo({ pageName, fallbackTitle, fallbackDescription }: UseSeoO
         {seoData.ogImageWidth && <meta property="og:image:width" content={seoData.ogImageWidth} />}
         {seoData.ogImageHeight && <meta property="og:image:height" content={seoData.ogImageHeight} />}
         {seoData.ogImageAlt && <meta property="og:image:alt" content={seoData.ogImageAlt} />}
-        <meta property="og:type" content="website" />
-        {seoData.canonical && <meta property="og:url" content={seoData.canonical} />}
+        <meta property="og:type" content={resolvedOgType} />
+        {resolvedCanonical && <meta property="og:url" content={resolvedCanonical} />}
         <meta property="og:site_name" content="SCUTI Company" />
         <meta property="og:locale" content="es_PE" />
         
         {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={seoData.ogTitle} />
-        <meta name="twitter:description" content={seoData.ogDescription} />
-        {seoData.ogImage && <meta name="twitter:image" content={seoData.ogImage} />}
+        <meta name="twitter:card" content={resolvedTwitterCard} />
+        <meta name="twitter:title" content={resolvedTwitterTitle} />
+        <meta name="twitter:description" content={resolvedTwitterDescription} />
+        {resolvedTwitterImage && <meta name="twitter:image" content={resolvedTwitterImage} />}
         {seoData.ogImageAlt && <meta name="twitter:image:alt" content={seoData.ogImageAlt} />}
+        
+        {/* Structured Data personalizado desde CMS */}
+        {seoData.structuredData && (
+          <script type="application/ld+json">
+            {JSON.stringify(seoData.structuredData)}
+          </script>
+        )}
       </Helmet>
     );
   };

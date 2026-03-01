@@ -33,6 +33,14 @@ export interface PageSeoConfig {
   ogImageAlt?: string;
   twitterCard?: string;
   canonical?: string;
+  // Campos SEO avanzados (match con CMS)
+  canonicalUrl?: string;
+  robots?: string;
+  ogType?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  structuredData?: Record<string, any> | null;
 }
 
 export interface SeoConfigMap {
