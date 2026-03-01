@@ -371,8 +371,8 @@ const HomeOptimized = () => {
           <meta name="article:tag" content={pageData.seo.focusKeyphrase} />
         )}
 
-        {/* Robots */}
-        <meta name="robots" content={pageData.seo?.robots || 'index, follow'} />
+        {/* Robots - incluye max-image-preview:large para Google Discover */}
+        <meta name="robots" content={pageData.seo?.robots ? `${pageData.seo.robots}, max-image-preview:large` : 'index, follow, max-image-preview:large'} />
 
         {/* Canonical */}
         <link rel="canonical" href={pageData.seo?.canonicalUrl || getFullUrl('/')} />

@@ -473,6 +473,37 @@ export const BlogsListSchema = ({ articles }: BlogsListSchemaProps) => {
 };
 
 // ====================================
+// SCHEMA PARA WEBPAGE (SEO)
+// ====================================
+export const WebPageSchema = ({ name, description, url }: { name: string; description: string; url: string }) => {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${url}#webpage`,
+    name,
+    description,
+    url,
+    isPartOf: {
+      '@type': 'WebSite',
+      '@id': `${SITE_CONFIG.siteUrl}#website`,
+      name: SITE_CONFIG.siteName,
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': `${SITE_CONFIG.siteUrl}/#organization`,
+      name: SITE_CONFIG.siteName,
+    },
+    inLanguage: 'es-PE',
+  };
+
+  return (
+    <Helmet>
+      <script type="application/ld+json">{JSON.stringify(schema)}</script>
+    </Helmet>
+  );
+};
+
+// ====================================
 // SCHEMA COMBINADO PARA HOME
 // ====================================
 export const HomePageSchema = () => {
@@ -481,6 +512,11 @@ export const HomePageSchema = () => {
       <OrganizationSchema />
       <WebsiteSchema />
       <LocalBusinessSchema />
+      <WebPageSchema
+        name={`${SITE_CONFIG.siteName} - Desarrollo de Software a Medida en Perú`}
+        description={SITE_CONFIG.siteDescription}
+        url={SITE_CONFIG.siteUrl}
+      />
       <ContactPageSchema />
     </>
   );

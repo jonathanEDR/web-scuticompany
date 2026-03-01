@@ -128,9 +128,9 @@ const HeroSection = ({ data }: HeroSectionProps) => {
         <div className={`space-y-3 sm:space-y-4 transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
-          {/* Main Title - Usa colores del CMS con fallback */}
+          {/* Main Title - SEO: <h1> para el título principal de la página */}
           <div className="max-w-3xl mx-auto">
-            <div
+            <h1
               className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold theme-transition transition-all duration-1000 ${
                 animationPhase >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
@@ -148,9 +148,9 @@ const HeroSection = ({ data }: HeroSectionProps) => {
             />
           </div>
 
-          {/* Subtitle y Description - Usa colores del CMS con fallback */}
+          {/* Subtitle y Description - SEO: <p> semánticos */}
           <div className="max-w-2xl mx-auto space-y-2">
-            <div
+            <p
               className={`text-sm sm:text-sm md:text-base theme-transition transition-all duration-1000 delay-300 ${
                 animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}

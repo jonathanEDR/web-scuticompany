@@ -303,9 +303,9 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
         </>
       )}
 
-      {/* Section Header - Conectado con estilos del CMS */}
+      {/* Section Header - SEO: <h2> para título de sección */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
-        <div
+        <h2
           className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 theme-transition"
           style={{
             lineHeight: '1.2',
@@ -317,7 +317,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
           }}
         >
           {cleanHtmlToText(mappedData.title)}
-        </div>
+        </h2>
         <div className="max-w-3xl mx-auto">
           <div
             className="theme-transition"
@@ -464,9 +464,9 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                 );
               })()}
 
-              {/* Content */}
+              {/* Content - SEO: <h3> para títulos de cards */}
               <div className="relative">
-                <div
+                <h3
                   className="text-2xl font-bold mb-4 transition-colors text-center"
                   style={{
                     color: getSafeStyle(

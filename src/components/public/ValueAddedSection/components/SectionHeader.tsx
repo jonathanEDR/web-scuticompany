@@ -33,7 +33,7 @@ export const SectionHeader = ({ title, subtitle, theme, isVisible, styles }: Sec
 
   return (
     <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
-      <div
+      <h2
         className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 theme-transition transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
@@ -45,7 +45,7 @@ export const SectionHeader = ({ title, subtitle, theme, isVisible, styles }: Sec
         }}
       >
         {cleanHtmlToText(title)}
-      </div>
+      </h2>
       {subtitle && (
         <div className="max-w-3xl mx-auto">
           <div
