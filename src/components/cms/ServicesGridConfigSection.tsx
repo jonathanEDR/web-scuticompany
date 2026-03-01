@@ -111,11 +111,11 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Encabezado colapsable */}
       <button
         type="button"
-        className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition-colors"
+        className="w-full flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 rounded transition-colors"
         onClick={() => setCollapsed((prev) => !prev)}
         aria-expanded={!collapsed}
       >
@@ -128,36 +128,36 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
       </button>
 
       {!collapsed && (
-        <div className="space-y-8">
+        <div className="space-y-4">
           
           {/* ===== SECCIÓN DESTACADOS ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               ⭐ Sección "Servicios Destacados"
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Título de la sección
                 </label>
                 <input
                   type="text"
                   value={gridConfig.featuredSection?.title || '⭐ Servicios Destacados'}
                   onChange={(e) => handleUpdate('featuredSection.title', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Icono
                 </label>
                 <input
                   type="text"
                   value={gridConfig.featuredSection?.icon || '★'}
                   onChange={(e) => handleUpdate('featuredSection.icon', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="★ ☆ ✶ ● ◆"
                 />
               </div>
@@ -177,7 +177,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Modo Claro */}
                 <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                   <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-2">
@@ -186,7 +186,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     {/* Color del Título */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Color del Título
                       </label>
                       <div className="flex gap-2">
@@ -208,7 +208,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                     
                     {/* Color del Icono */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Color del Icono
                       </label>
                       <div className="flex gap-2">
@@ -238,7 +238,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     {/* Color del Título */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Color del Título
                       </label>
                       <div className="flex gap-2">
@@ -260,7 +260,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                     
                     {/* Color del Icono */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Color del Icono
                       </label>
                       <div className="flex gap-2">
@@ -301,7 +301,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   type="checkbox"
                   checked={gridConfig.cardDesign?.transparentCards || false}
                   onChange={(e) => handleUpdate('cardDesign.transparentCards', e.target.checked)}
-                  className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-1 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -313,9 +313,9 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 </div>
               </label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   🌞 Imagen de fondo (tema claro)
                 </label>
                 <ManagedImageSelector
@@ -325,7 +325,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   🌙 Imagen de fondo (tema oscuro)
                 </label>
                 <ManagedImageSelector
@@ -337,7 +337,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
             {/* Opacidad de fondo */}
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Opacidad de la imagen: {Math.round((gridConfig.featuredSection?.backgroundOpacity || 0.1) * 100)}%
                 <span className="ml-2 text-xs text-gray-500">
                   {(gridConfig.featuredSection?.backgroundOpacity || 0.1) >= 0.9 ? '🔥 Ultra HD' : 
@@ -359,20 +359,20 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
           {/* ===== DISEÑO DE TARJETAS ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🎨 Diseño de Tarjetas de Servicio
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Border radius */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Redondeo de esquinas
                 </label>
                 <select
                   value={gridConfig.cardDesign?.borderRadius || '1rem'}
                   onChange={(e) => handleUpdate('cardDesign.borderRadius', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="0.5rem">Pequeño</option>
                   <option value="1rem">Normal</option>
@@ -383,13 +383,13 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Altura de imagen */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Altura de imagen
                 </label>
                 <select
                   value={gridConfig.cardDesign?.imageHeight || '12rem'}
                   onChange={(e) => handleUpdate('cardDesign.imageHeight', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="10rem">Pequeña (160px)</option>
                   <option value="12rem">Normal (192px)</option>
@@ -400,13 +400,13 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Ajuste de imagen */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Ajuste de imagen
                 </label>
                 <select
                   value={gridConfig.cardDesign?.imageObjectFit || 'cover'}
                   onChange={(e) => handleUpdate('cardDesign.imageObjectFit', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="cover">Cubrir (recorta)</option>
                   <option value="contain">Contener (completa)</option>
@@ -419,7 +419,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               {/* Color de título */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Color título (claro)
                 </label>
                 <div className="flex gap-2">
@@ -440,7 +440,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Color de título oscuro */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Color título (oscuro)
                 </label>
                 <div className="flex gap-2">
@@ -461,7 +461,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Color de precio */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Color precio
                 </label>
                 <div className="flex gap-2">
@@ -482,7 +482,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Color hover título */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Color título hover
                 </label>
                 <div className="flex gap-2">
@@ -505,7 +505,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
           {/* ===== TIPOGRAFÍA DE TARJETAS ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🔤 Tipografía de Tarjetas de Servicio
             </h3>
             
@@ -519,13 +519,13 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Fuente para títulos */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Fuente de títulos
                 </label>
                 <select
                   value={gridConfig.cardDesign?.titleFontFamily || 'inherit'}
                   onChange={(e) => handleUpdate('cardDesign.titleFontFamily', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   style={{ fontFamily: gridConfig.cardDesign?.titleFontFamily || 'inherit' }}
                 >
                   <option value="inherit" style={{ fontFamily: 'inherit' }}>Por defecto (Sistema)</option>
@@ -543,13 +543,13 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Fuente para descripción */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Fuente de descripción
                 </label>
                 <select
                   value={gridConfig.cardDesign?.descriptionFontFamily || 'inherit'}
                   onChange={(e) => handleUpdate('cardDesign.descriptionFontFamily', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   style={{ fontFamily: gridConfig.cardDesign?.descriptionFontFamily || 'inherit' }}
                 >
                   <option value="inherit" style={{ fontFamily: 'inherit' }}>Por defecto (Sistema)</option>
@@ -567,7 +567,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Vista previa */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Vista previa
                 </label>
                 <div className="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
@@ -597,13 +597,13 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
             {/* Peso de fuente */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Peso de títulos
                 </label>
                 <select
                   value={gridConfig.cardDesign?.titleFontWeight || '700'}
                   onChange={(e) => handleUpdate('cardDesign.titleFontWeight', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="400">Normal (400)</option>
                   <option value="500">Medio (500)</option>
@@ -615,13 +615,13 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Peso de descripción
                 </label>
                 <select
                   value={gridConfig.cardDesign?.descriptionFontWeight || '400'}
                   onChange={(e) => handleUpdate('cardDesign.descriptionFontWeight', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="300">Light (300)</option>
                   <option value="400">Normal (400)</option>
@@ -635,33 +635,33 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
           {/* ===== BADGE DESTACADO ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🏷️ Badge "Destacado"
             </h3>
             
             {/* Texto e Icono del badge */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Icono del badge
                 </label>
                 <input
                   type="text"
                   value={gridConfig.cardDesign?.featuredBadge?.icon || '★'}
                   onChange={(e) => handleUpdate('cardDesign.featuredBadge.icon', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="★ ☆ ✶ ●"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Texto del badge
                 </label>
                 <input
                   type="text"
                   value={gridConfig.cardDesign?.featuredBadge?.text || 'Destacado'}
                   onChange={(e) => handleUpdate('cardDesign.featuredBadge.text', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -673,7 +673,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Color del Icono
                   </label>
                   <div className="flex gap-2">
@@ -708,7 +708,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Color 1 */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Color 1 (Inicio)
                   </label>
                   <div className="flex gap-2">
@@ -738,7 +738,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
                 {/* Color 2 */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Color 2 (Fin)
                   </label>
                   <div className="flex gap-2">
@@ -768,7 +768,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
                 {/* Vista previa */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Vista previa
                   </label>
                   <div className="flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -787,7 +787,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Presets rápidos */}
               <div className="mt-4">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                   ⚡ Presets rápidos
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -820,43 +820,43 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
           {/* ===== BOTÓN VER DETALLES ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🔘 Botón "Ver detalles"
             </h3>
             
             {/* Texto e Icono del botón */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Texto del botón
                 </label>
                 <input
                   type="text"
                   value={gridConfig.cardDesign?.buttonText || 'Ver detalles'}
                   onChange={(e) => handleUpdate('cardDesign.buttonText', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Icono del botón
                 </label>
                 <input
                   type="text"
                   value={gridConfig.cardDesign?.buttonIcon || '→'}
                   onChange={(e) => handleUpdate('cardDesign.buttonIcon', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="→ ▶ ➔ ›"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Posición del icono
                 </label>
                 <select
                   value={gridConfig.cardDesign?.buttonIconPosition || 'right'}
                   onChange={(e) => handleUpdate('cardDesign.buttonIconPosition', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="left">← Izquierda</option>
                   <option value="right">Derecha →</option>
@@ -867,7 +867,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
             {/* Tipo de fondo */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Tipo de fondo
               </label>
               <div className="flex gap-4">
@@ -911,7 +911,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Color 1 */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     {gridConfig.cardDesign?.buttonSolidColor ? 'Color' : 'Color 1 (Inicio)'}
                   </label>
                   <div className="flex gap-2">
@@ -950,7 +950,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 {/* Color 2 - solo si es gradiente */}
                 {!gridConfig.cardDesign?.buttonSolidColor && (
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                       Color 2 (Fin)
                     </label>
                     <div className="flex gap-2">
@@ -981,12 +981,12 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
                 {/* Vista previa */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Vista previa
                   </label>
                   <div className="flex items-center justify-center h-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
                     <span 
-                      className="text-white text-sm font-medium px-4 py-2 shadow-lg cursor-pointer transition-transform hover:scale-105 flex items-center gap-2"
+                      className="text-white text-sm font-medium px-3 py-1.5 shadow-lg cursor-pointer transition-transform hover:scale-105 flex items-center gap-2"
                       style={{ 
                         background: gridConfig.cardDesign?.buttonGradient || `linear-gradient(90deg, ${gridConfig.cardDesign?.buttonColor1 || '#8B5CF6'}, ${gridConfig.cardDesign?.buttonColor2 || '#3B82F6'})`,
                         borderRadius: gridConfig.cardDesign?.buttonBorderRadius || '0.5rem'
@@ -1006,7 +1006,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Presets rápidos */}
               <div className="mt-4">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                   ⚡ Presets rápidos
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -1042,7 +1042,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
           {/* ===== CONTENIDO DE TARJETAS ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               📋 Contenido de Tarjetas (Uniformidad)
             </h3>
             
@@ -1054,7 +1054,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
             </div>
 
             {/* Grid de toggles para elementos */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
               {/* Mostrar Imagen */}
               <label className="flex items-center gap-2 cursor-pointer p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 <input
@@ -1164,7 +1164,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {/* Líneas del título */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Líneas de título
                 </label>
                 <select
@@ -1180,7 +1180,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Líneas de descripción */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Líneas de descripción
                 </label>
                 <select
@@ -1197,7 +1197,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Máximo de características */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Máx. características
                 </label>
                 <select
@@ -1228,7 +1228,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                 
                 {/* Estilo de resaltado */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                     Estilo de resaltado
                   </label>
                   <div className="flex gap-3">
@@ -1369,7 +1369,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   
                   {/* Texto */}
                   <div className="mb-4">
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Texto
                     </label>
                     <div className="flex gap-2">
@@ -1523,7 +1523,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                   
                   {/* Texto */}
                   <div className="mb-4">
-                    <label className="block text-xs font-medium text-gray-400 mb-2">
+                    <label className="block text-xs font-medium text-gray-400 mb-1">
                       Texto
                     </label>
                     <div className="flex gap-2">
@@ -1633,7 +1633,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
               {/* Máximo de tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Máx. tags
                 </label>
                 <select
@@ -1654,7 +1654,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
             {/* Altura mínima de tarjeta */}
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Altura mínima de tarjeta (para uniformidad)
               </label>
               <select
@@ -1674,7 +1674,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
           {/* ===== VISTA PREVIA DE TARJETA ===== */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               👁️ Vista Previa de Tarjeta
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -1736,7 +1736,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
 
                   {/* Título - con líneas configurables */}
                   <h3 
-                    className={`text-xl font-bold mb-3 transition-colors ${
+                    className={`text-lg font-bold mb-3 transition-colors ${
                       gridConfig.cardDesign?.contentConfig?.titleMaxLines === 1 ? 'line-clamp-1' :
                       gridConfig.cardDesign?.contentConfig?.titleMaxLines === 3 ? 'line-clamp-3' : 'line-clamp-2'
                     }`}
@@ -1799,7 +1799,7 @@ const ServicesGridConfigSection: React.FC<ServicesGridConfigSectionProps> = ({
                     {/* Botón - condicional */}
                     {gridConfig.cardDesign?.contentConfig?.showButton !== false && (
                       <span 
-                        className="text-white px-4 py-2 font-medium transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm cursor-pointer"
+                        className="text-white px-3 py-1.5 font-medium transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm cursor-pointer"
                         style={{
                           background: gridConfig.cardDesign?.buttonGradient || 'linear-gradient(90deg, #8B5CF6, #3B82F6)',
                           borderRadius: gridConfig.cardDesign?.buttonBorderRadius || '0.5rem'

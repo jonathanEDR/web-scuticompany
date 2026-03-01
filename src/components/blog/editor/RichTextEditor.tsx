@@ -330,7 +330,7 @@ export default function RichTextEditor({
   const charCount = text.length;
 
   return (
-    <div className={`rich-text-editor border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden ${className}`}>
+    <div className={`blog-editor rich-text-editor border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden ${className}`}>
       {/* Toolbar Moderno y Profesional */}
       {showToolbar && (
         <div className="border-b border-gray-300 dark:border-gray-600 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 p-3">

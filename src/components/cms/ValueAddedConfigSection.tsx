@@ -137,11 +137,11 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Encabezado colapsable */}
       <button
         type="button"
-        className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition-colors"
+        className="w-full flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 rounded transition-colors"
         onClick={() => setCollapsed((prev) => !prev)}
         aria-expanded={!collapsed}
         aria-controls="value-added-section-content"
@@ -162,7 +162,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
       {!collapsed && (
         <div id="value-added-section-content">
           {/* Layout principal con 2 columnas: Contenido y Imágenes */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
             {/* Columna izquierda: Editores de texto (2/3) */}
             <div className="xl:col-span-2 space-y-4">
@@ -199,7 +199,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
 
               {/* Texto alternativo para accesibilidad */}
               <div className="pt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   📝 Texto alternativo (Alt Text)
                 </label>
                 <input
@@ -207,7 +207,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                   value={pageData.content.valueAdded?.backgroundImageAlt || ''}
                   onChange={(e) => updateContent('valueAdded.backgroundImageAlt', e.target.value)}
                   placeholder="Describe la imagen para accesibilidad"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Mejora la accesibilidad y SEO describiendo qué muestra la imagen
@@ -218,7 +218,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
 
             {/* Columna derecha: Imágenes de Fondo (1/3) */}
             <div className="xl:col-span-1">
-              <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                 🖼️ Imágenes de Fondo
               </h4>
               <div className="space-y-4">
@@ -281,7 +281,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
 
           {/* ========== EDITOR DE TARJETAS INTEGRADO ========== */}
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-3">
               <div>
                 <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
                   🎴 Tarjetas de Valor Agregado
@@ -305,7 +305,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                   <button
                     onClick={applyChanges}
                     disabled={!hasUnsavedChanges}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
                   >
                     👀 Vista Previa
                   </button>
@@ -313,7 +313,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                   <button
                     onClick={saveChanges}
                     disabled={isSaving || !hasUnsavedChanges}
-                    className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 text-sm"
+                    className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 text-sm"
                   >
                     {isSaving ? (
                       <>
@@ -415,7 +415,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
 
                         {/* Gradiente */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             🎨 Gradiente CSS
                           </label>
                           <input
@@ -423,7 +423,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                             value={item.gradient || ''}
                             onChange={(e) => updateItem(index, 'gradient', e.target.value)}
                             placeholder="linear-gradient(135deg, #8B5CF6, #06B6D4)"
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           />
                           {item.gradient && (
                             <div
@@ -441,7 +441,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Texto del botón */}
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Texto del botón
                               </label>
                               <input
@@ -449,7 +449,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                                 value={item.buttonText || ''}
                                 onChange={(e) => updateItem(index, 'buttonText', e.target.value)}
                                 placeholder="Conocer más"
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                               />
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 Dejar vacío para usar "Conocer más" por defecto
@@ -458,7 +458,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
 
                             {/* URL del botón */}
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 URL de destino
                               </label>
                               <input
@@ -466,7 +466,7 @@ const ValueAddedConfigSection: React.FC<ValueAddedConfigSectionProps> = ({
                                 value={item.buttonUrl || ''}
                                 onChange={(e) => updateItem(index, 'buttonUrl', e.target.value)}
                                 placeholder="/servicios o https://..."
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                               />
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 Ruta interna (/servicios) o URL externa (https://...)

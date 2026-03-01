@@ -126,7 +126,7 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
       </button>
 
       {isExpanded && (
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 space-y-6">
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 space-y-3">
           
           {/* ========== SECCIÓN: TÍTULO Y DESCRIPCIÓN ========== */}
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-5 border border-purple-200 dark:border-purple-800">
@@ -334,7 +334,7 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
                   type="text"
                   value={mergedConfig.accordion?.header?.title?.text ?? 'Información Completa'}
                   onChange={(e) => updateAccordionHeaderTitle('text', e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-purple-500"
                   placeholder="Información Completa"
                 />
               </div>
@@ -478,7 +478,7 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
                   type="text"
                   value={mergedConfig.accordion?.header?.subtitle?.text ?? 'Haz clic en cada sección para ver más detalles'}
                   onChange={(e) => updateAccordionHeaderSubtitle('text', e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-purple-500"
                   placeholder="Haz clic en cada sección para ver más detalles"
                 />
               </div>
@@ -636,7 +636,7 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
               </div>
 
               {/* Vista Previa */}
-              <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 text-center">Vista Previa</p>
                 <div className={`${
                   mergedConfig.accordion?.header?.alignment === 'left' ? 'text-left' :
@@ -669,7 +669,7 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
               <select
                 value={mergedConfig.accordion?.defaultOpenPanel ?? 'descripcion'}
                 onChange={(e) => updateAccordion('defaultOpenPanel', e.target.value)}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-purple-500"
               >
                 <option value="">Ninguno (todos cerrados)</option>
                 {mergedConfig.accordion?.panels
@@ -737,8 +737,8 @@ export const AccordionConfigSection: React.FC<AccordionConfigSectionProps> = ({
           </div>
 
           {/* 💳 Estilos de Tarjetas de Contenido */}
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
-            <h4 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+            <h4 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
               <span>💳</span> Estilos de Tarjetas de Contenido
             </h4>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -1103,15 +1103,15 @@ const IconConfigSection: React.FC<IconConfigSectionProps> = ({
   const darkConfig = iconConfig?.dark || { showBackground: false, iconColor: '#a78bfa', iconActiveColor: '#c4b5fd' };
 
   return (
-    <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 rounded-xl p-6 border border-violet-200 dark:border-violet-800">
-      <h4 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+    <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 rounded-xl p-4 border border-violet-200 dark:border-violet-800">
+      <h4 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
         <span>🎯</span> Iconos del Header del Acordeón
       </h4>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
         Configura cómo se muestran los iconos en los títulos de cada panel. Por defecto sin fondo para un look más limpio.
       </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Tema Claro */}
         <div className="space-y-4 p-4 bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
           <h5 className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
@@ -1438,8 +1438,8 @@ const SectionIconsConfigPanel: React.FC<SectionIconsConfigPanelProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-800">
-      <h4 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+      <h4 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
         <span>🏷️</span> Iconos de Tarjetas de Contenido
       </h4>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -1493,7 +1493,7 @@ const SectionIconsConfigPanel: React.FC<SectionIconsConfigPanelProps> = ({
                 <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
                   {/* Tipo de icono */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Tipo de indicador
                     </label>
                     <div className="flex gap-2">
@@ -1535,7 +1535,7 @@ const SectionIconsConfigPanel: React.FC<SectionIconsConfigPanelProps> = ({
                   {/* Selector de icono (solo si type es 'icon') */}
                   {config.type === 'icon' && (
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Seleccionar icono
                       </label>
                       <div className="relative">

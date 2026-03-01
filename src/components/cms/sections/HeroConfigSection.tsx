@@ -271,13 +271,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Familia de fuente
           </label>
           <select
             value={titleConfig.fontFamily || 'Montserrat'}
             onChange={(e) => updateTitleField('fontFamily', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="Montserrat">Montserrat (Recomendado)</option>
             <option value="Inter">Inter</option>
@@ -289,13 +289,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tamaño de fuente
           </label>
           <select
             value={titleConfig.fontSize || 'text-5xl'}
             onChange={(e) => updateTitleField('fontSize', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="text-3xl">3XL</option>
             <option value="text-4xl">4XL</option>
@@ -306,13 +306,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Peso de fuente
           </label>
           <select
             value={titleConfig.fontWeight || 'font-bold'}
             onChange={(e) => updateTitleField('fontWeight', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="font-normal">Normal</option>
             <option value="font-medium">Medium</option>
@@ -323,13 +323,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Altura de línea
           </label>
           <select
             value={titleConfig.lineHeight || 'leading-tight'}
             onChange={(e) => updateTitleField('lineHeight', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="leading-none">None</option>
             <option value="leading-tight">Tight (Recomendado)</option>
@@ -349,13 +349,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Familia de fuente
           </label>
           <select
             value={subtitleConfig.fontFamily || 'Montserrat'}
             onChange={(e) => updateSubtitleField('fontFamily', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="Montserrat">Montserrat (Recomendado)</option>
             <option value="Inter">Inter</option>
@@ -367,13 +367,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tamaño de fuente
           </label>
           <select
             value={subtitleConfig.fontSize || 'text-xl'}
             onChange={(e) => updateSubtitleField('fontSize', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="text-base">Base</option>
             <option value="text-lg">LG</option>
@@ -383,13 +383,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Peso de fuente
           </label>
           <select
             value={subtitleConfig.fontWeight || 'font-normal'}
             onChange={(e) => updateSubtitleField('fontWeight', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="font-light">Light</option>
             <option value="font-normal">Normal (Recomendado)</option>
@@ -399,13 +399,13 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Altura de línea
           </label>
           <select
             value={subtitleConfig.lineHeight || 'leading-relaxed'}
             onChange={(e) => updateSubtitleField('lineHeight', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
           >
             <option value="leading-tight">Tight</option>
             <option value="leading-snug">Snug</option>
@@ -416,7 +416,7 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
         </div>
 
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Color del texto
           </label>
           <div className="flex gap-2">
@@ -430,7 +430,7 @@ const ContentStylesSection: React.FC<ContentStylesSectionProps> = ({
               type="text"
               value={subtitleConfig.color || '#6B7280'}
               onChange={(e) => updateSubtitleField('color', e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 font-mono text-sm"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 font-mono text-sm"
               placeholder="#6B7280"
             />
           </div>
@@ -643,7 +643,7 @@ const ButtonEditor: React.FC<ButtonEditorProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
             Estilo
           </label>
           <div className="grid grid-cols-3 gap-2">

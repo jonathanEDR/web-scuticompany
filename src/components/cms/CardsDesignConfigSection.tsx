@@ -377,13 +377,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4 md:gap-0">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3 gap-4 md:gap-0">
         {/* Left: Title, Section Selector, Status */}
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3 w-full md:w-auto">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
               🎨 Diseño de Tarjetas
             </h2>
             {/* 🔥 NUEVO: Selector de sección */}
@@ -452,14 +452,14 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
         <div className="flex gap-2 w-full md:w-auto">
           <button
             onClick={applyTransparentDefaults}
-            className="flex-1 md:flex-none px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+            className="flex-1 md:flex-none px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
             title="Aplicar diseño transparente a ambos temas y guardar"
           >
             ✨ Aplicar Transparencia
           </button>
           <button
             onClick={resetToDefaults}
-            className="flex-1 md:flex-none px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+            className="flex-1 md:flex-none px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
           >
             🔄 Restaurar por defecto
           </button>
@@ -471,7 +471,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
         <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
           <button
             onClick={() => setActiveTheme('light')}
-            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex-1 px-3 py-1.5 rounded-lg font-medium transition-all duration-200 ${
               activeTheme === 'light'
                 ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400'
@@ -481,7 +481,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           </button>
           <button
             onClick={() => setActiveTheme('dark')}
-            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex-1 px-3 py-1.5 rounded-lg font-medium transition-all duration-200 ${
               activeTheme === 'dark'
                 ? 'bg-gray-800 text-gray-100 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400'
@@ -538,7 +538,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
           {/* Icon Preview */}
           {safeCurrentStyles.iconBorderEnabled !== false ? (
             <div
-              className="relative mb-6 w-16 h-16 rounded-xl p-0.5"
+              className="relative mb-3 w-16 h-16 rounded-xl p-0.5"
               style={{ background: safeCurrentStyles.iconGradient }}
             >
               <div
@@ -552,7 +552,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               </div>
             </div>
           ) : (
-            <div className="relative mb-6 w-16 h-16 flex items-center justify-center text-3xl"
+            <div className="relative mb-3 w-16 h-16 flex items-center justify-center text-3xl"
                  style={{ color: safeCurrentStyles.iconColor }}>
               {activeSection === 'contact' ? '📧' : '💡'}
             </div>
@@ -603,8 +603,8 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
       </div>
 
       {/* Simple Mode Configuration */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
           🎨 Configuración Simple
         </h3>
 
@@ -625,7 +625,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
               {/* Borde y Grosor */}
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color del Borde
                 </label>
                 <div className="flex gap-2 mb-4">
@@ -642,7 +642,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                     className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   />
                 </div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Grosor del Borde
                 </label>
                 <select
@@ -685,7 +685,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Título */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del Título
                   </label>
                   <div className="flex gap-2">
@@ -706,7 +706,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Extracto */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del Extracto
                   </label>
                   <div className="flex gap-2">
@@ -727,7 +727,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Metadata */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color de Metadata
                   </label>
                   <div className="flex gap-2">
@@ -748,7 +748,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* CTA Color */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del CTA
                   </label>
                   <div className="flex gap-2">
@@ -783,7 +783,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del Texto
                   </label>
                   <div className="flex gap-2">
@@ -840,7 +840,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 onChange={(value) => updateCardStyle('border', value)}
               />
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Grosor del Borde
                 </label>
                 <select
@@ -923,7 +923,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 value={safeCurrentStyles.iconGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}
                 onChange={(value) => updateCardStyle('iconGradient', value)}
               />
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color del Icono
               </label>
               <div className="flex gap-2">
@@ -955,7 +955,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Color del Título */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del Título
                   </label>
                   <div className="flex gap-2 w-full min-w-0">
@@ -977,7 +977,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Color de la Descripción */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color de la Descripción
                   </label>
                   <div className="flex gap-2 w-full min-w-0">
@@ -999,7 +999,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Color del "Conocer más" */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del "Conocer más"
                   </label>
                   <div className="flex gap-2 w-full min-w-0">
@@ -1023,7 +1023,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
             {/* Fondo del Contenedor - Ancho completo */}
             <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Fondo del Contenedor del Icono
               </label>
               <input
@@ -1045,7 +1045,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
       <div className="mt-8">
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors duration-200 flex items-center justify-between"
+          className="w-full px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors duration-200 flex items-center justify-between"
         >
           <span>⚙️ Opciones Avanzadas</span>
           <span className="text-xl">{showAdvanced ? '▼' : '▶'}</span>
@@ -1054,13 +1054,13 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
       {/* Advanced Mode Configuration */}
       {showAdvanced && (
-        <div className="mt-6 space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        <div className="mt-6 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
             ⚙️ Configuración Avanzada
           </h3>
 
           {/* Grid de 2 columnas para Tamaño y Sombras */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Tamaño de Tarjetas - MEJORADO */}
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
               <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
@@ -1103,10 +1103,10 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {/* Ancho de Tarjetas - Slider */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     📐 Ancho Mínimo: <span className="font-mono text-blue-600 dark:text-blue-400">{currentStyles.cardMinWidth || '280px'}</span>
                   </label>
                   <div className="space-y-2">
@@ -1132,7 +1132,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Alto de Tarjetas - Toggle + Slider */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     📏 Alto Mínimo
                   </label>
                   <div className="space-y-3">
@@ -1187,7 +1187,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Espaciado Interno - Slider */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     📦 Espaciado Interno: <span className="font-mono text-purple-600 dark:text-purple-400">{currentStyles.cardPadding || '2rem'}</span>
                   </label>
                   <div className="space-y-2">
@@ -1213,7 +1213,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Ancho Máximo - Simple select */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     ↔️ Ancho Máximo
                   </label>
                   <select
@@ -1230,7 +1230,7 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
 
                 {/* Alineación de Tarjetas */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     🎯 Alineación de Tarjetas
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -1287,9 +1287,9 @@ const CardsDesignConfigSection: React.FC<CardsDesignConfigSectionProps> = ({
             <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
               🖱️ Efectos Hover
             </h4>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Fondo y Borde Hover */}
-              <div className="space-y-6">
+              <div className="space-y-3">
                 <ColorWithOpacity
                   label="Fondo (Hover)"
                   value={safeCurrentStyles.hoverBackground || 'rgba(255, 255, 255, 0.95)'}

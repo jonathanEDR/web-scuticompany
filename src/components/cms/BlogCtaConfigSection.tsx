@@ -90,7 +90,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
             <Megaphone className="w-5 h-5 text-purple-600 dark:text-purple-400" />
           </div>
           <div className="text-left">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
               Sección CTA (Último Llamado)
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -132,12 +132,12 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
           </div>
 
           {/* Tabs */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-3">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600'
@@ -150,7 +150,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
           </div>
 
           {/* Tab Content */}
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* ===== TAB: CONTENIDO ===== */}
             {activeTab === 'content' && (
               <div className="space-y-4">
@@ -169,7 +169,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                     value={ctaConfig.title}
                     onChange={(e) => handleChange('title', e.target.value)}
                     placeholder="¿Listo para transformar tu negocio?"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -183,7 +183,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                     value={ctaConfig.titleHighlight}
                     onChange={(e) => handleChange('titleHighlight', e.target.value)}
                     placeholder="transformar"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                   <p className="text-xs text-gray-500 mt-1">Esta palabra se resaltará con gradiente o color especial</p>
                 </div>
@@ -198,7 +198,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                     onChange={(e) => handleChange('subtitle', e.target.value)}
                     placeholder="Únete a miles de empresas..."
                     rows={2}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -210,7 +210,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                   <select
                     value={ctaConfig.fontFamily}
                     onChange={(e) => handleChange('fontFamily', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="Montserrat">Montserrat</option>
                     <option value="Inter">Inter</option>
@@ -231,7 +231,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                       value={ctaConfig.buttonText}
                       onChange={(e) => handleChange('buttonText', e.target.value)}
                       placeholder="Contáctanos"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                   <div>
@@ -243,7 +243,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                       value={ctaConfig.buttonLink}
                       onChange={(e) => handleChange('buttonLink', e.target.value)}
                       placeholder="/contacto"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -276,7 +276,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                           value={ctaConfig.secondaryButtonText}
                           onChange={(e) => handleChange('secondaryButtonText', e.target.value)}
                           placeholder="Ver servicios"
-                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         />
                       </div>
                       <div>
@@ -288,7 +288,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                           value={ctaConfig.secondaryButtonLink}
                           onChange={(e) => handleChange('secondaryButtonLink', e.target.value)}
                           placeholder="/servicios"
-                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         />
                       </div>
                     </div>
@@ -307,7 +307,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
 
                 {/* Tipo de fondo */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Tipo de fondo
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -315,7 +315,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                       <button
                         key={type}
                         onClick={() => handleChange('bgType', type)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                           ctaConfig.bgType === type
                             ? 'bg-purple-600 text-white'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400'
@@ -421,7 +421,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                       <select
                         value={ctaConfig.bgGradientDirection}
                         onChange={(e) => handleChange('bgGradientDirection', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       >
                         <option value="to-r">→ Izquierda a Derecha</option>
                         <option value="to-l">← Derecha a Izquierda</option>
@@ -533,7 +533,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
 
                     {/* Control de overlay */}
                     <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Opacidad del overlay oscuro: {Math.round((ctaConfig.bgOverlay ?? 0) * 100)}%
                       </label>
                       <input
@@ -706,7 +706,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
 
             {/* ===== TAB: BOTONES ===== */}
             {activeTab === 'buttons' && (
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {/* ===== BOTÓN PRINCIPAL ===== */}
                 <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg space-y-4">
                   <h5 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -1537,7 +1537,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
             >
               {/* Título preview */}
               <h3 
-                className="text-xl font-bold mb-2"
+                className="text-lg font-bold mb-2"
                 style={{ color: ctaConfig.titleColor }}
               >
                 {ctaConfig.title?.split(ctaConfig.titleHighlight || '')[0]}
@@ -1570,7 +1570,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
               {/* Botones preview */}
               <div className="flex gap-3 justify-center flex-wrap">
                 <span
-                  className="px-4 py-2 text-xs font-semibold"
+                  className="px-3 py-1.5 text-xs font-semibold"
                   style={{
                     background: ctaConfig.buttonUseGradient 
                       ? `linear-gradient(to right, ${ctaConfig.buttonGradientFrom}, ${ctaConfig.buttonGradientTo})`
@@ -1583,7 +1583,7 @@ const BlogCtaConfigSection: React.FC<BlogCtaConfigSectionProps> = ({ config, onC
                 </span>
                 {ctaConfig.showSecondaryButton && (
                   <span
-                    className="px-4 py-2 text-xs font-semibold"
+                    className="px-3 py-1.5 text-xs font-semibold"
                     style={{
                       color: ctaConfig.secondaryButtonTextColor,
                       border: `${ctaConfig.secondaryButtonBorderWidth}px solid ${ctaConfig.secondaryButtonBorderColor}`,

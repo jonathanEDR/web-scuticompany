@@ -153,14 +153,14 @@ const BackgroundImageSection: React.FC<BackgroundImageSectionProps> = ({
 
       {/* Alt Text de la Imagen */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           Alt Text de la Imagen
         </label>
         <input
           type="text"
           value={contactForm.backgroundImageAlt || ''}
           onChange={(e) => updateContent('contactForm.backgroundImageAlt', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           placeholder="Descripción de la imagen de fondo para accesibilidad"
         />
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">

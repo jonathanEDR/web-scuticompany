@@ -44,7 +44,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
   // Si estamos en la página de contacto, mostrar solo la configuración de la página pública
   if (isContactPage) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-3">
         {/* 🎨 CONFIGURACIÓN DE LA PÁGINA CONTACTO */}
         <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
           <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
@@ -170,7 +170,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
 
             {/* Gradiente del Título */}
             <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">🎨 Gradiente del Título (Opcional)</h4>
+              <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">🎨 Gradiente del Título (Opcional)</h4>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                 Activa el gradiente para dar un efecto colorido al título.
               </p>
@@ -274,7 +274,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
 
             {/* Imagen de fondo Hero */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">🖼️ Imagen de Fondo</h4>
+              <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">🖼️ Imagen de Fondo</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">☀️ Tema Claro</label>
@@ -335,7 +335,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
             
             {/* Imagen de fondo Formulario */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">🖼️ Imagen de Fondo</h4>
+              <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">🖼️ Imagen de Fondo</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">☀️ Tema Claro</label>
@@ -473,7 +473,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
 
             {/* Imagen de fondo Features */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">🖼️ Imagen de Fondo</h4>
+              <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">🖼️ Imagen de Fondo</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">☀️ Tema Claro</label>
@@ -549,7 +549,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                 type="text"
                 value={pageData.content.contact?.phone || ''}
                 onChange={(e) => updateContent('contact.phone', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="+51 973 397 306"
               />
             </div>
@@ -562,7 +562,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                 type="email"
                 value={pageData.content.contact?.email || ''}
                 onChange={(e) => updateContent('contact.email', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="gscutic@gmail.com"
               />
             </div>
@@ -577,7 +577,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
               rows={2}
               value={pageData.content.contact?.description || ''}
               onChange={(e) => updateContent('contact.description', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               placeholder="Empresa líder en desarrollo de software en Perú. Creamos soluciones digitales..."
             />
           </div>
@@ -592,7 +592,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                 type="text"
                 value={pageData.content.contact?.address || ''}
                 onChange={(e) => updateContent('contact.address', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Av. Principal 123"
               />
             </div>
@@ -605,7 +605,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                 type="text"
                 value={pageData.content.contact?.city || ''}
                 onChange={(e) => updateContent('contact.city', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Lima"
               />
             </div>
@@ -618,7 +618,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                 type="text"
                 value={pageData.content.contact?.country || ''}
                 onChange={(e) => updateContent('contact.country', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Perú"
               />
             </div>
@@ -633,7 +633,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
               type="text"
               value={pageData.content.contact?.businessHours || ''}
               onChange={(e) => updateContent('contact.businessHours', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               placeholder="Lunes a Viernes: 9:00 AM - 6:00 PM"
             />
           </div>
@@ -711,7 +711,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                         type="text"
                         value={link.name}
                         onChange={(e) => updateSocialLink(index, 'name', e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm text-center font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm text-center font-medium focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                         placeholder="nombre"
                       />
                       
@@ -720,7 +720,7 @@ const ContactConfigSection: React.FC<ContactConfigSectionProps> = ({
                         type="url"
                         value={link.url}
                         onChange={(e) => updateSocialLink(index, 'url', e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs mt-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs mt-2 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                         placeholder="https://..."
                       />
                       

@@ -147,15 +147,15 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-500 rounded-lg flex items-center justify-center">
             <span className="text-white text-lg">🏢</span>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               Diseño de Logos de Clientes
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -174,7 +174,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
           </button>
           
           {hasUnsavedChanges && (
-            <div className="px-4 py-2 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-lg text-sm font-medium border border-orange-200 dark:border-orange-700 flex items-center gap-2">
+            <div className="px-3 py-1.5 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-lg text-sm font-medium border border-orange-200 dark:border-orange-700 flex items-center gap-2">
               <span>⚠️</span>
               Tienes cambios sin guardar. Usa el botón "Guardar" de arriba.
             </div>
@@ -183,12 +183,12 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
       </div>
 
       {/* Theme Toggle */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-3">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tema:</span>
         <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
           <button
             onClick={() => setActiveTheme('light')}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
               activeTheme === 'light'
                 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -198,7 +198,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
           </button>
           <button
             onClick={() => setActiveTheme('dark')}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
               activeTheme === 'dark'
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -210,12 +210,12 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
       </div>
 
       {/* Tab Toggle */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-3">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Configurar:</span>
         <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
           <button
             onClick={() => setActiveTab('logos')}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'logos'
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -225,7 +225,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('animations')}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'animations'
                 ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -320,9 +320,9 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
 
       {/* Controles de configuración */}
       {activeTab === 'logos' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Columna izquierda - Logos */}
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Tamaño máximo de logos */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -389,7 +389,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
           </div>
 
           {/* Columna derecha - Logos */}
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Separación entre logos */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -419,7 +419,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
               <select
                 value={currentLogosStyles.logosAlignment}
                 onChange={(e) => updateLogosStyle('logosAlignment', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="left">Izquierda</option>
                 <option value="center">Centro</option>
@@ -435,7 +435,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
               <select
                 value={currentLogosStyles.logoFilter}
                 onChange={(e) => updateLogosStyle('logoFilter', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="grayscale(0%)">Color normal</option>
                 <option value="grayscale(100%)">Escala de grises</option>
@@ -447,9 +447,9 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
           </div>
         </div>
       ) : activeTab === 'animations' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Columna izquierda - Animaciones de Flotación */}
-          <div className="space-y-6">
+          <div className="space-y-3">
             <div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg border border-cyan-200 dark:border-cyan-700">
               <h4 className="font-medium text-cyan-800 dark:text-cyan-300 mb-2 flex items-center gap-2">
                 <span>🎈</span> Animación de Flotación
@@ -465,7 +465,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                     type="checkbox"
                     checked={currentLogosStyles.floatAnimation !== false}
                     onChange={(e) => updateLogosStyle('floatAnimation', e.target.checked)}
-                    className="w-5 h-5 text-cyan-600 rounded focus:ring-2 focus:ring-cyan-500"
+                    className="w-5 h-5 text-cyan-600 rounded focus:ring-1 focus:ring-cyan-500"
                   />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Habilitar animación flotante
@@ -482,7 +482,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                   value={currentLogosStyles.floatIntensity || 'normal'}
                   onChange={(e) => updateLogosStyle('floatIntensity', e.target.value)}
                   disabled={currentLogosStyles.floatAnimation === false}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-cyan-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
                 >
                   <option value="subtle">Sutil (8px)</option>
                   <option value="normal">Normal (15px)</option>
@@ -523,7 +523,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
           </div>
 
           {/* Columna derecha - Carrusel */}
-          <div className="space-y-6">
+          <div className="space-y-3">
             <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
               <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
                 <span>🎠</span> Carrusel Automático
@@ -539,7 +539,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                     type="checkbox"
                     checked={currentLogosStyles.carouselEnabled !== false}
                     onChange={(e) => updateLogosStyle('carouselEnabled', e.target.checked)}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-1 focus:ring-blue-500"
                   />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Habilitar rotación automática
@@ -578,7 +578,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                   value={currentLogosStyles.logosToShowDesktop || 6}
                   onChange={(e) => updateLogosStyle('logosToShowDesktop', parseInt(e.target.value))}
                   disabled={currentLogosStyles.carouselEnabled === false}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
                 >
                   <option value={4}>4 logos</option>
                   <option value={5}>5 logos</option>
@@ -597,7 +597,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                   value={currentLogosStyles.logosToShowTablet || 4}
                   onChange={(e) => updateLogosStyle('logosToShowTablet', parseInt(e.target.value))}
                   disabled={currentLogosStyles.carouselEnabled === false}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
                 >
                   <option value={2}>2 logos</option>
                   <option value={3}>3 logos</option>
@@ -615,7 +615,7 @@ const ClientLogosDesignSection: React.FC<ClientLogosDesignSectionProps> = ({
                   value={currentLogosStyles.logosToShowMobile || 3}
                   onChange={(e) => updateLogosStyle('logosToShowMobile', parseInt(e.target.value))}
                   disabled={currentLogosStyles.carouselEnabled === false}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50"
                 >
                   <option value={2}>2 logos</option>
                   <option value={3}>3 logos</option>

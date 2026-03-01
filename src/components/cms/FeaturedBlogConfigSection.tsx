@@ -17,9 +17,9 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
   const config = pageData.content?.featuredBlog || {};
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-200 dark:border-gray-700">
       {/* Header */}
-      <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center space-x-3 mb-3 pb-4 border-b border-gray-200 dark:border-gray-700">
         <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-xl flex items-center justify-center">
           <Sparkles className="w-6 h-6 text-white" />
         </div>
@@ -34,7 +34,7 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
       </div>
 
       {/* Contenido */}
-      <div className="space-y-6">
+      <div className="space-y-3">
         {/* Configuración del Encabezado */}
         <HeaderIconSelector
           config={config}
@@ -43,18 +43,18 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
 
         {/* Configuración de Tipografía */}
         <div className="bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
             🅰️ Configuración de Tipografía
           </h3>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Fuente Tipográfica
             </label>
             <select
               value={config.fontFamily || 'Montserrat'}
               onChange={(e) => updateContent('featuredBlog.fontFamily', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="Montserrat">Montserrat (Por defecto)</option>
               <option value="Inter">Inter</option>
@@ -90,40 +90,40 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
         {/* Textos Principales */}
         <div className="grid grid-cols-1 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Título de la Sección
             </label>
             <input
               type="text"
               value={config.title || 'Webinars y blogs'}
               onChange={(e) => updateContent('featuredBlog.title', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
               placeholder="Webinars y blogs"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Subtítulo
             </label>
             <textarea
               value={config.subtitle || ''}
               onChange={(e) => updateContent('featuredBlog.subtitle', e.target.value)}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white resize-none"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white resize-none"
               placeholder="Accede a nuestros webinars y blogs..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Descripción (Opcional)
             </label>
             <textarea
               value={config.description || ''}
               onChange={(e) => updateContent('featuredBlog.description', e.target.value)}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white resize-none"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white resize-none"
               placeholder="Descripción adicional..."
             />
           </div>
@@ -132,27 +132,27 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
         {/* Configuración del Botón */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Texto del Botón
             </label>
             <input
               type="text"
               value={config.buttonText || 'Ver todos los artículos'}
               onChange={(e) => updateContent('featuredBlog.buttonText', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
               placeholder="Ver todos los artículos"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Enlace del Botón
             </label>
             <input
               type="text"
               value={config.buttonLink || '/blog'}
               onChange={(e) => updateContent('featuredBlog.buttonLink', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
               placeholder="/blog"
             />
           </div>
@@ -160,7 +160,7 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
 
         {/* Cantidad de Posts */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Cantidad de Posts a Mostrar
           </label>
           <input
@@ -169,7 +169,7 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
             max="12"
             value={config.limit || 3}
             onChange={(e) => updateContent('featuredBlog.limit', parseInt(e.target.value))}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
           />
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             Número de posts destacados a mostrar (1-12)
@@ -180,7 +180,7 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-3">
             <ImageIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
               Imágenes de Fondo
             </h3>
           </div>
@@ -308,11 +308,11 @@ const FeaturedBlogConfigSection: React.FC<FeaturedBlogConfigSectionProps> = ({
 
         {/* Colores de Texto por Tema */}
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">
             Colores de Texto
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tema Claro */}
             <div className="space-y-3">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -433,14 +433,14 @@ const HeaderIconSelector: React.FC<HeaderIconSelectorProps> = ({ config, updateC
 
   return (
     <div className="bg-gradient-to-br from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-lg p-5 border border-purple-200 dark:border-purple-700">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+      <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
         ✨ Configuración del Encabezado
       </h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Selector de Icono */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Icono del Encabezado
           </label>
           
@@ -456,7 +456,7 @@ const HeaderIconSelector: React.FC<HeaderIconSelectorProps> = ({ config, updateC
             <div className="flex-1">
               <button
                 onClick={() => setShowIconPicker(!showIconPicker)}
-                className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between shadow-sm"
+                className="w-full px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between shadow-sm"
               >
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {AVAILABLE_SIDEBAR_ICONS.find(i => i.name === currentIcon)?.label || currentIcon}
@@ -471,7 +471,7 @@ const HeaderIconSelector: React.FC<HeaderIconSelectorProps> = ({ config, updateC
 
           {/* Iconos recomendados (siempre visibles) */}
           <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
               Iconos recomendados:
             </label>
             <div className="flex flex-wrap gap-2">
@@ -520,7 +520,7 @@ const HeaderIconSelector: React.FC<HeaderIconSelectorProps> = ({ config, updateC
 
         {/* Configuración de Color */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Color del Icono
           </label>
           <div className="space-y-3">
@@ -535,14 +535,14 @@ const HeaderIconSelector: React.FC<HeaderIconSelectorProps> = ({ config, updateC
                 type="text"
                 value={currentIconColor}
                 onChange={(e) => updateContent('featuredBlog.headerIconColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white font-mono text-sm"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 dark:bg-gray-700 dark:text-white font-mono text-sm"
                 placeholder="#8B5CF6"
               />
             </div>
             
             {/* Colores predefinidos */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Colores predefinidos:
               </label>
               <div className="flex flex-wrap gap-2">

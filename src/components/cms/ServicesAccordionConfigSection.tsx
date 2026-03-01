@@ -161,11 +161,11 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
             📋 Sección Acordeón de Servicios
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -198,7 +198,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
 
       {/* Contenido configurable */}
       {config.enabled !== false && (
-        <div className="space-y-6">
+        <div className="space-y-3">
           
           {/* ===== TEXTOS DE LA SECCIÓN ===== */}
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -207,7 +207,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('textos')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 ✏️ Textos de la Sección
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['textos'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,7 +219,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Título de la sección
                 </label>
                 <input
@@ -227,12 +227,12 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   value={config.sectionTitle || ''}
                   onChange={(e) => handleUpdate('sectionTitle', e.target.value)}
                   placeholder="Todos los servicios"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Subtítulo
                 </label>
                 <input
@@ -240,7 +240,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   value={config.sectionSubtitle || ''}
                   onChange={(e) => handleUpdate('sectionSubtitle', e.target.value)}
                   placeholder="Trabajamos para llevar tus operaciones al siguiente nivel."
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               </div>
@@ -255,7 +255,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('tipografia')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 🔤 Tipografía
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['tipografia'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,13 +267,13 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Fuente de títulos
                 </label>
                 <select
                   value={config.titleFontFamily || 'inherit'}
                   onChange={(e) => handleUpdate('titleFontFamily', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   style={{ fontFamily: config.titleFontFamily || 'inherit' }}
                 >
                   {FONT_OPTIONS.map(opt => (
@@ -285,13 +285,13 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Fuente de contenido
                 </label>
                 <select
                   value={config.contentFontFamily || 'inherit'}
                   onChange={(e) => handleUpdate('contentFontFamily', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   style={{ fontFamily: config.contentFontFamily || 'inherit' }}
                 >
                   {FONT_OPTIONS.map(opt => (
@@ -303,13 +303,13 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Peso de títulos
                 </label>
                 <select
                   value={config.titleFontWeight || '700'}
                   onChange={(e) => handleUpdate('titleFontWeight', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="400">Normal (400)</option>
                   <option value="500">Medio (500)</option>
@@ -330,7 +330,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('coloresClaro')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 ☀️ Colores Modo Claro
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['coloresClaro'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,7 +343,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Título sección con opción de gradiente */}
                   <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Título sección
                     </label>
                     
@@ -356,7 +356,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                       onChange={(e) => handleUpdate('titleUseGradient', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
                   </label>
                   <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                 </div>
@@ -408,7 +408,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Números
                 </label>
                 <div className="flex gap-2">
@@ -428,7 +428,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Título servicio
                 </label>
                 <div className="flex gap-2">
@@ -451,7 +451,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Features ✓
                 </label>
                 <div className="flex gap-2">
@@ -481,7 +481,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('coloresOscuro')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 🌙 Colores Modo Oscuro
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['coloresOscuro'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,7 +494,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Título sección con opción de gradiente - Modo Oscuro */}
                   <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Título sección
                     </label>
                     
@@ -507,7 +507,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                       onChange={(e) => handleUpdate('titleUseGradientDark', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
                   </label>
                   <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                 </div>
@@ -559,7 +559,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Números
                 </label>
                 <div className="flex gap-2">
@@ -581,7 +581,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Título servicio
                 </label>
                 <div className="flex gap-2">
@@ -604,7 +604,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Features ✓
                 </label>
                 <div className="flex gap-2">
@@ -634,7 +634,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('lineas')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 ➖ Líneas de Separación
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['lineas'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -647,7 +647,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 <div className="space-y-4">
                   {/* Grosor de línea */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Grosor de línea: {config.separatorLineWidth || 2}px
                     </label>
                 <input
@@ -806,7 +806,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('fondoExpandido')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 🎨 Fondo del Contenido Expandido
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['fondoExpandido'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -819,7 +819,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 <div className="space-y-4">
                   {/* Opacidad del fondo */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Opacidad: {((config.expandedBgOpacity ?? 0.8) * 100).toFixed(0)}%
                     </label>
                     <input
@@ -840,7 +840,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
 
               {/* Desenfoque (Blur) */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Desenfoque: {config.expandedBgBlur || 8}px
                 </label>
                 <input
@@ -974,7 +974,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('fondoHeader')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 🎨 Fondo del Header (Botón)
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['fondoHeader'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -987,7 +987,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 <div className="space-y-4">
                   {/* Opacidad normal */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Opacidad (estado normal): {((config.headerBgOpacity ?? 0.6) * 100).toFixed(0)}%
                     </label>
                     <input
@@ -1008,7 +1008,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
 
               {/* Opacidad hover */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Opacidad (hover/cerrado): {((config.headerBgHoverOpacity ?? 0.2) * 100).toFixed(0)}%
                 </label>
                 <input
@@ -1194,7 +1194,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('paginacion')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 📄 Colores de Paginación
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['paginacion'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1542,7 +1542,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('boton')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 🔘 Botón "Ver más"
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['boton'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1556,7 +1556,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
             {/* Fila 1: Texto y configuración básica */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Texto del botón
                 </label>
                 <input
@@ -1564,12 +1564,12 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   value={config.buttonText || ''}
                   onChange={(e) => handleUpdate('buttonText', e.target.value)}
                   placeholder="Ver más"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Color de texto
                 </label>
                 <div className="flex gap-2">
@@ -1590,7 +1590,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Max características
                 </label>
                 <input
@@ -1599,7 +1599,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   max="10"
                   value={config.maxFeatures || 3}
                   onChange={(e) => handleUpdate('maxFeatures', parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -1778,7 +1778,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               
               {/* Estilo de resaltado */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Estilo de resaltado
                 </label>
                 <div className="flex gap-3">
@@ -1919,7 +1919,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 
                 {/* Texto */}
                 <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                     Texto
                   </label>
                   <div className="flex gap-2">
@@ -2073,7 +2073,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 
                 {/* Texto */}
                 <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-400 mb-2">
+                  <label className="block text-xs font-medium text-gray-400 mb-1">
                     Texto
                   </label>
                   <div className="flex gap-2">
@@ -2188,7 +2188,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
               onClick={() => toggleSection('fondo')}
               className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 🖼️ Imagen de Fondo
               </h3>
               <svg className={`w-5 h-5 text-gray-500 transition-transform ${openSections['fondo'] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2221,7 +2221,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                     Opacidad del fondo: {Math.round((config.backgroundOpacity ?? 0.1) * 100)}%
                   </label>
                   <input
@@ -2240,7 +2240,7 @@ export const ServicesAccordionConfigSection: React.FC<ServicesAccordionConfigSec
                   <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                     <div className="text-center mb-4">
                       <h3 
-                        className="text-xl font-bold italic"
+                        className="text-lg font-bold italic"
                         style={{ 
                           color: config.titleColor || '#8B5CF6',
                           fontFamily: config.titleFontFamily || 'inherit'

@@ -24,8 +24,8 @@ const PreviewSection: React.FC<PreviewSectionProps> = ({
       badge="Demo"
     >
       <div className="bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-lg p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
-          <div className="text-center mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+          <div className="text-center mb-3">
             <h4 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               {contactForm.title || 'Título del formulario'}
             </h4>

@@ -22,11 +22,11 @@ const SolutionsConfigSection: React.FC<SolutionsConfigSectionProps> = ({
   const [collapsed, setCollapsed] = useState(true);
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Encabezado colapsable */}
       <button
         type="button"
-        className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition-colors"
+        className="w-full flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 rounded transition-colors"
         onClick={() => setCollapsed((prev) => !prev)}
         aria-expanded={!collapsed}
         aria-controls="solutions-section-content"
@@ -44,7 +44,7 @@ const SolutionsConfigSection: React.FC<SolutionsConfigSectionProps> = ({
       {!collapsed && (
         <div id="solutions-section-content">
           {/* Layout principal con 2 columnas: Contenido y Imágenes */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
             
             {/* Columna izquierda: Editores de texto (2/3) */}
             <div className="xl:col-span-2 space-y-4">
@@ -85,7 +85,7 @@ const SolutionsConfigSection: React.FC<SolutionsConfigSectionProps> = ({
 
             {/* Columna derecha: Imágenes de Fondo (1/3) */}
             <div className="xl:col-span-1">
-              <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                 🖼️ Imágenes de Fondo
               </h4>
               <div className="space-y-4">

@@ -119,7 +119,7 @@ const ClientLogosEditor: React.FC<ClientLogosEditorProps> = ({
   };
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-3 ${className}`}>
       {/* Header con botón agregar */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
@@ -127,7 +127,7 @@ const ClientLogosEditor: React.FC<ClientLogosEditorProps> = ({
             <span className="text-white text-lg">🏢</span>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               Gestión de Logos de Clientes
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -138,7 +138,7 @@ const ClientLogosEditor: React.FC<ClientLogosEditorProps> = ({
         
         <button
           onClick={addLogo}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
         >
           <span>➕</span>
           Agregar Logo
@@ -244,11 +244,11 @@ const ClientLogosEditor: React.FC<ClientLogosEditorProps> = ({
               {/* Contenido expandido */}
               {expandedLogo === index && (
                 <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Columna izquierda: Información */}
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Nombre del Cliente
                         </label>
                         <input
@@ -261,7 +261,7 @@ const ClientLogosEditor: React.FC<ClientLogosEditorProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Texto Alternativo
                         </label>
                         <input
@@ -274,7 +274,7 @@ const ClientLogosEditor: React.FC<ClientLogosEditorProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Enlace (opcional)
                         </label>
                         <input

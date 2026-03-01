@@ -107,7 +107,7 @@ const ServicesExtraSectionsConfig: React.FC<ServicesExtraSectionsConfigProps> = 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* ============================================ */}
       {/* 🖼️ FONDO COMPARTIDO PARA LAS 3 SECCIONES */}
       {/* ============================================ */}
@@ -136,7 +136,7 @@ const ServicesExtraSectionsConfig: React.FC<ServicesExtraSectionsConfigProps> = 
 
             {/* Imagen de fondo */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">🖼️ Imagen de Fondo</h4>
+              <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">🖼️ Imagen de Fondo</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">☀️ Tema Claro</label>
@@ -331,7 +331,7 @@ const ServicesExtraSectionsConfig: React.FC<ServicesExtraSectionsConfigProps> = 
                   items.push({ title: '', description: '', iconBgColor: 'purple' });
                   onUpdateWhyChoose('items', items);
                 }}
-                className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                className="mt-3 px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
               >
                 ➕ Agregar elemento
               </button>
@@ -481,7 +481,7 @@ const ServicesExtraSectionsConfig: React.FC<ServicesExtraSectionsConfigProps> = 
                   steps.push({ title: '', description: '' });
                   onUpdateProcess('steps', steps);
                 }}
-                className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="mt-3 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
               >
                 ➕ Agregar fase
               </button>
@@ -611,7 +611,7 @@ const ServicesExtraSectionsConfig: React.FC<ServicesExtraSectionsConfigProps> = 
                   items.push({ question: '', answer: '' });
                   onUpdateFaq('items', items);
                 }}
-                className="mt-3 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm"
+                className="mt-3 px-3 py-1.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm"
               >
                 ➕ Agregar pregunta
               </button>

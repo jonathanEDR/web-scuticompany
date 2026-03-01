@@ -228,9 +228,9 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
   }, []);
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50 mb-6">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50 mb-3">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
             {icon} {title}
@@ -260,7 +260,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
       </div>
 
       {/* Theme Tabs */}
-      <div className="flex mb-6">
+      <div className="flex mb-3">
         <button
           onClick={() => setActiveTheme('light')}
           className={`flex-1 py-2 px-4 rounded-l-lg font-medium transition-all duration-200 ${
@@ -350,12 +350,12 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
       </div>
 
       {/* Configuration Controls */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left Column */}
         <div className="space-y-4">
           {/* Background */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🎨 Fondo de Tarjeta
             </label>
             <ColorWithOpacity
@@ -367,7 +367,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
 
           {/* Border */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🔳 Borde
             </label>
             <GradientPicker
@@ -379,13 +379,13 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
 
           {/* Border Width */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               📏 Grosor del Borde
             </label>
             <select
               value={safeCurrentStyles.borderWidth}
               onChange={(e) => updateCardStyle('borderWidth', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="0px">Sin borde</option>
               <option value="1px">1px</option>
@@ -397,7 +397,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
 
           {/* Shadow */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🌫️ Sombra
             </label>
             <ShadowControl
@@ -412,7 +412,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
         <div className="space-y-4">
           {/* Title Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               📝 Color del Título
             </label>
             <ColorWithOpacity
@@ -424,7 +424,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
 
           {/* Description Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               📄 Color de Descripción
             </label>
             <ColorWithOpacity
@@ -436,13 +436,13 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
 
           {/* Cards Alignment */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🔀 Alineación de Tarjetas
             </label>
             <select
               value={safeCurrentStyles.cardsAlignment}
               onChange={(e) => updateCardStyle('cardsAlignment', e.target.value as 'left' | 'center' | 'right')}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="left">🔗 Izquierda</option>
               <option value="center">🎯 Centrado</option>
@@ -452,13 +452,13 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
 
           {/* Icon Alignment */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🎯 Alineación de Contenido
             </label>
             <select
               value={safeCurrentStyles.iconAlignment}
               onChange={(e) => updateCardStyle('iconAlignment', e.target.value as 'left' | 'center' | 'right')}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="left">🔗 Izquierda</option>
               <option value="center">🎯 Centrado</option>
@@ -472,7 +472,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
       <div className="mt-6">
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+          className="w-full px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
         >
           {showAdvanced ? '🔼' : '🔽'} Opciones Avanzadas
         </button>
@@ -484,7 +484,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Card Dimensions */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 📐 Ancho Mínimo
               </label>
               <input
@@ -492,12 +492,12 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
                 value={safeCurrentStyles.cardMinWidth}
                 onChange={(e) => updateCardStyle('cardMinWidth', e.target.value)}
                 placeholder="280px"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 📐 Ancho Máximo
               </label>
               <input
@@ -505,12 +505,12 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
                 value={safeCurrentStyles.cardMaxWidth}
                 onChange={(e) => updateCardStyle('cardMaxWidth', e.target.value)}
                 placeholder="100%"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 📏 Padding
               </label>
               <input
@@ -518,7 +518,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
                 value={safeCurrentStyles.cardPadding}
                 onChange={(e) => updateCardStyle('cardPadding', e.target.value)}
                 placeholder="2rem"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
 
@@ -529,7 +529,7 @@ const GenericCardsDesignConfig: React.FC<GenericCardsDesignConfigProps> = ({
                   type="checkbox"
                   checked={safeCurrentStyles.iconBorderEnabled}
                   onChange={(e) => updateCardStyle('iconBorderEnabled', e.target.checked)}
-                  className="mr-2 w-4 h-4 text-purple-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mr-2 w-4 h-4 text-purple-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500 focus:ring-1"
                 />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   🔘 Mostrar borde en iconos

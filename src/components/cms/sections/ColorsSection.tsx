@@ -63,7 +63,7 @@ const ColorsSection: React.FC<ColorsSectionProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Color del Título */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color del Título
               </label>
               <div className="flex gap-2">
@@ -85,7 +85,7 @@ const ColorsSection: React.FC<ColorsSectionProps> = ({
 
             {/* Color del Subtítulo */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color del Subtítulo
               </label>
               <div className="flex gap-2">
@@ -107,7 +107,7 @@ const ColorsSection: React.FC<ColorsSectionProps> = ({
 
             {/* Color de la Descripción */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color de la Descripción
               </label>
               <div className="flex gap-2">
@@ -129,7 +129,7 @@ const ColorsSection: React.FC<ColorsSectionProps> = ({
 
             {/* Color de Fondo del Botón */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Fondo del Botón
               </label>
               
@@ -285,7 +285,7 @@ const ColorsSection: React.FC<ColorsSectionProps> = ({
 
             {/* Color del Texto del Botón */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Texto del Botón
               </label>
               <div className="flex gap-2">
@@ -368,7 +368,7 @@ const ColorsSection: React.FC<ColorsSectionProps> = ({
                 Subtítulo de ejemplo
               </div>
               <div 
-                className="text-xl font-bold"
+                className="text-lg font-bold"
                 style={{ 
                   color: contactForm.styles?.[activeColorTheme]?.titleColor || (activeColorTheme === 'light' ? '#1f2937' : '#ffffff')
                 }}

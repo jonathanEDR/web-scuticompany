@@ -418,7 +418,7 @@ const MainSection: React.FC<{
             <div className="flex items-center gap-2">
               <span className={`text-xs sm:text-sm font-bold ${colors.text} opacity-60`}>SECCIÓN {number}</span>
             </div>
-            <h3 className={`text-base sm:text-xl font-bold ${colors.text} truncate`}>{title}</h3>
+            <h3 className={`text-base sm:text-lg font-bold ${colors.text} truncate`}>{title}</h3>
             <p className={`text-xs sm:text-sm ${colors.text} opacity-70 line-clamp-1`}>{description}</p>
           </div>
         </div>
@@ -427,7 +427,7 @@ const MainSection: React.FC<{
         </div>
       </button>
       {isOpen && (
-        <div className="p-3 sm:p-6 bg-white dark:bg-gray-900 space-y-4 sm:space-y-6">
+        <div className="p-3 sm:p-6 bg-white dark:bg-gray-900 space-y-4 sm:space-y-3">
           {children}
         </div>
       )}
@@ -512,7 +512,7 @@ const SelectField: React.FC<{
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 text-sm"
+      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 text-sm"
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>
@@ -538,7 +538,7 @@ const InputField: React.FC<{
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 text-sm"
+      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 text-sm"
     />
   </div>
 );
@@ -931,9 +931,9 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-4 text-white shadow-xl">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
             <Settings size={28} />
@@ -1221,7 +1221,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
 
         {/* 🎨 Estilos y Colores del Hero */}
         <SubSection title="Estilos y Colores del Hero" icon={<Palette size={18} />} defaultOpen={false}>
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Tipo de Fondo */}
             <div className="space-y-4">
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
@@ -1308,7 +1308,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                 ✏️ Colores del Texto
               </h4>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tema Claro */}
                 <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
                   <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -1393,7 +1393,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                 ⬅️ Botón "Volver al blog"
               </h4>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tema Claro */}
                 <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
                   <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -1442,7 +1442,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                 🏷️ Badge de Categoría
               </h4>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tema Claro */}
                 <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
                   <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -1521,7 +1521,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                 🎨 Iconos, Tiempo de Lectura y Avatar
               </h4>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tema Claro */}
                 <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
                   <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -1630,7 +1630,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                   </span>
                   
                   <h3 
-                    className="text-xl font-bold mb-2"
+                    className="text-lg font-bold mb-2"
                     style={{ 
                       color: config.hero?.styles?.light?.titleColor || '#ffffff',
                       fontFamily: config.hero?.styles?.light?.titleFont || 'inherit'
@@ -1727,7 +1727,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                   🎨 Estilos de la Barra
                 </h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Tema Claro */}
                   <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
                     <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -1871,7 +1871,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
                   🎨 Estilos del Botón Flotante y Panel
                 </h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Tema Claro */}
                   <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
                     <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -2074,7 +2074,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
             Selecciona una imagen de fondo para la sección de contenido. Puedes elegir de la galería o subir una nueva.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Imagen tema claro */}
             <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800/50">
               <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -2215,7 +2215,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
 
         {/* Colores del contenido */}
         <SubSection title="Colores" icon={<Palette size={18} />} defaultOpen={false}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
               <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                 <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs">☀️</span>
@@ -2255,7 +2255,7 @@ const BlogPostDetailConfigSection: React.FC<BlogPostDetailConfigSectionProps> = 
         {/* Autor y Tags */}
         <SubSection title="Autor y Etiquetas" icon={<Bookmark size={18} />} defaultOpen={false}>
           {/* ====== TARJETA DE AUTOR ====== */}
-          <div className="space-y-4 mb-6">
+          <div className="space-y-4 mb-3">
             <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
               👤 Tarjeta de Autor
             </h4>

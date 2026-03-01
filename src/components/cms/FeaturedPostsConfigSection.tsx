@@ -143,7 +143,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header Colapsable */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -154,7 +154,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
             <Newspaper className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="text-left">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
               Noticias Destacadas
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -180,7 +180,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'general' | 'heroCard' | 'smallCard')}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -199,14 +199,14 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
           <div className="space-y-4">
             {/* Título de la sección */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Título de la Sección
               </label>
               <input
                 type="text"
                 value={config.sectionTitle || 'Noticias Destacadas'}
                 onChange={(e) => handleChange('sectionTitle', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder="Noticias Destacadas"
               />
             </div>
@@ -227,13 +227,13 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
 
             {/* Layout */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Disposición
               </label>
               <select
                 value={config.layout || 'hero-left'}
                 onChange={(e) => handleChange('layout', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="hero-left">Tarjeta grande a la izquierda</option>
                 <option value="hero-right">Tarjeta grande a la derecha</option>
@@ -244,7 +244,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
 
             {/* Cantidad máxima */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Máximo de noticias destacadas
               </label>
               <input
@@ -253,19 +253,19 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                 max="6"
                 value={config.maxFeaturedPosts || 3}
                 onChange={(e) => handleChange('maxFeaturedPosts', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
 
             {/* Tipografía */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Tipografía
               </label>
               <select
                 value={config.fontFamily || 'Montserrat'}
                 onChange={(e) => handleChange('fontFamily', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="Montserrat">Montserrat (Predeterminado)</option>
                 <option value="Roboto">Roboto</option>
@@ -289,9 +289,9 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               </h4>
               
               {/* Colores de fondo */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-4 mb-3">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     <Sun className="w-4 h-4 text-yellow-500" />
                     Color fondo (Claro)
                   </label>
@@ -312,7 +312,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                   </div>
                 </div>
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     <Moon className="w-4 h-4 text-indigo-400" />
                     Color fondo (Oscuro)
                   </label>
@@ -473,7 +473,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                 🎨 Colores del Título e Icono por Tema
               </h4>
               
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 {/* Tema Claro */}
                 <div className="p-3 bg-white rounded-lg border border-gray-200">
                   <h5 className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
@@ -632,7 +632,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
         )}
 
         {activeTab === 'heroCard' && (
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Sección: Borde de la Tarjeta */}
             <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
               <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
@@ -640,7 +640,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del borde
                   </label>
                   <input
@@ -651,7 +651,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Grosor del borde ({config.heroCard?.cardBorderWidth || 2}px)
                   </label>
                   <input
@@ -677,7 +677,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                 🎨 Franja de Contenido
               </h4>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color de fondo de la franja
                 </label>
                 <div className="flex gap-3 items-center">
@@ -702,7 +702,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                       const opacity = e.target.value === '95' ? 'f0' : e.target.value === '85' ? 'd9' : 'bf';
                       handleChange('heroCard.contentBgColor', baseColor + opacity);
                     }}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
                     <option value="95">95% opacidad</option>
                     <option value="85">85% opacidad</option>
@@ -1222,7 +1222,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               </h4>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Título
                   </label>
                   <input
@@ -1233,7 +1233,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Extracto
                   </label>
                   <input
@@ -1244,7 +1244,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Fecha
                   </label>
                   <input
@@ -1507,7 +1507,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
             <div className="grid grid-cols-2 gap-4">
               {/* Fondo y borde */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color de fondo
                 </label>
                 <input
@@ -1519,7 +1519,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color del borde
                 </label>
                 <input
@@ -1531,7 +1531,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color borde hover
                 </label>
                 <input
@@ -1544,7 +1544,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
 
               {/* Textos */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color del título
                 </label>
                 <input
@@ -1556,7 +1556,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color del extracto
                 </label>
                 <input
@@ -1569,7 +1569,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
 
               {/* Categoría */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color fondo categoría
                 </label>
                 <input
@@ -1581,7 +1581,7 @@ export const FeaturedPostsConfigSection: React.FC<FeaturedPostsConfigSectionProp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color texto categoría
                 </label>
                 <input

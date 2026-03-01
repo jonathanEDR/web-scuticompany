@@ -227,11 +227,11 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Encabezado colapsable */}
       <button
         type="button"
-        className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-amber-500 rounded transition-colors"
+        className="w-full flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 focus:outline-none focus:ring-1 focus:ring-amber-500 rounded transition-colors"
         onClick={() => setCollapsed((prev) => !prev)}
         aria-expanded={!collapsed}
         aria-controls="values-section-content"
@@ -247,48 +247,48 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
       {/* Contenido colapsable */}
       {!collapsed && (
-        <div id="values-section-content" className="space-y-8">
+        <div id="values-section-content" className="space-y-4">
           {/* 🌟 ENCABEZADO DE VALORES */}
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-amber-200 dark:border-gray-700/50">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-amber-200 dark:border-gray-700/50">
 
-        <div className="space-y-6">
+        <div className="space-y-3">
           {/* Título de la sección */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Título de la Sección
             </label>
             <input
               type="text"
               value={values.title || ''}
               onChange={(e) => updateContent('values.title', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               placeholder="Ej: Nuestros Valores"
             />
           </div>
 
           {/* Subtítulo */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Subtítulo (opcional)
             </label>
             <input
               type="text"
               value={values.subtitle || ''}
               onChange={(e) => updateContent('values.subtitle', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               placeholder="Ej: Los principios que nos guían"
             />
           </div>
 
           {/* Tipografía */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🔤 Tipografía de la Sección
             </label>
             <select
               value={values.fontFamily || 'Montserrat'}
               onChange={(e) => updateContent('values.fontFamily', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               style={{ fontFamily: values.fontFamily || 'Montserrat' }}
             >
               {AVAILABLE_FONTS.map(font => (
@@ -305,7 +305,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
       </div>
 
       {/* 🎨 COLORES DEL TÍTULO DE LA SECCIÓN */}
-      <div className="bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-cyan-200 dark:border-gray-700/50">
+      <div className="bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-cyan-200 dark:border-gray-700/50">
         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
           🎨 Colores del Título de Sección
         </h3>
@@ -314,9 +314,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </p>
 
         {/* Colores de título de sección */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               ☀️ Color Título (Tema Claro)
             </label>
             <div className="flex items-center gap-3">
@@ -337,7 +337,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🌙 Color Título (Tema Oscuro)
             </label>
             <div className="flex items-center gap-3">
@@ -360,9 +360,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
 
         {/* 🌈 Gradiente para TÍTULO de sección */}
-        <div className="bg-gradient-to-r from-teal-100 to-cyan-100 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-6">
+        <div className="bg-gradient-to-r from-teal-100 to-cyan-100 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-3">
           <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🌈 Título con Gradiente</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Toggle Gradiente - Tema Claro */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -514,9 +514,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
 
         {/* Colores de subtítulo de sección */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               ☀️ Color Subtítulo (Tema Claro)
             </label>
             <div className="flex items-center gap-3">
@@ -535,7 +535,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🌙 Color Subtítulo (Tema Oscuro)
             </label>
             <div className="flex items-center gap-3">
@@ -557,21 +557,21 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
       </div>
 
       {/* ⚙️ CONFIGURACIÓN DEL CARRUSEL */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
-        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-6">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-3">
           🎠 Configuración del Carrusel
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Items por vista */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Items visibles (Desktop)
             </label>
             <select
               value={values.carouselConfig?.itemsPerView || 3}
               onChange={(e) => updateContent('values.carouselConfig.itemsPerView', parseInt(e.target.value))}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value={2}>2 items</option>
               <option value={3}>3 items</option>
@@ -581,7 +581,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
           {/* Autoplay */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Reproducción automática
             </label>
             <div className="flex items-center gap-3 mt-3">
@@ -602,7 +602,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
           {/* Velocidad */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Velocidad (segundos)
             </label>
             <input
@@ -612,14 +612,14 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
               value={values.carouselConfig?.autoplaySpeed || 5}
               onChange={(e) => updateContent('values.carouselConfig.autoplaySpeed', parseInt(e.target.value))}
               disabled={!values.carouselConfig?.autoplay}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
         </div>
       </div>
 
       {/* 📐 CONFIGURACIÓN DE TAMAÑO DE TARJETAS */}
-      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-teal-200 dark:border-gray-700/50">
+      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-teal-200 dark:border-gray-700/50">
         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
           📐 Tamaño de las Tarjetas
         </h3>
@@ -627,16 +627,16 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
           Configura el ancho y alto de las tarjetas de valores.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Alto de la tarjeta */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Alto de la tarjeta
             </label>
             <select
               value={values.cardHeight || '340px'}
               onChange={(e) => updateContent('values.cardHeight', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="280px">Pequeño (280px)</option>
               <option value="340px">Mediano (340px)</option>
@@ -651,13 +651,13 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
           {/* Ancho de la tarjeta */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Ancho de la tarjeta
             </label>
             <select
               value={values.cardWidth || '100%'}
               onChange={(e) => updateContent('values.cardWidth', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="100%">Completo (100%)</option>
               <option value="320px">Pequeño (320px)</option>
@@ -690,7 +690,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
       </div>
 
       {/* 🎨 CONFIGURACIÓN DE COLORES DE TARJETAS */}
-      <div className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-pink-200 dark:border-gray-700/50">
+      <div className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-pink-200 dark:border-gray-700/50">
         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
           🎨 Colores de las Tarjetas
         </h3>
@@ -704,7 +704,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             🖼️ Fondo de Tarjetas
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tema Claro */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -812,7 +812,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
           </h4>
           
           {/* Toggle Gradiente - Tema Claro */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -983,9 +983,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
 
         {/* Colores de borde */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               ☀️ Borde (Tema Claro)
             </label>
             <div className="flex items-center gap-3">
@@ -1005,7 +1005,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🌙 Borde (Tema Oscuro)
             </label>
             <div className="flex items-center gap-3">
@@ -1027,9 +1027,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
 
         {/* 🌈 Gradiente para BORDE */}
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-6">
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-3">
           <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🌈 Borde con Gradiente</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Toggle Gradiente Borde - Tema Claro */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -1177,9 +1177,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
 
         {/* Colores de título */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               ☀️ Color Título (Tema Claro)
             </label>
             <div className="flex items-center gap-3">
@@ -1198,7 +1198,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🌙 Color Título (Tema Oscuro)
             </label>
             <div className="flex items-center gap-3">
@@ -1219,9 +1219,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
 
         {/* 🌈 Gradiente para TÍTULO de tarjetas */}
-        <div className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-6">
+        <div className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-gray-700 dark:to-gray-700 rounded-lg p-4 mb-3">
           <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🌈 Título con Gradiente</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Toggle Gradiente Título - Tema Claro */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -1373,9 +1373,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         </div>
 
         {/* Colores de texto */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               ☀️ Color Texto (Tema Claro)
             </label>
             <div className="flex items-center gap-3">
@@ -1394,7 +1394,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🌙 Color Texto (Tema Oscuro)
             </label>
             <div className="flex items-center gap-3">
@@ -1416,7 +1416,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
         {/* Opacidad de imagen */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             🖼️ Opacidad de Imagen en Tarjetas: {values.cardImageOpacity ?? 100}%
           </label>
           <input
@@ -1507,135 +1507,94 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
       </div>
 
       {/* 🖼️ IMAGEN DE FONDO DE LA SECCIÓN */}
-      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-purple-200 dark:border-gray-700/50">
-        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
-          🖼️ Imagen de Fondo (Sección Valores)
+      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-purple-200 dark:border-gray-700/50">
+        <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-3">
+          🖼️ Imagen de Fondo
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Esta imagen se mostrará como fondo de toda la sección de valores.
-        </p>
 
-        {/* Toggle para tema claro/oscuro */}
-        <div className="flex gap-2 mb-4">
-          <button
-            type="button"
-            onClick={() => setImageTheme('light')}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-              imageTheme === 'light'
-                ? 'bg-amber-500 text-white shadow-md'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-            }`}
-          >
-            ☀️ Tema Claro
-          </button>
-          <button
-            type="button"
-            onClick={() => setImageTheme('dark')}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-              imageTheme === 'dark'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-            }`}
-          >
-            🌙 Tema Oscuro
-          </button>
-        </div>
-
-        {/* Selector de imagen */}
-        <ManagedImageSelector
-          label={imageTheme === 'light' ? '☀️ Imagen de fondo (Modo Claro)' : '🌙 Imagen de fondo (Modo Oscuro)'}
-          description="Tamaño recomendado: 1920x1080px"
-          currentImage={
-            typeof values.backgroundImage === 'string' 
-              ? values.backgroundImage 
-              : (values as any).backgroundImage?.[imageTheme] || ''
-          }
-          onImageSelect={(url: string) => {
-            const currentBgImage = typeof values.backgroundImage === 'object' ? values.backgroundImage : {};
-            updateContent('values.backgroundImage', {
-              ...currentBgImage,
-              [imageTheme]: url
-            });
-          }}
-          darkMode={imageTheme === 'dark'}
-          hideButtonArea={!!(typeof values.backgroundImage === 'string' 
-            ? values.backgroundImage 
-            : (values as any).backgroundImage?.[imageTheme])}
-        />
-
-        {/* Preview de imágenes */}
-        {(typeof values.backgroundImage === 'object' && 
-          ((values as any).backgroundImage?.light || (values as any).backgroundImage?.dark)) && (
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            {(values as any).backgroundImage?.light && (
-              <div className="relative">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">☀️ Modo Claro</p>
-                <img 
-                  src={(values as any).backgroundImage.light} 
-                  alt="Fondo claro" 
-                  className="w-full h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
-                />
+        <div className="flex gap-4">
+          {/* Controles (lado izquierdo) */}
+          <div className="flex-1 space-y-3">
+            {/* Opacidad */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Opacidad: {Math.round(((values as any).backgroundOpacity ?? 1) * 100)}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round(((values as any).backgroundOpacity ?? 1) * 100)}
+                onChange={(e) => updateContent('values.backgroundOpacity', parseInt(e.target.value) / 100)}
+                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              />
+              <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
               </div>
-            )}
-            {(values as any).backgroundImage?.dark && (
-              <div className="relative">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">🌙 Modo Oscuro</p>
-                <img 
-                  src={(values as any).backgroundImage.dark} 
-                  alt="Fondo oscuro" 
-                  className="w-full h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
-                />
-              </div>
-            )}
-          </div>
-        )}
+            </div>
 
-        {/* Opacidad de la imagen */}
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Opacidad de la imagen: {Math.round(((values as any).backgroundOpacity ?? 1) * 100)}%
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={Math.round(((values as any).backgroundOpacity ?? 1) * 100)}
-            onChange={(e) => updateContent('values.backgroundOpacity', parseInt(e.target.value) / 100)}
-            className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
-          />
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-            <span>0% (Invisible)</span>
-            <span>50%</span>
-            <span>100% (Nítido)</span>
+            {/* Overlay toggle */}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={(values as any).backgroundOverlay === true}
+                onChange={(e) => updateContent('values.backgroundOverlay', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span className="text-xs text-gray-700 dark:text-gray-300">Overlay oscuro</span>
+            </label>
           </div>
-        </div>
 
-        {/* Toggle de overlay */}
-        <div className="mt-4 flex items-center gap-3">
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={(values as any).backgroundOverlay === true}
-              onChange={(e) => updateContent('values.backgroundOverlay', e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-500"></div>
-            <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-              Aplicar overlay oscuro (mejora legibilidad del texto)
-            </span>
-          </label>
+          {/* Imágenes (lado derecho) */}
+          <div className="flex-shrink-0 flex gap-3">
+            <div>
+              <label className="block text-[9px] font-medium text-gray-500 dark:text-gray-400 mb-1 text-center">☀️ Claro</label>
+              <ManagedImageSelector
+                sidebar
+                label="Fondo Claro"
+                currentImage={
+                  typeof values.backgroundImage === 'string' 
+                    ? values.backgroundImage 
+                    : (values as any).backgroundImage?.light || ''
+                }
+                onImageSelect={(url: string) => {
+                  const currentBgImage = typeof values.backgroundImage === 'object' ? values.backgroundImage : {};
+                  updateContent('values.backgroundImage', { ...currentBgImage, light: url });
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-[9px] font-medium text-gray-500 dark:text-gray-400 mb-1 text-center">🌙 Oscuro</label>
+              <ManagedImageSelector
+                sidebar
+                darkMode
+                label="Fondo Oscuro"
+                currentImage={
+                  typeof values.backgroundImage === 'string' 
+                    ? values.backgroundImage 
+                    : (values as any).backgroundImage?.dark || ''
+                }
+                onImageSelect={(url: string) => {
+                  const currentBgImage = typeof values.backgroundImage === 'object' ? values.backgroundImage : {};
+                  updateContent('values.backgroundImage', { ...currentBgImage, dark: url });
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* 📋 LISTA DE VALORES */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
             📋 Lista de Valores ({values.items?.length || 0})
           </h3>
           <button
             onClick={addValue}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg"
+            className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1736,73 +1695,50 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
               {/* Contenido expandido */}
               {expandedValue === index && (
-                <div className="p-6 bg-white dark:bg-gray-800 space-y-6">
-                  {/* Título y descripción */}
-                  <div className="grid grid-cols-1 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Título del valor
-                      </label>
-                      <input
-                        type="text"
-                        value={item.title || ''}
-                        onChange={(e) => updateValue(index, 'title', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        placeholder="Ej: Innovación"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Descripción
-                    </label>
-                    <textarea
-                      value={item.description || ''}
-                      onChange={(e) => updateValue(index, 'description', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
-                      rows={3}
-                      placeholder="Describe este valor..."
-                    />
-                  </div>
-
-                  {/* Imagen del valor */}
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                      🖼️ Imagen del Valor (opcional)
-                    </label>
-
-                    <ManagedImageSelector
-                      currentImage={typeof item.image === 'string' ? item.image : (item.image?.light || item.image?.dark || '')}
-                      onImageSelect={(url: string) => updateValue(index, 'image', url)}
-                      label="Imagen del Valor"
-                      description="Esta imagen se usará tanto en tema claro como oscuro"
-                      darkMode={false}
-                    />
-
-                    {/* Preview de imagen */}
-                    {(typeof item.image === 'string' ? item.image : (item.image?.light || item.image?.dark)) && (
-                      <div className="mt-4">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Vista previa</p>
-                        <img 
-                          src={typeof item.image === 'string' ? item.image : (item.image?.light || item.image?.dark)} 
-                          alt={item.imageAlt || item.title} 
-                          className="w-full max-w-xs h-24 object-contain rounded-lg border border-gray-200 dark:border-gray-600" 
+                <div className="p-4 bg-white dark:bg-gray-800 space-y-2">
+                  <div className="flex gap-3">
+                    {/* Inputs (lado izquierdo) */}
+                    <div className="flex-1 space-y-2">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Título</label>
+                        <input
+                          type="text"
+                          value={item.title || ''}
+                          onChange={(e) => updateValue(index, 'title', e.target.value)}
+                          className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                          placeholder="Ej: Innovación"
                         />
                       </div>
-                    )}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
+                        <textarea
+                          value={item.description || ''}
+                          onChange={(e) => updateValue(index, 'description', e.target.value)}
+                          className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none text-sm"
+                          rows={2}
+                          placeholder="Describe este valor..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Alt text (SEO)</label>
+                        <input
+                          type="text"
+                          value={item.imageAlt || ''}
+                          onChange={(e) => updateValue(index, 'imageAlt', e.target.value)}
+                          className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                          placeholder="Ej: Innovación tecnológica"
+                        />
+                      </div>
+                    </div>
 
-                    {/* Alt text */}
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Texto alternativo (SEO)
-                      </label>
-                      <input
-                        type="text"
-                        value={item.imageAlt || ''}
-                        onChange={(e) => updateValue(index, 'imageAlt', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        placeholder="Ej: Imagen representando innovación tecnológica"
+                    {/* Imagen (lado derecho, al costado del input) */}
+                    <div className="flex-shrink-0">
+                      <label className="block text-[9px] font-medium text-gray-500 dark:text-gray-400 mb-1 text-center">Imagen</label>
+                      <ManagedImageSelector
+                        sidebar
+                        currentImage={typeof item.image === 'string' ? item.image : (item.image?.light || item.image?.dark || '')}
+                        onImageSelect={(url: string) => updateValue(index, 'image', url)}
+                        label="Imagen del Valor"
                       />
                     </div>
                   </div>
@@ -1813,14 +1749,14 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
           {/* Mensaje cuando no hay valores */}
           {(!values.items || values.items.length === 0) && (
-            <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
-              <span className="text-4xl mb-4 block">⭐</span>
+            <div className="text-center py-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+              <span className="text-2xl mb-2 block">⭐</span>
               <p className="text-gray-500 dark:text-gray-400 mb-4">
                 No hay valores configurados aún
               </p>
               <button
                 onClick={addValue}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1833,11 +1769,11 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
       </div>
 
       {/* 🏆 SECCIÓN "¿POR QUÉ ELEGIRNOS?" - NUEVA */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-blue-200 dark:border-gray-700/50">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-blue-200 dark:border-gray-700/50">
         {/* Encabezado colapsable */}
         <button
           type="button"
-          className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded transition-colors"
+          className="w-full flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded transition-colors"
           onClick={() => setCollapsedWhyChooseUs((prev) => !prev)}
           aria-expanded={!collapsedWhyChooseUs}
           aria-controls="why-choose-us-content"
@@ -1853,7 +1789,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
         {/* Contenido colapsable */}
         {!collapsedWhyChooseUs && (
-          <div id="why-choose-us-content" className="space-y-6">
+          <div id="why-choose-us-content" className="space-y-3">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Lista de beneficios o razones por las que los clientes deberían elegir tu empresa.
               Esta sección aparecerá después de los Valores.
@@ -1861,28 +1797,28 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
 
             {/* Título de la sección */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Título de la Sección
               </label>
               <input
                 type="text"
                 value={whyChooseUs.title || ''}
                 onChange={(e) => updateContent('whyChooseUs.title', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Ej: ¿Por qué elegir SCUTI Company?"
               />
             </div>
 
             {/* Subtítulo */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Subtítulo (opcional)
               </label>
               <input
                 type="text"
                 value={whyChooseUs.subtitle || ''}
                 onChange={(e) => updateContent('whyChooseUs.subtitle', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Ej: ¿Por qué las PYMES confían en nosotros?"
               />
             </div>
@@ -1891,7 +1827,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
             <div className="flex justify-end">
               <button
                 onClick={addWhyChooseUsItem}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1917,7 +1853,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
                         type="text"
                         value={item.icon || '✅'}
                         onChange={(e) => updateWhyChooseUsItem(index, 'icon', e.target.value)}
-                        className="w-16 h-12 text-2xl text-center border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500"
+                        className="w-16 h-12 text-2xl text-center border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-1 focus:ring-blue-500"
                         placeholder="✅"
                         maxLength={2}
                       />
@@ -1934,7 +1870,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
                           type="text"
                           value={item.title || ''}
                           onChange={(e) => updateWhyChooseUsItem(index, 'title', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                          className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                           placeholder="Ej: Experiencia comprobada"
                         />
                       </div>
@@ -1947,7 +1883,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
                         <textarea
                           value={item.description || ''}
                           onChange={(e) => updateWhyChooseUsItem(index, 'description', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none"
+                          className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none"
                           rows={2}
                           placeholder="Ej: Hemos trabajado con empresas de diversos sectores..."
                         />
@@ -2003,7 +1939,7 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
                 </p>
                 <button
                   onClick={addWhyChooseUsItem}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -2019,9 +1955,9 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
                 <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
                   👁️ Vista Previa
                 </h5>
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
                   {whyChooseUs.title && (
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                       {whyChooseUs.title}
                     </h3>
                   )}
@@ -2053,24 +1989,24 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
         )}
       </div>
 
-      {/* 📊 Vista Previa del Carrusel */}
+      {/* 📊 Vista Previa del Carrusel - Colapsable */}
       {values.items && values.items.length > 0 && (
-        <div className="bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            👁️ Vista Previa del Carrusel
-          </h4>
+        <details className="bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <summary className="px-4 py-2 cursor-pointer text-xs font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2 select-none">
+            👁️ Vista Previa del Carrusel (clic para expandir)
+          </summary>
           
-          <div className="overflow-hidden">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          <div className="px-4 pb-4 overflow-hidden">
+            <div className="text-center mb-2">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                 {values.title || 'Nuestros Valores'}
               </h3>
               {values.subtitle && (
-                <p className="text-gray-600 dark:text-gray-400 mt-2">{values.subtitle}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{values.subtitle}</p>
               )}
             </div>
 
-            <div className={`grid gap-4 ${
+            <div className={`grid gap-3 ${
               values.carouselConfig?.itemsPerView === 2 ? 'grid-cols-2' :
               values.carouselConfig?.itemsPerView === 4 ? 'grid-cols-4' :
               'grid-cols-3'
@@ -2078,47 +2014,30 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
               {values.items.slice(0, values.carouselConfig?.itemsPerView || 3).map((item, idx) => (
                 <div
                   key={idx}
-                  className="relative bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg overflow-hidden"
-                  style={{ minHeight: '180px' }}
+                  className="relative bg-white dark:bg-gray-800 rounded-lg p-3 shadow overflow-hidden"
+                  style={{ minHeight: '100px' }}
                 >
-                  {/* Fondo de imagen */}
                   {item.image?.light && (
                     <div className="absolute inset-0">
-                      <img
-                        src={item.image.light}
-                        alt={item.imageAlt || item.title}
-                        className="w-full h-full object-cover opacity-30"
-                      />
+                      <img src={item.image.light} alt={item.imageAlt || item.title} className="w-full h-full object-cover opacity-30" />
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-white/40 dark:from-gray-800 dark:via-gray-800/80 dark:to-gray-800/40" />
                     </div>
                   )}
-                  
-                  {/* Contenido */}
                   <div className="relative z-10 h-full flex flex-col justify-end">
-                    <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-1">
-                      {item.title}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                      {item.description}
-                    </p>
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-0.5">{item.title}</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">{item.description}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Indicadores */}
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-1.5 mt-3">
               {Array.from({ length: Math.ceil(values.items.length / (values.carouselConfig?.itemsPerView || 3)) }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`rounded-full transition-all ${
-                    idx === 0 ? 'w-6 h-2 bg-amber-500' : 'w-2 h-2 bg-gray-300 dark:bg-gray-600'
-                  }`}
-                />
+                <div key={idx} className={`rounded-full transition-all ${idx === 0 ? 'w-5 h-1.5 bg-amber-500' : 'w-1.5 h-1.5 bg-gray-300 dark:bg-gray-600'}`} />
               ))}
             </div>
           </div>
-        </div>
+        </details>
       )}
       </div>
       )}

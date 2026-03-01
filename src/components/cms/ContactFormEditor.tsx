@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAccordionState } from '../../hooks/useAccordionState';
 import type { ContactFormEditorProps } from './types/ContactFormTypes';
@@ -31,7 +31,7 @@ const ContactFormEditor: React.FC<ContactFormEditorProps> = ({
 
   if (!contactForm) {
     return (
-      <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+      <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
         <div className="text-center text-gray-500 dark:text-gray-400">
           No se encontró configuración del formulario de contacto
         </div>

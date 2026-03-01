@@ -108,36 +108,36 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* ===== TÍTULO ===== */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
           <span className="text-2xl">✏️</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Título Principal</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Título Principal</h3>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Texto del título
           </label>
           <input
             type="text"
             value={title.text}
             onChange={(e) => onUpdateTitle('text', e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             placeholder="¿Listo para comenzar tu proyecto?"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Tipografía
             </label>
             <select
               value={title.fontFamily}
               onChange={(e) => onUpdateTitle('fontFamily', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {FONT_FAMILIES.map((font) => (
                 <option key={font.value} value={font.value}>
@@ -148,13 +148,13 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Tamaño
             </label>
             <select
               value={title.fontSize}
               onChange={(e) => onUpdateTitle('fontSize', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {FONT_SIZES_TITLE.map((size) => (
                 <option key={size.value} value={size.value}>
@@ -165,13 +165,13 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Peso
             </label>
             <select
               value={title.fontWeight}
               onChange={(e) => onUpdateTitle('fontWeight', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {FONT_WEIGHTS.map((weight) => (
                 <option key={weight.value} value={weight.value}>
@@ -182,7 +182,7 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color
             </label>
             <div className="flex gap-2">
@@ -196,7 +196,7 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={title.color}
                 onChange={(e) => onUpdateTitle('color', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#FFFFFF"
               />
             </div>
@@ -312,31 +312,31 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
       <div className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
           <span className="text-2xl">📝</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Subtítulo</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Subtítulo</h3>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Texto del subtítulo
           </label>
           <textarea
             value={subtitle.text}
             onChange={(e) => onUpdateSubtitle('text', e.target.value)}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             placeholder="Nuestro equipo de expertos está listo para ayudarte..."
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Tipografía
             </label>
             <select
               value={subtitle.fontFamily}
               onChange={(e) => onUpdateSubtitle('fontFamily', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {FONT_FAMILIES.map((font) => (
                 <option key={font.value} value={font.value}>
@@ -347,13 +347,13 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Tamaño
             </label>
             <select
               value={subtitle.fontSize}
               onChange={(e) => onUpdateSubtitle('fontSize', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {FONT_SIZES_SUBTITLE.map((size) => (
                 <option key={size.value} value={size.value}>
@@ -364,13 +364,13 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Peso
             </label>
             <select
               value={subtitle.fontWeight}
               onChange={(e) => onUpdateSubtitle('fontWeight', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {FONT_WEIGHTS.map((weight) => (
                 <option key={weight.value} value={weight.value}>
@@ -381,7 +381,7 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color
             </label>
             <div className="flex gap-2">
@@ -395,7 +395,7 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={subtitle.color}
                 onChange={(e) => onUpdateSubtitle('color', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#E9D5FF"
               />
             </div>
@@ -418,18 +418,18 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
       <div className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
           <span className="text-2xl">🎯</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Botón Primario</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Botón Primario</h3>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Texto del botón
           </label>
           <input
             type="text"
             value={buttons.primary.text}
             onChange={(e) => onUpdatePrimaryButton('text', e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             placeholder="💬 Solicitar Cotización Gratuita"
           />
         </div>
@@ -463,7 +463,7 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color de fondo {buttons.primary.useTransparentBg && '(desactivado)'}
             </label>
             <div className="flex gap-2">
@@ -479,14 +479,14 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 value={buttons.primary.bgColor}
                 onChange={(e) => onUpdatePrimaryButton('bgColor', e.target.value)}
                 disabled={buttons.primary.useTransparentBg}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="#FFFFFF"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color del texto
             </label>
             <div className="flex gap-2">
@@ -500,14 +500,14 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={buttons.primary.textColor}
                 onChange={(e) => onUpdatePrimaryButton('textColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#7C3AED"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color hover
             </label>
             <div className="flex gap-2">
@@ -521,20 +521,20 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={buttons.primary.hoverBgColor}
                 onChange={(e) => onUpdatePrimaryButton('hoverBgColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#F3F4F6"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Bordes redondeados
             </label>
             <select
               value={buttons.primary.borderRadius}
               onChange={(e) => onUpdatePrimaryButton('borderRadius', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {BORDER_RADIUS.map((radius) => (
                 <option key={radius.value} value={radius.value}>
@@ -679,18 +679,18 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
       <div className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
           <span className="text-2xl">🔘</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Botón Secundario</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Botón Secundario</h3>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Texto del botón
           </label>
           <input
             type="text"
             value={buttons.secondary.text}
             onChange={(e) => onUpdateSecondaryButton('text', e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             placeholder="Ver todos los servicios"
           />
         </div>
@@ -724,7 +724,7 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color de fondo {buttons.secondary.useTransparentBg && '(desactivado)'}
             </label>
             <div className="flex gap-2">
@@ -740,14 +740,14 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 value={buttons.secondary.bgColor}
                 onChange={(e) => onUpdateSecondaryButton('bgColor', e.target.value)}
                 disabled={buttons.secondary.useTransparentBg}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="transparent"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color del texto
             </label>
             <div className="flex gap-2">
@@ -761,14 +761,14 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={buttons.secondary.textColor}
                 onChange={(e) => onUpdateSecondaryButton('textColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#FFFFFF"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color del borde
             </label>
             <div className="flex gap-2">
@@ -782,14 +782,14 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={buttons.secondary.borderColor}
                 onChange={(e) => onUpdateSecondaryButton('borderColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#FFFFFF"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color hover (fondo)
             </label>
             <div className="flex gap-2">
@@ -803,14 +803,14 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={buttons.secondary.hoverBgColor}
                 onChange={(e) => onUpdateSecondaryButton('hoverBgColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#FFFFFF"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Color hover (texto)
             </label>
             <div className="flex gap-2">
@@ -824,20 +824,20 @@ const CtaStylePanel: React.FC<CtaStylePanelProps> = ({
                 type="text"
                 value={buttons.secondary.hoverTextColor}
                 onChange={(e) => onUpdateSecondaryButton('hoverTextColor', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent text-sm font-mono"
                 placeholder="#7C3AED"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Bordes redondeados
             </label>
             <select
               value={buttons.secondary.borderRadius}
               onChange={(e) => onUpdateSecondaryButton('borderRadius', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500 focus:border-transparent"
             >
               {BORDER_RADIUS.map((radius) => (
                 <option key={radius.value} value={radius.value}>

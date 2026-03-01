@@ -144,7 +144,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header - Clickeable para colapsar */}
       <div 
         className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 -mx-2 px-2 py-2 rounded-lg transition-colors"
@@ -155,7 +155,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
             <Newspaper className="w-5 h-5 text-purple-600 dark:text-purple-400" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
               Sección Todas las Noticias
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -177,7 +177,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as typeof activeTab)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               activeTab === tab.id
                 ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -190,14 +190,14 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className="space-y-6">
+      <div className="space-y-3">
         {/* General Tab */}
         {activeTab === 'general' && (
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Título y configuración básica */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Título de la Sección
                 </label>
                 <input
@@ -209,7 +209,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Posts por Página
                 </label>
                 <input
@@ -239,7 +239,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
             {/* Tipografía */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Tipografía de las Tarjetas
               </label>
               <select
@@ -281,7 +281,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   <button
                     key={layout.id}
                     onClick={() => handleChange('layoutType', layout.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-colors ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 transition-colors ${
                       (config.layoutType || 'masonry') === layout.id
                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300'
                         : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'
@@ -300,7 +300,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 🎨 Colores por Tema
               </h4>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tema Claro */}
                 <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                   <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
@@ -427,7 +427,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 🖼️ Imagen de Fondo por Tema
               </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Imagen tema claro */}
                 <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                   <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -564,7 +564,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Posts por página */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Posts por Página
                     </label>
                     <input
@@ -581,7 +581,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                   {/* Estilo de paginación */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Estilo de Paginación
                     </label>
                     <select
@@ -1084,7 +1084,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
         {/* Image Card Tab */}
         {activeTab === 'imageCard' && (
-          <div className="space-y-6">
+          <div className="space-y-3">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Configura los estilos de las tarjetas con imagen de fondo (laterales del grid)
             </p>
@@ -1153,7 +1153,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
             {/* Configuración */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color del Overlay
                 </label>
                 <div className="flex items-center gap-2">
@@ -1173,7 +1173,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color del Título
                 </label>
                 <div className="flex items-center gap-2">
@@ -1193,7 +1193,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color Fondo Categoría
                 </label>
                 <div className="flex items-center gap-2">
@@ -1213,7 +1213,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color Texto Categoría
                 </label>
                 <div className="flex items-center gap-2">
@@ -1233,7 +1233,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Posición Categoría
                 </label>
                 <div className="flex gap-2">
@@ -1274,7 +1274,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color Nombre Autor
                 </label>
                 <div className="flex items-center gap-2">
@@ -1294,7 +1294,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Color Fecha
                 </label>
                 <div className="flex items-center gap-2">
@@ -1314,7 +1314,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Border Radius
                 </label>
                 <input
@@ -1336,7 +1336,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Alto de Tarjeta */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Alto de Tarjeta
                   </label>
                   <div className="space-y-2">
@@ -1383,7 +1383,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Ancho de Tarjeta */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Ancho de Tarjeta
                   </label>
                   <div className="space-y-2">
@@ -1418,7 +1418,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
               {/* Aspect Ratio (nuevo) */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Aspecto de Tarjeta (Proporción)
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -1465,7 +1465,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
         {/* Text Card Tab */}
         {activeTab === 'textCard' && (
-          <div className="space-y-6">
+          <div className="space-y-3">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Configura los estilos de las tarjetas de solo texto (centro del grid)
             </p>
@@ -1480,7 +1480,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               }}
             >
               <h4 
-                className="text-xl font-bold mb-3"
+                className="text-lg font-bold mb-3"
                 style={config.textCard?.titleUseGradient ? {
                   background: `linear-gradient(${
                     config.textCard?.titleGradientDirection === 'to-r' ? 'to right' :
@@ -1654,7 +1654,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               {/* Color de Fondo (solo si no es transparente) */}
               {!config.textCard?.bgTransparent && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color de Fondo
                   </label>
                   <div className="flex items-center gap-2">
@@ -1749,7 +1749,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del Título
                   </label>
                   <div className="flex items-center gap-2">
@@ -1778,7 +1778,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color del Extracto
                   </label>
                   <div className="flex items-center gap-2">
@@ -1798,7 +1798,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color Fondo Tags
                   </label>
                   <input
@@ -1810,7 +1810,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color Texto Tags
                   </label>
                   <div className="flex items-center gap-2">
@@ -1839,7 +1839,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               
               {/* Texto del botón */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Texto del Botón
                 </label>
                 <input
@@ -1863,7 +1863,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('textCard.buttonBgTransparent', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
                   </label>
                   <span className="text-xs text-gray-600 dark:text-gray-400">Transparente</span>
                 </div>
@@ -1879,7 +1879,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                           onChange={(e) => handleChange('textCard.buttonUseGradient', e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
                       </label>
                       <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                     </div>
@@ -1938,7 +1938,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('textCard.buttonTextUseGradient', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
                   </label>
                   <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                 </div>
@@ -1995,7 +1995,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                       onChange={(e) => handleChange('textCard.buttonBorderUseGradient', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500"></div>
                   </label>
                   <span className="text-xs text-gray-600 dark:text-gray-400">Usar Gradiente</span>
                 </div>
@@ -2056,7 +2056,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
             {/* Sección: Border Radius */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Border Radius de la Tarjeta
                 </label>
                 <input
@@ -2078,7 +2078,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Alto de Tarjeta */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Alto de Tarjeta
                   </label>
                   <div className="space-y-2">
@@ -2112,7 +2112,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Ancho de Tarjeta */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Ancho de Tarjeta
                   </label>
                   <div className="space-y-2">
@@ -2150,7 +2150,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
         {/* Sidebar Tab */}
         {activeTab === 'sidebar' && (
-          <div className="space-y-6">
+          <div className="space-y-3">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Configura los estilos del sidebar (categorías y tags)
             </p>
@@ -2164,7 +2164,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Tipografía */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Tipografía
                   </label>
                   <select
@@ -2185,7 +2185,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Border Width */}
                 <div className={config.sidebar?.showBorder === false ? 'opacity-50 pointer-events-none' : ''}>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Ancho Borde (px)
                   </label>
                   <input
@@ -2200,7 +2200,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Border Color Light */}
                 <div className={config.sidebar?.showBorder === false ? 'opacity-50 pointer-events-none' : ''}>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Borde (Claro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2221,7 +2221,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Border Color Dark */}
                 <div className={config.sidebar?.showBorder === false ? 'opacity-50 pointer-events-none' : ''}>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Borde (Oscuro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2244,7 +2244,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Border Radius */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Border Radius
                   </label>
                   <input
@@ -2258,7 +2258,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Padding */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Padding Interior
                   </label>
                   <input
@@ -2272,7 +2272,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Fondo Transparente Toggle */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Fondo Transparente
                   </label>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -2291,7 +2291,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Mostrar Borde Toggle */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Mostrar Borde
                   </label>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -2310,7 +2310,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Fondo del Sidebar */}
                 <div className={config.sidebar?.transparentBg ? 'opacity-50 pointer-events-none' : ''}>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Fondo (Claro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2332,7 +2332,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className={config.sidebar?.transparentBg ? 'opacity-50 pointer-events-none' : ''}>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Fondo (Oscuro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2354,7 +2354,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
             </div>
 
             {/* Preview del sidebar */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Preview Categorías */}
               <div 
                 className="p-4"
@@ -2416,7 +2416,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   <span 
-                    className="px-4 py-2 rounded-full text-sm font-medium"
+                    className="px-3 py-1.5 rounded-full text-sm font-medium"
                     style={{
                       backgroundColor: config.sidebar?.tagActiveBgColor || '#2563eb',
                       color: config.sidebar?.tagActiveTextColor || '#ffffff'
@@ -2425,7 +2425,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     All
                   </span>
                   <span 
-                    className="px-4 py-2 rounded-full text-sm font-medium"
+                    className="px-3 py-1.5 rounded-full text-sm font-medium"
                     style={{
                       backgroundColor: config.sidebar?.tagBgColor || '#e5e7eb',
                       color: config.sidebar?.tagTextColor || '#4b5563'
@@ -2434,7 +2434,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                     React
                   </span>
                   <span 
-                    className="px-4 py-2 rounded-full text-sm font-medium"
+                    className="px-3 py-1.5 rounded-full text-sm font-medium"
                     style={{
                       backgroundColor: config.sidebar?.tagBgColor || '#e5e7eb',
                       color: config.sidebar?.tagTextColor || '#4b5563'
@@ -2453,7 +2453,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Título (Claro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2472,7 +2472,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Título (Oscuro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2491,7 +2491,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Item (Claro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2510,7 +2510,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Item (Oscuro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2529,7 +2529,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Hover/Activo
                   </label>
                   <div className="flex items-center gap-2">
@@ -2557,7 +2557,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Título (Claro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2576,7 +2576,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Color Título (Oscuro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2595,7 +2595,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Fondo Tag (Claro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2614,7 +2614,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Fondo Tag (Oscuro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2633,7 +2633,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Texto Tag (Claro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2652,7 +2652,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Texto Tag (Oscuro)
                   </label>
                   <div className="flex items-center gap-2">
@@ -2671,7 +2671,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Fondo Tag Activo
                   </label>
                   <div className="flex items-center gap-2">
@@ -2690,7 +2690,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Texto Tag Activo
                   </label>
                   <div className="flex items-center gap-2">
@@ -2711,7 +2711,7 @@ export const AllNewsConfigSection: React.FC<AllNewsConfigSectionProps> = ({
 
                 {/* Máximo de tags visibles */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                     Máx. Tags Visibles
                   </label>
                   <div className="flex items-center gap-2">

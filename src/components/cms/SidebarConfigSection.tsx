@@ -397,7 +397,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -405,7 +405,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
             <Palette className="w-6 h-6 text-purple-600 dark:text-purple-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-white">
               Configuración del Sidebar
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -428,7 +428,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
           <button
             onClick={handleSave}
             disabled={isSaving || !hasChanges}
-            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors
+            className={`px-3 py-1.5 rounded-lg font-medium flex items-center gap-2 transition-colors
               ${hasChanges 
                 ? 'bg-purple-600 hover:bg-purple-700 text-white' 
                 : 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
@@ -456,7 +456,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
       <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
         <button
           onClick={() => setActiveType('admin')}
-          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-md transition-all ${
             activeType === 'admin'
               ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm'
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
@@ -467,7 +467,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
         </button>
         <button
           onClick={() => setActiveType('client')}
-          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-md transition-all ${
             activeType === 'client'
               ? 'bg-white dark:bg-gray-700 text-green-600 dark:text-green-400 shadow-sm'
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
@@ -591,7 +591,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
           icon={<Monitor className="w-5 h-5 text-gray-500" />}
           defaultOpen={true}
         >
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Fondo del Sidebar */}
             <AdvancedColorPicker
               label="Fondo del Sidebar"
@@ -622,7 +622,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
                       onChange={(e) => updateActiveConfig('navBgTransparent', e.target.checked as unknown as string)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 
                                     peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer 
                                     dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white 
                                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white 
@@ -662,7 +662,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
                       onChange={(e) => updateActiveConfig('navHoverBgTransparent', e.target.checked as unknown as string)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 
                                     peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer 
                                     dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white 
                                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white 
@@ -703,7 +703,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
                           onChange={(e) => updateActiveConfig('hoverBorderGradientEnabled', e.target.checked as unknown as string)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 
                                         peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer 
                                         dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white 
                                         after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white 
@@ -808,7 +808,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
               <div className="grid grid-cols-2 gap-4">
                 {/* Icono Modo Claro */}
                 <div className="p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">
+                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">
                     Modo Claro (icono visible)
                   </label>
                   <div className="flex items-center gap-3">
@@ -848,7 +848,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
 
                 {/* Icono Modo Oscuro */}
                 <div className="p-3 bg-gray-800 rounded-lg border border-gray-600">
-                  <label className="text-xs font-medium text-gray-300 mb-2 block">
+                  <label className="text-xs font-medium text-gray-300 mb-1 block">
                     Modo Oscuro (icono visible)
                   </label>
                   <div className="flex items-center gap-3">
@@ -898,7 +898,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
               <div className="space-y-4">
                 {/* Selector de fuente */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Fuente Principal
                   </label>
                   <div className="flex items-center gap-3">
@@ -920,7 +920,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
                       <option value="system-ui" style={{ fontFamily: 'system-ui' }}>Sistema (System UI)</option>
                     </select>
                     <div 
-                      className="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md text-sm border border-gray-300 dark:border-gray-600"
+                      className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-md text-sm border border-gray-300 dark:border-gray-600"
                       style={{ fontFamily: localGlobalConfig.fontFamily || 'Montserrat' }}
                     >
                       Abc 123
@@ -1160,7 +1160,7 @@ const SidebarConfigSection: React.FC<SidebarConfigSectionProps> = ({ onSave, onC
 
       {/* Preview Section */}
       <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
           <Eye size={20} />
           Vista Previa del Sidebar {activeType === 'admin' ? 'Admin' : 'Cliente'}
         </h3>

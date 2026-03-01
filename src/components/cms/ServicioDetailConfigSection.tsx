@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 🎛️ CONFIGURACIÓN CMS PARA PÁGINA DE DETALLE DE SERVICIO
  * Panel de configuración para personalizar la página ServicioDetail
  * 
@@ -712,7 +712,7 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
           description="Estilos y apariencia de los componentes"
         />
         {expandedSection === 'design' && (
-          <div className="p-6 border-t border-gray-200 dark:border-gray-700 space-y-6">
+          <div className="p-6 border-t border-gray-200 dark:border-gray-700 space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -721,7 +721,7 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
                 <select
                   value={mergedConfig.design?.headerStyle ?? 'minimal'}
                   onChange={(e) => updateDesign('headerStyle', e.target.value as any)}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="minimal">Minimalista</option>
                   <option value="card">Tarjeta con sombra</option>
@@ -736,7 +736,7 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
                 <select
                   value={mergedConfig.design?.panelBorderRadius ?? 'rounded-xl'}
                   onChange={(e) => updateDesign('panelBorderRadius', e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="rounded-none">Sin bordes</option>
                   <option value="rounded-md">Redondeado suave</option>
@@ -793,7 +793,7 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
           description="Fondo de la sección final con botones de contacto"
         />
         {expandedSection === 'cta' && (
-          <div className="p-6 border-t border-gray-200 dark:border-gray-700 space-y-6">
+          <div className="p-6 border-t border-gray-200 dark:border-gray-700 space-y-3">
             <CtaBackgroundEditor
               imageUrl={mergedConfig.cta?.background?.imageUrl || ''}
               overlay={mergedConfig.cta?.background?.overlay ?? 0.5}
@@ -818,7 +818,7 @@ const ServicioDetailConfigSection: React.FC<Props> = ({ config, onChange }) => {
 
       {/* Info Panel */}
       <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-violet-800 dark:text-violet-200 mb-3">
+        <h3 className="text-lg font-bold text-violet-800 dark:text-violet-200 mb-3">
           📄 Resumen de Configuración
         </h3>
         <p className="text-violet-700 dark:text-violet-300 mb-4">

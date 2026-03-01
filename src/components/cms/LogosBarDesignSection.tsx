@@ -127,15 +127,15 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-lg flex items-center justify-center">
             <span className="text-white text-lg">🎨</span>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               Configuración de Burbujas Flotantes 🫧
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -154,7 +154,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
           </button>
           
           {hasUnsavedChanges && (
-            <div className="px-4 py-2 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-lg text-sm font-medium border border-orange-200 dark:border-orange-700 flex items-center gap-2">
+            <div className="px-3 py-1.5 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-lg text-sm font-medium border border-orange-200 dark:border-orange-700 flex items-center gap-2">
               <span>⚠️</span>
               Tienes cambios sin guardar. Usa el botón "Guardar" de arriba.
             </div>
@@ -180,12 +180,12 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
       </div>
 
       {/* Theme Toggle */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-3">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tema:</span>
         <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
           <button
             onClick={() => setActiveTheme('light')}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
               activeTheme === 'light'
                 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -195,7 +195,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
           </button>
           <button
             onClick={() => setActiveTheme('dark')}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
               activeTheme === 'dark'
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -207,9 +207,9 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
       </div>
 
       {/* Configuraciones */}
-      <div className="space-y-6">
+      <div className="space-y-3">
         {/* Grid de 2 columnas para Movimiento e Interacción */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Columna 1: Movimiento de Burbujas */}
           <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
             <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-4">🫧 Movimiento de Burbujas</h4>
@@ -235,7 +235,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
 
               {/* Modo de Rotación */}
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Estilo de Rotación
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -253,7 +253,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
 
               {/* Velocidad de Animación */}
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Velocidad de Movimiento
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -300,7 +300,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
 
               {/* Intensidad de Hover */}
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Fuerza de Empuje
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -339,7 +339,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
         </div>
 
         {/* Grid de 2 columnas para Tamaño/Espaciado y Detección Inteligente */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Columna 1: Tamaño y Espaciado */}
           <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
             <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-4">📏 Tamaño y Espaciado</h4>
@@ -347,7 +347,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
             <div className="space-y-4">
               {/* Tamaño de Logos */}
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Tamaño de Burbujas
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -366,7 +366,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
 
               {/* Formato de Logo */}
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Formato de Logo
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -385,7 +385,7 @@ const LogosBarDesignSection: React.FC<LogosBarDesignSectionProps> = ({
 
               {/* Ancho Máximo */}
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Ancho Máximo
                 </label>
                 <select

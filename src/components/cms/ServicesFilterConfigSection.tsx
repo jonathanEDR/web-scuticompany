@@ -153,11 +153,11 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Encabezado colapsable */}
       <button
         type="button"
-        className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition-colors"
+        className="w-full flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 rounded transition-colors"
         onClick={() => setCollapsed((prev) => !prev)}
         aria-expanded={!collapsed}
       >
@@ -170,50 +170,50 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
       </button>
 
       {!collapsed && (
-        <div className="space-y-8">
+        <div className="space-y-4">
           
           {/* ===== SECCIÓN DE BÚSQUEDA ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🔎 Sección de Búsqueda
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Título de la sección
                 </label>
                 <input
                   type="text"
                   value={filterConfig.searchTitle}
                   onChange={(e) => handleUpdateFilter('searchTitle', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="BUSCAR"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Placeholder del input
                 </label>
                 <input
                   type="text"
                   value={filterConfig.searchPlaceholder}
                   onChange={(e) => handleUpdateFilter('searchPlaceholder', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="Busca un servicio..."
                 />
               </div>
               
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Descripción debajo del título
                 </label>
                 <input
                   type="text"
                   value={filterConfig.searchDescription}
                   onChange={(e) => handleUpdateFilter('searchDescription', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="Escribe aquí para encontrar el servicio..."
                 />
               </div>
@@ -248,7 +248,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   {/* Color de fondo */}
                   {!(filterConfig.styles?.searchInputBgTransparent === true || filterConfig.styles?.searchInputBgTransparent === 'true') && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Color de Fondo
                       </label>
                       <div className="flex gap-2">
@@ -271,7 +271,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del borde */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Color del Borde
                     </label>
                     <div className="flex gap-2">
@@ -293,7 +293,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del texto */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Color del Texto
                     </label>
                     <div className="flex gap-2">
@@ -315,7 +315,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del placeholder */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Color del Placeholder
                     </label>
                     <div className="flex gap-2">
@@ -360,7 +360,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   {/* Color de fondo */}
                   {!(filterConfig.styles?.searchInputBgTransparentDark === true || filterConfig.styles?.searchInputBgTransparentDark === 'true') && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
                         Color de Fondo
                       </label>
                       <div className="flex gap-2">
@@ -383,7 +383,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del borde */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Color del Borde
                     </label>
                     <div className="flex gap-2">
@@ -405,7 +405,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del texto */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Color del Texto
                     </label>
                     <div className="flex gap-2">
@@ -427,7 +427,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del placeholder */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Color del Placeholder
                     </label>
                     <div className="flex gap-2">
@@ -453,33 +453,33 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
           {/* ===== SECCIÓN DE CATEGORÍAS ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               📂 Sección de Categorías
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Título de la sección
                 </label>
                 <input
                   type="text"
                   value={filterConfig.categoriesTitle}
                   onChange={(e) => handleUpdateFilter('categoriesTitle', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="CATEGORÍAS"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Texto "Todas las categorías"
                 </label>
                 <input
                   type="text"
                   value={filterConfig.showAllCategoriesText}
                   onChange={(e) => handleUpdateFilter('showAllCategoriesText', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="Todas las categorías"
                 />
               </div>
@@ -1034,33 +1034,33 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
           {/* ===== SECCIÓN DE ORDENAMIENTO ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               📊 Sección de Ordenamiento
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Título de la sección
                 </label>
                 <input
                   type="text"
                   value={filterConfig.sortTitle}
                   onChange={(e) => handleUpdateFilter('sortTitle', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="ORDENAR"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Texto de resultados
                 </label>
                 <input
                   type="text"
                   value={filterConfig.resultsText}
                   onChange={(e) => handleUpdateFilter('resultsText', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   placeholder="Resultados:"
                 />
               </div>
@@ -1095,7 +1095,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   {/* Color de fondo */}
                   {!(filterConfig.styles?.sortSelectBgTransparent === true || filterConfig.styles?.sortSelectBgTransparent === 'true') && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Color de Fondo
                       </label>
                       <div className="flex gap-2">
@@ -1118,7 +1118,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del borde */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Color del Borde
                     </label>
                     <div className="flex gap-2">
@@ -1140,7 +1140,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del texto */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                       Color del Texto
                     </label>
                     <div className="flex gap-2">
@@ -1185,7 +1185,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   {/* Color de fondo */}
                   {!(filterConfig.styles?.sortSelectBgTransparentDark === true || filterConfig.styles?.sortSelectBgTransparentDark === 'true') && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
                         Color de Fondo
                       </label>
                       <div className="flex gap-2">
@@ -1208,7 +1208,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del borde */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Color del Borde
                     </label>
                     <div className="flex gap-2">
@@ -1230,7 +1230,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
                   
                   {/* Color del texto */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Color del Texto
                     </label>
                     <div className="flex gap-2">
@@ -1256,7 +1256,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
           {/* ===== COLORES DE ICONOS ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🎯 Colores de Iconos
             </h3>
             
@@ -1413,12 +1413,12 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
           {/* ===== ESTILOS VISUALES ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🎨 Estilos del Panel de Filtros
             </h3>
             
             {/* Configuración del borde por tema */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
               {/* Modo Claro */}
               <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -1636,13 +1636,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               {/* Ancho del borde */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Ancho del borde
                 </label>
                 <select
                   value={filterConfig.styles?.borderWidth || '2px'}
                   onChange={(e) => handleUpdateStyle('borderWidth', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="1px">1px - Fino</option>
                   <option value="2px">2px - Normal</option>
@@ -1653,13 +1653,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
               
               {/* Radio del borde */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Radio del borde
                 </label>
                 <select
                   value={filterConfig.styles?.borderRadius || '1rem'}
                   onChange={(e) => handleUpdateStyle('borderRadius', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="0">Sin redondeo</option>
                   <option value="0.5rem">Pequeño</option>
@@ -1816,7 +1816,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Color de título de sección */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Color de títulos (claro)
                 </label>
                 <div className="flex gap-2">
@@ -1837,7 +1837,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Color de título de sección (oscuro) */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Color de títulos (oscuro)
                 </label>
                 <div className="flex gap-2">
@@ -1858,13 +1858,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Radio del borde */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Redondeo del borde
                 </label>
                 <select
                   value={filterConfig.styles?.borderRadius || '1rem'}
                   onChange={(e) => handleUpdateStyle('borderRadius', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="0.5rem">Pequeño</option>
                   <option value="1rem">Normal</option>
@@ -1877,7 +1877,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
           {/* ===== TIPOGRAFÍA DEL PANEL ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               🔤 Tipografía del Panel de Filtros
             </h3>
             
@@ -1891,13 +1891,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Fuente para títulos */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Fuente de títulos
                 </label>
                 <select
                   value={filterConfig.styles?.titleFontFamily || 'inherit'}
                   onChange={(e) => handleUpdateStyle('titleFontFamily', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   style={{ fontFamily: filterConfig.styles?.titleFontFamily || 'inherit' }}
                 >
                   <option value="inherit" style={{ fontFamily: 'inherit' }}>Por defecto (Sistema)</option>
@@ -1915,13 +1915,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Fuente para contenido */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Fuente de contenido
                 </label>
                 <select
                   value={filterConfig.styles?.contentFontFamily || 'inherit'}
                   onChange={(e) => handleUpdateStyle('contentFontFamily', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                   style={{ fontFamily: filterConfig.styles?.contentFontFamily || 'inherit' }}
                 >
                   <option value="inherit" style={{ fontFamily: 'inherit' }}>Por defecto (Sistema)</option>
@@ -1939,7 +1939,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Vista previa */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Vista previa
                 </label>
                 <div className="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
@@ -1965,13 +1965,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
             {/* Peso de fuente */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Peso de títulos
                 </label>
                 <select
                   value={filterConfig.styles?.titleFontWeight || '700'}
                   onChange={(e) => handleUpdateStyle('titleFontWeight', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="400">Normal (400)</option>
                   <option value="500">Medio (500)</option>
@@ -1983,13 +1983,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Peso de contenido
                 </label>
                 <select
                   value={filterConfig.styles?.contentFontWeight || '400'}
                   onChange={(e) => handleUpdateStyle('contentFontWeight', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="300">Light (300)</option>
                   <option value="400">Normal (400)</option>
@@ -2003,20 +2003,20 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
           {/* ===== TAMAÑO DEL PANEL ===== */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               📐 Tamaño del Panel de Filtros
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Ancho del panel */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Ancho del panel
                 </label>
                 <select
                   value={filterConfig.styles?.panelWidth || '20rem'}
                   onChange={(e) => handleUpdateStyle('panelWidth', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="16rem">Compacto (256px)</option>
                   <option value="18rem">Pequeño (288px)</option>
@@ -2028,13 +2028,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Padding interno */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Padding interno
                 </label>
                 <select
                   value={filterConfig.styles?.panelPadding || '1.5rem'}
                   onChange={(e) => handleUpdateStyle('panelPadding', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="1rem">Compacto (16px)</option>
                   <option value="1.25rem">Pequeño (20px)</option>
@@ -2046,13 +2046,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Espaciado entre secciones */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Espaciado entre secciones
                 </label>
                 <select
                   value={filterConfig.styles?.sectionGap || '1.5rem'}
                   onChange={(e) => handleUpdateStyle('sectionGap', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="1rem">Compacto (16px)</option>
                   <option value="1.5rem">Normal (24px)</option>
@@ -2063,13 +2063,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Altura mínima */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Altura mínima
                 </label>
                 <select
                   value={filterConfig.styles?.minHeight || 'auto'}
                   onChange={(e) => handleUpdateStyle('minHeight', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="auto">Automática</option>
                   <option value="400px">Pequeña (400px)</option>
@@ -2085,13 +2085,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {/* Posición sticky */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Posición fija (sticky)
                 </label>
                 <select
                   value={filterConfig.styles?.stickyTop || '6rem'}
                   onChange={(e) => handleUpdateStyle('stickyTop', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="4rem">Muy arriba (64px)</option>
                   <option value="5rem">Arriba (80px)</option>
@@ -2103,13 +2103,13 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
               {/* Sombra */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                   Sombra
                 </label>
                 <select
                   value={filterConfig.styles?.shadow || 'none'}
                   onChange={(e) => handleUpdateStyle('shadow', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-purple-500"
                 >
                   <option value="none">Sin sombra</option>
                   <option value="sm">Sutil</option>
@@ -2123,7 +2123,7 @@ const ServicesFilterConfigSection: React.FC<ServicesFilterConfigSectionProps> = 
 
           {/* ===== VISTA PREVIA ===== */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
               👁️ Vista Previa del Panel
             </h3>
             <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">

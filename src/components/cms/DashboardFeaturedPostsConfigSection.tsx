@@ -233,11 +233,11 @@ interface ButtonConfigEditorProps {
 
 const ButtonConfigEditor: React.FC<ButtonConfigEditorProps> = ({ config, onChange, themePreview }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Texto e Icono */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
             Texto del Botón
           </label>
           <input
@@ -248,7 +248,7 @@ const ButtonConfigEditor: React.FC<ButtonConfigEditorProps> = ({ config, onChang
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
             Icono
           </label>
           <div className="flex items-center gap-2">
@@ -289,7 +289,7 @@ const ButtonConfigEditor: React.FC<ButtonConfigEditorProps> = ({ config, onChang
         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Fondo</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Tipo de Fondo
             </label>
             <select
@@ -346,7 +346,7 @@ const ButtonConfigEditor: React.FC<ButtonConfigEditorProps> = ({ config, onChang
           {config.borderEnabled && (
             <>
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Ancho del Borde
                 </label>
                 <input
@@ -359,7 +359,7 @@ const ButtonConfigEditor: React.FC<ButtonConfigEditorProps> = ({ config, onChang
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                   Tipo de Borde
                 </label>
                 <select
@@ -406,7 +406,7 @@ const ButtonConfigEditor: React.FC<ButtonConfigEditorProps> = ({ config, onChang
         <div className={`p-4 rounded-lg ${themePreview === 'light' ? 'bg-gray-100' : 'bg-gray-900'}`}>
           <button
             type="button"
-            className="px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
+            className="px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all"
             style={{
               background: config.bgType === 'gradient' 
                 ? `linear-gradient(to right, ${config.bgGradientFrom}, ${config.bgGradientTo})`
@@ -613,12 +613,12 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Newspaper className="w-6 h-6 text-purple-500" />
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">
             Posts Destacados del Dashboard
           </h2>
         </div>
@@ -669,7 +669,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Título
               </label>
               <input
@@ -680,7 +680,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Icono del Header
               </label>
               <div className="flex items-center gap-2">
@@ -753,7 +753,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               onChange={(color) => updateConfig('panel', themePreview === 'light' ? 'bgColorLight' : 'bgColorDark', color)}
             />
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Radio de Borde
               </label>
               <select
@@ -768,7 +768,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Tamaño de Sombra
               </label>
               <select
@@ -784,7 +784,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Padding Interno
               </label>
               <select
@@ -819,7 +819,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               onChange={(color) => updateConfig('card', themePreview === 'light' ? 'bgGradientToLight' : 'bgGradientToDark', color)}
             />
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Radio de Borde de Tarjeta
               </label>
               <select
@@ -833,7 +833,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Escala en Hover
               </label>
               <select
@@ -908,7 +908,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Familia de Fuente
               </label>
               <select
@@ -964,7 +964,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               supportOpacity={false}
             />
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Máximo de Tags a Mostrar
               </label>
               <input
@@ -1069,7 +1069,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Intervalo de Rotación (ms)
               </label>
               <input
@@ -1132,7 +1132,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
               supportOpacity={false}
             />
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                 Mensaje de Estado Vacío
               </label>
               <input
@@ -1153,7 +1153,7 @@ const DashboardFeaturedPostsConfigSection: React.FC<DashboardFeaturedPostsConfig
       <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={resetToDefaults}
-          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors flex items-center gap-2"
+          className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors flex items-center gap-2"
         >
           <RefreshCw className="w-4 h-4" />
           Resetear a Defaults

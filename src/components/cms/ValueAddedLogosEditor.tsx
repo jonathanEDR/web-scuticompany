@@ -117,15 +117,15 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50 ${className}`}>
+    <div className={`bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50 ${className}`}>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-lg flex items-center justify-center">
             <span className="text-white text-lg">🏢</span>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               Logos Flotantes 🫧
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -136,7 +136,7 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
         
         <button
           onClick={addLogo}
-          className="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2"
+          className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2"
         >
           <span>➕</span>
           Agregar Logo
@@ -239,11 +239,11 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
               {/* Contenido expandido */}
               {expandedLogo === index && (
                 <div className="p-6 border-t border-gray-200 dark:border-gray-600">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Columna izquierda - Información básica */}
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Nombre del Logo
                         </label>
                         <input
@@ -251,12 +251,12 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
                           value={logo.name}
                           onChange={(e) => updateLogo(index, 'name', e.target.value)}
                           placeholder="Ej: SQL, Python, React..."
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Texto Alternativo
                         </label>
                         <input
@@ -264,12 +264,12 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
                           value={logo.alt}
                           onChange={(e) => updateLogo(index, 'alt', e.target.value)}
                           placeholder="Descripción del logo"
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Enlace (Opcional)
                         </label>
                         <input
@@ -277,14 +277,14 @@ const ValueAddedLogosEditor: React.FC<ValueAddedLogosEditorProps> = ({
                           value={logo.link || ''}
                           onChange={(e) => updateLogo(index, 'link', e.target.value)}
                           placeholder="https://ejemplo.com"
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         />
                       </div>
                     </div>
 
                     {/* Columna derecha - Selector de imagen */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Imagen del Logo
                       </label>
                       <ManagedImageSelector

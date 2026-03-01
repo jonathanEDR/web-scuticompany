@@ -146,11 +146,11 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
             ⭐ Diseño de Tarjetas - Valor Agregado
           </h2>
           {hasUnsavedChanges && (
@@ -170,7 +170,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           {hasUnsavedChanges && (
             <button
               onClick={saveChanges}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+              className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
               title="Guardar cambios en la base de datos"
             >
               💾 Guardar
@@ -180,14 +180,14 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
       </div>
 
       {/* Theme Toggle */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-3">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tema:</span>
         <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
           <button
             onClick={() => {
               setActiveTheme('light');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
               activeTheme === 'light'
                 ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
@@ -199,7 +199,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
             onClick={() => {
               setActiveTheme('dark');
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
               activeTheme === 'dark'
                 ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
@@ -212,7 +212,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
       {/* Preview Card */}
       <div className="mb-8 relative">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
           👀 Vista Previa - {activeTheme === 'light' ? 'Tema Claro' : 'Tema Oscuro'}
         </h3>
         
@@ -282,8 +282,8 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
         </div>
 
       {/* Simple Mode Configuration */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
           🎨 Configuración Simple
         </h3>
 
@@ -306,7 +306,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
               onChange={(value) => updateCardStyle('border', value)}
             />
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Grosor del Borde
               </label>
               <select
@@ -332,7 +332,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Color del Título */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color del Título
               </label>
               <div className="flex gap-2">
@@ -353,7 +353,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
             {/* Color de la Descripción */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color de la Descripción
               </label>
               <div className="flex gap-2">
@@ -374,7 +374,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
             {/* Color del "Conocer más" */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color del "Conocer más"
               </label>
               <div className="flex gap-2">
@@ -401,7 +401,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
       <div className="mt-8">
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors duration-200 flex items-center justify-between"
+          className="w-full px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors duration-200 flex items-center justify-between"
         >
           <span>⚙️ Opciones Avanzadas</span>
           <span className="text-xl">{showAdvanced ? '▼' : '▶'}</span>
@@ -410,13 +410,13 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
       {/* Advanced Mode Configuration */}
       {showAdvanced && (
-        <div className="mt-6 space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        <div className="mt-6 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
             ⚙️ Configuración Avanzada
           </h3>
 
           {/* Grid de 2 columnas para Tamaño y Sombras */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Tamaño de Tarjetas - MEJORADO */}
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
               <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
@@ -459,10 +459,10 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {/* Ancho de Tarjetas - Slider */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     📐 Ancho Mínimo: <span className="font-mono text-blue-600 dark:text-blue-400">{safeCurrentStyles.cardMinWidth || '280px'}</span>
                   </label>
                   <div className="space-y-2">
@@ -488,7 +488,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
                 {/* Alto de Tarjetas - Toggle + Slider */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     📏 Alto Mínimo
                   </label>
                   <div className="space-y-3">
@@ -543,7 +543,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
                 {/* Espaciado Interno - Slider */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     📦 Espaciado Interno: <span className="font-mono text-purple-600 dark:text-purple-400">{safeCurrentStyles.cardPadding || '2rem'}</span>
                   </label>
                   <div className="space-y-2">
@@ -569,7 +569,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
                 {/* Ancho Máximo - Simple select */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     ↔️ Ancho Máximo
                   </label>
                   <select
@@ -586,7 +586,7 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
 
                 {/* Alineación de Tarjetas */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     🎯 Alineación de Tarjetas
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -643,9 +643,9 @@ const ValueAddedCardsDesignSection: React.FC<ValueAddedCardsDesignSectionProps> 
             <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
               🖱️ Efectos Hover
             </h4>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Fondo y Borde Hover */}
-              <div className="space-y-6">
+              <div className="space-y-3">
                 <ColorWithOpacity
                   label="Fondo (Hover)"
                   value={safeCurrentStyles.hoverBackground}

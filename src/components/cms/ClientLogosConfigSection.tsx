@@ -19,11 +19,11 @@ const ClientLogosConfigSection: React.FC<ClientLogosConfigSectionProps> = ({
   const [collapsed, setCollapsed] = useState(true);
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50">
       {/* Encabezado colapsable */}
       <button
         type="button"
-        className="w-full flex items-center justify-between text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition-colors"
+        className="w-full flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 rounded transition-colors"
         onClick={() => setCollapsed((prev) => !prev)}
         aria-expanded={!collapsed}
         aria-controls="client-logos-section-content"
@@ -92,7 +92,7 @@ const ClientLogosConfigSection: React.FC<ClientLogosConfigSectionProps> = ({
           </div>
 
           {/* Layout principal con 2 columnas: Contenido y Imagen */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-8">
             
             {/* Columna izquierda: Editores de texto (2/3) */}
             <div className="xl:col-span-2 space-y-4">

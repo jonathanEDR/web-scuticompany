@@ -174,11 +174,11 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 border border-gray-100 dark:border-gray-700/50 ${className}`}>
+    <div className={`bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-gray-100 dark:border-gray-700/50 ${className}`}>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
             📝 Contenido de las Tarjetas
           </h2>
           {hasUnsavedChanges && (
@@ -190,14 +190,14 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
         <div className="flex gap-2">
           <button
             onClick={addItem}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+            className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           >
             ➕ Agregar Solución
           </button>
           <button
             onClick={saveChanges}
             disabled={!hasUnsavedChanges || isSaving}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+            className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           >
             {isSaving ? '⏳ Guardando...' : '💾 Guardar'}
           </button>
@@ -242,7 +242,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
             {/* Contenido expandible */}
             {expandedCard === index && (
               <div className="p-6 bg-white dark:bg-gray-800">
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                   
                   {/* Columna izquierda: Contenido de texto (2/3) */}
                   <div className="xl:col-span-2 space-y-4">
@@ -303,14 +303,14 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
 
                     {/* Gradiente (opcional) */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         🎨 Gradiente (Tailwind)
                       </label>
                       <input
                         type="text"
                         value={item.gradient}
                         onChange={(e) => updateItem(index, 'gradient', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500"
                         placeholder="from-purple-500 to-purple-700"
                       />
                     </div>
@@ -330,7 +330,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                             onChange={(e) => updateItem(index, 'showButton', e.target.checked)}
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                          <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-purple-500 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                         </label>
                         <span className="text-sm text-gray-700 dark:text-gray-300">
                           {item.showButton !== false ? 'Botón visible' : 'Botón oculto'}
@@ -348,7 +348,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                               type="text"
                               value={item.buttonText || 'Conocer más'}
                               onChange={(e) => updateItem(index, 'buttonText', e.target.value)}
-                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500"
                               placeholder="Conocer más"
                             />
                           </div>
@@ -360,7 +360,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
                               type="text"
                               value={item.buttonLink || '/servicios'}
                               onChange={(e) => updateItem(index, 'buttonLink', e.target.value)}
-                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500"
                               placeholder="/servicios o https://..."
                             />
                           </div>
@@ -372,7 +372,7 @@ const CardItemsEditor: React.FC<CardItemsEditorProps> = ({
 
                   {/* Columna derecha: Iconos por tema (1/3) */}
                   <div className="xl:col-span-1">
-                    <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                       🖼️ Iconos por Tema
                     </h4>
                     <div className="space-y-4">

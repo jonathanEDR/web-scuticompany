@@ -287,13 +287,13 @@ const CmsManager: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">
+            <h2 className="text-lg font-bold text-red-800 dark:text-red-200 mb-2">
               ❌ Error al cargar
             </h2>
             <p className="text-red-600 dark:text-red-300 mb-4">{dataMessage.text}</p>
             <button
               onClick={loadPageData}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors duration-200"
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors duration-200"
             >
               🔄 Reintentar
             </button>
@@ -312,7 +312,7 @@ const CmsManager: React.FC = () => {
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Página seleccionada: {selectedPage}</p>
             <button
               onClick={loadPageData}
-              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
+              className="mt-4 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
             >
               🔄 Recargar
             </button>
@@ -325,20 +325,20 @@ const CmsManager: React.FC = () => {
   return (
     <div className="min-h-screen w-full">
       {/* Header */}
-      <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 mb-6 border border-gray-100 dark:border-gray-700/50">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-3 mb-2 border border-gray-100 dark:border-gray-700/50">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
           <div className="flex-1">
-            <div className="flex items-center gap-4 mb-2">
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 🎛️ Gestor de Contenido CMS
                 {hasGlobalChanges && (
-                  <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full animate-pulse">
+                  <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-xs font-medium rounded-full animate-pulse">
                     🟡 Cambios sin guardar
                   </span>
                 )}
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-3">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
               Administra el contenido, SEO y temas de tu página web
             </p>
             
@@ -357,7 +357,7 @@ const CmsManager: React.FC = () => {
               <select
                 value={selectedPage}
                 onChange={(e) => setSelectedPage(e.target.value as any)}
-                className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 font-medium hover:border-purple-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all"
+                className="px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 font-medium hover:border-purple-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all"
               >
                 <option value="home">🏠 Home (Inicio)</option>
                 <option value="about">👥 About (Nosotros)</option>
@@ -393,7 +393,7 @@ const CmsManager: React.FC = () => {
             <button
               onClick={handleManualSave}
               disabled={isLoading || !hasGlobalChanges}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 ${
+              className={`px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 ${
                 hasGlobalChanges && !isLoading
                   ? 'bg-green-600 hover:bg-green-700 text-white'
                   : 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -417,20 +417,20 @@ const CmsManager: React.FC = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 mb-6 border border-gray-100 dark:border-gray-700/50">
+      <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 mb-3 border border-gray-100 dark:border-gray-700/50">
         <div className="flex flex-wrap sm:flex-nowrap overflow-x-auto border-b border-gray-200 dark:border-gray-700 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex-shrink-0 flex-grow px-4 sm:px-6 py-3 sm:py-4 font-medium transition-colors duration-200 flex items-center gap-2 text-base sm:text-lg ${
+              className={`flex-shrink-0 flex-grow px-3 sm:px-4 py-2 sm:py-2.5 font-medium transition-colors duration-200 flex items-center gap-1.5 text-sm sm:text-base ${
                 activeTab === tab.id
                   ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
               }`}
-              style={{ minWidth: '120px' }}
+              style={{ minWidth: '100px' }}
             >
-              <span className="text-lg">{tab.icon}</span>
+              <span className="text-sm">{tab.icon}</span>
               {tab.label}
             </button>
           ))}
@@ -438,7 +438,7 @@ const CmsManager: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="w-full space-y-6">
+      <div className="w-full space-y-3">
         {activeTab === 'content' && (
           <>
             {/* 🎯 Hero Section - Diferente para Blog vs otras páginas */}
@@ -531,7 +531,7 @@ const CmsManager: React.FC = () => {
                 />
                 
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-blue-800 dark:text-blue-200 mb-3">
+                  <h3 className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-3">
                     📝 Configuración de Página "Nosotros"
                   </h3>
                   <p className="text-blue-700 dark:text-blue-300 mb-4">
@@ -585,7 +585,7 @@ const CmsManager: React.FC = () => {
                 
                 {/* Panel informativo */}
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
+                  <h3 className="text-lg font-bold text-green-800 dark:text-green-200 mb-3">
                     🛠️ Configuración de Página "Servicios"
                   </h3>
                   <p className="text-green-700 dark:text-green-300 mb-4">
@@ -619,7 +619,7 @@ const CmsManager: React.FC = () => {
             {/* 📞 SECCIONES ESPECÍFICAS PARA CONTACT */}
             {selectedPage === 'contact' && (
               <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-3">
+                <h3 className="text-lg font-bold text-purple-800 dark:text-purple-200 mb-3">
                   📞 Configuración de Página "Contacto"
                 </h3>
                 <p className="text-purple-700 dark:text-purple-300 mb-4">
@@ -638,7 +638,7 @@ const CmsManager: React.FC = () => {
               <>
                 {/* Panel informativo */}
                 <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-indigo-800 dark:text-indigo-200 mb-3">
+                  <h3 className="text-lg font-bold text-indigo-800 dark:text-indigo-200 mb-3">
                     📰 Configuración de Página "Blog"
                   </h3>
                   <p className="text-indigo-700 dark:text-indigo-300 mb-4">
@@ -668,7 +668,7 @@ const CmsManager: React.FC = () => {
           </>
         )}
         {activeTab === 'cards' && selectedPage === 'home' && (
-          <div className="space-y-8">
+          <div className="space-y-4">
             {/* 🔥 Configuración de Tarjetas de Soluciones (Solutions) */}
             <CardsDesignConfigSection
               pageData={pageData}
@@ -689,7 +689,7 @@ const CmsManager: React.FC = () => {
           </div>
         )}
         {activeTab === 'contact' && selectedPage === 'contact' && (
-          <div className="space-y-8">
+          <div className="space-y-4">
             {/* Configuración específica de la PÁGINA de Contacto */}
             <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-teal-200 dark:border-gray-700/50">
               <div className="flex items-center gap-2 mb-4">
@@ -712,7 +712,7 @@ const CmsManager: React.FC = () => {
           </div>
         )}
         {activeTab === 'contact' && selectedPage !== 'contact' && (
-          <div className="space-y-8">
+          <div className="space-y-4">
             {/* Configuración de contacto general (para Home y otras páginas) */}
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-gray-900/50 p-4 border border-blue-200 dark:border-gray-700/50">
               <div className="flex items-center gap-2 mb-4">
@@ -754,7 +754,7 @@ const CmsManager: React.FC = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 Esta página genera el SEO automáticamente desde los datos individuales:
               </p>
-              <ul className="text-left bg-white dark:bg-gray-800 rounded-lg p-6 mb-4 space-y-2">
+              <ul className="text-left bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 space-y-2">
                 <li className="flex items-start gap-2">
                   <span className="text-green-500 mt-1">✅</span>
                   <span className="text-gray-700 dark:text-gray-300">
@@ -801,7 +801,7 @@ const CmsManager: React.FC = () => {
           />
         )}
         {activeTab === 'sidebar' && (
-          <div className="space-y-8">
+          <div className="space-y-4">
             {/* Configuración del Sidebar */}
             <SidebarConfigSection
               onSave={() => setSaveStatus('saved')}
@@ -811,7 +811,7 @@ const CmsManager: React.FC = () => {
             {/* Separador */}
             <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-8">
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   <span className="text-2xl">📰</span>
                   Bloque de Posts Destacados
                 </h2>

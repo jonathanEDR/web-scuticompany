@@ -147,7 +147,7 @@ export const ThemeStylePanel: React.FC<ThemeStylePanelProps> = ({
             }}
           >
             <div
-              className="px-4 py-3 flex items-center gap-3"
+              className="px-3 py-1.5 flex items-center gap-3"
               style={{
                 background: `linear-gradient(to right, ${styles.accentGradientFrom}20, ${styles.accentGradientTo}20)`,
               }}
@@ -169,7 +169,7 @@ export const ThemeStylePanel: React.FC<ThemeStylePanelProps> = ({
               </div>
             </div>
             <div
-              className="px-4 py-3"
+              className="px-3 py-1.5"
               style={{
                 background: styles.contentBackground,
                 color: styles.contentText,

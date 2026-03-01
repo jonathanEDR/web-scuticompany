@@ -231,7 +231,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
         <div className="flex items-center gap-3">
           <span className="text-2xl">📰</span>
           <div className="text-left">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
               Blog Hero Section
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -255,10 +255,10 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
       {isExpanded && (
         <div className="p-6">
           {/* Sub-tabs */}
-          <div className="flex flex-wrap gap-2 mb-6 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
+          <div className="flex flex-wrap gap-2 mb-3 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
             <button
               onClick={() => setActiveSubTab('content')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md font-medium transition-all ${
                 activeSubTab === 'content'
                   ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
@@ -269,7 +269,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
             </button>
             <button
               onClick={() => setActiveSubTab('background')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md font-medium transition-all ${
                 activeSubTab === 'background'
                   ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
@@ -280,7 +280,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
             </button>
             <button
               onClick={() => setActiveSubTab('stats')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md font-medium transition-all ${
                 activeSubTab === 'stats'
                   ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
@@ -291,7 +291,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
             </button>
             <button
               onClick={() => setActiveSubTab('search')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md font-medium transition-all ${
                 activeSubTab === 'search'
                   ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
@@ -304,30 +304,30 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
           {/* Content Tab */}
           {activeSubTab === 'content' && (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {/* Título Principal */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Título Principal
                   </label>
                   <input
                     type="text"
                     value={blogHero.title || 'Blog'}
                     onChange={(e) => handleUpdate('title', e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Blog"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Palabra Destacada (color diferente)
                   </label>
                   <input
                     type="text"
                     value={blogHero.titleHighlight || 'Tech'}
                     onChange={(e) => handleUpdate('titleHighlight', e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Tech"
                   />
                 </div>
@@ -335,21 +335,21 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
               {/* Subtítulo */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Subtítulo
                 </label>
                 <input
                   type="text"
                   value={blogHero.subtitle || ''}
                   onChange={(e) => handleUpdate('subtitle', e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Las últimas noticias y tendencias tecnológicas"
                 />
               </div>
 
               {/* ✨ Estilos de Resaltado del Título */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                   ✨ Estilos de Resaltado del Título
                   <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(Efecto badge como en la maqueta)</span>
                 </h3>
@@ -370,7 +370,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                           onChange={(e) => handleUpdate('titleStyle.italic', e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     {/* Fondo */}
@@ -383,7 +383,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                           onChange={(e) => handleUpdate('titleStyle.hasBackground', e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     {/* Color de Fondo */}
@@ -449,7 +449,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                           onChange={(e) => handleUpdate('highlightStyle.italic', e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     {/* Fondo */}
@@ -462,7 +462,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                           onChange={(e) => handleUpdate('highlightStyle.hasBackground', e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     {/* Color de Fondo */}
@@ -515,12 +515,12 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
               {/* Colores de texto */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
                   Colores de Texto
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Color Título
                     </label>
                     <div className="flex items-center gap-3">
@@ -554,7 +554,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                             onChange={(e) => handleStyleUpdate('light', 'titleHighlightUseGradient', e.target.checked)}
                             className="sr-only peer"
                           />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                         </label>
                       </div>
                     </div>
@@ -644,7 +644,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
                 {/* Color Subtítulo - en nueva fila */}
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color Subtítulo
                   </label>
                   <div className="flex items-center gap-3 max-w-xs">
@@ -713,12 +713,12 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
           {/* Background Tab */}
           {activeSubTab === 'background' && (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {/* Imagen de fondo */}
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                       🖼️ Imagen de Fondo
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -781,7 +781,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                 {/* Overlay control (solo si hay imagen) */}
                 {blogHero.backgroundImage && (
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Oscurecer imagen: {Math.round((blogHero.backgroundOverlay || 0.5) * 100)}%
                     </label>
                     <input
@@ -805,7 +805,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                       🎨 Gradiente de Fondo
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -824,7 +824,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Color Inicio
                     </label>
                     <div className="flex items-center gap-3">
@@ -843,7 +843,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Color Fin
                     </label>
                     <div className="flex items-center gap-3">
@@ -916,7 +916,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
           {/* Stats Tab */}
           {activeSubTab === 'stats' && (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {/* Toggle de estadísticas */}
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div>
@@ -941,38 +941,38 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
               {/* Configuración de estadísticas */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Etiqueta de Artículos
                   </label>
                   <input
                     type="text"
                     value={blogHero.stats?.articlesLabel || 'Artículos'}
                     onChange={(e) => handleUpdate('stats.articlesLabel', e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Artículos"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Contador de Lectores
                   </label>
                   <input
                     type="text"
                     value={blogHero.stats?.readersCount || '15K+'}
                     onChange={(e) => handleUpdate('stats.readersCount', e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     placeholder="15K+"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Etiqueta de Lectores
                   </label>
                   <input
                     type="text"
                     value={blogHero.stats?.readersLabel || 'Lectores'}
                     onChange={(e) => handleUpdate('stats.readersLabel', e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Lectores"
                   />
                 </div>
@@ -999,30 +999,30 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
           {/* Search Tab */}
           {activeSubTab === 'search' && (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {/* Textos básicos */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Placeholder del Buscador
                   </label>
                   <input
                     type="text"
                     value={blogHero.search?.placeholder || 'Buscar noticias...'}
                     onChange={(e) => handleUpdate('search.placeholder', e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Buscar noticias..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Texto del Botón
                   </label>
                   <input
                     type="text"
                     value={blogHero.search?.buttonText || 'Buscar'}
                     onChange={(e) => handleUpdate('search.buttonText', e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Buscar"
                   />
                 </div>
@@ -1030,7 +1030,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
               {/* ========== ESTILOS DEL INPUT DE BÚSQUEDA ========== */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                   🔍 Estilos del Buscador
                 </h3>
 
@@ -1143,7 +1143,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                           onChange={(e) => handleUpdate('search.inputStyles.light.useGradientBorder', e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     {blogHero.search?.inputStyles?.light?.useGradientBorder && (
@@ -1320,7 +1320,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
                           onChange={(e) => handleUpdate('search.inputStyles.dark.useGradientBorder', e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     {blogHero.search?.inputStyles?.dark?.useGradientBorder && (
@@ -1391,7 +1391,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
               {/* ========== ESTILOS DEL BOTÓN ========== */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                   🔘 Estilos del Botón
                 </h3>
 
@@ -1538,7 +1538,7 @@ const BlogHeroConfigSection: React.FC<BlogHeroConfigSectionProps> = ({
 
               {/* Preview del buscador - Tema Claro */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
                   👁️ Vista Previa
                 </h3>
                 

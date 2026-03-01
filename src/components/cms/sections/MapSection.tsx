@@ -98,7 +98,7 @@ const MapSection: React.FC<MapSectionProps> = ({
               
               {/* Enlace de Google Maps */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   🔗 Enlace de Google Maps
                 </label>
                 <div className="space-y-2">
@@ -350,7 +350,7 @@ const MapSection: React.FC<MapSectionProps> = ({
 
                 {/* Logo personalizado */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                     Logo Personalizado
                   </label>
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
@@ -897,7 +897,7 @@ const MapSection: React.FC<MapSectionProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-600 text-center">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600 text-center">
                     <div className="text-4xl mb-2">🗺️</div>
                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
                       Configura las coordenadas

@@ -341,7 +341,7 @@ const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorP
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] px-4 py-3',
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[80px] px-3 py-2',
       },
     },
   });
@@ -376,13 +376,13 @@ const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorP
   return (
     <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800 transition-colors">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 px-4 pt-3">
+        <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1 px-3 pt-2">
           {label}
         </label>
       )}
 
       {/* Toolbar */}
-      <div className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-2 flex flex-wrap gap-1">
+      <div className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-2 py-1 flex flex-wrap gap-0.5">
         {/* Headings */}
         <div className="flex border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
           <button
@@ -611,7 +611,7 @@ const RichTextEditor = ({ value, onChange, placeholder, label }: RichTextEditorP
       </div>
 
       {/* Character count */}
-      <div className="border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
+      <div className="border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-1 text-[11px] text-gray-400 dark:text-gray-500">
         {editor.storage.characterCount?.characters() || 0} caracteres
       </div>
     </div>
