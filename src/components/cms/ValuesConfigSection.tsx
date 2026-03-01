@@ -131,7 +131,6 @@ const ValuesConfigSection: React.FC<ValuesConfigSectionProps> = ({
   const [collapsed, setCollapsed] = useState(true);
   const [collapsedWhyChooseUs, setCollapsedWhyChooseUs] = useState(true); // 🆕
   const [expandedValue, setExpandedValue] = useState<number | null>(null);
-  const [imageTheme, setImageTheme] = useState<'light' | 'dark'>('light');
 
   // Actualizar un valor específico
   const updateValue = (index: number, field: string, value: any) => {

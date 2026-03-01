@@ -153,6 +153,15 @@ interface PageData {
     ogTitle?: string;
     ogDescription?: string;
     ogImage?: string;
+    // Campos añadidos en Fase 1-2 SEO
+    canonicalUrl?: string;
+    robots?: string;
+    ogType?: string;
+    twitterCard?: string;
+    twitterTitle?: string;
+    twitterDescription?: string;
+    twitterImage?: string;
+    structuredData?: Record<string, any> | null;
   };
   theme?: ExtendedThemeConfig;
 }
