@@ -26,14 +26,15 @@ export default defineConfig({
     cssCodeSplit: true,
     // ⚡ Target moderno para mejor tree-shaking
     target: 'es2020',
-    // ⚡ PERF: No inyectar modulepreload para chunks diferidos (editor, clerk)
+    // ⚡ PERF: No inyectar modulepreload para chunks diferidos (editor, clerk, icons)
     // Solo los chunks críticos se precargan automáticamente
     modulePreload: {
       resolveDependencies: (_filename: string, deps: string[]) => {
         // Filtrar chunks pesados que no son críticos para el render inicial
         return deps.filter(dep => 
           !dep.includes('editor') && 
-          !dep.includes('clerk')
+          !dep.includes('clerk') &&
+          !dep.includes('icons')   // ⚡ lucide-react 858KB - no precargar (solo en dashboards/detalles)
         );
       }
     },
