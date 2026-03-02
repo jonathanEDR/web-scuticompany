@@ -83,10 +83,10 @@ export function useKeepBackendAlive(options?: {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       
-      // Delay de 2 segundos para no competir con recursos críticos
+      // ⚡ PERF: Delay de 10s para no competir con LCP, hero image y CMS fetch
       const initialTimeout = setTimeout(() => {
         pingBackend();
-      }, 2000);
+      }, 10000);
 
       // Configurar ping periódico
       intervalRef.current = setInterval(() => {

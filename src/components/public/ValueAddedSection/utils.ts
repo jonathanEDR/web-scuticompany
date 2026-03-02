@@ -1,5 +1,13 @@
-import DOMPurify from 'dompurify';
 import type { CardDesignStyles } from '../../../types/cms';
+
+// ⚡ PERF: Sanitización ligera en vez de DOMPurify (~22KB ahorrados)
+const sanitizeLight = (html: string): string => {
+  if (!html || !html.includes('<')) return html;
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  div.querySelectorAll('script,iframe,object,embed,form').forEach(el => el.remove());
+  return div.innerHTML;
+};
 import type { ValueAddedData, ValueAddedItem } from './types';
 import { DEFAULT_LIGHT_CARD_STYLES, DEFAULT_DARK_CARD_STYLES } from './constants';
 
@@ -9,7 +17,7 @@ import { DEFAULT_LIGHT_CARD_STYLES, DEFAULT_DARK_CARD_STYLES } from './constants
 export const cleanHtmlToText = (htmlString: string): string => {
   if (!htmlString) return '';
   const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = DOMPurify.sanitize(htmlString);
+  tempDiv.innerHTML = sanitizeLight(htmlString);
   return tempDiv.textContent || tempDiv.innerText || '';
 };
 

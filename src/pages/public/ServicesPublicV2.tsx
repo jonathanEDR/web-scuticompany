@@ -4,12 +4,13 @@
  * ⚡ Optimizada con lazy loading y React.memo
  */
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
-import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
+// ⚡ PERF: Lazy load del chat widget
+const FloatingChatWidget = lazy(() => import('../../components/floating-chat/FloatingChatWidget'));
 import { ServicioPublicCard } from '../../components/public/ServicioPublicCard';
 import { ServicesAccordionList } from '../../components/public/ServicesAccordionList';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -1739,7 +1740,9 @@ const ServicesPublicV2 = () => {
         <PublicFooter />
         
         {/* 💬 Chatbot de Ventas Flotante */}
-        <FloatingChatWidget />
+        <Suspense fallback={null}>
+          <FloatingChatWidget />
+        </Suspense>
       </div>
     </>
   );

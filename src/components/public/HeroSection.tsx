@@ -1,8 +1,23 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import '../../styles/gradient-borders.css';
+
+// ⚡ PERF: Sanitización ligera en lugar de DOMPurify (22KB) para contenido CMS confiable
+const sanitizeLight = (html: string): string => {
+  if (!html || !html.includes('<')) return html;
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  div.querySelectorAll('script,iframe,object,embed,form').forEach(el => el.remove());
+  return div.innerHTML;
+};
+
+// ⚡ PERF: Generar URLs responsivas de Cloudinary para diferentes tamaños de pantalla
+const getCloudinaryResponsive = (url: string | null, width: number): string | null => {
+  if (!url) return null;
+  if (!url.includes('cloudinary.com') || !url.includes('/upload/')) return url;
+  return url.replace('/upload/', `/upload/w_${width},f_auto,q_auto/`);
+};
 
 interface HeroData {
   title: string;
@@ -69,16 +84,20 @@ const HeroSection = ({ data }: HeroSectionProps) => {
 
   const currentBackgroundImage = getCurrentBackgroundImage();
 
-  // ⚡ PERF: Preload dinámico del hero image (LCP resource)
+  // ⚡ PERF: Preload dinámico del hero image con tamaño optimizado
   useEffect(() => {
     if (currentBackgroundImage) {
-      const existingPreload = document.querySelector(`link[rel="preload"][href="${currentBackgroundImage}"]`);
+      // Preload versión optimizada para el viewport actual
+      const optimalWidth = window.innerWidth <= 768 ? 768 : window.innerWidth <= 1024 ? 1024 : 1920;
+      const optimizedUrl = getCloudinaryResponsive(currentBackgroundImage, optimalWidth) || currentBackgroundImage;
+      const existingPreload = document.querySelector('link[rel="preload"][as="image"][data-hero]');
       if (!existingPreload) {
         const link = document.createElement('link');
         link.rel = 'preload';
         link.as = 'image';
-        link.href = currentBackgroundImage;
+        link.href = optimizedUrl;
         link.setAttribute('fetchpriority', 'high');
+        link.setAttribute('data-hero', 'true');
         document.head.appendChild(link);
       }
     }
@@ -107,14 +126,20 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                height: '100vh'
              }}>
       
-      {/* Background Image (si existe) - ⚡ PERF: <img> con fetchpriority para LCP */}
+      {/* Background Image - ⚡ PERF: srcSet responsivo + fetchPriority para LCP */}
       {currentBackgroundImage && (
         <img 
-          src={currentBackgroundImage}
+          src={getCloudinaryResponsive(currentBackgroundImage, 1920) || currentBackgroundImage}
+          srcSet={currentBackgroundImage.includes('cloudinary.com') ? `
+            ${getCloudinaryResponsive(currentBackgroundImage, 640)} 640w,
+            ${getCloudinaryResponsive(currentBackgroundImage, 768)} 768w,
+            ${getCloudinaryResponsive(currentBackgroundImage, 1024)} 1024w,
+            ${getCloudinaryResponsive(currentBackgroundImage, 1920)} 1920w
+          ` : undefined}
+          sizes="100vw"
           alt={heroData.backgroundImageAlt || 'Hero background'}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out z-0"
+          className="absolute inset-0 w-full h-full object-cover z-0"
           fetchPriority="high"
-          decoding="async"
           width={1920}
           height={1080}
         />
@@ -157,7 +182,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                   ? '1px 1px 2px rgba(0,0,0,0.1)' // Sombra muy sutil para tema claro
                   : '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6)' // Sombra más fuerte para tema oscuro
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.title) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeLight(heroData.title) }}
             />
           </div>
 
@@ -177,7 +202,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                   ? '0.5px 0.5px 1px rgba(0,0,0,0.1)' // Sombra muy ligera para tema claro
                   : '1px 1px 3px rgba(0,0,0,0.7), 0 0 6px rgba(0,0,0,0.5)' // Sombra para tema oscuro
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.subtitle) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeLight(heroData.subtitle) }}
             />
             <div
               className={`hero-description text-xs sm:text-xs md:text-sm theme-transition transition-all duration-1000 delay-500 ${
@@ -193,7 +218,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                   ? 'none' // Sin sombra para texto de descripción en tema claro
                   : '1px 1px 2px rgba(0,0,0,0.6)' // Sombra sutil para tema oscuro
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.description) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeLight(heroData.description) }}
             />
           </div>
 
@@ -248,56 +273,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
         </svg>
       </button>
 
-      {/* CSS for enhanced animations */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        
-        @keyframes gradientShift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        
-        @keyframes backgroundScroll {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(40px); }
-        }
-        
-        /* Smooth focus transitions */
-        .focus-ring {
-          transition: box-shadow 0.2s ease-in-out;
-        }
-        
-        /* Improved button interactions */
-        .button-hover {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 1s ease-out;
-        }
-        
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-        
-        /* Reduced motion for accessibility */
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-          }
-        }
-      `}</style>
+      {/* ⚡ PERF: Estilos duplicados eliminados - ya definidos en index.css */}
     </section>
   );
 };

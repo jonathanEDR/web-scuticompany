@@ -8,10 +8,11 @@
  * - Estructura responsive
  */
 
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import PublicHeader from './public/PublicHeader';
 import PublicFooter from './public/PublicFooter';
-import FloatingChatWidget from './floating-chat/FloatingChatWidget';
+// ⚡ PERF: Lazy load del chat widget
+const FloatingChatWidget = lazy(() => import('./floating-chat/FloatingChatWidget'));
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -37,7 +38,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
       {showFooter && <PublicFooter />}
       
       {/* 💬 Chatbot Flotante para páginas públicas */}
-      {showChat && <FloatingChatWidget />}
+      {showChat && <Suspense fallback={null}><FloatingChatWidget /></Suspense>}
     </div>
   );
 };

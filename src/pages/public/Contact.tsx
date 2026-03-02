@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import ContactSection from '../../components/public/ContactSection';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
-import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
+// ⚡ PERF: Lazy load del chat widget
+const FloatingChatWidget = lazy(() => import('../../components/floating-chat/FloatingChatWidget'));
 import { useCategoriasTipoServicio } from '../../hooks/useCategoriasTipoServicio';
 import { useSeo } from '../../hooks/useSeo';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
@@ -562,7 +563,9 @@ const Contact = () => {
       <PublicFooter />
       
       {/* 💬 Chatbot de Ventas Flotante */}
-      <FloatingChatWidget />
+      <Suspense fallback={null}>
+        <FloatingChatWidget />
+      </Suspense>
     </div>
   );
 };

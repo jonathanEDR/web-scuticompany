@@ -42,30 +42,21 @@ export default defineConfig({
         // ⚡ Code splitting optimizado
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // React core - carga crítica
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-core';
-            }
-            // Router - carga crítica
-            if (id.includes('react-router')) {
-              return 'router';
-            }
+            // ⚡ IMPORTANT: Paquetes específicos PRIMERO (antes del check genérico 'react')
+            // lucide-react contiene "react" en el nombre, debe ir antes
+            if (id.includes('lucide-react')) return 'icons';
+            // Router
+            if (id.includes('react-router')) return 'router';
             // Clerk - carga diferida
-            if (id.includes('@clerk')) {
-              return 'clerk';
-            }
+            if (id.includes('@clerk')) return 'clerk';
             // Editor TipTap - carga diferida (solo en /dashboard)
-            if (id.includes('@tiptap') || id.includes('prosemirror')) {
-              return 'editor';
-            }
-            // Iconos - carga diferida
-            if (id.includes('lucide-react')) {
-              return 'icons';
-            }
+            if (id.includes('@tiptap') || id.includes('prosemirror')) return 'editor';
+            // react-helmet
+            if (id.includes('react-helmet')) return 'react-helmet';
+            // React core - carga crítica (DESPUÉS de checks específicos)
+            if (id.includes('react') || id.includes('react-dom')) return 'react-core';
             // Utilidades
-            if (id.includes('date-fns') || id.includes('lodash')) {
-              return 'utils';
-            }
+            if (id.includes('date-fns') || id.includes('lodash')) return 'utils';
           }
         },
         // ⚡ Nombres de archivo con hash para cache busting
