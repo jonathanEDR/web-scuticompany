@@ -1,15 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
-
-// ⚡ PERF: Sanitización ligera en vez de DOMPurify (~22KB ahorrados)
-const sanitizeLight = (html: string): string => {
-  if (!html || !html.includes('<')) return html;
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  div.querySelectorAll('script,iframe,object,embed,form').forEach(el => el.remove());
-  return div.innerHTML;
-};
 import type { CardDesignStyles, ButtonStyle } from '../../types/cms';
 
 interface SolutionItem {
@@ -81,7 +73,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
   const cleanHtmlToText = (htmlString: string): string => {
     if (!htmlString) return '';
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = sanitizeLight(htmlString);
+    tempDiv.innerHTML = DOMPurify.sanitize(htmlString);
     return tempDiv.textContent || tempDiv.innerText || '';
   };
 
@@ -339,7 +331,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
               // 🎯 Permitir que los tamaños de letra del RichTextEditor se apliquen
               fontSize: 'inherit' // Hereda el tamaño del contenido HTML
             }}
-            dangerouslySetInnerHTML={{ __html: sanitizeLight(mappedData.subtitle || '') }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mappedData.subtitle || '') }}
           />
         </div>
       </div>
@@ -486,7 +478,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                     ),
                     fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
-                  dangerouslySetInnerHTML={{ __html: sanitizeLight(solution.title) }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.title) }}
                 />
                 <div
                   className="leading-relaxed transition-colors text-center"
@@ -497,7 +489,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                     ),
                     fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
-                  dangerouslySetInnerHTML={{ __html: sanitizeLight(solution.description) }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.description) }}
                 />
               </div>
 

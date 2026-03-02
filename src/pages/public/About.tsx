@@ -1,10 +1,9 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import DOMPurify from 'dompurify';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
-// ⚡ PERF: Lazy load del chat widget
-const FloatingChatWidget = lazy(() => import('../../components/floating-chat/FloatingChatWidget'));
+import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
 import { getPageBySlug } from '../../services/cmsApi';
@@ -1257,9 +1256,7 @@ const About = () => {
         <PublicFooter />
         
         {/* 💬 Chatbot de Ventas Flotante */}
-        <Suspense fallback={null}>
-          <FloatingChatWidget />
-        </Suspense>
+        <FloatingChatWidget />
       </div>
     </>
   );

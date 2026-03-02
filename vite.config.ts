@@ -26,15 +26,14 @@ export default defineConfig({
     cssCodeSplit: true,
     // ⚡ Target moderno para mejor tree-shaking
     target: 'es2020',
-    // ⚡ PERF: No inyectar modulepreload para chunks diferidos (editor, clerk, icons)
+    // ⚡ PERF: No inyectar modulepreload para chunks diferidos (editor, clerk)
     // Solo los chunks críticos se precargan automáticamente
     modulePreload: {
       resolveDependencies: (_filename: string, deps: string[]) => {
         // Filtrar chunks pesados que no son críticos para el render inicial
         return deps.filter(dep => 
           !dep.includes('editor') && 
-          !dep.includes('clerk') &&
-          !dep.includes('icons')   // ⚡ lucide-react 858KB - no precargar (solo en dashboards/detalles)
+          !dep.includes('clerk')
         );
       }
     },
@@ -43,18 +42,30 @@ export default defineConfig({
         // ⚡ Code splitting optimizado
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // ⚡ lucide-react PRIMERO (contiene "react" en nombre → evitar que caiga en react-core)
-            if (id.includes('lucide-react')) return 'icons';
             // React core - carga crítica
-            // Incluye: react, react-dom, react-router, react-helmet, @clerk/clerk-react, @tiptap/react
-            // Todos deben estar juntos para evitar errores de inicialización circular
-            if (id.includes('react') || id.includes('react-dom')) return 'react-core';
-            // Clerk sin "react" en path (@clerk/types, @clerk/backend, etc.)
-            if (id.includes('@clerk')) return 'clerk';
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-core';
+            }
+            // Router - carga crítica
+            if (id.includes('react-router')) {
+              return 'router';
+            }
+            // Clerk - carga diferida
+            if (id.includes('@clerk')) {
+              return 'clerk';
+            }
             // Editor TipTap - carga diferida (solo en /dashboard)
-            if (id.includes('@tiptap') || id.includes('prosemirror')) return 'editor';
+            if (id.includes('@tiptap') || id.includes('prosemirror')) {
+              return 'editor';
+            }
+            // Iconos - carga diferida
+            if (id.includes('lucide-react')) {
+              return 'icons';
+            }
             // Utilidades
-            if (id.includes('date-fns') || id.includes('lodash')) return 'utils';
+            if (id.includes('date-fns') || id.includes('lodash')) {
+              return 'utils';
+            }
           }
         },
         // ⚡ Nombres de archivo con hash para cache busting

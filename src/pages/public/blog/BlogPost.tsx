@@ -10,8 +10,6 @@ import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Tag as TagIcon } from 'lucide-react';
-// ⚡ PERF: Blog CSS se carga solo cuando se visita un post (extraído de index.css)
-import '../../../styles/blogPost.css';
 import { useBlogPost } from '../../../hooks/blog';
 import { usePostContent } from '../../../hooks/blog/usePostContent';
 import { useCmsData } from '../../../hooks/cms/useCmsData';

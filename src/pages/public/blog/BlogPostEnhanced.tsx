@@ -7,8 +7,6 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-// ⚡ PERF: Blog CSS se carga solo cuando se visita un post
-import '../../../styles/blogPost.css';
 import { useBlogPost } from '../../../hooks/blog';
 import { 
   ShareButtons, 

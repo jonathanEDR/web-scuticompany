@@ -1,16 +1,14 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import PublicHeader from '../../components/public/PublicHeader';
 import HeroSection from '../../components/public/HeroSection';
 import SolutionsSection from '../../components/public/SolutionsSection';
 import ValueAddedSection from '../../components/public/ValueAddedSection';
-// ⚡ PERF: Lazy load de secciones below-the-fold - no bloquean LCP
-const ClientLogosSection = lazy(() => import('../../components/public/ClientLogosSection'));
-const FeaturedBlogSection = lazy(() => import('../../components/public/FeaturedBlogSection'));
-const ContactSection = lazy(() => import('../../components/public/ContactSection'));
-const PublicFooter = lazy(() => import('../../components/public/PublicFooter'));
-// ⚡ PERF: Lazy load del chat widget - no es crítico para el render inicial
-const FloatingChatWidget = lazy(() => import('../../components/floating-chat/FloatingChatWidget'));
+import ClientLogosSection from '../../components/public/ClientLogosSection';
+import FeaturedBlogSection from '../../components/public/FeaturedBlogSection';
+import ContactSection from '../../components/public/ContactSection';
+import PublicFooter from '../../components/public/PublicFooter';
+import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import PageLoader from '../../components/common/PageLoader';
 import { HomePageSchema } from '../../components/seo/SchemaOrg';
 import { getPageBySlug, forceReload, getCachedPageSync } from '../../services/cmsApi';
@@ -422,32 +420,24 @@ const HomeOptimized = () => {
             data={pageData.content.valueAdded}
             themeConfig={pageData.theme}
           />
+          <ClientLogosSection
+            data={pageData.content.clientLogos}
+          />
 
-          {/* ⚡ PERF: Below-the-fold sections lazy loaded */}
-          <Suspense fallback={null}>
-            <ClientLogosSection
-              data={pageData.content.clientLogos}
-            />
+          <ContactSection
+            data={addCategoriasToConfig(pageData.content.contactForm, categorias)}
+            categorias={categorias}
+          />
 
-            <ContactSection
-              data={addCategoriasToConfig(pageData.content.contactForm, categorias)}
-              categorias={categorias}
-            />
-
-            <FeaturedBlogSection
-              data={pageData.content.featuredBlog}
-              themeConfig={pageData.theme}
-            />
-          </Suspense>
+          <FeaturedBlogSection
+            data={pageData.content.featuredBlog}
+            themeConfig={pageData.theme}
+          />
         </main>
-        <Suspense fallback={null}>
-          <PublicFooter />
-        </Suspense>
+        <PublicFooter />
 
-        {/* Chatbot de Ventas Flotante - ⚡ PERF: Lazy loaded */}
-        <Suspense fallback={null}>
-          <FloatingChatWidget />
-        </Suspense>
+        {/* Chatbot de Ventas Flotante */}
+        <FloatingChatWidget />
       </div>
     </>
   );
