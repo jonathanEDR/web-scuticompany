@@ -42,19 +42,16 @@ export default defineConfig({
         // ⚡ Code splitting optimizado
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // ⚡ lucide-react PRIMERO (contiene "react" en nombre, debe ir antes del check genérico)
+            // ⚡ lucide-react PRIMERO (contiene "react" en nombre → evitar que caiga en react-core)
             if (id.includes('lucide-react')) return 'icons';
-            // Router antes de react genérico
-            if (id.includes('react-router')) return 'router';
+            // React core - carga crítica
+            // Incluye: react, react-dom, react-router, react-helmet, @clerk/clerk-react, @tiptap/react
+            // Todos deben estar juntos para evitar errores de inicialización circular
+            if (id.includes('react') || id.includes('react-dom')) return 'react-core';
+            // Clerk sin "react" en path (@clerk/types, @clerk/backend, etc.)
+            if (id.includes('@clerk')) return 'clerk';
             // Editor TipTap - carga diferida (solo en /dashboard)
             if (id.includes('@tiptap') || id.includes('prosemirror')) return 'editor';
-            // react-helmet separado
-            if (id.includes('react-helmet')) return 'react-helmet';
-            // React core - incluye @clerk/clerk-react y @clerk/shared/react
-            // (DEBEN estar juntos para que Clerk inicialice correctamente)
-            if (id.includes('react') || id.includes('react-dom')) return 'react-core';
-            // Clerk restante (@clerk/types, @clerk/backend, etc.)
-            if (id.includes('@clerk')) return 'clerk';
             // Utilidades
             if (id.includes('date-fns') || id.includes('lodash')) return 'utils';
           }
