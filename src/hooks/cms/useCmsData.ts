@@ -70,6 +70,8 @@ export const useCmsData = (pageSlug: string = 'home') => {
             case 'blog': return 'Blog - Noticias';
             case 'blog-post-detail': return 'Detalle de Post del Blog';
             case 'servicio-detail': return 'Detalle de Servicio';
+            case 'proyectos': return 'Portafolio de Proyectos';
+            case 'proyecto-detail': return 'Detalle de Proyecto';
             default: return 'Página';
           }
         };
@@ -134,6 +136,17 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 ogImage: images.ogBlog,
                 twitterCard: 'summary_large_image'
               };
+            case 'proyectos':
+              return {
+                focusKeyphrase: 'portafolio proyectos tecnológicos',
+                metaTitle: `Portafolio de Proyectos${seo.titleSuffix}`,
+                metaDescription: 'Conoce los proyectos y sistemas que hemos desarrollado. Soluciones tecnológicas a medida para empresas.',
+                keywords: ['portafolio', 'proyectos', 'sistemas web', 'desarrollo software', 'soluciones tecnológicas'],
+                ogTitle: `Portafolio de Proyectos${seo.titleSuffix}`,
+                ogDescription: 'Proyectos tecnológicos que transforman negocios',
+                ogImage: images.ogDefault,
+                twitterCard: 'summary_large_image'
+              };
             case 'blog-post-detail':
               return {
                 focusKeyphrase: 'artículo tecnología',
@@ -142,6 +155,17 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 keywords: ['blog', 'artículo', 'tecnología', 'software', 'inteligencia artificial'],
                 ogTitle: 'Blog - SCUTI Company',
                 ogDescription: 'Contenido educativo sobre tecnología y desarrollo',
+                ogImage: images.ogDefault,
+                twitterCard: 'summary_large_image'
+              };
+            case 'proyecto-detail':
+              return {
+                focusKeyphrase: 'proyecto tecnológico',
+                metaTitle: `Proyecto${seo.titleSuffix}`,
+                metaDescription: 'Conoce los detalles de este proyecto tecnológico desarrollado por SCUTI Company.',
+                keywords: ['proyecto', 'desarrollo', 'software', 'portafolio', 'solución tecnológica'],
+                ogTitle: `Proyecto${seo.titleSuffix}`,
+                ogDescription: 'Detalle de proyecto tecnológico desarrollado a medida',
                 ogImage: images.ogDefault,
                 twitterCard: 'summary_large_image'
               };
@@ -216,6 +240,26 @@ export const useCmsData = (pageSlug: string = 'home') => {
                 ctaText: 'Ver Noticias',
                 ctaLink: '/blog',
                 backgroundImageAlt: 'Blog',
+                ...baseHero
+              };
+            case 'proyectos':
+              return {
+                title: 'Proyectos que transforman negocios',
+                subtitle: 'Nuestro Portafolio',
+                description: 'Soluciones tecnológicas a medida que impulsan el crecimiento de nuestros clientes',
+                ctaText: 'Contáctanos',
+                ctaLink: '/contacto',
+                backgroundImageAlt: 'Portafolio de Proyectos',
+                ...baseHero
+              };
+            case 'proyecto-detail':
+              return {
+                title: 'Detalle de Proyecto',
+                subtitle: 'Portafolio',
+                description: 'Conoce los detalles de este proyecto',
+                ctaText: 'Contactar',
+                ctaLink: '/contacto',
+                backgroundImageAlt: 'Detalle de Proyecto',
                 ...baseHero
               };
             default:
@@ -337,6 +381,143 @@ export const useCmsData = (pageSlug: string = 'home') => {
                   }
                 }
               }
+            };
+          }
+
+          // ✅ Para PROYECTOS: hero + portfolio grid + CTA section config
+          if (slug === 'proyectos') {
+            return {
+              ...baseContent,
+              portfolio: {
+                sectionTitle: 'Nuestros Proyectos',
+                backgroundImage: FALLBACK_BACKGROUND_IMAGES,
+                backgroundOpacity: 0,
+              },
+              portfolioCardDesign: {
+                light: {
+                  cardBg: '#ffffff',
+                  cardBorder: 'rgba(229,231,235,0.8)',
+                  cardHoverBorder: '#d8b4fe',
+                  cardRadius: '16',
+                  cardShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  cardHoverShadow: '0 25px 50px rgba(147,51,234,0.15)',
+                  imageHeight: '224',
+                  titleColor: '#111827',
+                  descriptionColor: '#4b5563',
+                  tagBg: '#faf5ff',
+                  tagText: '#7e22ce',
+                  tagBorder: '#f3e8ff',
+                  metricsValueColor: '#9333ea',
+                  metricsLabelColor: '#9ca3af',
+                  buttonBg: 'linear-gradient(to right, #faf5ff, #eef2ff)',
+                  buttonText: '#7e22ce',
+                  buttonBorder: 'rgba(196,181,253,0.5)',
+                  accentFrom: '#9333ea',
+                  accentTo: '#4f46e5',
+                },
+                dark: {
+                  cardBg: 'rgba(17,24,39,0.8)',
+                  cardBorder: 'rgba(255,255,255,0.1)',
+                  cardHoverBorder: 'rgba(168,85,247,0.4)',
+                  cardRadius: '16',
+                  cardShadow: '0 4px 6px rgba(0,0,0,0.2)',
+                  cardHoverShadow: '0 25px 50px rgba(0,0,0,0.5)',
+                  imageHeight: '224',
+                  titleColor: '#ffffff',
+                  descriptionColor: '#9ca3af',
+                  tagBg: 'rgba(147,51,234,0.1)',
+                  tagText: '#d8b4fe',
+                  tagBorder: 'rgba(147,51,234,0.2)',
+                  metricsValueColor: '#c084fc',
+                  metricsLabelColor: '#6b7280',
+                  buttonBg: 'linear-gradient(to right, rgba(147,51,234,0.2), rgba(79,70,229,0.2))',
+                  buttonText: '#d8b4fe',
+                  buttonBorder: 'rgba(147,51,234,0.2)',
+                  accentFrom: '#9333ea',
+                  accentTo: '#4f46e5',
+                },
+              },
+              solutions: {
+                title: '¿Tienes un proyecto en mente?',
+                description: 'Conversemos sobre cómo podemos ayudarte a hacerlo realidad',
+                backgroundImage: FALLBACK_BACKGROUND_IMAGES,
+                backgroundImageAlt: '',
+                items: []
+              },
+              ctaSection: {
+                backgroundImage: { light: '', dark: '' },
+                backgroundOpacity: 0.85,
+                bgColor: { light: '#faf5ff', dark: 'rgba(255,255,255,0.05)' },
+                titleColor: { light: '#111827', dark: '#ffffff' },
+                descriptionColor: { light: '#4b5563', dark: '#9ca3af' },
+                buttonGradientFrom: '#9333ea',
+                buttonGradientTo: '#4f46e5',
+                buttonText: '#ffffff',
+              },
+              filterDesign: {
+                activeBgFrom: '#9333ea',
+                activeBgTo: '#4f46e5',
+                activeText: '#ffffff',
+                activeShadow: '0 10px 15px rgba(147,51,234,0.25)',
+                inactiveBg: { light: '#ffffff', dark: 'rgba(255,255,255,0.05)' },
+                inactiveText: { light: '#4b5563', dark: '#9ca3af' },
+                inactiveBorder: { light: '#e5e7eb', dark: 'rgba(255,255,255,0.1)' },
+                borderRadius: '12',
+              }
+            };
+          }
+
+          // ✅ Para PROYECTO DETALLE: configuración completa de la página individual
+          if (slug === 'proyecto-detail') {
+            return {
+              ...baseContent,
+              proyectoDetailConfig: {
+                hero: {
+                  showBreadcrumb: true,
+                  showDecoBlobs: true,
+                  showAccentLine: true,
+                  showMetaInfo: true,
+                  showTechStack: true,
+                  buttons: {
+                    showConsultar: true,
+                    consultarText: 'Consultar',
+                    consultarLink: '/contacto',
+                    demoText: 'Ver Demo',
+                    accederText: 'Acceder al Sistema',
+                    style: 'outline',
+                  },
+                },
+                description: {
+                  sectionTitle: 'Sobre el proyecto',
+                  accentGradientFrom: '#9333ea',
+                  accentGradientTo: '#4f46e5',
+                  showImpactHighlight: true,
+                  impactTitle: 'Impacto del proyecto',
+                  showFullTechGrid: true,
+                  fullTechGridThreshold: 5,
+                },
+                results: {
+                  sectionTitle: 'Resultados clave',
+                  showFichaTecnica: true,
+                  fichaTecnicaTitle: 'Ficha técnica',
+                  showAccessLinks: true,
+                  accessLinksTitle: 'Acceso directo',
+                  metricValueColor: { light: '#9333ea', dark: '#c084fc' },
+                },
+                cta: {
+                  show: true,
+                  dividerText: '¿Listo para empezar?',
+                  title: 'Desarrollamos la solución ideal',
+                  titleHighlight: 'para tu negocio',
+                  subtitle: 'Cada proyecto que creamos está diseñado para generar resultados reales. Hablemos de tus objetivos.',
+                  primaryButtonText: 'Iniciar conversación',
+                  primaryButtonLink: '/contacto',
+                  primaryGradientFrom: '#9333ea',
+                  primaryGradientTo: '#4f46e5',
+                  secondaryButtonText: '← Ver más proyectos',
+                  secondaryButtonLink: '/proyectos',
+                },
+              },
             };
           }
 

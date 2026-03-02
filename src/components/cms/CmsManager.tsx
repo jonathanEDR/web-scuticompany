@@ -28,7 +28,9 @@ import ServicioDetailConfigSection from './ServicioDetailConfigSection';
 import BlogPostDetailConfigSection from './BlogPostDetailConfigSection';
 import SidebarConfigSection from './SidebarConfigSection';
 import DashboardFeaturedPostsConfigSection from './DashboardFeaturedPostsConfigSection';
+import ProyectoDetailConfigSection from './ProyectoDetailConfigSection';
 import ServicesExtraSectionsConfig from './ServicesExtraSectionsConfig';
+import ManagedImageSelector from '../ManagedImageSelector';
 import { defaultChatbotConfig } from '../../config/defaultChatbotConfig';
 
 const CmsManager: React.FC = () => {
@@ -37,7 +39,7 @@ const CmsManager: React.FC = () => {
   const { theme: currentTheme } = useTheme(); // 🆕 Obtener tema actual
   
   // 🆕 Estado para manejar qué página se está editando
-  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog' | 'servicio-detail' | 'blog-post-detail'>('home');
+  const [selectedPage, setSelectedPage] = useState<'home' | 'about' | 'services' | 'contact' | 'blog' | 'servicio-detail' | 'blog-post-detail' | 'proyectos' | 'proyecto-detail'>('home');
   
   // Determinar tab activo desde la URL
   const getInitialTab = (): 'content' | 'seo' | 'theme' | 'cards' | 'contact' | 'chatbot' | 'sidebar' => {
@@ -239,7 +241,7 @@ const CmsManager: React.FC = () => {
   };
 
   // ❌ Ocultar pestaña SEO para páginas de detalle (el SEO se genera automáticamente)
-  const shouldShowSeoTab = selectedPage !== 'servicio-detail' && selectedPage !== 'blog-post-detail';
+  const shouldShowSeoTab = selectedPage !== 'servicio-detail' && selectedPage !== 'blog-post-detail' && selectedPage !== 'proyecto-detail';
 
   const tabs = [
     { id: 'content' as const, label: 'Contenido', icon: '📝' },
@@ -366,6 +368,8 @@ const CmsManager: React.FC = () => {
                 <option value="contact">📞 Contact (Contacto)</option>
                 <option value="blog">📰 Blog (Noticias)</option>
                 <option value="blog-post-detail">📝 Blog Post Detalle (Artículo Individual)</option>
+                <option value="proyectos">🗂️ Proyectos (Portafolio)</option>
+                <option value="proyecto-detail">📋 Proyecto Detalle (Página Individual)</option>
               </select>
               
               {/* 🔄 Botón para limpiar cache y recargar */}
@@ -465,8 +469,8 @@ const CmsManager: React.FC = () => {
                   onChange={(config) => handleUpdateContent('blogCta', config)}
                 />
               </>
-            ) : selectedPage !== 'servicio-detail' ? (
-              /* 🏠 Hero genérico para otras páginas (NO para servicio-detail que tiene su propia configuración) */
+            ) : selectedPage !== 'servicio-detail' && selectedPage !== 'proyectos' && selectedPage !== 'proyecto-detail' ? (
+              /* 🏠 Hero genérico para otras páginas (NO para servicio-detail ni proyectos que tienen su propia configuración) */
               <HeroConfigSection
                 pageData={pageData}
                 updateContent={handleUpdateContent}
@@ -665,6 +669,371 @@ const CmsManager: React.FC = () => {
                 />
               </>
             )}
+
+            {/* 📋 SECCIONES ESPECÍFICAS PARA PROYECTO DETALLE */}
+            {selectedPage === 'proyecto-detail' && (
+              <>
+                <ProyectoDetailConfigSection
+                  config={pageData?.content?.proyectoDetailConfig || {}}
+                  onChange={(newConfig) => handleUpdateContent('proyectoDetailConfig', newConfig)}
+                />
+              </>
+            )}
+
+            {/* 🗂️ SECCIONES ESPECÍFICAS PARA PROYECTOS */}
+            {selectedPage === 'proyectos' && (
+              <>
+                {/* Hero reutilizable */}
+                <HeroConfigSection
+                  pageData={pageData}
+                  updateContent={handleUpdateContent}
+                  updateTextStyle={handleUpdateTextStyle}
+                />
+
+                {/* Sección CTA inferior */}
+                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 p-5">
+                  <div className="flex items-center gap-2 mb-5">
+                    <span className="text-2xl">💬</span>
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white">Sección CTA (Llamado a la acción)</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Bloque al pie del portafolio que invita al contacto</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Título del CTA</label>
+                      <input
+                        type="text"
+                        value={pageData?.content?.solutions?.title || ''}
+                        onChange={(e) => handleUpdateContent('solutions.title', e.target.value)}
+                        className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                        placeholder="¿Tienes un proyecto en mente?"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Descripción del CTA</label>
+                      <input
+                        type="text"
+                        value={pageData?.content?.solutions?.description || ''}
+                        onChange={(e) => handleUpdateContent('solutions.description', e.target.value)}
+                        className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                        placeholder="Conversemos sobre cómo podemos ayudarte a hacerlo realidad"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Texto del botón</label>
+                        <input
+                          type="text"
+                          value={pageData?.content?.hero?.ctaText || ''}
+                          onChange={(e) => handleUpdateContent('hero.ctaText', e.target.value)}
+                          className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                          placeholder="Contáctanos"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL del botón</label>
+                        <input
+                          type="text"
+                          value={pageData?.content?.hero?.ctaLink || ''}
+                          onChange={(e) => handleUpdateContent('hero.ctaLink', e.target.value)}
+                          className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                          placeholder="/contacto"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 🖼️ Imagen de fondo del CTA */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-2">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🖼️ Imagen de fondo</h3>
+                      <div className="flex gap-6 items-start">
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">☀️ Modo claro</span>
+                          <ManagedImageSelector
+                            sidebar
+                            label="Fondo CTA Claro"
+                            currentImage={(pageData?.content as any)?.ctaSection?.backgroundImage?.light || ''}
+                            onImageSelect={(url) => handleUpdateContent('ctaSection.backgroundImage.light', url)}
+                          />
+                        </div>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">🌙 Modo oscuro</span>
+                          <ManagedImageSelector
+                            sidebar
+                            darkMode
+                            label="Fondo CTA Oscuro"
+                            currentImage={(pageData?.content as any)?.ctaSection?.backgroundImage?.dark || ''}
+                            onImageSelect={(url) => handleUpdateContent('ctaSection.backgroundImage.dark', url)}
+                          />
+                        </div>
+                        <div className="flex-1 pt-1">
+                      <div className="mt-0">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          🎚️ Opacidad del overlay: {Math.round(((pageData?.content as any)?.ctaSection?.backgroundOpacity ?? 0.85) * 100)}%
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="95"
+                          step="5"
+                          value={Math.round(((pageData?.content as any)?.ctaSection?.backgroundOpacity ?? 0.85) * 100)}
+                          onChange={(e) => handleUpdateContent('ctaSection.backgroundOpacity', parseInt(e.target.value) / 100)}
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                        />
+                      </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 🎨 Colores del CTA */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-1">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🎨 Colores</h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fondo (claro)</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.bgColor?.light?.startsWith('#') ? (pageData?.content as any)?.ctaSection?.bgColor?.light : '#faf5ff'} onChange={(e) => handleUpdateContent('ctaSection.bgColor.light', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.bgColor?.light || ''} onChange={(e) => handleUpdateContent('ctaSection.bgColor.light', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" placeholder="#faf5ff" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fondo (oscuro)</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.bgColor?.dark?.startsWith('#') ? (pageData?.content as any)?.ctaSection?.bgColor?.dark : '#1f2937'} onChange={(e) => handleUpdateContent('ctaSection.bgColor.dark', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.bgColor?.dark || ''} onChange={(e) => handleUpdateContent('ctaSection.bgColor.dark', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" placeholder="rgba(255,255,255,0.05)" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Título (claro)</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.titleColor?.light || '#111827'} onChange={(e) => handleUpdateContent('ctaSection.titleColor.light', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.titleColor?.light || ''} onChange={(e) => handleUpdateContent('ctaSection.titleColor.light', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Título (oscuro)</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.titleColor?.dark || '#ffffff'} onChange={(e) => handleUpdateContent('ctaSection.titleColor.dark', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.titleColor?.dark || ''} onChange={(e) => handleUpdateContent('ctaSection.titleColor.dark', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Descripción (claro)</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.descriptionColor?.light || '#4b5563'} onChange={(e) => handleUpdateContent('ctaSection.descriptionColor.light', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.descriptionColor?.light || ''} onChange={(e) => handleUpdateContent('ctaSection.descriptionColor.light', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Descripción (oscuro)</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.descriptionColor?.dark || '#9ca3af'} onChange={(e) => handleUpdateContent('ctaSection.descriptionColor.dark', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.descriptionColor?.dark || ''} onChange={(e) => handleUpdateContent('ctaSection.descriptionColor.dark', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                      </div>
+                      {/* Botón gradiente */}
+                      <div className="grid grid-cols-3 gap-3 mt-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Botón desde</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.buttonGradientFrom || '#9333ea'} onChange={(e) => handleUpdateContent('ctaSection.buttonGradientFrom', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.buttonGradientFrom || ''} onChange={(e) => handleUpdateContent('ctaSection.buttonGradientFrom', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Botón hasta</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.buttonGradientTo || '#4f46e5'} onChange={(e) => handleUpdateContent('ctaSection.buttonGradientTo', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.buttonGradientTo || ''} onChange={(e) => handleUpdateContent('ctaSection.buttonGradientTo', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Texto botón</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.ctaSection?.buttonText || '#ffffff'} onChange={(e) => handleUpdateContent('ctaSection.buttonText', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.ctaSection?.buttonText || ''} onChange={(e) => handleUpdateContent('ctaSection.buttonText', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 🔘 Diseño de Filtros de Categoría */}
+                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 p-5">
+                  <div className="flex items-center gap-2 mb-5">
+                    <span className="text-2xl">🔘</span>
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white">Filtros de categoría</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Estilo de los botones "Todos", "Web", etc.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {/* Filtro activo */}
+                    <div>
+                      <h3 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Filtro activo (seleccionado)</h3>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Gradiente desde</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.filterDesign?.activeBgFrom || '#9333ea'} onChange={(e) => handleUpdateContent('filterDesign.activeBgFrom', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.activeBgFrom || ''} onChange={(e) => handleUpdateContent('filterDesign.activeBgFrom', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Gradiente hasta</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.filterDesign?.activeBgTo || '#4f46e5'} onChange={(e) => handleUpdateContent('filterDesign.activeBgTo', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.activeBgTo || ''} onChange={(e) => handleUpdateContent('filterDesign.activeBgTo', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Texto</label>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={(pageData?.content as any)?.filterDesign?.activeText || '#ffffff'} onChange={(e) => handleUpdateContent('filterDesign.activeText', e.target.value)} className="w-8 h-8 rounded-lg border cursor-pointer" />
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.activeText || ''} onChange={(e) => handleUpdateContent('filterDesign.activeText', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Sombra activa</label>
+                        <input type="text" value={(pageData?.content as any)?.filterDesign?.activeShadow || ''} onChange={(e) => handleUpdateContent('filterDesign.activeShadow', e.target.value)} className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono" placeholder="0 10px 15px rgba(147,51,234,0.25)" />
+                      </div>
+                    </div>
+                    {/* Filtro inactivo */}
+                    <div>
+                      <h3 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Filtro inactivo</h3>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fondo (claro / oscuro)</label>
+                          <div className="flex gap-1">
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.inactiveBg?.light || ''} onChange={(e) => handleUpdateContent('filterDesign.inactiveBg.light', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-[10px] text-gray-900 dark:text-white font-mono" placeholder="#ffffff" />
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.inactiveBg?.dark || ''} onChange={(e) => handleUpdateContent('filterDesign.inactiveBg.dark', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-[10px] text-gray-900 dark:text-white font-mono" placeholder="rgba(...)" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Texto (claro / oscuro)</label>
+                          <div className="flex gap-1">
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.inactiveText?.light || ''} onChange={(e) => handleUpdateContent('filterDesign.inactiveText.light', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-[10px] text-gray-900 dark:text-white font-mono" placeholder="#4b5563" />
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.inactiveText?.dark || ''} onChange={(e) => handleUpdateContent('filterDesign.inactiveText.dark', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-[10px] text-gray-900 dark:text-white font-mono" placeholder="#9ca3af" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Borde (claro / oscuro)</label>
+                          <div className="flex gap-1">
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.inactiveBorder?.light || ''} onChange={(e) => handleUpdateContent('filterDesign.inactiveBorder.light', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-[10px] text-gray-900 dark:text-white font-mono" placeholder="#e5e7eb" />
+                            <input type="text" value={(pageData?.content as any)?.filterDesign?.inactiveBorder?.dark || ''} onChange={(e) => handleUpdateContent('filterDesign.inactiveBorder.dark', e.target.value)} className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-[10px] text-gray-900 dark:text-white font-mono" placeholder="rgba(...)" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Radio de borde: {(pageData?.content as any)?.filterDesign?.borderRadius || '12'}px
+                        </label>
+                        <input type="range" min="0" max="24" step="2" value={(pageData?.content as any)?.filterDesign?.borderRadius || '12'} onChange={(e) => handleUpdateContent('filterDesign.borderRadius', e.target.value)} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" />
+                      </div>
+                    </div>
+                    {/* Preview mini filtros */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+                      <p className="text-[10px] font-medium text-gray-400 mb-2">Vista previa</p>
+                      <div className="flex gap-2 justify-center">
+                        <span style={{ background: `linear-gradient(to right, ${(pageData?.content as any)?.filterDesign?.activeBgFrom || '#9333ea'}, ${(pageData?.content as any)?.filterDesign?.activeBgTo || '#4f46e5'})`, color: (pageData?.content as any)?.filterDesign?.activeText || '#ffffff', borderRadius: `${(pageData?.content as any)?.filterDesign?.borderRadius || '12'}px`, boxShadow: (pageData?.content as any)?.filterDesign?.activeShadow || '0 10px 15px rgba(147,51,234,0.25)' }} className="px-3 py-1.5 text-xs font-semibold">Todos (3)</span>
+                        <span style={{ background: (pageData?.content as any)?.filterDesign?.inactiveBg?.light || '#ffffff', color: (pageData?.content as any)?.filterDesign?.inactiveText?.light || '#4b5563', border: `1px solid ${(pageData?.content as any)?.filterDesign?.inactiveBorder?.light || '#e5e7eb'}`, borderRadius: `${(pageData?.content as any)?.filterDesign?.borderRadius || '12'}px` }} className="px-3 py-1.5 text-xs font-semibold">🌐 Web (2)</span>
+                        <span style={{ background: (pageData?.content as any)?.filterDesign?.inactiveBg?.light || '#ffffff', color: (pageData?.content as any)?.filterDesign?.inactiveText?.light || '#4b5563', border: `1px solid ${(pageData?.content as any)?.filterDesign?.inactiveBorder?.light || '#e5e7eb'}`, borderRadius: `${(pageData?.content as any)?.filterDesign?.borderRadius || '12'}px` }} className="px-3 py-1.5 text-xs font-semibold">📱 App (1)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sección Portafolio (Grid de Tarjetas) */}
+                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-2xl">🗂️</span>
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white">Sección Portafolio (Grid de Proyectos)</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Título e imagen de fondo del área donde se muestran las tarjetas</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Título de sección */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Título de la sección
+                      </label>
+                      <input
+                        type="text"
+                        value={pageData?.content?.portfolio?.sectionTitle || ''}
+                        onChange={(e) => handleUpdateContent('portfolio.sectionTitle', e.target.value)}
+                        className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                        placeholder="Nuestros Proyectos"
+                      />
+                    </div>
+
+                    {/* Imágenes de fondo claro/oscuro */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        🖼️ Imagen de fondo (opcional)
+                      </label>
+                      <div className="flex gap-6 items-start">
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">☀️ Modo Claro</span>
+                          <ManagedImageSelector
+                            sidebar
+                            label="Fondo Claro"
+                            currentImage={
+                              typeof pageData?.content?.portfolio?.backgroundImage === 'string'
+                                ? pageData?.content?.portfolio?.backgroundImage
+                                : pageData?.content?.portfolio?.backgroundImage?.light || ''
+                            }
+                            onImageSelect={(url) => handleUpdateContent('portfolio.backgroundImage.light', url)}
+                          />
+                        </div>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">🌙 Modo Oscuro</span>
+                          <ManagedImageSelector
+                            sidebar
+                            darkMode
+                            label="Fondo Oscuro"
+                            currentImage={
+                              typeof pageData?.content?.portfolio?.backgroundImage === 'string'
+                                ? pageData?.content?.portfolio?.backgroundImage
+                                : pageData?.content?.portfolio?.backgroundImage?.dark || ''
+                            }
+                            onImageSelect={(url) => handleUpdateContent('portfolio.backgroundImage.dark', url)}
+                          />
+                        </div>
+                        <div className="flex-1 space-y-3 pt-1">
+                          {/* Opacidad del overlay */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              🎚️ Opacidad del overlay: {Math.round(((pageData?.content?.portfolio?.backgroundOpacity ?? 0) * 100))}%
+                            </label>
+                            <input
+                              type="range"
+                              min="0"
+                              max="95"
+                              step="5"
+                              value={Math.round(((pageData?.content?.portfolio?.backgroundOpacity ?? 0) * 100))}
+                              onChange={(e) => handleUpdateContent('portfolio.backgroundOpacity', parseInt(e.target.value) / 100)}
+                              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                            />
+                            <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+                              <span>0% (sin overlay)</span>
+                              <span>95%</span>
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                            💡 El overlay oscurece/aclara la imagen para mejorar la legibilidad del texto.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
         {activeTab === 'cards' && selectedPage === 'home' && (
@@ -678,13 +1047,482 @@ const CmsManager: React.FC = () => {
             {/* Nota: Las tarjetas de Valor Agregado se configuran en el tab Content dentro de ValueAddedConfigSection */}
           </div>
         )}
-        {activeTab === 'cards' && selectedPage !== 'home' && (
+        {activeTab === 'cards' && selectedPage === 'proyectos' && (
+          <div className="space-y-4">
+            {/* 🎴 Diseño de Tarjetas de Proyecto (Portafolio) */}
+            <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 p-5">
+              <div className="flex items-center gap-2 mb-5">
+                <span className="text-2xl">🎴</span>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">Diseño de Tarjetas de Proyecto</h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Configura la apariencia visual de las tarjetas del portafolio</p>
+                </div>
+              </div>
+
+              {/* Selector de tema (Light / Dark) */}
+              {(() => {
+                const cardTheme = (pageData?.content as any)?._cardDesignTheme || 'light';
+                const setCardTheme = (t: string) => handleUpdateContent('_cardDesignTheme', t);
+                const cd = (pageData?.content?.portfolioCardDesign as any)?.[cardTheme] || {};
+                const prefix = `portfolioCardDesign.${cardTheme}`;
+
+                return (
+                  <>
+                    <div className="flex gap-2 mb-6">
+                      <button
+                        onClick={() => setCardTheme('light')}
+                        className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                          cardTheme === 'light'
+                            ? 'bg-white text-gray-900 shadow-lg border-2 border-purple-400'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600'
+                        }`}
+                      >
+                        ☀️ Modo Claro
+                      </button>
+                      <button
+                        onClick={() => setCardTheme('dark')}
+                        className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                          cardTheme === 'dark'
+                            ? 'bg-gray-900 text-white shadow-lg border-2 border-purple-400'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600'
+                        }`}
+                      >
+                        🌙 Modo Oscuro
+                      </button>
+                    </div>
+
+                    {/* ── Tarjeta (contenedor) ── */}
+                    <div className="space-y-5">
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-xs">🃏</span>
+                          Contenedor de la tarjeta
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fondo</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.cardBg?.startsWith('rgba') || cd.cardBg?.startsWith('#') ? (cd.cardBg?.startsWith('#') ? cd.cardBg : '#111827') : '#ffffff'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.cardBg`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.cardBg || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.cardBg`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                                placeholder="#ffffff"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Borde</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.cardBorder?.startsWith('#') ? cd.cardBorder : '#e5e7eb'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.cardBorder`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.cardBorder || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.cardBorder`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                                placeholder="rgba(229,231,235,0.8)"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Borde Hover</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.cardHoverBorder?.startsWith('#') ? cd.cardHoverBorder : '#d8b4fe'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.cardHoverBorder`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.cardHoverBorder || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.cardHoverBorder`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                                placeholder="#d8b4fe"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                              Radio de borde: {cd.cardRadius || '16'}px
+                            </label>
+                            <input
+                              type="range"
+                              min="0"
+                              max="32"
+                              step="2"
+                              value={cd.cardRadius || '16'}
+                              onChange={(e) => handleUpdateContent(`${prefix}.cardRadius`, e.target.value)}
+                              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                            />
+                          </div>
+                        </div>
+                        {/* Sombras */}
+                        <div className="grid grid-cols-2 gap-3 mt-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Sombra</label>
+                            <input
+                              type="text"
+                              value={cd.cardShadow || ''}
+                              onChange={(e) => handleUpdateContent(`${prefix}.cardShadow`, e.target.value)}
+                              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              placeholder="0 1px 3px rgba(0,0,0,0.06)"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Sombra Hover</label>
+                            <input
+                              type="text"
+                              value={cd.cardHoverShadow || ''}
+                              onChange={(e) => handleUpdateContent(`${prefix}.cardHoverShadow`, e.target.value)}
+                              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              placeholder="0 25px 50px rgba(147,51,234,0.15)"
+                            />
+                          </div>
+                        </div>
+                        {/* Altura de imagen */}
+                        <div className="mt-3">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            Altura de imagen: {cd.imageHeight || '224'}px
+                          </label>
+                          <input
+                            type="range"
+                            min="150"
+                            max="350"
+                            step="10"
+                            value={cd.imageHeight || '224'}
+                            onChange={(e) => handleUpdateContent(`${prefix}.imageHeight`, e.target.value)}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                          />
+                          <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+                            <span>150px</span>
+                            <span>350px</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Textos ── */}
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xs">📝</span>
+                          Colores de textos
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Título</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.titleColor || '#111827'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.titleColor`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.titleColor || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.titleColor`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Descripción</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.descriptionColor || '#4b5563'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.descriptionColor`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.descriptionColor || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.descriptionColor`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Tags de tecnología ── */}
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-xs">🏷️</span>
+                          Tags de tecnología
+                        </h3>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fondo</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.tagBg?.startsWith('#') ? cd.tagBg : '#faf5ff'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.tagBg`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.tagBg || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.tagBg`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Texto</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.tagText?.startsWith('#') ? cd.tagText : '#7e22ce'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.tagText`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.tagText || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.tagText`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Borde</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.tagBorder?.startsWith('#') ? cd.tagBorder : '#f3e8ff'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.tagBorder`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.tagBorder || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.tagBorder`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Métricas ── */}
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xs">📊</span>
+                          Métricas
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Valor</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.metricsValueColor || '#9333ea'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.metricsValueColor`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.metricsValueColor || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.metricsValueColor`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Etiqueta</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.metricsLabelColor || '#9ca3af'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.metricsLabelColor`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.metricsLabelColor || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.metricsLabelColor`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Botón "Ver Proyecto" ── */}
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-xs">🔘</span>
+                          Botón principal
+                        </h3>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fondo</label>
+                            <input
+                              type="text"
+                              value={cd.buttonBg || ''}
+                              onChange={(e) => handleUpdateContent(`${prefix}.buttonBg`, e.target.value)}
+                              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              placeholder="linear-gradient(to right, ...)"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Texto</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.buttonText || '#7e22ce'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.buttonText`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.buttonText || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.buttonText`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Borde</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.buttonBorder?.startsWith('#') ? cd.buttonBorder : '#c4b5fd'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.buttonBorder`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.buttonBorder || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.buttonBorder`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Gradiente acentuado (botón Acceder) ── */}
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-xs">🎨</span>
+                          Color acento (botón Acceder / gradientes)
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Desde</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.accentFrom || '#9333ea'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.accentFrom`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.accentFrom || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.accentFrom`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Hasta</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={cd.accentTo || '#4f46e5'}
+                                onChange={(e) => handleUpdateContent(`${prefix}.accentTo`, e.target.value)}
+                                className="w-8 h-8 rounded-lg border cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={cd.accentTo || ''}
+                                onChange={(e) => handleUpdateContent(`${prefix}.accentTo`, e.target.value)}
+                                className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2">
+                          💡 El gradiente se usa en el botón "Acceder" y efectos de hover.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Preview mini */}
+                    <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">Vista previa (simplificada)</p>
+                      <div
+                        className="overflow-hidden transition-all"
+                        style={{
+                          background: cd.cardBg || '#ffffff',
+                          border: `1px solid ${cd.cardBorder || '#e5e7eb'}`,
+                          borderRadius: `${cd.cardRadius || 16}px`,
+                          boxShadow: cd.cardShadow || '0 1px 3px rgba(0,0,0,0.06)',
+                          maxWidth: '320px',
+                        }}
+                      >
+                        <div style={{ height: `${Math.min(Number(cd.imageHeight) || 224, 120)}px`, background: `linear-gradient(135deg, ${cd.accentFrom || '#9333ea'}33, ${cd.accentTo || '#4f46e5'}33)` }} className="flex items-center justify-center">
+                          <span className="text-3xl opacity-40">📸</span>
+                        </div>
+                        <div className="p-4">
+                          <h4 style={{ color: cd.titleColor || '#111827' }} className="font-bold text-sm mb-1">Nombre del Proyecto</h4>
+                          <p style={{ color: cd.descriptionColor || '#4b5563' }} className="text-xs mb-3">Descripción breve del proyecto de ejemplo...</p>
+                          <div className="flex gap-1.5 mb-3">
+                            {['React', 'Node.js'].map((t) => (
+                              <span
+                                key={t}
+                                style={{ background: cd.tagBg || '#faf5ff', color: cd.tagText || '#7e22ce', borderColor: cd.tagBorder || '#f3e8ff' }}
+                                className="text-[10px] px-2 py-0.5 rounded-md border font-medium"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex gap-2">
+                            <span
+                              style={{ background: cd.buttonBg || '#faf5ff', color: cd.buttonText || '#7e22ce', borderColor: cd.buttonBorder || '#c4b5fd' }}
+                              className="flex-1 text-center text-[10px] font-semibold px-2 py-1.5 rounded-lg border"
+                            >
+                              Ver Proyecto →
+                            </span>
+                            <span
+                              style={{ background: `linear-gradient(to right, ${cd.accentFrom || '#9333ea'}, ${cd.accentTo || '#4f46e5'})` }}
+                              className="flex-1 text-center text-[10px] font-bold px-2 py-1.5 rounded-lg text-white"
+                            >
+                              🚀 Acceder
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+        {activeTab === 'cards' && selectedPage !== 'home' && selectedPage !== 'proyectos' && (
           <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center">
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
               🎴 Diseño de Tarjetas
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              El diseño de tarjetas solo está disponible para la página "Home"
+              El diseño de tarjetas solo está disponible para las páginas "Home" y "Proyectos"
             </p>
           </div>
         )}

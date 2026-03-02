@@ -21,13 +21,18 @@ import {
   BookOpen,
   MessageCircle,
   Heart,
-  Edit3
+  Edit3,
+  Building2,
+  Briefcase,
+  UserCheck
 } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import type { BlogProfile } from '../../types/profile';
+import type { UserRole } from '../../types/roles';
 
 interface ProfileViewProps {
   profile: BlogProfile;
+  userRole?: UserRole;
   userStats?: {
     totalPosts: number;
     totalComments: number;
@@ -36,7 +41,7 @@ interface ProfileViewProps {
   onEditClick: () => void;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({ profile, userStats, onEditClick }) => {
+const ProfileView: React.FC<ProfileViewProps> = ({ profile, userRole, userStats, onEditClick }) => {
   const { user } = useUser();
 
   // Helper para formatear URLs de redes sociales
@@ -67,6 +72,23 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profile, userStats, onEditCli
   );
 
   const hasExpertise = profile.expertise && profile.expertise.length > 0;
+
+  // Determinar si es un rol administrativo (muestra expertise) o cliente/usuario (muestra empresa/sector)
+  const isAdminRole = userRole && ['ADMIN', 'SUPER_ADMIN', 'MODERATOR', 'EDITOR'].includes(userRole);
+  const isClientOrUser = !isAdminRole;
+  const hasCompanyInfo = profile.company || profile.sector;
+
+  // Helper para label de rol legible
+  const getRoleLabel = (role?: UserRole): string => {
+    switch (role) {
+      case 'CLIENT': return 'Cliente';
+      case 'USER': return 'Usuario';
+      case 'ADMIN': return 'Administrador';
+      case 'SUPER_ADMIN': return 'Super Admin';
+      case 'MODERATOR': return 'Moderador';
+      default: return 'Usuario';
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -149,8 +171,8 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profile, userStats, onEditCli
               </p>
             )}
 
-            {/* Stats inline */}
-            {userStats && (
+            {/* Stats inline - Solo para roles administrativos */}
+            {isAdminRole && userStats && (
               <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <div className="flex items-center text-sm">
                   <BookOpen className="w-4 h-4 mr-1.5 text-gray-400" />
@@ -173,13 +195,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profile, userStats, onEditCli
         </div>
       </div>
 
-      {/* Sección adicional: Expertise + Redes + Privacidad */}
-      {(hasExpertise || hasSocialLinks) && (
+      {/* Sección adicional: Expertise/Empresa + Redes + Rol */}
+      {(hasExpertise || hasSocialLinks || isClientOrUser || hasCompanyInfo) && (
         <div className="px-6 sm:px-8 pb-6 sm:pb-8">
           <div className="pt-6 border-t border-gray-100 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Expertise */}
-            {hasExpertise && (
+            {/* Para ADMIN/MODERATOR: Expertise técnica */}
+            {isAdminRole && hasExpertise && (
               <div>
                 <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 flex items-center">
                   <Zap className="w-4 h-4 mr-1.5 text-yellow-500" />
@@ -195,6 +217,47 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profile, userStats, onEditCli
                     </span>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Para CLIENT/USER: Badge de rol + Empresa + Sector */}
+            {isClientOrUser && (
+              <div className="space-y-4">
+                {/* Badge de Rol */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 flex items-center">
+                    <UserCheck className="w-4 h-4 mr-1.5 text-emerald-500" />
+                    Tu Rol
+                  </h3>
+                  <span className="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800">
+                    <UserCheck className="w-3.5 h-3.5 mr-1.5" />
+                    {getRoleLabel(userRole)}
+                  </span>
+                </div>
+
+                {/* Empresa */}
+                {profile.company && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 flex items-center">
+                      <Building2 className="w-4 h-4 mr-1.5 text-blue-500" />
+                      Empresa / Organización
+                    </h3>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{profile.company}</p>
+                  </div>
+                )}
+
+                {/* Sector */}
+                {profile.sector && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 flex items-center">
+                      <Briefcase className="w-4 h-4 mr-1.5 text-purple-500" />
+                      Sector / Industria
+                    </h3>
+                    <span className="inline-flex items-center px-3 py-1 text-sm bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
+                      {profile.sector}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 

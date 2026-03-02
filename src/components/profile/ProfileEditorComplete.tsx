@@ -26,7 +26,9 @@ import {
   ExternalLink,
   Info,
   Zap,
-  Music
+  Music,
+  Building2,
+  Briefcase
 } from 'lucide-react';
 import { 
   getMyProfile, 
@@ -35,6 +37,8 @@ import {
 } from '../../services/profileService';
 import { useProfileCache } from '../../hooks/useDashboardCache';
 import type { BlogProfile } from '../../types/profile';
+import { SECTOR_CATEGORIES } from '../../types/profile';
+import type { UserRole } from '../../types/roles';
 import AvatarUpload from './AvatarUpload';
 
 // ============================================
@@ -47,6 +51,8 @@ interface FormData {
   location: string;
   website: string;
   expertise: string[];
+  company: string;
+  sector: string;
   social: {
     facebook: string;
     tiktok: string;
@@ -81,12 +87,16 @@ type TabType = 'basic' | 'social' | 'privacy';
 
 interface ProfileEditorProps {
   compactMode?: boolean; // Si es true, oculta el header grande
+  userRole?: UserRole;
 }
 
-const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) => {
+const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false, userRole }) => {
   const { getToken } = useAuth();
   const { user } = useUser();
   const navigate = useNavigate();
+
+  // Determinar si es rol administrativo
+  const isAdminRole = userRole && ['ADMIN', 'SUPER_ADMIN', 'MODERATOR', 'EDITOR'].includes(userRole);
 
   // ⚡ CACHE OPTIMIZADO: Hook personalizado para cache de perfil
   const {
@@ -107,6 +117,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
     location: '',
     website: '',
     expertise: [] as string[],
+    company: '',
+    sector: '',
     social: {
       facebook: '',
       tiktok: '',
@@ -159,6 +171,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
           : (typeof bp.expertise === 'string' && bp.expertise 
              ? (bp.expertise as string).split(', ').filter((e: string) => e.trim())
              : []),
+        company: String(bp.company || ''),
+        sector: String(bp.sector || ''),
         avatar: String(avatarFallback),
         social: {
           facebook: String(bp.social?.facebook || ''),
@@ -184,6 +198,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
         location: '',
         website: '',
         expertise: [],
+        company: '',
+        sector: '',
         avatar: String(user?.imageUrl || ''),
         social: {
           facebook: '',
@@ -212,6 +228,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
         website: formData.website,
         avatar: formData.avatar,
         expertise: formData.expertise,
+        company: formData.company,
+        sector: formData.sector,
         social: formData.social,
         isPublicProfile: formData.privacy.isPublicProfile,
         allowComments: formData.privacy.allowComments,
@@ -417,6 +435,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
         expertise: Array.isArray(formData.expertise) 
           ? formData.expertise.join(', ') // Convertir array a string separado por comas
           : (formData.expertise || ''),
+        company: formData.company,
+        sector: formData.sector,
         social: formData.social,
         // Campos de privacidad al nivel raíz (no anidado en 'privacy')
         showEmail: formData.privacy.showEmail,
@@ -726,7 +746,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
                 )}
               </div>
 
-              {/* Expertise */}
+              {/* Expertise - Solo para roles administrativos */}
+              {isAdminRole && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Zap className="inline w-4 h-4 mr-2" />
@@ -775,6 +796,56 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ compactMode = false }) =>
                   ))}
                 </select>
               </div>
+              )}
+
+              {/* Empresa y Sector - Solo para clientes y usuarios */}
+              {!isAdminRole && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <Building2 className="inline w-4 h-4 mr-2" />
+                    Empresa / Organización
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, company: e.target.value }));
+                      setHasChanges(true);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Nombre de tu empresa u organización"
+                    maxLength={150}
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Opcional — la empresa o entidad a la que perteneces
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <Briefcase className="inline w-4 h-4 mr-2" />
+                    Sector / Industria
+                  </label>
+                  <select
+                    value={formData.sector}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, sector: e.target.value }));
+                      setHasChanges(true);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  >
+                    <option value="">Selecciona tu sector</option>
+                    {SECTOR_CATEGORIES.map(sector => (
+                      <option key={sector} value={sector}>{sector}</option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Sector o industria en la que te desempeñas
+                  </p>
+                </div>
+              </>
+              )}
             </div>
           )}
 

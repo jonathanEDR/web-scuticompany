@@ -62,21 +62,17 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
     fontWeightBold: globalConfig.fontWeightBold || '600',
   };
 
-  // Menú simplificado solo para USER y CLIENT
-  const menuItems: MenuItem[] = [
+  // ¿Es cliente? (CLIENT, ADMIN, MODERATOR, SUPER_ADMIN tienen acceso a mensajes y proyectos)
+  const isClient = role === 'CLIENT' || role === 'ADMIN' || role === 'MODERATOR' || role === 'SUPER_ADMIN';
+
+  // Menú base (todos los roles)
+  const baseMenuItems: MenuItem[] = [
     {
       name: 'Dashboard',
       icon: '🏠',
       menuKey: 'dashboard',
       path: '/dashboard/client',
       description: 'Panel principal'
-    },
-    {
-      name: 'Mensajes',
-      icon: '💬',
-      menuKey: 'mensajes',
-      path: '/dashboard/client/messages',
-      description: 'Comunicación y solicitudes'
     },
     {
       name: 'Mi Actividad',
@@ -92,6 +88,32 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
       path: '/dashboard/profile',
       description: 'Tu información'
     }
+  ];
+
+  // Ítems exclusivos para rol CLIENT (no USER)
+  const clientOnlyItems: MenuItem[] = isClient ? [
+    {
+      name: 'Mensajes',
+      icon: '💬',
+      menuKey: 'mensajes',
+      path: '/dashboard/client/messages',
+      description: 'Comunicación con el equipo'
+    },
+    {
+      name: 'Mis Proyectos',
+      icon: '🗂️',
+      menuKey: 'proyectos',
+      path: '/dashboard/client/proyectos',
+      description: 'Proyectos asignados a tu cuenta'
+    },
+  ] : [];
+
+  // Menú final: Dashboard → Mensajes/Proyectos (CLIENT) → Mi Actividad → Perfil
+  const menuItems: MenuItem[] = [
+    baseMenuItems[0],       // Dashboard
+    ...clientOnlyItems,     // Mensajes + Mis Proyectos (solo CLIENT)
+    baseMenuItems[1],       // Mi Actividad
+    baseMenuItems[2],       // Perfil
   ];
 
   const handleNavigation = (path: string) => {

@@ -10,9 +10,11 @@ import ProfileView from './ProfileView';
 import ProfileEditor from './ProfileEditorComplete';
 import { useProfileCache } from '../../hooks/useDashboardCache';
 import { getMyProfile } from '../../services/profileService';
+import { useAuth as useAppAuth } from '../../contexts/AuthContext';
 
 const ProfilePage: React.FC = () => {
   const { getToken } = useAuth();
+  const { role } = useAppAuth();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   // Cargar datos del perfil
@@ -86,6 +88,7 @@ const ProfilePage: React.FC = () => {
       {/* Vista del Perfil */}
       <ProfileView
         profile={profile}
+        userRole={role || undefined}
         userStats={{
           totalPosts: 0, // TODO: Obtener stats reales del backend
           totalComments: 0,
@@ -136,7 +139,7 @@ const ProfilePage: React.FC = () => {
           }`}
         >
           <div className="border-t border-gray-200 dark:border-gray-700 p-6">
-            <ProfileEditor compactMode={true} />
+            <ProfileEditor compactMode={true} userRole={role || undefined} />
           </div>
         </div>
       </div>

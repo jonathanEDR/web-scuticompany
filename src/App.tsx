@@ -88,6 +88,18 @@ const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
 // Módulo de Agenda - Administrativo
 const AgendaManagement = lazy(() => import('./pages/admin/AgendaManagement'));
 
+// Módulo de Proyectos - Páginas Públicas
+const Proyectos = lazy(() => import('./pages/public/Proyectos'));
+const ProyectoDetail = lazy(() => import('./pages/public/ProyectoDetail'));
+
+// Módulo de Proyectos - Páginas Administrativas
+const ProyectosManagement = lazy(() => import('./pages/admin/ProyectosManagement'));
+const ProyectoForm = lazy(() => import('./pages/admin/ProyectoForm'));
+const ProyectoAsignacion = lazy(() => import('./pages/admin/ProyectoAsignacion'));
+
+// Módulo de Proyectos - Páginas del Cliente
+const MisProyectos = lazy(() => import('./pages/client/MisProyectos'));
+
 // Componente de Testing IA (temporal) - Comentado hasta implementar
 // const AISystemTestWithAuth = lazy(() => import('./components/testing/AISystemTestWithAuth'));
 const PostEditor = lazy(() => import('./pages/admin/blog/PostEditor'));
@@ -189,7 +201,11 @@ function AppContent() {
               <Route path="/contacto" element={<Contact />} />
               <Route path="/perfil/:username" element={<PublicProfilePage />} />
 
-              {/* 📜 PÁGINAS LEGALES */}
+              {/* � PORTAFOLIO DE PROYECTOS - Público */}
+              <Route path="/proyectos" element={<Proyectos />} />
+              <Route path="/proyectos/:slug" element={<ProyectoDetail />} />
+
+              {/* �📜 PÁGINAS LEGALES */}
               <Route path="/privacidad" element={<PrivacyPolicy />} />
               <Route path="/terminos" element={<TermsOfService />} />
 
@@ -222,14 +238,25 @@ function AppContent() {
                 {/* Portal Cliente */}
                 <Route path="portal" element={<ClientPortal />} />
                 
-                {/* Mis Mensajes */}
-                <Route path="messages" element={<MyMessages />} />
+                {/* Mis Mensajes - Solo para CLIENT (no USER) */}
+                <Route path="messages" element={
+                  <RoleBasedRoute allowedRoles={[UserRole.CLIENT, UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <MyMessages />
+                  </RoleBasedRoute>
+                } />
                 
                 {/* Mis Solicitudes con Timeline */}
                 <Route path="solicitudes" element={<MySolicitudes />} />
                 
                 {/* Redirección de ruta antigua "leads" a nueva "solicitudes" */}
                 <Route path="leads" element={<Navigate to="/dashboard/client/solicitudes" replace />} />
+                
+                {/* Mis Proyectos Asignados - Solo para CLIENT (no USER) */}
+                <Route path="proyectos" element={
+                  <RoleBasedRoute allowedRoles={[UserRole.CLIENT, UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
+                    <MisProyectos />
+                  </RoleBasedRoute>
+                } />
               </Route>
               
               {/* ⚡ Dashboard para ADMIN, MODERATOR y SUPER_ADMIN */}
@@ -508,7 +535,45 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
+              {/* � MÓDULO DE PROYECTOS - Solo ADMIN y SUPER_ADMIN */}
+              
+              {/* Gestión de Proyectos - Lista y acciones */}
+              <Route path="/dashboard/proyectos" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <ProyectosManagement />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Crear Nuevo Proyecto */}
+              <Route path="/dashboard/proyectos/nuevo" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <ProyectoForm />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Editar Proyecto Existente */}
+              <Route path="/dashboard/proyectos/:id/editar" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <ProyectoForm />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+              
+              {/* Asignación de Clientes a Proyecto */}
+              <Route path="/dashboard/proyectos/:id/clientes" element={
+                <DashboardRoute>
+                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                    <ProyectoAsignacion />
+                  </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* �👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
               <Route path="/dashboard/admin/users" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>

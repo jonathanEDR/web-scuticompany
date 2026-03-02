@@ -241,6 +241,21 @@ const PublicHeaderOptimized = () => {
             >
               <span className="relative z-10">Blog</span>
             </Link>
+            <Link 
+              to="/proyectos" 
+              className="relative theme-text-secondary theme-transition px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
+                (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.color = '';
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+              }}
+              aria-label="Proyectos"
+            >
+              <span className="relative z-10">Proyectos</span>
+            </Link>
             <div className="relative group dropdown-container">
               <button 
                 className="relative theme-text-secondary theme-transition flex items-center px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"

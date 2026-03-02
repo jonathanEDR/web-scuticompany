@@ -22,6 +22,8 @@ export interface BlogProfile {
   website?: string;
   location?: string;
   expertise?: string[];
+  company?: string;
+  sector?: string;
   social?: SocialLinks;
   isPublicProfile?: boolean;
   allowComments?: boolean;
@@ -39,6 +41,8 @@ export interface PublicUserProfile {
   website?: string;
   location?: string;
   expertise?: string[];
+  company?: string;
+  sector?: string;
   social?: SocialLinks;
   isPublicProfile?: boolean;
   profileCompleteness?: number;
@@ -74,6 +78,8 @@ export interface BlogProfileFormData {
   website: string;
   location: string;
   expertise: string[];
+  company: string;
+  sector: string;
   social: SocialLinks;
   isPublicProfile: boolean;
   allowComments: boolean;
@@ -161,6 +167,28 @@ export const EXPERTISE_CATEGORIES = [
   'Inteligencia Artificial',
   'Internet de las Cosas (IoT)',
   'Realidad Virtual/Aumentada'
+] as const;
+
+export const SECTOR_CATEGORIES = [
+  'Tecnología',
+  'Salud',
+  'Educación',
+  'Finanzas y Banca',
+  'Retail / Comercio',
+  'Manufactura',
+  'Construcción',
+  'Transporte y Logística',
+  'Alimentación y Bebidas',
+  'Turismo y Hotelería',
+  'Medios y Entretenimiento',
+  'Agricultura',
+  'Energía',
+  'Legal',
+  'Inmobiliaria',
+  'Consultoría',
+  'ONG / Sin fines de lucro',
+  'Gobierno',
+  'Otro'
 ] as const;
 
 export type ExpertiseCategory = typeof EXPERTISE_CATEGORIES[number];

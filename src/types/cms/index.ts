@@ -988,10 +988,20 @@ export interface PageContent {
   servicioDetailConfig?: any; // Configuración de la página ServicioDetail con acordeón
   // 🆕 CONTENIDO PARA PÁGINA DE DETALLE DE BLOG POST
   blogPostDetailConfig?: any; // Configuración de la página de detalle del post
+  // 🆕 CONTENIDO PARA PÁGINA DE DETALLE DE PROYECTO
+  proyectoDetailConfig?: any; // Configuración de la página ProyectoDetail
   // 🆕 CONFIGURACIÓN DEL SIDEBAR DEL DASHBOARD
   dashboardSidebar?: DashboardSidebarConfig;
   // 🆕 CONFIGURACIÓN DEL BLOQUE DE POSTS DESTACADOS DEL DASHBOARD
   dashboardFeaturedPosts?: DashboardFeaturedPostsConfig;
+  // 🆕 CONTENIDO PARA PÁGINA DE PROYECTOS (portafolio)
+  portfolio?: {
+    sectionTitle?: string;
+    backgroundImage?: string | { light?: string; dark?: string };
+    backgroundOpacity?: number;
+  };
+  // 🆕 DISEÑO DE TARJETAS DE PROYECTO (portafolio)
+  portfolioCardDesign?: Record<string, Record<string, any>>;
 }
 
 // ============================================
