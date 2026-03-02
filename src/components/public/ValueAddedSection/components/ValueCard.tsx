@@ -36,6 +36,9 @@ const CardIcon = ({
           src={iconData.value}
           alt={`Icono ${title}`}
           className="w-10 h-10 object-contain"
+          width={40}
+          height={40}
+          loading="lazy"
           style={{
             filter: `hue-rotate(0deg) saturate(1) brightness(1)`
           }}

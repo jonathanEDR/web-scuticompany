@@ -69,16 +69,32 @@ const HeroSection = ({ data }: HeroSectionProps) => {
 
   const currentBackgroundImage = getCurrentBackgroundImage();
 
-  // Animación progresiva al cargar el componente
+  // ⚡ PERF: Preload dinámico del hero image (LCP resource)
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
+    if (currentBackgroundImage) {
+      const existingPreload = document.querySelector(`link[rel="preload"][href="${currentBackgroundImage}"]`);
+      if (!existingPreload) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = currentBackgroundImage;
+        link.setAttribute('fetchpriority', 'high');
+        document.head.appendChild(link);
+      }
+    }
+  }, [currentBackgroundImage]);
+
+  // Animación progresiva al cargar el componente
+  // ⚡ PERF: h1 (LCP) se muestra inmediatamente sin delay para mejorar PageSpeed
+  useEffect(() => {
+    // isVisible = true inmediato para que el h1 (LCP) sea visible sin delay
+    setIsVisible(true);
     const phases = [
-      setTimeout(() => setAnimationPhase(1), 300),
-      setTimeout(() => setAnimationPhase(2), 600),
-      setTimeout(() => setAnimationPhase(3), 900),
+      setTimeout(() => setAnimationPhase(1), 200),
+      setTimeout(() => setAnimationPhase(2), 400),
+      setTimeout(() => setAnimationPhase(3), 700),
     ];
     return () => {
-      clearTimeout(timer);
       phases.forEach(clearTimeout);
     };
   }, []);
@@ -91,20 +107,17 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                height: '100vh'
              }}>
       
-      {/* Background Image (si existe) - CALIDAD HD SIN FILTROS */}
+      {/* Background Image (si existe) - ⚡ PERF: <img> con fetchpriority para LCP */}
       {currentBackgroundImage && (
-        <>
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out z-0"
-            style={{
-              backgroundImage: `url(${currentBackgroundImage})`,
-              opacity: 1  // 100% opacidad - calidad HD total
-            }}
-            role="img"
-            aria-label={heroData.backgroundImageAlt || 'Hero background'}
-          />
-          {/* SIN OVERLAY - imagen pura HD */}
-        </>
+        <img 
+          src={currentBackgroundImage}
+          alt={heroData.backgroundImageAlt || 'Hero background'}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out z-0"
+          fetchPriority="high"
+          decoding="async"
+          width={1920}
+          height={1080}
+        />
       )}
 
       {/* Animated Background Pattern - Solo si NO hay imagen */}

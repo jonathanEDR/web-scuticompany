@@ -4,35 +4,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KBF4RX89');</script>
-    <!-- End Google Tag Manager -->
-
-    <!-- Google Analytics 4 (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NQB8D9SHKX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NQB8D9SHKX');
-    </script>
-    <!-- End Google Analytics 4 -->
-    
-    <!-- ⚡ PRECONNECT PRIMERO - Deben ir antes que cualquier otro recurso -->
-    <link rel="preconnect" href="https://www.googletagmanager.com" />
-    <link rel="preconnect" href="https://www.google-analytics.com" />
+    <!-- ⚡ PRECONNECT PRIMERO (máx 4) - Antes que cualquier otro recurso -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://light-dolphin-42.clerk.accounts.dev" crossorigin />
     <link rel="preconnect" href="https://web-scuticompany-back.onrender.com" crossorigin />
     
-    <!-- DNS Prefetch para recursos secundarios -->
+    <!-- DNS Prefetch para recursos secundarios (no bloquean render) -->
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://maps.googleapis.com" />
+
+    <!-- ⚡ GTM + GA4 DIFERIDO - Se cargan después del render inicial para no bloquear LCP -->
+    <script>
+      // Inicializar dataLayer inmediatamente (necesario para GTM)
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Diferir carga de GTM y GA4 hasta que el navegador esté idle
+      function loadAnalytics() {
+        // Google Tag Manager
+        (function(w,d,s,l,i){w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KBF4RX89');
+        
+        // Google Analytics 4
+        var ga=document.createElement('script');ga.async=true;
+        ga.src='https://www.googletagmanager.com/gtag/js?id=G-NQB8D9SHKX';
+        document.head.appendChild(ga);
+        gtag('js', new Date());
+        gtag('config', 'G-NQB8D9SHKX');
+      }
+      
+      // Cargar analytics después de que el contenido principal esté listo
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadAnalytics, { timeout: 3000 });
+      } else {
+        setTimeout(loadAnalytics, 2500);
+      }
+    </script>
 
     <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="google96cb30ebe99b22ed" />

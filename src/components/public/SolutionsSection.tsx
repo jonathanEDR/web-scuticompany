@@ -399,6 +399,9 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                           src={currentIcon.value as string} 
                           alt={solution.title} 
                           className="w-12 h-12 object-contain"
+                          width={48}
+                          height={48}
+                          loading="lazy"
                         />
                       );
                     case 'emoji':

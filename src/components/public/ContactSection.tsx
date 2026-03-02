@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useContactForm } from '../../hooks/useContactForm';
-import SimpleGoogleMap from './SimpleGoogleMap';
+// ⚡ PERF: Lazy load Google Maps (~294KB) - solo se carga cuando el componente es visible
+const SimpleGoogleMap = lazy(() => import('./SimpleGoogleMap'));
 import RegisterSuggestionModal from './RegisterSuggestionModal';
 import type { Categoria } from '../../services/categoriasApi';
 
@@ -644,10 +645,21 @@ const ContactSection = ({ data, categorias = [], transparentBackground = false }
           </form>
           </div>
 
-          {/* Mapa de Google (solo si está habilitado) */}
+          {/* Mapa de Google (solo si está habilitado) - ⚡ PERF: Lazy loaded */}
           {data?.map?.enabled && (
             <div className="flex items-start lg:sticky lg:top-4">
-              <SimpleGoogleMap
+              <Suspense fallback={
+                <div style={{ 
+                  height: data.map.height || '400px', 
+                  background: 'var(--color-surface, #1a1a2e)',
+                  borderRadius: data.map.borderRadius || data?.layout?.borderRadius || '1rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'var(--color-text-secondary, #9ca3af)'
+                }}>
+                  Cargando mapa...
+                </div>
+              }>
+                <SimpleGoogleMap
                 googleMapsUrl={data.map.googleMapsUrl || ''}
                 height={data.map.height || '400px'}
                 width={data.map.width}
@@ -669,6 +681,7 @@ const ContactSection = ({ data, categorias = [], transparentBackground = false }
                 hoverEffect={data.map.hoverEffect === 'electric' ? 'thunder' : (data.map.hoverEffect || 'glow')}
                 animationEnabled={data.map.animationEnabled !== false}
               />
+              </Suspense>
             </div>
           )}
 

@@ -7,20 +7,22 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { ServerNotificationProvider } from './contexts/ServerNotificationContext';
 import ToastContainer from './components/common/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary';
-import { DashboardProviders } from './components/DashboardProviders';
-import ProtectedRoute from './components/ProtectedRoute';
-import RoleBasedRoute from './components/RoleBasedRoute';
-import DashboardRouter from './components/DashboardRouter';
-import SmartDashboardLayout from './components/SmartDashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import PageLoader from './components/common/PageLoader';
-import WelcomeNotification from './components/WelcomeNotification';
 import useGTMPageView from './hooks/useGTMPageView';
 import { useKeepBackendAlive } from './hooks/useKeepBackendAlive';
 import { UserRole } from './types/roles';
 import { useAuth } from './contexts/AuthContext';
 import { setTokenGetter } from './services/blog/blogApiClientSetup';
 import './App.css';
+
+// ⚡ PERF: Lazy load de componentes del dashboard (no se necesitan en páginas públicas)
+const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
+const RoleBasedRoute = lazy(() => import('./components/RoleBasedRoute'));
+const DashboardRouter = lazy(() => import('./components/DashboardRouter'));
+const SmartDashboardLayout = lazy(() => import('./components/SmartDashboardLayout'));
+const DashboardProviders = lazy(() => import('./components/DashboardProviders').then(m => ({ default: m.DashboardProviders })));
+const WelcomeNotification = lazy(() => import('./components/WelcomeNotification'));
 
 // ⚡ Configuración de Clerk global optimizada
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_bGlnaHQtZG9scGhpbi00Mi5jbGVyay5hY2NvdW50cy5kZXYk';

@@ -152,6 +152,9 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
             src={backgroundImage}
             alt={data.backgroundImageAlt || 'Client logos background'}
             className="w-full h-full object-cover"
+            width={1920}
+            height={400}
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-black bg-opacity-30" />
         </div>
@@ -236,6 +239,9 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
                         src={logo.imageUrl}
                         alt={logo.alt || logo.name}
                         className="transition-all duration-300 ease-out w-full h-auto"
+                        width={120}
+                        height={60}
+                        loading="lazy"
                         style={{
                           maxWidth: logosStyles.logoMaxWidth || '120px',
                           height: data.logosHeight || 'auto',
@@ -256,7 +262,6 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
                           e.currentTarget.style.transform = 'scale(1)';
                           e.currentTarget.style.transition = 'all 0.3s ease-out';
                         }}
-                        loading="lazy"
                       />
                     </LogoComponent>
                   </div>

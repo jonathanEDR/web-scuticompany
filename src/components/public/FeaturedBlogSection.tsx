@@ -234,6 +234,8 @@ const FeaturedBlogSection = ({ data, themeConfig }: FeaturedBlogSectionProps) =>
                     src={post.featuredImage}
                     alt={post.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    width={400}
+                    height={224}
                     loading="lazy"
                   />
                 ) : (
