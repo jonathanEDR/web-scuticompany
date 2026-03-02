@@ -42,19 +42,19 @@ export default defineConfig({
         // ⚡ Code splitting optimizado
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // ⚡ IMPORTANT: Paquetes específicos PRIMERO (antes del check genérico 'react')
-            // lucide-react contiene "react" en el nombre, debe ir antes
+            // ⚡ lucide-react PRIMERO (contiene "react" en nombre, debe ir antes del check genérico)
             if (id.includes('lucide-react')) return 'icons';
-            // Router
+            // Router antes de react genérico
             if (id.includes('react-router')) return 'router';
-            // Clerk - carga diferida
-            if (id.includes('@clerk')) return 'clerk';
             // Editor TipTap - carga diferida (solo en /dashboard)
             if (id.includes('@tiptap') || id.includes('prosemirror')) return 'editor';
-            // react-helmet
+            // react-helmet separado
             if (id.includes('react-helmet')) return 'react-helmet';
-            // React core - carga crítica (DESPUÉS de checks específicos)
+            // React core - incluye @clerk/clerk-react y @clerk/shared/react
+            // (DEBEN estar juntos para que Clerk inicialice correctamente)
             if (id.includes('react') || id.includes('react-dom')) return 'react-core';
+            // Clerk restante (@clerk/types, @clerk/backend, etc.)
+            if (id.includes('@clerk')) return 'clerk';
             // Utilidades
             if (id.includes('date-fns') || id.includes('lodash')) return 'utils';
           }
