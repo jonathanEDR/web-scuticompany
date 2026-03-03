@@ -41,6 +41,7 @@ function generateFavicons(): string {
 // Cache en memoria para evitar llamadas repetidas a la API
 const postCache = new Map<string, { data: any; timestamp: number }>();
 const servicioCache = new Map<string, { data: any; timestamp: number }>();
+const proyectoCache = new Map<string, { data: any; timestamp: number }>();
 const pageSeoCache = new Map<string, { data: any; timestamp: number }>();
 const pageFullCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
@@ -131,6 +132,118 @@ async function getServicioData(slug: string): Promise<any | null> {
     console.error(`Error fetching servicio ${slug}:`, error);
     return null;
   }
+}
+
+async function getProyectoData(slug: string): Promise<any | null> {
+  const cached = proyectoCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  try {
+    const response = await fetch(
+      `${CONFIG.apiUrl}/api/proyectos/detalle/${slug}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Vercel-Edge-Middleware'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`Error fetching proyecto ${slug}: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    if (!data.success || !data.data) return null;
+
+    proyectoCache.set(slug, { data: data.data, timestamp: Date.now() });
+    return data.data;
+  } catch (error) {
+    console.error(`Error fetching proyecto ${slug}:`, error);
+    return null;
+  }
+}
+
+function generateProyectoMetaTags(proyecto: any): string {
+  const nombre = escapeHtml(proyecto.nombre || 'Proyecto');
+  const descripcion = escapeHtml(
+    proyecto.descripcionCorta ||
+    (proyecto.descripcionCompleta ? proyecto.descripcionCompleta.replace(/<[^>]*>/g, '').substring(0, 160) : '') ||
+    'Proyecto tecnológico desarrollado por SCUTI Company'
+  );
+  const proyectoUrl = `${CONFIG.siteUrl}/proyectos/${proyecto.slug}`;
+  const imagen = proyecto.imagenPrincipal?.url ||
+    proyecto.imagenPrincipal?.secure_url ||
+    (typeof proyecto.imagenPrincipal === 'string' && proyecto.imagenPrincipal.startsWith('http') ? proyecto.imagenPrincipal : null) ||
+    CONFIG.defaultImage;
+  const keywords = [
+    proyecto.categoria || 'proyecto',
+    'SCUTI Company',
+    'desarrollo de software',
+    ...(proyecto.tecnologias?.slice(0, 5).map((t: any) => typeof t === 'string' ? t : t.nombre) || [])
+  ].filter(Boolean).join(', ');
+
+  return `
+    ${generateFavicons()}
+    <!-- Primary Meta Tags - Proyecto - Generado por Edge Middleware -->
+    <title>${nombre} | SCUTI Company</title>
+    <meta name="title" content="${nombre} | SCUTI Company" />
+    <meta name="description" content="${descripcion}" />
+    <meta name="keywords" content="${escapeHtml(keywords)}" />
+    <meta name="author" content="SCUTI Company" />
+    <link rel="canonical" href="${proyectoUrl}" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${proyectoUrl}" />
+    <meta property="og:title" content="${nombre} | SCUTI Company" />
+    <meta property="og:description" content="${descripcion}" />
+    <meta property="og:image" content="${imagen}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta property="og:locale" content="es_PE" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="${proyectoUrl}" />
+    <meta name="twitter:title" content="${nombre} | SCUTI Company" />
+    <meta name="twitter:description" content="${descripcion}" />
+    <meta name="twitter:image" content="${imagen}" />
+    <meta name="twitter:site" content="${CONFIG.twitterHandle}" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "${nombre}",
+      "description": "${descripcion}",
+      "url": "${proyectoUrl}",
+      "image": "${imagen}",
+      "applicationCategory": "${escapeHtml(proyecto.categoria || 'WebApplication')}",
+      "creator": {
+        "@type": "Organization",
+        "name": "SCUTI Company",
+        "url": "${CONFIG.siteUrl}"
+      }
+    }
+    <\/script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "${CONFIG.siteUrl}"},
+        {"@type": "ListItem", "position": 2, "name": "Proyectos", "item": "${CONFIG.siteUrl}/proyectos"},
+        {"@type": "ListItem", "position": 3, "name": "${nombre}", "item": "${proyectoUrl}"}
+      ]
+    }
+    <\/script>
+  `;
 }
 
 /**
@@ -1211,11 +1324,13 @@ export default async function middleware(request: Request) {
   const isPrivacidadPage = /^\/privacidad\/?$/.test(pathname);
   const isTerminosPage = /^\/terminos\/?$/.test(pathname);
   const isBlogListPage = /^\/blog\/?$/.test(pathname);
+  const isProyectosListPage = /^\/proyectos\/?$/.test(pathname);
   const blogPostMatch = pathname.match(/^\/blog\/([^\/]+)$/);
   const servicioDetailMatch = pathname.match(/^\/servicios\/([^\/]+)$/);
+  const proyectoDetailMatch = pathname.match(/^\/proyectos\/([^\/]+)$/);
 
   // Si no es ninguna página que manejamos, continuar normal
-  if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isContactoPage && !isPrivacidadPage && !isTerminosPage && !isBlogListPage && !blogPostMatch && !servicioDetailMatch) {
+  if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isContactoPage && !isPrivacidadPage && !isTerminosPage && !isBlogListPage && !isProyectosListPage && !blogPostMatch && !servicioDetailMatch && !proyectoDetailMatch) {
     return next();
   }
 
@@ -1626,14 +1741,145 @@ export default async function middleware(request: Request) {
     });
   }
 
+  // === CASO: Listado de proyectos /proyectos ===
+  if (isProyectosListPage) {
+    console.log(`[Edge Middleware] Crawler detected for /proyectos: ${userAgent.substring(0, 50)}`);
+
+    const indexUrl = new URL('/', request.url);
+    const response = await fetch(indexUrl.toString(), {
+      headers: { 'Accept': 'text/html', 'User-Agent': 'Vercel-Edge-Middleware-Internal' }
+    });
+    if (!response.ok) return next();
+    let html = await response.text();
+
+    const proyectosUrl = `${CONFIG.siteUrl}/proyectos`;
+    const metaTags = `
+    ${generateFavicons()}
+    <title>Portafolio de Proyectos | SCUTI Company</title>
+    <meta name="description" content="Conoce nuestros proyectos tecnológicos: aplicaciones web, sistemas empresariales, e-commerce e inteligencia artificial desarrollados a medida en Perú." />
+    <meta name="keywords" content="portafolio, proyectos, desarrollo de software, sistemas web, SCUTI Company, Perú" />
+    <link rel="canonical" href="${proyectosUrl}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${proyectosUrl}" />
+    <meta property="og:title" content="Portafolio de Proyectos | SCUTI Company" />
+    <meta property="og:description" content="Conoce nuestros proyectos tecnológicos desarrollados a medida en Perú." />
+    <meta property="og:image" content="${CONFIG.defaultImage}" />
+    <meta property="og:site_name" content="SCUTI Company" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Portafolio de Proyectos | SCUTI Company" />
+    <meta name="twitter:description" content="Conoce nuestros proyectos tecnológicos desarrollados a medida en Perú." />
+    <meta name="twitter:image" content="${CONFIG.defaultImage}" />
+    `;
+
+    html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
+    html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
+    html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'X-Robots-Tag': 'index, follow',
+        'X-Edge-Middleware': 'proyectos-list-seo'
+      }
+    });
+  }
+
+  // === CASO: Detalle de proyecto /proyectos/:slug ===
+  if (proyectoDetailMatch) {
+    const proyectoSlug = proyectoDetailMatch[1];
+    if (proyectoSlug.includes('.') || proyectoSlug === 'index') return next();
+
+    console.log(`[Edge Middleware] Crawler detected for /proyectos/${proyectoSlug}: ${userAgent.substring(0, 50)}`);
+
+    const proyecto = await getProyectoData(proyectoSlug);
+    if (!proyecto) {
+      console.log(`[Edge Middleware] Proyecto not found: ${proyectoSlug}`);
+      return next();
+    }
+
+    const indexUrl = new URL('/', request.url);
+    const response = await fetch(indexUrl.toString(), {
+      headers: { 'Accept': 'text/html', 'User-Agent': 'Vercel-Edge-Middleware-Internal' }
+    });
+    if (!response.ok) return next();
+    let html = await response.text();
+
+    const metaTags = generateProyectoMetaTags(proyecto);
+
+    html = html.replace(/<title[^>]*>.*?<\/title>/gi, '');
+    html = html.replace(/<meta[^>]*property="og:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="twitter:[^"]*"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name="keywords"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="shortcut icon"[^>]*>/gi, '');
+    html = html.replace(/<link[^>]*rel="apple-touch-icon"[^>]*>/gi, '');
+    html = html.replace(/<head[^>]*>/i, `<head>\n${metaTags}`);
+
+    // Contenido visible para crawlers
+    const nombre = escapeHtml(proyecto.nombre || '');
+    const descripcion = escapeHtml(proyecto.descripcionCorta || '');
+    const imagen = proyecto.imagenPrincipal?.url ||
+      proyecto.imagenPrincipal?.secure_url ||
+      (typeof proyecto.imagenPrincipal === 'string' && proyecto.imagenPrincipal.startsWith('http') ? proyecto.imagenPrincipal : null) ||
+      '';
+    const techs = proyecto.tecnologias?.slice(0, 6).map((t: any) =>
+      `<li>${escapeHtml(typeof t === 'string' ? t : t.nombre || '')}</li>`
+    ).join('') || '';
+    const metricas = proyecto.metricas?.slice(0, 4).map((m: any) =>
+      `<li><strong>${escapeHtml(String(m.valor || ''))}</strong> ${escapeHtml(m.nombre || '')}</li>`
+    ).join('') || '';
+
+    const visibleContent = `
+      <main itemscope itemtype="https://schema.org/SoftwareApplication" style="max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif">
+        <nav aria-label="Breadcrumb" style="font-size:.875rem;color:#6b7280;margin-bottom:1rem">
+          <a href="/" style="color:#7c3aed">Inicio</a> &gt;
+          <a href="/proyectos" style="color:#7c3aed">Proyectos</a> &gt;
+          <span>${nombre}</span>
+        </nav>
+        <h1 itemprop="name" style="font-size:2rem;font-weight:700;color:#111827;margin-bottom:1rem">${nombre}</h1>
+        <p itemprop="description" style="font-size:1rem;line-height:1.7;color:#4b5563;margin-bottom:1.5rem">${descripcion}</p>
+        ${imagen ? `<img itemprop="image" src="${imagen}" alt="${nombre}" width="1200" height="630" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:1.5rem" />` : ''}
+        ${techs ? `<h2 style="font-size:1.25rem;font-weight:600;color:#374151;margin-bottom:.75rem">Tecnologías utilizadas</h2><ul style="list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem">${techs}</ul>` : ''}
+        ${metricas ? `<h2 style="font-size:1.25rem;font-weight:600;color:#374151;margin-bottom:.75rem">Resultados obtenidos</h2><ul style="list-style:none;padding:0">${metricas}</ul>` : ''}
+        <a href="/contacto" style="display:inline-block;background:#7c3aed;color:white;padding:.75rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;margin-top:1.5rem">Solicitar Proyecto Similar</a>
+      </main>`;
+
+    html = html.replace(
+      /<div id="root">[\s\S]*?<\/div>/i,
+      `<div id="root">${visibleContent}</div>`
+    );
+    console.log(`[Edge Middleware] ✅ Injected visible content for /proyectos/${proyectoSlug}`);
+
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'X-Robots-Tag': 'index, follow',
+        'X-Edge-Middleware': 'proyecto-detail-seo'
+      }
+    });
+  }
+
   // Si llegamos aquí, continuar normalmente
   return next();
 }
 
 /**
  * Configuración del middleware
- * Se ejecuta para rutas de blog y servicios
+ * Se ejecuta para rutas de blog, servicios y proyectos
  */
 export const config = {
-  matcher: ['/', '/servicios', '/servicios/:path*', '/nosotros', '/contacto', '/privacidad', '/terminos', '/blog', '/blog/:path*']
+  matcher: ['/', '/servicios', '/servicios/:path*', '/nosotros', '/contacto', '/privacidad', '/terminos', '/blog', '/blog/:path*', '/proyectos', '/proyectos/:path*']
 };
