@@ -285,12 +285,34 @@ export default function ProyectoDetail() {
     },
   ].filter(Boolean) as { label: string; value: string }[];
 
+  const seoTitle    = (proyecto.seo?.metaTitle    || proyecto.nombre) + ' | Scuti Company';
+  const seoDesc     = proyecto.seo?.metaDescription || proyecto.descripcionCorta || '';
+  const seoUrl      = `https://scuticompany.com/proyectos/${proyecto.slug}`;
+  const seoImage    = typeof proyecto.imagenPrincipal === 'string' && proyecto.imagenPrincipal.startsWith('http')
+    ? proyecto.imagenPrincipal
+    : 'https://scuticompany.com/logofondonegro.jpeg';
+
   return (
     <>
       <Helmet>
-        <title>{proyecto.seo?.metaTitle || proyecto.nombre} | Scuti Company</title>
-        <meta name="description" content={proyecto.seo?.metaDescription || proyecto.descripcionCorta} />
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDesc} />
         {proyecto.seo?.keywords && <meta name="keywords" content={proyecto.seo.keywords.join(', ')} />}
+        <link rel="canonical" href={seoUrl} />
+        {/* Open Graph */}
+        <meta property="og:type"        content="website" />
+        <meta property="og:url"         content={seoUrl} />
+        <meta property="og:title"       content={seoTitle} />
+        <meta property="og:description" content={seoDesc} />
+        <meta property="og:image"       content={seoImage} />
+        <meta property="og:locale"      content="es_PE" />
+        <meta property="og:site_name"   content="SCUTI Company" />
+        {/* Twitter */}
+        <meta name="twitter:card"        content="summary_large_image" />
+        <meta name="twitter:site"        content="@scuticompany" />
+        <meta name="twitter:title"       content={seoTitle} />
+        <meta name="twitter:description" content={seoDesc} />
+        <meta name="twitter:image"       content={seoImage} />
       </Helmet>
 
       <PublicHeader />

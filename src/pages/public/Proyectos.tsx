@@ -460,11 +460,29 @@ export default function Proyectos() {
   const cmsMetaTitle = cmsData?.seo?.metaTitle || stripHtml(heroTitleHtml) || 'Portafolio de Proyectos | Scuti Company';
   const cmsMetaDescription = cmsData?.seo?.metaDescription || stripHtml(heroDescriptionHtml) || 'Conoce los proyectos y sistemas que hemos desarrollado. Soluciones tecnológicas a medida para empresas.';
 
+  const proyectosUrl   = 'https://scuticompany.com/proyectos';
+  const proyectosImage = 'https://scuticompany.com/logofondonegro.jpeg';
+
   return (
     <>
       <Helmet>
         <title>{cmsMetaTitle}</title>
         <meta name="description" content={cmsMetaDescription} />
+        <link rel="canonical" href={proyectosUrl} />
+        {/* Open Graph */}
+        <meta property="og:type"        content="website" />
+        <meta property="og:url"         content={proyectosUrl} />
+        <meta property="og:title"       content={cmsMetaTitle} />
+        <meta property="og:description" content={cmsMetaDescription} />
+        <meta property="og:image"       content={proyectosImage} />
+        <meta property="og:locale"      content="es_PE" />
+        <meta property="og:site_name"   content="SCUTI Company" />
+        {/* Twitter */}
+        <meta name="twitter:card"        content="summary_large_image" />
+        <meta name="twitter:site"        content="@scuticompany" />
+        <meta name="twitter:title"       content={cmsMetaTitle} />
+        <meta name="twitter:description" content={cmsMetaDescription} />
+        <meta name="twitter:image"       content={proyectosImage} />
       </Helmet>
 
       <PublicHeader />
