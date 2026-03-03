@@ -255,6 +255,65 @@ async function generateServicesSitemap() {
 }
 
 /**
+ * Obtener todos los proyectos del portafolio
+ */
+async function getAllProyectos() {
+  try {
+    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/proyectos?limit=1000`);
+    if (!data.success || !data.data) return [];
+    return Array.isArray(data.data) ? data.data : [];
+  } catch (error) {
+    console.error(`   ❌ Error obteniendo proyectos: ${error.message}`);
+    return [];
+  }
+}
+
+/**
+ * Generar sitemap-proyectos.xml con proyectos del portafolio
+ */
+async function generateProyectosSitemap() {
+  console.log('\n🗂️  Generando sitemap-proyectos.xml');
+  console.log('═'.repeat(50));
+
+  console.log('\n📡 Conectando a API...');
+  const proyectos = await getAllProyectos();
+
+  if (proyectos.length === 0) {
+    console.warn('\n⚠️ No se encontraron proyectos para el sitemap.');
+    return { proyectosCount: 0 };
+  }
+
+  let urls = [];
+
+  console.log(`\n🗂️  Proyectos (${proyectos.length}):`);
+  for (const proyecto of proyectos) {
+    if (proyecto.slug) {
+      const lastmod = formatDate(proyecto.updatedAt || proyecto.createdAt);
+      urls.push(`
+  <url>
+    <loc>${escapeXml(CONFIG.siteUrl)}/proyectos/${escapeXml(proyecto.slug)}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`);
+      console.log(`   ✅ /proyectos/${proyecto.slug}`);
+    }
+  }
+
+  const sitemapProyectos = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Sitemap de Proyectos - Generado: ${new Date().toISOString()} -->
+  <!-- Total URLs: ${urls.length} -->${urls.join('')}
+</urlset>`;
+
+  const sitemapProyectosPath = path.join(distPath, 'sitemap-proyectos.xml');
+  fs.writeFileSync(sitemapProyectosPath, sitemapProyectos);
+  console.log(`\n   📁 Archivo generado: dist/sitemap-proyectos.xml`);
+
+  return { proyectosCount: proyectos.length };
+}
+
+/**
  * Actualizar el índice principal (sitemap.xml) con la fecha actual
  */
 function updateSitemapIndex() {
@@ -283,6 +342,12 @@ function updateSitemapIndex() {
     <lastmod>${today}</lastmod>
   </sitemap>
 
+  <!-- Sitemap de proyectos (dinamico) -->
+  <sitemap>
+    <loc>${CONFIG.siteUrl}/sitemap-proyectos.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+
 </sitemapindex>`;
 
   const sitemapIndexPath = path.join(distPath, 'sitemap.xml');
@@ -302,6 +367,7 @@ async function main() {
 
   const { postsCount, categoriesCount } = await generateBlogSitemap();
   const { servicesCount } = await generateServicesSitemap();
+  const { proyectosCount } = await generateProyectosSitemap();
   updateSitemapIndex();
 
   // Resumen
@@ -311,14 +377,16 @@ async function main() {
   console.log(`   💼 Servicios: ${servicesCount}`);
   console.log(`   📝 Posts del blog: ${postsCount}`);
   console.log(`   📁 Categorías: ${categoriesCount}`);
-  console.log(`   🔢 Total URLs: ${servicesCount + postsCount + categoriesCount}`);
+  console.log(`   🗂️  Proyectos: ${proyectosCount}`);
+  console.log(`   🔢 Total URLs: ${servicesCount + postsCount + categoriesCount + proyectosCount}`);
   console.log('═'.repeat(50));
 
-  if (postsCount > 0 || servicesCount > 0) {
+  if (postsCount > 0 || servicesCount > 0 || proyectosCount > 0) {
     console.log('\n🎉 Sitemaps actualizados correctamente!');
     console.log('   - sitemap.xml (índice)');
     console.log('   - sitemap-services.xml (servicios)');
     console.log('   - sitemap-blog.xml (posts)');
+    console.log('   - sitemap-proyectos.xml (proyectos)');
   }
 }
 

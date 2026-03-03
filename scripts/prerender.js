@@ -44,6 +44,17 @@ const routes = [
       ogDescription: 'Conoce más sobre SCUTI Company y nuestro equipo',
       url: 'https://scuticompany.com/nosotros'
     }
+  },
+  {
+    path: '/proyectos',
+    seo: {
+      title: 'Portafolio de Proyectos - SCUTI Company',
+      description: 'Conoce nuestros proyectos tecnológicos: aplicaciones web, sistemas empresariales, e-commerce e inteligencia artificial desarrollados a medida.',
+      keywords: 'proyectos, portafolio, sistemas, desarrollo de software, soluciones tecnológicas, SCUTI',
+      ogTitle: 'Portafolio de Proyectos - SCUTI Company',
+      ogDescription: 'Descubre los sistemas y proyectos tecnológicos que hemos desarrollado para nuestros clientes',
+      url: 'https://scuticompany.com/proyectos'
+    }
   }
 ];
 
