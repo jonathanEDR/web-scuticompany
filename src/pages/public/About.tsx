@@ -34,8 +34,10 @@ const stripHtmlTags = (html: string): string => {
  */
 const sanitizeHtmlWithStyles = (html: string): string => {
   if (!html) return '';
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['span', 'strong', 'em', 'b', 'i', 'u', 's', 'br', 'p', 'h1', 'h2', 'h3'],
+  // Strip heading tags to prevent nesting (e.g. <h1><h1>text</h1></h1>)
+  const stripped = html.replace(/<\/?h[1-6][^>]*>/gi, '');
+  return DOMPurify.sanitize(stripped, {
+    ALLOWED_TAGS: ['span', 'strong', 'em', 'b', 'i', 'u', 's', 'br', 'p'],
     ALLOWED_ATTR: ['style', 'class', 'data-gradient'],
     ALLOW_DATA_ATTR: true
   });

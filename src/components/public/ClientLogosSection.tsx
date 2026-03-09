@@ -7,6 +7,11 @@ import type {
   ClientLogosDesignStyles
 } from '../../types/cms';
 
+const stripHeadingTags = (html: string): string => {
+  if (!html) return '';
+  return html.replace(/<\/?h[1-6][^>]*>/gi, '');
+};
+
 interface ClientLogosSectionProps {
   data?: ClientLogosContent;
 }
@@ -173,7 +178,7 @@ const ClientLogosSection: React.FC<ClientLogosSectionProps> = ({ data }) => {
                 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
                 style={{ color: textStyles.titleColor }}
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(data.title || 'Nuestros clientes')
+                  __html: DOMPurify.sanitize(stripHeadingTags(data.title || 'Nuestros clientes'))
                 }}
               />
               {data.description && (

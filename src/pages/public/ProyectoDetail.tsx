@@ -7,6 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import * as LucideIcons from 'lucide-react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import DOMPurify from 'dompurify';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
@@ -495,7 +496,7 @@ export default function ProyectoDetail() {
                       ? 'prose-invert prose-p:text-gray-300 prose-headings:text-white prose-strong:text-white prose-li:text-gray-300'
                       : 'prose-p:text-gray-600 prose-headings:text-gray-900 prose-li:text-gray-600'
                   }`}
-                  dangerouslySetInnerHTML={{ __html: proyecto.descripcionCompleta || `<p>${proyecto.descripcionCorta}</p>` }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(proyecto.descripcionCompleta || `<p>${proyecto.descripcionCorta}</p>`) }}
                 />
               </div>
 

@@ -4,6 +4,12 @@ import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import type { CardDesignStyles, ButtonStyle } from '../../types/cms';
 
+// Elimina heading tags del HTML para evitar anidamiento inválido
+const stripHeadingTags = (html: string): string => {
+  if (!html) return '';
+  return html.replace(/<\/?h[1-6][^>]*>/gi, '');
+};
+
 interface SolutionItem {
   id?: string;
   title: string;
@@ -478,7 +484,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                     ),
                     fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.title) }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(stripHeadingTags(solution.title)) }}
                 />
                 <div
                   className="leading-relaxed transition-colors text-center"
@@ -489,7 +495,7 @@ const SolutionsSection = ({ data, themeConfig }: SolutionsSectionProps) => {
                     ),
                     fontSize: 'inherit' // Permitir tamaños del RichTextEditor
                   }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution.description) }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(stripHeadingTags(solution.description)) }}
                 />
               </div>
 

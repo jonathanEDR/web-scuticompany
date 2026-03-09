@@ -7,6 +7,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
@@ -18,6 +19,11 @@ import { useCategoriasList } from '../../hooks/useCategoriasCache';
 import { invalidateServiciosCache } from '../../utils/serviciosCache';
 import { getPageBySlug } from '../../services/cmsApi';
 import { useSiteConfig } from '../../hooks/useSiteConfig';
+
+const stripHeadingTags = (html: string): string => {
+  if (!html) return '';
+  return html.replace(/<\/?h[1-6][^>]*>/gi, '');
+};
 import { useSeo } from '../../hooks/useSeo';
 import { BreadcrumbSchema } from '../../components/seo/SchemaOrg';
 import Breadcrumbs from '../../components/common/Breadcrumbs';
@@ -399,13 +405,13 @@ const ServicesPublicV2 = () => {
               <h1 
                 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-1 leading-none"
                 dangerouslySetInnerHTML={{ 
-                  __html: pageData?.content?.hero?.title || 'Nuestros <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Servicios</span>'
+                  __html: DOMPurify.sanitize(stripHeadingTags(pageData?.content?.hero?.title || 'Nuestros <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Servicios</span>'))
                 }}
               />
               <p 
                 className="text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mt-1 mb-0 leading-tight"
                 dangerouslySetInnerHTML={{ 
-                  __html: pageData?.content?.hero?.subtitle || 'Soluciones digitales de vanguardia diseñadas para impulsar tu negocio hacia el éxito'
+                  __html: DOMPurify.sanitize(stripHeadingTags(pageData?.content?.hero?.subtitle || 'Soluciones digitales de vanguardia diseñadas para impulsar tu negocio hacia el éxito'))
                 }}
               />
               {/* Descripción adicional si existe */}
@@ -413,7 +419,7 @@ const ServicesPublicV2 = () => {
                 <p 
                   className="text-sm text-gray-500 dark:text-gray-400 max-w-3xl mx-auto mt-1 leading-tight"
                   dangerouslySetInnerHTML={{ 
-                    __html: pageData.content.hero.description
+                    __html: DOMPurify.sanitize(stripHeadingTags(pageData.content.hero.description))
                   }}
                 />
               )}

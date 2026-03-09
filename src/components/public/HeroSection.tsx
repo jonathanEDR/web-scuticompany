@@ -4,6 +4,13 @@ import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import '../../styles/gradient-borders.css';
 
+// Elimina heading tags del HTML para evitar anidamiento inválido (ej: <h1><h1>text</h1></h1>)
+// Preserva todo el formato inline (bold, italic, colores, gradientes, fuentes)
+const stripHeadingTags = (html: string): string => {
+  if (!html) return '';
+  return html.replace(/<\/?h[1-6][^>]*>/gi, '');
+};
+
 interface HeroData {
   title: string;
   subtitle: string;
@@ -157,13 +164,13 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                   ? '1px 1px 2px rgba(0,0,0,0.1)' // Sombra muy sutil para tema claro
                   : '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6)' // Sombra más fuerte para tema oscuro
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.title) }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(stripHeadingTags(heroData.title)) }}
             />
           </div>
 
-          {/* Subtitle y Description - SEO: <p> semánticos */}
+          {/* Subtitle - SEO: <h2> para jerarquía correcta de headings */}
           <div className="max-w-2xl mx-auto space-y-2">
-            <p
+            <h2
               className={`text-sm sm:text-sm md:text-base theme-transition transition-all duration-1000 delay-300 ${
                 animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
@@ -177,7 +184,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                   ? '0.5px 0.5px 1px rgba(0,0,0,0.1)' // Sombra muy ligera para tema claro
                   : '1px 1px 3px rgba(0,0,0,0.7), 0 0 6px rgba(0,0,0,0.5)' // Sombra para tema oscuro
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.subtitle) }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(stripHeadingTags(heroData.subtitle)) }}
             />
             <div
               className={`hero-description text-xs sm:text-xs md:text-sm theme-transition transition-all duration-1000 delay-500 ${
@@ -193,7 +200,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                   ? 'none' // Sin sombra para texto de descripción en tema claro
                   : '1px 1px 2px rgba(0,0,0,0.6)' // Sombra sutil para tema oscuro
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroData.description) }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(stripHeadingTags(heroData.description)) }}
             />
           </div>
 

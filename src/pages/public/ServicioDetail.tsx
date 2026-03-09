@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import DOMPurify from 'dompurify';
 import * as LucideIcons from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
@@ -1052,7 +1053,7 @@ export const ServicioDetail: React.FC = () => {
                         <div 
                           className="leading-relaxed whitespace-pre-line"
                           style={{ color: getAccordionStyles().contentText }}
-                          dangerouslySetInnerHTML={{ __html: servicio.descripcion.replace(/\n/g, '<br>') }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(servicio.descripcion.replace(/\n/g, '<br>')) }}
                         />
                       </div>
                     )}
@@ -1078,13 +1079,13 @@ export const ServicioDetail: React.FC = () => {
                         <div 
                           className="text-gray-700 dark:text-gray-300 leading-relaxed"
                           dangerouslySetInnerHTML={{ 
-                            __html: servicio.descripcionRica
+                            __html: DOMPurify.sanitize(servicio.descripcionRica
                               .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">$1</h3>')
                               .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 mt-8">$1</h2>')
                               .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
                               .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
                               .replace(/^\- (.*$)/gim, '<li class="ml-4 mb-2">• $1</li>')
-                              .replace(/\n/g, '<br>')
+                              .replace(/\n/g, '<br>'))
                           }}
                           />
                         </div>
@@ -1599,7 +1600,7 @@ export const ServicioDetail: React.FC = () => {
                         <div 
                           className="leading-relaxed whitespace-pre-line"
                           style={{ color: getAccordionStyles().contentText }}
-                          dangerouslySetInnerHTML={{ __html: sanitizeContenidoAdicional(servicio.contenidoAdicional).replace(/\n/g, '<br>') }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(sanitizeContenidoAdicional(servicio.contenidoAdicional).replace(/\n/g, '<br>')) }}
                         />
                       </div>
                     )}

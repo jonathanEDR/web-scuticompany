@@ -535,7 +535,7 @@ export default function Proyectos() {
               className={`text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 ${
                 isDark ? 'text-white' : 'text-gray-900'
               } [&_strong]:bg-gradient-to-r [&_strong]:from-purple-600 [&_strong]:to-indigo-600 [&_strong]:bg-clip-text [&_strong]:text-transparent [&_p]:m-0`}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroTitleHtml) }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroTitleHtml.replace(/<\/?h[1-6][^>]*>/gi, '')) }}
             />
 
             <div

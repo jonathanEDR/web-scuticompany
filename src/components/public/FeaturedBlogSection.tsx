@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, Clock, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { useTheme } from '../../contexts/ThemeContext';
 import DynamicIcon from '../ui/DynamicIcon';
 import PageLoader from '../common/PageLoader';
@@ -191,7 +192,7 @@ const FeaturedBlogSection = ({ data, themeConfig }: FeaturedBlogSectionProps) =>
                 color: currentStyles?.descriptionColor || undefined,
                 fontFamily: data.fontFamily || 'Montserrat'
               }}
-              dangerouslySetInnerHTML={{ __html: data.description }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description) }}
             />
           )}
         </div>
