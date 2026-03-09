@@ -125,6 +125,9 @@ const AIAnalytics = lazy(() => import('./pages/admin/AIAnalytics'));
 // 🔔 Historial de Notificaciones
 const NotificationsHistory = lazy(() => import('./pages/admin/NotificationsHistory'));
 
+// 🎥 Sala de Reuniones Virtual (SERSI)
+const MeetingRoom = lazy(() => import('./pages/admin/MeetingRoom'));
+
 
 /**
  * Wrapper para rutas del dashboard con providers de autenticación y roles
@@ -326,6 +329,13 @@ function AppContent() {
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
                     <CrmMessages />
                   </RoleBasedRoute>
+                </DashboardRoute>
+              } />
+
+              {/* 🎥 SALA DE REUNIONES VIRTUAL - Todos los usuarios autenticados */}
+              <Route path="/dashboard/sala-reuniones" element={
+                <DashboardRoute>
+                  <MeetingRoom />
                 </DashboardRoute>
               } />
 
