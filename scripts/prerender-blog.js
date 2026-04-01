@@ -541,10 +541,19 @@ function generatePostHtml(indexHtml, post) {
 
   // Reemplazar el contenido del div#root con el contenido visible del post
   // Esto es crítico para que Google vea el contenido real
-  html = html.replace(
-    /<div id="root">.*?<\/div>/s,
-    `<div id="root">${visibleContent}</div>`
-  );
+  // Usar marcadores únicos para evitar el problema del regex lazy con divs anidados
+  if (html.includes('<!--ROOT-CONTENT-START-->')) {
+    html = html.replace(
+      /<!--ROOT-CONTENT-START-->[\s\S]*?<!--ROOT-CONTENT-END-->/,
+      visibleContent
+    );
+  } else {
+    // Fallback: regex para versiones anteriores del template
+    html = html.replace(
+      /<div id="root">[\s\S]*?<\/div>\s*<\/div>/i,
+      `<div id="root">${visibleContent}</div>`
+    );
+  }
 
   // 🎯 CRÍTICO: Inyectar datos del post como JSON para que React hidrate sin llamar a la API
   // Sin esto, React destruye el contenido visible al hidratarse y muestra "Artículo no encontrado"

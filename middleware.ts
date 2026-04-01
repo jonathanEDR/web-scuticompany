@@ -1205,6 +1205,24 @@ function generateVisibleCmsContent(pageData: any, pageName: string, pageUrl: str
 }
 
 /**
+ * 🔧 Helper: Reemplazar el contenido del div#root de forma segura
+ * Usa marcadores únicos si están disponibles, fallback a regex de dos niveles
+ */
+function replaceRootContent(html: string, content: string): string {
+  if (html.includes('<!--ROOT-CONTENT-START-->')) {
+    return html.replace(
+      /<!--ROOT-CONTENT-START-->[\s\S]*?<!--ROOT-CONTENT-END-->/i,
+      content
+    );
+  }
+  // Fallback: captura hasta el SEGUNDO </div> para incluir el div externo
+  return html.replace(
+    /<div id="root">[\s\S]*?<\/div>\s*<\/div>/i,
+    `<div id="root">${content}</div>`
+  );
+}
+
+/**
  * 🎯 CRÍTICO PARA SEO: Generar contenido visible del artículo para crawlers
  * Esto reemplaza el div#root vacío con contenido real del artículo
  * Para que Google vea contenido real en lugar de "Artículo no encontrado"
@@ -1397,10 +1415,7 @@ export default async function middleware(request: Request) {
     // 3) 🎯 CRÍTICO: Inyectar contenido visible en <div id="root">
     if (fullPageData) {
       const visibleContent = generateVisibleCmsContent(fullPageData, pageName, pageUrl);
-      html = html.replace(
-        /<div id="root">[\s\S]*?<\/div>/i,
-        `<div id="root">${visibleContent}</div>`
-      );
+      html = replaceRootContent(html, visibleContent);
       console.log(`[Edge Middleware] ✅ Injected visible content for /${pageName}`);
     }
 
@@ -1532,10 +1547,7 @@ export default async function middleware(request: Request) {
             </main>
             <style>.cms-page-seo{max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif}.cms-page-seo h1{font-size:2rem;margin:1rem 0;color:#1f2937}.cms-page-seo h2{font-size:1.5rem;margin:1.5rem 0 .5rem;color:#374151}.cms-page-seo p{font-size:1rem;line-height:1.7;color:#4b5563}.cms-page-seo ul{padding-left:1.5rem}.cms-page-seo li{margin-bottom:.75rem;color:#4b5563;line-height:1.6}.cms-page-seo a{color:#7c3aed;text-decoration:none}.cms-page-seo nav{font-size:.875rem;color:#6b7280;margin-bottom:1rem}@media(prefers-color-scheme:dark){.cms-page-seo{background:#111;color:#f9fafb}.cms-page-seo h1,.cms-page-seo h2{color:#f9fafb}.cms-page-seo p,.cms-page-seo li{color:#d1d5db}}</style>
           `;
-          html = html.replace(
-            /<div id="root">[\s\S]*?<\/div>/i,
-            `<div id="root">${blogContent}</div>`
-          );
+          html = replaceRootContent(html, blogContent);
           console.log(`[Edge Middleware] ✅ Injected ${posts.length} posts for /blog list`);
         }
       }
@@ -1649,10 +1661,7 @@ export default async function middleware(request: Request) {
       </main>
       <style>.cms-page-seo{max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif}.cms-page-seo h1{font-size:2rem;margin:1rem 0;color:#1f2937}.cms-page-seo h2{font-size:1.5rem;margin:1.5rem 0 .5rem;color:#374151}.cms-page-seo p{font-size:1rem;line-height:1.7;color:#4b5563}.cms-page-seo ul{padding-left:1.5rem}.cms-page-seo li{margin-bottom:.5rem;color:#4b5563;line-height:1.6}.cms-page-seo a{color:#7c3aed;text-decoration:none}.cms-page-seo nav{font-size:.875rem;color:#6b7280;margin-bottom:1rem}@media(prefers-color-scheme:dark){.cms-page-seo{background:#111;color:#f9fafb}.cms-page-seo h1,.cms-page-seo h2{color:#f9fafb}.cms-page-seo p,.cms-page-seo li{color:#d1d5db}}</style>
     `;
-    html = html.replace(
-      /<div id="root">[\s\S]*?<\/div>/i,
-      `<div id="root">${servicioContent}</div>`
-    );
+    html = replaceRootContent(html, servicioContent);
     console.log(`[Edge Middleware] ✅ Injected visible content for /servicios/${servicioSlug}`);
 
     // Retornar el HTML modificado
@@ -1724,10 +1733,7 @@ export default async function middleware(request: Request) {
     // 🎯 CRÍTICO PARA SEO: Reemplazar el div#root con contenido real del artículo
     // Esto evita que Google vea "Artículo no encontrado" o un div vacío
     const visibleContent = generateVisibleArticleContent(post);
-    html = html.replace(
-      /<div id="root">[\s\S]*?<\/div>/i,
-      `<div id="root">${visibleContent}</div>`
-    );
+    html = replaceRootContent(html, visibleContent);
 
     // 🎯 CRÍTICO: Inyectar datos del post como JSON para que React hidrate sin llamar a la API
     // Sin esto, React destruye el contenido visible al hidratarse y muestra "Artículo no encontrado"
@@ -1861,11 +1867,9 @@ export default async function middleware(request: Request) {
         <a href="/contacto" style="display:inline-block;background:#7c3aed;color:white;padding:.75rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;margin-top:1.5rem">Solicitar Proyecto Similar</a>
       </main>`;
 
-    html = html.replace(
-      /<div id="root">[\s\S]*?<\/div>/i,
-      `<div id="root">${visibleContent}</div>`
-    );
+    html = replaceRootContent(html, visibleContent);
     console.log(`[Edge Middleware] ✅ Injected visible content for /proyectos/${proyectoSlug}`);
+
 
     return new Response(html, {
       status: 200,
