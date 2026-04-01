@@ -1729,6 +1729,12 @@ export default async function middleware(request: Request) {
       `<div id="root">${visibleContent}</div>`
     );
 
+    // 🎯 CRÍTICO: Inyectar datos del post como JSON para que React hidrate sin llamar a la API
+    // Sin esto, React destruye el contenido visible al hidratarse y muestra "Artículo no encontrado"
+    const safePostJson = JSON.stringify(post).replace(/<\/script/gi, '<\\/script');
+    const postDataScript = `<script>window.__PRERENDERED_BLOG_POST__=${safePostJson};</script>`;
+    html = html.replace('</body>', `${postDataScript}\n</body>`);
+
     // Retornar el HTML modificado
     return new Response(html, {
       status: 200,

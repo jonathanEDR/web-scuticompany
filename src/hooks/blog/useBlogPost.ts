@@ -35,6 +35,28 @@ const isPrerendering = (): boolean => {
   return false;
 };
 
+/**
+ * 🔍 Obtener datos de post pre-renderizados inyectados por middleware o prerender-blog.js
+ * Esto evita que React haga una llamada API innecesaria cuando los datos ya están en el HTML
+ */
+const getPrerenderedPostData = (slug: string): { post: BlogPost; relatedPosts: BlogPost[] } | null => {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const prerendered = (window as any).__PRERENDERED_BLOG_POST__;
+    if (prerendered && prerendered.slug === slug) {
+      return {
+        post: prerendered as BlogPost,
+        relatedPosts: (window as any).__PRERENDERED_RELATED_POSTS__ || []
+      };
+    }
+  } catch {
+    // Silenciar errores de parsing
+  }
+  
+  return null;
+};
+
 interface UseBlogPostReturn {
   post: BlogPost | null;
   relatedPosts: BlogPost[];  // ✅ Ahora se exponen los posts relacionados
@@ -52,12 +74,13 @@ interface UseBlogPostReturn {
  * ✅ Optimizado: loading inteligente basado en caché existente
  */
 export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
-  // ✅ Inicialización inteligente: verificar caché inmediatamente
-  const initialCached = slug ? blogCache.get<{ post: BlogPost; relatedPosts: BlogPost[] }>('POST_DETAIL', slug) : null;
+  // ✅ Inicialización inteligente: verificar datos pre-renderizados y luego caché
+  const prerenderedData = slug ? getPrerenderedPostData(slug) : null;
+  const initialCached = slug ? (prerenderedData || blogCache.get<{ post: BlogPost; relatedPosts: BlogPost[] }>('POST_DETAIL', slug)) : null;
   
   const [post, setPost] = useState<BlogPost | null>(initialCached?.post || null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>(initialCached?.relatedPosts || []);
-  const [loading, setLoading] = useState(!initialCached && !!slug); // ✅ No loading si hay caché
+  const [loading, setLoading] = useState(!initialCached && !!slug); // ✅ No loading si hay caché o datos pre-renderizados
   const [error, setError] = useState<string | null>(null);
   const prerenderMode = isPrerendering();
 
@@ -75,6 +98,18 @@ export function useBlogPost(slug: string | undefined): UseBlogPostReturn {
       console.log('[useBlogPost] Modo pre-renderizado detectado, omitiendo fetch API');
       setLoading(false);
       // No setear error - dejar que el HTML estático pre-renderizado sea visible
+      return;
+    }
+
+    // ✅ Si ya tenemos datos pre-renderizados, usarlos directamente sin llamar a la API
+    const prerendered = getPrerenderedPostData(slug);
+    if (prerendered) {
+      console.log('[useBlogPost] Usando datos pre-renderizados del HTML');
+      setPost(prerendered.post);
+      setRelatedPosts(prerendered.relatedPosts);
+      setLoading(false);
+      // Guardar en caché para navegación subsecuente
+      blogCache.set('POST_DETAIL', slug, prerendered);
       return;
     }
 
