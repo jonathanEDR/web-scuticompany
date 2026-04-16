@@ -289,14 +289,41 @@ export function useServiciosList(
 }
 
 /**
+ * 🔍 Obtener datos de servicio pre-renderizados inyectados por middleware o prerender-services.js
+ * Esto evita que React haga una llamada API innecesaria cuando los datos ya están en el HTML
+ */
+const getPrerenderedServiceData = (slug: string): Servicio | null => {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const prerendered = (window as any).__PRERENDERED_SERVICE__;
+    if (prerendered && (prerendered.slug === slug || prerendered._id === slug)) {
+      return prerendered as Servicio;
+    }
+  } catch {
+    // Silenciar errores de parsing
+  }
+  
+  return null;
+};
+
+/**
  * Hook especializado para detalle de servicio
  * 🔥 OPTIMIZADO: Usa endpoint directo por slug/ID en lugar de cargar todos
+ * ✅ Compatible con pre-renderizado SEO: lee window.__PRERENDERED_SERVICE__
  */
 export function useServicioDetail(
   slug: string,
   options: UseServiciosCacheOptions = {}
 ) {
   const fetchFn = useCallback(async () => {
+    // 🎯 PRIMERO: Verificar si hay datos pre-renderizados inyectados por middleware/prerender
+    const prerendered = getPrerenderedServiceData(slug);
+    if (prerendered) {
+      console.log('[useServicioDetail] Usando datos pre-renderizados para:', slug);
+      return prerendered;
+    }
+
     const { serviciosApi } = await import('../services/serviciosApi');
     
     try {

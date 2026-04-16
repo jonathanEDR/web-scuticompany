@@ -1662,7 +1662,14 @@ export default async function middleware(request: Request) {
       <style>.cms-page-seo{max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif}.cms-page-seo h1{font-size:2rem;margin:1rem 0;color:#1f2937}.cms-page-seo h2{font-size:1.5rem;margin:1.5rem 0 .5rem;color:#374151}.cms-page-seo p{font-size:1rem;line-height:1.7;color:#4b5563}.cms-page-seo ul{padding-left:1.5rem}.cms-page-seo li{margin-bottom:.5rem;color:#4b5563;line-height:1.6}.cms-page-seo a{color:#7c3aed;text-decoration:none}.cms-page-seo nav{font-size:.875rem;color:#6b7280;margin-bottom:1rem}@media(prefers-color-scheme:dark){.cms-page-seo{background:#111;color:#f9fafb}.cms-page-seo h1,.cms-page-seo h2{color:#f9fafb}.cms-page-seo p,.cms-page-seo li{color:#d1d5db}}</style>
     `;
     html = replaceRootContent(html, servicioContent);
-    console.log(`[Edge Middleware] ✅ Injected visible content for /servicios/${servicioSlug}`);
+
+    // 🎯 CRÍTICO: Inyectar datos del servicio como JSON para que React hidrate sin llamar a la API
+    // Sin esto, React destruye el contenido visible al hidratarse y muestra error
+    const safeServiceJson = JSON.stringify(servicio).replace(/<\/script/gi, '<\\/script');
+    const serviceDataScript = `<script>window.__PRERENDERED_SERVICE__=${safeServiceJson};</script>`;
+    html = html.replace('</body>', `${serviceDataScript}\n</body>`);
+
+    console.log(`[Edge Middleware] ✅ Injected visible content + data for /servicios/${servicioSlug}`);
 
     // Retornar el HTML modificado
     return new Response(html, {
