@@ -1,12 +1,22 @@
 /**
- * 🗺️ Generador de Sitemap XML Dinámico para Blog
+ * 🗺️ Generador del Índice de Sitemaps
  *
- * Genera sitemap-blog.xml con todos los posts del blog y actualiza el índice principal.
+ * IMPORTANTE: Los sitemaps de contenido dinámico (blog, servicios, proyectos)
+ * ya NO se generan estáticamente en el build. Se sirven en tiempo real desde
+ * el backend a través de rewrites en vercel.json:
  *
- * Estructura de sitemaps:
- * - sitemap.xml (índice)
- *   ├── sitemap-pages.xml (páginas estáticas - no se modifica)
- *   └── sitemap-blog.xml (posts del blog - generado dinámicamente)
+ *   /sitemap-blog.xml      → backend /api/blog/sitemap.xml
+ *   /sitemap-services.xml  → backend /api/servicios/sitemap.xml
+ *   /sitemap-proyectos.xml → backend /api/proyectos/sitemap.xml
+ *
+ * Motivo: los archivos estáticos en dist/ tienen PRECEDENCIA sobre los
+ * rewrites de Vercel. Generarlos en el build los dejaba congelados hasta el
+ * siguiente deploy, y los posts/servicios nuevos no aparecían en el sitemap
+ * (causa de "Rastreada: actualmente sin indexar" en Search Console).
+ *
+ * Este script solo:
+ *  1. Genera el índice sitemap.xml (referencias a los 4 sitemaps hijos)
+ *  2. Elimina de dist/ cualquier sitemap dinámico estático que bloquearía los rewrites
  */
 
 import fs from 'fs';
@@ -18,306 +28,22 @@ const __dirname = path.dirname(__filename);
 
 const distPath = path.join(__dirname, '../dist');
 
-// Configuración
-// IMPORTANTE: Normalizar la URL base - remover /api si ya está incluido para evitar /api/api
-let rawApiUrl = process.env.VITE_API_URL || process.env.API_URL || 'https://web-scuticompany-back.onrender.com';
-// Remover /api del final si existe para evitar duplicación
-const baseApiUrl = rawApiUrl.replace(/\/api\/?$/, '');
-
-// ✅ Configuración centralizada - Usar variables de entorno con fallbacks
 const CONFIG = {
-  apiUrl: baseApiUrl,
-  siteUrl: process.env.VITE_SITE_URL || 'https://scuticompany.com',
-  siteName: process.env.VITE_SITE_NAME || 'SCUTI Company'
+  siteUrl: process.env.VITE_SITE_URL || 'https://scuticompany.com'
 };
-
-// Debug: mostrar qué URL se está usando
-console.log('═'.repeat(60));
-console.log('🔧 CONFIGURACIÓN DE BUILD');
-console.log('═'.repeat(60));
-console.log(`   VITE_API_URL (raw): ${process.env.VITE_API_URL || '(not set)'}`);
-console.log(`   API_URL (raw): ${process.env.API_URL || '(not set)'}`);
-console.log(`   Base URL (normalized): ${CONFIG.apiUrl}`);
-console.log(`   Full API path will be: ${CONFIG.apiUrl}/api/...`);
-console.log('═'.repeat(60));
-
-/**
- * Fetch wrapper con timeout y retry
- * Aumentado timeout a 60s y reintentos a 5 para manejar cold starts de Render
- */
-async function fetchWithRetry(url, options = {}, retries = 5) {
-  console.log(`   🔗 Fetching: ${url}`);
-  
-  for (let i = 0; i < retries; i++) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000); // 60s para cold start
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'User-Agent': 'Vercel-Build-Sitemap/1.0'
-        },
-        ...options,
-        signal: controller.signal
-      });
-
-      clearTimeout(timeout);
-
-      // Log detallado de la respuesta
-      console.log(`   📊 Response: ${response.status} ${response.statusText}`);
-      
-      if (!response.ok) {
-        // Intentar leer el cuerpo del error
-        const errorBody = await response.text().catch(() => 'No body');
-        console.log(`   📄 Error body: ${errorBody.substring(0, 200)}`);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log(`   ✅ Success: ${JSON.stringify(data).substring(0, 100)}...`);
-      return data;
-    } catch (error) {
-      console.warn(`   ⚠️ Intento ${i + 1}/${retries} fallido: ${error.message}`);
-      if (i === retries - 1) throw error;
-      await new Promise(r => setTimeout(r, 3000 * (i + 1))); // Más tiempo entre reintentos
-    }
-  }
-}
-
-/**
- * Obtener todos los posts publicados
- */
-async function getAllPosts() {
-  try {
-    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/blog/posts?limit=1000`);
-    if (!data.success || !data.data?.data) return [];
-    return data.data.data;
-  } catch (error) {
-    console.error(`   ❌ Error obteniendo posts: ${error.message}`);
-    return [];
-  }
-}
-
-/**
- * Obtener todas las categorías
- */
-async function getAllCategories() {
-  try {
-    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/blog/categories`);
-    if (!data.success) return [];
-    return data.data || [];
-  } catch (error) {
-    console.warn(`   ⚠️ Error obteniendo categorías: ${error.message}`);
-    return [];
-  }
-}
 
 /**
  * Formatear fecha para sitemap (YYYY-MM-DD)
  */
-function formatDate(dateString) {
-  if (!dateString) return new Date().toISOString().split('T')[0];
-  return new Date(dateString).toISOString().split('T')[0];
+function formatDate(date) {
+  return new Date(date).toISOString().split('T')[0];
 }
 
 /**
- * Escapar caracteres especiales XML
+ * Generar el índice principal sitemap.xml
  */
-function escapeXml(text) {
-  if (!text) return '';
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-/**
- * Generar sitemap-blog.xml con posts del blog
- */
-async function generateBlogSitemap() {
-  console.log('\n🗺️  Generando sitemap-blog.xml');
-  console.log('═'.repeat(50));
-
-  console.log('\n📡 Conectando a API...');
-  const posts = await getAllPosts();
-  // NO incluir categorías en el sitemap - son filtros, no páginas
-  // const categories = await getAllCategories();
-
-  if (posts.length === 0) {
-    console.warn('\n⚠️ No se encontraron posts para el sitemap.');
-    return { postsCount: 0, categoriesCount: 0 };
-  }
-
-  let urls = [];
-
-  // Agregar posts del blog
-  console.log(`\n📝 Posts del blog (${posts.length}):`);
-  for (const post of posts) {
-    if (post.slug) {
-      const lastmod = formatDate(post.updatedAt || post.publishedAt);
-      urls.push(`
-  <url>
-    <loc>${escapeXml(CONFIG.siteUrl)}/blog/${escapeXml(post.slug)}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`);
-      console.log(`   ✅ /blog/${post.slug}`);
-    }
-  }
-
-  // ❌ NO incluir categorías del blog en el sitemap
-  // Las categorías son FILTROS de la página /blog, no páginas independientes
-  // Google debe indexar /blog y los posts individuales, no los filtros
-  console.log(`\n📁 Categorías del blog: NO incluidas en sitemap (son filtros)`);
-
-  // Generar XML del sitemap de blog
-  const sitemapBlog = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Sitemap del Blog - Generado: ${new Date().toISOString()} -->
-  <!-- Total URLs: ${urls.length} -->
-  <!-- NOTA: Categorías y tags NO incluidos (son filtros, no páginas) -->${urls.join('')}
-</urlset>`;
-
-  // Escribir sitemap-blog.xml
-  const sitemapBlogPath = path.join(distPath, 'sitemap-blog.xml');
-  fs.writeFileSync(sitemapBlogPath, sitemapBlog);
-  console.log(`\n   📁 Archivo generado: dist/sitemap-blog.xml`);
-
-  return { postsCount: posts.length, categoriesCount: 0 };
-}
-
-/**
- * Obtener todos los servicios activos
- */
-async function getAllServices() {
-  try {
-    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/servicios?activo=true&visibleEnWeb=true&limit=1000`);
-    if (!data.success || !data.data) return [];
-    return data.data;
-  } catch (error) {
-    console.error(`   ❌ Error obteniendo servicios: ${error.message}`);
-    return [];
-  }
-}
-
-/**
- * Generar sitemap-services.xml con servicios
- */
-async function generateServicesSitemap() {
-  console.log('\n💼 Generando sitemap-services.xml');
-  console.log('═'.repeat(50));
-
-  console.log('\n📡 Conectando a API...');
-  const servicios = await getAllServices();
-
-  if (servicios.length === 0) {
-    console.warn('\n⚠️ No se encontraron servicios para el sitemap.');
-    return { servicesCount: 0 };
-  }
-
-  let urls = [];
-
-  // Agregar servicios
-  console.log(`\n💼 Servicios (${servicios.length}):`);
-  for (const servicio of servicios) {
-    if (servicio.slug) {
-      const lastmod = formatDate(servicio.updatedAt || servicio.createdAt);
-      urls.push(`
-  <url>
-    <loc>${escapeXml(CONFIG.siteUrl)}/servicios/${escapeXml(servicio.slug)}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`);
-      console.log(`   ✅ /servicios/${servicio.slug}`);
-    }
-  }
-
-  // Generar XML del sitemap de servicios
-  const sitemapServices = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Sitemap de Servicios - Generado: ${new Date().toISOString()} -->
-  <!-- Total URLs: ${urls.length} -->${urls.join('')}
-</urlset>`;
-
-  // Escribir sitemap-services.xml
-  const sitemapServicesPath = path.join(distPath, 'sitemap-services.xml');
-  fs.writeFileSync(sitemapServicesPath, sitemapServices);
-  console.log(`\n   📁 Archivo generado: dist/sitemap-services.xml`);
-
-  return { servicesCount: servicios.length };
-}
-
-/**
- * Obtener todos los proyectos del portafolio
- */
-async function getAllProyectos() {
-  try {
-    const data = await fetchWithRetry(`${CONFIG.apiUrl}/api/proyectos?limit=1000`);
-    if (!data.success || !data.data) return [];
-    return Array.isArray(data.data) ? data.data : [];
-  } catch (error) {
-    console.error(`   ❌ Error obteniendo proyectos: ${error.message}`);
-    return [];
-  }
-}
-
-/**
- * Generar sitemap-proyectos.xml con proyectos del portafolio
- */
-async function generateProyectosSitemap() {
-  console.log('\n🗂️  Generando sitemap-proyectos.xml');
-  console.log('═'.repeat(50));
-
-  console.log('\n📡 Conectando a API...');
-  const proyectos = await getAllProyectos();
-
-  if (proyectos.length === 0) {
-    console.warn('\n⚠️ No se encontraron proyectos para el sitemap.');
-    return { proyectosCount: 0 };
-  }
-
-  let urls = [];
-
-  console.log(`\n🗂️  Proyectos (${proyectos.length}):`);
-  for (const proyecto of proyectos) {
-    if (proyecto.slug) {
-      const lastmod = formatDate(proyecto.updatedAt || proyecto.createdAt);
-      urls.push(`
-  <url>
-    <loc>${escapeXml(CONFIG.siteUrl)}/proyectos/${escapeXml(proyecto.slug)}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>`);
-      console.log(`   ✅ /proyectos/${proyecto.slug}`);
-    }
-  }
-
-  const sitemapProyectos = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Sitemap de Proyectos - Generado: ${new Date().toISOString()} -->
-  <!-- Total URLs: ${urls.length} -->${urls.join('')}
-</urlset>`;
-
-  const sitemapProyectosPath = path.join(distPath, 'sitemap-proyectos.xml');
-  fs.writeFileSync(sitemapProyectosPath, sitemapProyectos);
-  console.log(`\n   📁 Archivo generado: dist/sitemap-proyectos.xml`);
-
-  return { proyectosCount: proyectos.length };
-}
-
-/**
- * Actualizar el índice principal (sitemap.xml) con la fecha actual
- */
-function updateSitemapIndex() {
-  console.log('\n📋 Actualizando índice de sitemaps...');
+function generateSitemapIndex() {
+  console.log('\n📋 Generando índice de sitemaps (sitemap.xml)...');
 
   const today = formatDate(new Date());
 
@@ -330,19 +56,19 @@ function updateSitemapIndex() {
     <lastmod>${today}</lastmod>
   </sitemap>
 
-  <!-- Sitemap de servicios (dinamico) -->
-  <sitemap>
-    <loc>${CONFIG.siteUrl}/sitemap-services.xml</loc>
-    <lastmod>${today}</lastmod>
-  </sitemap>
-
-  <!-- Sitemap del blog (dinamico) -->
+  <!-- Sitemap del blog (dinamico - servido por el backend) -->
   <sitemap>
     <loc>${CONFIG.siteUrl}/sitemap-blog.xml</loc>
     <lastmod>${today}</lastmod>
   </sitemap>
 
-  <!-- Sitemap de proyectos (dinamico) -->
+  <!-- Sitemap de servicios (dinamico - servido por el backend) -->
+  <sitemap>
+    <loc>${CONFIG.siteUrl}/sitemap-services.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+
+  <!-- Sitemap de proyectos (dinamico - servido por el backend) -->
   <sitemap>
     <loc>${CONFIG.siteUrl}/sitemap-proyectos.xml</loc>
     <lastmod>${today}</lastmod>
@@ -350,48 +76,39 @@ function updateSitemapIndex() {
 
 </sitemapindex>`;
 
-  const sitemapIndexPath = path.join(distPath, 'sitemap.xml');
-  fs.writeFileSync(sitemapIndexPath, sitemapIndex);
-  console.log('   ✅ sitemap.xml actualizado');
+  fs.writeFileSync(path.join(distPath, 'sitemap.xml'), sitemapIndex);
+  console.log('   ✅ sitemap.xml generado');
 }
 
 /**
- * Función principal
+ * Eliminar sitemaps dinámicos estáticos de dist/
+ * Si existen como archivo, Vercel los sirve y los rewrites al backend nunca aplican.
  */
-async function main() {
-  // Verificar que existe dist
+function removeStaleDynamicSitemaps() {
+  const dynamicSitemaps = ['sitemap-blog.xml', 'sitemap-services.xml', 'sitemap-proyectos.xml'];
+
+  for (const file of dynamicSitemaps) {
+    const filePath = path.join(distPath, file);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`   🧹 Eliminado dist/${file} (se sirve dinámico vía rewrite)`);
+    }
+  }
+}
+
+function main() {
   if (!fs.existsSync(distPath)) {
     console.error('❌ Error: No se encontró el directorio dist.');
     process.exit(1);
   }
 
-  const { postsCount, categoriesCount } = await generateBlogSitemap();
-  const { servicesCount } = await generateServicesSitemap();
-  const { proyectosCount } = await generateProyectosSitemap();
-  updateSitemapIndex();
+  generateSitemapIndex();
+  removeStaleDynamicSitemaps();
 
-  // Resumen
-  console.log('\n' + '═'.repeat(50));
-  console.log('📊 RESUMEN DE SITEMAPS');
-  console.log('═'.repeat(50));
-  console.log(`   💼 Servicios: ${servicesCount}`);
-  console.log(`   📝 Posts del blog: ${postsCount}`);
-  console.log(`   📁 Categorías: ${categoriesCount}`);
-  console.log(`   🗂️  Proyectos: ${proyectosCount}`);
-  console.log(`   🔢 Total URLs: ${servicesCount + postsCount + categoriesCount + proyectosCount}`);
-  console.log('═'.repeat(50));
-
-  if (postsCount > 0 || servicesCount > 0 || proyectosCount > 0) {
-    console.log('\n🎉 Sitemaps actualizados correctamente!');
-    console.log('   - sitemap.xml (índice)');
-    console.log('   - sitemap-services.xml (servicios)');
-    console.log('   - sitemap-blog.xml (posts)');
-    console.log('   - sitemap-proyectos.xml (proyectos)');
-  }
+  console.log('\n🎉 Índice de sitemaps actualizado.');
+  console.log('   - sitemap.xml (índice, estático)');
+  console.log('   - sitemap-pages.xml (estático, en public/)');
+  console.log('   - sitemap-blog.xml / sitemap-services.xml / sitemap-proyectos.xml (dinámicos, backend)');
 }
 
-// Ejecutar
-main().catch(error => {
-  console.error('\n❌ Error fatal:', error.message);
-  process.exit(1);
-});
+main();

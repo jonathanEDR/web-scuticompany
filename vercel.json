@@ -9,6 +9,14 @@
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/sitemap.xml"
     },
     {
+      "source": "/sitemap-services.xml",
+      "destination": "https://web-scuticompany-back.onrender.com/api/servicios/sitemap.xml"
+    },
+    {
+      "source": "/sitemap-proyectos.xml",
+      "destination": "https://web-scuticompany-back.onrender.com/api/proyectos/sitemap.xml"
+    },
+    {
       "source": "/api/blog/(.*)",
       "destination": "https://web-scuticompany-back.onrender.com/api/blog/$1"
     },
@@ -24,10 +32,6 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=3600, s-maxage=86400"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "index, follow"
         }
       ]
     },

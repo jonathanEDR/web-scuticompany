@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
+
   <!-- Sitemap de paginas estaticas -->
   <sitemap>
     <loc>https://scuticompany.com/sitemap-pages.xml</loc>
-    <lastmod>2026-02-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
   </sitemap>
-  
-  <!-- Sitemap del blog (dinamico) -->
+
+  <!-- Sitemap del blog (dinamico - servido por el backend) -->
   <sitemap>
     <loc>https://scuticompany.com/sitemap-blog.xml</loc>
-    <lastmod>2026-02-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
   </sitemap>
-  
-  <!-- Sitemap de servicios (dinámico) -->
+
+  <!-- Sitemap de servicios (dinamico - servido por el backend) -->
   <sitemap>
     <loc>https://scuticompany.com/sitemap-services.xml</loc>
-    <lastmod>2026-02-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
   </sitemap>
-  
+
+  <!-- Sitemap de proyectos (dinamico - servido por el backend) -->
+  <sitemap>
+    <loc>https://scuticompany.com/sitemap-proyectos.xml</loc>
+    <lastmod>2026-06-11</lastmod>
+  </sitemap>
+
 </sitemapindex>

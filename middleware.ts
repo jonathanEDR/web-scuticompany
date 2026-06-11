@@ -46,125 +46,119 @@ const pageSeoCache = new Map<string, { data: any; timestamp: number }>();
 const pageFullCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
-/**
- * Obtener datos del post desde la API
- */
-async function getPostData(slug: string): Promise<any | null> {
-  // Verificar cache
-  const cached = postCache.get(slug);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
-  }
+// Configuración de fetch con timeout y reintentos (cold start del backend en Render)
+const FETCH_TIMEOUT_MS = 9000;
+const FETCH_RETRIES = 2;
 
-  try {
-    const response = await fetch(
-      `${CONFIG.apiUrl}/api/blog/posts/${slug}?incrementViews=false`,
-      {
+/**
+ * Resultado de una consulta a la API:
+ * - 'ok'       → el recurso existe
+ * - 'notfound' → la API respondió pero el recurso NO existe (devolver 404 al crawler)
+ * - 'error'    → la API falló o no respondió a tiempo (devolver 503, NUNCA 404)
+ */
+type ApiResult<T> =
+  | { status: 'ok'; data: T }
+  | { status: 'notfound' }
+  | { status: 'error' };
+
+/**
+ * Fetch JSON con timeout y reintentos.
+ * Distingue 404 (recurso inexistente) de errores transitorios (timeout, 5xx).
+ */
+async function fetchJsonWithRetry(url: string): Promise<ApiResult<any>> {
+  for (let attempt = 1; attempt <= FETCH_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+      const response = await fetch(url, {
         headers: {
           'Accept': 'application/json',
           'User-Agent': 'Vercel-Edge-Middleware'
-        }
+        },
+        signal: controller.signal
+      });
+
+      clearTimeout(timer);
+
+      // 404/410 de la API = el recurso no existe (no reintentar)
+      if (response.status === 404 || response.status === 410) {
+        return { status: 'notfound' };
       }
-    );
 
-    if (!response.ok) {
-      console.error(`Error fetching post ${slug}: ${response.status}`);
-      return null;
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return { status: 'ok', data: await response.json() };
+    } catch (error) {
+      console.error(`[Edge Middleware] Fetch attempt ${attempt}/${FETCH_RETRIES} failed for ${url}:`, error);
     }
-
-    const data = await response.json();
-    
-    if (!data.success || !data.data?.post) {
-      return null;
-    }
-
-    const post = data.data.post;
-    
-    // Guardar en cache
-    postCache.set(slug, { data: post, timestamp: Date.now() });
-    
-    return post;
-  } catch (error) {
-    console.error(`Error fetching post ${slug}:`, error);
-    return null;
   }
+  return { status: 'error' };
+}
+
+/**
+ * Obtener datos del post desde la API
+ */
+async function getPostData(slug: string): Promise<ApiResult<any>> {
+  // Verificar cache
+  const cached = postCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return { status: 'ok', data: cached.data };
+  }
+
+  const result = await fetchJsonWithRetry(
+    `${CONFIG.apiUrl}/api/blog/posts/${slug}?incrementViews=false`
+  );
+  if (result.status !== 'ok') return result;
+
+  if (!result.data.success || !result.data.data?.post) {
+    return { status: 'notfound' };
+  }
+
+  const post = result.data.data.post;
+  postCache.set(slug, { data: post, timestamp: Date.now() });
+  return { status: 'ok', data: post };
 }
 
 /**
  * Obtener datos del servicio desde la API
  */
-async function getServicioData(slug: string): Promise<any | null> {
+async function getServicioData(slug: string): Promise<ApiResult<any>> {
   // Verificar cache
   const cached = servicioCache.get(slug);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
+    return { status: 'ok', data: cached.data };
   }
 
-  try {
-    const response = await fetch(
-      `${CONFIG.apiUrl}/api/servicios/${slug}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Vercel-Edge-Middleware'
-        }
-      }
-    );
+  const result = await fetchJsonWithRetry(`${CONFIG.apiUrl}/api/servicios/${slug}`);
+  if (result.status !== 'ok') return result;
 
-    if (!response.ok) {
-      console.error(`Error fetching servicio ${slug}: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    
-    if (!data.success || !data.data) {
-      return null;
-    }
-
-    const servicio = data.data;
-    
-    // Guardar en cache
-    servicioCache.set(slug, { data: servicio, timestamp: Date.now() });
-    
-    return servicio;
-  } catch (error) {
-    console.error(`Error fetching servicio ${slug}:`, error);
-    return null;
+  if (!result.data.success || !result.data.data) {
+    return { status: 'notfound' };
   }
+
+  const servicio = result.data.data;
+  servicioCache.set(slug, { data: servicio, timestamp: Date.now() });
+  return { status: 'ok', data: servicio };
 }
 
-async function getProyectoData(slug: string): Promise<any | null> {
+async function getProyectoData(slug: string): Promise<ApiResult<any>> {
   const cached = proyectoCache.get(slug);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
+    return { status: 'ok', data: cached.data };
   }
 
-  try {
-    const response = await fetch(
-      `${CONFIG.apiUrl}/api/proyectos/detalle/${slug}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Vercel-Edge-Middleware'
-        }
-      }
-    );
+  const result = await fetchJsonWithRetry(`${CONFIG.apiUrl}/api/proyectos/detalle/${slug}`);
+  if (result.status !== 'ok') return result;
 
-    if (!response.ok) {
-      console.error(`Error fetching proyecto ${slug}: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    if (!data.success || !data.data) return null;
-
-    proyectoCache.set(slug, { data: data.data, timestamp: Date.now() });
-    return data.data;
-  } catch (error) {
-    console.error(`Error fetching proyecto ${slug}:`, error);
-    return null;
+  if (!result.data.success || !result.data.data) {
+    return { status: 'notfound' };
   }
+
+  proyectoCache.set(slug, { data: result.data.data, timestamp: Date.now() });
+  return { status: 'ok', data: result.data.data };
 }
 
 function generateProyectoMetaTags(proyecto: any): string {
@@ -257,39 +251,19 @@ async function getPageSeoData(slug: string): Promise<any | null> {
     return cached.data;
   }
 
-  try {
-    const response = await fetch(
-      `${CONFIG.apiUrl}/api/cms/pages/${slug}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Vercel-Edge-Middleware'
-        }
-      }
-    );
+  const result = await fetchJsonWithRetry(`${CONFIG.apiUrl}/api/cms/pages/${slug}`);
 
-    if (!response.ok) {
-      console.error(`[Edge Middleware] Error fetching CMS page "${slug}": ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-
-    if (!data.success || !data.data?.seo) {
-      console.log(`[Edge Middleware] No SEO data in CMS for page "${slug}"`);
-      return null;
-    }
-
-    const seo = data.data.seo;
-
-    // Guardar en cache
-    pageSeoCache.set(slug, { data: seo, timestamp: Date.now() });
-
-    return seo;
-  } catch (error) {
-    console.error(`[Edge Middleware] Error fetching CMS SEO for "${slug}":`, error);
+  if (result.status !== 'ok' || !result.data.success || !result.data.data?.seo) {
+    console.log(`[Edge Middleware] No SEO data in CMS for page "${slug}"`);
     return null;
   }
+
+  const seo = result.data.data.seo;
+
+  // Guardar en cache
+  pageSeoCache.set(slug, { data: seo, timestamp: Date.now() });
+
+  return seo;
 }
 
 /**
@@ -302,28 +276,12 @@ async function getFullCmsPageData(slug: string): Promise<any | null> {
     return cached.data;
   }
 
-  try {
-    const response = await fetch(
-      `${CONFIG.apiUrl}/api/cms/pages/${slug}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Vercel-Edge-Middleware'
-        }
-      }
-    );
+  const result = await fetchJsonWithRetry(`${CONFIG.apiUrl}/api/cms/pages/${slug}`);
 
-    if (!response.ok) return null;
+  if (result.status !== 'ok' || !result.data.success || !result.data.data) return null;
 
-    const data = await response.json();
-    if (!data.success || !data.data) return null;
-
-    pageFullCache.set(slug, { data: data.data, timestamp: Date.now() });
-    return data.data;
-  } catch (error) {
-    console.error(`[Edge Middleware] Error fetching full CMS page "${slug}":`, error);
-    return null;
-  }
+  pageFullCache.set(slug, { data: result.data.data, timestamp: Date.now() });
+  return result.data.data;
 }
 
 /**
@@ -1328,11 +1286,69 @@ function generateVisibleArticleContent(post: any): string {
 }
 
 /**
+ * 🚫 Respuesta 404 real para recursos inexistentes.
+ * Evita los "Soft 404" de Google: antes se servía el shell del SPA con HTTP 200.
+ */
+function notFoundResponse(titulo: string, mensaje: string, backHref: string, backLabel: string): Response {
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>${escapeHtml(titulo)} | SCUTI Company</title>
+</head>
+<body style="font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f9fafb;color:#1f2937">
+  <main style="text-align:center;padding:2rem;max-width:480px">
+    <h1 style="font-size:1.5rem;margin-bottom:.5rem">${escapeHtml(titulo)}</h1>
+    <p style="color:#6b7280;margin-bottom:1.5rem">${escapeHtml(mensaje)}</p>
+    <a href="${backHref}" style="display:inline-block;background:#7c3aed;color:#fff;padding:.75rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600">${escapeHtml(backLabel)}</a>
+  </main>
+</body>
+</html>`;
+
+  return new Response(html, {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=300',
+      'X-Robots-Tag': 'noindex',
+      'X-Edge-Middleware': 'not-found'
+    }
+  });
+}
+
+/**
+ * ⚠️ Respuesta 503 cuando la API no responde (cold start / caída transitoria).
+ * NUNCA devolver 404 en este caso: Google desindexaría contenido válido.
+ * Con 503 + Retry-After, Googlebot reintenta más tarde sin penalizar la URL.
+ */
+function serviceUnavailableResponse(): Response {
+  return new Response('Servicio temporalmente no disponible. Intente nuevamente en unos minutos.', {
+    status: 503,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Retry-After': '120',
+      'Cache-Control': 'no-store',
+      'X-Edge-Middleware': 'api-unavailable'
+    }
+  });
+}
+
+/**
  * Middleware principal
  */
 export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
+
+  // 🔀 Normalizar slash final: /blog/mi-post/ → /blog/mi-post (301)
+  // Evita URLs duplicadas y que crawlers reciban el shell del SPA sin procesar
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    const normalized = new URL(request.url);
+    normalized.pathname = pathname.replace(/\/+$/, '');
+    return Response.redirect(normalized.toString(), 301);
+  }
 
   // Detectar tipo de página
   const isHomePage = /^\/?$/.test(pathname);
@@ -1353,8 +1369,10 @@ export default async function middleware(request: Request) {
   }
 
   // Verificar User-Agent para detectar crawlers
+  // Incluye todos los UAs de Google: Googlebot, Google-InspectionTool (prueba de URL
+  // en Search Console), GoogleOther, Storebot, AdsBot y APIs-Google
   const userAgent = request.headers.get('user-agent') || '';
-  const isCrawler = /facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Googlebot|bingbot|Slackbot|TelegramBot|Discordbot|Applebot|PetalBot|SemrushBot|AhrefsBot|GPTBot|ClaudeBot|PerplexityBot|YandexBot|DuckDuckBot|Baiduspider|MJ12bot|ia_archiver|Bytespider/i.test(userAgent);
+  const isCrawler = /facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|AdsBot-Google|APIs-Google|bingbot|Slackbot|TelegramBot|Discordbot|Applebot|PetalBot|SemrushBot|AhrefsBot|GPTBot|ClaudeBot|PerplexityBot|YandexBot|DuckDuckBot|Baiduspider|MJ12bot|ia_archiver|Bytespider/i.test(userAgent);
 
   // Si no es un crawler, dejar pasar la request normal
   if (!isCrawler) {
@@ -1579,12 +1597,24 @@ export default async function middleware(request: Request) {
     console.log(`[Edge Middleware] Crawler detected for /servicios/${servicioSlug}: ${userAgent.substring(0, 50)}`);
 
     // Obtener datos del servicio
-    const servicio = await getServicioData(servicioSlug);
+    const servicioResult = await getServicioData(servicioSlug);
 
-    if (!servicio) {
-      console.log(`[Edge Middleware] Servicio not found: ${servicioSlug}`);
-      return next();
+    if (servicioResult.status === 'notfound') {
+      console.log(`[Edge Middleware] Servicio not found (404): ${servicioSlug}`);
+      return notFoundResponse(
+        'Servicio no encontrado',
+        'El servicio que buscas no existe o ya no está disponible.',
+        '/servicios',
+        'Ver todos los servicios'
+      );
     }
+
+    if (servicioResult.status === 'error') {
+      console.log(`[Edge Middleware] API unavailable for servicio: ${servicioSlug}`);
+      return serviceUnavailableResponse();
+    }
+
+    const servicio = servicioResult.data;
 
     // Obtener el HTML original desde /index.html
     const indexUrl = new URL('/', request.url);
@@ -1695,12 +1725,24 @@ export default async function middleware(request: Request) {
     console.log(`[Edge Middleware] Crawler detected for /blog/${slug}: ${userAgent.substring(0, 50)}`);
 
     // Obtener datos del post
-    const post = await getPostData(slug);
+    const postResult = await getPostData(slug);
 
-    if (!post) {
-      console.log(`[Edge Middleware] Post not found: ${slug}`);
-      return next();
+    if (postResult.status === 'notfound') {
+      console.log(`[Edge Middleware] Post not found (404): ${slug}`);
+      return notFoundResponse(
+        'Artículo no encontrado',
+        'El artículo que buscas no existe o ha sido eliminado.',
+        '/blog',
+        'Volver al blog'
+      );
     }
+
+    if (postResult.status === 'error') {
+      console.log(`[Edge Middleware] API unavailable for post: ${slug}`);
+      return serviceUnavailableResponse();
+    }
+
+    const post = postResult.data;
 
     // Obtener el HTML original desde /index.html (no desde la URL actual que da 404)
     const indexUrl = new URL('/', request.url);
@@ -1819,11 +1861,24 @@ export default async function middleware(request: Request) {
 
     console.log(`[Edge Middleware] Crawler detected for /proyectos/${proyectoSlug}: ${userAgent.substring(0, 50)}`);
 
-    const proyecto = await getProyectoData(proyectoSlug);
-    if (!proyecto) {
-      console.log(`[Edge Middleware] Proyecto not found: ${proyectoSlug}`);
-      return next();
+    const proyectoResult = await getProyectoData(proyectoSlug);
+
+    if (proyectoResult.status === 'notfound') {
+      console.log(`[Edge Middleware] Proyecto not found (404): ${proyectoSlug}`);
+      return notFoundResponse(
+        'Proyecto no encontrado',
+        'El proyecto que buscas no existe o ya no está disponible.',
+        '/proyectos',
+        'Ver todos los proyectos'
+      );
     }
+
+    if (proyectoResult.status === 'error') {
+      console.log(`[Edge Middleware] API unavailable for proyecto: ${proyectoSlug}`);
+      return serviceUnavailableResponse();
+    }
+
+    const proyecto = proyectoResult.data;
 
     const indexUrl = new URL('/', request.url);
     const response = await fetch(indexUrl.toString(), {

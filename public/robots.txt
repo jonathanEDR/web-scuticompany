@@ -8,11 +8,10 @@ Allow: /
 Disallow: /admin/
 Disallow: /dashboard/
 
-# Bloquear filtros de blog (no son páginas, son filtros de la página principal)
-Disallow: /blog/category/
-Disallow: /blog/categoria/
-Disallow: /blog/tag/
-Disallow: /blog/tags/
+# NOTA: Los filtros de blog (/blog/category/, /blog/tag/) NO se bloquean aqui.
+# Esas URLs tienen meta robots "noindex" y redirigen a /blog (BlogFilterRedirect).
+# Bloquearlas en robots.txt impedia que Google viera el noindex y quedaban
+# reportadas como "Bloqueada por robots.txt" en Search Console.
 
 # Sitemaps
 Sitemap: https://scuticompany.com/sitemap.xml
