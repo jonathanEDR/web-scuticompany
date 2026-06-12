@@ -1,16 +1,13 @@
 import React from 'react';
+import { ArrowDown, ArrowRight, ArrowUp, Flame, Globe, Users, Smartphone, Mail, Phone, Target, MessageCircle, MapPin } from 'lucide-react';
 
 interface StatusBadgeProps {
   estado: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
-/**
- * 🏷️ Badge de estado del lead (solicitud)
- */
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ estado, size = 'md' }) => {
   const colorClasses = {
-    // Estados nuevos
     nuevo: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
     en_revision: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
     contactando: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-300',
@@ -20,7 +17,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ estado, size = 'md' })
     completado: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
     rechazado: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
     cancelado: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-    // Estados legacy (mantener compatibilidad)
     contactado: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
     calificado: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
     propuesta: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
@@ -37,17 +33,15 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ estado, size = 'md' })
   };
 
   const labels = {
-    // Estados nuevos (con emojis)
-    nuevo: '📝 Nueva',
-    en_revision: '👀 En Revisión',
-    contactando: '📞 Contactando',
-    cotizacion: '💰 Cotización',
-    aprobado: '✅ Aprobado',
-    en_desarrollo: '🚀 En Desarrollo',
-    completado: '✨ Completado',
-    rechazado: '❌ Rechazado',
-    cancelado: '🚫 Cancelado',
-    // Estados legacy
+    nuevo: 'Nueva',
+    en_revision: 'En Revisión',
+    contactando: 'Contactando',
+    cotizacion: 'Cotización',
+    aprobado: 'Aprobado',
+    en_desarrollo: 'En Desarrollo',
+    completado: 'Completado',
+    rechazado: 'Rechazado',
+    cancelado: 'Cancelado',
     contactado: 'Contactado',
     calificado: 'Calificado',
     propuesta: 'Propuesta',
@@ -69,9 +63,6 @@ interface PriorityBadgeProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-/**
- * ⚡ Badge de prioridad del lead
- */
 export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ prioridad, size = 'md' }) => {
   const colorClasses = {
     baja: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
@@ -86,11 +77,13 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ prioridad, size = 
     lg: 'text-base px-3 py-1'
   };
 
-  const icons = {
-    baja: '⬇️',
-    media: '➡️',
-    alta: '⬆️',
-    urgente: '🔥'
+  const iconSize = size === 'lg' ? 14 : 12;
+
+  const icons: Record<string, React.ReactNode> = {
+    baja: <ArrowDown size={iconSize} strokeWidth={2} />,
+    media: <ArrowRight size={iconSize} strokeWidth={2} />,
+    alta: <ArrowUp size={iconSize} strokeWidth={2} />,
+    urgente: <Flame size={iconSize} strokeWidth={2} />
   };
 
   const labels = {
@@ -102,7 +95,7 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ prioridad, size = 
 
   return (
     <span className={`inline-flex items-center gap-1 font-medium rounded-full ${colorClasses[prioridad as keyof typeof colorClasses] || colorClasses.media} ${sizeClasses[size]}`}>
-      <span>{icons[prioridad as keyof typeof icons]}</span>
+      {icons[prioridad as keyof typeof icons]}
       {labels[prioridad as keyof typeof labels] || prioridad}
     </span>
   );
@@ -113,19 +106,18 @@ interface OrigenBadgeProps {
   size?: 'sm' | 'md';
 }
 
-/**
- * 🌐 Badge de origen del lead
- */
 export const OrigenBadge: React.FC<OrigenBadgeProps> = ({ origen, size = 'sm' }) => {
-  const icons = {
-    web: '🌐',
-    referido: '👥',
-    redes_sociales: '📱',
-    email: '📧',
-    telefono: '📞',
-    evento: '🎯',
-    chat: '💬',
-    otro: '📌'
+  const iconSize = size === 'md' ? 13 : 11;
+
+  const icons: Record<string, React.ReactNode> = {
+    web: <Globe size={iconSize} strokeWidth={1.5} />,
+    referido: <Users size={iconSize} strokeWidth={1.5} />,
+    redes_sociales: <Smartphone size={iconSize} strokeWidth={1.5} />,
+    email: <Mail size={iconSize} strokeWidth={1.5} />,
+    telefono: <Phone size={iconSize} strokeWidth={1.5} />,
+    evento: <Target size={iconSize} strokeWidth={1.5} />,
+    chat: <MessageCircle size={iconSize} strokeWidth={1.5} />,
+    otro: <MapPin size={iconSize} strokeWidth={1.5} />
   };
 
   const labels = {
@@ -146,7 +138,7 @@ export const OrigenBadge: React.FC<OrigenBadgeProps> = ({ origen, size = 'sm' })
 
   return (
     <span className={`inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-full ${sizeClasses[size]}`}>
-      <span>{icons[origen as keyof typeof icons] || '📌'}</span>
+      {icons[origen as keyof typeof icons] || <MapPin size={iconSize} strokeWidth={1.5} />}
       {labels[origen as keyof typeof labels] || origen}
     </span>
   );

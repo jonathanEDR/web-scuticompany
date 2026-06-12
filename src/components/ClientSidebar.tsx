@@ -99,13 +99,6 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
       path: '/dashboard/client/messages',
       description: 'Comunicación con el equipo'
     },
-    {
-      name: 'Mis Proyectos',
-      icon: '🗂️',
-      menuKey: 'proyectos',
-      path: '/dashboard/client/proyectos',
-      description: 'Proyectos asignados a tu cuenta'
-    },
   ] : [];
 
   // Item de Sala de Reuniones (todos los roles)
@@ -117,10 +110,10 @@ export default function ClientSidebar({ isOpen, setIsOpen }: ClientSidebarProps)
     description: 'Sala de reuniones virtual'
   };
 
-  // Menú final: Dashboard → Mensajes/Proyectos (CLIENT) → Mi Actividad → Sala Reuniones → Perfil
+  // Menú final: Dashboard → Mensajes (CLIENT) → Mi Actividad → Sala Reuniones → Perfil
   const menuItems: MenuItem[] = [
     baseMenuItems[0],       // Dashboard
-    ...clientOnlyItems,     // Mensajes + Mis Proyectos (solo CLIENT)
+    ...clientOnlyItems,     // Mensajes (solo CLIENT)
     baseMenuItems[1],       // Mi Actividad
     meetingItem,            // Sala de Reuniones
     baseMenuItems[2],       // Perfil

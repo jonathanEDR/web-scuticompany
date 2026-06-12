@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import DynamicIcon from '../ui/DynamicIcon';
 
 // ============================================
 // TIPOS
@@ -121,7 +122,12 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({
                 title={tab.description || tab.title}
               >
                 {/* Icono */}
-                <span className="text-lg flex-shrink-0">{tab.icon}</span>
+                <span className="flex-shrink-0">
+                  {/^[a-zA-Z]/.test(tab.icon)
+                    ? <DynamicIcon name={tab.icon} size={18} strokeWidth={1.5} />
+                    : <span className="text-lg">{tab.icon}</span>
+                  }
+                </span>
                 
                 {/* Contenido */}
                 <div className="flex flex-col items-start min-w-0">

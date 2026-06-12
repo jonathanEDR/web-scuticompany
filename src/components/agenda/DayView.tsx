@@ -4,7 +4,9 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { ChevronLeft, ChevronRight, Plus, Calendar, Clock, MapPin } from 'lucide-react';
 import { StatusBadge, PriorityBadge, TypeBadge } from './EventBadges';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import type { Event } from '../../types/event';
 
 interface DayViewProps {
@@ -24,6 +26,14 @@ const DayView: React.FC<DayViewProps> = ({
   initialDate = new Date()
 }) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
+
+  // Colores del tema dinámico (mismo origen que el Sidebar/CMS)
+  const { colors } = useDashboardHeaderGradient();
+  const themeVars = {
+    '--agenda-from': colors.from,
+    '--agenda-via': colors.via,
+    '--agenda-to': colors.to,
+  } as React.CSSProperties;
 
   // ========================================
   // UTILIDADES
@@ -97,7 +107,7 @@ const DayView: React.FC<DayViewProps> = ({
   const isToday = isSameDay(currentDate, new Date());
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6" style={themeVars}>
       {/* Header Responsive */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4">
         {/* Móvil: Layout vertical */}
@@ -106,27 +116,29 @@ const DayView: React.FC<DayViewProps> = ({
           <div className="flex items-center justify-between">
             <button
               onClick={goToPreviousDay}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors
+                       text-gray-600 dark:text-gray-300"
               title="Día anterior"
             >
-              ←
+              <ChevronLeft size={18} strokeWidth={1.5} />
             </button>
             <div className="text-center flex-1">
               <h2 className="text-base font-bold text-gray-900 dark:text-white capitalize">
                 {formatDate(currentDate)}
               </h2>
               {isToday && (
-                <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                <span className="text-xs text-[color:var(--agenda-from)] font-medium">
                   Hoy
                 </span>
               )}
             </div>
             <button
               onClick={goToNextDay}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors
+                       text-gray-600 dark:text-gray-300"
               title="Día siguiente"
             >
-              →
+              <ChevronRight size={18} strokeWidth={1.5} />
             </button>
           </div>
           {/* Botones de acción */}
@@ -144,10 +156,12 @@ const DayView: React.FC<DayViewProps> = ({
             {onCreateEvent && (
               <button
                 onClick={() => onCreateEvent(currentDate)}
-                className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white 
-                         rounded-lg font-medium transition-colors text-sm"
+                className="flex-1 px-3 py-2 text-white rounded-lg font-medium transition-all
+                         hover:brightness-110 text-sm inline-flex items-center justify-center gap-1"
+                style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}
               >
-                ➕ Nuevo
+                <Plus size={14} strokeWidth={2} />
+                Nuevo
               </button>
             )}
           </div>
@@ -158,27 +172,29 @@ const DayView: React.FC<DayViewProps> = ({
           <div className="flex items-center gap-4">
             <button
               onClick={goToPreviousDay}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors
+                       text-gray-600 dark:text-gray-300"
               title="Día anterior"
             >
-              ←
+              <ChevronLeft size={18} strokeWidth={1.5} />
             </button>
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize">
                 {formatDate(currentDate)}
               </h2>
               {isToday && (
-                <span className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                <span className="text-sm text-[color:var(--agenda-from)] font-medium">
                   Hoy
                 </span>
               )}
             </div>
             <button
               onClick={goToNextDay}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors
+                       text-gray-600 dark:text-gray-300"
               title="Día siguiente"
             >
-              →
+              <ChevronRight size={18} strokeWidth={1.5} />
             </button>
           </div>
           <div className="flex items-center gap-3">
@@ -194,10 +210,12 @@ const DayView: React.FC<DayViewProps> = ({
             {onCreateEvent && (
               <button
                 onClick={() => onCreateEvent(currentDate)}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-                         font-medium transition-colors"
+                className="px-4 py-2 text-white rounded-lg font-medium transition-all
+                         hover:brightness-110 inline-flex items-center gap-2"
+                style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}
               >
-                ➕ Nuevo Evento
+                <Plus size={16} strokeWidth={2} />
+                Nuevo Evento
               </button>
             )}
           </div>
@@ -208,7 +226,7 @@ const DayView: React.FC<DayViewProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <div className="text-center">
-            <div className="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400">
+            <div className="text-2xl md:text-3xl font-bold text-[color:var(--agenda-from)]">
               {dayEvents.length}
             </div>
             <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
@@ -246,7 +264,7 @@ const DayView: React.FC<DayViewProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {dayEvents.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📅</div>
+            <Calendar size={56} strokeWidth={1.5} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               No hay eventos programados
             </h3>
@@ -256,10 +274,12 @@ const DayView: React.FC<DayViewProps> = ({
             {onCreateEvent && (
               <button
                 onClick={() => onCreateEvent(currentDate)}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-                         font-medium transition-colors"
+                className="px-6 py-2 text-white rounded-lg font-medium transition-all
+                         hover:brightness-110 inline-flex items-center gap-2"
+                style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}
               >
-                ➕ Crear Evento
+                <Plus size={16} strokeWidth={2} />
+                Crear Evento
               </button>
             )}
           </div>
@@ -286,8 +306,8 @@ const DayView: React.FC<DayViewProps> = ({
                           <div
                             key={event._id}
                             onClick={() => onEventClick(event)}
-                            className="p-3 md:p-4 border-l-4 bg-gradient-to-r from-purple-50 to-pink-50 
-                                     dark:from-gray-750 dark:to-gray-900 rounded-r-lg
+                            className="p-3 md:p-4 border-l-4 bg-gray-50 
+                                     dark:bg-gray-900 rounded-r-lg
                                      cursor-pointer hover:shadow-lg transition-all transform hover:scale-[1.02]
                                      border border-gray-100 dark:border-gray-700"
                             style={{ borderLeftColor: event.color }}
@@ -298,7 +318,7 @@ const DayView: React.FC<DayViewProps> = ({
                                   {event.title}
                                 </h4>
                                 <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
-                                  <span>⏰</span>
+                                  <Clock size={14} strokeWidth={1.5} className="flex-shrink-0" />
                                   <span className="truncate">{formatTime(event.startDate)} - {formatTime(event.endDate)}</span>
                                 </div>
                               </div>
@@ -315,7 +335,7 @@ const DayView: React.FC<DayViewProps> = ({
 
                             {event.location && event.location.address && (
                               <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
-                                <span>📍</span>
+                                <MapPin size={14} strokeWidth={1.5} className="flex-shrink-0" />
                                 <span className="truncate">{event.location.address}</span>
                               </div>
                             )}
@@ -359,8 +379,8 @@ const DayView: React.FC<DayViewProps> = ({
                             <div
                               key={event._id}
                               onClick={() => onEventClick(event)}
-                              className="p-3 md:p-4 border-l-4 bg-gradient-to-r from-purple-50 to-pink-50 
-                                       dark:from-gray-750 dark:to-gray-900 rounded-r-lg
+                              className="p-3 md:p-4 border-l-4 bg-gray-50 
+                                       dark:bg-gray-900 rounded-r-lg
                                        cursor-pointer hover:shadow-lg transition-all transform hover:scale-[1.02]
                                        border border-gray-100 dark:border-gray-700"
                               style={{ borderLeftColor: event.color }}
@@ -371,7 +391,7 @@ const DayView: React.FC<DayViewProps> = ({
                                     {event.title}
                                   </h4>
                                   <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
-                                    <span>⏰</span>
+                                    <Clock size={14} strokeWidth={1.5} className="flex-shrink-0" />
                                     <span className="truncate">{formatTime(event.startDate)} - {formatTime(event.endDate)}</span>
                                   </div>
                                 </div>
@@ -388,7 +408,7 @@ const DayView: React.FC<DayViewProps> = ({
 
                               {event.location && event.location.address && (
                                 <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
-                                  <span>📍</span>
+                                  <MapPin size={14} strokeWidth={1.5} className="flex-shrink-0" />
                                   <span className="truncate">{event.location.address}</span>
                                 </div>
                               )}

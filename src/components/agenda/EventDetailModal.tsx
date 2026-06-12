@@ -4,8 +4,23 @@
  */
 
 import React from 'react';
+import {
+  X,
+  CalendarDays,
+  CalendarCheck,
+  MapPin,
+  Clock,
+  RefreshCw,
+  Users,
+  FileText,
+  Trash2,
+  Pencil,
+  CheckCircle2,
+  XCircle,
+} from 'lucide-react';
 import { Button } from '../UI';
 import { StatusBadge, PriorityBadge, TypeBadge, CategoryBadge } from './EventBadges';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import type { Event } from '../../types/event';
 
 interface EventDetailModalProps {
@@ -30,7 +45,16 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
   onStatusChange,
   isLoading = false
 }) => {
+  // Colores del tema dinámico (mismo origen que el Sidebar/CMS)
+  const { colors } = useDashboardHeaderGradient();
+
   if (!show || !event) return null;
+
+  const themeVars = {
+    '--agenda-from': colors.from,
+    '--agenda-via': colors.via,
+    '--agenda-to': colors.to,
+  } as React.CSSProperties;
 
   // ========================================
   // FORMATEO
@@ -106,7 +130,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={themeVars}>
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
@@ -140,7 +164,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 ml-4"
               >
-                ✕
+                <X size={20} strokeWidth={1.5} />
               </button>
             </div>
 
@@ -157,7 +181,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
             <div className="space-y-4 mb-6">
               {/* Fecha y hora */}
               <div className="flex items-start gap-3">
-                <div className="text-2xl">📅</div>
+                <CalendarDays size={22} strokeWidth={1.5} className="mt-0.5 text-[color:var(--agenda-from)]" />
                 <div className="flex-1">
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                     Fecha y hora
@@ -181,7 +205,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
 
               {event.location && event.location.address && (
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">📍</div>
+                  <MapPin size={22} strokeWidth={1.5} className="mt-0.5 text-[color:var(--agenda-from)]" />
                   <div className="flex-1">
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                       Ubicación
@@ -195,7 +219,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
 
               {/* Duración */}
               <div className="flex items-start gap-3">
-                <div className="text-2xl">⏱️</div>
+                <Clock size={22} strokeWidth={1.5} className="mt-0.5 text-[color:var(--agenda-from)]" />
                 <div className="flex-1">
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                     Duración
@@ -209,7 +233,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
               {/* Todo el día */}
               {event.allDay && (
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">🔄</div>
+                  <RefreshCw size={22} strokeWidth={1.5} className="mt-0.5 text-[color:var(--agenda-from)]" />
                   <div className="flex-1">
                     <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 
                                  text-sm rounded-full">
@@ -222,7 +246,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
               {/* Asistentes */}
               {event.attendees && event.attendees.length > 0 && (
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">👥</div>
+                  <Users size={22} strokeWidth={1.5} className="mt-0.5 text-[color:var(--agenda-from)]" />
                   <div className="flex-1">
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                       Asistentes ({event.attendees.length})
@@ -232,8 +256,8 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                         <div key={idx} className="flex items-center gap-2">
                       {attendee.user && attendee.user.email && attendee.user.firstName ? (
                         <>
-                          <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 
-                                        flex items-center justify-center text-purple-600 dark:text-purple-300">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium"
+                               style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}>
                             {attendee.user.firstName.charAt(0)}
                           </div>
                           <div>
@@ -258,16 +282,20 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                           </div>
                         </>
                       ) : null}
-                          <span className={`ml-auto text-xs px-2 py-1 rounded ${
-                            attendee.status === 'accepted' 
+                          <span className={`ml-auto text-xs px-2 py-1 rounded inline-flex items-center gap-1 ${
+                            attendee.status === 'accepted'
                               ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
                               : attendee.status === 'declined'
                               ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
                               : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                           }`}>
-                            {attendee.status === 'accepted' ? '✓ Aceptó' : 
-                             attendee.status === 'declined' ? '✗ Rechazó' : 
-                             '? Pendiente'}
+                            {attendee.status === 'accepted' ? (
+                              <><CheckCircle2 size={12} strokeWidth={1.5} /> Aceptó</>
+                            ) : attendee.status === 'declined' ? (
+                              <><XCircle size={12} strokeWidth={1.5} /> Rechazó</>
+                            ) : (
+                              <><Clock size={12} strokeWidth={1.5} /> Pendiente</>
+                            )}
                           </span>
                         </div>
                       ))}
@@ -279,7 +307,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
               {/* Notas */}
               {event.notes && (
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">📝</div>
+                  <FileText size={22} strokeWidth={1.5} className="mt-0.5 text-[color:var(--agenda-from)]" />
                   <div className="flex-1">
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                       Notas
@@ -321,9 +349,11 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                     className="px-3 py-1.5 text-sm rounded-lg transition-colors
                              disabled:opacity-50 disabled:cursor-not-allowed
                              bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300
-                             hover:bg-blue-200 dark:hover:bg-blue-800"
+                             hover:bg-blue-200 dark:hover:bg-blue-800
+                             inline-flex items-center gap-1.5"
                   >
-                    📅 Programado
+                    <CalendarCheck size={14} strokeWidth={1.5} />
+                    Programado
                   </button>
                   <button
                     onClick={() => handleStatusChange('in_progress')}
@@ -331,9 +361,11 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                     className="px-3 py-1.5 text-sm rounded-lg transition-colors
                              disabled:opacity-50 disabled:cursor-not-allowed
                              bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300
-                             hover:bg-yellow-200 dark:hover:bg-yellow-800"
+                             hover:bg-yellow-200 dark:hover:bg-yellow-800
+                             inline-flex items-center gap-1.5"
                   >
-                    ⏳ En Progreso
+                    <RefreshCw size={14} strokeWidth={1.5} />
+                    En Progreso
                   </button>
                   <button
                     onClick={() => handleStatusChange('completed')}
@@ -341,9 +373,11 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                     className="px-3 py-1.5 text-sm rounded-lg transition-colors
                              disabled:opacity-50 disabled:cursor-not-allowed
                              bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300
-                             hover:bg-green-200 dark:hover:bg-green-800"
+                             hover:bg-green-200 dark:hover:bg-green-800
+                             inline-flex items-center gap-1.5"
                   >
-                    ✅ Completado
+                    <CheckCircle2 size={14} strokeWidth={1.5} />
+                    Completado
                   </button>
                   <button
                     onClick={() => handleStatusChange('cancelled')}
@@ -351,9 +385,11 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                     className="px-3 py-1.5 text-sm rounded-lg transition-colors
                              disabled:opacity-50 disabled:cursor-not-allowed
                              bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300
-                             hover:bg-red-200 dark:hover:bg-red-800"
+                             hover:bg-red-200 dark:hover:bg-red-800
+                             inline-flex items-center gap-1.5"
                   >
-                    ❌ Cancelado
+                    <XCircle size={14} strokeWidth={1.5} />
+                    Cancelado
                   </button>
                 </div>
               </div>
@@ -368,7 +404,10 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                     variant="danger"
                     disabled={isLoading}
                   >
-                    🗑️ Eliminar
+                    <span className="inline-flex items-center gap-1.5">
+                      <Trash2 size={16} strokeWidth={1.5} />
+                      Eliminar
+                    </span>
                   </Button>
                 )}
               </div>
@@ -381,13 +420,17 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                   Cerrar
                 </Button>
                 {onEdit && (
-                  <Button
+                  <button
                     onClick={handleEdit}
                     disabled={isLoading}
-                    className="bg-purple-600 hover:bg-purple-700"
+                    className="px-4 py-2 text-white rounded-lg font-medium transition-all
+                             hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed
+                             inline-flex items-center gap-1.5"
+                    style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}
                   >
-                    ✏️ Editar
-                  </Button>
+                    <Pencil size={16} strokeWidth={1.5} />
+                    Editar
+                  </button>
                 )}
               </div>
             </div>

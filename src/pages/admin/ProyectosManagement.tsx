@@ -11,7 +11,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, Plus, Search, Eye, EyeOff, Star, Pencil,
-  ExternalLink, Trash2, Users, Package, Loader2
+  ExternalLink, Trash2, Package, Loader2
 } from 'lucide-react';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import ProjectAIChatModal from '../../components/admin/ProjectAIChatModal';
@@ -150,7 +150,6 @@ const ProyectosManagement: React.FC = () => {
               { valor: stats.total || 0, label: 'Total Sistemas' },
               { valor: stats.activos || 0, label: 'Activos' },
               { valor: stats.enPortfolio || 0, label: 'En Catálogo' },
-              { valor: stats.totalClientes || 0, label: 'Clientes Asignados' },
             ].map((card, idx) => (
               <div key={idx} className="bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl p-4">
                 <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{card.valor}</div>
@@ -213,7 +212,6 @@ const ProyectosManagement: React.FC = () => {
                     <th className="text-left px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">Estado</th>
                     <th className="text-center px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">Catálogo</th>
                     <th className="text-center px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">Destacado</th>
-                    <th className="text-center px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">Clientes</th>
                     <th className="text-center px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">Vistas</th>
                     <th className="text-right px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">Acciones</th>
                   </tr>
@@ -291,17 +289,6 @@ const ProyectosManagement: React.FC = () => {
                             title={proyecto.destacado ? 'Sistema destacado' : 'No destacado'}
                           >
                             <Star size={18} strokeWidth={1.5} fill={proyecto.destacado ? 'currentColor' : 'none'} />
-                          </button>
-                        </td>
-
-                        {/* Clientes */}
-                        <td className="px-5 py-4 text-center">
-                          <button
-                            onClick={() => navigate(`/dashboard/proyectos/${proyecto._id}/clientes`)}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-200 dark:hover:border-purple-500/30 transition"
-                          >
-                            <Users size={13} strokeWidth={2} />
-                            {proyecto.assignedClients?.length || 0}
                           </button>
                         </td>
 

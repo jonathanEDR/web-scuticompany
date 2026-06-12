@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { categoriasApi, type CreateCategoriaData } from '../../services/categoriasApi';
 import { useNotification } from '../../hooks/useNotification';
 import { Modal } from '../common/Modal';
+import { CategoryIcon } from '../servicios/CategoryIcon';
 
 interface CreateCategoriaModalProps {
   isOpen: boolean;
@@ -24,10 +25,12 @@ interface FormData extends CreateCategoriaData {
 }
 
 // Iconos predefinidos para seleccionar
+// Nombres de iconos Lucide (renderizados con <CategoryIcon />).
+// Las categorías antiguas con emoji se siguen mostrando tal cual hasta que se editen.
 const ICONOS_PREDEFINIDOS = [
-  '💻', '🎨', '📈', '🧠', '🔧', '⚡', '📱', '🌐',
-  '🚀', '💡', '🎯', '📊', '🔒', '☁️', '📝', '🎵',
-  '📷', '🛠️', '💳', '📞', '📦', '🏆', '📁', '🎪'
+  'Code', 'Palette', 'TrendingUp', 'Brain', 'Wrench', 'Zap', 'Smartphone', 'Globe',
+  'Rocket', 'Lightbulb', 'Target', 'BarChart3', 'Lock', 'Cloud', 'FileText', 'Music',
+  'Camera', 'Hammer', 'CreditCard', 'Phone', 'Package', 'Trophy', 'Folder', 'Sparkles'
 ];
 
 // Colores predefinidos
@@ -66,7 +69,7 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
     defaultValues: {
       nombre: '',
       descripcion: '',
-      icono: '📁',
+      icono: 'Folder',
       color: '#3B82F6',
       orden: 0
     }
@@ -128,7 +131,7 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
                 maxLength: { value: 50, message: 'Máximo 50 caracteres' }
               })}
               placeholder="Ej: Desarrollo Móvil"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)]"
             />
             {errors.nombre && (
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.nombre.message}</p>
@@ -146,7 +149,7 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
               })}
               rows={3}
               placeholder="Breve descripción de la categoría..."
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] resize-none"
             />
             {errors.descripcion && (
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.descripcion.message}</p>
@@ -171,28 +174,41 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
                     key={icono}
                     type="button"
                     onClick={() => setValue('icono', icono)}
-                    className={`w-12 h-12 text-2xl rounded-lg border-2 transition-colors ${
+                    className={`w-12 h-12 rounded-lg border-2 transition-colors flex items-center justify-center ${
                       watchedIcon === icono
-                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
-                        : 'border-gray-300 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500'
+                        ? 'border-[color:var(--srv-from,#a855f7)]'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-[color:var(--srv-from,#a855f7)]'
                     }`}
+                    style={
+                      watchedIcon === icono
+                        ? { backgroundColor: 'color-mix(in srgb, var(--srv-from, #9333ea) 10%, transparent)' }
+                        : undefined
+                    }
+                    title={icono}
                   >
-                    {icono}
+                    <CategoryIcon
+                      icon={icono}
+                      size={20}
+                      className={
+                        watchedIcon === icono
+                          ? 'text-[color:var(--srv-from,#9333ea)]'
+                          : 'text-gray-600 dark:text-gray-300'
+                      }
+                    />
                   </button>
                 ))}
               </div>
-              
-              {/* Input personalizado */}
+
+              {/* Vista previa del icono seleccionado */}
               <div className="flex items-center gap-3">
-                <span className="text-2xl bg-gray-100 dark:bg-gray-700 rounded-lg w-12 h-12 flex items-center justify-center">
-                  {watchedIcon}
+                <span className="bg-gray-100 dark:bg-gray-700 rounded-lg w-12 h-12 flex items-center justify-center">
+                  <CategoryIcon icon={watchedIcon} size={22} color={watchedColor} />
                 </span>
                 <input
                   type="text"
                   {...register('icono')}
-                  placeholder="O ingresa un emoji personalizado"
-                  maxLength={4}
-                  className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="O ingresa un nombre de icono Lucide (ej: Rocket)"
+                  className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)]"
                 />
               </div>
             </div>
@@ -232,7 +248,7 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
                   type="text"
                   {...register('color')}
                   placeholder="#3B82F6"
-                  className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)]"
                 />
               </div>
             </div>
@@ -249,7 +265,7 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
               min="0"
               step="1"
               placeholder="0"
-              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full bg-white dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)]"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Las categorías se ordenarán por este número (menor número = primera posición)
@@ -261,11 +277,11 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
         <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Vista Previa:</h4>
           <div className="flex items-center gap-3">
-            <div 
+            <div
               className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg font-semibold"
               style={{ backgroundColor: watchedColor }}
             >
-              {watchedIcon}
+              <CategoryIcon icon={watchedIcon} size={20} />
             </div>
             <div>
               <div className="font-medium text-gray-900 dark:text-white">
@@ -291,7 +307,8 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2 text-white rounded-lg hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            style={{ background: `linear-gradient(to right, var(--srv-from, #9333ea), var(--srv-to, #7e22ce))` }}
           >
             {isSubmitting ? (
               <>
@@ -300,7 +317,7 @@ export const CreateCategoriaModal: React.FC<CreateCategoriaModalProps> = ({
               </>
             ) : (
               <>
-                <span>📁</span>
+                <CategoryIcon icon="FolderPlus" size={16} />
                 Crear Categoría
               </>
             )}

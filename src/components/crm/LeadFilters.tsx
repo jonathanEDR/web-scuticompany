@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Search, Users, FileText, Star } from 'lucide-react';
 
 // Tipos de filtros de leads
 interface LeadFilters {
@@ -23,39 +24,39 @@ interface LeadFiltersProps {
 
 // Opciones de estados
 const ESTADO_OPTIONS = [
-  { value: 'all', label: '📊 Todos los estados', group: null },
-  { value: 'nuevo', label: '📝 Nueva', group: 'activos' },
-  { value: 'en_revision', label: '👀 En Revisión', group: 'activos' },
-  { value: 'contactando', label: '📞 Contactando', group: 'activos' },
-  { value: 'cotizacion', label: '💰 Cotización', group: 'activos' },
-  { value: 'aprobado', label: '✅ Aprobado', group: 'activos' },
-  { value: 'en_desarrollo', label: '🚀 En Desarrollo', group: 'activos' },
-  { value: 'completado', label: '✨ Completado', group: 'finales' },
-  { value: 'rechazado', label: '❌ Rechazado', group: 'finales' },
-  { value: 'cancelado', label: '🚫 Cancelado', group: 'finales' },
+  { value: 'all', label: 'Todos los estados', group: null },
+  { value: 'nuevo', label: 'Nueva', group: 'activos' },
+  { value: 'en_revision', label: 'En Revisión', group: 'activos' },
+  { value: 'contactando', label: 'Contactando', group: 'activos' },
+  { value: 'cotizacion', label: 'Cotización', group: 'activos' },
+  { value: 'aprobado', label: 'Aprobado', group: 'activos' },
+  { value: 'en_desarrollo', label: 'En Desarrollo', group: 'activos' },
+  { value: 'completado', label: 'Completado', group: 'finales' },
+  { value: 'rechazado', label: 'Rechazado', group: 'finales' },
+  { value: 'cancelado', label: 'Cancelado', group: 'finales' },
 ];
 
 // Opciones de prioridad
 const PRIORIDAD_OPTIONS = [
-  { value: 'all', label: '🎯 Todas las prioridades' },
-  { value: 'urgente', label: '🔥 Urgente' },
-  { value: 'alta', label: '⬆️ Alta' },
-  { value: 'media', label: '➡️ Media' },
-  { value: 'baja', label: '⬇️ Baja' },
+  { value: 'all', label: 'Todas las prioridades' },
+  { value: 'urgente', label: 'Urgente' },
+  { value: 'alta', label: 'Alta' },
+  { value: 'media', label: 'Media' },
+  { value: 'baja', label: 'Baja' },
 ];
 
 // Opciones de origen
 const ORIGEN_OPTIONS = [
-  { value: 'all', label: '🌐 Todos los orígenes' },
-  { value: 'web', label: '🌐 Sitio Web' },
-  { value: 'web-authenticated', label: '👤 Web (Registrado)' },
-  { value: 'chat', label: '💬 Chat' },
-  { value: 'facebook', label: '📘 Facebook' },
-  { value: 'instagram', label: '📷 Instagram' },
-  { value: 'google', label: '🔍 Google' },
-  { value: 'referido', label: '👥 Referido' },
-  { value: 'directo', label: '📞 Directo' },
-  { value: 'otro', label: '📋 Otro' },
+  { value: 'all', label: 'Todos los orígenes' },
+  { value: 'web', label: 'Sitio Web' },
+  { value: 'web-authenticated', label: 'Web (Registrado)' },
+  { value: 'chat', label: 'Chat' },
+  { value: 'facebook', label: 'Facebook' },
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'google', label: 'Google' },
+  { value: 'referido', label: 'Referido' },
+  { value: 'directo', label: 'Directo' },
+  { value: 'otro', label: 'Otro' },
 ];
 
 /**
@@ -113,7 +114,7 @@ export const LeadFiltersComponent: React.FC<LeadFiltersProps> = ({
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-            <span className="text-purple-600 dark:text-purple-400">🔍</span>
+            <Search size={16} strokeWidth={1.5} className="text-purple-600 dark:text-purple-400" />
           </div>
           <div className="text-left">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -160,7 +161,7 @@ export const LeadFiltersComponent: React.FC<LeadFiltersProps> = ({
                 placeholder="Buscar leads..."
                 className="w-full pl-9 pr-8 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500"
               />
-              <span className="absolute left-3 top-3 text-gray-400 text-sm">🔍</span>
+              <Search size={15} strokeWidth={1.5} className="absolute left-3 top-3 text-gray-400" />
               {searchTerm && (
                 <button
                   type="button"
@@ -260,40 +261,40 @@ export const LeadFiltersComponent: React.FC<LeadFiltersProps> = ({
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                📊 Todos
+                Todos
               </button>
               <button
                 type="button"
                 onClick={() => onFilterChange('origen', 'web-authenticated')}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
                   filters.origen === 'web-authenticated'
                     ? 'bg-green-600 text-white shadow-sm'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                👤 Registrados
+                <Users size={11} strokeWidth={1.5} />Registrados
               </button>
               <button
                 type="button"
                 onClick={() => onFilterChange('estado', 'nuevo')}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
                   filters.estado === 'nuevo'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                🆕 Nuevos
+                <FileText size={11} strokeWidth={1.5} />Nuevos
               </button>
               <button
                 type="button"
                 onClick={() => onFilterChange('prioridad', 'alta')}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
                   filters.prioridad === 'alta'
                     ? 'bg-amber-500 text-white shadow-sm'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                ⭐ Alta prioridad
+                <Star size={11} strokeWidth={1.5} />Alta prioridad
               </button>
             </div>
 

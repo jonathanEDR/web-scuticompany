@@ -101,10 +101,6 @@ const ProyectoSlugRedirect = () => {
 // Módulo de Proyectos - Páginas Administrativas
 const ProyectosManagement = lazy(() => import('./pages/admin/ProyectosManagement'));
 const ProyectoForm = lazy(() => import('./pages/admin/ProyectoForm'));
-const ProyectoAsignacion = lazy(() => import('./pages/admin/ProyectoAsignacion'));
-
-// Módulo de Proyectos - Páginas del Cliente
-const MisProyectos = lazy(() => import('./pages/client/MisProyectos'));
 
 // Componente de Testing IA (temporal) - Comentado hasta implementar
 // const AISystemTestWithAuth = lazy(() => import('./components/testing/AISystemTestWithAuth'));
@@ -263,12 +259,6 @@ function AppContent() {
                 {/* Redirección de ruta antigua "leads" a nueva "solicitudes" */}
                 <Route path="leads" element={<Navigate to="/dashboard/client/solicitudes" replace />} />
                 
-                {/* Mis Proyectos Asignados - Solo para CLIENT (no USER) */}
-                <Route path="proyectos" element={
-                  <RoleBasedRoute allowedRoles={[UserRole.CLIENT, UserRole.ADMIN, UserRole.MODERATOR, UserRole.SUPER_ADMIN]}>
-                    <MisProyectos />
-                  </RoleBasedRoute>
-                } />
               </Route>
               
               {/* ⚡ Dashboard para ADMIN, MODERATOR y SUPER_ADMIN */}
@@ -583,16 +573,7 @@ function AppContent() {
                 </DashboardRoute>
               } />
               
-              {/* Asignación de Clientes a Proyecto */}
-              <Route path="/dashboard/proyectos/:id/clientes" element={
-                <DashboardRoute>
-                  <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                    <ProyectoAsignacion />
-                  </RoleBasedRoute>
-                </DashboardRoute>
-              } />
-
-              {/* �👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
+              {/* 👥 Gestión de Usuarios - Solo ADMIN y SUPER_ADMIN */}
               <Route path="/dashboard/admin/users" element={
                 <DashboardRoute>
                   <RoleBasedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>

@@ -1,6 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { LogIn, UserPlus } from 'lucide-react';
 import Logo from '../Logo';
+import { CategoryIcon } from '../servicios/CategoryIcon';
 import { SITE_CONFIG } from '../../config/siteConfig';
 import type { PageData } from '../../types/cms';
 import { getCmsApiUrl, logApiCall, testBackendConnection } from '../../utils/apiHelper';
@@ -139,9 +141,10 @@ const PublicFooter = () => {
                     <li key={categoria._id}>
                       <Link
                         to={`/servicios?categoria=${categoria.slug}`}
-                        className="text-gray-200 hover:text-purple-400 transition-colors text-sm"
+                        className="inline-flex items-center gap-2 text-gray-200 hover:text-purple-400 transition-colors text-sm"
                       >
-                        {categoria.icono} {categoria.nombre}
+                        <CategoryIcon icon={categoria.icono} size={13} color={categoria.color} className="flex-shrink-0 opacity-80" />
+                        {categoria.nombre}
                       </Link>
                     </li>
                   ))
@@ -225,15 +228,17 @@ const PublicFooter = () => {
                   <>
                     <button
                       onClick={() => navigate('/login')}
-                      className="w-full px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
+                      className="w-full inline-flex items-center gap-2 px-4 py-2 text-gray-200 hover:text-purple-400 transition-colors text-sm text-left border border-gray-600 rounded-lg hover:border-purple-400"
                     >
-                      🔐 Iniciar Sesión
+                      <LogIn size={14} strokeWidth={1.5} />
+                      Iniciar Sesión
                     </button>
                     <button
                       onClick={() => navigate('/signup')}
-                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm"
                     >
-                      🚀 Crear Cuenta
+                      <UserPlus size={14} strokeWidth={1.5} />
+                      Crear Cuenta
                     </button>
                   </>
                 )}
@@ -387,9 +392,10 @@ const PublicFooter = () => {
                         <li key={categoria._id}>
                           <Link
                             to={`/servicios?categoria=${categoria.slug}`}
-                            className="text-gray-200 hover:text-purple-400 transition-colors text-sm"
+                            className="inline-flex items-center gap-2 text-gray-200 hover:text-purple-400 transition-colors text-sm"
                           >
-                            {categoria.icono} {categoria.nombre}
+                            <CategoryIcon icon={categoria.icono} size={13} color={categoria.color} className="flex-shrink-0 opacity-80" />
+                            {categoria.nombre}
                           </Link>
                         </li>
                       ))

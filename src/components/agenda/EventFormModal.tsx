@@ -4,7 +4,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Pencil, Plus, X, AlertCircle, Loader2, Save } from 'lucide-react';
 import { Button } from '../UI';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import type { Event } from '../../types/event';
 
 interface EventFormModalProps {
@@ -26,6 +28,14 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
   isLoading = false
 }) => {
   const isEdit = !!event;
+
+  // Colores del tema dinámico (mismo origen que el Sidebar/CMS)
+  const { colors } = useDashboardHeaderGradient();
+  const themeVars = {
+    '--agenda-from': colors.from,
+    '--agenda-via': colors.via,
+    '--agenda-to': colors.to,
+  } as React.CSSProperties;
 
   // Estado del formulario
   const [formData, setFormData] = useState<any>({
@@ -154,9 +164,9 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={themeVars}>
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={handleCancel}
       />
@@ -166,14 +176,18 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
         <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {isEdit ? '✏️ Editar Evento' : '➕ Nuevo Evento'}
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
+                    style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}>
+                {isEdit ? <Pencil size={20} strokeWidth={1.5} /> : <Plus size={20} strokeWidth={1.5} />}
+              </span>
+              {isEdit ? 'Editar Evento' : 'Nuevo Evento'}
             </h2>
             <button
               onClick={handleCancel}
               className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
             >
-              ✕
+              <X size={20} strokeWidth={1.5} />
             </button>
           </div>
 
@@ -182,7 +196,10 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
             {/* Error general */}
             {errors.submit && (
               <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <p className="text-red-700 dark:text-red-300">❌ {errors.submit}</p>
+                <p className="text-red-700 dark:text-red-300 flex items-center gap-2">
+                  <AlertCircle size={18} strokeWidth={1.5} className="flex-shrink-0" />
+                  {errors.submit}
+                </p>
               </div>
             )}
 
@@ -196,7 +213,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
                 className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 
-                         text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 
+                         text-gray-900 dark:text-white focus:ring-2 focus:ring-[color:var(--agenda-via)] 
                          ${errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                 placeholder="Ej: Reunión con cliente"
                 maxLength={200}
@@ -217,7 +234,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                          bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                         focus:ring-2 focus:ring-purple-500"
+                         focus:ring-2 focus:ring-[color:var(--agenda-via)]"
                 placeholder="Descripción del evento..."
               />
             </div>
@@ -233,7 +250,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                   onChange={(e) => handleChange('type', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-purple-500"
+                           focus:ring-2 focus:ring-[color:var(--agenda-via)]"
                 >
                   <option value="meeting">Reunión</option>
                   <option value="appointment">Cita</option>
@@ -251,7 +268,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                   onChange={(e) => handleChange('category', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-purple-500"
+                           focus:ring-2 focus:ring-[color:var(--agenda-via)]"
                 >
                   <option value="cliente">Cliente</option>
                   <option value="interno">Interno</option>
@@ -273,7 +290,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                   onChange={(e) => handleChange('startDate', parseDateTimeLocal(e.target.value))}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-purple-500"
+                           focus:ring-2 focus:ring-[color:var(--agenda-via)]"
                 />
               </div>
 
@@ -286,7 +303,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                   value={formatDateTimeLocal(formData.endDate)}
                   onChange={(e) => handleChange('endDate', parseDateTimeLocal(e.target.value))}
                   className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 
-                           text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500
+                           text-gray-900 dark:text-white focus:ring-2 focus:ring-[color:var(--agenda-via)]
                            ${errors.endDate ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                 />
                 {errors.endDate && (
@@ -306,7 +323,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                 onChange={(e) => handleChange('location', { type: 'physical', address: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                          bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                         focus:ring-2 focus:ring-purple-500"
+                         focus:ring-2 focus:ring-[color:var(--agenda-via)]"
                 placeholder="Ej: Oficina principal, Sala de juntas"
               />
             </div>
@@ -322,7 +339,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                   onChange={(e) => handleChange('priority', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-purple-500"
+                           focus:ring-2 focus:ring-[color:var(--agenda-via)]"
                 >
                   <option value="low">Baja</option>
                   <option value="medium">Media</option>
@@ -358,7 +375,8 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                   type="checkbox"
                   checked={formData.allDay}
                   onChange={(e) => handleChange('allDay', e.target.checked)}
-                  className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                  className="w-4 h-4 rounded focus:ring-[color:var(--agenda-via)]"
+                  style={{ accentColor: 'var(--agenda-from)' }}
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   Evento de todo el día
@@ -377,7 +395,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                 rows={2}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                          bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                         focus:ring-2 focus:ring-purple-500"
+                         focus:ring-2 focus:ring-[color:var(--agenda-via)]"
                 placeholder="Notas privadas sobre el evento..."
               />
             </div>
@@ -394,17 +412,20 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-                         font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 text-white rounded-lg font-medium transition-all
+                         hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed
+                         inline-flex items-center gap-2"
+                style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}
               >
                 {isLoading ? (
                   <>
-                    <span className="animate-spin mr-2">⏳</span>
+                    <Loader2 size={16} strokeWidth={1.5} className="animate-spin" />
                     Guardando...
                   </>
                 ) : (
                   <>
-                    {isEdit ? '💾 Guardar Cambios' : '➕ Crear Evento'}
+                    {isEdit ? <Save size={16} strokeWidth={1.5} /> : <Plus size={16} strokeWidth={1.5} />}
+                    {isEdit ? 'Guardar Cambios' : 'Crear Evento'}
                   </>
                 )}
               </button>

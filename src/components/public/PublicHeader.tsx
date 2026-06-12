@@ -4,6 +4,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useClerkDetection } from '../../hooks/useClerkDetection';
 import { useCategoriasList } from '../../hooks/useCategoriasCache';
 import Logo from '../Logo';
+import { CategoryIcon } from '../servicios/CategoryIcon';
 import '../../styles/gradient-borders.css';
 
 /**
@@ -296,7 +297,7 @@ const PublicHeaderOptimized = () => {
                       <Link
                         key={categoria._id}
                         to={`/servicios?categoria=${categoria.slug}`}
-                        className="block px-4 py-2.5 text-sm theme-text-secondary theme-transition rounded-md mx-1"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm theme-text-secondary theme-transition rounded-md mx-1"
                         onClick={() => setShowSolutionsDropdown(false)}
                         onMouseEnter={(e) => {
                           (e.target as HTMLElement).style.backgroundColor = theme === 'dark' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.08)';
@@ -309,7 +310,13 @@ const PublicHeaderOptimized = () => {
                           (e.target as HTMLElement).style.paddingLeft = '1rem';
                         }}
                       >
-                        {categoria.icono} {categoria.nombre}
+                        <CategoryIcon
+                          icon={categoria.icono}
+                          size={14}
+                          color={categoria.color}
+                          className="inline-block flex-shrink-0"
+                        />
+                        <span>{categoria.nombre}</span>
                       </Link>
                     ))}
                   </div>

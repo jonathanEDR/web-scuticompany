@@ -4,6 +4,26 @@
  */
 
 import React from 'react';
+import {
+  Users,
+  CalendarDays,
+  Bell,
+  Sparkles,
+  CalendarCheck,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  Flame,
+  MapPin,
+  Building2,
+  Monitor,
+  Phone,
+  Clock,
+  type LucideIcon,
+} from 'lucide-react';
 import type { EventType, EventStatus, EventPriority, EventCategory, LocationType } from '../../types/event';
 
 // ============================================================================
@@ -16,18 +36,19 @@ interface TypeBadgeProps {
 }
 
 export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, className = '' }) => {
-  const styles: Record<EventType, { bg: string; text: string; label: string; icon: string }> = {
-    meeting: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Reunión', icon: '👥' },
-    appointment: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', label: 'Cita', icon: '📅' },
-    reminder: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Recordatorio', icon: '⏰' },
-    event: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Evento', icon: '🎉' }
+  const styles: Record<EventType, { bg: string; text: string; label: string; icon: LucideIcon }> = {
+    meeting: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Reunión', icon: Users },
+    appointment: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', label: 'Cita', icon: CalendarDays },
+    reminder: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Recordatorio', icon: Bell },
+    event: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Evento', icon: Sparkles }
   };
 
   const style = styles[type];
+  const Icon = style.icon;
 
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text} ${className}`}>
-      <span>{style.icon}</span>
+      <Icon size={12} strokeWidth={1.5} />
       {style.label}
     </span>
   );
@@ -43,18 +64,19 @@ interface StatusBadgeProps {
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className = '' }) => {
-  const styles: Record<EventStatus, { bg: string; text: string; label: string; icon: string }> = {
-    scheduled: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Programado', icon: '📌' },
-    in_progress: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'En Progreso', icon: '🔄' },
-    completed: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Completado', icon: '✅' },
-    cancelled: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Cancelado', icon: '❌' }
+  const styles: Record<EventStatus, { bg: string; text: string; label: string; icon: LucideIcon }> = {
+    scheduled: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Programado', icon: CalendarCheck },
+    in_progress: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'En Progreso', icon: RefreshCw },
+    completed: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Completado', icon: CheckCircle2 },
+    cancelled: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Cancelado', icon: XCircle }
   };
 
   const style = styles[status];
+  const Icon = style.icon;
 
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text} ${className}`}>
-      <span>{style.icon}</span>
+      <Icon size={12} strokeWidth={1.5} />
       {style.label}
     </span>
   );
@@ -70,18 +92,19 @@ interface PriorityBadgeProps {
 }
 
 export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ priority, className = '' }) => {
-  const styles: Record<EventPriority, { bg: string; text: string; label: string; icon: string }> = {
-    low: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', label: 'Baja', icon: '⬇️' },
-    medium: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Media', icon: '➡️' },
-    high: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Alta', icon: '⬆️' },
-    urgent: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Urgente', icon: '🔥' }
+  const styles: Record<EventPriority, { bg: string; text: string; label: string; icon: LucideIcon }> = {
+    low: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', label: 'Baja', icon: ArrowDown },
+    medium: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Media', icon: ArrowRight },
+    high: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Alta', icon: ArrowUp },
+    urgent: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Urgente', icon: Flame }
   };
 
   const style = styles[priority];
+  const Icon = style.icon;
 
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text} ${className}`}>
-      <span>{style.icon}</span>
+      <Icon size={12} strokeWidth={1.5} />
       {style.label}
     </span>
   );
@@ -123,18 +146,19 @@ interface LocationBadgeProps {
 }
 
 export const LocationBadge: React.FC<LocationBadgeProps> = ({ locationType, className = '' }) => {
-  const styles: Record<LocationType, { bg: string; text: string; label: string; icon: string }> = {
-    none: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', label: 'Sin ubicación', icon: '📍' },
-    physical: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Presencial', icon: '🏢' },
-    virtual: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Virtual', icon: '💻' },
-    phone: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', label: 'Telefónica', icon: '📞' }
+  const styles: Record<LocationType, { bg: string; text: string; label: string; icon: LucideIcon }> = {
+    none: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', label: 'Sin ubicación', icon: MapPin },
+    physical: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Presencial', icon: Building2 },
+    virtual: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Virtual', icon: Monitor },
+    phone: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', label: 'Telefónica', icon: Phone }
   };
 
   const style = styles[locationType];
+  const Icon = style.icon;
 
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text} ${className}`}>
-      <span>{style.icon}</span>
+      <Icon size={12} strokeWidth={1.5} />
       {style.label}
     </span>
   );
@@ -205,7 +229,8 @@ export const TimeBadge: React.FC<TimeBadgeProps> = ({ date, className = '' }) =>
 
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text} ${className}`}>
-      🕐 {style.label}
+      <Clock size={12} strokeWidth={1.5} />
+      {style.label}
     </span>
   );
 };

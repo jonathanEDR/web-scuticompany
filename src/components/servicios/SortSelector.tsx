@@ -4,6 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
+import { ArrowUpDown, Check, ChevronDown } from 'lucide-react';
 import type { SortOption } from '../../types/filters';
 import { SORT_OPTIONS } from '../../types/filters';
 
@@ -15,28 +16,6 @@ interface SortSelectorProps {
   currentSort: SortOption;
   onSortChange: (sort: SortOption) => void;
 }
-
-// ============================================
-// ICONOS
-// ============================================
-
-const SortIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-  </svg>
-);
-
-const ChevronDownIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-  </svg>
-);
 
 // ============================================
 // COMPONENTE
@@ -76,10 +55,10 @@ export const SortSelector = ({ currentSort, onSortChange }: SortSelectorProps) =
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
       >
-        <SortIcon />
+        <ArrowUpDown size={16} strokeWidth={1.5} />
         <span className="hidden sm:inline">{currentSort.label}</span>
         <span className="sm:hidden">Ordenar</span>
-        <ChevronDownIcon />
+        <ChevronDown size={14} strokeWidth={1.5} />
       </button>
 
       {/* Dropdown */}
@@ -94,14 +73,19 @@ export const SortSelector = ({ currentSort, onSortChange }: SortSelectorProps) =
                   w-full px-4 py-2 text-left text-sm flex items-center justify-between
                   hover:bg-gray-100 dark:hover:bg-gray-700
                   transition-colors
-                  ${isSelected(option) ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300'}
+                  ${isSelected(option) ? 'text-[color:var(--srv-from)]' : 'text-gray-700 dark:text-gray-300'}
                   ${index === 0 ? 'rounded-t-lg' : ''}
                   ${index === SORT_OPTIONS.length - 1 ? 'rounded-b-lg' : ''}
                 `}
+                style={
+                  isSelected(option)
+                    ? { backgroundColor: 'color-mix(in srgb, var(--srv-from) 10%, transparent)' }
+                    : undefined
+                }
               >
                 <span>{option.label}</span>
                 {isSelected(option) && (
-                  <CheckIcon />
+                  <Check size={16} strokeWidth={1.5} />
                 )}
               </button>
             ))}

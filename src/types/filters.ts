@@ -64,10 +64,11 @@ export const SORT_OPTIONS: SortOption[] = [
 
 // CATEGORIAS_OPTIONS eliminado - ahora se cargan dinámicamente desde la API
 
+// Los iconos son nombres de iconos Lucide, renderizados con <CategoryIcon />
 export const TIPO_PRECIO_OPTIONS = [
-  { value: 'fijo', label: 'Precio Fijo', icon: '💰' },
-  { value: 'desde', label: 'Desde', icon: '📊' },
-  { value: 'personalizado', label: 'Personalizado', icon: '✨' },
+  { value: 'fijo', label: 'Precio Fijo', icon: 'DollarSign' },
+  { value: 'desde', label: 'Desde', icon: 'TrendingUp' },
+  { value: 'personalizado', label: 'Personalizado', icon: 'Sparkles' },
 ];
 
 export const ESTADO_OPTIONS = [

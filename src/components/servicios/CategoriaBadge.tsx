@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { CategoryIcon } from './CategoryIcon';
 
 // ============================================
 // TIPOS
@@ -33,37 +34,37 @@ interface CategoriaConfig {
 const categoriaConfigFallback: Record<string, CategoriaConfig> = {
   desarrollo: {
     label: 'Desarrollo',
-    icon: '💻',
+    icon: 'Code',
     color: 'text-blue-700 dark:text-blue-300',
     bgColor: 'bg-blue-600/20 border-blue-500/50'
   },
   diseño: {
     label: 'Diseño',
-    icon: '🎨',
+    icon: 'Palette',
     color: 'text-pink-700 dark:text-pink-300',
     bgColor: 'bg-pink-600/20 border-pink-500/50'
   },
   marketing: {
     label: 'Marketing',
-    icon: '📊',
+    icon: 'BarChart3',
     color: 'text-green-700 dark:text-green-300',
     bgColor: 'bg-green-600/20 border-green-500/50'
   },
   consultoría: {
     label: 'Consultoría',
-    icon: '💼',
+    icon: 'Briefcase',
     color: 'text-purple-700 dark:text-purple-300',
     bgColor: 'bg-purple-600/20 border-purple-500/50'
   },
   mantenimiento: {
     label: 'Mantenimiento',
-    icon: '🔧',
+    icon: 'Wrench',
     color: 'text-orange-700 dark:text-orange-300',
     bgColor: 'bg-orange-600/20 border-orange-500/50'
   },
   otro: {
     label: 'Otro',
-    icon: '📦',
+    icon: 'Package',
     color: 'text-gray-700 dark:text-gray-300',
     bgColor: 'bg-gray-600/20 border-gray-500/50'
   }
@@ -191,7 +192,7 @@ export const CategoriaBadge: React.FC<CategoriaBadgeProps> = ({
 
   return (
     <span {...badgeProps}>
-      {showIcon && <span className="text-sm">{icon}</span>}
+      {showIcon && <CategoryIcon icon={icon} size={size === 'sm' ? 12 : size === 'lg' ? 16 : 14} />}
       <span>{label}</span>
     </span>
   );

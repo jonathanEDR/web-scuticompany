@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
+import { Rocket, Plus, ClipboardList, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useServicios } from '../../hooks/useServicios';
 import { MetricCard, MiniChartCard } from '../../components/dashboard/MetricCard';
@@ -185,7 +186,7 @@ export const ServicioDashboard = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              📊 Dashboard de Servicios
+              Dashboard de Servicios
             </h1>
             <div className="flex items-center gap-3">
               <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -262,7 +263,7 @@ export const ServicioDashboard = () => {
         {/* Gráficas principales */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <MultiLineChartCard
-            title="📈 Tendencia de Servicios"
+            title="Tendencia de Servicios"
             data={trendData}
             lines={[
               { dataKey: 'servicios', name: 'Total', color: '#8B5CF6' },
@@ -272,7 +273,7 @@ export const ServicioDashboard = () => {
           />
           
           <BarChartCard
-            title="📊 Servicios por Categoría"
+            title="Servicios por Categoría"
             data={categoriaChartData}
             dataKey="Servicios"
             color="#3B82F6"
@@ -283,13 +284,13 @@ export const ServicioDashboard = () => {
         {/* Gráficas secundarias */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PieChartCard
-            title="🎯 Distribución por Estado"
+            title="Distribución por Estado"
             data={estadoChartData}
             height={300}
           />
           
           <BarChartCard
-            title="💰 Servicios por Tipo de Precio"
+            title="Servicios por Tipo de Precio"
             data={tipoPrecioChartData}
             dataKey="Servicios"
             xAxisKey="name"
@@ -301,14 +302,14 @@ export const ServicioDashboard = () => {
         {/* Acciones rápidas */}
         <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            🚀 Acciones Rápidas
+            <span className="flex items-center gap-2"><Rocket size={18} strokeWidth={1.5} />Acciones Rápidas</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               to="/dashboard/servicios/new"
               className="flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
             >
-              <span className="text-2xl">➕</span>
+              <Plus size={24} strokeWidth={1.5} className="text-purple-600 dark:text-purple-400 flex-shrink-0" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-white">Nuevo Servicio</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Crear un servicio</p>
@@ -319,7 +320,7 @@ export const ServicioDashboard = () => {
               to="/dashboard/servicios/management"
               className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
             >
-              <span className="text-2xl">📋</span>
+              <ClipboardList size={24} strokeWidth={1.5} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-white">Gestionar Servicios</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Ver todos los servicios</p>
@@ -329,7 +330,7 @@ export const ServicioDashboard = () => {
             <button
               className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
             >
-              <span className="text-2xl">📊</span>
+              <BarChart3 size={24} strokeWidth={1.5} className="text-green-600 dark:text-green-400 flex-shrink-0" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-white">Exportar Datos</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Descargar reporte</p>

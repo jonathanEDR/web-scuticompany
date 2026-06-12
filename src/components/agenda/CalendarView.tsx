@@ -4,7 +4,9 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { ChevronLeft, ChevronRight, Plus, Calendar, Clock } from 'lucide-react';
 import { StatusBadge, PriorityBadge, TypeBadge } from './EventBadges';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import type { Event } from '../../types/event';
 
 interface CalendarViewProps {
@@ -32,6 +34,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+
+  // Colores del tema dinámico (mismo origen que el Sidebar/CMS)
+  const { colors } = useDashboardHeaderGradient();
+  const themeVars = {
+    '--agenda-from': colors.from,
+    '--agenda-via': colors.via,
+    '--agenda-to': colors.to,
+  } as React.CSSProperties;
 
   // ========================================
   // UTILIDADES DE FECHA
@@ -167,32 +177,34 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={themeVars}>
       {/* Header de navegación */}
       <div className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <div className="flex items-center gap-4">
           <button
             onClick={goToPreviousMonth}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors
+                     text-gray-600 dark:text-gray-300"
             title="Mes anterior"
           >
-            ← 
+            <ChevronLeft size={18} strokeWidth={1.5} />
           </button>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize">
             {formatMonthYear(currentDate)}
           </h2>
           <button
             onClick={goToNextMonth}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors
+                     text-gray-600 dark:text-gray-300"
             title="Mes siguiente"
           >
-            →
+            <ChevronRight size={18} strokeWidth={1.5} />
           </button>
         </div>
         <button
           onClick={goToToday}
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-                   font-medium transition-colors"
+          className="px-4 py-2 text-white rounded-lg font-medium transition-all hover:brightness-110"
+          style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}
         >
           Hoy
         </button>
@@ -225,27 +237,32 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                     min-h-24 bg-white dark:bg-gray-800 p-2 cursor-pointer
                     hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors
                     ${!day.isCurrentMonth ? 'opacity-40' : ''}
-                    ${day.isToday ? 'ring-2 ring-purple-500 ring-inset' : ''}
-                    ${selectedDay && isSameDay(day.date, selectedDay) ? 'bg-purple-50 dark:bg-purple-900/20' : ''}
+                    ${day.isToday ? 'ring-2 ring-[color:var(--agenda-from)] ring-inset' : ''}
                   `}
+                  style={
+                    selectedDay && isSameDay(day.date, selectedDay)
+                      ? { backgroundColor: 'color-mix(in srgb, var(--agenda-from) 12%, transparent)' }
+                      : undefined
+                  }
                 >
                   {/* Número del día */}
                   <div className="flex items-center justify-between mb-1">
                     <span
                       className={`
                         text-sm font-medium
-                        ${day.isToday 
-                          ? 'w-6 h-6 flex items-center justify-center rounded-full bg-purple-600 text-white' 
+                        ${day.isToday
+                          ? 'w-6 h-6 flex items-center justify-center rounded-full text-white'
                           : day.isCurrentMonth
                           ? 'text-gray-900 dark:text-white'
                           : 'text-gray-400 dark:text-gray-600'
                         }
                       `}
+                      style={day.isToday ? { backgroundColor: 'var(--agenda-from)' } : undefined}
                     >
                       {day.date.getDate()}
                     </span>
                     {day.events.length > 0 && (
-                      <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">
+                      <span className="text-xs font-semibold text-[color:var(--agenda-from)]">
                         {day.events.length}
                       </span>
                     )}
@@ -300,24 +317,25 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                   </h3>
                   <button
                     onClick={() => handleCreateEventForDay(selectedDay)}
-                    className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg
-                             text-purple-600 dark:text-purple-400 transition-colors"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg
+                             text-[color:var(--agenda-from)] transition-colors"
                     title="Crear evento"
                   >
-                    ➕
+                    <Plus size={18} strokeWidth={1.5} />
                   </button>
                 </div>
 
                 {getDayEvents.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="text-4xl mb-2">📅</div>
+                    <Calendar size={40} strokeWidth={1.5} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
                     <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
                       No hay eventos este día
                     </p>
                     <button
                       onClick={() => handleCreateEventForDay(selectedDay)}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
-                               text-sm font-medium transition-colors"
+                      className="px-4 py-2 text-white rounded-lg text-sm font-medium
+                               transition-all hover:brightness-110"
+                      style={{ background: `linear-gradient(to right, var(--agenda-from), var(--agenda-to))` }}
                     >
                       Crear Evento
                     </button>
@@ -339,8 +357,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                           <TypeBadge type={event.type} />
                         </div>
                         
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                          ⏰ {formatTime(event.startDate)} - {formatTime(event.endDate)}
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1.5">
+                          <Clock size={14} strokeWidth={1.5} />
+                          {formatTime(event.startDate)} - {formatTime(event.endDate)}
                         </div>
 
                         {event.description && (
@@ -360,7 +379,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
               </>
             ) : (
               <div className="text-center py-12">
-                <div className="text-4xl mb-4">📅</div>
+                <Calendar size={40} strokeWidth={1.5} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
                 <p className="text-gray-500 dark:text-gray-400">
                   Selecciona un día para ver sus eventos
                 </p>
@@ -374,17 +393,19 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <div className="flex flex-wrap items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs"
+                 style={{ backgroundColor: 'var(--agenda-from)' }}>
               15
             </div>
             <span className="text-gray-600 dark:text-gray-400">Hoy</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded border-2 border-purple-500"></div>
+            <div className="w-6 h-6 rounded border-2 border-[color:var(--agenda-from)]"></div>
             <span className="text-gray-600 dark:text-gray-400">Día actual</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-purple-50 dark:bg-purple-900/20"></div>
+            <div className="w-6 h-6 rounded"
+                 style={{ backgroundColor: 'color-mix(in srgb, var(--agenda-from) 12%, transparent)' }}></div>
             <span className="text-gray-600 dark:text-gray-400">Día seleccionado</span>
           </div>
         </div>

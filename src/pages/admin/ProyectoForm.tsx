@@ -8,8 +8,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import {
+  ClipboardList, Link2, ImageIcon, Wrench, ShoppingCart, Package, Target,
+  DollarSign, HelpCircle, BarChart3, Search, Star, CheckCircle2, Loader2,
+  Save, Rocket, Camera, Trash2
+} from 'lucide-react';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import ImageSelectorModal from '../../components/ImageSelectorModal';
+import CategoryIcon from '../../components/servicios/CategoryIcon';
+import LucideIconPicker from '../../components/ui/LucideIconPicker';
 import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import { proyectosApi } from '../../services/proyectosApi';
 import type { CreateProyectoRequest, Proyecto, PlanPeriodo } from '../../types/proyecto';
@@ -36,9 +43,7 @@ const ProyectoForm: React.FC = () => {
     descripcionCompleta: '',
     imagenPrincipal: '',
     imagenes: [],
-    icono: '🚀',
-    tieneUrl: false,
-    urlSistema: '',
+    icono: 'Rocket',
     urlDemo: '',
     tecnologias: [],
     categoria: 'web',
@@ -108,9 +113,7 @@ const ProyectoForm: React.FC = () => {
         descripcionCompleta: proyecto.descripcionCompleta || '',
         imagenPrincipal: proyecto.imagenPrincipal || '',
         imagenes: proyecto.imagenes || [],
-        icono: proyecto.icono || '🚀',
-        tieneUrl: proyecto.tieneUrl || false,
-        urlSistema: proyecto.urlSistema || '',
+        icono: proyecto.icono || 'Rocket',
         urlDemo: proyecto.urlDemo || '',
         tecnologias: proyecto.tecnologias || [],
         categoria: proyecto.categoria || 'web',
@@ -384,7 +387,12 @@ const ProyectoForm: React.FC = () => {
                 disabled={guardando}
                 className="px-5 py-2.5 rounded-lg bg-white text-purple-700 font-bold hover:bg-white/90 shadow-lg transition-all disabled:opacity-50"
               >
-                {guardando ? '⏳ Guardando...' : esEdicion ? '💾 Guardar Cambios' : '🚀 Crear Proyecto'}
+                {guardando
+                ? <><Loader2 size={16} strokeWidth={1.5} className="animate-spin" /> Guardando...</>
+                : esEdicion
+                  ? <><Save size={16} strokeWidth={1.5} /> Guardar Cambios</>
+                  : <><Rocket size={16} strokeWidth={1.5} /> Crear Proyecto</>
+              }
               </button>
             </div>
           </div>
@@ -402,7 +410,8 @@ const ProyectoForm: React.FC = () => {
         {/* ============================== */}
         <div className={sectionClass}>
           <h2 className={sectionTitleClass}>
-            📋 Información Básica
+            <ClipboardList size={20} strokeWidth={1.5} />
+            Información Básica
             <span className="text-xs lg:text-sm font-normal text-gray-600 dark:text-gray-400">(Obligatorio)</span>
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
@@ -423,7 +432,7 @@ const ProyectoForm: React.FC = () => {
               <label className={labelClass}>Categoría</label>
               <select value={form.categoria} onChange={(e) => updateField('categoria', e.target.value)} className={inputClass}>
                 {Object.entries(PROYECTO_CATEGORIAS).map(([key, val]) => (
-                  <option key={key} value={key}>{val.icon} {val.label}</option>
+                  <option key={key} value={key}>{val.label}</option>
                 ))}
               </select>
             </div>
@@ -431,7 +440,7 @@ const ProyectoForm: React.FC = () => {
               <label className={labelClass}>Estado</label>
               <select value={form.estado} onChange={(e) => updateField('estado', e.target.value)} className={inputClass}>
                 {Object.entries(PROYECTO_ESTADOS).map(([key, val]) => (
-                  <option key={key} value={key}>{val.icon} {val.label}</option>
+                  <option key={key} value={key}>{val.label}</option>
                 ))}
               </select>
             </div>
@@ -465,11 +474,10 @@ const ProyectoForm: React.FC = () => {
             </label>
             <label className="flex items-center gap-2 cursor-pointer group">
               <input type="checkbox" checked={form.destacado} onChange={(e) => updateField('destacado', e.target.checked)} className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500" />
-              <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">⭐ Destacado</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" checked={form.tieneUrl} onChange={(e) => updateField('tieneUrl', e.target.checked)} className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-purple-600 focus:ring-2 focus:ring-purple-500" />
-              <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">🔗 Tiene URL de sistema</span>
+              <span className="inline-flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                <Star size={13} strokeWidth={1.5} />
+                Destacado
+              </span>
             </label>
           </div>
         </div>
@@ -477,28 +485,19 @@ const ProyectoForm: React.FC = () => {
         {/* ============================== */}
         {/* URLS */}
         {/* ============================== */}
-        {form.tieneUrl && (
-          <div className={sectionClass}>
-            <h2 className={sectionTitleClass}>🔗 URLs del Sistema</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-              <div>
-                <label className={labelClass}>URL del Sistema (privada)</label>
-                <input type="url" value={form.urlSistema} onChange={(e) => updateField('urlSistema', e.target.value)} className={inputClass} placeholder="https://sistema.ejemplo.com" />
-                <p className={helperTextClass}>🔒 Solo visible para clientes asignados</p>
-              </div>
-              <div>
-                <label className={labelClass}>URL Demo (pública)</label>
-                <input type="url" value={form.urlDemo} onChange={(e) => updateField('urlDemo', e.target.value)} className={inputClass} placeholder="https://demo.ejemplo.com" />
-              </div>
-            </div>
+        <div className={sectionClass}>
+          <h2 className={sectionTitleClass}><Link2 size={20} strokeWidth={1.5} /> URLs</h2>
+          <div>
+            <label className={labelClass}>URL Demo (pública)</label>
+            <input type="url" value={form.urlDemo} onChange={(e) => updateField('urlDemo', e.target.value)} className={inputClass} placeholder="https://demo.ejemplo.com" />
           </div>
-        )}
+        </div>
 
         {/* ============================== */}
         {/* IMÁGENES (Media Library) */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>🖼️ Imágenes</h2>
+          <h2 className={sectionTitleClass}><ImageIcon size={20} strokeWidth={1.5} /> Imágenes</h2>
           
           {/* Imagen Principal */}
           <div className="mb-6">
@@ -523,7 +522,7 @@ const ProyectoForm: React.FC = () => {
                     onClick={eliminarImagenPrincipal}
                     className="px-3 py-1.5 bg-red-500/90 text-white rounded-lg text-sm font-semibold hover:bg-red-600 transition"
                   >
-                    🗑️ Quitar
+                    <Trash2 size={13} strokeWidth={1.5} /> Quitar
                   </button>
                 </div>
               </div>
@@ -534,7 +533,7 @@ const ProyectoForm: React.FC = () => {
                 className="w-full max-w-md h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center gap-3 hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-all cursor-pointer group"
               >
                 <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors">
-                  <span className="text-2xl">📷</span>
+                  <Camera size={22} strokeWidth={1.5} className="text-gray-400 group-hover:text-purple-500 transition-colors" />
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
@@ -570,7 +569,7 @@ const ProyectoForm: React.FC = () => {
                         onClick={() => eliminarImagen(idx)}
                         className="p-2 bg-red-500/90 text-white rounded-lg text-xs font-semibold hover:bg-red-600 transition"
                       >
-                        🗑️ Quitar
+                        <Trash2 size={13} strokeWidth={1.5} /> Quitar
                       </button>
                     </div>
                   </div>
@@ -588,7 +587,7 @@ const ProyectoForm: React.FC = () => {
         {/* TECNOLOGÍAS */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>🛠️ Tecnologías</h2>
+          <h2 className={sectionTitleClass}><Wrench size={20} strokeWidth={1.5} /> Tecnologías</h2>
 
           {/* Formulario agregar tech */}
           <div className={`rounded-xl p-4 mb-4 border ${
@@ -610,13 +609,11 @@ const ProyectoForm: React.FC = () => {
                 />
               </div>
               <div>
-                <label className={labelClass}>Emoji (opcional)</label>
-                <input
-                  type="text"
+                <LucideIconPicker
+                  label="Icono (opcional)"
                   value={nuevaTech.icono}
-                  onChange={(e) => setNuevaTech((p) => ({ ...p, icono: e.target.value }))}
-                  className={inputClass}
-                  placeholder="⚛️"
+                  onChange={(name) => setNuevaTech((p) => ({ ...p, icono: name }))}
+                  placeholder="Atom"
                 />
               </div>
             </div>
@@ -634,7 +631,7 @@ const ProyectoForm: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               {(form.tecnologias || []).map((tech, idx) => (
                 <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium border border-purple-200 dark:border-purple-700">
-                  {tech.icono && <span>{tech.icono}</span>}
+                  {tech.icono && <CategoryIcon icon={tech.icono} size={14} className="flex-shrink-0" />}
                   {tech.nombre}
                   <button
                     type="button"
@@ -648,7 +645,7 @@ const ProyectoForm: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center gap-3 p-3 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
-              <span className="text-2xl opacity-40">🛠️</span>
+              <Wrench size={22} strokeWidth={1.5} className="text-gray-300 dark:text-gray-600" />
               <p className="text-sm text-gray-400 dark:text-gray-500 italic">
                 Aún no hay tecnologías. Completa el formulario arriba y haz clic en "Agregar".
               </p>
@@ -661,7 +658,8 @@ const ProyectoForm: React.FC = () => {
         {/* ============================== */}
         <div className={sectionClass}>
           <h2 className={sectionTitleClass}>
-            🛒 Información Comercial
+            <ShoppingCart size={20} strokeWidth={1.5} />
+            Información Comercial
             <span className="text-xs lg:text-sm font-normal text-gray-600 dark:text-gray-400">(Para vender el sistema)</span>
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
@@ -716,7 +714,10 @@ const ProyectoForm: React.FC = () => {
               <ul className="space-y-2 mt-3">
                 {(form.problemasQueResuelve || []).map((p, idx) => (
                   <li key={idx} className="flex items-center justify-between p-2.5 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200/50 dark:border-gray-600/50 text-sm text-gray-700 dark:text-gray-300">
-                    <span>✅ {p}</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <CheckCircle2 size={14} strokeWidth={1.5} className="text-emerald-500 flex-shrink-0" />
+                      {p}
+                    </span>
                     <button type="button" onClick={() => eliminarProblema(idx)} className="text-gray-400 hover:text-red-500 transition px-2">×</button>
                   </li>
                 ))}
@@ -729,14 +730,18 @@ const ProyectoForm: React.FC = () => {
         {/* MÓDULOS DEL SISTEMA */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>📦 Módulos del Sistema</h2>
+          <h2 className={sectionTitleClass}><Package size={20} strokeWidth={1.5} /> Módulos del Sistema</h2>
           <p className={`${helperTextClass} mb-4`}>Las funcionalidades que incluye el sistema (lo que el comprador recibe). Ej: "Control de inventario", "Reportes de ventas"</p>
 
           <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
             <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-3 mb-3">
               <div>
-                <label className={labelClass}>Emoji</label>
-                <input type="text" value={nuevoModulo.icono} onChange={(e) => setNuevoModulo((p) => ({ ...p, icono: e.target.value }))} className={inputClass} placeholder="📦" />
+                <LucideIconPicker
+                  label="Icono"
+                  value={nuevoModulo.icono}
+                  onChange={(name) => setNuevoModulo((p) => ({ ...p, icono: name }))}
+                  placeholder="Package"
+                />
               </div>
               <div>
                 <label className={labelClass}>Nombre del módulo *</label>
@@ -757,7 +762,7 @@ const ProyectoForm: React.FC = () => {
               {(form.modulos || []).map((mod, idx) => (
                 <div key={idx} className="flex items-start justify-between p-3 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200/50 dark:border-gray-600/50 group">
                   <div className="flex items-start gap-2 min-w-0">
-                    <span className="text-lg flex-shrink-0">{mod.icono || '📦'}</span>
+                    <CategoryIcon icon={mod.icono || 'Package'} size={20} color="#9333ea" className="flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="font-semibold text-sm text-gray-900 dark:text-white">{mod.nombre}</p>
                       {mod.descripcion && <p className="text-xs text-gray-500 dark:text-gray-400">{mod.descripcion}</p>}
@@ -776,14 +781,18 @@ const ProyectoForm: React.FC = () => {
         {/* BENEFICIOS */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>🎯 Beneficios para el Negocio</h2>
+          <h2 className={sectionTitleClass}><Target size={20} strokeWidth={1.5} /> Beneficios para el Negocio</h2>
           <p className={`${helperTextClass} mb-4`}>Orientados al comprador, no técnicos. Ej: "Atiende más mesas con el mismo personal"</p>
 
           <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
             <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-3 mb-3">
               <div>
-                <label className={labelClass}>Emoji</label>
-                <input type="text" value={nuevoBeneficio.icono} onChange={(e) => setNuevoBeneficio((p) => ({ ...p, icono: e.target.value }))} className={inputClass} placeholder="🚀" />
+                <LucideIconPicker
+                  label="Icono"
+                  value={nuevoBeneficio.icono}
+                  onChange={(name) => setNuevoBeneficio((p) => ({ ...p, icono: name }))}
+                  placeholder="Rocket"
+                />
               </div>
               <div>
                 <label className={labelClass}>Título del beneficio *</label>
@@ -804,7 +813,7 @@ const ProyectoForm: React.FC = () => {
               {(form.beneficios || []).map((b, idx) => (
                 <div key={idx} className="flex items-start justify-between p-3 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200/50 dark:border-gray-600/50 group">
                   <div className="flex items-start gap-2 min-w-0">
-                    <span className="text-lg flex-shrink-0">{b.icono || '✅'}</span>
+                    <CategoryIcon icon={b.icono || 'CheckCircle2'} size={20} color="#10b981" className="flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="font-semibold text-sm text-gray-900 dark:text-white">{b.titulo}</p>
                       {b.descripcion && <p className="text-xs text-gray-500 dark:text-gray-400">{b.descripcion}</p>}
@@ -823,7 +832,7 @@ const ProyectoForm: React.FC = () => {
         {/* PLANES DE PRECIO */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>💰 Planes de Precio</h2>
+          <h2 className={sectionTitleClass}><DollarSign size={20} strokeWidth={1.5} /> Planes de Precio</h2>
           <p className={`${helperTextClass} mb-4`}>Si no agregas planes, la página mostrará "Consultar precio". Marca uno como "Recomendado" para destacarlo.</p>
 
           <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
@@ -862,7 +871,10 @@ const ProyectoForm: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={nuevoPlan.destacado} onChange={(e) => setNuevoPlan((p) => ({ ...p, destacado: e.target.checked }))} className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-2 focus:ring-purple-500" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">⭐ Plan recomendado</span>
+                <span className="inline-flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+                  <Star size={13} strokeWidth={1.5} />
+                  Plan recomendado
+                </span>
               </label>
               <button type="button" onClick={agregarPlan} className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">
                 + Agregar plan
@@ -874,7 +886,7 @@ const ProyectoForm: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {(form.planes || []).map((plan, idx) => (
                 <div key={idx} className={`relative p-4 rounded-xl border-2 ${plan.destacado ? 'border-purple-500' : 'border-gray-200/50 dark:border-gray-600/50'} bg-white dark:bg-gray-700/30`}>
-                  {plan.destacado && <span className="absolute -top-2.5 left-3 px-2 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded-full">⭐ RECOMENDADO</span>}
+                  {plan.destacado && <span className="absolute -top-2.5 left-3 inline-flex items-center gap-1 px-2 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded-full"><Star size={9} strokeWidth={1.5} /> RECOMENDADO</span>}
                   <div className="flex items-start justify-between mb-1">
                     <p className="font-bold text-gray-900 dark:text-white">{plan.nombre}</p>
                     <button type="button" onClick={() => eliminarPlan(idx)} className="text-gray-400 hover:text-red-500 transition px-1">×</button>
@@ -898,7 +910,7 @@ const ProyectoForm: React.FC = () => {
         {/* PREGUNTAS FRECUENTES */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>❓ Preguntas Frecuentes</h2>
+          <h2 className={sectionTitleClass}><HelpCircle size={20} strokeWidth={1.5} /> Preguntas Frecuentes</h2>
           <p className={`${helperTextClass} mb-4`}>Responde las objeciones típicas de compra: implementación, soporte, capacitación, requisitos, etc.</p>
 
           <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
@@ -936,7 +948,7 @@ const ProyectoForm: React.FC = () => {
         {/* RESULTADOS / MÉTRICAS */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>📊 Resultados</h2>
+          <h2 className={sectionTitleClass}><BarChart3 size={20} strokeWidth={1.5} /> Resultados</h2>
 
           <div className="mb-6">
             <label className={labelClass}>Descripción de resultados</label>
@@ -1033,7 +1045,7 @@ const ProyectoForm: React.FC = () => {
         {/* SEO */}
         {/* ============================== */}
         <div className={sectionClass}>
-          <h2 className={sectionTitleClass}>🔍 SEO</h2>
+          <h2 className={sectionTitleClass}><Search size={20} strokeWidth={1.5} /> SEO</h2>
           <div className="grid grid-cols-1 gap-4 lg:gap-6">
             <div>
               <label className={labelClass}>Meta Title</label>

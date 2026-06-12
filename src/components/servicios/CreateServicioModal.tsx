@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { Plus, Sparkles, Star, CheckCircle2, X } from 'lucide-react';
 import { serviciosApi } from '../../services/serviciosApi';
 import { uploadImage } from '../../services/imageService';
 import { useNotification } from '../../hooks/useNotification';
@@ -212,7 +213,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
         estado: 'activo' as const,
         visibleEnWeb: true,
         moneda: formData.moneda || 'PEN' as const,
-        icono: '🚀'
+        icono: 'Rocket' // Nombre de icono Lucide (renderizado con <CategoryIcon />)
       };
       
       await serviciosApi.create(servicioData);
@@ -230,7 +231,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="🆕 Crear Nuevo Servicio"
+      title="Crear Nuevo Servicio"
       size="xl"
       className="max-h-[90vh] overflow-y-auto"
     >
@@ -244,7 +245,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
             <input
               type="text"
               {...register('titulo', { required: 'El título es requerido' })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Ej: Desarrollo de Sitio Web"
             />
             {errors.titulo && (
@@ -260,15 +261,15 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowCreateCategoriaModal(true)}
-                className="inline-flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                className="inline-flex items-center gap-1 text-sm text-[color:var(--srv-from,#9333ea)] hover:opacity-80 transition-opacity"
               >
-                <span className="text-xs">➕</span>
+                <Plus size={14} strokeWidth={2} />
                 Nueva
               </button>
             </div>
             <select
               {...register('categoria', { required: 'La categoría es requerida' })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
               disabled={loadingCategorias}
             >
               <option value="">
@@ -276,7 +277,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               </option>
               {categorias.map((categoria) => (
                 <option key={categoria._id} value={categoria._id}>
-                  {categoria.icono} {categoria.nombre}
+                  {categoria.nombre}
                 </option>
               ))}
             </select>
@@ -291,11 +292,11 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
             </label>
             <select
               {...register('tipoPrecio')}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
-              <option value="fijo">💰 Precio Fijo</option>
-              <option value="rango">📊 Rango de Precios</option>
-              <option value="personalizado">🎯 Personalizado</option>
+              <option value="fijo">Precio Fijo</option>
+              <option value="rango">Rango de Precios</option>
+              <option value="personalizado">Personalizado</option>
             </select>
           </div>
 
@@ -305,12 +306,12 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
             </label>
             <select
               {...register('moneda')}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
-              <option value="PEN">🇵🇪 Soles (S/)</option>
-              <option value="USD">🇺🇸 Dólares ($)</option>
-              <option value="MXN">🇲🇽 Pesos Mexicanos (MXN)</option>
-              <option value="EUR">🇪🇺 Euros (€)</option>
+              <option value="PEN">Soles (S/)</option>
+              <option value="USD">Dólares ($)</option>
+              <option value="MXN">Pesos Mexicanos (MXN)</option>
+              <option value="EUR">Euros (€)</option>
             </select>
           </div>
 
@@ -327,7 +328,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
                   valueAsNumber: true,
                   min: { value: 0, message: 'El precio debe ser mayor a 0' }
                 })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="0.00"
               />
               {errors.precio && (
@@ -347,7 +348,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               type="text"
               {...register('descripcionCorta')}
               maxLength={150}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Breve descripción del servicio (máx. 150 caracteres)"
             />
           </div>
@@ -359,7 +360,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
             <textarea
               {...register('descripcion')}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
               placeholder="Descripción detallada del servicio..."
             />
           </div>
@@ -387,13 +388,14 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               value={caracteristicaInput}
               onChange={(e) => setCaracteristicaInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCaracteristica())}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Agregar característica..."
             />
             <button
               type="button"
               onClick={addCaracteristica}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="px-4 py-2 text-white rounded-lg hover:brightness-110 transition-all"
+              style={{ background: `linear-gradient(to right, var(--srv-from, #9333ea), var(--srv-to, #7e22ce))` }}
             >
               Agregar
             </button>
@@ -410,7 +412,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
                   onClick={() => removeCaracteristica(index)}
                   className="text-purple-600 hover:text-purple-800 dark:text-purple-300 dark:hover:text-purple-100"
                 >
-                  ×
+                  <X size={12} strokeWidth={2} />
                 </button>
               </span>
             ))}
@@ -428,7 +430,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               value={etiquetaInput}
               onChange={(e) => setEtiquetaInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addEtiqueta())}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[color:var(--srv-via,#a855f7)] focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Agregar etiqueta..."
             />
             <button
@@ -451,7 +453,7 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
                   onClick={() => removeEtiqueta(index)}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-100"
                 >
-                  ×
+                  <X size={12} strokeWidth={2} />
                 </button>
               </span>
             ))}
@@ -464,9 +466,12 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
             <input
               type="checkbox"
               {...register('destacado')}
-              className="mr-2 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+              className="mr-2 h-4 w-4 text-[color:var(--srv-from,#9333ea)] focus:ring-[color:var(--srv-via,#a855f7)] border-gray-300 rounded"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">★ Servicio destacado</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300 inline-flex items-center gap-1.5">
+              <Star size={14} strokeWidth={1.5} className="text-yellow-500" />
+              Servicio destacado
+            </span>
           </label>
           
           <label className="flex items-center">
@@ -475,7 +480,10 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               {...register('activo')}
               className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">✅ Servicio activo</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300 inline-flex items-center gap-1.5">
+              <CheckCircle2 size={14} strokeWidth={1.5} className="text-green-500" />
+              Servicio activo
+            </span>
           </label>
         </div>
 
@@ -491,7 +499,8 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            className="px-6 py-2 text-white rounded-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+            style={{ background: `linear-gradient(to right, var(--srv-from, #9333ea), var(--srv-to, #7e22ce))` }}
           >
             {isSubmitting ? (
               <>
@@ -500,7 +509,8 @@ export const CreateServicioModal: React.FC<CreateServicioModalProps> = ({
               </>
             ) : (
               <>
-                ✨ Crear Servicio
+                <Sparkles size={16} strokeWidth={1.5} />
+                Crear Servicio
               </>
             )}
           </button>

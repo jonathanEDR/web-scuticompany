@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Briefcase, BarChart3, UserPlus, Zap, Target, Inbox, Eye, Pencil, Trash2, Plus, List, XCircle } from 'lucide-react';
 import { useCRM } from '../../hooks/useCRM';
 import { useAuth } from '../../contexts/AuthContext';
 import SmartDashboardLayout from '../../components/SmartDashboardLayout';
@@ -157,7 +158,7 @@ const LeadsManagement: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
-                <span className="text-4xl">💼</span>
+                <Briefcase size={36} strokeWidth={1.5} />
                 Gestión de Leads
               </h1>
               <p className="text-white/90 text-lg">
@@ -176,8 +177,8 @@ const LeadsManagement: React.FC = () => {
                       : 'text-white/90 hover:bg-white/10'
                   }`}
                 >
-                  <span className="hidden sm:inline">📋 Lista</span>
-                  <span className="sm:hidden">📋</span>
+                  <span className="hidden sm:flex items-center gap-1"><List size={14} strokeWidth={1.5} />Lista</span>
+                  <span className="sm:hidden"><List size={14} strokeWidth={1.5} /></span>
                 </button>
                 <button
                   onClick={() => setShowStats(true)}
@@ -187,8 +188,8 @@ const LeadsManagement: React.FC = () => {
                       : 'text-white/90 hover:bg-white/10'
                   }`}
                 >
-                  <span className="hidden sm:inline">📊 Estadísticas</span>
-                  <span className="sm:hidden">📊</span>
+                  <span className="hidden sm:flex items-center gap-1"><BarChart3 size={14} strokeWidth={1.5} />Estadísticas</span>
+                  <span className="sm:hidden"><BarChart3 size={14} strokeWidth={1.5} /></span>
                 </button>
               </div>
 
@@ -198,7 +199,7 @@ const LeadsManagement: React.FC = () => {
                   className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white"
                   size="sm"
                 >
-                  <span className="mr-2">➕</span>
+                  <Plus size={16} strokeWidth={1.5} className="mr-2" />
                   <span className="hidden sm:inline">Nuevo Lead</span>
                   <span className="sm:hidden">Nuevo</span>
                 </Button>
@@ -215,7 +216,7 @@ const LeadsManagement: React.FC = () => {
                     <p className="text-sm font-medium text-white/80 truncate">Total Leads</p>
                     <p className="text-2xl sm:text-3xl font-bold text-white">{pagination.totalRecords}</p>
                   </div>
-                  <div className="text-3xl sm:text-4xl opacity-80">📊</div>
+                  <BarChart3 size={36} strokeWidth={1.5} className="opacity-80 text-white flex-shrink-0" />
                 </div>
               </div>
 
@@ -227,7 +228,7 @@ const LeadsManagement: React.FC = () => {
                       {leads.filter(l => l.estado === 'nuevo').length}
                     </p>
                   </div>
-                  <div className="text-3xl sm:text-4xl opacity-80">🆕</div>
+                  <UserPlus size={36} strokeWidth={1.5} className="opacity-80 text-white flex-shrink-0" />
                 </div>
               </div>
 
@@ -239,7 +240,7 @@ const LeadsManagement: React.FC = () => {
                       {leads.filter(l => ['contactado', 'calificado', 'propuesta', 'negociacion'].includes(l.estado)).length}
                     </p>
                   </div>
-                  <div className="text-3xl sm:text-4xl opacity-80">⚡</div>
+                  <Zap size={36} strokeWidth={1.5} className="opacity-80 text-white flex-shrink-0" />
                 </div>
               </div>
 
@@ -251,7 +252,7 @@ const LeadsManagement: React.FC = () => {
                       {leads.filter(l => l.estado === 'ganado').length}
                     </p>
                   </div>
-                  <div className="text-3xl sm:text-4xl opacity-80">🎯</div>
+                  <Target size={36} strokeWidth={1.5} className="opacity-80 text-white flex-shrink-0" />
                 </div>
               </div>
             </div>
@@ -280,7 +281,7 @@ const LeadsManagement: React.FC = () => {
         <Card>
           {error && (
             <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-red-800 dark:text-red-200">❌ {error}</p>
+              <p className="text-red-800 dark:text-red-200 flex items-center gap-2"><XCircle size={16} strokeWidth={1.5} />{error}</p>
             </div>
           )}
 
@@ -290,7 +291,7 @@ const LeadsManagement: React.FC = () => {
             </div>
           ) : leads.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">📭</div>
+              <Inbox size={60} strokeWidth={1.5} className="mx-auto mb-4 text-gray-400 dark:text-gray-500" />
               <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 No hay leads disponibles
               </p>
@@ -425,7 +426,7 @@ const LeadsManagement: React.FC = () => {
                               className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                               title="Ver detalles"
                             >
-                              👁️
+                              <Eye size={16} strokeWidth={1.5} />
                             </button>
                             {hasPermission('MANAGE_CONTENT') && (
                               <>
@@ -437,7 +438,7 @@ const LeadsManagement: React.FC = () => {
                                   className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300"
                                   title="Editar"
                                 >
-                                  ✏️
+                                  <Pencil size={16} strokeWidth={1.5} />
                                 </button>
                                 <button
                                   onClick={(e) => {
@@ -447,7 +448,7 @@ const LeadsManagement: React.FC = () => {
                                   className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                                   title="Eliminar"
                                 >
-                                  🗑️
+                                  <Trash2 size={16} strokeWidth={1.5} />
                                 </button>
                               </>
                             )}
@@ -527,27 +528,27 @@ const LeadsManagement: React.FC = () => {
                             e.stopPropagation();
                             handleViewLead(lead);
                           }}
-                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors font-medium"
+                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors font-medium flex items-center justify-center gap-1"
                         >
-                          👁️ Ver
+                          <Eye size={14} strokeWidth={1.5} />Ver
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEditLead(lead);
                           }}
-                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg transition-colors font-medium"
+                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg transition-colors font-medium flex items-center justify-center gap-1"
                         >
-                          ✏️ Editar
+                          <Pencil size={14} strokeWidth={1.5} />Editar
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteLead(lead);
                           }}
-                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors font-medium"
+                          className="flex-1 py-2 px-3 text-xs sm:text-sm text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors font-medium flex items-center justify-center gap-1"
                         >
-                          🗑️
+                          <Trash2 size={14} strokeWidth={1.5} />
                         </button>
                       </div>
                     )}

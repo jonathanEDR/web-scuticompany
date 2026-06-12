@@ -4,12 +4,14 @@
  */
 
 import { useState, useEffect } from 'react';
+import { X, Filter, RotateCcw, Star, CheckCircle2, Globe, Package, Image } from 'lucide-react';
 import type { ServicioFilters } from '../../types/filters';
-import { 
-  TIPO_PRECIO_OPTIONS, 
-  ESTADO_OPTIONS 
+import {
+  TIPO_PRECIO_OPTIONS,
+  ESTADO_OPTIONS
 } from '../../types/filters';
 import { categoriasApi, type Categoria } from '../../services/categoriasApi';
+import { CategoryIcon } from './CategoryIcon';
 
 // ============================================
 // TIPOS
@@ -22,28 +24,6 @@ interface FiltersPanelProps {
   isOpen?: boolean;
   resultCount?: number;
 }
-
-// ============================================
-// ICONOS
-// ============================================
-
-const CloseIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
-
-const FilterIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-  </svg>
-);
-
-const ResetIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-  </svg>
-);
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -171,12 +151,15 @@ export const FiltersPanel = ({
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 z-10">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <FilterIcon />
+              <Filter size={18} strokeWidth={1.5} className="text-[color:var(--srv-from)]" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Filtros
               </h2>
               {activeFiltersCount > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full">
+                <span
+                  className="px-2 py-0.5 text-xs font-medium text-[color:var(--srv-from)] rounded-full"
+                  style={{ backgroundColor: 'color-mix(in srgb, var(--srv-from) 15%, transparent)' }}
+                >
                   {activeFiltersCount}
                 </span>
               )}
@@ -188,7 +171,7 @@ export const FiltersPanel = ({
                 title="Cerrar filtros"
                 aria-label="Cerrar panel de filtros"
               >
-                <CloseIcon />
+                <X size={18} strokeWidth={1.5} />
               </button>
             )}
           </div>
@@ -202,9 +185,9 @@ export const FiltersPanel = ({
           {activeFiltersCount > 0 && (
             <button
               onClick={handleResetFilters}
-              className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-1.5 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+              className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-1.5 text-sm text-[color:var(--srv-from)] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
-              <ResetIcon />
+              <RotateCcw size={14} strokeWidth={1.5} />
               Limpiar filtros
             </button>
           )}
@@ -228,14 +211,14 @@ export const FiltersPanel = ({
                     type="checkbox"
                     checked={localFilters.categorias?.includes(categoria.slug) || false}
                     onChange={() => handleCategoryToggle(categoria.slug)}
-                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                   />
-                  <span
-                    className="w-3 h-3 rounded-full flex items-center justify-center text-xs"
-                    style={{ backgroundColor: categoria.color }}
-                  >
-                    {categoria.icono}
-                  </span>
+                  <CategoryIcon
+                    icon={categoria.icono}
+                    size={14}
+                    color={categoria.color}
+                    className="flex-shrink-0"
+                  />
                   <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
                     {categoria.nombre}
                   </span>
@@ -263,7 +246,7 @@ export const FiltersPanel = ({
                   placeholder="0"
                   value={localFilters.precioMin || ''}
                   onChange={e => handleFilterChange('precioMin', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[color:var(--srv-via)]"
                 />
               </div>
               <div>
@@ -276,7 +259,7 @@ export const FiltersPanel = ({
                   placeholder="∞"
                   value={localFilters.precioMax || ''}
                   onChange={e => handleFilterChange('precioMax', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[color:var(--srv-via)]"
                 />
               </div>
             </div>
@@ -297,9 +280,13 @@ export const FiltersPanel = ({
                     type="checkbox"
                     checked={localFilters.tipoPrecio?.includes(tipo.value as any) || false}
                     onChange={() => handleTipoPrecioToggle(tipo.value as any)}
-                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                   />
-                  <span>{tipo.icon}</span>
+                  <CategoryIcon
+                    icon={tipo.icon}
+                    size={14}
+                    className="text-gray-500 dark:text-gray-400 flex-shrink-0"
+                  />
                   <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
                     {tipo.label}
                   </span>
@@ -323,7 +310,7 @@ export const FiltersPanel = ({
                     type="checkbox"
                     checked={localFilters.estado?.includes(estado.value as any) || false}
                     onChange={() => handleEstadoToggle(estado.value as any)}
-                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                   />
                   <span className={`
                     px-2 py-0.5 text-xs font-medium rounded-full
@@ -349,10 +336,11 @@ export const FiltersPanel = ({
                   type="checkbox"
                   checked={localFilters.destacado === true}
                   onChange={e => handleFilterChange('destacado', e.target.checked ? true : undefined)}
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                  ★ Solo destacados
+                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white inline-flex items-center gap-1.5">
+                  <Star size={14} strokeWidth={1.5} className="text-yellow-500" />
+                  Solo destacados
                 </span>
               </label>
 
@@ -361,10 +349,11 @@ export const FiltersPanel = ({
                   type="checkbox"
                   checked={localFilters.activo === true}
                   onChange={e => handleFilterChange('activo', e.target.checked ? true : undefined)}
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                  ✅ Solo activos
+                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white inline-flex items-center gap-1.5">
+                  <CheckCircle2 size={14} strokeWidth={1.5} className="text-green-500" />
+                  Solo activos
                 </span>
               </label>
 
@@ -373,10 +362,11 @@ export const FiltersPanel = ({
                   type="checkbox"
                   checked={localFilters.visibleEnWeb === true}
                   onChange={e => handleFilterChange('visibleEnWeb', e.target.checked ? true : undefined)}
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                  🌐 Visible en web
+                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white inline-flex items-center gap-1.5">
+                  <Globe size={14} strokeWidth={1.5} className="text-blue-500" />
+                  Visible en web
                 </span>
               </label>
 
@@ -385,10 +375,11 @@ export const FiltersPanel = ({
                   type="checkbox"
                   checked={localFilters.conPaquetes === true}
                   onChange={e => handleFilterChange('conPaquetes', e.target.checked ? true : undefined)}
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                  📦 Con paquetes
+                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white inline-flex items-center gap-1.5">
+                  <Package size={14} strokeWidth={1.5} className="text-orange-500" />
+                  Con paquetes
                 </span>
               </label>
 
@@ -397,10 +388,11 @@ export const FiltersPanel = ({
                   type="checkbox"
                   checked={localFilters.conImagenes === true}
                   onChange={e => handleFilterChange('conImagenes', e.target.checked ? true : undefined)}
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-[color:var(--srv-from)] border-gray-300 rounded focus:ring-[color:var(--srv-via)]"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                  🖼️ Con imágenes
+                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white inline-flex items-center gap-1.5">
+                  <Image size={14} strokeWidth={1.5} className="text-purple-500" />
+                  Con imágenes
                 </span>
               </label>
             </div>

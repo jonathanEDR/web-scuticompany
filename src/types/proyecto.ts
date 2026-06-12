@@ -80,9 +80,7 @@ export interface Proyecto {
   colorPrincipal: string;
   logoCliente: string;
   
-  // Sistema
-  tieneUrl: boolean;
-  urlSistema: string;
+  // URLs
   urlDemo: string;
   urlRepositorio: string;
   
@@ -115,9 +113,6 @@ export interface Proyecto {
   urlVideo?: string;
   faqs?: FaqSistema[];
 
-  // Clientes
-  assignedClients: ClienteAsignado[];
-
   // Resultados
   resultados: {
     descripcion: string;
@@ -136,25 +131,13 @@ export interface Proyecto {
   };
   orden: number;
   vistas: number;
-  accesos: number;
-  
+
   // Virtuals
   esPublico?: boolean;
-  tieneAccesoSistema?: boolean;
-  totalClientesAsignados?: number;
   
   // Timestamps
   createdAt: string;
   updatedAt: string;
-}
-
-export interface ClienteAsignado {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  profileImage?: string;
 }
 
 export type ProyectoCategoria = 'web' | 'mobile' | 'desktop' | 'api' | 'ecommerce' | 'crm' | 'erp' | 'saas' | 'landing' | 'otro';
@@ -176,8 +159,6 @@ export interface CreateProyectoRequest {
   icono?: string;
   colorPrincipal?: string;
   logoCliente?: string;
-  tieneUrl?: boolean;
-  urlSistema?: string;
   urlDemo?: string;
   urlRepositorio?: string;
   tecnologias?: Tecnologia[];
@@ -192,7 +173,6 @@ export interface CreateProyectoRequest {
   fechaInicio?: string;
   fechaFin?: string;
   clienteNombre?: string;
-  assignedClients?: string[];
   rubro?: string;
   problemasQueResuelve?: string[];
   beneficios?: BeneficioSistema[];
@@ -229,9 +209,7 @@ export interface ProyectoStatsResponse {
   enDesarrollo?: number;
   enPortfolio: number;
   destacados?: number;
-  totalClientes: number;
   totalVistas?: number;
-  totalAccesos?: number;
   porCategoria?: {
     categoria: string;
     count: number;
@@ -258,22 +236,22 @@ export interface PaginationInfo {
 // ============================================
 
 export const PROYECTO_CATEGORIAS: Record<ProyectoCategoria, { label: string; icon: string; color: string }> = {
-  web: { label: 'Web', icon: '🌐', color: '#3B82F6' },
-  mobile: { label: 'Mobile', icon: '📱', color: '#8B5CF6' },
-  desktop: { label: 'Desktop', icon: '🖥️', color: '#6366F1' },
-  api: { label: 'API', icon: '⚡', color: '#F59E0B' },
-  ecommerce: { label: 'E-commerce', icon: '🛒', color: '#10B981' },
-  crm: { label: 'CRM', icon: '💼', color: '#EF4444' },
-  erp: { label: 'ERP', icon: '🏢', color: '#F97316' },
-  saas: { label: 'SaaS', icon: '☁️', color: '#06B6D4' },
-  landing: { label: 'Landing', icon: '📄', color: '#EC4899' },
-  otro: { label: 'Otro', icon: '📦', color: '#6B7280' }
+  web: { label: 'Web', icon: 'Globe', color: '#3B82F6' },
+  mobile: { label: 'Mobile', icon: 'Smartphone', color: '#8B5CF6' },
+  desktop: { label: 'Desktop', icon: 'Monitor', color: '#6366F1' },
+  api: { label: 'API', icon: 'Zap', color: '#F59E0B' },
+  ecommerce: { label: 'E-commerce', icon: 'ShoppingCart', color: '#10B981' },
+  crm: { label: 'CRM', icon: 'Briefcase', color: '#EF4444' },
+  erp: { label: 'ERP', icon: 'Building2', color: '#F97316' },
+  saas: { label: 'SaaS', icon: 'Cloud', color: '#06B6D4' },
+  landing: { label: 'Landing', icon: 'FileText', color: '#EC4899' },
+  otro: { label: 'Otro', icon: 'Package', color: '#6B7280' }
 };
 
 export const PROYECTO_ESTADOS: Record<ProyectoEstado, { label: string; icon: string; color: string; bgColor: string }> = {
-  en_desarrollo: { label: 'En desarrollo', icon: '🔨', color: '#F59E0B', bgColor: 'bg-yellow-100 text-yellow-800' },
-  activo: { label: 'Activo', icon: '✅', color: '#10B981', bgColor: 'bg-green-100 text-green-800' },
-  mantenimiento: { label: 'Mantenimiento', icon: '🔧', color: '#6366F1', bgColor: 'bg-indigo-100 text-indigo-800' },
-  completado: { label: 'Completado', icon: '🏁', color: '#3B82F6', bgColor: 'bg-blue-100 text-blue-800' },
-  archivado: { label: 'Archivado', icon: '📦', color: '#6B7280', bgColor: 'bg-gray-100 text-gray-800' }
+  en_desarrollo: { label: 'En desarrollo', icon: 'Hammer', color: '#F59E0B', bgColor: 'bg-yellow-100 text-yellow-800' },
+  activo: { label: 'Activo', icon: 'CheckCircle2', color: '#10B981', bgColor: 'bg-green-100 text-green-800' },
+  mantenimiento: { label: 'Mantenimiento', icon: 'Wrench', color: '#6366F1', bgColor: 'bg-indigo-100 text-indigo-800' },
+  completado: { label: 'Completado', icon: 'Flag', color: '#3B82F6', bgColor: 'bg-blue-100 text-blue-800' },
+  archivado: { label: 'Archivado', icon: 'Package', color: '#6B7280', bgColor: 'bg-gray-100 text-gray-800' }
 };

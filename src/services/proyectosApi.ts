@@ -12,7 +12,6 @@ import type {
   ProyectoFilters,
   ProyectoStatsResponse,
   CategoriaProyecto,
-  ClienteAsignado,
   PaginationInfo
 } from '../types/proyecto';
 
@@ -22,9 +21,6 @@ import type {
 
 const API_BASE_URL = getBackendUrl();
 
-/**
- * Cliente axios configurado para proyectos
- */
 const apiClient: AxiosInstance = axios.create({
   baseURL: `${API_BASE_URL}/api/proyectos`,
   timeout: 15000,
@@ -37,9 +33,6 @@ const apiClient: AxiosInstance = axios.create({
 // INTERCEPTORES
 // ============================================
 
-/**
- * Interceptor para agregar token de autenticación automáticamente
- */
 apiClient.interceptors.request.use(
   async (config) => {
     try {
@@ -60,9 +53,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-/**
- * Interceptor de logging en desarrollo
- */
 if (import.meta.env.DEV) {
   apiClient.interceptors.request.use(
     (config) => {
@@ -87,9 +77,6 @@ function handleError(error: unknown): string {
 // 📌 ENDPOINTS PÚBLICOS
 // ============================================
 
-/**
- * Obtener portafolio público de proyectos
- */
 async function getPortfolio(params?: {
   categoria?: string;
   destacado?: boolean;
@@ -104,9 +91,6 @@ async function getPortfolio(params?: {
   }
 }
 
-/**
- * Obtener detalle de un proyecto público por slug
- */
 async function getProyectoBySlug(slug: string): Promise<Proyecto> {
   try {
     const response = await apiClient.get(`/detalle/${slug}`);
@@ -116,9 +100,6 @@ async function getProyectoBySlug(slug: string): Promise<Proyecto> {
   }
 }
 
-/**
- * Obtener categorías de proyectos con conteo
- */
 async function getCategorias(): Promise<CategoriaProyecto[]> {
   try {
     const response = await apiClient.get('/categorias');
@@ -129,52 +110,9 @@ async function getCategorias(): Promise<CategoriaProyecto[]> {
 }
 
 // ============================================
-// 🔐 ENDPOINTS CLIENTE
-// ============================================
-
-/**
- * Obtener proyectos asignados al usuario logueado
- */
-async function getMisProyectos(): Promise<{ data: Proyecto[]; total: number }> {
-  try {
-    const response = await apiClient.get('/cliente/mis-proyectos');
-    return response.data;
-  } catch (error) {
-    throw new Error(handleError(error));
-  }
-}
-
-/**
- * Obtener URL de acceso a un sistema
- */
-async function accederProyecto(id: string): Promise<{ nombre: string; url: string }> {
-  try {
-    const response = await apiClient.get(`/cliente/${id}/acceso`);
-    return response.data.data;
-  } catch (error) {
-    throw new Error(handleError(error));
-  }
-}
-
-/**
- * Verificar si el usuario tiene acceso a un proyecto
- */
-async function verificarAcceso(id: string): Promise<boolean> {
-  try {
-    const response = await apiClient.get(`/cliente/${id}/verificar-acceso`);
-    return response.data.data.tieneAcceso;
-  } catch (error) {
-    return false;
-  }
-}
-
-// ============================================
 // 🛡️ ENDPOINTS ADMIN
 // ============================================
 
-/**
- * Obtener todos los proyectos (panel admin)
- */
 async function getAllProyectosAdmin(params?: ProyectoFilters): Promise<{
   data: Proyecto[];
   pagination: PaginationInfo;
@@ -187,9 +125,6 @@ async function getAllProyectosAdmin(params?: ProyectoFilters): Promise<{
   }
 }
 
-/**
- * Obtener un proyecto específico (admin)
- */
 async function getProyectoAdmin(id: string): Promise<Proyecto> {
   try {
     const response = await apiClient.get(`/admin/${id}`);
@@ -199,9 +134,6 @@ async function getProyectoAdmin(id: string): Promise<Proyecto> {
   }
 }
 
-/**
- * Crear un nuevo proyecto
- */
 async function crearProyecto(data: CreateProyectoRequest): Promise<Proyecto> {
   try {
     const response = await apiClient.post('/admin', data);
@@ -211,9 +143,6 @@ async function crearProyecto(data: CreateProyectoRequest): Promise<Proyecto> {
   }
 }
 
-/**
- * Actualizar un proyecto existente
- */
 async function actualizarProyecto(id: string, data: UpdateProyectoRequest): Promise<Proyecto> {
   try {
     const response = await apiClient.put(`/admin/${id}`, data);
@@ -223,9 +152,6 @@ async function actualizarProyecto(id: string, data: UpdateProyectoRequest): Prom
   }
 }
 
-/**
- * Eliminar un proyecto
- */
 async function eliminarProyecto(id: string): Promise<void> {
   try {
     await apiClient.delete(`/admin/${id}`);
@@ -234,35 +160,6 @@ async function eliminarProyecto(id: string): Promise<void> {
   }
 }
 
-/**
- * Asignar clientes a un proyecto
- */
-async function asignarClientes(proyectoId: string, clientIds: string[]): Promise<Proyecto> {
-  try {
-    const response = await apiClient.put(`/admin/${proyectoId}/clientes`, { clientIds });
-    return response.data.data;
-  } catch (error) {
-    throw new Error(handleError(error));
-  }
-}
-
-/**
- * Obtener clientes disponibles para asignación
- */
-async function getClientesDisponibles(search?: string): Promise<ClienteAsignado[]> {
-  try {
-    const response = await apiClient.get('/admin/clientes-disponibles', {
-      params: search ? { search } : undefined
-    });
-    return response.data.data;
-  } catch (error) {
-    throw new Error(handleError(error));
-  }
-}
-
-/**
- * Obtener estadísticas de proyectos
- */
 async function getEstadisticas(): Promise<ProyectoStatsResponse> {
   try {
     const response = await apiClient.get('/admin/stats');
@@ -281,20 +178,13 @@ export const proyectosApi = {
   getPortfolio,
   getProyectoBySlug,
   getCategorias,
-  
-  // Cliente
-  getMisProyectos,
-  accederProyecto,
-  verificarAcceso,
-  
+
   // Admin
   getAllProyectosAdmin,
   getProyectoAdmin,
   crearProyecto,
   actualizarProyecto,
   eliminarProyecto,
-  asignarClientes,
-  getClientesDisponibles,
   getEstadisticas,
 };
 

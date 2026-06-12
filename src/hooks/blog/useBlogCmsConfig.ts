@@ -7,10 +7,12 @@ import { useState, useEffect } from 'react';
 import { getPageBySlug, getCachedPageSync } from '../../services/cmsApi';
 
 // Configuración por defecto del Hero del Blog
+// Los textos (title, titleHighlight, subtitle) se omiten intencionalmente:
+// siempre vienen del CMS. El skeleton cubre la carga inicial.
 export const DEFAULT_BLOG_HERO_CONFIG = {
-  title: 'Blog',
-  titleHighlight: 'Tech',
-  subtitle: 'Las últimas noticias y tendencias tecnológicas',
+  title: '',
+  titleHighlight: '',
+  subtitle: '',
   fontFamily: 'Montserrat',
   // Estilos de resaltado del título principal (efecto badge/highlight)
   titleStyle: {

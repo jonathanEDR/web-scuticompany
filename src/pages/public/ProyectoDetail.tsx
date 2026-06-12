@@ -5,7 +5,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import * as LucideIcons from 'lucide-react';
+import { MessageSquare, Eye, Star, Target, Lightbulb } from 'lucide-react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import CategoryIcon from '../../components/servicios/CategoryIcon';
 import { Helmet } from 'react-helmet-async';
 import DOMPurify from 'dompurify';
 import PublicHeader from '../../components/public/PublicHeader';
@@ -13,7 +15,6 @@ import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import ContactModal from '../../components/public/ContactModal';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { useCmsData } from '../../hooks/cms/useCmsData';
 import { proyectosApi } from '../../services/proyectosApi';
 import type { ProyectoDetailConfig } from '../../components/cms/ProyectoDetailConfigSection';
@@ -94,12 +95,12 @@ function ImageCarousel({ imagenes, nombre, icono, isDark }: CarouselProps) {
 
   if (total === 0) {
     return (
-      <div className={`aspect-[16/9] rounded-2xl flex items-center justify-center text-8xl ${
+      <div className={`aspect-[16/9] rounded-2xl flex items-center justify-center ${
         isDark
           ? 'bg-gradient-to-br from-purple-900/40 to-indigo-900/40 border border-white/10'
           : 'bg-gradient-to-br from-purple-100 to-indigo-100'
       }`}>
-        {icono || '🚀'}
+        <CategoryIcon icon={icono || 'Rocket'} size={80} color={isDark ? '#a78bfa' : '#9333ea'} />
       </div>
     );
   }
@@ -201,7 +202,6 @@ export default function ProyectoDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { theme } = useTheme();
-  const { user } = useAuth();
   const isDark = theme === 'dark';
   const { pageData: cmsPage } = useCmsData('proyecto-detail');
 
@@ -216,8 +216,6 @@ export default function ProyectoDetail() {
 
   const [proyecto, setProyecto] = useState<Proyecto | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tieneAcceso, setTieneAcceso] = useState(false);
-  const [accediendo, setAccediendo] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   // Plan seleccionado al pulsar "Lo quiero" en un plan específico (contexto del lead)
   const [planSeleccionado, setPlanSeleccionado] = useState<string | null>(null);
@@ -225,10 +223,6 @@ export default function ProyectoDetail() {
   useEffect(() => {
     if (slug) cargarProyecto();
   }, [slug]);
-
-  useEffect(() => {
-    if (user && proyecto) verificarAcceso();
-  }, [user, proyecto]);
 
   const cargarProyecto = async () => {
     try {
@@ -239,28 +233,6 @@ export default function ProyectoDetail() {
       navigate('/sistemas', { replace: true });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const verificarAcceso = async () => {
-    if (!proyecto) return;
-    try {
-      setTieneAcceso(await proyectosApi.verificarAcceso(proyecto._id));
-    } catch {
-      setTieneAcceso(false);
-    }
-  };
-
-  const handleAcceder = async () => {
-    if (!proyecto) return;
-    try {
-      setAccediendo(true);
-      const data = await proyectosApi.accederProyecto(proyecto._id);
-      window.open(data.url, '_blank', 'noopener,noreferrer');
-    } catch (error: any) {
-      alert(error.message || 'No tienes acceso a este sistema');
-    } finally {
-      setAccediendo(false);
     }
   };
 
@@ -287,11 +259,11 @@ export default function ProyectoDetail() {
   const metricas = proyecto.resultados?.metricas || [];
 
   const metaItems = [
-    proyecto.industria     && { label: '🏭 Industria', value: proyecto.industria },
-    proyecto.clienteNombre && { label: '🤝 Cliente',   value: proyecto.clienteNombre },
-    proyecto.fechaInicio   && { label: '📅 Inicio',    value: new Date(proyecto.fechaInicio).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) },
+    proyecto.industria     && { label: 'Industria', value: proyecto.industria },
+    proyecto.clienteNombre && { label: 'Cliente',   value: proyecto.clienteNombre },
+    proyecto.fechaInicio   && { label: 'Inicio',    value: new Date(proyecto.fechaInicio).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) },
     (proyecto.fechaFin || proyecto.fechaFinalizacion) && {
-      label: '🏁 Entrega',
+      label: 'Entrega',
       value: new Date((proyecto.fechaFin || proyecto.fechaFinalizacion)!).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }),
     },
   ].filter(Boolean) as { label: string; value: string }[];
@@ -389,16 +361,19 @@ export default function ProyectoDetail() {
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold"
                     style={{ backgroundColor: `${categoriaInfo.color}18`, color: categoriaInfo.color, border: `1px solid ${categoriaInfo.color}35` }}
                   >
-                    {categoriaInfo.icon} {categoriaInfo.label}
+                    <CategoryIcon icon={categoriaInfo.icon} size={12} color={categoriaInfo.color} className="flex-shrink-0" />
+                    {categoriaInfo.label}
                   </span>
                   {proyecto.rubro && (
-                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-sm font-semibold border border-emerald-200 dark:border-emerald-800/40">
-                      🎯 Para {proyecto.rubro}
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-sm font-semibold border border-emerald-200 dark:border-emerald-800/40">
+                      <Target size={12} strokeWidth={1.5} />
+                      Para {proyecto.rubro}
                     </span>
                   )}
                   {proyecto.destacado && (
-                    <span className="px-3 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-sm font-semibold border border-amber-200">
-                      ⭐ Más vendido
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-sm font-semibold border border-amber-200">
+                      <Star size={12} strokeWidth={1.5} />
+                      Más vendido
                     </span>
                   )}
                 </div>
@@ -471,7 +446,10 @@ export default function ProyectoDetail() {
                               : 'border-purple-200 text-purple-700 bg-purple-50'
                           }`}
                         >
-                          {mod.icono ? `${mod.icono} ` : ''}{mod.nombre}
+                          {mod.icono && (
+                            <CategoryIcon icon={mod.icono} size={12} className="flex-shrink-0" />
+                          )}
+                          {mod.nombre}
                         </span>
                       ))}
                       {modulos.length > 6 && (
@@ -511,7 +489,8 @@ export default function ProyectoDetail() {
                     onClick={() => abrirCotizacion()}
                     className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/30"
                   >
-                    💬 {cfg.hero.buttons?.consultarText || 'Solicitar cotización'}
+                    <MessageSquare size={16} strokeWidth={1.5} />
+                    {cfg.hero.buttons?.consultarText || 'Solicitar cotización'}
                   </button>
                   {proyecto.urlDemo && (
                     <a
@@ -524,24 +503,9 @@ export default function ProyectoDetail() {
                           : 'border-gray-300 text-gray-600 hover:border-purple-400 hover:text-gray-900'
                       }`}
                     >
-                      👁️ Probar demo
+                      <Eye size={16} strokeWidth={1.5} />
+                      Probar demo
                     </a>
-                  )}
-                  {tieneAcceso && proyecto.tieneUrl && (
-                    <button
-                      onClick={handleAcceder}
-                      disabled={accediendo}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all border disabled:opacity-50 ${
-                        isDark
-                          ? 'border-white/25 text-gray-300 hover:border-white/50 hover:text-white'
-                          : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-900'
-                      }`}
-                    >
-                      {accediendo
-                        ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />Conectando...</>
-                        : <>🚀 Acceder a mi sistema</>
-                      }
-                    </button>
                   )}
                 </div>
               </div>
@@ -582,8 +546,9 @@ export default function ProyectoDetail() {
                 <div className={`p-6 rounded-2xl border-l-4 border-purple-500 ${
                   isDark ? 'bg-purple-900/10 border border-purple-800/30' : 'bg-purple-50 border border-purple-100'
                 }`}>
-                  <p className={`font-semibold text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-purple-400' : 'text-purple-700'}`}>
-                    💡 {cfg.description.impactTitle || 'Impacto del proyecto'}
+                  <p className={`inline-flex items-center gap-1.5 font-semibold text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-purple-400' : 'text-purple-700'}`}>
+                    <Lightbulb size={14} strokeWidth={1.5} />
+                    {cfg.description.impactTitle || 'Impacto del proyecto'}
                   </p>
                   <p className={`text-base leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     {proyecto.resultados.descripcion}
@@ -610,7 +575,9 @@ export default function ProyectoDetail() {
                             : 'bg-white border-gray-100 shadow-sm hover:border-emerald-200 hover:shadow-md'
                         }`}
                       >
-                        <div className="text-2xl mb-2">{b.icono || '✅'}</div>
+                        <div className="mb-2">
+                          <CategoryIcon icon={b.icono || 'CheckCircle2'} size={24} color={isDark ? '#34d399' : '#059669'} />
+                        </div>
                         <h3 className={`font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{b.titulo}</h3>
                         {b.descripcion && (
                           <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -642,10 +609,10 @@ export default function ProyectoDetail() {
                             : 'bg-white border-gray-100 shadow-sm hover:border-purple-200'
                         }`}
                       >
-                        <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                        <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
                           isDark ? 'bg-purple-500/10 border border-purple-500/20' : 'bg-purple-50 border border-purple-100'
                         }`}>
-                          {mod.icono || '📦'}
+                          <CategoryIcon icon={mod.icono || 'Package'} size={20} color={isDark ? '#c084fc' : '#9333ea'} />
                         </div>
                         <div className="min-w-0">
                           <h3 className={`font-semibold text-sm mb-0.5 ${isDark ? 'text-white' : 'text-gray-900'}`}>{mod.nombre}</h3>
@@ -790,22 +757,13 @@ export default function ProyectoDetail() {
               )}
 
               {/* Quick access sidebar */}
-              {cfg.results.showAccessLinks !== false && (proyecto.urlDemo || (tieneAcceso && proyecto.tieneUrl)) && (
+              {cfg.results.showAccessLinks !== false && proyecto.urlDemo && (
                 <div className={`rounded-2xl p-5 border space-y-2 ${
                   isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'
                 }`}>
                   <h3 className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                     {cfg.results.accessLinksTitle || 'Acceso directo'}
                   </h3>
-                  {tieneAcceso && proyecto.tieneUrl && (
-                    <button
-                      onClick={handleAcceder}
-                      disabled={accediendo}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl text-sm font-bold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/25 disabled:opacity-50"
-                    >
-                      🚀 Acceder al Sistema
-                    </button>
-                  )}
                   {proyecto.urlDemo && (
                     <a
                       href={proyecto.urlDemo}
@@ -854,8 +812,9 @@ export default function ProyectoDetail() {
                     } ${plan.destacado ? (isDark ? 'bg-purple-900/15' : 'bg-purple-50/60') : ''}`}
                   >
                     {plan.destacado && (
-                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg">
-                        ⭐ Recomendado
+                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-4 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg">
+                        <Star size={10} strokeWidth={1.5} />
+                        Recomendado
                       </span>
                     )}
 
@@ -977,7 +936,8 @@ export default function ProyectoDetail() {
                 className="px-8 py-4 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-purple-500/30"
                 style={{ background: `linear-gradient(to right, ${cfg.cta.primaryGradientFrom || '#9333ea'}, ${cfg.cta.primaryGradientTo || '#4f46e5'})` }}
               >
-                💬 {cfg.cta.primaryButtonText || 'Solicitar cotización'}
+                <MessageSquare size={18} strokeWidth={1.5} />
+                {cfg.cta.primaryButtonText || 'Solicitar cotización'}
               </button>
               <Link
                 to={cfg.cta.secondaryButtonLink || '/sistemas'}

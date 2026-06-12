@@ -6,7 +6,9 @@
 
 import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
+import { MessageSquare } from 'lucide-react';
 import { SITE_CONFIG } from '../../config/siteConfig';
+import { CategoryIcon } from '../servicios/CategoryIcon';
 import type { Servicio } from '../../types/servicios';
 
 // ============================================
@@ -287,11 +289,12 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div 
-                className="text-6xl opacity-80"
-                style={{ color: servicio.colorIcono || '#8B5CF6' }}
-              >
-                {servicio.icono || '🚀'}
+              <div className="opacity-80">
+                <CategoryIcon
+                  icon={servicio.icono || 'Rocket'}
+                  size={72}
+                  color={servicio.colorIcono || '#8B5CF6'}
+                />
               </div>
             </div>
           )}
@@ -314,14 +317,19 @@ export const ServicioPublicCard: React.FC<ServicioPublicCardProps> = ({
               }}
             >
               {servicio.categoria?.icono && (
-                <span className="mr-1">{servicio.categoria.icono}</span>
+                <CategoryIcon
+                  icon={servicio.categoria.icono}
+                  size={12}
+                  className="inline-block mr-1 flex-shrink-0"
+                />
               )}
               {getCategoryName(servicio.categoria)}
             </span>
             
             {servicio.requiereContacto && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                💬 Consulta
+              <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                <MessageSquare size={11} strokeWidth={1.5} />
+                Consulta
               </span>
             )}
           </div>

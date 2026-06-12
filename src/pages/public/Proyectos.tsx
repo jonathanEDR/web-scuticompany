@@ -9,11 +9,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import DOMPurify from 'dompurify';
+import { Rocket, Star, Target, MessageSquare, FolderOpen } from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
+import CategoryIcon from '../../components/servicios/CategoryIcon';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { proyectosApi } from '../../services/proyectosApi';
 import { getPageBySlug } from '../../services/cmsApi';
 import type { Proyecto, ProyectoCategoria } from '../../types/proyecto';
@@ -60,13 +61,11 @@ interface PortfolioCardDesignTheme {
 
 interface ProyectoCardProps {
   proyecto: Proyecto;
-  tieneAcceso: boolean;
-  onAcceder: (id: string) => void;
   theme: string;
   cardDesign?: PortfolioCardDesignTheme;
 }
 
-const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: ProyectoCardProps) => {
+const ProyectoCard = ({ proyecto, theme, cardDesign }: ProyectoCardProps) => {
   const isDark = theme === 'dark';
   const categoriaInfo = PROYECTO_CATEGORIAS[proyecto.categoria] || PROYECTO_CATEGORIAS.otro;
 
@@ -115,7 +114,7 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
               <div className={`w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center ${
                 isDark ? 'bg-white/10 backdrop-blur-sm' : 'bg-purple-100'
               }`}>
-                <span className="text-3xl">{categoriaInfo.icon}</span>
+                <CategoryIcon icon={categoriaInfo.icon} size={32} color={categoriaInfo.color} />
               </div>
               <p className={`text-sm font-medium ${
                 isDark ? 'text-gray-400' : 'text-gray-500'
@@ -128,18 +127,21 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
           <div className="flex gap-2">
             {proyecto.destacado && (
-              <span className="px-2.5 py-1 bg-amber-400/95 backdrop-blur-md text-gray-900 rounded-lg text-xs font-bold shadow-lg">
-                ⭐ Más vendido
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-400/95 backdrop-blur-md text-gray-900 rounded-lg text-xs font-bold shadow-lg">
+                <Star size={10} strokeWidth={1.5} />
+                Más vendido
               </span>
             )}
             {proyecto.rubro && (
-              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold backdrop-blur-md shadow-lg bg-emerald-500/90 text-white">
-                🎯 {proyecto.rubro}
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold backdrop-blur-md shadow-lg bg-emerald-500/90 text-white">
+                <Target size={10} strokeWidth={1.5} />
+                {proyecto.rubro}
               </span>
             )}
           </div>
-          <span className="px-2.5 py-1 rounded-lg text-xs font-medium backdrop-blur-md shadow-lg bg-black/40 text-white border border-white/10">
-            {categoriaInfo.icon} {categoriaInfo.label}
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium backdrop-blur-md shadow-lg bg-black/40 text-white border border-white/10">
+            <CategoryIcon icon={categoriaInfo.icon} size={10} color="white" />
+            {categoriaInfo.label}
           </span>
         </div>
 
@@ -201,7 +203,10 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
                   border: `1px solid ${cd.tagBorder || (isDark ? 'rgba(147,51,234,0.2)' : '#f3e8ff')}`,
                 }}
               >
-                {item.icono ? `${item.icono} ` : ''}{item.nombre}
+                {item.icono && (
+                  <CategoryIcon icon={item.icono} size={11} className="inline-block mr-1 flex-shrink-0" />
+                )}
+                {item.nombre}
               </span>
             ))}
             {(proyecto.modulos?.length || 0) > 4 && (
@@ -274,17 +279,6 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
             Ver sistema →
           </Link>
 
-          {tieneAcceso && proyecto.tieneUrl && (
-            <button
-              onClick={(e) => { e.preventDefault(); onAcceder(proyecto._id); }}
-              className="flex-1 px-4 py-2.5 text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg"
-              style={{
-                background: `linear-gradient(to right, ${cd.accentFrom || '#9333ea'}, ${cd.accentTo || '#4f46e5'})`,
-              }}
-            >
-              🚀 Acceder
-            </button>
-          )}
         </div>
       </div>
     </div>
@@ -297,12 +291,10 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
 
 export default function Proyectos() {
   const { theme } = useTheme();
-  const { user } = useAuth();
   const isDark = theme === 'dark';
 
   // State
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
-  const [misProyectoIds, setMisProyectoIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoriaActiva, setCategoriaActiva] = useState<string>('all');
   const [categoriasDisponibles, setCategoriasDisponibles] = useState<{ value: string; label: string; count: number }[]>([]);
@@ -316,12 +308,6 @@ export default function Proyectos() {
   useEffect(() => {
     cargarDatos();
   }, [categoriaActiva]);
-
-  useEffect(() => {
-    if (user) {
-      cargarMisProyectos();
-    }
-  }, [user]);
 
   // 🆕 Cargar datos del CMS (sin caché la primera vez para evitar datos obsoletos)
   const loadCmsData = () => {
@@ -370,24 +356,6 @@ export default function Proyectos() {
       console.error('Error cargando proyectos:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const cargarMisProyectos = async () => {
-    try {
-      const res = await proyectosApi.getMisProyectos();
-      setMisProyectoIds(res.data.map((p: Proyecto) => p._id));
-    } catch {
-      // No logueado o sin proyectos asignados
-    }
-  };
-
-  const handleAcceder = async (id: string) => {
-    try {
-      const data = await proyectosApi.accederProyecto(id);
-      window.open(data.url, '_blank', 'noopener,noreferrer');
-    } catch (error: any) {
-      alert(error.message || 'Error al acceder al sistema');
     }
   };
 
@@ -547,7 +515,8 @@ export default function Proyectos() {
             <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6 ${
               isDark ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-purple-100 text-purple-700'
             }`}>
-              🚀 {heroBadgeText}
+              <Rocket size={14} strokeWidth={1.5} />
+              {heroBadgeText}
             </span>
 
             <h1
@@ -639,7 +608,8 @@ export default function Proyectos() {
                       : { background: filterInactiveBg, color: filterInactiveText, border: `1px solid ${filterInactiveBorder}`, borderRadius: `${filterRadius}px` }
                     }
                   >
-                    {info?.icon || '📁'} {cat.label} ({cat.count})
+                    <CategoryIcon icon={info?.icon || 'Folder'} size={13} className="inline-block mr-1 flex-shrink-0" />
+                    {cat.label} ({cat.count})
                   </button>
                 );
               })}
@@ -662,8 +632,6 @@ export default function Proyectos() {
                   <ProyectoCard
                     key={proyecto._id}
                     proyecto={proyecto}
-                    tieneAcceso={misProyectoIds.includes(proyecto._id)}
-                    onAcceder={handleAcceder}
                     theme={theme}
                     cardDesign={activeCardDesign}
                   />
@@ -674,7 +642,9 @@ export default function Proyectos() {
             {/* Empty state */}
             {!loading && proyectos.length === 0 && (
               <div className="text-center py-20">
-                <div className="text-6xl mb-4">📁</div>
+                <div className="flex justify-center mb-4">
+                  <FolderOpen size={60} strokeWidth={1.5} className={isDark ? 'text-gray-600' : 'text-gray-400'} />
+                </div>
                 <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   No hay sistemas en esta categoría
                 </h3>
@@ -725,7 +695,8 @@ export default function Proyectos() {
                 color: ctaBtnText,
               }}
             >
-              💬 {ctaButtonText}
+              <MessageSquare size={18} strokeWidth={1.5} />
+              {ctaButtonText}
             </Link>
           </div>
         </section>

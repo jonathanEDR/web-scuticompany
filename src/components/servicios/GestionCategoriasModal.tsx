@@ -5,7 +5,9 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { Tag, X, Plus } from 'lucide-react';
 import { categoriasApi, type Categoria } from '../../services/categoriasApi';
+import { CategoryIcon } from './CategoryIcon';
 
 interface GestionCategoriasModalProps {
   isOpen: boolean;
@@ -13,9 +15,13 @@ interface GestionCategoriasModalProps {
   onCategoryChange?: () => void;
 }
 
+// Nombres de iconos Lucide (renderizados con <CategoryIcon />).
+// Las categorías antiguas con emoji se siguen mostrando tal cual hasta que se editen.
 const ICONOS_DISPONIBLES = [
-  '💻', '🎨', '📈', '🤝', '🔧', '📦', '⚙️', '🚀', '💡', '📱',
-  '🌐', '📊', '🎯', '💰', '📝', '🔍', '⭐', '🔥', '💎', '🎪'
+  'Code', 'Palette', 'TrendingUp', 'Handshake', 'Wrench', 'Package',
+  'Settings', 'Rocket', 'Lightbulb', 'Smartphone', 'Globe', 'BarChart3',
+  'Target', 'DollarSign', 'FileText', 'Search', 'Star', 'Flame',
+  'Gem', 'Sparkles', 'Brain', 'GraduationCap', 'Database', 'Shield',
 ];
 
 const COLORES_DISPONIBLES = [
@@ -37,7 +43,7 @@ function GestionCategoriasModal({
     defaultValues: {
       nombre: '',
       descripcion: '',
-      icono: '📦',
+      icono: 'Package',
       color: '#3B82F6'
     }
   });
@@ -70,7 +76,7 @@ function GestionCategoriasModal({
     reset({
       nombre: '',
       descripcion: '',
-      icono: '📦',
+      icono: 'Package',
       color: '#3B82F6'
     });
     setShowForm(true);
@@ -141,14 +147,15 @@ function GestionCategoriasModal({
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
-            🏷️ Gestión de Categorías
+          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <Tag size={20} strokeWidth={1.5} className="text-[color:var(--srv-from,#9333ea)]" />
+            Gestión de Categorías
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+            className="text-gray-400 hover:text-gray-600"
           >
-            ×
+            <X size={20} strokeWidth={1.5} />
           </button>
         </div>
 
@@ -159,9 +166,10 @@ function GestionCategoriasModal({
             <div className="mb-6">
               <button
                 onClick={handleCreate}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                className="text-white px-4 py-2 rounded-lg hover:brightness-110 transition-all flex items-center gap-2"
+                style={{ background: `linear-gradient(to right, var(--srv-from, #9333ea), var(--srv-to, #7e22ce))` }}
               >
-                <span>+</span>
+                <Plus size={16} strokeWidth={2} />
                 Nueva Categoría
               </button>
             </div>
@@ -184,7 +192,7 @@ function GestionCategoriasModal({
                     </label>
                     <input
                       {...register('nombre', { required: 'El nombre es obligatorio' })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[color:var(--srv-via,#a855f7)] focus:border-[color:var(--srv-via,#a855f7)]"
                       placeholder="Ej: Desarrollo Web"
                     />
                     {errors.nombre && (
@@ -199,7 +207,7 @@ function GestionCategoriasModal({
                     </label>
                     <textarea
                       {...register('descripcion')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[color:var(--srv-via,#a855f7)] focus:border-[color:var(--srv-via,#a855f7)]"
                       placeholder="Descripción de la categoría"
                       rows={2}
                     />
@@ -211,20 +219,33 @@ function GestionCategoriasModal({
                   
                   {/* Icono */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Icono: <span className="text-2xl ml-2">{watchedIcon}</span>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      Icono:
+                      <CategoryIcon icon={watchedIcon} size={20} color={watchedColor} />
                     </label>
-                    <div className="grid grid-cols-10 gap-2">
+                    <div className="grid grid-cols-8 gap-2">
                       {ICONOS_DISPONIBLES.map((icono) => (
                         <button
                           key={icono}
                           type="button"
                           onClick={() => setValue('icono', icono)}
-                          className={`p-2 text-xl border rounded-md hover:bg-gray-50 ${
-                            watchedIcon === icono ? 'border-purple-500 bg-purple-50' : 'border-gray-300'
+                          className={`p-2 border rounded-md hover:bg-gray-50 flex items-center justify-center ${
+                            watchedIcon === icono
+                              ? 'border-[color:var(--srv-from,#a855f7)]'
+                              : 'border-gray-300'
                           }`}
+                          style={
+                            watchedIcon === icono
+                              ? { backgroundColor: 'color-mix(in srgb, var(--srv-from, #9333ea) 10%, transparent)' }
+                              : undefined
+                          }
+                          title={icono}
                         >
-                          {icono}
+                          <CategoryIcon
+                            icon={icono}
+                            size={18}
+                            className={watchedIcon === icono ? 'text-[color:var(--srv-from,#9333ea)]' : 'text-gray-600'}
+                          />
                         </button>
                       ))}
                     </div>
@@ -259,11 +280,11 @@ function GestionCategoriasModal({
                 {/* Vista previa */}
                 <div className="bg-white p-3 rounded-md border">
                   <p className="text-sm font-medium text-gray-700 mb-2">Vista previa:</p>
-                  <span 
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white"
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium text-white"
                     style={{ backgroundColor: watchedColor }}
                   >
-                    <span className="mr-1">{watchedIcon}</span>
+                    <CategoryIcon icon={watchedIcon} size={14} />
                     {watch('nombre') || 'Nombre de la categoría'}
                   </span>
                 </div>
@@ -273,7 +294,8 @@ function GestionCategoriasModal({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 disabled:opacity-50"
+                    className="text-white px-4 py-2 rounded-md hover:brightness-110 transition-all disabled:opacity-50"
+                    style={{ background: `linear-gradient(to right, var(--srv-from, #9333ea), var(--srv-to, #7e22ce))` }}
                   >
                     {loading ? 'Guardando...' : editingCategory ? 'Actualizar' : 'Crear'}
                   </button>
@@ -305,11 +327,11 @@ function GestionCategoriasModal({
                     className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <span 
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white"
+                      <span
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium text-white"
                         style={{ backgroundColor: categoria.color }}
                       >
-                        <span className="mr-1">{categoria.icono}</span>
+                        <CategoryIcon icon={categoria.icono} size={14} />
                         {categoria.nombre}
                       </span>
                       <div className="text-sm text-gray-600">

@@ -7,7 +7,7 @@
  * - Acciones rápidas desde las tarjetas de servicio
  */
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServicios } from '../../hooks/useServicios';
 import { useNotification } from '../../hooks/useNotification';
@@ -26,47 +26,22 @@ import useServicesCanvas, { servicioToServiceContext } from '../../hooks/useServ
 import type { ServicioFilters, SortOption } from '../../types/filters';
 import { SORT_OPTIONS } from '../../types/filters';
 import type { Servicio } from '../../types/servicios';
-import { Sparkles } from 'lucide-react';
-
-// ============================================
-// ICONOS
-// ============================================
-
-const PlusIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-  </svg>
-);
-
-const FilterIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-  </svg>
-);
-
-const GridIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-  </svg>
-);
-
-const ListIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-  </svg>
-);
-
-const RefreshIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-  </svg>
-);
-
-const ArrowLeftIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-  </svg>
-);
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
+import {
+  Sparkles,
+  Plus,
+  Filter,
+  LayoutGrid,
+  List,
+  RefreshCw,
+  ArrowLeft,
+  Home,
+  ClipboardList,
+  Tag,
+  Search,
+  ChevronDown,
+  Check,
+} from 'lucide-react';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -76,6 +51,14 @@ export const ServiciosManagementOptimized = () => {
   const navigate = useNavigate();
   const { success, error: showError } = useNotification();
   const { shouldUseClientDashboard } = useAuth();
+
+  // Colores del tema dinámico (mismo origen que el Sidebar/CMS)
+  const { headerGradient, colors } = useDashboardHeaderGradient();
+  const themeVars = {
+    '--srv-from': colors.from,
+    '--srv-via': colors.via,
+    '--srv-to': colors.to,
+  } as CSSProperties;
   
   // Services Canvas hook
   const { 
@@ -287,8 +270,9 @@ export const ServiciosManagementOptimized = () => {
     resetLoadMore();
   };
 
-  const handleRefresh = () => {
-    window.location.reload();
+  const handleRefresh = async () => {
+    invalidateAllCache();
+    await refresh();
   };
 
   const handleOpenGlobalServicesCanvas = () => {
@@ -300,80 +284,91 @@ export const ServiciosManagementOptimized = () => {
   // ============================================
 
   return (
-    <div className="w-full bg-gray-50 dark:bg-gray-900">
+    <div className="w-full bg-gray-50 dark:bg-gray-900" style={themeVars}>
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-            <div className="flex-1 min-w-0">
-              {/* Breadcrumb Navigation */}
-              <nav className="flex items-center gap-1 sm:gap-2 mb-3" aria-label="Breadcrumb">
+          {/* Breadcrumb Navigation */}
+          <nav className="flex items-center gap-1 sm:gap-2 mb-3" aria-label="Breadcrumb">
+            <button
+              onClick={() => navigate(dashboardPath)}
+              className="inline-flex items-center gap-1.5 px-2 py-1.5 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[color:var(--srv-from)] transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent"
+            >
+              <ArrowLeft size={18} strokeWidth={1.5} />
+              <span className="hidden xs:inline">
+                {shouldUseClientDashboard ? 'Panel Cliente' : 'Dashboard Admin'}
+              </span>
+              <span className="xs:hidden">
+                <Home size={16} strokeWidth={1.5} />
+              </span>
+            </button>
+            <span className="text-gray-400 dark:text-gray-600 text-sm">/</span>
+            <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-900 dark:text-white px-2 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <ClipboardList size={14} strokeWidth={1.5} className="text-[color:var(--srv-from)]" />
+              <span className="hidden sm:inline">Gestión de&nbsp;</span>Servicios
+            </span>
+          </nav>
+
+          {/* Banner con gradiente dinámico (consistente con Agenda) */}
+          <div
+            className="rounded-xl md:rounded-2xl p-4 md:p-6 shadow-xl mb-4"
+            style={{ background: headerGradient }}
+          >
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <ClipboardList size={28} strokeWidth={1.5} className="text-white" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white mb-0.5">
+                    Gestión de Servicios
+                  </h1>
+                  <p className="text-sm text-white/80">
+                    {totalItems} servicios totales
+                    {activeFiltersCount > 0 && ` • ${activeFiltersCount} filtro${activeFiltersCount > 1 ? 's' : ''} activo${activeFiltersCount > 1 ? 's' : ''}`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                 <button
-                  onClick={() => navigate(dashboardPath)}
-                  className="inline-flex items-center gap-1.5 px-2 py-1.5 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                  className="px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors flex items-center gap-2 disabled:opacity-50 flex-shrink-0"
+                  title="Refrescar"
                 >
-                  <ArrowLeftIcon />
-                  <span className="hidden xs:inline">
-                    {shouldUseClientDashboard ? 'Panel Cliente' : 'Dashboard Admin'}
-                  </span>
-                  <span className="xs:hidden">🏠</span>
+                  <RefreshCw size={18} strokeWidth={1.5} />
+                  <span className="hidden sm:inline">Refrescar</span>
                 </button>
-                <span className="text-gray-400 dark:text-gray-600 text-sm">/</span>
-                <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white px-2 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  📋 <span className="hidden sm:inline">Gestión de </span>Servicios
-                </span>
-              </nav>
 
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                📋 Gestión de Servicios
-              </h1>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-2">
-                {totalItems} servicios totales
-                {activeFiltersCount > 0 && ` • ${activeFiltersCount} filtro${activeFiltersCount > 1 ? 's' : ''} activo${activeFiltersCount > 1 ? 's' : ''}`}
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <button
-                onClick={handleRefresh}
-                disabled={loading}
-                className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 disabled:opacity-50 flex-shrink-0"
-                title="Refrescar"
-              >
-                <RefreshIcon />
-                <span className="hidden sm:inline">Refrescar</span>
-              </button>
-              
-              {/* ⚠️ Cache removido - Ahora se usa CacheConfig centralizado del backend */}
-              
-              <button
-                onClick={() => setShowCategoriesModal(true)}
-                className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm flex-shrink-0"
-                title="Gestionar Categorías"
-              >
-                <span>🏷️</span>
-                <span className="hidden md:inline">Categorías</span>
-                <span className="hidden lg:inline">Gestionar Categorías</span>
-              </button>
+                <button
+                  onClick={() => setShowCategoriesModal(true)}
+                  className="px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors flex items-center gap-2 flex-shrink-0"
+                  title="Gestionar Categorías"
+                >
+                  <Tag size={18} strokeWidth={1.5} />
+                  <span className="hidden md:inline">Categorías</span>
+                </button>
 
-              <button
-                onClick={handleOpenGlobalServicesCanvas}
-                className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 flex-shrink-0"
-                title="🤖 Services Canvas IA - Análisis de portafolio, pricing inteligente y generación de contenido"
-              >
-                <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">Services Canvas</span>
-                <span className="sm:hidden">🤖 IA</span>
-              </button>
-              
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-sm flex-1 sm:flex-none justify-center sm:justify-start"
-              >
-                <PlusIcon />
-                <span className="hidden sm:inline">Nuevo Servicio</span>
-                <span className="sm:hidden">Nuevo</span>
-              </button>
+                <button
+                  onClick={handleOpenGlobalServicesCanvas}
+                  className="px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 flex-shrink-0"
+                  title="Services Canvas IA - Análisis de portafolio, pricing inteligente y generación de contenido"
+                >
+                  <Sparkles size={18} strokeWidth={1.5} />
+                  <span className="hidden sm:inline">Services Canvas</span>
+                  <span className="sm:hidden">IA</span>
+                </button>
+
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="px-4 sm:px-5 py-2 bg-white text-[color:var(--srv-from)] rounded-lg font-semibold hover:bg-white/90 transition-all shadow-lg flex items-center gap-2 flex-1 sm:flex-none justify-center"
+                >
+                  <Plus size={18} strokeWidth={2} />
+                  <span className="hidden sm:inline">Nuevo Servicio</span>
+                  <span className="sm:hidden">Nuevo</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -392,17 +387,25 @@ export const ServiciosManagementOptimized = () => {
               className={`
                 px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 relative
                 ${showFilters
-                  ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300'
+                  ? 'border-[color:var(--srv-from)] text-[color:var(--srv-from)]'
                   : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }
               `}
+              style={
+                showFilters
+                  ? { backgroundColor: 'color-mix(in srgb, var(--srv-from) 10%, transparent)' }
+                  : undefined
+              }
               title={showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
             >
-              <FilterIcon />
+              <Filter size={18} strokeWidth={1.5} />
               <span className="hidden sm:inline">Filtros</span>
               <span className="sm:hidden">{showFilters ? 'Ocultar' : 'Filtros'}</span>
               {activeFiltersCount > 0 && (
-                <span className="px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
+                <span
+                  className="px-2 py-0.5 text-white text-xs rounded-full"
+                  style={{ backgroundColor: 'var(--srv-from)' }}
+                >
                   {activeFiltersCount}
                 </span>
               )}
@@ -423,26 +426,36 @@ export const ServiciosManagementOptimized = () => {
                 className={`
                   p-2 rounded-lg transition-colors
                   ${viewMode === 'grid'
-                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+                    ? 'text-[color:var(--srv-from)]'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }
                 `}
+                style={
+                  viewMode === 'grid'
+                    ? { backgroundColor: 'color-mix(in srgb, var(--srv-from) 12%, transparent)' }
+                    : undefined
+                }
                 title="Vista en cuadrícula"
               >
-                <GridIcon />
+                <LayoutGrid size={18} strokeWidth={1.5} />
               </button>
               <button
                 onClick={() => setViewMode('list')}
                 className={`
                   p-2 rounded-lg transition-colors
                   ${viewMode === 'list'
-                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+                    ? 'text-[color:var(--srv-from)]'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }
                 `}
+                style={
+                  viewMode === 'list'
+                    ? { backgroundColor: 'color-mix(in srgb, var(--srv-from) 12%, transparent)' }
+                    : undefined
+                }
                 title="Vista en lista"
               >
-                <ListIcon />
+                <List size={18} strokeWidth={1.5} />
               </button>
             </div>
           </div>
@@ -479,7 +492,7 @@ export const ServiciosManagementOptimized = () => {
               <SkeletonGrid items={12} columns={viewMode === 'grid' ? 3 : 1} />
             ) : visibleData.length === 0 ? (
               <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700">
-                <div className="text-6xl mb-4">🔍</div>
+                <Search size={56} strokeWidth={1.5} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                   No se encontraron servicios
                 </h3>
@@ -492,7 +505,8 @@ export const ServiciosManagementOptimized = () => {
                 {(searchTerm || activeFiltersCount > 0) && (
                   <button
                     onClick={handleResetFilters}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    className="px-4 py-2 text-white rounded-lg transition-all hover:brightness-110"
+                    style={{ background: `linear-gradient(to right, var(--srv-from), var(--srv-to))` }}
                   >
                     Limpiar filtros
                   </button>
@@ -535,11 +549,10 @@ export const ServiciosManagementOptimized = () => {
                     </p>
                     <button
                       onClick={loadMore}
-                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
+                      className="px-6 py-3 text-white rounded-xl transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 hover:brightness-110 font-medium"
+                      style={{ background: `linear-gradient(to right, var(--srv-from), var(--srv-to))` }}
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
+                      <ChevronDown size={18} strokeWidth={1.5} />
                       Ver más ({remainingItems} restantes)
                     </button>
                   </div>
@@ -548,8 +561,9 @@ export const ServiciosManagementOptimized = () => {
                 {/* Indicador cuando se muestran todos */}
                 {!hasMore && totalItems > 0 && (
                   <div className="flex justify-center mt-6 mb-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full">
-                      ✓ Mostrando todos los {totalItems} servicios
+                    <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full inline-flex items-center gap-1.5">
+                      <Check size={14} strokeWidth={1.5} className="text-green-500" />
+                      Mostrando todos los {totalItems} servicios
                     </p>
                   </div>
                 )}

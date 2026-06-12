@@ -29,7 +29,7 @@ export const SimpleHeroSection: React.FC<SimpleHeroSectionProps> = ({
   }, [searchQuery]);
 
   // Obtener configuración del CMS y tema actual
-  const { config } = useBlogCmsConfig();
+  const { config, loading } = useBlogCmsConfig();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const blogHero = config?.blogHero || DEFAULT_BLOG_HERO_CONFIG;
@@ -109,8 +109,47 @@ export const SimpleHeroSection: React.FC<SimpleHeroSectionProps> = ({
     }
   };
 
+  // Mientras el CMS carga (sin caché): skeleton neutro sin colores del tema
+  if (loading) {
+    const skeletonBg = isDarkMode ? '#111827' : '#f3f4f6';
+    const barColor = isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+    return (
+      <section
+        className="animate-pulse"
+        style={{ backgroundColor: skeletonBg }}
+      >
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            {/* Título skeleton */}
+            <div className="flex justify-center items-center gap-3 flex-wrap">
+              <div className="h-12 w-36 rounded-lg" style={{ backgroundColor: barColor }} />
+              <div className="h-12 w-52 rounded-lg" style={{ backgroundColor: barColor }} />
+            </div>
+            {/* Subtítulo skeleton */}
+            <div className="flex justify-center">
+              <div className="h-5 w-72 rounded-full" style={{ backgroundColor: barColor }} />
+            </div>
+            {/* Stats skeleton */}
+            <div className="flex justify-center gap-10">
+              <div className="space-y-2">
+                <div className="h-8 w-14 rounded mx-auto" style={{ backgroundColor: barColor }} />
+                <div className="h-4 w-20 rounded mx-auto" style={{ backgroundColor: barColor }} />
+              </div>
+              <div className="space-y-2">
+                <div className="h-8 w-14 rounded mx-auto" style={{ backgroundColor: barColor }} />
+                <div className="h-4 w-20 rounded mx-auto" style={{ backgroundColor: barColor }} />
+              </div>
+            </div>
+            {/* Barra de búsqueda skeleton */}
+            <div className="max-w-xl mx-auto h-14 rounded-full" style={{ backgroundColor: barColor }} />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section 
+    <section
       className="text-white"
       style={{
         ...getBackgroundStyle(),
@@ -137,14 +176,14 @@ export const SimpleHeroSection: React.FC<SimpleHeroSectionProps> = ({
                   : '0',
               }}
             >
-              {blogHero.title || 'Blog'}
+              {blogHero.title}
             </span>
             {/* Texto destacado con soporte para fondo + gradiente */}
-            {(() => {
+            {blogHero.titleHighlight && (() => {
               const { containerStyle, textStyle } = getHighlightStyles();
               return (
                 <span style={containerStyle}>
-                  <span style={textStyle}>{blogHero.titleHighlight || 'Tech'}</span>
+                  <span style={textStyle}>{blogHero.titleHighlight}</span>
                 </span>
               );
             })()}
@@ -155,7 +194,7 @@ export const SimpleHeroSection: React.FC<SimpleHeroSectionProps> = ({
             className="text-lg mb-8"
             style={{ color: blogHero.styles?.light?.subtitleColor || '#bfdbfe' }}
           >
-            {blogHero.subtitle || 'Las últimas noticias y tendencias tecnológicas'}
+            {blogHero.subtitle}
           </p>
 
           {/* Stats Simple */}

@@ -116,7 +116,7 @@ export const ServicioFormV3: React.FC = () => {
       precio: 0,
       moneda: 'PEN',
       estado: 'activo',
-      icono: '🚀',
+      icono: 'Rocket',
       destacado: false,
       activo: true,
       visibleEnWeb: true,
@@ -163,21 +163,21 @@ export const ServicioFormV3: React.FC = () => {
     {
       id: 'basic',
       title: 'Información Básica',
-      icon: '📋',
+      icon: 'ClipboardList',
       description: 'Datos principales del servicio',
       isValid: Boolean(watch('titulo') && watch('descripcion'))
     },
     {
       id: 'pricing',
       title: 'Precios y Comercial',
-      icon: '💰',
+      icon: 'DollarSign',
       description: 'Configuración de precios y promociones',
       isValid: Boolean(watch('precio') !== undefined)
     },
     {
       id: 'visual',
       title: 'Diseño Visual',
-      icon: '🎨',
+      icon: 'Palette',
       description: 'Icono, colores y elementos visuales',
       isOptional: true,
       isCompleted: Boolean(watch('icono') || watch('colorPrimario') || watch('colorSecundario'))
@@ -185,7 +185,7 @@ export const ServicioFormV3: React.FC = () => {
     {
       id: 'advanced',
       title: 'Contenido Avanzado',
-      icon: '✨',
+      icon: 'Sparkles',
       description: 'Descripción rica, video, galería',
       isOptional: true,
       isCompleted: Boolean(watch('descripcionRica') || watch('videoUrl') || galeriaImagenes?.length || watch('contenidoAdicional'))
@@ -193,7 +193,7 @@ export const ServicioFormV3: React.FC = () => {
     {
       id: 'features',
       title: 'Características',
-      icon: '⚡',
+      icon: 'Zap',
       description: 'Beneficios, incluye/excluye, FAQ',
       isOptional: true,
       isCompleted: Boolean(
@@ -207,7 +207,7 @@ export const ServicioFormV3: React.FC = () => {
     {
       id: 'settings',
       title: 'Configuraciones',
-      icon: '⚙️',
+      icon: 'Settings',
       description: 'Estado, visibilidad y opciones avanzadas',
       isValid: true
     }
@@ -568,18 +568,18 @@ export const ServicioFormV3: React.FC = () => {
       if (response.success && response.data?.content) {
         // Generar etiqueta promocional inteligente basada en el contenido
         const etiquetasComunes = [
-          '¡NUEVO!', '🔥 POPULAR', '⭐ RECOMENDADO', '🚀 INNOVADOR', 
-          '💡 ESPECIALISTA', '✨ PREMIUM', '🎯 PERSONALIZADO', '🏆 EXPERTO'
+          '¡NUEVO!', 'POPULAR', 'RECOMENDADO', 'INNOVADOR',
+          'ESPECIALISTA', 'PREMIUM', 'PERSONALIZADO', 'EXPERTO'
         ];
         
         let etiqueta = '';
         if (serviceInfo.categoria?.toLowerCase().includes('consultor')) {
-          etiqueta = '💡 ESPECIALISTA';
-        } else if (serviceInfo.titulo?.toLowerCase().includes('desarrollo') || 
+          etiqueta = 'ESPECIALISTA';
+        } else if (serviceInfo.titulo?.toLowerCase().includes('desarrollo') ||
                    serviceInfo.titulo?.toLowerCase().includes('diseño')) {
-          etiqueta = '🚀 INNOVADOR';
+          etiqueta = 'INNOVADOR';
         } else if (serviceInfo.categoria?.toLowerCase().includes('marketing')) {
-          etiqueta = '🔥 POPULAR';
+          etiqueta = 'POPULAR';
         } else {
           etiqueta = etiquetasComunes[Math.floor(Math.random() * etiquetasComunes.length)];
         }

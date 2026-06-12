@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { Check, Settings, Pause, XCircle, Ban, type LucideIcon } from 'lucide-react';
 
 // ============================================
 // CONFIGURACIÓN DE ESTADOS
@@ -13,7 +14,7 @@ interface EstadoConfig {
   label: string;
   color: string;
   bgColor: string;
-  icon: string;
+  icon: LucideIcon;
 }
 
 const estadoConfig: Record<string, EstadoConfig> = {
@@ -21,31 +22,31 @@ const estadoConfig: Record<string, EstadoConfig> = {
     label: 'Activo',
     color: 'text-green-700 dark:text-green-300',
     bgColor: 'bg-green-500/20 border-green-500/50',
-    icon: '✓'
+    icon: Check
   },
   desarrollo: {
     label: 'En desarrollo',
     color: 'text-blue-700 dark:text-blue-300',
     bgColor: 'bg-blue-500/20 border-blue-500/50',
-    icon: '⚙️'
+    icon: Settings
   },
   pausado: {
     label: 'Pausado',
     color: 'text-yellow-700 dark:text-yellow-300',
     bgColor: 'bg-yellow-500/20 border-yellow-500/50',
-    icon: '⏸️'
+    icon: Pause
   },
   descontinuado: {
     label: 'Descontinuado',
     color: 'text-red-700 dark:text-red-300',
     bgColor: 'bg-red-500/20 border-red-500/50',
-    icon: '❌'
+    icon: XCircle
   },
   agotado: {
     label: 'Agotado',
     color: 'text-gray-700 dark:text-gray-300',
     bgColor: 'bg-gray-500/20 border-gray-500/50',
-    icon: '🚫'
+    icon: Ban
   }
 };
 
@@ -81,6 +82,7 @@ export const EstadoBadge: React.FC<EstadoBadgeProps> = ({
 }) => {
   // Obtener configuración del estado
   const config = estadoConfig[estado.toLowerCase()] || estadoConfig.activo;
+  const Icon = config.icon;
 
   // Tamaños
   const sizeClasses = {
@@ -89,10 +91,12 @@ export const EstadoBadge: React.FC<EstadoBadgeProps> = ({
     lg: 'text-base px-4 py-1.5'
   };
 
+  const iconSizes = { sm: 12, md: 14, lg: 16 };
+
   return (
     <span
       className={`
-        inline-flex items-center gap-1.5 
+        inline-flex items-center gap-1.5
         ${sizeClasses[size]}
         ${config.color}
         ${config.bgColor}
@@ -101,7 +105,7 @@ export const EstadoBadge: React.FC<EstadoBadgeProps> = ({
       `}
       title={`Estado: ${config.label}`}
     >
-      {showIcon && <span className="text-sm">{config.icon}</span>}
+      {showIcon && <Icon size={iconSizes[size]} strokeWidth={1.5} />}
       <span>{config.label}</span>
     </span>
   );

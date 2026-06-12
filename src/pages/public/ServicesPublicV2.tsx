@@ -7,9 +7,11 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
+import { AlertCircle, RefreshCw, HelpCircle } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import PublicHeader from '../../components/public/PublicHeader';
 import PublicFooter from '../../components/public/PublicFooter';
+import { CategoryIcon } from '../../components/servicios/CategoryIcon';
 import FloatingChatWidget from '../../components/floating-chat/FloatingChatWidget';
 import { ServicioPublicCard } from '../../components/public/ServicioPublicCard';
 import { ServicesAccordionList } from '../../components/public/ServicesAccordionList';
@@ -1364,13 +1366,16 @@ const ServicesPublicV2 = () => {
                 {/* Estado de error con animación */}
                 {error && (
                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center mb-8 animate-scale-in">
-                    <div className="text-4xl mb-2 animate-bounce">❌</div>
+                    <div className="flex justify-center mb-2 animate-bounce">
+                      <AlertCircle size={40} strokeWidth={1.5} className="text-red-500" />
+                    </div>
                     <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
                     <button
                       onClick={() => recargarConInvalidacion()}
-                      className="mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                      className="mt-4 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105"
                     >
-                      🔄 Recargar servicios
+                      <RefreshCw size={14} strokeWidth={1.5} />
+                      Recargar servicios
                     </button>
                   </div>
                 )}
@@ -1637,7 +1642,7 @@ const ServicesPublicV2 = () => {
                   const titleColor = currentTheme === 'dark' ? (process.titleColorDark || '#ffffff') : (process.titleColor || '#111827');
                   const subtitleColor = currentTheme === 'dark' ? (process.subtitleColorDark || '#9ca3af') : (process.subtitleColor || '#6b7280');
 
-                  const stepIcons = ['🔍', '📐', '⚡', '🚀', '🔧', '📊'];
+                  const stepIcons = ['Search', 'PenTool', 'Zap', 'Rocket', 'Wrench', 'BarChart3'];
                   const stepColors = [
                     'from-purple-500 to-indigo-500',
                     'from-blue-500 to-cyan-500',
@@ -1682,7 +1687,7 @@ const ServicesPublicV2 = () => {
                                         <div className={`md:hidden w-10 h-10 rounded-full bg-gradient-to-br ${stepColors[index % stepColors.length]} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                                           {index + 1}
                                         </div>
-                                        <span className="text-2xl">{stepIcons[index % stepIcons.length]}</span>
+                                        <CategoryIcon icon={stepIcons[index % stepIcons.length]} size={24} className="text-white" />
                                         <h3 className={`text-lg font-bold ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{step.title}</h3>
                                       </div>
                                       <p className={`leading-relaxed ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{step.description}</p>
@@ -1717,7 +1722,9 @@ const ServicesPublicV2 = () => {
                     <section className="relative py-20">
                       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
-                          <span className="text-4xl mb-4 block">❓</span>
+                          <div className="flex justify-center mb-4">
+                            <HelpCircle size={40} strokeWidth={1.5} className="text-purple-400" />
+                          </div>
                           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: titleColor }}>{title}</h2>
                         </div>
                         
