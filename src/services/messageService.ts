@@ -20,6 +20,7 @@ import type {
   TemplateListResponse,
   UnreadMessagesResponse,
   SearchMessagesResponse,
+  ConversationListResponse,
   ApiResponse,
 } from '../types/message.types';
 
@@ -275,42 +276,29 @@ export const messageService = {
   },
 
   /**
-   * � Obtener todos los mensajes
-   * GET /api/crm/messages/search (sin filtros de búsqueda)
+   * 🗂️ Obtener conversaciones (último mensaje por lead + contadores)
+   * GET /api/crm/messages/conversations
+   * Agrupación y paginación se hacen en el servidor
    */
-  getAllMessages: async (filters: Partial<MessageFilters> = {}): Promise<SearchMessagesResponse> => {
+  getConversations: async (
+    filters: { page?: number; limit?: number } = {}
+  ): Promise<ConversationListResponse> => {
     try {
-      const params: any = {
+      const params = {
         page: filters.page || 1,
         limit: filters.limit || 50,
-        sortBy: filters.sortBy || 'createdAt',
-        sortOrder: filters.sortOrder || 'desc',
       };
 
-      // Solo agregar filtros si existen (sin search)
-      if (filters.tipo && filters.tipo !== 'all') {
-        params.tipo = filters.tipo;
-      }
-      if (filters.leido !== undefined) {
-        params.leido = filters.leido;
-      }
-      if (filters.esPrivado !== undefined) {
-        params.esPrivado = filters.esPrivado;
-      }
-      if (filters.incluirPrivados !== undefined) {
-        params.incluirPrivados = filters.incluirPrivados;
-      }
-
-      const response = await api.get('/messages/search', { params });
+      const response = await api.get('/messages/conversations', { params });
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error obteniendo todos los mensajes:', error);
+      console.error('❌ Error obteniendo conversaciones:', error);
       throw error.response?.data || error;
     }
   },
 
   /**
-   * �🔍 Buscar mensajes
+   * 🔍 Buscar mensajes
    * GET /api/crm/messages/search
    */
   searchMessages: async (
@@ -555,6 +543,30 @@ export const formatRelativeTime = (date: string | Date): string => {
 };
 
 /**
+ * Extraer el ID de un leadId que puede venir como string o poblado como objeto
+ */
+export const extractLeadId = (leadId: LeadMessage['leadId']): string => {
+  return typeof leadId === 'object' && leadId !== null ? leadId._id : leadId;
+};
+
+/**
+ * Determinar si un mensaje fue enviado por el equipo (no por el cliente)
+ */
+export const isMessageFromTeam = (message: LeadMessage): boolean => {
+  // Criterio 1: El tipo de mensaje NO es respuesta_cliente
+  const notClientResponse = message.tipo !== 'respuesta_cliente';
+
+  // Criterio 2: El autor tiene rol de admin/moderador/sistema
+  const isTeamRole = ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'SYSTEM'].includes(message.autor?.rol || '');
+
+  // Criterio 3: El autor se llama "Sistema" o "SCUTI" (mensajes automáticos)
+  const isSystemAuthor = message.autor?.nombre?.toLowerCase().includes('sistema') ||
+                         message.autor?.nombre?.toLowerCase().includes('scuti');
+
+  return notClientResponse || isTeamRole || !!isSystemAuthor;
+};
+
+/**
  * Contar mensajes no leídos en un array
  */
 export const countUnreadMessages = (messages: LeadMessage[]): number => {
@@ -645,6 +657,8 @@ export default {
     validateMessageContent,
     extractVariables,
     formatRelativeTime,
+    extractLeadId,
+    isMessageFromTeam,
     countUnreadMessages,
     filterMessages,
     groupMessagesByDate,

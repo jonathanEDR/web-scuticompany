@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Search, Bell, CheckCheck, Lock } from 'lucide-react';
 import type { MessageFilters as IMessageFilters, MessageType, MessageStats } from '../../../types/message.types';
 import { MESSAGE_TYPE_LABELS } from '../../../types/message.types';
 
@@ -115,7 +116,7 @@ export const MessageFiltersComponent: React.FC<MessageFiltersProps> = ({
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-            <span className="text-blue-600 dark:text-blue-400">🔍</span>
+            <Search size={16} strokeWidth={1.5} className="text-blue-600 dark:text-blue-400" />
           </div>
           <div className="text-left">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -164,7 +165,7 @@ export const MessageFiltersComponent: React.FC<MessageFiltersProps> = ({
                   placeholder="Buscar en asunto o contenido..."
                   className="w-full pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white text-sm"
                 />
-                <span className="absolute left-3 top-2.5 text-gray-400 text-sm">🔍</span>
+                <Search size={15} strokeWidth={1.5} className="absolute left-3 top-2.5 text-gray-400" />
                 {searchTerm && (
                   <button
                     type="button"
@@ -205,7 +206,7 @@ export const MessageFiltersComponent: React.FC<MessageFiltersProps> = ({
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
-                  🔔 No leídos
+                  <Bell size={11} strokeWidth={1.5} className="inline mr-1" />No leídos
                 </button>
                 <button
                   type="button"
@@ -216,7 +217,7 @@ export const MessageFiltersComponent: React.FC<MessageFiltersProps> = ({
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
-                  ✅ Leídos
+                  <CheckCheck size={11} strokeWidth={1.5} className="inline mr-1" />Leídos
                 </button>
               </div>
             </div>
@@ -237,7 +238,7 @@ export const MessageFiltersComponent: React.FC<MessageFiltersProps> = ({
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                🌐 Todos
+                Todos
               </button>
               {Object.entries(MESSAGE_TYPE_LABELS).map(([key, label]) => (
                 <button
@@ -268,7 +269,7 @@ export const MessageFiltersComponent: React.FC<MessageFiltersProps> = ({
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                 />
                 <span className="text-xs text-gray-600 dark:text-gray-400">
-                  🔒 Incluir notas internas
+                  <Lock size={12} strokeWidth={1.5} className="inline mr-1" />Incluir notas internas
                 </span>
               </label>
             )}

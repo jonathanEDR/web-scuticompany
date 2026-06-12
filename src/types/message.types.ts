@@ -10,12 +10,10 @@
 /**
  * Tipos de mensajes disponibles en el sistema
  */
-export type MessageType = 
+export type MessageType =
   | 'nota_interna'      // Nota privada del equipo
   | 'mensaje_cliente'   // Mensaje enviado al cliente
   | 'respuesta_cliente' // Respuesta del cliente
-  | 'email'             // Email enviado
-  | 'sms'               // SMS enviado
   | 'notificacion';     // Notificación del sistema
 
 /**
@@ -95,6 +93,12 @@ export interface LeadMessage {
     nombre?: string;
     correo?: string;
     estado?: string;
+    usuarioRegistrado?: {
+      userId: string;
+      nombre?: string;
+      email?: string;
+      profileImage?: string | null;
+    };
   };
   
   // Autor y destinatario
@@ -120,10 +124,7 @@ export interface LeadMessage {
   // Threading (respuestas)
   respondidoA?: string | LeadMessage;
   respuestas?: string[];
-  
-  // Adjuntos
-  adjuntos?: MessageAttachment[];
-  
+
   // Metadata
   etiquetas?: string[];
   metadata?: {
@@ -143,22 +144,48 @@ export interface LeadMessage {
   updatedAt: string;
 }
 
+// ========================================
+// 🗂️ INTERFACE: CONVERSACIÓN
+// ========================================
+
 /**
- * Interface para adjuntos
+ * Conversación agregada por Lead (último mensaje + contadores)
+ * Respuesta de GET /api/crm/messages/conversations
  */
-export interface MessageAttachment {
-  cloudinaryId: string;
-  publicId: string;
-  url: string;
-  secureUrl: string;
-  format: string;
-  resourceType: 'image' | 'video' | 'raw' | 'auto';
-  bytes: number;
-  width?: number;
-  height?: number;
-  originalFilename?: string;
-  subidoPor: MessageAuthor;
-  createdAt: string;
+export interface Conversation {
+  leadId: string;
+  lead: {
+    _id: string;
+    nombre?: string;
+    correo?: string;
+    estado?: string;
+    tipoServicio?: string;
+    usuarioRegistrado?: {
+      userId: string;
+      nombre?: string;
+      email?: string;
+      profileImage?: string | null;
+    };
+  } | null;
+  totalMensajes: number;
+  noLeidos: number;
+  ultimoMensaje: LeadMessage;
+}
+
+/**
+ * Respuesta del endpoint de conversaciones
+ */
+export interface ConversationListResponse {
+  success: boolean;
+  data: {
+    conversaciones: Conversation[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+    };
+  };
 }
 
 // ========================================

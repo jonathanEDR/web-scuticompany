@@ -5,6 +5,11 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  Mail, Phone, Building2, Target, CheckCircle2, AlertTriangle,
+  Loader2, MessageCircle, FileText, CornerUpLeft, X, Send,
+  Bell, Lock
+} from 'lucide-react';
 import { messageService, formatRelativeTime } from '../../../services/messageService';
 import type { LeadMessage } from '../../../types/message.types';
 import { useUser } from '@clerk/clerk-react';
@@ -247,15 +252,16 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
   // 🎨 HELPERS DE RENDER
   // ========================================
 
-  const getMessageTypeIcon = (tipo: string) => {
+  const getMessageTypeIcon = (tipo: string): React.ReactNode => {
+    const s = { size: 12, strokeWidth: 1.5 };
     switch (tipo) {
-      case 'nota_interna': return '📝';
-      case 'mensaje_cliente': return '✉️';
-      case 'respuesta_cliente': return '💬';
-      case 'email': return '📧';
-      case 'sms': return '📱';
-      case 'notificacion': return '🔔';
-      default: return '💬';
+      case 'nota_interna': return <FileText {...s} />;
+      case 'mensaje_cliente': return <Send {...s} />;
+      case 'respuesta_cliente': return <CornerUpLeft {...s} />;
+      case 'email': return <Mail {...s} />;
+      case 'sms': return <Phone {...s} />;
+      case 'notificacion': return <Bell {...s} />;
+      default: return <MessageCircle {...s} />;
     }
   };
 
@@ -314,16 +320,16 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
             </div>
             <div className="text-sm text-white/80 space-y-0.5">
               {lead.correo && (
-                <p className="truncate">📧 {lead.correo}</p>
+                <p className="truncate flex items-center gap-1"><Mail size={12} strokeWidth={1.5} />{lead.correo}</p>
               )}
               {lead.celular && (
-                <p>📱 {lead.celular}</p>
+                <p className="flex items-center gap-1"><Phone size={12} strokeWidth={1.5} />{lead.celular}</p>
               )}
               {lead.empresa && (
-                <p className="truncate">🏢 {lead.empresa}</p>
+                <p className="truncate flex items-center gap-1"><Building2 size={12} strokeWidth={1.5} />{lead.empresa}</p>
               )}
               {lead.tipoServicio && (
-                <p>🎯 {lead.tipoServicio}</p>
+                <p className="flex items-center gap-1"><Target size={12} strokeWidth={1.5} />{lead.tipoServicio}</p>
               )}
             </div>
           </div>
@@ -341,11 +347,11 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
         {/* Indicador de usuario vinculado */}
         {lead.usuarioRegistrado ? (
           <div className="mt-3 px-3 py-2 bg-white/20 rounded-lg text-sm">
-            <span className="font-medium">✅ Usuario vinculado:</span> {lead.usuarioRegistrado.nombre}
+            <span className="font-medium flex items-center gap-1"><CheckCircle2 size={13} strokeWidth={1.5} />Usuario vinculado:</span> {lead.usuarioRegistrado.nombre}
           </div>
         ) : (
           <div className="mt-3 px-3 py-2 bg-yellow-500/30 rounded-lg text-sm">
-            <span className="font-medium">⚠️ Sin usuario vinculado</span>
+            <span className="font-medium flex items-center gap-1"><AlertTriangle size={13} strokeWidth={1.5} />Sin usuario vinculado</span>
             <span className="text-white/80"> - Solo notas internas disponibles</span>
           </div>
         )}
@@ -358,14 +364,14 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="animate-spin text-4xl mb-2">⏳</div>
+              <Loader2 size={36} strokeWidth={1.5} className="animate-spin mb-2 text-gray-400" />
               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Cargando conversación...</p>
             </div>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <p className="text-4xl mb-2">💬</p>
+              <MessageCircle size={48} strokeWidth={1.5} className="mb-2 opacity-30" />
               <p className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Sin mensajes
               </p>
@@ -417,7 +423,7 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
                   {isInternal ? (
                     <div className={`max-w-[90%] rounded-lg p-3 shadow-sm ${bubbleStyle}`}>
                       <div className={`flex items-center gap-2 mb-2 pb-2 border-b ${isDarkMode ? 'border-amber-700' : 'border-amber-300'}`}>
-                        <span className="text-lg">📝</span>
+                        <FileText size={16} strokeWidth={1.5} />
                         <span className={`text-xs font-semibold uppercase tracking-wide ${isDarkMode ? 'text-amber-300' : 'text-amber-700'}`}>
                           Nota del Equipo
                         </span>
@@ -526,7 +532,7 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
                               className="hover:opacity-100 opacity-60 transition-opacity"
                               title="Responder"
                             >
-                              ↩️
+                              <CornerUpLeft size={13} strokeWidth={1.5} />
                             </button>
                           )}
                         </div>
@@ -544,7 +550,7 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
       {/* Error Message */}
       {error && (
         <div className="px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm border-t border-red-200 dark:border-red-800">
-          ⚠️ {error}
+          <AlertTriangle size={14} strokeWidth={1.5} className="inline mr-1" />{error}
           <button 
             onClick={() => setError(null)}
             className="ml-2 underline hover:no-underline"
@@ -559,8 +565,8 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
         <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-t border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                ↩️ Respondiendo a {replyingTo.autor.nombre}
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
+                <CornerUpLeft size={11} strokeWidth={1.5} />Respondiendo a {replyingTo.autor.nombre}
               </p>
               <p className={`text-sm truncate ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 {replyingTo.contenido.substring(0, 60)}...
@@ -570,7 +576,7 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
               onClick={() => setReplyingTo(null)}
               className={`p-1 rounded ${isDarkMode ? 'hover:bg-blue-800' : 'hover:bg-blue-200'}`}
             >
-              ✕
+              <X size={14} strokeWidth={1.5} />
             </button>
           </div>
         </div>
@@ -595,7 +601,7 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             } ${!lead.usuarioRegistrado ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            ✉️ Mensaje al Cliente
+            <Send size={14} strokeWidth={1.5} className="inline mr-1" />Mensaje al Cliente
           </button>
           <button
             onClick={() => setMessageType('internal')}
@@ -607,7 +613,7 @@ export const ConversationPanel: React.FC<ConversationPanelProps> = ({
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            📝 Nota Interna
+            <Lock size={14} strokeWidth={1.5} className="inline mr-1" />Nota Interna
           </button>
         </div>
 

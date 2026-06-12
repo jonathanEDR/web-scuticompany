@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { MessageCircle, RefreshCw, Bell, Volume2, Lock, Calendar, Target } from 'lucide-react';
 import { MessageCard } from './MessageCard';
 import type { LeadMessage, MessageFilters } from '../../../types/message.types';
 import { groupMessagesByDate } from '../../../services/messageService';
@@ -134,7 +135,7 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
   if (!loading && visibleMessages.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4">
-        <div className="text-6xl mb-4">💬</div>
+        <MessageCircle size={60} strokeWidth={1.5} className="mb-4 text-gray-300 dark:text-gray-600" />
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
           {emptyMessage}
         </h3>
@@ -148,7 +149,7 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
             onClick={handleRefresh}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            🔄 Actualizar
+            <RefreshCw size={14} strokeWidth={1.5} className="inline mr-1" />Actualizar
           </button>
         )}
       </div>
@@ -177,8 +178,8 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
           {/* No leídos */}
           {unreadCount > 0 && (
             <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
-              <span className="text-xs font-medium text-yellow-700 dark:text-yellow-300">
-                🔔 {unreadCount} sin leer
+              <span className="flex items-center gap-1 text-xs font-medium text-yellow-700 dark:text-yellow-300">
+                <Bell size={11} strokeWidth={1.5} />{unreadCount} sin leer
               </span>
             </div>
           )}
@@ -186,9 +187,9 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
           {/* Públicos/Privados */}
           {canViewPrivate && privateCount > 0 && (
             <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-              <span>📢 {publicCount} públicos</span>
+              <span className="flex items-center gap-1"><Volume2 size={11} strokeWidth={1.5} />{publicCount} públicos</span>
               <span>•</span>
-              <span>🔒 {privateCount} privados</span>
+              <span className="flex items-center gap-1"><Lock size={11} strokeWidth={1.5} />{privateCount} privados</span>
             </div>
           )}
         </div>
@@ -201,7 +202,7 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
             className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
             title="Actualizar mensajes"
           >
-            <span className={loading ? 'animate-spin inline-block' : ''}>🔄</span>
+            <RefreshCw size={18} strokeWidth={1.5} className={loading ? 'animate-spin' : ''} />
           </button>
         )}
       </div>
@@ -216,7 +217,7 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
         {loading && visibleMessages.length === 0 && (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="text-4xl mb-2 animate-bounce">💬</div>
+              <MessageCircle size={36} strokeWidth={1.5} className="mb-2 animate-bounce text-gray-400" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Cargando mensajes...
               </p>
@@ -231,8 +232,8 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
               <div className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                  📅 {date}
+                <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <Calendar size={11} strokeWidth={1.5} />{date}
                 </span>
               </div>
               <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
@@ -274,7 +275,7 @@ export const MessageTimeline: React.FC<MessageTimelineProps> = ({
         {!hasMore && visibleMessages.length > 0 && (
           <div className="flex items-center justify-center py-6">
             <div className="text-center">
-              <div className="text-2xl mb-2">🎯</div>
+              <Target size={20} strokeWidth={1.5} className="mb-2 text-gray-400" />
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Inicio de la conversación
               </p>

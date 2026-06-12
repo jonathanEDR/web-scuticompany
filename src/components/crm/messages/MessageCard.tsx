@@ -1,9 +1,9 @@
-/**
- * 💬 MESSAGE CARD - Tarjeta Individual de Mensaje
- * Componente para mostrar un mensaje del CRM con todas sus propiedades
- */
-
 import React, { useState } from 'react';
+import {
+  FileText, MessageCircle, CornerUpLeft, AlertTriangle, Clock,
+  Lock, User, ClipboardList, Check, CheckCheck,
+  Trash2, ChevronUp, ChevronDown
+} from 'lucide-react';
 import type { LeadMessage } from '../../../types/message.types';
 import {
   MESSAGE_TYPE_LABELS,
@@ -24,9 +24,6 @@ interface MessageCardProps {
   showLead?: boolean;
 }
 
-/**
- * 🎨 Componente MessageCard
- */
 export const MessageCard: React.FC<MessageCardProps> = ({
   message,
   onReply,
@@ -40,14 +37,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Si es privado y el usuario no puede verlo, no renderizar
-  if (message.esPrivado && !canViewPrivate) {
-    return null;
-  }
-
-  // ========================================
-  // 🎨 HELPERS DE ESTILO
-  // ========================================
+  if (message.esPrivado && !canViewPrivate) return null;
 
   const getTipoColor = () => {
     const color = MESSAGE_TYPE_COLORS[message.tipo] || 'gray';
@@ -61,63 +51,41 @@ export const MessageCard: React.FC<MessageCardProps> = ({
 
   const getPrioridadColor = () => {
     const color = MESSAGE_PRIORITY_COLORS[message.prioridad] || 'gray';
-    return {
-      badge: `bg-${color}-100 dark:bg-${color}-900 text-${color}-700 dark:text-${color}-300`,
-    };
+    return { badge: `bg-${color}-100 dark:bg-${color}-900 text-${color}-700 dark:text-${color}-300` };
   };
 
-  const getTipoIcon = () => {
+  const getTipoIcon = (): React.ReactNode => {
     switch (message.tipo) {
-      case 'nota_interna':
-        return '📝';
-      case 'mensaje_cliente':
-        return '💬';
-      case 'respuesta_cliente':
-        return '↩️';
-      default:
-        return '💬';
+      case 'nota_interna': return <FileText size={12} strokeWidth={1.5} />;
+      case 'mensaje_cliente': return <MessageCircle size={12} strokeWidth={1.5} />;
+      case 'respuesta_cliente': return <CornerUpLeft size={12} strokeWidth={1.5} />;
+      default: return <MessageCircle size={12} strokeWidth={1.5} />;
     }
   };
 
-  const getEstadoIcon = () => {
-    if (message.leido) {
-      return '✓✓';
-    }
-    if (message.estado === 'enviado') {
-      return '✓';
-    }
-    if (message.estado === 'fallido') {
-      return '⚠️';
-    }
-    return '🕒';
+  const getEstadoIcon = (): React.ReactNode => {
+    if (message.leido) return <CheckCheck size={14} strokeWidth={2} />;
+    if (message.estado === 'enviado') return <Check size={14} strokeWidth={2} />;
+    if (message.estado === 'fallido') return <AlertTriangle size={14} strokeWidth={1.5} />;
+    return <Clock size={14} strokeWidth={1.5} />;
   };
 
   const colors = getTipoColor();
   const prioridadColors = getPrioridadColor();
 
-  // ========================================
-  // 🔄 HANDLERS
-  // ========================================
-
   const handleMarkAsRead = () => {
-    if (!message.leido && onMarkAsRead) {
-      onMarkAsRead(message._id);
-    }
+    if (!message.leido && onMarkAsRead) onMarkAsRead(message._id);
   };
 
   const handleReply = () => {
-    if (onReply) {
-      onReply(message._id);
-    }
+    if (onReply) onReply(message._id);
   };
 
   const handleDelete = async () => {
     if (window.confirm('¿Estás seguro de eliminar este mensaje?')) {
       setIsDeleting(true);
       try {
-        if (onDelete) {
-          await onDelete(message._id);
-        }
+        if (onDelete) await onDelete(message._id);
       } catch (error) {
         console.error('Error eliminando mensaje:', error);
       } finally {
@@ -128,25 +96,14 @@ export const MessageCard: React.FC<MessageCardProps> = ({
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
-    // Auto-marcar como leído al expandir
-    if (!isExpanded && !message.leido) {
-      handleMarkAsRead();
-    }
+    if (!isExpanded && !message.leido) handleMarkAsRead();
   };
-
-  // ========================================
-  // 📏 CONTENIDO
-  // ========================================
 
   const shouldTruncate = message.contenido.length > 200;
   const displayContent =
     !isExpanded && shouldTruncate
       ? message.contenido.substring(0, 200) + '...'
       : message.contenido;
-
-  // ========================================
-  // 🎨 RENDER
-  // ========================================
 
   return (
     <div
@@ -160,14 +117,12 @@ export const MessageCard: React.FC<MessageCardProps> = ({
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
-        {/* Autor y Tipo */}
         <div className="flex items-start gap-3 flex-1 min-w-0">
           {/* Avatar */}
           <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
             {message.autor.nombre.charAt(0).toUpperCase()}
           </div>
 
-          {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h4 className="font-semibold text-gray-900 dark:text-white truncate">
@@ -175,37 +130,27 @@ export const MessageCard: React.FC<MessageCardProps> = ({
               </h4>
 
               {/* Badge Tipo */}
-              <span
-                className={`
-                  inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
-                  ${colors.badge}
-                `}
-              >
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${colors.badge}`}>
                 {getTipoIcon()}
                 {MESSAGE_TYPE_LABELS[message.tipo]}
               </span>
 
               {/* Badge Privado */}
               {message.esPrivado && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300">
-                  🔒 Privado
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300">
+                  <Lock size={10} strokeWidth={1.5} />
+                  Privado
                 </span>
               )}
 
-              {/* Badge Prioridad (si no es normal) */}
+              {/* Badge Prioridad */}
               {message.prioridad !== 'normal' && (
-                <span
-                  className={`
-                    inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                    ${prioridadColors.badge}
-                  `}
-                >
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${prioridadColors.badge}`}>
                   {message.prioridad.toUpperCase()}
                 </span>
               )}
             </div>
 
-            {/* Email y Rol */}
             <div className="flex items-center gap-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
               <span>{message.autor.email}</span>
               <span>•</span>
@@ -217,28 +162,27 @@ export const MessageCard: React.FC<MessageCardProps> = ({
         {/* Timestamp y Estado */}
         <div className="flex-shrink-0 flex flex-col items-end gap-1">
           <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-            <span>🕒</span>
+            <Clock size={11} strokeWidth={1.5} />
             {formatRelativeTime(message.createdAt)}
           </div>
-          <div className="flex items-center gap-1">
-            <span className={message.leido ? 'text-green-500' : 'text-gray-400'}>
-              {getEstadoIcon()}
-            </span>
+          <div className={message.leido ? 'text-green-500' : 'text-gray-400'}>
+            {getEstadoIcon()}
           </div>
         </div>
       </div>
 
-      {/* Asunto (si existe) */}
+      {/* Asunto */}
       {message.asunto && (
-        <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          📋 {message.asunto}
+        <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+          <ClipboardList size={13} strokeWidth={1.5} />
+          {message.asunto}
         </div>
       )}
 
-      {/* Destinatario (si existe) */}
+      {/* Destinatario */}
       {message.destinatario && message.destinatario.nombre && (
         <div className="mb-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <span>👤</span>
+          <User size={14} strokeWidth={1.5} />
           <span>Para: {message.destinatario.nombre}</span>
         </div>
       )}
@@ -249,57 +193,26 @@ export const MessageCard: React.FC<MessageCardProps> = ({
           {displayContent}
         </p>
 
-        {/* Botón Expandir/Contraer */}
         {shouldTruncate && (
           <button
             onClick={toggleExpand}
             className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
           >
             {isExpanded ? (
-              <>
-                <span>▲</span>
-                Ver menos
-              </>
+              <><ChevronUp size={14} strokeWidth={1.5} />Ver menos</>
             ) : (
-              <>
-                <span>▼</span>
-                Ver más
-              </>
+              <><ChevronDown size={14} strokeWidth={1.5} />Ver más</>
             )}
           </button>
         )}
       </div>
 
-      {/* Responde a (si es una respuesta) */}
+      {/* Responde a */}
       {message.respondidoA && typeof message.respondidoA === 'object' && (
         <div className="mb-3 p-2 bg-gray-100 dark:bg-gray-800 rounded border-l-4 border-blue-500">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-            En respuesta a:
-          </div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">En respuesta a:</div>
           <div className="text-sm text-gray-700 dark:text-gray-300 truncate">
             {message.respondidoA.contenido}
-          </div>
-        </div>
-      )}
-
-      {/* Adjuntos (si existen) */}
-      {message.adjuntos && message.adjuntos.length > 0 && (
-        <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-            📎 {message.adjuntos.length} adjunto(s)
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {message.adjuntos.map((adjunto) => (
-              <a
-                key={adjunto.cloudinaryId}
-                href={adjunto.secureUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                {adjunto.originalFilename || 'Ver archivo'}
-              </a>
-            ))}
           </div>
         </div>
       )}
@@ -321,37 +234,34 @@ export const MessageCard: React.FC<MessageCardProps> = ({
       {/* Acciones */}
       <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          {/* Botón Responder */}
           {canReply && !message.esPrivado && (
             <button
               onClick={handleReply}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-3 py-1.5 rounded flex items-center gap-1 transition-colors"
+              className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-3 py-1.5 rounded transition-colors"
             >
-              <span>↩️</span>
+              <CornerUpLeft size={14} strokeWidth={1.5} />
               Responder
             </button>
           )}
 
-          {/* Botón Marcar como Leído */}
           {!message.leido && onMarkAsRead && (
             <button
               onClick={handleMarkAsRead}
-              className="text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 px-3 py-1.5 rounded flex items-center gap-1 transition-colors"
+              className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 px-3 py-1.5 rounded transition-colors"
             >
-              <span>✓</span>
+              <Check size={14} strokeWidth={2} />
               Marcar leído
             </button>
           )}
         </div>
 
-        {/* Botón Eliminar */}
         {canDelete && (
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded flex items-center gap-1 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded transition-colors disabled:opacity-50"
           >
-            <span>🗑️</span>
+            <Trash2 size={14} strokeWidth={1.5} />
             {isDeleting ? 'Eliminando...' : 'Eliminar'}
           </button>
         )}

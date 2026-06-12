@@ -43,8 +43,9 @@ export interface DirectUser {
   fullName: string;
   username?: string;
   profileImage?: string;
+  role: string;
   messageCount: number;
-  hasVirtualLead: boolean;
+  hasRealLeads: boolean;
   createdAt: string;
   lastLogin?: string;
 }

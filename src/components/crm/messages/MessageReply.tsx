@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { CornerUpLeft, X, MessageCircle, AlertTriangle, Lock, Volume2, Loader2, Keyboard } from 'lucide-react';
 import type { LeadMessage } from '../../../types/message.types';
 import { MESSAGE_CONSTANTS } from '../../../types/message.types';
 import { validateMessageContent, formatRelativeTime } from '../../../services/messageService';
@@ -126,7 +127,7 @@ export const MessageReply: React.FC<MessageReplyProps> = ({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <span>↩️</span>
+            <CornerUpLeft size={14} strokeWidth={1.5} />
             Responder a {originalMessage.autor.nombre}
           </h4>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -141,14 +142,14 @@ export const MessageReply: React.FC<MessageReplyProps> = ({
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           title="Cancelar"
         >
-          <span className="text-xl">✖</span>
+          <X size={18} strokeWidth={2} />
         </button>
       </div>
 
       {/* Quote del mensaje original */}
       <div className="p-3 bg-gray-50 dark:bg-gray-800/50 border-l-4 border-blue-500 rounded">
         <div className="text-xs text-gray-600 dark:text-gray-400 mb-1 flex items-center gap-1">
-          <span>💬</span>
+          <MessageCircle size={12} strokeWidth={1.5} />
           Mensaje original:
         </div>
         <p className="text-sm text-gray-700 dark:text-gray-300 italic">
@@ -160,7 +161,7 @@ export const MessageReply: React.FC<MessageReplyProps> = ({
       {error && (
         <div className="p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
           <p className="text-xs text-red-700 dark:text-red-300 flex items-center gap-1">
-            <span>⚠️</span>
+            <AlertTriangle size={12} strokeWidth={1.5} className="flex-shrink-0" />
             {error}
           </p>
         </div>
@@ -212,15 +213,18 @@ export const MessageReply: React.FC<MessageReplyProps> = ({
                   disabled={isSubmitting}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-xs text-gray-700 dark:text-gray-300">
-                  {esPrivado ? '🔒 Respuesta privada' : '📢 Respuesta pública'}
+                <span className="text-xs text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                  {esPrivado
+                    ? <><Lock size={12} strokeWidth={1.5} />Respuesta privada</>
+                    : <><Volume2 size={12} strokeWidth={1.5} />Respuesta pública</>
+                  }
                 </span>
               </label>
             )}
 
             {/* Hint de shortcut */}
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              💡 Ctrl+Enter para enviar
+            <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+              <Keyboard size={11} strokeWidth={1.5} />Ctrl+Enter para enviar
             </span>
           </div>
 
@@ -242,12 +246,12 @@ export const MessageReply: React.FC<MessageReplyProps> = ({
             >
               {isSubmitting ? (
                 <>
-                  <span className="animate-spin">⏳</span>
+                  <Loader2 size={12} strokeWidth={2} className="animate-spin" />
                   Enviando...
                 </>
               ) : (
                 <>
-                  <span>↩️</span>
+                  <CornerUpLeft size={13} strokeWidth={1.5} />
                   Responder
                 </>
               )}

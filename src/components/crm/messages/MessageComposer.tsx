@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { FileText, MessageCircle, Lock, Volume2, AlertTriangle, ClipboardList, X, Wrench, Loader2, Send } from 'lucide-react';
 import type {
   MessageTemplate,
   MessagePriority,
@@ -212,8 +213,10 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
   const caracteresRestantes = MESSAGE_CONSTANTS.MAX_CONTENT_LENGTH - contenido.length;
   const porcentajeUsado = (contenido.length / MESSAGE_CONSTANTS.MAX_CONTENT_LENGTH) * 100;
 
-  const getTipoLabel = () => {
-    return messageType === 'internal' ? '📝 Nota Interna' : '💬 Mensaje a Cliente';
+  const getTipoLabel = (): React.ReactNode => {
+    return messageType === 'internal'
+      ? <span className="flex items-center gap-2"><FileText size={16} strokeWidth={1.5} />Nota Interna</span>
+      : <span className="flex items-center gap-2"><MessageCircle size={16} strokeWidth={1.5} />Mensaje a Cliente</span>;
   };
 
   const getTipoDescription = () => {
@@ -273,7 +276,10 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
               : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
           }`}
         >
-          {messageType === 'internal' ? '🔒 Privado' : '📢 Público'}
+          {messageType === 'internal'
+            ? <span className="flex items-center gap-1"><Lock size={12} strokeWidth={1.5} />Privado</span>
+            : <span className="flex items-center gap-1"><Volume2 size={12} strokeWidth={1.5} />Público</span>
+          }
         </span>
       </div>
 
@@ -281,7 +287,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
       {error && (
         <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2">
-            <span>⚠️</span>
+            <AlertTriangle size={14} strokeWidth={1.5} className="flex-shrink-0" />
             {error}
           </p>
         </div>
@@ -295,7 +301,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
             onClick={() => setShowTemplates(!showTemplates)}
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
           >
-            <span>📋</span>
+            <ClipboardList size={14} strokeWidth={1.5} />
             {showTemplates ? 'Ocultar plantillas' : 'Usar plantilla'}
           </button>
 
@@ -359,7 +365,10 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
             onClick={() => setShowVariables(!showVariables)}
             className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
           >
-            {showVariables ? '✖ Cerrar' : '🔧 Variables'}
+            {showVariables
+              ? <span className="flex items-center gap-1"><X size={12} strokeWidth={2} />Cerrar</span>
+              : <span className="flex items-center gap-1"><Wrench size={12} strokeWidth={1.5} />Variables</span>
+            }
           </button>
         </div>
 
@@ -473,7 +482,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
                     onClick={() => handleRemoveEtiqueta(etiqueta)}
                     className="hover:text-red-600"
                   >
-                    ✖
+                    <X size={10} strokeWidth={2} />
                   </button>
                 </span>
               ))}
@@ -531,12 +540,12 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           >
             {isSubmitting ? (
               <>
-                <span className="animate-spin">⏳</span>
+                <Loader2 size={14} strokeWidth={2} className="animate-spin" />
                 Enviando...
               </>
             ) : (
               <>
-                <span>📤</span>
+                <Send size={14} strokeWidth={1.5} />
                 Enviar Mensaje
               </>
             )}

@@ -9,32 +9,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ClientConversationPanel from '../../components/client/ClientConversationPanel';
 import type { LeadMessage } from '../../types/message.types';
 import type { Lead } from '../../services/crmService';
-import { messageService } from '../../services/messageService';
+import { messageService, extractLeadId, isMessageFromTeam } from '../../services/messageService';
 import { crmService } from '../../services/crmService';
 import { useFilterPrivateMessages } from '../../components/guards/PrivateMessageGuard';
 import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import { MessageCircle, Loader, Inbox, Search, Building2, ArrowLeft, Filter } from 'lucide-react';
-
-// 🔧 Helper para identificar si un mensaje es del equipo (no del cliente)
-const isMessageFromTeam = (message: LeadMessage): boolean => {
-  // Criterio 1: El tipo de mensaje NO es respuesta_cliente
-  const notClientResponse = message.tipo !== 'respuesta_cliente';
-  
-  // Criterio 2: El autor tiene rol de admin/moderador/sistema
-  const isTeamRole = ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'SYSTEM'].includes(message.autor?.rol || '');
-  
-  // Criterio 3: El autor se llama "Sistema" o "SCUTI" (mensajes automáticos)
-  const isSystemAuthor = message.autor?.nombre?.toLowerCase().includes('sistema') || 
-                         message.autor?.nombre?.toLowerCase().includes('scuti');
-  
-  // Es del equipo si cumple el criterio principal O tiene rol de equipo O es sistema
-  return notClientResponse || isTeamRole || isSystemAuthor;
-};
-
-// 🔧 Helper para extraer leadId de manera consistente
-const extractLeadId = (leadId: string | object): string => {
-  return typeof leadId === 'object' ? (leadId as any)._id : leadId;
-};
 
 export default function MyMessages() {
   const navigate = useNavigate();
@@ -83,34 +62,18 @@ export default function MyMessages() {
     setError(null);
 
     try {
-      // Cargar leads del cliente
-      const leadsResponse = await crmService.getClientLeads();
+      // Cargar leads (para el filtro) y conversaciones en paralelo
+      // El backend agrupa por lead y devuelve el último mensaje de cada conversación
+      const [leadsResponse, conversationsResponse] = await Promise.all([
+        crmService.getClientLeads(),
+        messageService.getConversations({ limit: 100 }),
+      ]);
+
       const clientLeads = leadsResponse.data?.leads || [];
       setLeads(clientLeads);
 
-      // Cargar mensajes de todos los leads
-      const allMessages: LeadMessage[] = [];
-      for (const lead of clientLeads) {
-        try {
-          const messagesResponse = await messageService.getLeadMessages(lead._id, {
-            limit: 100,
-            incluirPrivados: false,
-          });
-          const leadMessages = messagesResponse.data?.mensajes || [];
-          allMessages.push(...leadMessages);
-        } catch (err) {
-          console.warn(`No se pudieron cargar mensajes del lead ${lead._id}`);
-        }
-      }
-
-      // Ordenar por fecha (más reciente primero)
-      allMessages.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-
-      // Agrupar mensajes por Lead: mostrar solo el último mensaje de cada conversación
-      const mensajesAgrupados = agruparMensajesPorLead(allMessages);
-      setMessages(mensajesAgrupados);
+      const conversaciones = conversationsResponse.data?.conversaciones || [];
+      setMessages(conversaciones.map((c) => c.ultimoMensaje));
     } catch (err: any) {
       console.error('Error cargando datos:', err);
       setError(err.message || 'Error al cargar los mensajes');
@@ -119,24 +82,6 @@ export default function MyMessages() {
     }
   };
 
-  /**
-   * 🔄 Agrupar mensajes por Lead
-   * Muestra solo el mensaje más reciente de cada conversación (Lead)
-   */
-  const agruparMensajesPorLead = (mensajes: LeadMessage[]): LeadMessage[] => {
-    const mensajesPorLead = new Map<string, LeadMessage>();
-    
-    // Ya vienen ordenados por fecha más reciente primero
-    for (const mensaje of mensajes) {
-      const leadId = extractLeadId(mensaje.leadId);
-      
-      if (!mensajesPorLead.has(leadId)) {
-        mensajesPorLead.set(leadId, mensaje);
-      }
-    }
-    
-    return Array.from(mensajesPorLead.values());
-  };
   // ========================================
   // 🎯 FILTROS
   // ========================================
@@ -146,7 +91,7 @@ export default function MyMessages() {
 
     // Filtro por lead
     if (selectedLead !== 'all') {
-      result = result.filter((msg) => msg.leadId === selectedLead);
+      result = result.filter((msg) => extractLeadId(msg.leadId) === selectedLead);
     }
 
     // Filtro por búsqueda
