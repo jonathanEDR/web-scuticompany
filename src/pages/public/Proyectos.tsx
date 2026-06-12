@@ -17,13 +17,19 @@ import { useAuth } from '../../contexts/AuthContext';
 import { proyectosApi } from '../../services/proyectosApi';
 import { getPageBySlug } from '../../services/cmsApi';
 import type { Proyecto, ProyectoCategoria } from '../../types/proyecto';
-import { PROYECTO_CATEGORIAS, PROYECTO_ESTADOS } from '../../types/proyecto';
+import { PROYECTO_CATEGORIAS } from '../../types/proyecto';
 
 // Helper: extraer texto plano de HTML (para SEO / fallbacks)
 const stripHtml = (html: string): string => {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText || '';
+};
+
+// Helper: formatear precio con símbolo de moneda
+const formatPrecio = (valor: number, moneda: string = 'PEN'): string => {
+  const simbolo = moneda === 'PEN' ? 'S/' : moneda === 'USD' ? '$' : moneda === 'EUR' ? '€' : moneda;
+  return `${simbolo} ${valor.toLocaleString('es-PE')}`;
 };
 
 // ============================================
@@ -62,7 +68,6 @@ interface ProyectoCardProps {
 
 const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: ProyectoCardProps) => {
   const isDark = theme === 'dark';
-  const estadoInfo = PROYECTO_ESTADOS[proyecto.estado] || PROYECTO_ESTADOS.activo;
   const categoriaInfo = PROYECTO_CATEGORIAS[proyecto.categoria] || PROYECTO_CATEGORIAS.otro;
 
   // Shortcut para estilos CMS
@@ -124,20 +129,14 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
           <div className="flex gap-2">
             {proyecto.destacado && (
               <span className="px-2.5 py-1 bg-amber-400/95 backdrop-blur-md text-gray-900 rounded-lg text-xs font-bold shadow-lg">
-                ⭐ Destacado
+                ⭐ Más vendido
               </span>
             )}
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold backdrop-blur-md shadow-lg ${
-              proyecto.estado === 'activo'
-                ? 'bg-emerald-500/90 text-white'
-                : proyecto.estado === 'en_desarrollo'
-                  ? 'bg-blue-500/90 text-white'
-                  : proyecto.estado === 'completado'
-                    ? 'bg-purple-500/90 text-white'
-                    : 'bg-gray-500/90 text-white'
-            }`}>
-              {estadoInfo.icon} {estadoInfo.label}
-            </span>
+            {proyecto.rubro && (
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold backdrop-blur-md shadow-lg bg-emerald-500/90 text-white">
+                🎯 {proyecto.rubro}
+              </span>
+            )}
           </div>
           <span className="px-2.5 py-1 rounded-lg text-xs font-medium backdrop-blur-md shadow-lg bg-black/40 text-white border border-white/10">
             {categoriaInfo.icon} {categoriaInfo.label}
@@ -150,9 +149,9 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
             <h3 className="text-xl font-bold text-white mb-0.5 line-clamp-1 drop-shadow-lg">
               {proyecto.nombre}
             </h3>
-            {proyecto.industria && (
+            {(proyecto.rubro || proyecto.industria) && (
               <span className="text-xs text-white/70 font-medium">
-                {proyecto.industria}
+                {proyecto.rubro || proyecto.industria}
               </span>
             )}
           </div>
@@ -186,10 +185,13 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
           {proyecto.descripcionCorta}
         </p>
 
-        {/* Tecnologías - estilo profesional */}
-        {proyecto.tecnologias && proyecto.tecnologias.length > 0 && (
+        {/* Módulos del sistema (prioridad) o tecnologías (fallback) */}
+        {(proyecto.modulos?.length || proyecto.tecnologias?.length) ? (
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {proyecto.tecnologias.slice(0, 5).map((tech, idx) => (
+            {(proyecto.modulos?.length
+              ? proyecto.modulos.slice(0, 4).map(m => ({ icono: m.icono, nombre: m.nombre }))
+              : (proyecto.tecnologias || []).slice(0, 5).map(t => ({ icono: t.icono, nombre: t.nombre }))
+            ).map((item, idx) => (
               <span
                 key={idx}
                 className="text-xs px-2.5 py-1 rounded-lg font-medium transition-colors"
@@ -199,18 +201,18 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
                   border: `1px solid ${cd.tagBorder || (isDark ? 'rgba(147,51,234,0.2)' : '#f3e8ff')}`,
                 }}
               >
-                {tech.icono ? `${tech.icono} ` : ''}{tech.nombre}
+                {item.icono ? `${item.icono} ` : ''}{item.nombre}
               </span>
             ))}
-            {proyecto.tecnologias.length > 5 && (
+            {(proyecto.modulos?.length || 0) > 4 && (
               <span className={`text-xs px-2.5 py-1 rounded-lg font-medium ${
                 isDark ? 'text-gray-500 bg-white/5' : 'text-gray-400 bg-gray-50'
               }`}>
-                +{proyecto.tecnologias.length - 5} más
+                +{(proyecto.modulos?.length || 0) - 4} módulos más
               </span>
             )}
           </div>
-        )}
+        ) : null}
 
         {/* Métricas destacadas */}
         {metricasDestacadas.length > 0 && (
@@ -236,6 +238,23 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
           </div>
         )}
 
+        {/* Precio del sistema */}
+        <div className={`flex items-baseline justify-between mb-4 p-3 rounded-xl ${
+          isDark ? 'bg-white/5 border border-white/5' : 'bg-gray-50 border border-gray-100'
+        }`}>
+          <span className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+            {proyecto.precioDesde ? 'Desde' : 'Precio'}
+          </span>
+          <span
+            className="text-lg font-bold"
+            style={{ color: cd.metricsValueColor || (isDark ? '#c084fc' : '#9333ea') }}
+          >
+            {proyecto.precioDesde
+              ? formatPrecio(proyecto.precioDesde, proyecto.monedaPrecio)
+              : 'Consultar'}
+          </span>
+        </div>
+
         {/* Separador */}
         <div className={`border-t mb-4 ${
           isDark ? 'border-white/5' : 'border-gray-100'
@@ -244,7 +263,7 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
         {/* Actions */}
         <div className="flex gap-2">
           <Link
-            to={`/proyectos/${proyecto.slug}`}
+            to={`/sistemas/${proyecto.slug}`}
             className="flex-1 text-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group-hover:shadow-md"
             style={{
               background: cd.buttonBg || (isDark ? 'linear-gradient(to right, rgba(147,51,234,0.2), rgba(79,70,229,0.2))' : 'linear-gradient(to right, #faf5ff, #eef2ff)'),
@@ -252,7 +271,7 @@ const ProyectoCard = ({ proyecto, tieneAcceso, onAcceder, theme, cardDesign }: P
               border: `1px solid ${cd.buttonBorder || (isDark ? 'rgba(147,51,234,0.2)' : 'rgba(196,181,253,0.5)')}`,
             }}
           >
-            Ver Proyecto →
+            Ver sistema →
           </Link>
 
           {tieneAcceso && proyecto.tieneUrl && (
@@ -384,9 +403,9 @@ export default function Proyectos() {
   const cmsSolutions = cmsData?.content?.solutions;
 
   // Rich text HTML para renderizar con dangerouslySetInnerHTML
-  const heroTitleHtml = cmsHero?.title || '<p>Proyectos que <span style="background: linear-gradient(to right, #9333ea, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">transforman negocios</span></p>';
-  const heroBadgeHtml = cmsHero?.subtitle || 'Nuestro Portafolio';
-  const heroDescriptionHtml = cmsHero?.description || '<p>Soluciones tecnológicas a medida que impulsan el crecimiento de nuestros clientes</p>';
+  const heroTitleHtml = cmsHero?.title || '<p>Sistemas listos para <span style="background: linear-gradient(to right, #9333ea, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">tu negocio</span></p>';
+  const heroBadgeHtml = cmsHero?.subtitle || 'Catálogo de Sistemas';
+  const heroDescriptionHtml = cmsHero?.description || '<p>Software probado y funcionando: restaurantes, inventarios, ventas y más. Implementación rápida, sin desarrollar desde cero.</p>';
 
   // Texto plano para badge (strip HTML ya que es un span pequeño)
   const heroBadgeText = stripHtml(heroBadgeHtml);
@@ -401,8 +420,8 @@ export default function Proyectos() {
   const heroBgOpacity = typeof cmsHero?.backgroundOpacity === 'number' ? cmsHero.backgroundOpacity : 0.8;
 
   // CTA: estos campos son inputs de texto plano (no rich text)
-  const ctaTitle = cmsSolutions?.title || '¿Tienes un proyecto en mente?';
-  const ctaDescription = cmsSolutions?.description || 'Conversemos sobre cómo podemos ayudarte a hacerlo realidad';
+  const ctaTitle = cmsSolutions?.title || '¿No encuentras el sistema para tu negocio?';
+  const ctaDescription = cmsSolutions?.description || 'Lo desarrollamos a tu medida. Cuéntanos qué necesitas y te asesoramos sin costo';
   const ctaButtonText = cmsHero?.ctaText || 'Contáctanos';
   const ctaButtonLink = cmsHero?.ctaLink || '/contacto';
 
@@ -457,10 +476,10 @@ export default function Proyectos() {
   const filterRadius = fd?.borderRadius || '12';
 
   // SEO: strip HTML para meta tags
-  const cmsMetaTitle = cmsData?.seo?.metaTitle || stripHtml(heroTitleHtml) || 'Portafolio de Proyectos | Scuti Company';
-  const cmsMetaDescription = cmsData?.seo?.metaDescription || stripHtml(heroDescriptionHtml) || 'Conoce los proyectos y sistemas que hemos desarrollado. Soluciones tecnológicas a medida para empresas.';
+  const cmsMetaTitle = cmsData?.seo?.metaTitle || stripHtml(heroTitleHtml) || 'Sistemas para tu Negocio | Scuti Company';
+  const cmsMetaDescription = cmsData?.seo?.metaDescription || stripHtml(heroDescriptionHtml) || 'Catálogo de sistemas listos para implementar: gestión de restaurantes, control de inventario, ventas y más. Software probado para tu rubro.';
 
-  const proyectosUrl   = 'https://scuticompany.com/proyectos';
+  const proyectosUrl   = 'https://scuticompany.com/sistemas';
   const proyectosImage = 'https://scuticompany.com/logofondonegro.jpeg';
 
   return (
@@ -552,7 +571,7 @@ export default function Proyectos() {
                   {totalProyectos}+
                 </div>
                 <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                  Proyectos
+                  Sistemas
                 </div>
               </div>
               <div className="text-center">
@@ -631,7 +650,7 @@ export default function Proyectos() {
               <div className="flex justify-center py-20">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600 mx-auto mb-4" />
-                  <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Cargando proyectos...</p>
+                  <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Cargando sistemas...</p>
                 </div>
               </div>
             )}
@@ -657,7 +676,7 @@ export default function Proyectos() {
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📁</div>
                 <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  No hay proyectos en esta categoría
+                  No hay sistemas en esta categoría
                 </h3>
                 <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
                   Prueba seleccionando otra categoría o vuelve pronto

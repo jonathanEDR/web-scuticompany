@@ -125,6 +125,7 @@ const DEFAULT_MENU_ICONS: DashboardSidebarConfig['menuIcons'] = {
   agenda: { iconName: 'Calendar', iconColorLight: '#10b981', iconColorDark: '#34d399' },
   media: { iconName: 'Image', iconColorLight: '#f97316', iconColorDark: '#fb923c' },
   blog: { iconName: 'PenTool', iconColorLight: '#06b6d4', iconColorDark: '#22d3ee' },
+  proyectos: { iconName: 'Boxes', iconColorLight: '#8b5cf6', iconColorDark: '#a78bfa' },
   agentesIA: { iconName: 'Bot', iconColorLight: '#8b5cf6', iconColorDark: '#a78bfa' },
   scutiAI: { iconName: 'Sparkles', iconColorLight: '#ec4899', iconColorDark: '#f472b6' },
   configuracion: { iconName: 'Settings', iconColorLight: '#6b7280', iconColorDark: '#9ca3af' },

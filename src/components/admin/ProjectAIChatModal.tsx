@@ -8,6 +8,8 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Sparkles, X, Bot, Send } from 'lucide-react';
+import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import projectSessionApi from '../../services/projectSessionApi';
 import type {
   ProjectSessionMessage,
@@ -28,6 +30,9 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
   onClose,
   onProjectCreated,
 }) => {
+  // Gradiente del sistema (misma config del Sidebar)
+  const { headerGradient } = useDashboardHeaderGradient();
+
   // State
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ProjectSessionMessage[]>([]);
@@ -164,7 +169,7 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
         setCreatedProject(finalSession.createdProject);
         setMessages(prev => [...prev, {
           role: 'agent',
-          message: `✅ ¡Proyecto **"${finalSession.createdProject?.nombre || 'Nuevo proyecto'}"** creado exitosamente!\n\nPuedes verlo en tu panel de proyectos o editarlo con el formulario completo.`,
+          message: `✅ ¡Sistema **"${finalSession.createdProject?.nombre || 'Nuevo sistema'}"** creado exitosamente!\n\nYa está publicado en tu catálogo de sistemas. Puedes editarlo con el formulario completo si quieres ajustar algo.`,
           timestamp: new Date().toISOString(),
         }]);
         
@@ -177,10 +182,10 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
         }
       } else if (finalSession.generation?.status === 'completed' && finalSession.generation?.projectData) {
         setCreatedProject(finalSession.generation.projectData);
-        const projectName = (finalSession.generation.projectData as Record<string, unknown>)?.nombre || 'Nuevo proyecto';
+        const projectName = (finalSession.generation.projectData as Record<string, unknown>)?.nombre || 'Nuevo sistema';
         setMessages(prev => [...prev, {
           role: 'agent',
-          message: `✅ ¡Proyecto **"${projectName}"** creado exitosamente!\n\nPuedes verlo en tu panel de proyectos o editarlo con el formulario completo.`,
+          message: `✅ ¡Sistema **"${projectName}"** creado exitosamente!\n\nYa está publicado en tu catálogo de sistemas. Puedes editarlo con el formulario completo si quieres ajustar algo.`,
           timestamp: new Date().toISOString(),
         }]);
         
@@ -196,7 +201,7 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
         setError(finalSession.generation.error?.message || 'Error en la generación');
         setMessages(prev => [...prev, {
           role: 'agent',
-          message: '❌ Hubo un error al crear el proyecto. Puedes intentar de nuevo.',
+          message: '❌ Hubo un error al crear el sistema. Puedes intentar de nuevo.',
           timestamp: new Date().toISOString(),
         }]);
       }
@@ -239,6 +244,28 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
     }
   };
 
+  // 📋 Pegado explícito: inserta el texto del portapapeles manualmente en la
+  // posición del cursor. Garantiza que pegar funcione aunque algo externo
+  // (extensión del navegador, listener global) interfiera con el evento.
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const text = e.clipboardData.getData('text/plain');
+    if (!text) return;
+    e.preventDefault();
+
+    const target = e.currentTarget;
+    const start = target.selectionStart ?? inputValue.length;
+    const end = target.selectionEnd ?? inputValue.length;
+
+    setInputValue(prev => prev.slice(0, start) + text + prev.slice(end));
+
+    // Reposicionar cursor y reajustar altura tras el re-render
+    requestAnimationFrame(() => {
+      target.selectionStart = target.selectionEnd = start + text.length;
+      target.style.height = 'auto';
+      target.style.height = Math.min(target.scrollHeight, 96) + 'px';
+    });
+  };
+
   const handleActionClick = (action: ProjectSessionAction) => {
     if (action.id === 'confirm_generate') sendMessage('sí');
     else if (action.id === 'modify') sendMessage('modificar');
@@ -256,12 +283,13 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
 
   const stageLabels: Record<string, string> = {
     initialized: 'Inicio',
-    basic_info: 'Información básica',
-    description: 'Descripciones',
-    categorization: 'Categorización',
+    basic_info: 'Sistema y rubro',
+    problema_solucion: 'Problemas que resuelve',
+    modulos: 'Módulos y beneficios',
+    planes_precio: 'Planes de precio',
     technologies: 'Tecnologías',
-    results: 'Resultados',
-    seo_generation: 'SEO',
+    faqs: 'Preguntas frecuentes',
+    seo_generation: 'SEO comercial',
     review_and_confirm: 'Revisión',
     generating: 'Creando...',
     generation_completed: 'Completado',
@@ -289,9 +317,9 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
         >
           {isAgent && (
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-lg">🤖</span>
+              <Bot size={16} strokeWidth={1.5} className="text-purple-600 dark:text-purple-400" />
               <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">
-                Asistente de Proyectos
+                Asistente de Sistemas
               </span>
             </div>
           )}
@@ -326,12 +354,12 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
 
       {/* Modal */}
       <div className="relative w-full max-w-2xl h-[85vh] mx-4 bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-white/10">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+        {/* Header - gradiente del sistema (misma config del Sidebar) */}
+        <div className="flex items-center justify-between px-6 py-4 text-white" style={{ background: headerGradient }}>
           <div className="flex items-center gap-3">
-            <span className="text-2xl">✨</span>
+            <Sparkles size={24} strokeWidth={1.5} className="text-white/90" />
             <div>
-              <h2 className="font-bold text-lg">Crear Proyecto con IA</h2>
+              <h2 className="font-bold text-lg">Crear Sistema con IA</h2>
               <p className="text-white/70 text-xs">
                 {stageLabels[stage] || stage} • {progress}%
               </p>
@@ -342,15 +370,15 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
             title="Cerrar"
           >
-            ✕
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
         {/* Progress bar */}
         <div className="h-1 bg-gray-200 dark:bg-gray-800">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500 ease-out"
-            style={{ width: `${progress}%` }}
+            className="h-full transition-all duration-500 ease-out"
+            style={{ width: `${progress}%`, background: headerGradient }}
           />
         </div>
 
@@ -378,7 +406,7 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
                     <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {isGenerating ? 'Creando proyecto...' : 'Pensando...'}
+                    {isGenerating ? 'Creando sistema...' : 'Pensando...'}
                   </span>
                 </div>
               </div>
@@ -426,11 +454,12 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
                   onClick={() => handleActionClick(action)}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                     action.type === 'primary'
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700'
+                      ? 'text-white hover:opacity-90'
                       : action.type === 'danger'
                       ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/30'
                       : 'bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/15 hover:bg-gray-200 dark:hover:bg-white/15'
                   }`}
+                  style={action.type === 'primary' ? { background: headerGradient } : undefined}
                 >
                   {action.label}
                 </button>
@@ -445,7 +474,7 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
                 <span className="text-lg">✅</span>
-                <span className="text-sm font-medium">Proyecto creado exitosamente</span>
+                <span className="text-sm font-medium">Sistema creado exitosamente</span>
               </div>
               <button
                 onClick={resetAndClose}
@@ -466,6 +495,7 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
                 placeholder={
                   isLoading
                     ? 'Esperando respuesta...'
@@ -486,11 +516,11 @@ const ProjectAIChatModal: React.FC<ProjectAIChatModalProps> = ({
               <button
                 onClick={() => sendMessage()}
                 disabled={!inputValue.trim() || isLoading || isInitializing}
-                className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white disabled:opacity-40 hover:from-purple-700 hover:to-indigo-700 transition-all"
+                className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl text-white disabled:opacity-40 hover:opacity-90 transition-all"
+                style={{ background: headerGradient }}
+                title="Enviar"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
+                <Send size={16} strokeWidth={2} />
               </button>
             </div>
           </div>

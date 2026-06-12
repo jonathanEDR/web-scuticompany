@@ -26,6 +26,45 @@ export interface ProyectoSEO {
   keywords?: string[];
 }
 
+// ============================================
+// TIPOS COMERCIALES (Sistema en venta)
+// ============================================
+
+export interface ModuloSistema {
+  nombre: string;
+  descripcion?: string;
+  icono?: string;
+}
+
+export interface BeneficioSistema {
+  titulo: string;
+  descripcion?: string;
+  icono?: string;
+}
+
+export type PlanPeriodo = 'unico' | 'mensual' | 'anual';
+
+export interface PlanSistema {
+  nombre: string;
+  precio: number | null;
+  moneda?: string;
+  periodo: PlanPeriodo;
+  descripcion?: string;
+  caracteristicas: string[];
+  destacado?: boolean;
+}
+
+export interface FaqSistema {
+  pregunta: string;
+  respuesta: string;
+}
+
+export const PLAN_PERIODOS: Record<PlanPeriodo, string> = {
+  unico: 'Pago único',
+  mensual: '/mes',
+  anual: '/año'
+};
+
 export interface Proyecto {
   _id: string;
   nombre: string;
@@ -65,9 +104,20 @@ export interface Proyecto {
   fechaInicio?: string;
   fechaFin?: string;
   
+  // Comercial (sistema en venta)
+  rubro?: string;
+  problemasQueResuelve?: string[];
+  beneficios?: BeneficioSistema[];
+  modulos?: ModuloSistema[];
+  planes?: PlanSistema[];
+  precioDesde?: number | null;
+  monedaPrecio?: string;
+  urlVideo?: string;
+  faqs?: FaqSistema[];
+
   // Clientes
   assignedClients: ClienteAsignado[];
-  
+
   // Resultados
   resultados: {
     descripcion: string;
@@ -143,6 +193,15 @@ export interface CreateProyectoRequest {
   fechaFin?: string;
   clienteNombre?: string;
   assignedClients?: string[];
+  rubro?: string;
+  problemasQueResuelve?: string[];
+  beneficios?: BeneficioSistema[];
+  modulos?: ModuloSistema[];
+  planes?: PlanSistema[];
+  precioDesde?: number | null;
+  monedaPrecio?: string;
+  urlVideo?: string;
+  faqs?: FaqSistema[];
   resultados?: {
     descripcion: string;
     metricas: Metrica[];

@@ -1,5 +1,5 @@
 ﻿import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams } from 'react-router-dom';
 import { ClerkProvider, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -88,9 +88,15 @@ const BlogDashboard = lazy(() => import('./pages/admin/blog/BlogDashboard'));
 // Módulo de Agenda - Administrativo
 const AgendaManagement = lazy(() => import('./pages/admin/AgendaManagement'));
 
-// Módulo de Proyectos - Páginas Públicas
+// Módulo de Sistemas (catálogo comercial) - Páginas Públicas
 const Proyectos = lazy(() => import('./pages/public/Proyectos'));
 const ProyectoDetail = lazy(() => import('./pages/public/ProyectoDetail'));
+
+// Redirección /proyectos/:slug → /sistemas/:slug (ruta antigua)
+const ProyectoSlugRedirect = () => {
+  const { slug } = useParams();
+  return <Navigate to={`/sistemas/${slug}`} replace />;
+};
 
 // Módulo de Proyectos - Páginas Administrativas
 const ProyectosManagement = lazy(() => import('./pages/admin/ProyectosManagement'));
@@ -204,9 +210,12 @@ function AppContent() {
               <Route path="/contacto" element={<Contact />} />
               <Route path="/perfil/:username" element={<PublicProfilePage />} />
 
-              {/* � PORTAFOLIO DE PROYECTOS - Público */}
-              <Route path="/proyectos" element={<Proyectos />} />
-              <Route path="/proyectos/:slug" element={<ProyectoDetail />} />
+              {/* 🛒 CATÁLOGO DE SISTEMAS - Público */}
+              <Route path="/sistemas" element={<Proyectos />} />
+              <Route path="/sistemas/:slug" element={<ProyectoDetail />} />
+              {/* 🔄 Redirecciones desde la ruta antigua /proyectos (SEO: 301 en middleware) */}
+              <Route path="/proyectos" element={<Navigate to="/sistemas" replace />} />
+              <Route path="/proyectos/:slug" element={<ProyectoSlugRedirect />} />
 
               {/* �📜 PÁGINAS LEGALES */}
               <Route path="/privacidad" element={<PrivacyPolicy />} />

@@ -155,7 +155,7 @@ async function getAllProyectos() {
 // ─── Schema.org ──────────────────────────────────────────────────────────────
 
 function generateProjectSchema(proyecto) {
-  const projectUrl = `${CONFIG.siteUrl}/proyectos/${proyecto.slug}`;
+  const projectUrl = `${CONFIG.siteUrl}/sistemas/${proyecto.slug}`;
   const imageUrl = getImageUrl(proyecto.imagenPrincipal);
   const categoryLabel = getCategoryLabel(proyecto.categoria);
 
@@ -188,8 +188,8 @@ function generateBreadcrumbSchema(proyecto) {
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Inicio", "item": CONFIG.siteUrl },
-      { "@type": "ListItem", "position": 2, "name": "Proyectos", "item": `${CONFIG.siteUrl}/proyectos` },
-      { "@type": "ListItem", "position": 3, "name": proyecto.nombre, "item": `${CONFIG.siteUrl}/proyectos/${proyecto.slug}` }
+      { "@type": "ListItem", "position": 2, "name": "Sistemas", "item": `${CONFIG.siteUrl}/sistemas` },
+      { "@type": "ListItem", "position": 3, "name": proyecto.nombre, "item": `${CONFIG.siteUrl}/sistemas/${proyecto.slug}` }
     ]
   };
 }
@@ -219,7 +219,7 @@ function generateVisibleContent(proyecto) {
       <header>
         <nav aria-label="Breadcrumb" class="breadcrumb">
           <a href="/" data-discover="true">Inicio</a> &gt;
-          <a href="/proyectos" data-discover="true">Proyectos</a> &gt;
+          <a href="/sistemas" data-discover="true">Sistemas</a> &gt;
           <span>${escapeHtml(proyecto.nombre)}</span>
         </nav>
 
@@ -264,10 +264,10 @@ function generateVisibleContent(proyecto) {
 
       <div class="project-cta">
         <a href="/contacto" class="cta-button">💬 Solicitar Proyecto Similar</a>
-        <a href="/proyectos" class="cta-link">← Ver todos los proyectos</a>
+        <a href="/sistemas" class="cta-link">← Ver todos los sistemas</a>
       </div>
 
-      <meta itemprop="url" content="${CONFIG.siteUrl}/proyectos/${proyecto.slug}" />
+      <meta itemprop="url" content="${CONFIG.siteUrl}/sistemas/${proyecto.slug}" />
       <meta itemprop="applicationCategory" content="${escapeHtml(categoryLabel)}" />
     </article>
 
@@ -322,7 +322,7 @@ function generateVisibleContent(proyecto) {
 // ─── HTML page builder ───────────────────────────────────────────────────────
 
 function buildHtmlPage(indexHtml, proyecto) {
-  const projectUrl = `${CONFIG.siteUrl}/proyectos/${proyecto.slug}`;
+  const projectUrl = `${CONFIG.siteUrl}/sistemas/${proyecto.slug}`;
   const imageUrl = getImageUrl(proyecto.imagenPrincipal);
   const description = truncate(proyecto.descripcionCorta || stripHtml(proyecto.descripcionCompleta), 160);
   const title = `${proyecto.nombre} - SCUTI Company`;
@@ -404,13 +404,13 @@ async function main() {
   let failed = 0;
 
   // Generar página de listado /proyectos/index.html
-  const proyectosDir = path.join(distPath, 'proyectos');
+  const proyectosDir = path.join(distPath, 'sistemas');
   if (!fs.existsSync(proyectosDir)) {
     fs.mkdirSync(proyectosDir, { recursive: true });
   }
 
   const listadoHtml = (() => {
-    const url = `${CONFIG.siteUrl}/proyectos`;
+    const url = `${CONFIG.siteUrl}/sistemas`;
     const title = 'Portafolio de Proyectos - SCUTI Company';
     const description = 'Conoce nuestros proyectos tecnológicos: aplicaciones web, sistemas empresariales, e-commerce e inteligencia artificial desarrollados por SCUTI Company.';
     let html = indexHtml;
@@ -447,7 +447,7 @@ async function main() {
 
       console.log(`✅ /proyectos/${proyecto.slug}/index.html`);
       console.log(`   📄 ${proyecto.nombre}`);
-      console.log(`   🔗 ${CONFIG.siteUrl}/proyectos/${proyecto.slug}\n`);
+      console.log(`   🔗 ${CONFIG.siteUrl}/sistemas/${proyecto.slug}\n`);
       generated++;
     } catch (err) {
       console.error(`   ❌ Error generando /proyectos/${proyecto.slug}: ${err.message}`);

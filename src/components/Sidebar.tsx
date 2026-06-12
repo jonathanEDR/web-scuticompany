@@ -170,14 +170,14 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       // Solo roles administrativos - Módulo de blog
     },
     {
-      name: 'Proyectos',
+      name: 'Sistemas',
       icon: '🗂️',
       menuKey: 'proyectos',
       path: '/dashboard/proyectos',
-      description: 'Gestión de proyectos',
+      description: 'Catálogo de sistemas en venta',
       permission: Permission.MANAGE_CONTENT,
       adminOnly: true,
-      // Solo roles administrativos - Módulo de proyectos
+      // Solo roles administrativos - Módulo de sistemas (catálogo comercial)
     },
     {
       name: 'Agentes IA',

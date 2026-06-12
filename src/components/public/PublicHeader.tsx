@@ -242,7 +242,7 @@ const PublicHeaderOptimized = () => {
               <span className="relative z-10">Blog</span>
             </Link>
             <Link 
-              to="/proyectos" 
+              to="/sistemas"
               className="relative theme-text-secondary theme-transition px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 group overflow-hidden"
               onMouseEnter={(e) => {
                 (e.target as HTMLElement).style.color = theme === 'dark' ? '#A78BFA' : '#7C3AED';
@@ -252,9 +252,9 @@ const PublicHeaderOptimized = () => {
                 (e.target as HTMLElement).style.color = '';
                 (e.target as HTMLElement).style.backgroundColor = 'transparent';
               }}
-              aria-label="Proyectos"
+              aria-label="Sistemas"
             >
-              <span className="relative z-10">Proyectos</span>
+              <span className="relative z-10">Sistemas</span>
             </Link>
             <div className="relative group dropdown-container">
               <button 

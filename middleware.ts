@@ -168,7 +168,7 @@ function generateProyectoMetaTags(proyecto: any): string {
     (proyecto.descripcionCompleta ? proyecto.descripcionCompleta.replace(/<[^>]*>/g, '').substring(0, 160) : '') ||
     'Proyecto tecnológico desarrollado por SCUTI Company'
   );
-  const proyectoUrl = `${CONFIG.siteUrl}/proyectos/${proyecto.slug}`;
+  const proyectoUrl = `${CONFIG.siteUrl}/sistemas/${proyecto.slug}`;
   const imagen = proyecto.imagenPrincipal?.url ||
     proyecto.imagenPrincipal?.secure_url ||
     (typeof proyecto.imagenPrincipal === 'string' && proyecto.imagenPrincipal.startsWith('http') ? proyecto.imagenPrincipal : null) ||
@@ -232,7 +232,7 @@ function generateProyectoMetaTags(proyecto: any): string {
       "@type": "BreadcrumbList",
       "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "${CONFIG.siteUrl}"},
-        {"@type": "ListItem", "position": 2, "name": "Proyectos", "item": "${CONFIG.siteUrl}/proyectos"},
+        {"@type": "ListItem", "position": 2, "name": "Sistemas", "item": "${CONFIG.siteUrl}/sistemas"},
         {"@type": "ListItem", "position": 3, "name": "${nombre}", "item": "${proyectoUrl}"}
       ]
     }
@@ -1350,6 +1350,14 @@ export default async function middleware(request: Request) {
     return Response.redirect(normalized.toString(), 301);
   }
 
+  // 🔀 Migración /proyectos → /sistemas (301 permanente para usuarios y crawlers)
+  // El módulo se replanteó como catálogo comercial de sistemas en venta
+  if (pathname === '/proyectos' || pathname.startsWith('/proyectos/')) {
+    const redirected = new URL(request.url);
+    redirected.pathname = pathname.replace(/^\/proyectos/, '/sistemas');
+    return Response.redirect(redirected.toString(), 301);
+  }
+
   // Detectar tipo de página
   const isHomePage = /^\/?$/.test(pathname);
   const isServiciosPage = /^\/servicios\/?$/.test(pathname);
@@ -1358,10 +1366,10 @@ export default async function middleware(request: Request) {
   const isPrivacidadPage = /^\/privacidad\/?$/.test(pathname);
   const isTerminosPage = /^\/terminos\/?$/.test(pathname);
   const isBlogListPage = /^\/blog\/?$/.test(pathname);
-  const isProyectosListPage = /^\/proyectos\/?$/.test(pathname);
+  const isProyectosListPage = /^\/sistemas\/?$/.test(pathname);
   const blogPostMatch = pathname.match(/^\/blog\/([^\/]+)$/);
   const servicioDetailMatch = pathname.match(/^\/servicios\/([^\/]+)$/);
-  const proyectoDetailMatch = pathname.match(/^\/proyectos\/([^\/]+)$/);
+  const proyectoDetailMatch = pathname.match(/^\/sistemas\/([^\/]+)$/);
 
   // Si no es ninguna página que manejamos, continuar normal
   if (!isHomePage && !isServiciosPage && !isNosotrosPage && !isContactoPage && !isPrivacidadPage && !isTerminosPage && !isBlogListPage && !isProyectosListPage && !blogPostMatch && !servicioDetailMatch && !proyectoDetailMatch) {
@@ -1813,22 +1821,22 @@ export default async function middleware(request: Request) {
     if (!response.ok) return next();
     let html = await response.text();
 
-    const proyectosUrl = `${CONFIG.siteUrl}/proyectos`;
+    const proyectosUrl = `${CONFIG.siteUrl}/sistemas`;
     const metaTags = `
     ${generateFavicons()}
-    <title>Portafolio de Proyectos | SCUTI Company</title>
-    <meta name="description" content="Conoce nuestros proyectos tecnológicos: aplicaciones web, sistemas empresariales, e-commerce e inteligencia artificial desarrollados a medida en Perú." />
-    <meta name="keywords" content="portafolio, proyectos, desarrollo de software, sistemas web, SCUTI Company, Perú" />
+    <title>Sistemas para tu Negocio | SCUTI Company</title>
+    <meta name="description" content="Catálogo de sistemas listos para implementar: gestión de restaurantes, control de inventario, ventas y más. Software probado para tu rubro en Perú." />
+    <meta name="keywords" content="sistemas para negocios, sistema para restaurantes, control de inventario, software listo, sistema de ventas, SCUTI Company, Perú" />
     <link rel="canonical" href="${proyectosUrl}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${proyectosUrl}" />
-    <meta property="og:title" content="Portafolio de Proyectos | SCUTI Company" />
-    <meta property="og:description" content="Conoce nuestros proyectos tecnológicos desarrollados a medida en Perú." />
+    <meta property="og:title" content="Sistemas para tu Negocio | SCUTI Company" />
+    <meta property="og:description" content="Catálogo de sistemas listos para implementar en tu negocio: restaurantes, inventarios, ventas y más." />
     <meta property="og:image" content="${CONFIG.defaultImage}" />
     <meta property="og:site_name" content="SCUTI Company" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Portafolio de Proyectos | SCUTI Company" />
-    <meta name="twitter:description" content="Conoce nuestros proyectos tecnológicos desarrollados a medida en Perú." />
+    <meta name="twitter:title" content="Sistemas para tu Negocio | SCUTI Company" />
+    <meta name="twitter:description" content="Catálogo de sistemas listos para implementar en tu negocio: restaurantes, inventarios, ventas y más." />
     <meta name="twitter:image" content="${CONFIG.defaultImage}" />
     `;
 
@@ -1866,10 +1874,10 @@ export default async function middleware(request: Request) {
     if (proyectoResult.status === 'notfound') {
       console.log(`[Edge Middleware] Proyecto not found (404): ${proyectoSlug}`);
       return notFoundResponse(
-        'Proyecto no encontrado',
-        'El proyecto que buscas no existe o ya no está disponible.',
-        '/proyectos',
-        'Ver todos los proyectos'
+        'Sistema no encontrado',
+        'El sistema que buscas no existe o ya no está disponible.',
+        '/sistemas',
+        'Ver todos los sistemas'
       );
     }
 
@@ -1918,7 +1926,7 @@ export default async function middleware(request: Request) {
       <main itemscope itemtype="https://schema.org/SoftwareApplication" style="max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif">
         <nav aria-label="Breadcrumb" style="font-size:.875rem;color:#6b7280;margin-bottom:1rem">
           <a href="/" style="color:#7c3aed">Inicio</a> &gt;
-          <a href="/proyectos" style="color:#7c3aed">Proyectos</a> &gt;
+          <a href="/sistemas" style="color:#7c3aed">Sistemas</a> &gt;
           <span>${nombre}</span>
         </nav>
         <h1 itemprop="name" style="font-size:2rem;font-weight:700;color:#111827;margin-bottom:1rem">${nombre}</h1>
@@ -1926,7 +1934,7 @@ export default async function middleware(request: Request) {
         ${imagen ? `<img itemprop="image" src="${imagen}" alt="${nombre}" width="1200" height="630" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:1.5rem" />` : ''}
         ${techs ? `<h2 style="font-size:1.25rem;font-weight:600;color:#374151;margin-bottom:.75rem">Tecnologías utilizadas</h2><ul style="list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem">${techs}</ul>` : ''}
         ${metricas ? `<h2 style="font-size:1.25rem;font-weight:600;color:#374151;margin-bottom:.75rem">Resultados obtenidos</h2><ul style="list-style:none;padding:0">${metricas}</ul>` : ''}
-        <a href="/contacto" style="display:inline-block;background:#7c3aed;color:white;padding:.75rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;margin-top:1.5rem">Solicitar Proyecto Similar</a>
+        <a href="/contacto" style="display:inline-block;background:#7c3aed;color:white;padding:.75rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;margin-top:1.5rem">Quiero este sistema</a>
       </main>`;
 
     html = replaceRootContent(html, visibleContent);
@@ -1953,5 +1961,5 @@ export default async function middleware(request: Request) {
  * Se ejecuta para rutas de blog, servicios y proyectos
  */
 export const config = {
-  matcher: ['/', '/servicios', '/servicios/:path*', '/nosotros', '/contacto', '/privacidad', '/terminos', '/blog', '/blog/:path*', '/proyectos', '/proyectos/:path*']
+  matcher: ['/', '/servicios', '/servicios/:path*', '/nosotros', '/contacto', '/privacidad', '/terminos', '/blog', '/blog/:path*', '/proyectos', '/proyectos/:path*', '/sistemas', '/sistemas/:path*']
 };

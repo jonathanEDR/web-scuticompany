@@ -12,8 +12,8 @@ import SmartDashboardLayout from '../../components/SmartDashboardLayout';
 import ImageSelectorModal from '../../components/ImageSelectorModal';
 import { useDashboardHeaderGradient } from '../../hooks/cms/useDashboardHeaderGradient';
 import { proyectosApi } from '../../services/proyectosApi';
-import type { CreateProyectoRequest, Proyecto } from '../../types/proyecto';
-import { PROYECTO_CATEGORIAS, PROYECTO_ESTADOS } from '../../types/proyecto';
+import type { CreateProyectoRequest, Proyecto, PlanPeriodo } from '../../types/proyecto';
+import { PROYECTO_CATEGORIAS, PROYECTO_ESTADOS, PLAN_PERIODOS } from '../../types/proyecto';
 
 const ProyectoForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -50,6 +50,16 @@ const ProyectoForm: React.FC = () => {
     fechaInicio: '',
     fechaFin: '',
     orden: 0,
+    // Comercial (sistema en venta)
+    rubro: '',
+    problemasQueResuelve: [],
+    beneficios: [],
+    modulos: [],
+    planes: [],
+    precioDesde: null,
+    monedaPrecio: 'PEN',
+    urlVideo: '',
+    faqs: [],
     resultados: {
       metricas: [],
       descripcion: '',
@@ -65,6 +75,20 @@ const ProyectoForm: React.FC = () => {
   const [nuevaTech, setNuevaTech] = useState({ nombre: '', icono: '' });
   const [nuevaKeyword, setNuevaKeyword] = useState('');
   const [nuevaMetrica, setNuevaMetrica] = useState({ nombre: '', valor: '', descripcion: '' });
+
+  // Campos temporales comerciales
+  const [nuevoProblema, setNuevoProblema] = useState('');
+  const [nuevoModulo, setNuevoModulo] = useState({ nombre: '', descripcion: '', icono: '' });
+  const [nuevoBeneficio, setNuevoBeneficio] = useState({ titulo: '', descripcion: '', icono: '' });
+  const [nuevoPlan, setNuevoPlan] = useState({
+    nombre: '',
+    precio: '' as string,
+    periodo: 'mensual' as PlanPeriodo,
+    descripcion: '',
+    caracteristicas: '',
+    destacado: false
+  });
+  const [nuevaFaq, setNuevaFaq] = useState({ pregunta: '', respuesta: '' });
 
   // ========================================
   // CARGA EN MODO EDICIÓN
@@ -98,6 +122,15 @@ const ProyectoForm: React.FC = () => {
         fechaInicio: proyecto.fechaInicio ? proyecto.fechaInicio.split('T')[0] : '',
         fechaFin: proyecto.fechaFin ? proyecto.fechaFin.split('T')[0] : '',
         orden: proyecto.orden || 0,
+        rubro: proyecto.rubro || '',
+        problemasQueResuelve: proyecto.problemasQueResuelve || [],
+        beneficios: proyecto.beneficios || [],
+        modulos: proyecto.modulos || [],
+        planes: proyecto.planes || [],
+        precioDesde: proyecto.precioDesde ?? null,
+        monedaPrecio: proyecto.monedaPrecio || 'PEN',
+        urlVideo: proyecto.urlVideo || '',
+        faqs: proyecto.faqs || [],
         resultados: proyecto.resultados || { metricas: [], descripcion: '' },
         seo: proyecto.seo || { metaTitle: '', metaDescription: '', keywords: [] },
       });
@@ -172,6 +205,70 @@ const ProyectoForm: React.FC = () => {
         metricas: (prev.resultados?.metricas || []).filter((_, i) => i !== idx),
       },
     }));
+  };
+
+  // ========================================
+  // HANDLERS COMERCIALES (sistema en venta)
+  // ========================================
+
+  const agregarProblema = () => {
+    if (!nuevoProblema.trim()) return;
+    setForm((prev) => ({ ...prev, problemasQueResuelve: [...(prev.problemasQueResuelve || []), nuevoProblema.trim()] }));
+    setNuevoProblema('');
+  };
+
+  const eliminarProblema = (idx: number) => {
+    setForm((prev) => ({ ...prev, problemasQueResuelve: (prev.problemasQueResuelve || []).filter((_, i) => i !== idx) }));
+  };
+
+  const agregarModulo = () => {
+    if (!nuevoModulo.nombre.trim()) return;
+    setForm((prev) => ({ ...prev, modulos: [...(prev.modulos || []), { ...nuevoModulo, nombre: nuevoModulo.nombre.trim() }] }));
+    setNuevoModulo({ nombre: '', descripcion: '', icono: '' });
+  };
+
+  const eliminarModulo = (idx: number) => {
+    setForm((prev) => ({ ...prev, modulos: (prev.modulos || []).filter((_, i) => i !== idx) }));
+  };
+
+  const agregarBeneficio = () => {
+    if (!nuevoBeneficio.titulo.trim()) return;
+    setForm((prev) => ({ ...prev, beneficios: [...(prev.beneficios || []), { ...nuevoBeneficio, titulo: nuevoBeneficio.titulo.trim() }] }));
+    setNuevoBeneficio({ titulo: '', descripcion: '', icono: '' });
+  };
+
+  const eliminarBeneficio = (idx: number) => {
+    setForm((prev) => ({ ...prev, beneficios: (prev.beneficios || []).filter((_, i) => i !== idx) }));
+  };
+
+  const agregarPlan = () => {
+    if (!nuevoPlan.nombre.trim()) return;
+    const plan = {
+      nombre: nuevoPlan.nombre.trim(),
+      precio: nuevoPlan.precio.trim() === '' ? null : parseFloat(nuevoPlan.precio),
+      moneda: form.monedaPrecio || 'PEN',
+      periodo: nuevoPlan.periodo,
+      descripcion: nuevoPlan.descripcion.trim(),
+      // Una característica por línea
+      caracteristicas: nuevoPlan.caracteristicas.split('\n').map(c => c.trim()).filter(Boolean),
+      destacado: nuevoPlan.destacado
+    };
+    setForm((prev) => ({ ...prev, planes: [...(prev.planes || []), plan] }));
+    setNuevoPlan({ nombre: '', precio: '', periodo: 'mensual', descripcion: '', caracteristicas: '', destacado: false });
+  };
+
+  const eliminarPlan = (idx: number) => {
+    setForm((prev) => ({ ...prev, planes: (prev.planes || []).filter((_, i) => i !== idx) }));
+  };
+
+  const agregarFaq = () => {
+    if (!nuevaFaq.pregunta.trim() || !nuevaFaq.respuesta.trim()) return;
+    setForm((prev) => ({ ...prev, faqs: [...(prev.faqs || []), { pregunta: nuevaFaq.pregunta.trim(), respuesta: nuevaFaq.respuesta.trim() }] }));
+    setNuevaFaq({ pregunta: '', respuesta: '' });
+  };
+
+  const eliminarFaq = (idx: number) => {
+    setForm((prev) => ({ ...prev, faqs: (prev.faqs || []).filter((_, i) => i !== idx) }));
   };
 
   // ========================================
@@ -556,6 +653,282 @@ const ProyectoForm: React.FC = () => {
                 Aún no hay tecnologías. Completa el formulario arriba y haz clic en "Agregar".
               </p>
             </div>
+          )}
+        </div>
+
+        {/* ============================== */}
+        {/* INFORMACIÓN COMERCIAL */}
+        {/* ============================== */}
+        <div className={sectionClass}>
+          <h2 className={sectionTitleClass}>
+            🛒 Información Comercial
+            <span className="text-xs lg:text-sm font-normal text-gray-600 dark:text-gray-400">(Para vender el sistema)</span>
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <div>
+              <label className={labelClass}>Rubro objetivo</label>
+              <input type="text" value={form.rubro || ''} onChange={(e) => updateField('rubro', e.target.value)} className={inputClass} placeholder="Ej: Restaurantes, Retail, Farmacias" />
+              <p className={helperTextClass}>El tipo de negocio al que va dirigido el sistema</p>
+            </div>
+            <div>
+              <label className={labelClass}>Video demostrativo (YouTube)</label>
+              <input type="url" value={form.urlVideo || ''} onChange={(e) => updateField('urlVideo', e.target.value)} className={inputClass} placeholder="https://www.youtube.com/watch?v=..." />
+            </div>
+            <div>
+              <label className={labelClass}>Precio desde</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.precioDesde ?? ''}
+                onChange={(e) => updateField('precioDesde', e.target.value === '' ? null : parseFloat(e.target.value))}
+                className={inputClass}
+                placeholder="Vacío = 'Consultar precio'"
+              />
+              <p className={helperTextClass}>Se muestra como "Desde S/ X" en el catálogo</p>
+            </div>
+            <div>
+              <label className={labelClass}>Moneda</label>
+              <select value={form.monedaPrecio || 'PEN'} onChange={(e) => updateField('monedaPrecio', e.target.value)} className={inputClass}>
+                <option value="PEN">S/ Soles (PEN)</option>
+                <option value="USD">$ Dólares (USD)</option>
+                <option value="EUR">€ Euros (EUR)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Problemas que resuelve */}
+          <div className="mt-6 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+            <label className={labelClass}>Problemas que resuelve</label>
+            <p className={`${helperTextClass} mb-3`}>Se muestran como checklist en el hero. Ej: "Pierdes ventas por no controlar tu inventario"</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={nuevoProblema}
+                onChange={(e) => setNuevoProblema(e.target.value)}
+                className={`${inputClass} flex-1`}
+                placeholder="Describe un problema del negocio que el sistema soluciona"
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), agregarProblema())}
+              />
+              <button type="button" onClick={agregarProblema} className="px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-semibold transition-all">+</button>
+            </div>
+            {(form.problemasQueResuelve || []).length > 0 && (
+              <ul className="space-y-2 mt-3">
+                {(form.problemasQueResuelve || []).map((p, idx) => (
+                  <li key={idx} className="flex items-center justify-between p-2.5 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200/50 dark:border-gray-600/50 text-sm text-gray-700 dark:text-gray-300">
+                    <span>✅ {p}</span>
+                    <button type="button" onClick={() => eliminarProblema(idx)} className="text-gray-400 hover:text-red-500 transition px-2">×</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* ============================== */}
+        {/* MÓDULOS DEL SISTEMA */}
+        {/* ============================== */}
+        <div className={sectionClass}>
+          <h2 className={sectionTitleClass}>📦 Módulos del Sistema</h2>
+          <p className={`${helperTextClass} mb-4`}>Las funcionalidades que incluye el sistema (lo que el comprador recibe). Ej: "Control de inventario", "Reportes de ventas"</p>
+
+          <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
+            <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-3 mb-3">
+              <div>
+                <label className={labelClass}>Emoji</label>
+                <input type="text" value={nuevoModulo.icono} onChange={(e) => setNuevoModulo((p) => ({ ...p, icono: e.target.value }))} className={inputClass} placeholder="📦" />
+              </div>
+              <div>
+                <label className={labelClass}>Nombre del módulo *</label>
+                <input type="text" value={nuevoModulo.nombre} onChange={(e) => setNuevoModulo((p) => ({ ...p, nombre: e.target.value }))} className={inputClass} placeholder="Ej: Control de inventario" />
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className={labelClass}>Descripción breve <span className="text-gray-400 font-normal">(opcional)</span></label>
+              <input type="text" value={nuevoModulo.descripcion} onChange={(e) => setNuevoModulo((p) => ({ ...p, descripcion: e.target.value }))} className={inputClass} placeholder="Ej: Stock en tiempo real con alertas de productos por agotarse" />
+            </div>
+            <button type="button" onClick={agregarModulo} className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">
+              + Agregar módulo
+            </button>
+          </div>
+
+          {(form.modulos || []).length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {(form.modulos || []).map((mod, idx) => (
+                <div key={idx} className="flex items-start justify-between p-3 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200/50 dark:border-gray-600/50 group">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="text-lg flex-shrink-0">{mod.icono || '📦'}</span>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-gray-900 dark:text-white">{mod.nombre}</p>
+                      {mod.descripcion && <p className="text-xs text-gray-500 dark:text-gray-400">{mod.descripcion}</p>}
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => eliminarModulo(idx)} className="flex-shrink-0 ml-2 text-gray-400 hover:text-red-500 transition px-1">×</button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 dark:text-gray-500 italic">Aún no hay módulos agregados.</p>
+          )}
+        </div>
+
+        {/* ============================== */}
+        {/* BENEFICIOS */}
+        {/* ============================== */}
+        <div className={sectionClass}>
+          <h2 className={sectionTitleClass}>🎯 Beneficios para el Negocio</h2>
+          <p className={`${helperTextClass} mb-4`}>Orientados al comprador, no técnicos. Ej: "Atiende más mesas con el mismo personal"</p>
+
+          <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
+            <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-3 mb-3">
+              <div>
+                <label className={labelClass}>Emoji</label>
+                <input type="text" value={nuevoBeneficio.icono} onChange={(e) => setNuevoBeneficio((p) => ({ ...p, icono: e.target.value }))} className={inputClass} placeholder="🚀" />
+              </div>
+              <div>
+                <label className={labelClass}>Título del beneficio *</label>
+                <input type="text" value={nuevoBeneficio.titulo} onChange={(e) => setNuevoBeneficio((p) => ({ ...p, titulo: e.target.value }))} className={inputClass} placeholder="Ej: Ahorra horas de trabajo manual" />
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className={labelClass}>Descripción <span className="text-gray-400 font-normal">(opcional)</span></label>
+              <input type="text" value={nuevoBeneficio.descripcion} onChange={(e) => setNuevoBeneficio((p) => ({ ...p, descripcion: e.target.value }))} className={inputClass} placeholder="Explica brevemente cómo el sistema genera este beneficio" />
+            </div>
+            <button type="button" onClick={agregarBeneficio} className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">
+              + Agregar beneficio
+            </button>
+          </div>
+
+          {(form.beneficios || []).length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {(form.beneficios || []).map((b, idx) => (
+                <div key={idx} className="flex items-start justify-between p-3 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200/50 dark:border-gray-600/50 group">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="text-lg flex-shrink-0">{b.icono || '✅'}</span>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-gray-900 dark:text-white">{b.titulo}</p>
+                      {b.descripcion && <p className="text-xs text-gray-500 dark:text-gray-400">{b.descripcion}</p>}
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => eliminarBeneficio(idx)} className="flex-shrink-0 ml-2 text-gray-400 hover:text-red-500 transition px-1">×</button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 dark:text-gray-500 italic">Aún no hay beneficios agregados.</p>
+          )}
+        </div>
+
+        {/* ============================== */}
+        {/* PLANES DE PRECIO */}
+        {/* ============================== */}
+        <div className={sectionClass}>
+          <h2 className={sectionTitleClass}>💰 Planes de Precio</h2>
+          <p className={`${helperTextClass} mb-4`}>Si no agregas planes, la página mostrará "Consultar precio". Marca uno como "Recomendado" para destacarlo.</p>
+
+          <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+              <div>
+                <label className={labelClass}>Nombre del plan *</label>
+                <input type="text" value={nuevoPlan.nombre} onChange={(e) => setNuevoPlan((p) => ({ ...p, nombre: e.target.value }))} className={inputClass} placeholder="Ej: Básico, Pro, Premium" />
+              </div>
+              <div>
+                <label className={labelClass}>Precio</label>
+                <input type="number" min="0" step="0.01" value={nuevoPlan.precio} onChange={(e) => setNuevoPlan((p) => ({ ...p, precio: e.target.value }))} className={inputClass} placeholder="Vacío = Consultar" />
+              </div>
+              <div>
+                <label className={labelClass}>Periodo</label>
+                <select value={nuevoPlan.periodo} onChange={(e) => setNuevoPlan((p) => ({ ...p, periodo: e.target.value as PlanPeriodo }))} className={inputClass}>
+                  <option value="unico">Pago único</option>
+                  <option value="mensual">Mensual</option>
+                  <option value="anual">Anual</option>
+                </select>
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className={labelClass}>Descripción corta <span className="text-gray-400 font-normal">(opcional)</span></label>
+              <input type="text" value={nuevoPlan.descripcion} onChange={(e) => setNuevoPlan((p) => ({ ...p, descripcion: e.target.value }))} className={inputClass} placeholder="Ej: Para negocios que recién empiezan" />
+            </div>
+            <div className="mb-3">
+              <label className={labelClass}>Características (una por línea)</label>
+              <textarea
+                value={nuevoPlan.caracteristicas}
+                onChange={(e) => setNuevoPlan((p) => ({ ...p, caracteristicas: e.target.value }))}
+                className={`${inputClass} min-h-[100px]`}
+                placeholder={'Hasta 2 usuarios\nControl de inventario\nReportes básicos\nSoporte por WhatsApp'}
+                rows={4}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={nuevoPlan.destacado} onChange={(e) => setNuevoPlan((p) => ({ ...p, destacado: e.target.checked }))} className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-2 focus:ring-purple-500" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">⭐ Plan recomendado</span>
+              </label>
+              <button type="button" onClick={agregarPlan} className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">
+                + Agregar plan
+              </button>
+            </div>
+          </div>
+
+          {(form.planes || []).length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {(form.planes || []).map((plan, idx) => (
+                <div key={idx} className={`relative p-4 rounded-xl border-2 ${plan.destacado ? 'border-purple-500' : 'border-gray-200/50 dark:border-gray-600/50'} bg-white dark:bg-gray-700/30`}>
+                  {plan.destacado && <span className="absolute -top-2.5 left-3 px-2 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded-full">⭐ RECOMENDADO</span>}
+                  <div className="flex items-start justify-between mb-1">
+                    <p className="font-bold text-gray-900 dark:text-white">{plan.nombre}</p>
+                    <button type="button" onClick={() => eliminarPlan(idx)} className="text-gray-400 hover:text-red-500 transition px-1">×</button>
+                  </div>
+                  <p className="text-lg font-extrabold text-purple-600 dark:text-purple-400 mb-1">
+                    {plan.precio !== null && plan.precio !== undefined
+                      ? `${(form.monedaPrecio || 'PEN') === 'PEN' ? 'S/' : form.monedaPrecio === 'USD' ? '$' : '€'} ${plan.precio} ${PLAN_PERIODOS[plan.periodo] || ''}`
+                      : 'Consultar'}
+                  </p>
+                  {plan.descripcion && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{plan.descripcion}</p>}
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{plan.caracteristicas?.length || 0} características</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 dark:text-gray-500 italic">Aún no hay planes. La página mostrará "Consultar precio".</p>
+          )}
+        </div>
+
+        {/* ============================== */}
+        {/* PREGUNTAS FRECUENTES */}
+        {/* ============================== */}
+        <div className={sectionClass}>
+          <h2 className={sectionTitleClass}>❓ Preguntas Frecuentes</h2>
+          <p className={`${helperTextClass} mb-4`}>Responde las objeciones típicas de compra: implementación, soporte, capacitación, requisitos, etc.</p>
+
+          <div className="rounded-xl p-4 mb-4 border bg-gray-50 dark:bg-gray-700/20 border-gray-200 dark:border-gray-600/40">
+            <div className="mb-3">
+              <label className={labelClass}>Pregunta *</label>
+              <input type="text" value={nuevaFaq.pregunta} onChange={(e) => setNuevaFaq((p) => ({ ...p, pregunta: e.target.value }))} className={inputClass} placeholder="Ej: ¿Cuánto demora la implementación?" />
+            </div>
+            <div className="mb-3">
+              <label className={labelClass}>Respuesta *</label>
+              <textarea value={nuevaFaq.respuesta} onChange={(e) => setNuevaFaq((p) => ({ ...p, respuesta: e.target.value }))} className={`${inputClass} min-h-[80px]`} placeholder="Respuesta clara y directa" rows={3} />
+            </div>
+            <button type="button" onClick={agregarFaq} className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">
+              + Agregar pregunta
+            </button>
+          </div>
+
+          {(form.faqs || []).length > 0 ? (
+            <div className="space-y-2">
+              {(form.faqs || []).map((faq, idx) => (
+                <div key={idx} className="flex items-start justify-between p-3 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200/50 dark:border-gray-600/50">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-gray-900 dark:text-white">{faq.pregunta}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{faq.respuesta}</p>
+                  </div>
+                  <button type="button" onClick={() => eliminarFaq(idx)} className="flex-shrink-0 ml-3 text-gray-400 hover:text-red-500 transition px-1">×</button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 dark:text-gray-500 italic">Aún no hay preguntas frecuentes.</p>
           )}
         </div>
 
